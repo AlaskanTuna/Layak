@@ -1,5 +1,11 @@
 # PROGRESS (AGENT ONLY)
 
-## [date] - Placeholder Entry
+> Refer to `docs/plan.md` when recording completed tasks.
 
--
+---
+
+## [DD/MM/YY] - ...
+
+- ...
+
+---

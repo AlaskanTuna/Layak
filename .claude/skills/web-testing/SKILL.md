@@ -61,6 +61,7 @@ Confirm the output of `browser-use doctor` shows all checks passing. Proceed to 
 Guide the user through installation. Present the options below and ask which they prefer:
 
 **Option A — pip (virtual environment recommended):**
+
 ```bash
 python3 -m venv ~/.browser-use-env
 source ~/.browser-use-env/bin/activate
@@ -69,6 +70,7 @@ browser-use install   # installs Chromium + system deps
 ```
 
 **Option B — uv (faster):**
+
 ```bash
 uv venv ~/.browser-use-env
 source ~/.browser-use-env/bin/activate
@@ -77,17 +79,20 @@ browser-use install
 ```
 
 **Option C — pipx (isolated):**
+
 ```bash
 pipx install browser-use
 browser-use install
 ```
 
 After installation, verify:
+
 ```bash
 browser-use doctor
 ```
 
 If `cloudflared` is also needed (for tunnel features), guide installation based on architecture:
+
 ```bash
 # Check architecture
 uname -m
@@ -132,16 +137,16 @@ Create `docs/test.md` (create the `docs/` directory if it does not exist).
 
 ## 1. <Section Name> (<route>)
 
-| #   | Test           | What to check              | Observation |
-| --- | -------------- | -------------------------- | ----------- |
-| 1.1 | <test name>   | <what to verify>           |             |
-| 1.2 | <test name>   | <what to verify>           |             |
+| #   | Test        | What to check    | Observation |
+| --- | ----------- | ---------------- | ----------- |
+| 1.1 | <test name> | <what to verify> |             |
+| 1.2 | <test name> | <what to verify> |             |
 
 ## 2. <Next Section> (<route>)
 
-| #   | Test           | What to check              | Observation |
-| --- | -------------- | -------------------------- | ----------- |
-| 2.1 | <test name>   | <what to verify>           |             |
+| #   | Test        | What to check    | Observation |
+| --- | ----------- | ---------------- | ----------- |
+| 2.1 | <test name> | <what to verify> |             |
 ```
 
 ### Guidelines for Writing Tests
@@ -178,31 +183,31 @@ Do NOT start browser testing until the user approves the test plan.
 
 ### Core Command Reference
 
-| Action | Command |
-|--------|---------|
-| Navigate | `browser-use open <url>` |
-| Page state | `browser-use state` |
-| Screenshot | `browser-use screenshot <path>` |
-| Full-page screenshot | `browser-use screenshot <path> --full` |
-| Click element | `browser-use click <index>` |
-| Click coordinates | `browser-use click <x> <y>` |
-| Type into focused field | `browser-use type <text>` |
-| Type into specific input | `browser-use input <index> <text>` |
-| Select dropdown | `browser-use select <index> <value>` |
-| Press key | `browser-use keys <key>` |
-| Scroll | `browser-use scroll down` / `browser-use scroll up --amount 500` |
-| Run JavaScript | `browser-use eval <js>` |
-| Wait for element | `browser-use wait selector <css> --timeout 5000` |
-| Wait for text | `browser-use wait text <text> --timeout 5000` |
-| Get page title | `browser-use get title` |
-| Get element text | `browser-use get text <index>` |
-| Get input value | `browser-use get value <index>` |
-| Get HTML | `browser-use get html --selector <css>` |
-| Upload file | `browser-use upload <index> <path>` |
-| Hover | `browser-use hover <index>` |
-| Go back | `browser-use back` |
-| Manage cookies | `browser-use cookies get` / `set` / `clear` / `export` / `import` |
-| Close browser | `browser-use close` |
+| Action                   | Command                                                           |
+| ------------------------ | ----------------------------------------------------------------- |
+| Navigate                 | `browser-use open <url>`                                          |
+| Page state               | `browser-use state`                                               |
+| Screenshot               | `browser-use screenshot <path>`                                   |
+| Full-page screenshot     | `browser-use screenshot <path> --full`                            |
+| Click element            | `browser-use click <index>`                                       |
+| Click coordinates        | `browser-use click <x> <y>`                                       |
+| Type into focused field  | `browser-use type <text>`                                         |
+| Type into specific input | `browser-use input <index> <text>`                                |
+| Select dropdown          | `browser-use select <index> <value>`                              |
+| Press key                | `browser-use keys <key>`                                          |
+| Scroll                   | `browser-use scroll down` / `browser-use scroll up --amount 500`  |
+| Run JavaScript           | `browser-use eval <js>`                                           |
+| Wait for element         | `browser-use wait selector <css> --timeout 5000`                  |
+| Wait for text            | `browser-use wait text <text> --timeout 5000`                     |
+| Get page title           | `browser-use get title`                                           |
+| Get element text         | `browser-use get text <index>`                                    |
+| Get input value          | `browser-use get value <index>`                                   |
+| Get HTML                 | `browser-use get html --selector <css>`                           |
+| Upload file              | `browser-use upload <index> <path>`                               |
+| Hover                    | `browser-use hover <index>`                                       |
+| Go back                  | `browser-use back`                                                |
+| Manage cookies           | `browser-use cookies get` / `set` / `clear` / `export` / `import` |
+| Close browser            | `browser-use close`                                               |
 
 ### Execution Pattern Per Test
 
@@ -224,6 +229,7 @@ For each test in the plan, follow this pattern:
 ### Handling Common Scenarios
 
 **SSL certificate warnings:**
+
 ```bash
 browser-use state          # find "Advanced" button index
 browser-use click <index>  # click Advanced
@@ -232,6 +238,7 @@ browser-use click <index>  # click Proceed
 ```
 
 **Login via form:**
+
 ```bash
 browser-use state                          # find input indices
 browser-use input <email_idx> "user@example.com"
@@ -242,6 +249,7 @@ browser-use screenshot /tmp/post-login.png
 ```
 
 **Verifying data via JavaScript:**
+
 ```bash
 # Count table rows
 browser-use eval "document.querySelectorAll('tbody tr').length"
@@ -257,12 +265,14 @@ browser-use eval "performance.getEntriesByType('resource').filter(e => e.name.in
 ```
 
 **Handling popups and modals (SweetAlert2, Bootstrap modals, etc.):**
+
 ```bash
 browser-use state          # modal elements will appear in the state tree
 browser-use click <index>  # click confirm/cancel button in modal
 ```
 
 **Checking HTMX partial updates (no full page reload):**
+
 ```bash
 # Before action: note the element count or content
 browser-use eval "document.querySelectorAll('tbody tr').length"
@@ -282,14 +292,15 @@ Save screenshots to `/tmp/test-<section>-<id>.png` during testing. These are eph
 
 Update the Observation column in `docs/test.md` for every test in that section before moving to the next. Use concise result prefixes:
 
-| Prefix | Meaning |
-|--------|---------|
-| **Pass** | Test assertion fully met |
-| **Partial** | Some aspects work, some do not — explain what failed |
-| **Fail** | Test assertion not met — explain the failure |
+| Prefix         | Meaning                                                                     |
+| -------------- | --------------------------------------------------------------------------- |
+| **Pass**       | Test assertion fully met                                                    |
+| **Partial**    | Some aspects work, some do not — explain what failed                        |
+| **Fail**       | Test assertion not met — explain the failure                                |
 | **Not tested** | Could not be tested — explain why (e.g., insufficient data, CLI limitation) |
 
 Example observations:
+
 - `Pass — 4 metric cards visible: Users (5), Assets (12), Storage (1.2 GB), Reviews (3)`
 - `Partial — Chart renders but data is all zeros (no uploads exist yet)`
 - `Fail — POST returned HTTP 400; antiforgery token not included in request`
@@ -304,16 +315,17 @@ After all tests are executed, present a summary table:
 ```markdown
 ### Results
 
-| Section | Pass | Partial | Fail | Not Tested |
-|---------|------|---------|------|------------|
-| 1. ... | N | N | N | N |
-| 2. ... | N | N | N | N |
-| **Total** | **N** | **N** | **N** | **N** |
+| Section   | Pass  | Partial | Fail  | Not Tested |
+| --------- | ----- | ------- | ----- | ---------- |
+| 1. ...    | N     | N       | N     | N          |
+| 2. ...    | N     | N       | N     | N          |
+| **Total** | **N** | **N**   | **N** | **N**      |
 ```
 
 Then list key findings — failures, partial results, and anything the user should investigate manually.
 
 Close the browser session:
+
 ```bash
 browser-use close
 ```

@@ -17,36 +17,41 @@ cat <file> | gemini --prompt "<prompt>" --yolo --raw-output -m auto
 
 ## Command Reference
 
-| Flag | Purpose |
-|------|---------|
-| `--prompt "<prompt>"` | Non-interactive headless mode (required) |
-| `--yolo` | Auto-accept all actions, no confirmation prompts |
-| `--raw-output` | Unsanitized output, no ANSI stripping overhead |
-| `-m auto` | Let Gemini auto-select the best model from its lineup |
+| Flag                  | Purpose                                               |
+| --------------------- | ----------------------------------------------------- |
+| `--prompt "<prompt>"` | Non-interactive headless mode (required)              |
+| `--yolo`              | Auto-accept all actions, no confirmation prompts      |
+| `--raw-output`        | Unsanitized output, no ANSI stripping overhead        |
+| `-m auto`             | Let Gemini auto-select the best model from its lineup |
 
 ## Usage Patterns
 
 ### Single file scan
+
 ```bash
 cat document.pdf | gemini --prompt "Summarize the key points" --yolo --raw-output -m auto
 ```
 
 ### Multiple files combined
+
 ```bash
 cat file1.md file2.md file3.md | gemini --prompt "Compare these documents and list differences" --yolo --raw-output -m auto
 ```
 
 ### Structured extraction
+
 ```bash
 cat contract.pdf | gemini --prompt "Extract all dates, parties, and obligations as a markdown table" --yolo --raw-output -m auto
 ```
 
 ### Code/config understanding
+
 ```bash
 cat terraform/*.tf | gemini --prompt "Explain this infrastructure setup" --yolo --raw-output -m auto
 ```
 
 ### With grep pre-filtering
+
 ```bash
 grep -r "ERROR" logs/ | gemini --prompt "Categorize these errors and suggest root causes" --yolo --raw-output -m auto
 ```
@@ -67,10 +72,10 @@ grep -r "ERROR" logs/ | gemini --prompt "Categorize these errors and suggest roo
 
 ## Common Mistakes
 
-| Mistake | Fix |
-|---------|-----|
-| Running Gemini interactively | Always use `--prompt` for headless mode |
-| Missing `--yolo` | Gemini may block waiting for confirmation |
-| Missing `--raw-output` | Output may be sanitized/stripped unexpectedly |
+| Mistake                      | Fix                                                        |
+| ---------------------------- | ---------------------------------------------------------- |
+| Running Gemini interactively | Always use `--prompt` for headless mode                    |
+| Missing `--yolo`             | Gemini may block waiting for confirmation                  |
+| Missing `--raw-output`       | Output may be sanitized/stripped unexpectedly              |
 | Piping binary files directly | Use appropriate tools to convert first (e.g., `pdftotext`) |
-| No timeout on huge inputs | Prefix with `timeout 120` for safety |
+| No timeout on huge inputs    | Prefix with `timeout 120` for safety                       |

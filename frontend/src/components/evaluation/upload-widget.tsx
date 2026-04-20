@@ -38,7 +38,7 @@ const SLOT_SPECS: SlotSpec[] = [
     slot: 'utility',
     label: 'Utility bill',
     hint: 'Water, electricity, or broadband bill for address verification — within the last three months.',
-    required: false
+    required: true
   }
 ]
 
@@ -187,9 +187,9 @@ export function UploadWidget({ onSubmit, onUseSamples, disabled = false }: Props
     utility: null
   })
 
-  const requiredFilled = (['ic', 'payslip'] as const).every(s => state[s].file !== null && state[s].error === null)
-  const anyErrors = (['ic', 'payslip', 'utility'] as const).some(s => state[s].error !== null)
-  const canSubmit = requiredFilled && !anyErrors
+  const canSubmit = (['ic', 'payslip', 'utility'] as const).every(
+    s => state[s].file !== null && state[s].error === null
+  )
 
   function handleFileChange(slot: UploadSlot, file: File | null) {
     if (!file) {
@@ -208,13 +208,11 @@ export function UploadWidget({ onSubmit, onUseSamples, disabled = false }: Props
 
   function handleSubmit() {
     if (!canSubmit) return
-    const utility = state.utility.file
-    const files: UploadFiles = {
+    onSubmit({
       ic: state.ic.file!,
       payslip: state.payslip.file!,
-      utility: utility ?? state.ic.file!
-    }
-    onSubmit(files)
+      utility: state.utility.file!
+    })
   }
 
   return (

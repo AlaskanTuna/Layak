@@ -4,6 +4,20 @@
 
 ---
 
+## [21/04/26] - Demo-docs audit fixes: watermark opacity, README Chrome guide, provenance-drift disclosure
+
+Three parallel subagent audits (legal compliance, fixture-data fidelity, print-to-PDF fidelity) on commit `d6b1664` returned actionable findings. Fixed here.
+
+- **A4 watermark opacity** — bumped `rgba(196, 30, 58, 0.14)` → `rgba(196, 30, 58, 0.22)` on both `grab-earnings.html` and `tnb-bill.html`. The 0.14 alpha would have reduced to ~11% grey luminance on a B/W printer (invisible); 0.22 survives grayscale. Also shifted the `.wm.top` / `.wm.mid` rows from `22%`/`52%` to `28%`/`55%` so the rotated watermarks clip symmetrically rather than the top band being half-hidden by page overflow.
+- **README Chrome print guide** — dropped the A7 fallback line (A7 = 74 × 105 mm, not a "close substitute" for the 85.6 × 54 mm MyKad; misleading advice). Replaced with explicit Chrome print-dialog settings (uncheck `Headers and footers`, set `Margins: None`, leave `Background graphics: on`) and a copy-pasteable `google-chrome --headless --print-to-pdf` command as the deterministic fallback. Also noted that `file://` works if Next's dev server isn't running.
+- **Intentional provenance drift** — added a "Known synthetic-provenance drift (intentional, disclosed)" section to `frontend/public/demo/README.md` documenting two issues an observant viewer would spot:
+  1. MyKad shows `PEREMPUAN / FEMALE` but IC last digit `1` is odd (male-coded under real MyKad convention). The `4321` last-four is fixture-locked (`backend/app/fixtures/aisyah.py`); flipping would ripple through 20+ test + doc references. Disclosed rather than flipped.
+  2. MyKad DOB `24 MAR 1990` derived from IC prefix makes Aisyah 36 at the demo's "now" (21 Apr 2026), but the fixture + `docs/prd.md` / `docs/roadmap.md` / `docs/project-idea.md` all say age 34. The IC and the age each come from separately-locked sources; the drift is synthetic-only and never enters the rule engine (rules use dependant ages and income, not `profile.age`). Disclosed rather than reconciled.
+- **Not addressed** (audit flagged but cosmetic): minor A4 overflow headroom on `grab-earnings.html` and `tnb-bill.html` — each leaves 15–40 mm of page-2 safety margin, fine for current content; `address plausibility` (real-street + arbitrary house number pattern) — standard synthetic-persona practice and borderline under PDPA, documented in `docs/trd.md` §9.6 already.
+- **Verification:** `pnpm -C frontend build` still passes (static `public/` assets don't hit the compile graph); `pytest -q` in `backend/` passes all 39 tests.
+
+---
+
 ## [21/04/26] - Added three synthetic Aisyah demo documents (MyKad, Grab earnings, TNB bill) closing TRD §9.6
 
 Independent PO1 task from `docs/mockgen.md`. Three self-contained HTML files at `frontend/public/demo/` styled to look like the documents Aisyah uploads during the demo, plus a render guide.

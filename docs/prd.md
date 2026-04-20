@@ -42,8 +42,6 @@
    3. [Emergency de-scope plan](#63-emergency-de-scope-plan)
 7. [Disclaimers](#7-disclaimers)
 
-> **Team & delivery responsibilities moved.** See `docs/trd.md` §10 for the role split (PO1 Hao, PO2 Adam), the phase ownership matrix mapping every `docs/plan.md` task to a human owner, cross-cutting responsibilities, and swap / escalation rules.
-
 ---
 
 ## 1. Problem Statement

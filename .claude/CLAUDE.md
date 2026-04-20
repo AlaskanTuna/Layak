@@ -132,7 +132,7 @@ git push origin main
 - **Log progress.** After every meaningful milestone, append a dated one-paragraph entry to `docs/progress.md`. Tick completed items in `docs/plan.md`.
 - **No secrets in repo.** `.env.example` committed, `.env` gitignored. `GEMINI_API_KEY` lives in Secret Manager in production. No credentials in README, logs, or UI strings.
 - **Respect freeze points.** Past the Phase 1 feature freeze (21 Apr 18:00 MYT / sprint hour 20/24), no new endpoints, pages, or flows. Bug fixes only until code freeze (21 Apr 21:00 MYT).
-- **Plan B trigger.** If Vertex AI Search is not green by sprint hour 12, collapse to the inline-PDF grounding plan (`docs/trd.md` §8). P1 calls the trigger.
+- **Plan B trigger.** If Vertex AI Search is not green by sprint hour 12, collapse to the inline-PDF grounding plan (`docs/trd.md` §8). PO1 calls the trigger.
 
 ---
 

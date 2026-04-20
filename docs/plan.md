@@ -95,7 +95,7 @@
 
 ### 7. Feature: Commit scheme source PDFs
 
-**Purpose/Issue:** The Phase 1 rule engine (task 4) and Vertex AI Search seed script (task 3) both read from the six source PDFs catalogued in `docs/trd.md` §6.1. Downloading and committing them tonight removes a dependency for tomorrow's P1 backend work — no GCP, no backend scaffold needed. Some `gov.my` URLs bot-block automated fetches (see `docs/trd.md` §6 gotcha list); manual browser download is the documented fallback.
+**Purpose/Issue:** The Phase 1 rule engine (task 4) and Vertex AI Search seed script (task 3) both read from the six source PDFs catalogued in `docs/trd.md` §6.1. Downloading and committing them tonight removes a dependency for tomorrow's PO1 backend work — no GCP, no backend scaffold needed. Some `gov.my` URLs bot-block automated fetches (see `docs/trd.md` §6 gotcha list); manual browser download is the documented fallback.
 
 **Implementation:**
 

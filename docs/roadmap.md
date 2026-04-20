@@ -3,14 +3,14 @@
 > **Project:** Layak
 > **Hackathon:** Project 2030: MyAI Future Hackathon (GDG On Campus UTM)
 > **Category:** Open
-> **Team:** 2 members — P1 (Team Lead), P2 (Co-dev)
+> **Team:** 2 members — PO1 (Team Lead), PO2 (Co-dev)
 > **Registration deadline:** 20 Apr 2026 · 23:59 MYT
 > **Submission deadline:** 21 Apr 2026 · 23:59 MYT
 > **Effective build window (from idea lock):** ~26 hours
 
 This roadmap is the single source of truth for the sprint. Claude Code re-reads this file before every major task. Anything not on this roadmap does not get built.
 
-Owner convention: **P1** drives AI/backend, **P2** drives frontend/infra, **Both** = paired. Adjust as strengths dictate.
+Owner convention: **PO1** drives AI/backend, **PO2** drives frontend/infra, **Both** = paired. Adjust as strengths dictate.
 
 ---
 
@@ -21,16 +21,16 @@ Owner convention: **P1** drives AI/backend, **P2** drives frontend/infra, **Both
 
 | Time (MYT)    | Milestone                                                                                           | Owner | Deliverable                                                           |
 | ------------- | --------------------------------------------------------------------------------------------------- | ----- | --------------------------------------------------------------------- |
-| ASAP          | Team Lead submits Google Form registration                                                          | P1    | Submission confirmation visible in response sheet                     |
-| ASAP          | Kick off Track 4 + Track 2 deep research in parallel                                                | P1    | 2 claude.ai chats running                                             |
-| ASAP → 20:00  | P2 reads handbook + FAQs independently                                                              | P2    | Aligned understanding, any flags raised                               |
+| ASAP          | Team Lead submits Google Form registration                                                          | PO1   | Submission confirmation visible in response sheet                     |
+| ASAP          | Kick off Track 4 + Track 2 deep research in parallel                                                | PO1   | 2 claude.ai chats running                                             |
+| ASAP → 20:00  | PO2 reads handbook + FAQs independently                                                             | PO2   | Aligned understanding, any flags raised                               |
 | 20:00         | Both review research reports, debate top 3 ideas                                                    | Both  | **DECISION: idea + track locked**                                     |
-| 20:15         | Project name chosen; rename repo `myai-future-hackathon` → codename                                 | P1    | Renamed public repo                                                   |
-| 20:15 → 22:00 | Scaffold `docs/` via Claude Code kickoff prompt                                                     | P1    | `docs/prd.md`, `docs/trd.md`, `docs/progress.md`, `README.md` stubbed |
-| 20:15 → 22:00 | GCP project, billing linked, enable Vertex AI + Cloud Run + Artifact Registry + Secret Manager APIs | P2    | `gcloud` authed on both laptops                                       |
-| 22:00         | Gemini API key from AI Studio                                                                       | P2    | Key in local `.env` (NOT committed); `.env.example` committed         |
+| 20:15         | Project name chosen; rename repo `myai-future-hackathon` → codename                                 | PO1   | Renamed public repo                                                   |
+| 20:15 → 22:00 | Scaffold `docs/` via Claude Code kickoff prompt                                                     | PO1   | `docs/prd.md`, `docs/trd.md`, `docs/progress.md`, `README.md` stubbed |
+| 20:15 → 22:00 | GCP project, billing linked, enable Vertex AI + Cloud Run + Artifact Registry + Secret Manager APIs | PO2   | `gcloud` authed on both laptops                                       |
+| 22:00         | Gemini API key from AI Studio                                                                       | PO2   | Key in local `.env` (NOT committed); `.env.example` committed         |
 | 22:00 → 23:30 | Hello-world: FastAPI route → Gemini call → container → Cloud Run                                    | Both  | Public URL returns a Gemini response in browser                       |
-| 23:30         | Commit, push, tag `v0.0.1-helloworld`                                                               | P1    | Green build on `main`                                                 |
+| 23:30         | Commit, push, tag `v0.0.1-helloworld`                                                               | PO1   | Green build on `main`                                                 |
 | **00:30**     | **SLEEP — hard rule**                                                                               | Both  |                                                                       |
 
 **Phase 0 exit gate:**
@@ -52,16 +52,16 @@ Owner convention: **P1** drives AI/backend, **P2** drives frontend/infra, **Both
 | Time (MYT)    | Milestone                                                     | Owner | Deliverable                                           |
 | ------------- | ------------------------------------------------------------- | ----- | ----------------------------------------------------- |
 | 08:00 → 08:30 | Stand-up. Re-read roadmap. Claim tasks.                       | Both  | Today's plan crystal clear                            |
-| 08:30 → 10:30 | Backend: data models, Gemini agent wired to 2–3 FunctionTools | P1    | `/api/agent` returns real agent responses             |
-| 08:30 → 10:30 | Frontend scaffolding: framework, routing, API client stub     | P2    | Skeleton UI reachable locally                         |
-| 10:30 → 12:00 | Backend: orchestration layer (agent takes ≥3 chained steps)   | P1    | Agent autonomously executes the critical action chain |
-| 10:30 → 12:00 | Frontend: build the critical journey UI with mock data        | P2    | All screens render                                    |
+| 08:30 → 10:30 | Backend: data models, Gemini agent wired to 2–3 FunctionTools | PO1   | `/api/agent` returns real agent responses             |
+| 08:30 → 10:30 | Frontend scaffolding: framework, routing, API client stub     | PO2   | Skeleton UI reachable locally                         |
+| 10:30 → 12:00 | Backend: orchestration layer (agent takes ≥3 chained steps)   | PO1   | Agent autonomously executes the critical action chain |
+| 10:30 → 12:00 | Frontend: build the critical journey UI with mock data        | PO2   | All screens render                                    |
 | 12:00 → 12:30 | Lunch. Progress sync. Re-read `progress.md`.                  | Both  | Gap list identified                                   |
 | 12:30 → 14:30 | Wire frontend ↔ backend (real API calls, no mocks)            | Both  | Happy path works end-to-end locally                   |
-| 14:30 → 16:00 | Redeploy to Cloud Run. Test on the public URL.                | P2    | URL shows the working journey                         |
-| 14:30 → 16:00 | Backend hardening: error handling, structured logging         | P1    | No 500s on the happy path                             |
-| 16:00 → 17:30 | Mobile/desktop responsiveness pass                            | P2    | Passes 3 viewport checks (375px, 768px, 1440px)       |
-| 16:00 → 17:30 | Seed demo data. Rehearse the demo script 3×.                  | P1    | Happy path runs cleanly 3× in a row                   |
+| 14:30 → 16:00 | Redeploy to Cloud Run. Test on the public URL.                | PO2   | URL shows the working journey                         |
+| 14:30 → 16:00 | Backend hardening: error handling, structured logging         | PO1   | No 500s on the happy path                             |
+| 16:00 → 17:30 | Mobile/desktop responsiveness pass                            | PO2   | Passes 3 viewport checks (375px, 768px, 1440px)       |
+| 16:00 → 17:30 | Seed demo data. Rehearse the demo script 3×.                  | PO1   | Happy path runs cleanly 3× in a row                   |
 | **18:00**     | **🔒 FEATURE FREEZE**                                         | Both  | No new code paths after this point                    |
 
 **Phase 1 exit gate:**
@@ -80,14 +80,14 @@ Owner convention: **P1** drives AI/backend, **P2** drives frontend/infra, **Both
 
 | Time (MYT)    | Milestone                                                                                            | Owner | Deliverable                            |
 | ------------- | ---------------------------------------------------------------------------------------------------- | ----- | -------------------------------------- |
-| 18:00 → 19:00 | UI polish: copy, empty states, obvious bugs                                                          | P2    | Demo-ready URL                         |
-| 18:00 → 19:00 | README final pass: features, setup, AI disclosure, architecture diagram                              | P1    | Rubric-ready README                    |
-| 19:00 → 20:00 | Record 3-min video demo (script → 2 takes)                                                           | P1    | Raw `demo.mp4`                         |
-| 19:00 → 20:00 | Draft pitch deck in Canva (15 slides max)                                                            | P2    | First pass of deck                     |
-| 20:00 → 21:00 | Edit video (trim, captions if time); upload to YouTube unlisted                                      | P1    | YouTube URL                            |
-| 20:00 → 21:30 | Polish deck: problem → user → solution → demo → architecture → tech → impact → business model → team | P2    | Final deck                             |
+| 18:00 → 19:00 | UI polish: copy, empty states, obvious bugs                                                          | PO2   | Demo-ready URL                         |
+| 18:00 → 19:00 | README final pass: features, setup, AI disclosure, architecture diagram                              | PO1   | Rubric-ready README                    |
+| 19:00 → 20:00 | Record 3-min video demo (script → 2 takes)                                                           | PO1   | Raw `demo.mp4`                         |
+| 19:00 → 20:00 | Draft pitch deck in Canva (15 slides max)                                                            | PO2   | First pass of deck                     |
+| 20:00 → 21:00 | Edit video (trim, captions if time); upload to YouTube unlisted                                      | PO1   | YouTube URL                            |
+| 20:00 → 21:30 | Polish deck: problem → user → solution → demo → architecture → tech → impact → business model → team | PO2   | Final deck                             |
 | 21:30 → 22:00 | Export deck to PDF; final repo sweep (remove scratch files)                                          | Both  | `pitch.pdf` in repo                    |
-| 22:00 → 23:00 | Fill and submit the Google Form; double-check every link                                             | P1    | Submission confirmation email received |
+| 22:00 → 23:00 | Fill and submit the Google Form; double-check every link                                             | PO1   | Submission confirmation email received |
 | **23:00**     | **🚨 HARD SUBMIT** (59-min buffer before the actual deadline)                                        | Both  | Form submitted                         |
 | 23:00 → 23:59 | Buffer zone. Resubmit if anything is broken.                                                         | Both  | Peace of mind                          |
 

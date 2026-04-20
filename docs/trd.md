@@ -355,7 +355,7 @@ Both invocations use `pnpm exec` to bypass the pnpm v10 bare-script shortcut whi
 
 **Trigger.** If Vertex AI Search data-store creation, indexing, or IAM wiring is not complete by **sprint hour 12**, collapse to the Plan B inline-PDF grounding in §8.
 
-**Owner.** P1 calls the trigger.
+**Owner.** PO1 calls the trigger.
 
 **Indicator metrics.** (a) the seed script `backend/scripts/seed_vertex_ai_search.py` has not run to green by hour 10; (b) a canary retrieval query against the data store returns zero or low-quality hits by hour 11; (c) the service account cannot be granted the required Discovery Engine role within ops budget.
 

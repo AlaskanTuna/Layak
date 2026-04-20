@@ -3,7 +3,9 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
+    "predev": "test -L .env.local || ln -sf ../.env .env.local",
     "dev": "next dev --webpack",
+    "prebuild": "test -L .env.local || ln -sf ../.env .env.local",
     "build": "next build --webpack",
     "start": "next start",
     "lint": "eslint"

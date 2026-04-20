@@ -114,10 +114,10 @@
 
 > **Before you start Phase 1 (08:00 standup checklist):**
 >
-> - [ ] GCP project live; Vertex AI, Cloud Run, Artifact Registry, Secret Manager, Discovery Engine APIs enabled (Phase 0, PO1).
-> - [ ] `GEMINI_API_KEY` in GCP Secret Manager as `gemini-api-key`; also in local `.env.local` for dev (PO1).
-> - [ ] Six scheme PDFs present under `backend/data/schemes/` (Phase 0 task 7 — **done**, commit `9138113`).
-> - [ ] Both laptops can `gcloud auth login` + `pnpm run dev` successfully.
+> - [x] GCP project live; Vertex AI, Cloud Run, Artifact Registry, Secret Manager, Discovery Engine APIs enabled (Phase 0, PO1).
+> - [x] `GEMINI_API_KEY` in GCP Secret Manager as `gemini-api-key`; also in local `.env.local` for dev (PO1).
+> - [x] Six scheme PDFs present under `backend/data/schemes/` (Phase 0 task 7 — **done**, commit `9138113`).
+> - [x] Both laptops can `gcloud auth login` + `pnpm run dev` successfully.
 
 ### 1. Feature: Backend data models and agent wiring
 
@@ -227,8 +227,8 @@
 
 **Implementation — Both, paired:**
 
-- [ ] `NEXT_PUBLIC_API_URL=http://localhost:8080` in `frontend/.env.local`; document in `.env.example`.
-- [ ] `frontend/src/lib/sse-client.ts` points at `${NEXT_PUBLIC_API_URL}/api/agent/intake`; remove the mock-mode flag (or move it behind a dev-only toggle).
+- [ ] `NEXT_PUBLIC_BACKEND_URL=http://localhost:8000` in root `.env` (default value already in root `.env.example`; reaches Next.js via the `frontend/.env.local -> ../.env` symlink auto-created by `pnpm dev`).
+- [ ] `frontend/src/lib/sse-client.ts` points at `${NEXT_PUBLIC_BACKEND_URL}/api/agent/intake`; remove the mock-mode flag (or move it behind a dev-only toggle).
 - [ ] **Happy path**: upload Aisyah fixtures via the widget → five SSE events fire → ranked list + provenance + total RM render → Code Execution panel shows Python → draft packet downloads.
 
 **Implementation — PO1 (Hao):**

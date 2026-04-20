@@ -323,11 +323,11 @@ Both invocations use `pnpm exec` to bypass the pnpm v10 bare-script shortcut whi
 
 ## 7. Security & Secrets
 
-- `.env` and `.env.*` are git-ignored; `.env.example` / `.env.template` are the only committed templates (whitelisted in root `.gitignore`).
-- **Secrets split: Secret Manager for production only; plain local files for dev.** This is the deliberate minimum — SM avoids leaking the Gemini key into Cloud Run deploy metadata and shell history without the overhead of SDK fetches or bootstrap scripts during the 26h sprint.
+- `.env` and `.env.*` are git-ignored repo-wide; `.env.example` / `.env.template` are the only committed templates (whitelisted in root `.gitignore`).
+- **Secrets split: Secret Manager for production only; single root `.env` for dev.** This is the deliberate minimum — SM avoids leaking the Gemini key into Cloud Run deploy metadata and shell history without the overhead of SDK fetches or bootstrap scripts during the 26h sprint.
   - **Production (Cloud Run)**: `GEMINI_API_KEY` is stored in GCP Secret Manager as `gemini-api-key` (create once via `gcloud secrets create gemini-api-key --replication-policy=automatic`; populate with `echo -n "<key>" | gcloud secrets versions add gemini-api-key --data-file=-`). Cloud Run services mount it via `--set-secrets=GEMINI_API_KEY=gemini-api-key:latest` at deploy time — the plaintext value never appears in the `gcloud run deploy` command or its history.
-  - **Development (local)**: each developer pastes the same key into their own gitignored files — `frontend/.env.local` (Next.js convention) and `backend/.env` (FastAPI via `python-dotenv`). No SDK fetch at startup, no bootstrap script. The key is shared out-of-band (Signal / 1Password / shared password manager — never Slack, never email, never the repo).
-  - `frontend/.env.example` and the forthcoming `backend/.env.example` (Phase 1) catalogue the variable names; values stay blank in the template.
+  - **Development (local)**: a single gitignored `.env` at the repo root is the only local secrets file. Next.js reads it through a `frontend/.env.local -> ../.env` symlink auto-created by the `predev` and `prebuild` hooks in `frontend/package.json`; FastAPI loads it via `python-dotenv` pointed at the repo root. Each developer pastes the shared key into their own local `.env` once — never committed, shared out-of-band (Signal / 1Password / shared password manager — never Slack, never email, never the repo).
+  - Root `.env.example` is the single committed template catalogue of env var names; values stay blank.
 - Cloud Run service account has `roles/secretmanager.secretAccessor` plus the minimum Vertex AI access roles; no broader privilege.
 - HTTPS-only (Cloud Run defaults).
 - No PII persisted. IC numbers appear in UI and packet as last-4-digits only; full IC is held only in request-scope memory on the backend and never logged.

@@ -1,2 +1,2 @@
-pnpm -C frontend lint-staged
-pnpm lint-staged
+pnpm --dir frontend exec lint-staged
+pnpm exec lint-staged

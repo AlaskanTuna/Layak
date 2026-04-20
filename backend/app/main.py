@@ -15,14 +15,28 @@ Run locally:
 
 from __future__ import annotations
 
+import os
 from collections.abc import AsyncIterator
+from pathlib import Path
 from typing import Annotated
 
 from fastapi import FastAPI, File, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 from starlette.responses import StreamingResponse
 
-from app.agents.root_agent import stream_agent_events
+# Load repo-root .env into os.environ before any agent module reads GEMINI_API_KEY.
+# Path: backend/app/main.py -> project root is three levels up.
+_DOTENV = Path(__file__).resolve().parent.parent.parent / ".env"
+if _DOTENV.is_file():
+    for _line in _DOTENV.read_text(encoding="utf-8").splitlines():
+        if _line.startswith("#") or "=" not in _line:
+            continue
+        _k, _v = _line.split("=", 1)
+        _k, _v = _k.strip(), _v.strip()
+        if _k and _v and _k not in os.environ:
+            os.environ[_k] = _v
+
+from app.agents.root_agent import stream_agent_events  # noqa: E402 — after dotenv load
 
 app = FastAPI(title="Layak Backend", version="0.1.0")
 

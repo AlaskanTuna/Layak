@@ -4,6 +4,28 @@
 
 ---
 
+## [21/04/26] - Task 3 Path 2: wired real Gemini 2.5 Flash into extract / classify / compute_upside (Vertex AI Search still pending ADC login)
+
+Path 1 stubs replaced with real Gemini calls. End-to-end SSE stream against the three synthetic Aisyah demo PDFs (rendered via Edge headless from `frontend/public/demo/*.html`): **11 events in 59 s** (median Gemini call ~15-20 s per tool). No error events; all 5 step pairs + terminal `done`. Backend tests 39/39 still pass.
+
+- **New `backend/app/agents/gemini.py`** — shared `google.genai.Client` factory. `get_client()` caches the client via `@lru_cache(maxsize=1)`, sources `GEMINI_API_KEY` from `os.environ` first then falls back to parsing the repo-root `.env`. Exports `FAST_MODEL="gemini-2.5-flash"` + `ORCHESTRATOR_MODEL="gemini-2.5-pro"` plus a `detect_mime()` helper that infers MIME from file magic bytes (PDF `%PDF-`, JPEG, PNG, GIF, WebP) with filename-extension fallback.
+- **Rewrote `backend/app/agents/tools/extract.py`** to use Gemini 2.5 Flash multimodal. Sends the three documents as `Part.from_bytes(data, mime_type=detect_mime(...))` followed by an instruction Part. `response_mime_type="application/json"`, `temperature=0.0`, `Profile.model_validate_json()` on return. Server-side `response_schema=Profile` deliberately omitted because Pydantic's `extra="forbid"` emits `additional_properties` which Gemini's schema dialect rejects with `400 INVALID_ARGUMENT` — fix is documented inline. Instruction is explicit about the privacy invariant: only `ic_last4` as the 4-digit suffix, never the full 12-digit IC.
+- **Rewrote `backend/app/agents/tools/classify.py`** — Gemini 2.5 Flash structured-output call taking the extracted Profile JSON and returning a HouseholdClassification with per-capita monthly income + a 3-5 item `notes` array of plain-English observations that the pipeline stepper surfaces.
+- **Rewrote `backend/app/agents/tools/compute_upside.py`** — Gemini 2.5 Flash with the Code Execution tool enabled (`types.Tool(code_execution=types.ToolCodeExecution())`). Prompt asks for a specific `{:<42s}{:>12,}`-formatted table. `_extract_exec_parts()` helper walks `response.candidates[0].content.parts[]` extracting `executable_code.code` → `python_snippet` and `code_execution_result.output` → `stdout`. `total_annual_rm` + `per_scheme_rm` are computed server-side as the authoritative values regardless of what Gemini's script prints (belt-and-braces). **Downgraded from 2.5 Pro to 2.5 Flash** — free-tier key returns `429 RESOURCE_EXHAUSTED` on every Pro call; Flash supports the same Code Execution tool with identical payload shape. Documented in the module docstring.
+- **Added dotenv loader** to the top of `backend/app/main.py` — parses `repo-root/.env` into `os.environ` before `stream_agent_events` imports, so `GEMINI_API_KEY` is available at tool-execution time. 8-line inline parser (no new dep); `noqa: E402` on the late `root_agent` import so ruff doesn't reorder it above the dotenv block.
+- **End-to-end smoke**:
+  1. `msedge.exe --headless --print-to-pdf=…` rendered `mykad.html`, `grab-earnings.html`, `tnb-bill.html` to PDFs (70-585 KB each).
+  2. `curl -F ic=@mykad.pdf -F payslip=@grab-earnings.pdf -F utility=@tnb-bill.pdf POST /api/agent/intake`.
+  3. SSE ran 11 events in 59 s. `extract` returned `Profile(name='AISYAH BINTI AHMAD', ic_last4='4321', age=36, monthly_income_rm=2800, form_type='form_b', ...)` — privacy invariant held. Household size defaulted to 1 + empty `dependants` (the demo docs don't carry household info — that would come from a BK-01 or a separate declaration; known limitation, see below). `classify` emitted `per_capita_monthly_rm=2800` + 4 plain-English notes. `match` returned only `lhdn_form_b` qualifying at RM457/yr. `compute_upside` returned a Gemini-rendered Python snippet + stdout 55-char-wide table. `generate` produced a single-draft Packet. `done`.
+- **Known limitation**: real-upload path extracts only what the synthetic demo docs disclose. MyKad + Grab earnings + TNB bill don't contain household composition fields, so `household_size=1` + `dependants=[]` falls out — STR 2026 and JKM Warga Emas don't match. The demo narrative handles this cleanly: the **"Use Aisyah sample documents"** button triggers the frontend's mock SSE replay which shows the full three-scheme flow (STR RM450 + JKM RM7,200 + LHDN RM558 = RM8,208/yr) against the fixtured Aisyah profile. Judges see the full pipeline either way.
+- **Not done in Path 2 (blocked on user action)**:
+  - `gcloud auth application-default login` — interactive browser OAuth, can't be driven from this CLI session.
+  - Once ADC is green: `python backend/scripts/seed_vertex_ai_search.py --project layak-myaifuturehackathon --execute` runs in ~5 min (incl. the 180 s indexing wait); populates `VERTEX_AI_SEARCH_DATA_STORE` in `.env` after canaries pass.
+  - Vertex AI Search enrichment of `match_schemes` — when the VAIS data store is live, each `SchemeMatch.rule_citations` gets real retrieved passages + URLs instead of the rule engine's hardcoded ones. Rule engine remains the source of truth for the numbers; VAIS is the grounding layer.
+- **Verification**: ruff check + format clean on 23 files; pytest 39/39 passed in 2.75 s (rule-engine tests are Gemini-free and unaffected by the tool rewrites).
+
+---
+
 ## [21/04/26] - Synced frontend Aisyah fixture to Hao's Task 3 Path 1 stub outputs (classify notes, compute_upside stdout, packet filenames)
 
 After merging `origin/main` (Hao's Task 3 Path 1 + demo-doc redesign), the frontend mock fixture drifted from backend stub output in three places — mock-mode would have shown different strings than wired-mode. Aligned verbatim.

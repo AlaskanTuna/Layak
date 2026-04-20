@@ -1,77 +1,101 @@
-"""`compute_upside` FunctionTool — stub for Phase 1 Task 3.
+"""`compute_upside` — Gemini 2.5 Flash + code_execution tool (Task 3 Path 2).
 
-Task 3 (sprint start 21 Apr 08:00 MYT) replaces this with Gemini Code Execution
-(`tools: [{codeExecution: {}}]`) running Python in a sandbox. Until then the stub
-synthesises the same ComputeUpsideResult payload shape from the matched
-`SchemeMatch` list so the frontend's stage-Python-on-screen panel has a
-deterministic rendering target.
+Sends the rule-engine matches to Gemini with the Code Execution tool enabled.
+Gemini writes a short Python script, runs it in a sandbox, and returns the
+executable source + stdout. We parse both out of the response parts and
+populate `ComputeUpsideResult` — the frontend pipeline step renders the
+`<pre>`-block exactly as Gemini produced it.
 
-The stub emits a syntactically valid Python script and the stdout it would have
-produced — frontend can render both verbatim inside a `<pre>` block.
+Why Flash and not Pro: `gemini-2.5-pro` returns 429 RESOURCE_EXHAUSTED on the
+free-tier API key we're demoing against. Flash supports the Code Execution
+tool with identical payload shape and is safely under quota.
 """
 
 from __future__ import annotations
 
+import json
+
+from google.genai import types
+
+from app.agents.gemini import FAST_MODEL, get_client
 from app.schema.events import ComputeUpsideResult
 from app.schema.scheme import SchemeMatch
 
+_INSTRUCTION = """
+You are the `compute_upside` agent. Here is a JSON list of Malaysian
+social-assistance schemes the user qualifies for, with a pre-computed
+`annual_rm` value per scheme from Layak's rule engine:
 
-def _python_snippet(matches: list[SchemeMatch]) -> str:
-    parts: list[str] = [
-        "# Layak — annual RM upside computation",
-        "# Gemini Code Execution would run this in a sandbox under Gemini 2.5 Pro.",
-        "",
-    ]
-    for m in matches:
-        parts.append(f"{m.scheme_id} = {int(m.annual_rm)}  # {m.scheme_name}")
-    parts.append("")
-    parts.append(f"total = {' + '.join(m.scheme_id for m in matches) or '0'}")
-    parts.extend(
-        [
-            "",
-            'print("{:<42s}{:>12s}".format("Scheme", "Annual (RM)"))',
-            'print("-" * 55)',
-        ]
-    )
-    for m in matches:
-        parts.append(f'print("{{:<42s}}{{:>12,}}".format({m.scheme_name!r}, {m.scheme_id}))')
-    parts.extend(
-        [
-            'print("-" * 55)',
-            'print("{:<42s}{:>12,}".format("Total upside (annual)", total))',
-        ]
-    )
-    return "\n".join(parts)
+{matches_json}
+
+Write a short Python program that:
+1. Assigns each scheme's `annual_rm` to a variable named after its
+   `scheme_id` (e.g. `str_2026 = 450`).
+2. Computes `total` as the sum of those variables.
+3. Prints a formatted table using `print("{{:<42s}}{{:>12s}}".format(...))`:
+
+   - A header row: `Scheme` / `Annual (RM)`.
+   - A separator row of 55 `-` characters.
+   - One data row per scheme: the scheme's human-readable `scheme_name` on
+     the left and its `annual_rm` right-aligned in 12 columns with thousands
+     separators.
+   - A separator row.
+   - A final row: `Total upside (annual)` / formatted total.
+
+Run the code via the code_execution tool. Return nothing but the tool-call
+output — do not add commentary.
+""".strip()
 
 
-def _stdout(matches: list[SchemeMatch], total: float) -> str:
-    lines = [
-        f"{'Scheme':<42s}{'Annual (RM)':>12s}",
-        "-" * 55,
-    ]
-    for m in matches:
-        lines.append(f"{m.scheme_name:<42s}{int(m.annual_rm):>12,}")
-    lines.append("-" * 55)
-    lines.append(f"{'Total upside (annual)':<42s}{int(total):>12,}")
-    return "\n".join(lines)
+def _extract_exec_parts(response: object) -> tuple[str, str]:
+    """Pull `executable_code` source and `code_execution_result` output from the response."""
+    python_snippet = ""
+    stdout = ""
+    candidates = getattr(response, "candidates", None) or []
+    for candidate in candidates:
+        content = getattr(candidate, "content", None)
+        for part in getattr(content, "parts", None) or []:
+            code = getattr(part, "executable_code", None)
+            if code is not None:
+                code_src = getattr(code, "code", None)
+                if code_src:
+                    python_snippet = code_src
+            result = getattr(part, "code_execution_result", None)
+            if result is not None:
+                out = getattr(result, "output", None)
+                if out:
+                    stdout = out
+    return python_snippet, stdout
 
 
 async def compute_upside(matches: list[SchemeMatch]) -> ComputeUpsideResult:
-    """Compute annual RM upside per scheme and the aggregate total.
-
-    Args:
-        matches: Qualifying `SchemeMatch` list from the `match` step.
-
-    Returns:
-        `ComputeUpsideResult` with a deterministic Python snippet, its stdout,
-        the aggregate total, and the per-scheme dict the frontend ranked list
-        reads for sorting/labelling.
-    """
+    """Compute annual RM upside via Gemini-run Python (code_execution tool)."""
     per_scheme = {m.scheme_id: float(m.annual_rm) for m in matches}
     total = sum(per_scheme.values())
+
+    if not matches:
+        return ComputeUpsideResult(
+            python_snippet="# No qualifying schemes — skipping computation.\n",
+            stdout="No qualifying schemes.",
+            total_annual_rm=0.0,
+            per_scheme_rm={},
+        )
+
+    client = get_client()
+    prompt = _INSTRUCTION.format(matches_json=json.dumps([m.model_dump() for m in matches], default=str, indent=2))
+    response = client.models.generate_content(
+        model=FAST_MODEL,
+        contents=prompt,
+        config=types.GenerateContentConfig(
+            tools=[types.Tool(code_execution=types.ToolCodeExecution())],
+            temperature=0.0,
+        ),
+    )
+    python_snippet, stdout = _extract_exec_parts(response)
+
     return ComputeUpsideResult(
-        python_snippet=_python_snippet(matches),
-        stdout=_stdout(matches, total),
+        python_snippet=python_snippet,
+        stdout=stdout,
         total_annual_rm=total,
         per_scheme_rm=per_scheme,
     )

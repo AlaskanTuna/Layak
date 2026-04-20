@@ -1,45 +1,52 @@
-"""`classify_household` FunctionTool — stub for Phase 1 Task 3.
+"""`classify_household` — Gemini 2.5 Flash structured output (Task 3 Path 2).
 
-Task 3 (sprint start 21 Apr 08:00 MYT) replaces this with a Gemini 2.5 Flash
-structured-output call. Until then the stub derives household classification
-flags directly from the `Profile` produced by the extract step.
-
-Output conforms to `HouseholdClassification` (see `app/schema/profile.py`).
+Takes the `Profile` produced by the extract step and returns a
+`HouseholdClassification` with per-capita income, income band, and a short
+human-readable summary the pipeline stepper surfaces in the `classify` step.
 """
 
 from __future__ import annotations
 
+from google.genai import types
+
+from app.agents.gemini import FAST_MODEL, get_client, strip_json_fences
 from app.schema.profile import HouseholdClassification, Profile
+
+_INSTRUCTION = """
+You are the `classify_household` agent. Given the Profile JSON below, produce
+a HouseholdClassification JSON covering:
+
+- `has_children_under_18`: true iff any dependant is relationship=child and age < 18.
+- `has_elderly_dependant`: true iff any dependant is relationship=parent and age >= 60.
+- `income_band`: one of `b40_hardcore` (<RM1,500), `b40_household` (RM1,500-2,500),
+  `b40_household_with_children` (RM2,501-5,000 with children under 18), `m40` (RM5,001-10,000),
+  `t20` (>RM10,000).
+- `per_capita_monthly_rm`: `monthly_income_rm / household_size`, rounded to 2 dp.
+  Return as a bare number (e.g. `700.0`). No currency symbol or thousand separators.
+- `notes`: an ordered list of 3-5 short, human-readable observations about the
+  household, in plain English. Each note a single sentence. Include: household
+  size, per-capita income, filer category (Form B vs BE), and any distinctive
+  dependant pattern (e.g. "Two children under 18 in household" or
+  "One elderly parent dependent, age 70").
+
+Respond with the JSON only — no markdown fences, no ```json tags, no preamble,
+no commentary before or after.
+
+Profile:
+{profile_json}
+""".strip()
 
 
 async def classify_household(profile: Profile) -> HouseholdClassification:
-    """Classify a profile's household composition, age flags, and income band.
-
-    Args:
-        profile: Validated citizen profile from the extract step.
-
-    Returns:
-        `HouseholdClassification` with per-capita income and human-readable notes
-        the frontend pipeline stepper can surface in the `classify` step result.
-    """
-    per_capita = profile.monthly_income_rm / max(profile.household_size, 1)
-    children_under_18 = sum(1 for d in profile.dependants if d.relationship == "child" and d.age < 18)
-    elderly_dependants = sum(1 for d in profile.dependants if d.relationship == "parent" and d.age >= 60)
-
-    notes = [
-        f"Household size: {profile.household_size}.",
-        f"Per-capita monthly income: RM{per_capita:,.0f}.",
-        f"Filer category: {profile.form_type.replace('_', ' ').upper()}.",
-    ]
-    if children_under_18:
-        notes.append(f"{children_under_18} child(ren) under 18 in household.")
-    if elderly_dependants:
-        notes.append(f"{elderly_dependants} parent dependant(s) aged 60+.")
-
-    return HouseholdClassification(
-        has_children_under_18=profile.household_flags.has_children_under_18,
-        has_elderly_dependant=profile.household_flags.has_elderly_dependant,
-        income_band=profile.household_flags.income_band,
-        per_capita_monthly_rm=per_capita,
-        notes=notes,
+    """Classify a profile's household composition via Gemini 2.5 Flash."""
+    client = get_client()
+    prompt = _INSTRUCTION.format(profile_json=profile.model_dump_json(indent=2))
+    response = client.models.generate_content(
+        model=FAST_MODEL,
+        contents=prompt,
+        config=types.GenerateContentConfig(
+            response_mime_type="application/json",
+            temperature=0.0,
+        ),
     )
+    return HouseholdClassification.model_validate_json(strip_json_fences(response.text))

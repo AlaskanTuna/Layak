@@ -27,6 +27,7 @@ from collections.abc import AsyncIterator
 from google.adk.agents import LlmAgent, SequentialAgent
 from google.adk.tools import FunctionTool
 
+from app.agents.gemini import sanitize_error_message
 from app.agents.tools.classify import classify_household
 from app.agents.tools.compute_upside import compute_upside
 from app.agents.tools.extract import extract_profile
@@ -39,6 +40,7 @@ from app.schema.events import (
     ExtractResult,
     GenerateResult,
     MatchResult,
+    Step,
     StepResultEvent,
     StepStartedEvent,
 )
@@ -92,9 +94,10 @@ root_agent = SequentialAgent(
     ],
 )
 
-# Visible step transitions for the frontend stepper in stub mode; real Gemini
-# latency in Task 3 Path 2 makes this unnecessary.
-_STUB_STEP_DELAY_S = 0.25
+# Small inter-step delay for perceptible stepper animation in stub mode. At
+# real-Gemini latencies (15-20 s per call) this is noise; kept for dev-mode
+# smoke tests against canned fixtures.
+_INTER_STEP_DELAY_S = 0.1
 
 
 async def stream_agent_events(
@@ -102,11 +105,14 @@ async def stream_agent_events(
 ) -> AsyncIterator[StepStartedEvent | StepResultEvent | DoneEvent | ErrorEvent]:
     """Stream the five-step pipeline as ordered SSE events.
 
-    Task 3 Path 1 scaffold emits all five step pairs plus a terminal `done`
-    event. Data payloads come from the stub tools (extract returns Aisyah
-    fixture, match delegates to the rule engine in Task 4, etc.). The wire
-    format is identical to Task 3 Path 2 so the frontend does not need to
-    change when real Gemini calls replace the stubs.
+    Each step that's in-flight when an exception is raised is recorded as
+    `current_step`, so the terminal `ErrorEvent` can identify the failing step
+    and the frontend stepper can mark exactly that pill as errored (instead of
+    leaving the previously-started step spinning).
+
+    The error message is sanitized (`sanitize_error_message`) to redact any
+    5+-digit runs and cap length — this prevents a hallucinated full MyKad IC
+    from leaking via a `Profile.model_validate_json` `ValidationError`.
 
     Args:
         uploads: Mapping of `{"ic"|"payslip"|"utility": (filename, bytes)}`.
@@ -114,36 +120,43 @@ async def stream_agent_events(
     Yields:
         Pydantic event models in the order the frontend expects to render them.
     """
+    current_step: Step | None = None
     try:
-        yield StepStartedEvent(step="extract")
-        await asyncio.sleep(_STUB_STEP_DELAY_S)
+        current_step = "extract"
+        yield StepStartedEvent(step=current_step)
+        await asyncio.sleep(_INTER_STEP_DELAY_S)
         profile = await extract_profile(
             uploads["ic"][1],
             uploads["payslip"][1],
             uploads["utility"][1],
         )
-        yield StepResultEvent(step="extract", data=ExtractResult(profile=profile))
+        yield StepResultEvent(step=current_step, data=ExtractResult(profile=profile))
 
-        yield StepStartedEvent(step="classify")
-        await asyncio.sleep(_STUB_STEP_DELAY_S)
+        current_step = "classify"
+        yield StepStartedEvent(step=current_step)
+        await asyncio.sleep(_INTER_STEP_DELAY_S)
         classification = await classify_household(profile)
-        yield StepResultEvent(step="classify", data=ClassifyResult(classification=classification))
+        yield StepResultEvent(step=current_step, data=ClassifyResult(classification=classification))
 
-        yield StepStartedEvent(step="match")
-        await asyncio.sleep(_STUB_STEP_DELAY_S)
+        current_step = "match"
+        yield StepStartedEvent(step=current_step)
+        await asyncio.sleep(_INTER_STEP_DELAY_S)
         matches = await match_schemes(profile)
-        yield StepResultEvent(step="match", data=MatchResult(matches=matches))
+        yield StepResultEvent(step=current_step, data=MatchResult(matches=matches))
 
-        yield StepStartedEvent(step="compute_upside")
-        await asyncio.sleep(_STUB_STEP_DELAY_S)
+        current_step = "compute_upside"
+        yield StepStartedEvent(step=current_step)
+        await asyncio.sleep(_INTER_STEP_DELAY_S)
         trace = await compute_upside(matches)
-        yield StepResultEvent(step="compute_upside", data=trace)
+        yield StepResultEvent(step=current_step, data=trace)
 
-        yield StepStartedEvent(step="generate")
-        await asyncio.sleep(_STUB_STEP_DELAY_S)
+        current_step = "generate"
+        yield StepStartedEvent(step=current_step)
+        await asyncio.sleep(_INTER_STEP_DELAY_S)
         packet = await generate_packet(profile, matches)
-        yield StepResultEvent(step="generate", data=GenerateResult(packet=packet))
+        yield StepResultEvent(step=current_step, data=GenerateResult(packet=packet))
 
         yield DoneEvent(packet=packet)
     except Exception as exc:  # noqa: BLE001 — surface every failure to the UI.
-        yield ErrorEvent(step=None, message=f"{type(exc).__name__}: {exc}")
+        raw = f"{type(exc).__name__}: {exc}"
+        yield ErrorEvent(step=current_step, message=sanitize_error_message(raw))

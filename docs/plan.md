@@ -49,22 +49,22 @@
 
 ### 4. Feature: Scaffold Next.js frontend tooling
 
-**Purpose/Issue:** Bring the repo to a state where the team can start building UI tomorrow morning — Next.js 14 + Tailwind + shadcn/ui + Lucide + Husky + Prettier, with WSL-friendly HMR polling and a stub landing page. Do not touch backend; no AI wiring; no Cloud Run deploy.
+**Purpose/Issue:** Bring the repo to a state where the team can start building UI tomorrow morning — Next.js 16 + React 19 + Tailwind 4 + shadcn/ui + Lucide + Husky + Prettier, with WSL-friendly webpack HMR polling and a stub landing page. Do not touch backend; no AI wiring; no Cloud Run deploy.
 
 **Implementation:**
 
-- [ ] Verify `pnpm`, `node`, `git` versions; stop and ask if `pnpm` is missing.
-- [ ] Scaffold Next.js 14 App Router (TypeScript, Tailwind, ESLint, `src/` dir, `@/*` alias, `--no-turbo`, pnpm) without overwriting `docs/`, `.claude/`, `.git/`, `README.md`, or existing configs.
-- [ ] Initialize shadcn/ui (slate, CSS variables, `src/app/globals.css`) and add the minimum component set: button, card, input, label, textarea, alert, badge, dialog, form, progress, separator, sonner, tabs, toast.
-- [ ] Install `lucide-react`.
-- [ ] Install Husky + lint-staged; write `.husky/pre-commit` → `pnpm lint-staged`; add `lint-staged` block to `package.json` (ESLint `--fix` on ts/tsx/js/jsx; Prettier `--write` on md/json/css).
-- [ ] Install Prettier + `prettier-plugin-tailwindcss` if not already present.
-- [ ] Configure WSL HMR polling in `next.config.mjs` (poll=800ms, aggregateTimeout=300ms, ignore `node_modules`); keep standard webpack path.
-- [ ] Update `.gitignore` to cover `.env`, `.env.local`, `.next/`, `node_modules/`, `dist/`, `*.log`, `.DS_Store`, `coverage/`; keep `.claude/` tracked.
-- [ ] Create `.env.example` at repo root with `GOOGLE_API_KEY`, `GEMINI_API_KEY`, `GOOGLE_CLOUD_PROJECT` placeholders.
-- [ ] Create stub landing page at `src/app/page.tsx` (single "Layak" card + disabled Lucide "Start" button, ≤40 lines).
-- [ ] Run `pnpm lint` and `pnpm build`; surface warnings but do not fix pre-existing template noise.
-- [ ] Commit `chore(frontend): scaffold Next.js + Tailwind + shadcn + Husky + Lucide` (include lockfile).
+- [x] Verify `pnpm` (10.33.0), `node` (v24.14.0), and `git` (2.43.0) versions.
+- [x] Scaffold Next.js 16 App Router (TypeScript, Tailwind 4, ESLint 9, `src/` dir, `@/*` alias, `--no-turbopack`, pnpm) into a temp dir and merge into repo root, preserving `docs/`, `.claude/`, `.git/`, `README.md`, and existing configs.
+- [x] Initialize shadcn/ui (Tailwind 4 auto-detected; `base-nova` default preset, CSS variables in `src/app/globals.css`) and add 12 components: alert, badge, button, card, dialog, input, label, progress, separator, sonner, tabs, textarea. (`toast` is deprecated in favour of `sonner`; `form` wrapper did not land — react-hook-form + zod installed for manual composition.)
+- [x] Install `lucide-react`.
+- [x] Install Husky + lint-staged; write `.husky/pre-commit` → `pnpm lint-staged`; add `lint-staged` block to `package.json` (ESLint `--fix` on ts/tsx/js/jsx; Prettier `--write` on md/json/css).
+- [x] Install Prettier + `prettier-plugin-tailwindcss` (Prettier was already present).
+- [x] Configure WSL webpack HMR polling in `next.config.ts` (poll=800ms, aggregateTimeout=300ms, ignore `node_modules`); force `--webpack` in dev/build scripts since Next.js 16 defaults to Turbopack.
+- [x] Confirm existing `.gitignore` already covers `.env`, `.env.local`, `.next/`, `node_modules/`, `dist/`, `*.log`, `.DS_Store`, `coverage/` — no edit needed; `.claude/` remains tracked.
+- [x] Create `.env.example` at repo root with `GOOGLE_API_KEY`, `GEMINI_API_KEY`, `GOOGLE_CLOUD_PROJECT`, `GOOGLE_CLOUD_LOCATION`, `VERTEX_AI_SEARCH_DATA_STORE` placeholders.
+- [x] Create stub landing page at `src/app/page.tsx` (single "Layak" card + disabled Lucide `Play` icon "Start" button, 27 lines).
+- [x] Run `pnpm lint` (clean) and `pnpm build --webpack` (clean — two routes `/` and `/_not-found` prerendered static).
+- [x] Commit `chore(frontend): scaffold Next.js + Tailwind + shadcn + Husky + Lucide` with lockfile.
 
 ### 5. Feature: Push and handoff
 

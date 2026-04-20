@@ -26,7 +26,7 @@ Primary persona is **Aisyah** — 34, Grab driver in Kuantan, two school-age chi
 
 The full architecture contract lives in `docs/trd.md`. Do **not** create `docs/architecture.md` — TRD is canonical.
 
-Two-service app: **Next.js 14 frontend** and **FastAPI + ADK-Python backend**, both on Cloud Run. The `RootAgent` (Gemini 2.5 Pro, ADK `SequentialAgent`) orchestrates five `FunctionTool`s. Vertex AI Search is the primary RAG layer over three committed scheme PDFs in `backend/data/schemes/`. The app is **stateless** — no DB, no GCS, no Firestore in v1; scheme rules are hardcoded Pydantic models; the repo is the source of truth for the scheme corpus.
+Two-service app: **Next.js 16 frontend** (React 19, Tailwind 4) and **FastAPI + ADK-Python backend**, both on Cloud Run. The `RootAgent` (Gemini 2.5 Pro, ADK `SequentialAgent`) orchestrates five `FunctionTool`s. Vertex AI Search is the primary RAG layer over three committed scheme PDFs in `backend/data/schemes/`. The app is **stateless** — no DB, no GCS, no Firestore in v1; scheme rules are hardcoded Pydantic models; the repo is the source of truth for the scheme corpus.
 
 Plan B (at sprint hour 12 if Vertex AI Search setup stalls): collapse to Gemini 2.5 Pro inline-PDF grounding in its 1M-token context. Keep ADK-Python and the five-step pipeline intact. See `docs/trd.md` §8.
 
@@ -36,7 +36,8 @@ Plan B (at sprint hour 12 if Vertex AI Search setup stalls): collapse to Gemini 
 
 ### Frontend
 
-- **Framework:** Next.js 14 App Router, React 18, TypeScript.
+- **Framework:** Next.js 16 App Router (`--webpack` forced in scripts; Turbopack is the 16 default but the WSL webpack-polling config below is tried-and-true), React 19, TypeScript 5.
+- **Next.js 16 note.** The scaffold ships `AGENTS.md` + root `CLAUDE.md` warning that Next.js 16 has breaking changes vs prior training data. Read `node_modules/next/dist/docs/` before writing framework-sensitive code. Heed deprecation notices in `next dev` output.
 - **Styling:** Tailwind CSS, shadcn/ui (slate, CSS variables), Lucide React icons.
 - **Tooling:** pnpm (packageManager=pnpm@10.33.0, engines.node=24.x), Husky + lint-staged, Prettier + `prettier-plugin-tailwindcss`, ESLint.
 - **Dev experience:** `next.config.mjs` sets WSL-friendly HMR polling (`poll: 800`, `aggregateTimeout: 300`, ignore `node_modules`).

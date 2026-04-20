@@ -4,6 +4,19 @@
 
 ---
 
+## [20/04/26] - Scaffolded Next.js 16 frontend tooling
+
+- Scaffolded Next.js 16.2.4 + React 19.2.4 + Tailwind 4.2.2 + ESLint 9 flat config into the repo via a temp-dir merge (preserved `docs/`, `.claude/`, `.git/`, existing `.prettierrc`/`.prettierignore`/`README.md`). Renamed package to `layak`; dropped legacy `.eslintrc.cjs` and `src/.gitkeep`.
+- Installed `lucide-react`, Husky (9.1.7) with pre-commit `pnpm lint-staged`, lint-staged (16.4.0), `prettier-plugin-tailwindcss`, and scaffold defaults.
+- Ran `pnpm dlx shadcn@latest init -d` (Tailwind 4 auto-detected, `base-nova` preset) and added 12 shadcn components: alert, badge, button, card, dialog, input, label, progress, separator, sonner, tabs, textarea. `toast` is deprecated in favour of `sonner`; `form` wrapper component did not land under the base-nova preset — react-hook-form + @hookform/resolvers + zod installed for manual composition.
+- Configured webpack HMR polling in `next.config.ts` (poll=800ms, aggregateTimeout=300ms, ignore `node_modules`); forced `--webpack` in dev/build scripts so WSL polling runs. Next.js 16 defaults to Turbopack; we keep Turbopack as a one-flag-flip option if polling becomes unnecessary.
+- Added `.env.example` with `GOOGLE_API_KEY`, `GEMINI_API_KEY`, `GOOGLE_CLOUD_PROJECT`, `GOOGLE_CLOUD_LOCATION`, `VERTEX_AI_SEARCH_DATA_STORE` placeholders. Existing `.gitignore` already covers `.env`/`.next/`/`node_modules/`/etc. and keeps `.claude/` tracked.
+- Replaced scaffold default `src/app/page.tsx` with a 27-line Layak stub (shadcn Card + disabled Lucide Play-icon button). Updated `layout.tsx` metadata title/description.
+- `pnpm lint` clean. `pnpm build --webpack` clean — two routes prerendered static (`/`, `/_not-found`).
+- Updated `docs/prd.md`, `docs/trd.md`, and `.claude/CLAUDE.md` to reflect the Next.js 16 / React 19 / Tailwind 4 / ESLint 9 stack bump (kickoff `@latest` delivered newer than the PRD's "Next.js 14" note — PO confirmed "use latest release").
+
+---
+
 ## [20/04/26] - Initialized project-specific .claude/CLAUDE.md and inventoried skills
 
 - Filled `.claude/CLAUDE.md` Project, Current Phase, Architecture (points to trd.md), Tech Stack (frontend locked, backend pending, infra on Cloud Run), Commands, and Code Style sections.

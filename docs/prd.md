@@ -69,7 +69,7 @@ Each requirement below ties to one of the ten in-scope v1 deliverables. Acceptan
 
 ### FR-1 — Single-page web app on Cloud Run
 
-**Description.** Next.js 14 App Router application deployed at a public Cloud Run HTTPS URL, accessible without login.
+**Description.** Next.js 16 App Router application (React 19, Tailwind 4) deployed at a public Cloud Run HTTPS URL, accessible without login.
 
 **Acceptance criteria:**
 

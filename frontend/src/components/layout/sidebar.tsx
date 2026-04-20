@@ -3,9 +3,8 @@
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useEffect, useState } from 'react'
-import { FileText, HelpCircle, Home, Menu, type LucideIcon } from 'lucide-react'
+import { BookOpen, LayoutDashboard, Library, Menu, Sparkles, type LucideIcon } from 'lucide-react'
 
-import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
 
@@ -13,14 +12,13 @@ type NavItem = {
   href: string
   label: string
   icon: LucideIcon
-  enabled: boolean
-  hint?: string
 }
 
 const NAV_ITEMS: NavItem[] = [
-  { href: '/', label: 'Home', icon: Home, enabled: true },
-  { href: '#schemes', label: 'Schemes', icon: FileText, enabled: false, hint: 'v2' },
-  { href: '#about', label: 'How it works', icon: HelpCircle, enabled: false, hint: 'v2' }
+  { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
+  { href: '/dashboard/evaluation', label: 'Evaluation', icon: Sparkles },
+  { href: '/dashboard/schemes', label: 'Schemes', icon: Library },
+  { href: '/dashboard/how-it-works', label: 'How it Works', icon: BookOpen }
 ]
 
 type SidebarProps = {
@@ -58,49 +56,33 @@ export function Sidebar({ mobileOpen, onMobileClose }: SidebarProps) {
         <nav className="flex flex-1 flex-col gap-0.5 overflow-y-auto p-2">
           {NAV_ITEMS.map(item => {
             const Icon = item.icon
-            const active = item.enabled && pathname === item.href
-            const body = (
-              <span
-                className={cn(
-                  'flex h-9 w-full items-center gap-3 rounded-md px-2.5 text-sm transition-colors',
-                  active
-                    ? 'bg-sidebar-accent text-sidebar-accent-foreground'
-                    : 'text-sidebar-foreground/80 hover:bg-sidebar-accent/60 hover:text-sidebar-foreground',
-                  !item.enabled && 'cursor-not-allowed opacity-50 hover:bg-transparent hover:text-sidebar-foreground/80'
-                )}
+            const active = pathname === item.href
+            return (
+              <Link
+                key={item.label}
+                href={item.href}
+                aria-label={item.label}
+                aria-current={active ? 'page' : undefined}
               >
-                <Icon className="size-4 shrink-0" aria-hidden />
                 <span
                   className={cn(
-                    'flex flex-1 items-center justify-between gap-2 overflow-hidden transition-opacity duration-200',
-                    isCollapsed ? 'pointer-events-none opacity-0' : 'opacity-100'
+                    'flex h-9 w-full items-center gap-3 rounded-md px-2.5 text-sm transition-colors',
+                    active
+                      ? 'bg-sidebar-accent text-sidebar-accent-foreground'
+                      : 'text-sidebar-foreground/80 hover:bg-sidebar-accent/60 hover:text-sidebar-foreground'
                   )}
                 >
-                  <span className="truncate">{item.label}</span>
-                  {item.hint ? (
-                    <Badge variant="outline" className="shrink-0 px-1.5 py-0 text-[10px] font-normal">
-                      {item.hint}
-                    </Badge>
-                  ) : null}
+                  <Icon className="size-4 shrink-0" aria-hidden />
+                  <span
+                    className={cn(
+                      'flex-1 truncate transition-opacity duration-200',
+                      isCollapsed ? 'pointer-events-none opacity-0' : 'opacity-100'
+                    )}
+                  >
+                    {item.label}
+                  </span>
                 </span>
-              </span>
-            )
-            if (item.enabled) {
-              return (
-                <Link
-                  key={item.label}
-                  href={item.href}
-                  aria-label={item.label}
-                  aria-current={active ? 'page' : undefined}
-                >
-                  {body}
-                </Link>
-              )
-            }
-            return (
-              <span key={item.label} role="link" aria-disabled aria-label={item.label}>
-                {body}
-              </span>
+              </Link>
             )
           })}
         </nav>

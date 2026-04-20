@@ -73,7 +73,7 @@ Owner convention: **PO1** drives AI/backend, **PO2** drives frontend/infra, **Bo
 
 ---
 
-## Phase 2 — Submission Package
+## Phase X — Submission Package
 
 **When:** 21 April, 18:00 → 23:00
 **Goal:** Ship clean, complete artifacts. Nothing heroic, nothing risky.

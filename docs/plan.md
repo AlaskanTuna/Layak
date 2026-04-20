@@ -286,9 +286,15 @@ _All four exit-criteria items met: Aisyah total = **RM8,208/year** (STR RM450 + 
 
 ---
 
-## Phase 2: Submission Package
+## Phase 2: App Workflow Refinement
 
-> Maps to `docs/roadmap.md` Phase 2 — ship clean, complete artifacts. Tasks below are picked up on demo-day evening, post feature-freeze.
+...
+
+---
+
+## Phase X: Submission Package
+
+> Maps to `docs/roadmap.md` Phase X — ship clean, complete artifacts. Tasks below are picked up on demo-day evening, post feature-freeze.
 
 ### 1. Feature: UI polish and README final pass
 
@@ -327,9 +333,5 @@ _All four exit-criteria items met: Aisyah total = **RM8,208/year** (STR RM450 + 
 - [ ] Fill and submit the Google Form against every required field (repo URL, Cloud Run URL, video URL, deck PDF, GitHub profile links, track + category).
 - [ ] Verify each link in the confirmation email.
 - [ ] Resubmit if anything breaks during the 23:00–23:59 buffer.
-
----
-
-## Phase X: ...
 
 ---

@@ -4,6 +4,10 @@
 
 ---
 
+## [21/04/26] - Moved frontend favicon into public static assets
+
+Moved `frontend/src/app/favicon.ico` into `frontend/public/favicon.ico` so Next.js serves it as a static asset. Updated `frontend/src/app/layout.tsx` metadata to point at `/favicon.ico` explicitly, and verified the layout file still type-checks.
+
 ## [21/04/26] - Synced frontend Aisyah fixture to Hao's Task 3 Path 1 stub outputs (classify notes, compute_upside stdout, packet filenames)
 
 After merging `origin/main` (Hao's Task 3 Path 1 + demo-doc redesign), the frontend mock fixture drifted from backend stub output in three places — mock-mode would have shown different strings than wired-mode. Aligned verbatim.

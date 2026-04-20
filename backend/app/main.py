@@ -42,7 +42,9 @@ app = FastAPI(title="Layak Backend", version="0.1.0")
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000"],
+    # Dev: regex matches any localhost port (PO2 runs :6767, scaffold default is :3000).
+    # Prod: the Cloud Run frontend URL is added to `allow_origins` at Task 6 deploy time.
+    allow_origin_regex=r"http://localhost:\d+",
     allow_methods=["GET", "POST", "OPTIONS"],
     allow_headers=["*"],
 )

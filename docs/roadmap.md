@@ -1,6 +1,6 @@
 # ROADMAP
 
-> **Project:** _[TBD — replace once idea is locked]_
+> **Project:** Layak
 > **Hackathon:** Project 2030: MyAI Future Hackathon (GDG On Campus UTM)
 > **Category:** Open
 > **Team:** 2 members — P1 (Team Lead), P2 (Co-dev)
@@ -19,19 +19,19 @@ Owner convention: **P1** drives AI/backend, **P2** drives frontend/infra, **Both
 **When:** 20 April, afternoon → midnight
 **Goal:** Registration submitted, idea locked, hello-world live on Cloud Run, both laptops primed. Sleep by 01:00.
 
-| Time (MYT)    | Milestone                                                                                           | Owner | Deliverable                                                                    |
-| ------------- | --------------------------------------------------------------------------------------------------- | ----- | ------------------------------------------------------------------------------ |
-| ASAP          | Team Lead submits Google Form registration                                                          | P1    | Submission confirmation visible in response sheet                              |
-| ASAP          | Kick off Track 4 + Track 2 deep research in parallel                                                | P1    | 2 claude.ai chats running                                                      |
-| ASAP → 20:00  | P2 reads handbook + FAQs independently                                                              | P2    | Aligned understanding, any flags raised                                        |
-| 20:00         | Both review research reports, debate top 3 ideas                                                    | Both  | **DECISION: idea + track locked**                                              |
-| 20:15         | Project name chosen; rename repo `myai-future-hackathon` → codename                                 | P1    | Renamed public repo                                                            |
-| 20:15 → 22:00 | Scaffold `docs/` via Claude Code kickoff prompt                                                     | P1    | `docs/prd.md`, `docs/architecture.md`, `docs/progress.md`, `README.md` stubbed |
-| 20:15 → 22:00 | GCP project, billing linked, enable Vertex AI + Cloud Run + Artifact Registry + Secret Manager APIs | P2    | `gcloud` authed on both laptops                                                |
-| 22:00         | Gemini API key from AI Studio                                                                       | P2    | Key in local `.env` (NOT committed); `.env.example` committed                  |
-| 22:00 → 23:30 | Hello-world: FastAPI route → Gemini call → container → Cloud Run                                    | Both  | Public URL returns a Gemini response in browser                                |
-| 23:30         | Commit, push, tag `v0.0.1-helloworld`                                                               | P1    | Green build on `main`                                                          |
-| **00:30**     | **SLEEP — hard rule**                                                                               | Both  |                                                                                |
+| Time (MYT)    | Milestone                                                                                           | Owner | Deliverable                                                           |
+| ------------- | --------------------------------------------------------------------------------------------------- | ----- | --------------------------------------------------------------------- |
+| ASAP          | Team Lead submits Google Form registration                                                          | P1    | Submission confirmation visible in response sheet                     |
+| ASAP          | Kick off Track 4 + Track 2 deep research in parallel                                                | P1    | 2 claude.ai chats running                                             |
+| ASAP → 20:00  | P2 reads handbook + FAQs independently                                                              | P2    | Aligned understanding, any flags raised                               |
+| 20:00         | Both review research reports, debate top 3 ideas                                                    | Both  | **DECISION: idea + track locked**                                     |
+| 20:15         | Project name chosen; rename repo `myai-future-hackathon` → codename                                 | P1    | Renamed public repo                                                   |
+| 20:15 → 22:00 | Scaffold `docs/` via Claude Code kickoff prompt                                                     | P1    | `docs/prd.md`, `docs/trd.md`, `docs/progress.md`, `README.md` stubbed |
+| 20:15 → 22:00 | GCP project, billing linked, enable Vertex AI + Cloud Run + Artifact Registry + Secret Manager APIs | P2    | `gcloud` authed on both laptops                                       |
+| 22:00         | Gemini API key from AI Studio                                                                       | P2    | Key in local `.env` (NOT committed); `.env.example` committed         |
+| 22:00 → 23:30 | Hello-world: FastAPI route → Gemini call → container → Cloud Run                                    | Both  | Public URL returns a Gemini response in browser                       |
+| 23:30         | Commit, push, tag `v0.0.1-helloworld`                                                               | P1    | Green build on `main`                                                 |
+| **00:30**     | **SLEEP — hard rule**                                                                               | Both  |                                                                       |
 
 **Phase 0 exit gate:**
 
@@ -111,5 +111,47 @@ Owner convention: **P1** drives AI/backend, **P2** drives frontend/infra, **Both
 | Feature freeze | 21 Apr 18:00 | No new endpoints, pages, or flows. Bug fixes only.                           |
 | Code freeze    | 21 Apr 21:00 | No commits to `main` except submission-related metadata (README links, etc). |
 | Hard submit    | 21 Apr 23:00 | Form submitted. Anything after is bonus polish.                              |
+
+---
+
+## Decision log
+
+| Date        | Decision       | Value                                                                                                                                                                           |
+| ----------- | -------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 20 Apr 2026 | Category       | Open                                                                                                                                                                            |
+| 20 Apr 2026 | Track          | Track 2 — Citizens First (GovTech & Digital Services)                                                                                                                           |
+| 20 Apr 2026 | Project name   | Layak                                                                                                                                                                           |
+| 20 Apr 2026 | Agentic moment | One upload → five visible agent steps (extract → classify → match → rank → generate) → ranked schemes, provenance-cited rules, and a signed DRAFT application packet.           |
+| 20 Apr 2026 | Orchestrator   | ADK-Python v1.31 GA (not Genkit — Genkit-Python is Alpha with a known warm-instance bug on Cloud Run).                                                                          |
+| 20 Apr 2026 | RAG layer      | Vertex AI Search (primary); Gemini 2.5 Pro inline-PDF 1M-context grounding as documented Plan B if Vertex AI Search setup stalls past sprint hour 12.                           |
+| 20 Apr 2026 | Persona        | Aisyah, 34, Grab driver in Kuantan — files **Form B** (self-employed), not Form BE.                                                                                             |
+| 20 Apr 2026 | Schemes locked | STR 2026 (household tier), JKM Warga Emas (RM600/mo per Budget 2026, RM500 fallback), five LHDN reliefs (individual, parent medical, child 16a ×2, EPF+life #17, lifestyle #9). |
+| 20 Apr 2026 | Persistence    | Stateless — no DB, no GCS, no Firestore in v1. Scheme PDFs git-versioned at `backend/data/schemes/`.                                                                            |
+
+---
+
+## Non-goals
+
+Mirrored from `docs/project-idea.md` §5 and `docs/prd.md` §6.2. Any item below renders as a greyed-out "Checking… (v2)" card in the UI — never a working feature.
+
+- Live submission to any government portal (disqualification risk).
+- Malay, Chinese, or Tamil UI (English only in v1).
+- Schemes beyond the three locked: i-Saraan, PERKESO, MyKasih, eKasih, PADU sync, state-level aid (Kita Selangor, Penang elderly), SARA claim flow.
+- Appeal workflow (BK-02 / BK-05 / JKM20).
+- Mobile native app.
+- User accounts and persistent storage.
+- MyDigital ID / MyKad NFC reading.
+- Multi-document versioning.
+- Email / WhatsApp delivery of packet.
+- Voice input.
+- OKU, spouse, and disability edge cases in the rule engine.
+- EV charging, SSPN, and housing-loan-interest reliefs (#22).
+- Tax filing submission to MyTax.
+- PADU registration.
+- Household-income percentile framing against OpenDOSM data.
+- Budget 2026 SARA Untuk Semua one-off disbursement.
+- eKasih booster tier toggle.
+- Warga Emas discretionary-override path.
+- Form B vs Form BE auto-routing (Aisyah is locked as Form B filer).
 
 ---

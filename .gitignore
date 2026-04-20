@@ -70,7 +70,7 @@ Temporary Items
 
 # Project docs (managed locally, not committed)
 # =============================================
-docs/
+# docs/
 
 # TypeScript build output (tsc -b emits alongside source files)
 # ==========================================================

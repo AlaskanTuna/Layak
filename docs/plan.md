@@ -99,12 +99,12 @@
 
 **Implementation:**
 
-- [ ] Download the six PDFs into `backend/data/schemes/`: `RISALAH STR 2026.pdf`, `BK-01.pdf`, `JKM18.pdf`, `pr-no-4-2024.pdf`, `explanatorynotes_be2025.pdf`, `rf-filing-programme-for-2026.pdf` (canonical URLs in `docs/trd.md` §6.1).
-- [ ] Verify each file: size ≥ 1 KB, first four bytes are the `%PDF` magic header.
-- [ ] For any URL that returns an error page or bot-block, report it so the human can browser-download and drop the file in.
-- [ ] Delete `backend/data/schemes/.gitkeep` once at least one real PDF lands.
-- [ ] Tick these items in `docs/plan.md`; append a dated summary to `docs/progress.md`.
-- [ ] Commit `chore(db): commit scheme source PDFs`.
+- [x] Download the six PDFs into `backend/data/schemes/`: `RISALAH STR 2026.pdf`, `BK-01.pdf`, `JKM18.pdf`, `pr-no-4-2024.pdf`, `explanatorynotes_be2025.pdf`, `rf-filing-programme-for-2026.pdf` (canonical URLs in `docs/trd.md` §6.1).
+- [x] Verify each file: size ≥ 1 KB, first four bytes are the `%PDF` magic header.
+- [x] For any URL that returns an error page or bot-block, report it so the human can browser-download and drop the file in.
+- [x] Delete `backend/data/schemes/.gitkeep` once at least one real PDF lands.
+- [x] Tick these items in `docs/plan.md`; append a dated summary to `docs/progress.md`.
+- [x] Commit `chore(db): commit scheme source PDFs`.
 
 ---
 

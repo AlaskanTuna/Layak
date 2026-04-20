@@ -172,14 +172,16 @@
 
 **Implementation — PO1 (Hao):**
 
-- [ ] **Vertex AI Search seed**: `backend/scripts/seed_vertex_ai_search.py` — reads the six PDFs from `backend/data/schemes/`, creates a Discovery Engine data store `layak-schemes-v1` in `asia-southeast1`, uploads + indexes all six, waits for indexing to complete. Idempotent; safe to re-run.
-- [ ] **Canary query test**: `search("STR 2026 household income threshold")` returns at least one passage from `risalah-str-2026.pdf`; same for JKM and LHDN. Assert in the seed script.
-- [ ] **Expand FunctionTools from 2 to 5**:
-  - `extract_profile` → Gemini 2.5 Flash multimodal with `Profile` as structured output. Replace the stub.
-  - `classify_household` → Gemini 2.5 Flash → `{has_children_under_18, has_elderly_dependant, income_band}`.
-  - `match_schemes` → for each of {STR, JKM, LHDN}, queries Vertex AI Search, then delegates to the rule engine (task 4); until task 4 lands, stub with `qualifies=True`.
-  - `compute_upside` → Gemini Code Execution (`tools: [{codeExecution: {}}]`) runs Python computing annual RM per scheme + total; emit the Python snippet + stdout as a `step_result` payload so the UI shows it on stage.
-  - `generate_packet` → stubbed; WeasyPrint lands in task 5.
+> **Path 1 (scaffolding-only, landed in commit prior to sprint start per CLAUDE.md "no Gemini/Vertex calls until sprint start" guardrail):** structural 5-tool pipeline + seed-script skeleton. `Path 2` below replaces the stubs with real Gemini calls + live Vertex AI Search indexing at sprint start.
+
+- [x] **Vertex AI Search seed**: `backend/scripts/seed_vertex_ai_search.py` — reads the six PDFs from `backend/data/schemes/`, creates a Discovery Engine data store `layak-schemes-v1` in `asia-southeast1`, uploads + indexes all six, waits for indexing to complete. Idempotent; safe to re-run. _(Path 1: script written, dry-run works showing all 6 PDFs and canary queries; `--execute` opt-in flag gates real API calls, deferred to Path 2. `asia-southeast1` not available for Discovery Engine data stores in v1 — defaulting to `global` with a note in the script docstring; Cloud Run still lives in `asia-southeast1`.)_
+- [x] **Canary query test**: `search("STR 2026 household income threshold")` returns at least one passage from `risalah-str-2026.pdf`; same for JKM and LHDN. Assert in the seed script. _(Path 1: defined in `CANARY_QUERIES` in the seed script; runs after indexing when `--execute` is passed.)_
+- [x] **Expand FunctionTools from 2 to 5**: _(Path 1: all 5 present as stubs with stable wire-shape outputs. Path 2 swaps each stub for the real Gemini call.)_
+  - `extract_profile` → Gemini 2.5 Flash multimodal with `Profile` as structured output. Replace the stub. _(Path 1: returns canned Aisyah fixture.)_
+  - `classify_household` → Gemini 2.5 Flash → `{has_children_under_18, has_elderly_dependant, income_band}`. _(Path 1: derived directly from `Profile.household_flags` + computed per-capita + 5 human-readable notes.)_
+  - `match_schemes` → for each of {STR, JKM, LHDN}, queries Vertex AI Search, then delegates to the rule engine (task 4); until task 4 lands, stub with `qualifies=True`. _(Path 1: delegates to Task 4 rule engine, sorts descending by `annual_rm`, filters non-qualifying. Vertex AI Search retrieval added in Path 2.)_
+  - `compute_upside` → Gemini Code Execution (`tools: [{codeExecution: {}}]`) runs Python computing annual RM per scheme + total; emit the Python snippet + stdout as a `step_result` payload so the UI shows it on stage. _(Path 1: stub synthesises a syntactically-valid Python snippet and its stdout deterministically from the `SchemeMatch` list; `ComputeUpsideResult.python_snippet` + `.stdout` payload shape is stable.)_
+  - `generate_packet` → stubbed; WeasyPrint lands in task 5. _(Path 1: returns filename-only `PacketDraft`s slugged by `profile.ic_last4` — `BK-01-STR2026-draft-4321.pdf`, `JKM18-warga-emas-draft-4321.pdf`, `LHDN-form-b-relief-summary-4321.pdf`. `blob_bytes_b64` stays `None` until Task 5.)_
 - [ ] **Plan B trigger (sprint hour 12 ≈ 14:30 MYT)**: if Vertex AI Search setup isn't green or canary queries return empty by 14:30, flip to inline-PDF grounding per `docs/trd.md` §8 — drop the Search client, replace with a local `{pdf_name → pages}` lookup that Gemini 2.5 Pro reads inline (~80K tokens, well under the 200K cheap tier). ADK and the five-step pipeline stay intact. PO1 calls the trigger; both accept without re-debate.
 
 **Implementation — PO2 (Adam), sync points:**

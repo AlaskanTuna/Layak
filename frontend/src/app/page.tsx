@@ -1,24 +1,21 @@
-import { Play } from 'lucide-react'
-import { Button } from '@/components/ui/button'
-import { Card, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { HomeClient } from '@/components/home/home-client'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 
 export default function Home() {
   return (
-    <main className="flex flex-1 items-center justify-center p-6">
-      <Card className="w-full max-w-md">
+    <main className="flex flex-1 items-start justify-center p-4 sm:p-6">
+      <Card className="w-full max-w-xl">
         <CardHeader>
           <CardTitle>Layak</CardTitle>
           <CardDescription>
-            Agentic AI concierge for Malaysian social-assistance schemes. Upload three documents; the agent returns a
-            ranked, cited list of what you qualify for and a pre-filled draft application packet.
+            Upload three documents — your MyKad, a recent payslip, and a utility bill. The agent extracts, classifies,
+            matches, ranks, and drafts application packets for every scheme you qualify for. Every number cites a source
+            page. Every packet is a DRAFT — you submit manually.
           </CardDescription>
         </CardHeader>
-        <div className="px-6 pb-6">
-          <Button disabled className="w-full">
-            <Play className="mr-2 h-4 w-4" aria-hidden />
-            Start
-          </Button>
-        </div>
+        <CardContent>
+          <HomeClient />
+        </CardContent>
       </Card>
     </main>
   )

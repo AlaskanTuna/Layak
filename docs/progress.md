@@ -63,6 +63,42 @@ Path 1 per the CLAUDE.md "no Gemini or Vertex AI call until sprint start" guardr
 
 ---
 
+## [20/04/26] - Phase 1 Task 2 commit 3: results view — ranked list, scheme cards, provenance panel, code execution trace
+
+- Wrote `frontend/src/components/results/provenance-panel.tsx` — given `RuleCitation[]`, renders each citation as a clickable card (`rule_id`, `source_pdf · page_ref`). Clicking opens a shadcn `Dialog` with the passage text as a blockquote plus an external "Open source PDF" link (when `source_url` is present). Grounds FR-7.
+- Wrote `frontend/src/components/results/scheme-card.tsx` — shadcn `Card` with agency `Badge`, scheme name, right-aligned "RMx,xxx per year (est.)" block, and `summary` description. "Why I qualify" toggle (`aria-expanded`) reveals the justification paragraph, the `ProvenancePanel`, and an "Open <agency> portal" external link. Grounds FR-6 + FR-9.
+- Wrote `frontend/src/components/results/ranked-list.tsx` — filters to `qualifies=true`, sorts by `annual_rm` desc, renders a total-upside banner (uses `upside.total_annual_rm` when available, else sums `annual_rm`). Below the ranked cards, a "Checking… (v2)" section lists eight out-of-scope schemes from PRD §6.2 AC line 173 (i-Saraan, PERKESO SKSPS, MyKasih, eKasih, PADU sync, state-level aid, SARA claim flow, appeal workflow) as a 2-col grid of `opacity-60` cards.
+- Wrote `frontend/src/components/results/code-execution-panel.tsx` — dedicated card rendering the Gemini Code Execution `python_snippet` and `stdout` as two `<pre>` blocks with `Code2` / `Terminal` icons. Advance-wires the Task 3 PO2 sync point ("Render Code Execution stdout in a small `<pre>` — this is the judge-trust moment") so commit 3 looks demo-complete in mock mode today.
+- Rewired `frontend/src/components/home/home-client.tsx` results phase: replaces the placeholder with `<RankedList matches={state.matches} totalAnnualRm={state.upside?.total_annual_rm ?? null} />` followed by `<CodeExecutionPanel upside={state.upside} />` (rendered only when `upside` is present, so real-mode pre-Task-3 still renders cleanly).
+- `pnpm run lint` clean. `pnpm run build` clean — 6.3 s compile, two routes prerendered static.
+- Deferred to Task 5 / Task 6: responsiveness eyeball at 375 / 768 / 1440 viewports (final checkpoint manual QA), packet download button (FR-8, wired in Task 5 alongside WeasyPrint), error recovery card on `error` SSE events.
+
+---
+
+## [20/04/26] - Phase 1 Task 2 commit 2: SSE consumer hook, pipeline stepper, Aisyah fixture
+
+- Wrote `frontend/src/lib/agent-types.ts` — TS mirror of `backend/app/schema/*.py` Pydantic models (`Profile`, `HouseholdClassification`, `SchemeMatch`, `RuleCitation`, `Packet`, `AgentEvent` discriminated union). Field names stay snake_case to match the JSON wire format. Exported `PIPELINE_STEPS` and `STEP_LABELS` constants.
+- Wrote `frontend/src/fixtures/aisyah-response.ts` — canned replay mirroring `backend/app/fixtures/aisyah.py` verbatim (STR RM1,200 + JKM RM7,200 + LHDN RM1,008 = RM9,408/yr). Adds forward-looking fixtures the backend doesn't emit yet: `AISYAH_CLASSIFICATION`, `AISYAH_UPSIDE` (Python snippet + stdout), `AISYAH_PACKET`. `AISYAH_MOCK_EVENTS` is a 11-event ordered replay totalling ~3.8 s end-to-end.
+- Wrote `frontend/src/lib/sse-client.ts` — `useAgentPipeline()` hook exposing `{state, start, reset}`. `start({mode:"mock"})` replays the fixture via staggered `setTimeout`s; `start({mode:"real", files})` POSTs multipart `FormData` to `${NEXT_PUBLIC_BACKEND_URL}/api/agent/intake` and consumes the `text/event-stream` body via `ReadableStream` + manual `data: …\n\n` chunk parser. `NEXT_PUBLIC_USE_MOCK_SSE=1` env flag forces mock for all real submissions. `AbortController` + `setTimeout` handles cleaned up on unmount or `reset()`. Reducer (`applyEvent`) is split out so the same logic drives both paths.
+- Wrote `frontend/src/components/pipeline/pipeline-stepper.tsx` — shadcn `Progress` bar (percent complete) over an `<ol>` of five labelled rows. Each row carries a status icon (spinner / check / red alert / empty circle) and a textual state label. Active row picks up a `primary/5` tint, errored row a `destructive/5` tint. `aria-current="step"` on the active row for assistive tech.
+- Rewrote `frontend/src/components/home/home-client.tsx` — derives display phase from `state.phase` (eliminates a `set-state-in-effect` ESLint error from the first pass). Submit + demo-mode handlers both call `start(...)`; `handleReset` clears fixture state and returns to landing. Results phase renders a placeholder with the total RM upside (real ranked list + provenance panel land in commit 3).
+- `pnpm run lint` clean (after one correction). `pnpm run build` clean — 4.5 s compile, two routes prerendered static.
+- Deferred to commit 3: `ranked-list.tsx`, `scheme-card.tsx`, `provenance-panel.tsx`, "Why I qualify" expander (FR-9), click-through source PDFs dialog (FR-7), out-of-scope "Checking… (v2)" cards (PRD §6.2).
+
+---
+
+## [20/04/26] - Phase 1 Task 2 commit 1: landing view, upload widget, demo-mode banner
+
+- Flipped root `.env.example` `NEXT_PUBLIC_BACKEND_URL` from `:8000` to `:8080` to match `backend/app/main.py:13` (uvicorn `--port 8080`) and Cloud Run's default `PORT=8080`. Frontend branch only; backend untouched.
+- Wrote `frontend/src/components/upload/upload-widget.tsx` — three separately-labelled file inputs (IC, payslip, utility) with `accept="image/*,application/pdf"`, mobile `capture="environment"`, controlled per-slot state, per-slot clear button, inline validation (`aria-invalid` + linked `aria-describedby`) rejecting files > 10 MB and non-image/non-PDF MIME types. "Continue" button disabled until all three slots are valid; "Use Aisyah sample documents" button sits adjacent (responsive row on sm+). Covers FR-2.
+- Wrote `frontend/src/components/home/demo-mode-banner.tsx` — shadcn `Alert` in amber with `Sparkles` icon and copy "Running against Aisyah — a synthetic Grab driver …". Light + dark mode palette.
+- Wrote `frontend/src/components/home/home-client.tsx` — `'use client'` orchestrator holding a three-phase state (`landing` | `processing` | `results`) and `isDemoMode` flag. Submit + "Use Aisyah" handlers both flip phase to `processing`; banner surfaces only in demo mode. Real SSE trigger + fixture replay land in Task 2 commit 2.
+- Replaced `frontend/src/app/page.tsx` stub with a server component wrapping `HomeClient` inside shadcn `Card` + `CardContent`; copy references the extract → classify → match → rank → generate pipeline and the DRAFT invariant.
+- `pnpm run lint` clean. `pnpm run build` clean — compiled in 8.5 s, two routes prerendered (`/`, `/_not-found`).
+- Deferred to commit 2: `frontend/src/fixtures/aisyah-response.ts`, SSE consumer hook (`sse-client.ts`), pipeline stepper. Deferred to commit 3: ranked-list + scheme-card + provenance panel.
+
+---
+
 ## [21/04/26] - Demo-docs audit fixes: watermark opacity, README Chrome guide, provenance-drift disclosure
 
 Three parallel subagent audits (legal compliance, fixture-data fidelity, print-to-PDF fidelity) on commit `d6b1664` returned actionable findings. Fixed here.
@@ -89,6 +125,18 @@ Independent PO1 task from `docs/mockgen.md`. Three self-contained HTML files at 
 - Sanity-check: `pnpm -C frontend build` still passes (static `public/` files don't enter the compile graph).
 - Closed `docs/trd.md` §9.6 open question with a RESOLVED marker pointing at `frontend/public/demo/`. Note inside: the original plan said "payslip (EA Form/CP8A)" but Aisyah is a Form B gig worker — an EA Form would misrepresent her filer category, so `grab-earnings.html` replaces it. The net payout still ties to `monthly_income_rm`.
 - IC number quirk flagged by the brief (last digit even = female, `4321` ends in 1 → male-coded): preserved intentionally because the `ic_last4 = "4321"` value is fixture-locked across backend tests and the rule engine. Rippling a change across both sides of the codebase would cost more than the synthetic mismatch risks.
+
+---
+
+## [21/04/26] - Synced frontend Aisyah fixture to Phase 1 Task 4 rule-engine output
+
+- Merged `origin/main` (commits `5b072b8` Task 4 rule engine + `2f7155d` §6.19 fix) into the `frontend` branch. Conflicts were additive in `docs/progress.md` + `docs/plan.md` only — resolved by concatenating entries in chronological order.
+- The rule engine produced different Aisyah figures than the initial Task 2 commit-2 fixture mirror. New live totals: **JKM Warga Emas RM7,200 + LHDN Form B RM558 + STR 2026 RM450 = RM8,208/year** (was RM9,408). Both clear the plan.md ≥RM7,000 headline.
+  - STR dropped from an assumed RM1,200 (higher tier) to the correct RM450 — Aisyah lands in the 1–2 children bucket × RM2,501–5,000 band of the risalah p.2 tier table.
+  - LHDN dropped from an assumed flat RM1,008 to RM558 — real YA2025 bracket math: RM33,600 annual chargeable income minus RM30,500 stacked reliefs → RM3,100 taxable → RM0 tax after reliefs, saving the full RM558 that was otherwise owed.
+- Rewrote `frontend/src/fixtures/aisyah-response.ts` to mirror the rule-engine output verbatim: `AISYAH_SCHEME_MATCHES` now sorted by `annual_rm` desc, `scheme_name` / `summary` / `why_qualify` strings regenerated per the engine's final copy, LHDN citations expanded to 6 entries (added §6.19.3 split between §49(1)(a)/§49(1)(b) and §6.11.3 lifestyle). `AISYAH_UPSIDE` Python snippet + stdout + `total_annual_rm` + `per_scheme_rm` all updated. `AISYAH_PACKET.drafts[]` reordered to match.
+- `AISYAH_CLASSIFICATION.per_capita_monthly_rm` already RM700 — no change. Added a Form B filer note.
+- `pnpm run lint` clean. `pnpm run build` clean.
 
 ---
 

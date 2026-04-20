@@ -149,14 +149,14 @@
 
 **Implementation — PO2 (Adam):**
 
-- [ ] Replace `frontend/src/app/page.tsx` stub with the real landing view (upload widget above the fold + trust copy "We store nothing. Draft only — you submit manually.").
-- [ ] **Upload widget (FR-2)**: `frontend/src/components/upload/upload-widget.tsx` — three separately-labelled inputs (IC, payslip, utility) with `accept="image/*,application/pdf"` and `capture="environment"` for mobile camera. Reject files > 10 MB and non-image/non-PDF MIME types inline (not via toast).
-- [ ] **"Use Aisyah sample documents" button (FR-10)**: loads `frontend/src/fixtures/aisyah-response.ts` and skips the upload step; renders a "DEMO MODE" banner.
-- [ ] **SSE consumer (shared infra)**: `frontend/src/lib/sse-client.ts` — `useEventSource()` React hook parses `step_started | step_result | done | error` per task 1's locked event shape; exposes `{currentStep, stepResults, isDone, error}`.
-- [ ] **Pipeline stepper (FR-3/4/5 visual)**: `frontend/src/components/pipeline/pipeline-stepper.tsx` — renders the five steps with shadcn `Progress` + labels; each step lights up on `step_started`, checkmarks on `step_result`.
-- [ ] **Ranked scheme list (FR-6) + "Why I qualify" (FR-9)**: `scheme-card.tsx` (shadcn `Card` with RM/year, summary, expander) and `ranked-list.tsx` (descending by annual RM; total RM in header; out-of-scope schemes as greyed "Checking… (v2)" cards per `docs/prd.md` §6.2).
-- [ ] **Provenance panel (FR-7)**: `provenance-panel.tsx` — each rule citation as `rule → source PDF (page n)`; click opens shadcn `Dialog` with the passage text; click-through links to raw PDFs (mock for now).
-- [ ] **Mock SSE mode**: `NEXT_PUBLIC_USE_MOCK_SSE=1` env flag replays events from `aisyah-response.ts` with staggered `setTimeout`s so the UI animation rhythm is testable without the backend.
+- [x] Replace `frontend/src/app/page.tsx` stub with the real landing view (upload widget above the fold + trust copy "We store nothing. Draft only — you submit manually.").
+- [x] **Upload widget (FR-2)**: `frontend/src/components/upload/upload-widget.tsx` — three separately-labelled inputs (IC, payslip, utility) with `accept="image/*,application/pdf"` and `capture="environment"` for mobile camera. Reject files > 10 MB and non-image/non-PDF MIME types inline (not via toast).
+- [x] **"Use Aisyah sample documents" button (FR-10)**: loads `frontend/src/fixtures/aisyah-response.ts` and skips the upload step; renders a "DEMO MODE" banner.
+- [x] **SSE consumer (shared infra)**: `frontend/src/lib/sse-client.ts` — `useAgentPipeline()` hook handles both mock replay and real `fetch` SSE streaming, parses `step_started | step_result | done | error`, exposes `{state: {phase, stepStates, profile, classification, matches, upside, packet, error}, start, reset}`.
+- [x] **Pipeline stepper (FR-3/4/5 visual)**: `frontend/src/components/pipeline/pipeline-stepper.tsx` — renders the five steps with shadcn `Progress` + labels; each step lights up on `step_started`, checkmarks on `step_result`, and goes red on `error`.
+- [x] **Ranked scheme list (FR-6) + "Why I qualify" (FR-9)**: `scheme-card.tsx` (shadcn `Card` with RM/year, agency badge, summary, "Why I qualify" expander carrying the justification + ProvenancePanel + agency portal link) and `ranked-list.tsx` (descending by annual RM; total annual RM banner in header; eight out-of-scope schemes from PRD §6.2 as greyed "Checking… (v2)" cards in a grid).
+- [x] **Provenance panel (FR-7)**: `provenance-panel.tsx` — each rule citation renders as `rule_id → source PDF (page_ref)` in a clickable card; click opens shadcn `Dialog` with the passage text as a blockquote plus a "Open source PDF" external link. Bonus: `code-execution-panel.tsx` renders Gemini Code Execution Python + stdout as a paired `<pre>` block on the results view (advance-wires Task 3 PO2 sync point).
+- [x] **Mock SSE mode**: `NEXT_PUBLIC_USE_MOCK_SSE=1` env flag replays events from `aisyah-response.ts` with staggered `setTimeout`s so the UI animation rhythm is testable without the backend.
 - [ ] **Responsiveness smoke**: eyeball 375 / 768 / 1440 in Chrome DevTools. No horizontal scroll.
 - [ ] Commit in 2–3 chunks: `feat(ui): add upload widget and demo-mode banner`, `feat(ui): add pipeline stepper and sse consumer hook`, `feat(ui): add results view with ranked list and provenance panel`.
 

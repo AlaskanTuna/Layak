@@ -376,11 +376,15 @@ Monorepo via pnpm workspace. Frontend lives at `frontend/` (workspace package `l
 
 Budget 2026 announced RM600/month; no gov.my PDF yet reflects the uplift (JKM federal page last revised 2019). UI copy falls back to "RM500–600/month depending on current gazetted rate" when the rule engine cannot confirm RM600 against the live JKM18 form. Decision: display RM600 in demo copy and cite the Budget 2026 speech; keep the RM500 fallback string in the rule engine for belt-and-braces.
 
-### 9.6 Demo document specimens
+### 9.6 Demo document specimens — RESOLVED
 
-- MyKad — synthetic, watermarked, fictional IC number, AI-generated face, no holographic/chip elements.
-- Payslip — EA Form specimen layout (C.P. 8A) used as visual reference; synthetic content.
-- TNB utility bill — no official specimen PDF exists on tnb.com.my; generate a synthetic bill from observed layouts with no real account or meter numbers.
+Closed by commit landing the three synthetic HTML documents at `frontend/public/demo/` (`mykad.html`, `grab-earnings.html`, `tnb-bill.html`) with a render guide at `frontend/public/demo/README.md`. Next serves them at `/demo/<name>.html` during `pnpm dev`; Cmd+P → Save as PDF produces the demo artefacts. All three carry the repeated diagonal `SYNTHETIC — FOR DEMO ONLY` watermark, pin to `backend/app/fixtures/aisyah.py` (name, IC `900324-06-4321`, monthly income RM2,800, address shared between MyKad and TNB), and avoid any replication of the Malaysian coat of arms, holographic foil, or chip contacts. Pitch deck slide 1 must also disclose the documents as synthetic.
+
+Original decisions (preserved for audit trail):
+
+- MyKad — synthetic, watermarked, fictional IC number, no holographic/chip elements.
+- Grab earnings statement replaces the original payslip/EA Form plan — Aisyah is a Form B gig worker (docs/prd.md §3.1), so an EA Form specimen would have misrepresented her filer category. Monthly net ties to `monthly_income_rm`.
+- TNB utility bill — no official specimen PDF exists on tnb.com.my; generated from observed layouts with no real account or meter numbers.
 
 All three are PDPA 2010 / NRR 1990 compliant only so long as they are labelled SYNTHETIC on every page and in slide 1 of the pitch deck.
 

@@ -1,0 +1,494 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>TNB electricity bill (synthetic) — Aisyah binti Ahmad</title>
+    <style>
+      @page {
+        size: A4;
+        margin: 18mm;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      html,
+      body {
+        margin: 0;
+        padding: 0;
+        background: #f3f5f1;
+        font-family:
+          -apple-system,
+          BlinkMacSystemFont,
+          'Segoe UI',
+          Roboto,
+          Helvetica,
+          Arial,
+          sans-serif;
+        color: #10261a;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+      }
+
+      body {
+        display: flex;
+        justify-content: center;
+        padding: 24px;
+      }
+
+      .page {
+        width: 210mm;
+        min-height: 297mm;
+        background: #ffffff;
+        padding: 18mm 18mm 20mm;
+        position: relative;
+        box-shadow: 0 8px 28px rgba(0, 0, 0, 0.08);
+        overflow: hidden;
+      }
+
+      @media print {
+        body {
+          background: #ffffff;
+          padding: 0;
+          display: block;
+        }
+        .page {
+          width: auto;
+          min-height: auto;
+          padding: 0;
+          box-shadow: none;
+        }
+      }
+
+      header.brand {
+        display: flex;
+        align-items: flex-end;
+        justify-content: space-between;
+        gap: 8mm;
+        padding-bottom: 5mm;
+        border-bottom: 2mm solid #00793f;
+        position: relative;
+      }
+
+      header.brand::after {
+        content: '';
+        position: absolute;
+        left: 0;
+        right: 0;
+        bottom: -3.8mm;
+        height: 1mm;
+        background: #fcd116;
+      }
+
+      .brand-left {
+        display: flex;
+        align-items: center;
+        gap: 4mm;
+      }
+
+      .brand-mark {
+        width: 16mm;
+        height: 16mm;
+        background: #00793f;
+        color: #fcd116;
+        border-radius: 2mm;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 7mm;
+        font-weight: 900;
+        letter-spacing: -0.4mm;
+      }
+
+      .brand-text .name {
+        font-size: 5mm;
+        font-weight: 800;
+        color: #00562d;
+        letter-spacing: 0.4mm;
+        text-transform: uppercase;
+      }
+
+      .brand-text .sub {
+        font-size: 3.4mm;
+        color: #3c5147;
+        margin-top: 0.6mm;
+      }
+
+      .brand-meta {
+        text-align: right;
+        font-size: 3mm;
+        color: #3c5147;
+        line-height: 1.4;
+      }
+
+      .brand-meta .label {
+        color: #6b7a71;
+        text-transform: uppercase;
+        letter-spacing: 0.3mm;
+        font-size: 2.6mm;
+      }
+
+      .brand-meta .strong {
+        font-size: 4.2mm;
+        color: #10261a;
+        font-weight: 700;
+      }
+
+      section {
+        margin-top: 10mm;
+      }
+
+      h2 {
+        font-size: 3.4mm;
+        text-transform: uppercase;
+        letter-spacing: 0.8mm;
+        color: #00562d;
+        margin: 0 0 3mm;
+        border-bottom: 0.3mm solid #d0e3d6;
+        padding-bottom: 2mm;
+      }
+
+      .two-col-block {
+        display: grid;
+        grid-template-columns: 1.15fr 1fr;
+        gap: 10mm;
+      }
+
+      .info-card {
+        background: #f6faf5;
+        padding: 5mm 6mm;
+        border-radius: 2mm;
+        border: 0.3mm solid #d0e3d6;
+      }
+
+      .row {
+        display: grid;
+        grid-template-columns: 42mm 1fr;
+        gap: 2mm;
+        font-size: 3.2mm;
+        line-height: 1.4;
+        padding: 1.2mm 0;
+      }
+
+      .row + .row {
+        border-top: 0.2mm dotted #cddcd4;
+      }
+
+      .row .label {
+        color: #6b7a71;
+        text-transform: uppercase;
+        letter-spacing: 0.3mm;
+        font-size: 2.6mm;
+        padding-top: 0.8mm;
+      }
+
+      .row .value {
+        font-weight: 600;
+        color: #10261a;
+      }
+
+      table.usage {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 3.2mm;
+        margin-top: 2mm;
+      }
+
+      table.usage th,
+      table.usage td {
+        padding: 2.6mm 4mm;
+        text-align: left;
+      }
+
+      table.usage thead th {
+        background: #00562d;
+        color: #ffffff;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.4mm;
+        font-size: 2.8mm;
+      }
+
+      table.usage td.amount,
+      table.usage th.amount {
+        text-align: right;
+        font-variant-numeric: tabular-nums;
+      }
+
+      table.usage tbody tr + tr td {
+        border-top: 0.2mm solid #e1ebe4;
+      }
+
+      table.usage tr.subtotal td {
+        background: #eef6f0;
+        font-weight: 700;
+      }
+
+      table.usage tr.total td {
+        background: #fcd116;
+        color: #10261a;
+        font-weight: 800;
+        font-size: 4mm;
+      }
+
+      .pay-grid {
+        display: grid;
+        grid-template-columns: 1fr 42mm;
+        gap: 8mm;
+        margin-top: 4mm;
+        align-items: start;
+      }
+
+      .jompay {
+        background: #00562d;
+        color: #ffffff;
+        padding: 5mm 6mm;
+        border-radius: 2mm;
+        font-size: 3mm;
+        line-height: 1.45;
+      }
+
+      .jompay .title {
+        display: flex;
+        align-items: center;
+        gap: 2mm;
+        font-size: 4mm;
+        font-weight: 800;
+        letter-spacing: 0.5mm;
+        margin-bottom: 2mm;
+      }
+
+      .jompay .chip {
+        background: #fcd116;
+        color: #10261a;
+        padding: 0.6mm 2mm;
+        border-radius: 1mm;
+        font-size: 3mm;
+        letter-spacing: 0.3mm;
+      }
+
+      .jompay dt {
+        font-size: 2.6mm;
+        color: #b2d6bf;
+        letter-spacing: 0.3mm;
+        text-transform: uppercase;
+        margin-top: 2.5mm;
+      }
+
+      .jompay dd {
+        font-size: 3.4mm;
+        color: #ffffff;
+        font-weight: 600;
+        margin: 0.4mm 0 0;
+        font-variant-numeric: tabular-nums;
+      }
+
+      .qr {
+        width: 42mm;
+        height: 42mm;
+        background: repeating-linear-gradient(0deg, #e6e6e6, #e6e6e6 2mm, #f2f2f2 2mm, #f2f2f2 4mm),
+          repeating-linear-gradient(90deg, rgba(0, 0, 0, 0.05), rgba(0, 0, 0, 0.05) 2mm, transparent 2mm, transparent 4mm);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        font-size: 2.8mm;
+        color: #3c5147;
+        border: 0.3mm solid #c5d1c9;
+        border-radius: 1mm;
+      }
+
+      footer.legal {
+        margin-top: 14mm;
+        padding-top: 4mm;
+        border-top: 0.3mm solid #d0e3d6;
+        font-size: 2.6mm;
+        color: #6b7a71;
+        line-height: 1.5;
+      }
+
+      .wm-layer {
+        position: absolute;
+        inset: 0;
+        pointer-events: none;
+        overflow: hidden;
+      }
+
+      .wm {
+        position: absolute;
+        left: 50%;
+        font-size: 22mm;
+        font-weight: 900;
+        letter-spacing: 2mm;
+        color: rgba(196, 30, 58, 0.14);
+        white-space: nowrap;
+        transform-origin: center;
+        transform: translate(-50%, -50%) rotate(-30deg);
+      }
+
+      .wm.top {
+        top: 22%;
+      }
+
+      .wm.mid {
+        top: 52%;
+      }
+
+      .wm.bot {
+        top: 82%;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="page">
+      <header class="brand">
+        <div class="brand-left">
+          <div class="brand-mark">T</div>
+          <div class="brand-text">
+            <div class="name">Tenaga Nasional Berhad</div>
+            <div class="sub">Bil Elektrik · Electricity Bill · Pahang Region</div>
+          </div>
+        </div>
+        <div class="brand-meta">
+          <div class="label">Bill reference</div>
+          <div class="strong">TNB-2026-03-0820012</div>
+          <div>Issue date · 05 April 2026</div>
+          <div>Page 1 of 1</div>
+        </div>
+      </header>
+
+      <section>
+        <div class="two-col-block">
+          <div class="info-card">
+            <h2 style="margin-top: 0">Customer</h2>
+            <div class="row">
+              <div class="label">Name</div>
+              <div class="value">Aisyah binti Ahmad</div>
+            </div>
+            <div class="row">
+              <div class="label">Account no.</div>
+              <div class="value">082-0012-3456</div>
+            </div>
+            <div class="row">
+              <div class="label">Service address</div>
+              <div class="value">
+                No. 42, Jalan IM 7/10,<br />
+                Bandar Indera Mahkota,<br />
+                25200 Kuantan, Pahang Darul Makmur
+              </div>
+            </div>
+            <div class="row">
+              <div class="label">Tariff</div>
+              <div class="value">Domestic (A) · Single-phase</div>
+            </div>
+          </div>
+
+          <div class="info-card">
+            <h2 style="margin-top: 0">Billing period</h2>
+            <div class="row">
+              <div class="label">Period</div>
+              <div class="value">01-03-2026 → 31-03-2026</div>
+            </div>
+            <div class="row">
+              <div class="label">Days billed</div>
+              <div class="value">31 days</div>
+            </div>
+            <div class="row">
+              <div class="label">Previous reading</div>
+              <div class="value">4,218 kWh (28-02-2026)</div>
+            </div>
+            <div class="row">
+              <div class="label">Current reading</div>
+              <div class="value">4,501 kWh (31-03-2026)</div>
+            </div>
+            <div class="row">
+              <div class="label">Consumption</div>
+              <div class="value">283 kWh</div>
+            </div>
+            <div class="row">
+              <div class="label">Due date</div>
+              <div class="value">30 April 2026</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section>
+        <h2>Charges breakdown</h2>
+        <table class="usage">
+          <thead>
+            <tr>
+              <th>Description</th>
+              <th class="amount">Amount (RM)</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>First 200 kWh @ RM0.218 / kWh</td>
+              <td class="amount">43.60</td>
+            </tr>
+            <tr>
+              <td>Next 83 kWh @ RM0.334 / kWh</td>
+              <td class="amount">27.72</td>
+            </tr>
+            <tr class="subtotal">
+              <td>Subtotal — energy charges</td>
+              <td class="amount">71.32</td>
+            </tr>
+            <tr>
+              <td>KWTBB (Kumpulan Wang Tenaga Boleh Baharu) — 1.6%</td>
+              <td class="amount">1.14</td>
+            </tr>
+            <tr class="total">
+              <td>Amount due on 30 April 2026</td>
+              <td class="amount">RM72.46</td>
+            </tr>
+          </tbody>
+        </table>
+      </section>
+
+      <section>
+        <h2>Payment</h2>
+        <div class="pay-grid">
+          <div class="jompay">
+            <div class="title">
+              JomPAY
+              <span class="chip">Bank · Online</span>
+            </div>
+            <dl>
+              <dt>Biller code</dt>
+              <dd>9191</dd>
+              <dt>Reference 1 (account)</dt>
+              <dd>082-0012-3456</dd>
+              <dt>Reference 2 (bill)</dt>
+              <dd>TNB-2026-03-0820012</dd>
+              <dt>Amount</dt>
+              <dd>RM72.46</dd>
+            </dl>
+          </div>
+          <div class="qr" aria-hidden="true">
+            QR code<br />
+            placeholder<br />
+            — synthetic —
+          </div>
+        </div>
+      </section>
+
+      <footer class="legal">
+        Synthetic specimen generated for the Layak hackathon demo (Project 2030 · MyAI Future).
+        Tariff rates are realistic for the Domestic (A) schedule as of early 2026 but the account,
+        meter readings, and customer are entirely fictional. The biller code 9191 is TNB's real
+        public JomPAY identifier, included as an interoperability reference only; no real payment
+        is routed. This document carries a permanent <strong>SYNTHETIC — FOR DEMO ONLY</strong>
+        watermark and is not a genuine bill from Tenaga Nasional Berhad.
+      </footer>
+
+      <div class="wm-layer" aria-hidden="true">
+        <span class="wm top">SYNTHETIC — FOR DEMO ONLY</span>
+        <span class="wm mid">SYNTHETIC — FOR DEMO ONLY</span>
+        <span class="wm bot">SYNTHETIC — FOR DEMO ONLY</span>
+      </div>
+    </div>
+  </body>
+</html>

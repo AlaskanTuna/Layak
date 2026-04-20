@@ -1,0 +1,384 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Grab Partner — Monthly Earnings (synthetic)</title>
+    <style>
+      @page {
+        size: A4;
+        margin: 18mm;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      html,
+      body {
+        margin: 0;
+        padding: 0;
+        background: #f4f6f5;
+        font-family:
+          -apple-system,
+          BlinkMacSystemFont,
+          'Segoe UI',
+          Roboto,
+          Helvetica,
+          Arial,
+          sans-serif;
+        color: #0d2016;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+      }
+
+      body {
+        display: flex;
+        justify-content: center;
+        padding: 24px;
+      }
+
+      .page {
+        width: 210mm;
+        min-height: 297mm;
+        background: #ffffff;
+        padding: 18mm 18mm 20mm;
+        position: relative;
+        box-shadow: 0 8px 28px rgba(0, 0, 0, 0.08);
+        overflow: hidden;
+      }
+
+      @media print {
+        body {
+          background: #ffffff;
+          padding: 0;
+          display: block;
+        }
+        .page {
+          width: auto;
+          min-height: auto;
+          padding: 0;
+          box-shadow: none;
+        }
+      }
+
+      header.brand {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        border-bottom: 2mm solid #00b14f;
+        padding-bottom: 6mm;
+      }
+
+      .logo {
+        display: flex;
+        align-items: center;
+        gap: 3mm;
+      }
+
+      .logo .mark {
+        width: 14mm;
+        height: 14mm;
+        border-radius: 50%;
+        background: #00b14f;
+        color: #ffffff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 6.5mm;
+        font-weight: 800;
+        letter-spacing: -0.5mm;
+      }
+
+      .logo .name {
+        font-size: 6mm;
+        font-weight: 800;
+        color: #0a6e34;
+        letter-spacing: -0.2mm;
+      }
+
+      .logo .tag {
+        font-size: 3mm;
+        color: #556b5a;
+        margin-top: 0.5mm;
+      }
+
+      .header-meta {
+        text-align: right;
+        font-size: 3.2mm;
+        color: #556b5a;
+      }
+
+      .header-meta .title {
+        font-size: 4.2mm;
+        color: #0d2016;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.4mm;
+      }
+
+      section {
+        margin-top: 10mm;
+      }
+
+      h2 {
+        font-size: 3.6mm;
+        text-transform: uppercase;
+        letter-spacing: 0.8mm;
+        color: #0a6e34;
+        margin: 0 0 3mm;
+        border-bottom: 0.3mm solid #cfe4d7;
+        padding-bottom: 2mm;
+      }
+
+      .partner {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 4mm 10mm;
+        font-size: 3.6mm;
+      }
+
+      .partner .label {
+        font-size: 2.8mm;
+        text-transform: uppercase;
+        letter-spacing: 0.4mm;
+        color: #6b7a71;
+      }
+
+      .partner .value {
+        font-size: 3.8mm;
+        font-weight: 600;
+        color: #0d2016;
+        margin-top: 0.5mm;
+      }
+
+      table.earnings {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 3.6mm;
+        margin-top: 3mm;
+      }
+
+      table.earnings th,
+      table.earnings td {
+        padding: 3mm 4mm;
+        text-align: left;
+      }
+
+      table.earnings thead th {
+        background: #e6f7ee;
+        color: #0a6e34;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.4mm;
+        font-size: 2.8mm;
+        border-bottom: 0.4mm solid #00b14f;
+      }
+
+      table.earnings td.amount,
+      table.earnings th.amount {
+        text-align: right;
+        font-variant-numeric: tabular-nums;
+      }
+
+      table.earnings tbody tr + tr td {
+        border-top: 0.2mm solid #e7ece8;
+      }
+
+      table.earnings tr.negative td.amount {
+        color: #b4431e;
+      }
+
+      table.earnings tr.positive td.amount {
+        color: #0a6e34;
+      }
+
+      table.earnings tr.total td {
+        background: #0a6e34;
+        color: #ffffff;
+        font-weight: 800;
+        font-size: 4.2mm;
+        border: none;
+      }
+
+      table.earnings tr.total td.amount {
+        letter-spacing: 0.4mm;
+      }
+
+      .two-col {
+        display: grid;
+        grid-template-columns: 1.2fr 1fr;
+        gap: 12mm;
+        margin-top: 10mm;
+        font-size: 3.2mm;
+        color: #3a4941;
+        line-height: 1.45;
+      }
+
+      .two-col h3 {
+        font-size: 3.2mm;
+        color: #0a6e34;
+        text-transform: uppercase;
+        letter-spacing: 0.4mm;
+        margin: 0 0 2mm;
+      }
+
+      footer.legal {
+        margin-top: 16mm;
+        padding-top: 4mm;
+        border-top: 0.3mm solid #cfe4d7;
+        font-size: 2.6mm;
+        color: #6b7a71;
+        line-height: 1.5;
+      }
+
+      /* Diagonal watermarks — top + bottom so crops don't hide both. */
+      .wm-layer {
+        position: absolute;
+        inset: 0;
+        pointer-events: none;
+        overflow: hidden;
+      }
+
+      .wm {
+        position: absolute;
+        left: 50%;
+        font-size: 22mm;
+        font-weight: 900;
+        letter-spacing: 2mm;
+        color: rgba(196, 30, 58, 0.14);
+        white-space: nowrap;
+        transform-origin: center;
+        transform: translate(-50%, -50%) rotate(-30deg);
+      }
+
+      .wm.top {
+        top: 22%;
+      }
+
+      .wm.mid {
+        top: 52%;
+      }
+
+      .wm.bot {
+        top: 82%;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="page">
+      <header class="brand">
+        <div class="logo">
+          <div class="mark" aria-hidden="true">g</div>
+          <div>
+            <div class="name">Grab</div>
+            <div class="tag">Partner Earnings · Malaysia</div>
+          </div>
+        </div>
+        <div class="header-meta">
+          <div class="title">Monthly Earnings Statement</div>
+          <div>Statement period · 1 March 2026 – 31 March 2026</div>
+          <div>Issued · 31 March 2026 · Next · 30 April 2026</div>
+        </div>
+      </header>
+
+      <section>
+        <h2>Partner details</h2>
+        <div class="partner">
+          <div>
+            <div class="label">Partner name</div>
+            <div class="value">AISYAH BINTI AHMAD</div>
+          </div>
+          <div>
+            <div class="label">Partner ID</div>
+            <div class="value">KTN-GRAB-38271</div>
+          </div>
+          <div>
+            <div class="label">Vehicle type</div>
+            <div class="value">GrabCar Saver</div>
+          </div>
+          <div>
+            <div class="label">Payout bank</div>
+            <div class="value">Maybank · ••••8276</div>
+          </div>
+          <div>
+            <div class="label">City zone</div>
+            <div class="value">Kuantan, Pahang</div>
+          </div>
+          <div>
+            <div class="label">Partner tier</div>
+            <div class="value">Gold · 14 months active</div>
+          </div>
+        </div>
+      </section>
+
+      <section>
+        <h2>Earnings summary</h2>
+        <table class="earnings">
+          <thead>
+            <tr>
+              <th>Line item</th>
+              <th class="amount">Amount (RM)</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Total completed trips</td>
+              <td class="amount">412</td>
+            </tr>
+            <tr>
+              <td>Gross fare</td>
+              <td class="amount">3,520.00</td>
+            </tr>
+            <tr class="negative">
+              <td>Platform commission (20%)</td>
+              <td class="amount">−704.00</td>
+            </tr>
+            <tr class="negative">
+              <td>Tolls reimbursed</td>
+              <td class="amount">−116.00</td>
+            </tr>
+            <tr class="positive">
+              <td>Incentive bonuses</td>
+              <td class="amount">+100.00</td>
+            </tr>
+            <tr class="total">
+              <td>Net payout to Maybank</td>
+              <td class="amount">2,800.00</td>
+            </tr>
+          </tbody>
+        </table>
+      </section>
+
+      <div class="two-col">
+        <div>
+          <h3>Payout details</h3>
+          Net of RM2,800.00 transferred to Maybank savings account ending 8276 on
+          31 March 2026. Settlement reference <strong>GRB-PAY-2026-03-38271</strong>.
+          Next statement publishes on 30 April 2026; GrabPay wallet withdrawals
+          appear separately in the GrabPay app.
+        </div>
+        <div>
+          <h3>Tax note</h3>
+          Grab Malaysia does not withhold income tax. As a self-employed partner
+          you are responsible for filing under LHDN <strong>Form B</strong> by
+          30 June 2026 (YA 2025). Download a consolidated CSV of trips from the
+          driver app → <em>Earnings → Statements → Export</em>.
+        </div>
+      </div>
+
+      <footer class="legal">
+        Synthetic specimen generated for the Layak hackathon demo (Project 2030 · MyAI Future).
+        Any resemblance to real Grab branding is stylistic only; the Grab name and green are used in
+        good-faith reference, not as real artwork. No real partner, trip, or bank data is represented.
+        This document carries a permanent <strong>SYNTHETIC — FOR DEMO ONLY</strong> watermark and is
+        not a statement of earnings from Grab Malaysia Sdn Bhd.
+      </footer>
+
+      <div class="wm-layer" aria-hidden="true">
+        <span class="wm top">SYNTHETIC — FOR DEMO ONLY</span>
+        <span class="wm mid">SYNTHETIC — FOR DEMO ONLY</span>
+        <span class="wm bot">SYNTHETIC — FOR DEMO ONLY</span>
+      </div>
+    </div>
+  </body>
+</html>

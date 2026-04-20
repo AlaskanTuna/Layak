@@ -4,6 +4,21 @@
 
 ---
 
+## [21/04/26] - Added three synthetic Aisyah demo documents (MyKad, Grab earnings, TNB bill) closing TRD §9.6
+
+Independent PO1 task from `docs/mockgen.md`. Three self-contained HTML files at `frontend/public/demo/` styled to look like the documents Aisyah uploads during the demo, plus a render guide.
+
+- `frontend/public/demo/mykad.html` — 85.6 × 54 mm (ISO/IEC 7810 ID-1) via `@page`. Off-white `#f5f3ed` with Pahang-green `#006c35` top border; photo placeholder + signature strip + IC (monospace), name, citizenship, gender (PEREMPUAN / FEMALE), DOB 24 MAR 1990, and the shared address. Stylized "MyKad · KAD PENGENALAN MALAYSIA" text header — **no coat of arms, holographic foil, or chip contacts** (Critical Do-Nots compliance). Three diagonal `SYNTHETIC — FOR DEMO ONLY` watermarks at 22 / 50 / 78% card-height so any reasonable crop still shows one.
+- `frontend/public/demo/grab-earnings.html` — A4 portrait, emerald `#00b14f` Grab-ish accent, stylised `g` monogram in place of the real logo. Partner block (AISYAH BINTI AHMAD, Partner ID `KTN-GRAB-38271`, GrabCar Saver, Maybank ••••8276, Kuantan zone, Gold tier), 6-row earnings table totalling **Net payout RM2,800.00** = `monthly_income_rm` in the fixture. Statement period 1–31 March 2026, issued 31 March 2026, next statement 30 April 2026. Tax-note callout points the user at LHDN Form B filing by 30 June 2026 (YA 2025). Three watermarks at 22 / 52 / 82% page-height.
+- `frontend/public/demo/tnb-bill.html` — A4 portrait, TNB green `#00793f` + yellow `#fcd116`, stylised `T` monogram. Customer block pins the identical address to the MyKad (the residence cross-check the classify step uses), account `082-0012-3456`, tariff Domestic (A) single-phase. Billing period 01-03-2026 → 31-03-2026, issue 05 April 2026, due **30 April 2026**. Consumption block: prev 4,218 → curr 4,501 kWh = 283 kWh, first 200 @ RM0.218 (RM43.60), next 83 @ RM0.334 (RM27.72), subtotal RM71.32, KWTBB 1.6% RM1.14, **Amount due RM72.46**. JomPAY panel with real public biller code `9191`, synthetic references, QR placeholder. Three watermarks at the same 22 / 52 / 82% heights.
+- `frontend/public/demo/README.md` — one-paragraph render guide (open in Chrome → Cmd+P → Save as PDF; custom paper size for the MyKad; A4 for the rest), plus the data-fidelity table and the legal-safety reasoning that each file stays PDPA 2010 / NRR 1990 compliant.
+- **No React-tree churn, no deps installed, no configs touched.** Static assets under `public/` are served as-is by Next.
+- Sanity-check: `pnpm -C frontend build` still passes (static `public/` files don't enter the compile graph).
+- Closed `docs/trd.md` §9.6 open question with a RESOLVED marker pointing at `frontend/public/demo/`. Note inside: the original plan said "payslip (EA Form/CP8A)" but Aisyah is a Form B gig worker — an EA Form would misrepresent her filer category, so `grab-earnings.html` replaces it. The net payout still ties to `monthly_income_rm`.
+- IC number quirk flagged by the brief (last digit even = female, `4321` ends in 1 → male-coded): preserved intentionally because the `ic_last4 = "4321"` value is fixture-locked across backend tests and the rule engine. Rippling a change across both sides of the codebase would cost more than the synthetic mismatch risks.
+
+---
+
 ## [20/04/26] - Fixed LHDN §6.20 → §6.19 miscitation and tightened rule-engine test coverage from audit findings
 
 Post-commit subagent audits (rule correctness, test coverage, plan.md adherence) surfaced three real issues in the rule engine. All fixed here.

@@ -23,12 +23,14 @@ export function SchemeCard({ match }: Props) {
   return (
     <Card>
       <CardHeader>
-        <div className="flex items-start justify-between gap-3">
-          <div className="flex flex-col gap-1">
-            <CardTitle>{match.scheme_name}</CardTitle>
-            <Badge variant="outline">{match.agency}</Badge>
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+          <div className="flex min-w-0 flex-col gap-1">
+            <CardTitle className="break-words">{match.scheme_name}</CardTitle>
+            <Badge variant="outline" className="w-fit">
+              {match.agency}
+            </Badge>
           </div>
-          <div className="shrink-0 text-right">
+          <div className="shrink-0 text-left sm:text-right">
             <div className="font-heading text-lg font-semibold text-foreground">{formatRm(match.annual_rm)}</div>
             <div className="text-xs text-muted-foreground">per year (est.)</div>
           </div>

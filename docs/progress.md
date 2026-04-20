@@ -4,6 +4,19 @@
 
 ---
 
+## [21/04/26] - Phase 1 Task 5 PO2 prep: packet download card, error recovery card, mobile polish on scheme card
+
+Front-loading the three PO2 items for Task 5 so the 12:30 paired wiring block is a straight SSE-endpoint swap rather than a build-and-wire session.
+
+- Wrote `frontend/src/components/results/packet-download.tsx` — renders after `state.phase === 'done'` when `state.packet != null`. One `DraftRow` per `PacketDraft`: `FileDown` icon + filename + `scheme_id` meta + right-aligned button. When `blob_bytes_b64` is populated, clicks decode via `atob` → `Uint8Array` → `Blob(application/pdf)` → `URL.createObjectURL` + anchor click download; when null (mock + pre-WeasyPrint real mode), the button is disabled with `Pending backend` copy and a one-line footer explains the packet shell is ready for Task 5 wiring. Header reassures on the DRAFT-watermark invariant. Covers FR-8 UI side.
+- Wrote `frontend/src/components/home/error-recovery-card.tsx` — `destructive`-tinted shadcn Card rendered when `state.phase === 'error'`. Title + `AlertTriangle` icon + error message as `CardDescription`. Two full-width-on-mobile, side-by-side-on-sm action buttons: `Try with sample documents` triggers `handleUseSamples` (mock replay — the escape hatch per FR-3 AC "UI offers to retry or fall back to seed data"), `Start over` triggers `reset`. Covers the missing error path the audit in `docs/progress.md` flagged.
+- Rewired `frontend/src/components/home/home-client.tsx` — added `showError = state.phase === 'error'` derived flag; rendered `<ErrorRecoveryCard />` above the generic `Start over` button (which is suppressed in the error case since the recovery card carries its own). `<PacketDownload packet={state.packet} />` sits below `<CodeExecutionPanel />` in the results block, so the demo flow reads top-down: stepper → RM hero → scheme cards → code trace → downloads.
+- Mobile polish on `frontend/src/components/results/scheme-card.tsx` — header flex direction now `flex-col sm:flex-row sm:items-start sm:justify-between` so the RM value stacks below the title at 375px instead of crowding the scheme-name column. Added `break-words` to the title and `w-fit` to the `agency` Badge so long agency strings don't stretch unnaturally. The upload widget was already column-stacked at all breakpoints (three inputs vertical, not side-by-side) — no change needed there; ticked plan L246 with a note.
+- `pnpm run lint` clean. `pnpm run build` clean.
+- Next PO2 action: coordinate with PO1 at 12:30 paired-wiring block — confirm SSE event shape hasn't drifted, plug real backend URL, smoke-test Aisyah happy path end-to-end.
+
+---
+
 ## [20/04/26] - Phase 1 Task 2 commit 3: results view — ranked list, scheme cards, provenance panel, code execution trace
 
 - Wrote `frontend/src/components/results/provenance-panel.tsx` — given `RuleCitation[]`, renders each citation as a clickable card (`rule_id`, `source_pdf · page_ref`). Clicking opens a shadcn `Dialog` with the passage text as a blockquote plus an external "Open source PDF" link (when `source_url` is present). Grounds FR-7.

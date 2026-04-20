@@ -241,9 +241,9 @@ _All four exit-criteria items met: Aisyah total = **RM8,208/year** (STR RM450 + 
 
 **Implementation — PO2 (Adam):**
 
-- [ ] `frontend/src/components/results/packet-download.tsx` — download button appears after `done`; click triggers ZIP save or renders three separate PDF links.
-- [ ] **Error surface**: on `error` SSE event, show a recovery card with "Use sample documents" button (FR-3 AC) — avoid a dead-end.
-- [ ] Mobile polish pass on the upload widget (375px — consider a stepper if three side-by-side inputs feel cramped).
+- [x] `frontend/src/components/results/packet-download.tsx` — renders one row per `PacketDraft` with a `Download PDF` button; base64-decode + `Blob` + `URL.createObjectURL` download when `blob_bytes_b64` is populated, else a disabled "Pending backend" button with explanatory copy. Surfaces `drafts.length` in the header and the DRAFT-watermark invariant in the description. Replaces the ZIP-vs-links decision with "whichever the backend delivers" — works for both delivery shapes.
+- [x] **Error surface**: `frontend/src/components/home/error-recovery-card.tsx` — `destructive`-tinted card rendered when `state.phase === 'error'`, showing the SSE error message plus two actions: `Try with sample documents` (triggers mock replay) and `Start over` (resets). Covers FR-3 AC.
+- [x] Mobile polish pass on the upload widget (375px): no-op required — the widget already stacks the three inputs vertically on every breakpoint (`flex flex-col gap-4`), so no "side-by-side" squeeze exists. Bonus: tightened `scheme-card.tsx` header to stack vertically below `sm` (`flex-col sm:flex-row`) so the RM amount doesn't crowd long scheme names on 375px; `Badge` constrained to `w-fit`; title gets `break-words`.
 
 - [ ] Commit (paired): `feat(ui): wire real sse stream and packet download to backend`.
 

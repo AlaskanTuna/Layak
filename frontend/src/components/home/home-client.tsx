@@ -3,8 +3,10 @@
 import { useState } from 'react'
 
 import { DemoModeBanner } from '@/components/home/demo-mode-banner'
+import { ErrorRecoveryCard } from '@/components/home/error-recovery-card'
 import { PipelineStepper } from '@/components/pipeline/pipeline-stepper'
 import { CodeExecutionPanel } from '@/components/results/code-execution-panel'
+import { PacketDownload } from '@/components/results/packet-download'
 import { RankedList } from '@/components/results/ranked-list'
 import { Button } from '@/components/ui/button'
 import { UploadWidget, type UploadFiles } from '@/components/upload/upload-widget'
@@ -16,6 +18,7 @@ export function HomeClient() {
 
   const showLanding = state.phase === 'idle'
   const showResults = state.phase === 'done'
+  const showError = state.phase === 'error'
 
   function handleSubmit(files: UploadFiles) {
     setIsDemoMode(false)
@@ -39,20 +42,27 @@ export function HomeClient() {
       {!showLanding && (
         <>
           <PipelineStepper state={state} />
+          {showError && (
+            <ErrorRecoveryCard
+              message={state.error ?? 'Unknown error.'}
+              onUseSamples={handleUseSamples}
+              onReset={handleReset}
+            />
+          )}
           {showResults && (
             <>
-              <RankedList
-                matches={state.matches}
-                totalAnnualRm={state.upside?.total_annual_rm ?? null}
-              />
+              <RankedList matches={state.matches} totalAnnualRm={state.upside?.total_annual_rm ?? null} />
               {state.upside && <CodeExecutionPanel upside={state.upside} />}
+              <PacketDownload packet={state.packet} />
             </>
           )}
-          <div className="flex">
-            <Button type="button" variant="outline" onClick={handleReset}>
-              Start over
-            </Button>
-          </div>
+          {!showError && (
+            <div className="flex">
+              <Button type="button" variant="outline" onClick={handleReset}>
+                Start over
+              </Button>
+            </div>
+          )}
         </>
       )}
     </div>

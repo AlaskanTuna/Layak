@@ -93,6 +93,19 @@
 - [x] Update `docs/trd.md` §6.3 (current versions), §6.4 (repo layout), §9.4 (close the backend-layout open question) and `.claude/CLAUDE.md` (Architecture, Tech Stack paths, Commands block, Code Style paths).
 - [x] Commit `refactor(infra): split into frontend/ and backend/ pnpm workspace`.
 
+### 7. Feature: Commit scheme source PDFs
+
+**Purpose/Issue:** The Phase 1 rule engine (task 4) and Vertex AI Search seed script (task 3) both read from the six source PDFs catalogued in `docs/trd.md` §6.1. Downloading and committing them tonight removes a dependency for tomorrow's P1 backend work — no GCP, no backend scaffold needed. Some `gov.my` URLs bot-block automated fetches (see `docs/trd.md` §6 gotcha list); manual browser download is the documented fallback.
+
+**Implementation:**
+
+- [ ] Download the six PDFs into `backend/data/schemes/`: `RISALAH STR 2026.pdf`, `BK-01.pdf`, `JKM18.pdf`, `pr-no-4-2024.pdf`, `explanatorynotes_be2025.pdf`, `rf-filing-programme-for-2026.pdf` (canonical URLs in `docs/trd.md` §6.1).
+- [ ] Verify each file: size ≥ 1 KB, first four bytes are the `%PDF` magic header.
+- [ ] For any URL that returns an error page or bot-block, report it so the human can browser-download and drop the file in.
+- [ ] Delete `backend/data/schemes/.gitkeep` once at least one real PDF lands.
+- [ ] Tick these items in `docs/plan.md`; append a dated summary to `docs/progress.md`.
+- [ ] Commit `chore(db): commit scheme source PDFs`.
+
 ---
 
 ## Phase 1: Core Build

@@ -18,14 +18,7 @@
         margin: 0;
         padding: 0;
         background: #2d3237;
-        font-family:
-          -apple-system,
-          BlinkMacSystemFont,
-          'Segoe UI',
-          Roboto,
-          Helvetica,
-          Arial,
-          sans-serif;
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
         color: #0c1e3a;
         -webkit-print-color-adjust: exact;
         print-color-adjust: exact;
@@ -85,12 +78,7 @@
         position: absolute;
         inset: 0;
         pointer-events: none;
-        background: radial-gradient(
-          ellipse at 50% 45%,
-          transparent 0%,
-          transparent 60%,
-          rgba(10, 40, 65, 0.14) 100%
-        );
+        background: radial-gradient(ellipse at 50% 45%, transparent 0%, transparent 60%, rgba(10, 40, 65, 0.14) 100%);
       }
 
       /* ── Top strip: pink stamp on the left, MyKad+flag flush right ──── */
@@ -201,8 +189,7 @@
       .chip {
         width: 9mm;
         height: 7mm;
-        background:
-          linear-gradient(135deg, #c9a34b 0%, #e1c17a 45%, #a7832f 100%);
+        background: linear-gradient(135deg, #c9a34b 0%, #e1c17a 45%, #a7832f 100%);
         border: 0.2mm solid #7e5f20;
         border-radius: 0.4mm;
         margin-bottom: 2.6mm;
@@ -263,6 +250,8 @@
         height: 29mm;
         background: linear-gradient(180deg, #c2cdd4 0%, #9fadb8 100%);
         border: 0.18mm solid #7b8a96;
+        position: relative;
+        overflow: hidden;
         display: flex;
         align-items: center;
         justify-content: center;
@@ -271,6 +260,26 @@
         color: #3a4a57;
         letter-spacing: 0.2mm;
         line-height: 1.15;
+      }
+
+      .photo img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
+      }
+
+      .photo .photo-fallback {
+        position: absolute;
+        inset: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: linear-gradient(180deg, rgba(255, 255, 255, 0.18), rgba(0, 0, 0, 0.08));
+        color: #243746;
+        font-weight: 500;
+        text-transform: uppercase;
+        letter-spacing: 0.2mm;
       }
 
       .status {
@@ -370,10 +379,7 @@
             <rect width="70" height="35" fill="#010066" />
             <circle cx="28" cy="17.5" r="10" fill="#fcbf00" />
             <circle cx="32" cy="16.5" r="9" fill="#010066" />
-            <polygon
-              points="49,8 51,15 59,15 53,19 55,26 49,22 43,26 45,19 39,15 47,15"
-              fill="#fcbf00"
-            />
+            <polygon points="49,8 51,15 59,15 53,19 55,26 49,22 43,26 45,19 39,15 47,15" fill="#fcbf00" />
           </svg>
         </div>
       </div>
@@ -392,7 +398,13 @@
         </div>
 
         <div class="photo-col">
-          <div class="photo">Photo<br />placeholder</div>
+          <div class="photo">
+            <img
+              src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=500&q=80"
+              alt="Sample portrait photo for the synthetic MyKad"
+            />
+            <div class="photo-fallback" aria-hidden="true">Sample photo</div>
+          </div>
           <div class="status">WARGANEGARA</div>
         </div>
       </div>

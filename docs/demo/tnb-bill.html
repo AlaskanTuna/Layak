@@ -18,14 +18,7 @@
         margin: 0;
         padding: 0;
         background: #e5e7eb;
-        font-family:
-          -apple-system,
-          BlinkMacSystemFont,
-          'Segoe UI',
-          Roboto,
-          Helvetica,
-          Arial,
-          sans-serif;
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
         color: #1a2540;
         font-size: 3.2mm;
         line-height: 1.4;
@@ -442,11 +435,13 @@
 
       /* ── Tip banner ───────────────────────────────────────────────────── */
       .tip-banner {
+        position: relative;
         margin-top: auto;
         background: #0a3d7e;
         color: #ffffff;
         border-radius: 1.8mm;
         padding: 4mm 6mm;
+        overflow: hidden;
         display: grid;
         grid-template-columns: 1fr 36mm;
         gap: 4mm;
@@ -467,17 +462,27 @@
       }
 
       .tip-photo {
+        position: relative;
         height: 18mm;
         background:
           linear-gradient(135deg, rgba(255, 255, 255, 0.15), transparent 50%),
           linear-gradient(180deg, #3a5a8a 0%, #24396a 100%);
         border-radius: 1.2mm;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 2.4mm;
-        letter-spacing: 0.3mm;
-        opacity: 0.9;
+        overflow: hidden;
+      }
+
+      .tip-photo img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
+        filter: saturate(0.95) contrast(1.02) brightness(0.95);
+      }
+
+      .tip-photo .tip-overlay {
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(180deg, rgba(10, 61, 126, 0.18), rgba(10, 61, 126, 0.5));
       }
 
       /* ── Footer ───────────────────────────────────────────────────────── */
@@ -652,7 +657,9 @@
             <dd>082-0012-3456</dd>
             <dt>Ref-2:</dt>
             <dd>TNB-2026-03-0820012</dd>
-            <div class="foot">JomPAY di Perbankan Internet dan Telefon Mudah dengan akaun semasa, simpanan atau kad kredit.</div>
+            <div class="foot">
+              JomPAY di Perbankan Internet dan Telefon Mudah dengan akaun semasa, simpanan atau kad kredit.
+            </div>
           </dl>
         </div>
       </section>
@@ -745,14 +752,20 @@
           <div class="tip-title">TIP MENINGKATKAN KECEKAPAN TENAGA</div>
           <div class="tip-sub">Matikan lampu jika tidak digunakan.</div>
         </div>
-        <div class="tip-photo">[ Photo placeholder ]</div>
+        <div class="tip-photo">
+          <img
+            src="https://images.unsplash.com/photo-1509395176047-4a66953fd231?auto=format&fit=crop&w=800&q=80"
+            alt="Sample lightbulb image for the TNB energy-saving tip"
+          />
+          <div class="tip-overlay" aria-hidden="true"></div>
+        </div>
       </section>
 
       <footer class="legal">
         <div>
-          Tenaga Nasional Berhad (Syarikat disemak sahih) · Ibu Pejabat, Tingkat 14, Wisma TNB,
-          129 Jalan Bangsar, 59200 Kuala Lumpur. Dokumen sintetik untuk demo Layak (Projek
-          2030 · MyAI Future) — tiada akaun, bacaan meter atau pelanggan sebenar dibentangkan.
+          Tenaga Nasional Berhad (Syarikat disemak sahih) · Ibu Pejabat, Tingkat 14, Wisma TNB, 129 Jalan Bangsar, 59200
+          Kuala Lumpur. Dokumen sintetik untuk demo Layak (Projek 2030 · MyAI Future) — tiada akaun, bacaan meter atau
+          pelanggan sebenar dibentangkan.
         </div>
         <div>m/s 1 / 3</div>
       </footer>

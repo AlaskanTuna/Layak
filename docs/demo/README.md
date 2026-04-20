@@ -13,6 +13,11 @@ The files are static and inline-styled, no build step. They live beside
 this README in `docs/demo/`, so you can open them directly from the
 workspace or point any local static server at this folder.
 
+The MyKad portrait and the TNB tip image use sample web-hosted photos,
+so the browser needs network access the first time they load. If the
+images fail to load, the underlying cards still print with their fallback
+gradients.
+
 - [mykad.html](mykad.html)
 - [grab-earnings.html](grab-earnings.html)
 - [tnb-bill.html](tnb-bill.html)

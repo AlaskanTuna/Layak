@@ -7,7 +7,7 @@ type Props = {
   name?: string
 }
 
-export function EvaluationHeroCard({ name }: Props) {
+export function DashboardHero({ name }: Props) {
   const greeting = name ? `Welcome back, ${name}.` : 'Welcome back.'
   return (
     <section className="relative overflow-hidden rounded-xl border border-primary/15 bg-gradient-to-br from-primary/8 via-primary/3 to-transparent p-6 sm:p-8">
@@ -16,7 +16,7 @@ export function EvaluationHeroCard({ name }: Props) {
           <ShieldCheck className="size-3.5" aria-hidden />
           Dashboard
         </p>
-        <h1 className="font-heading text-2xl font-semibold tracking-tight sm:text-3xl">{greeting}</h1>
+        <h1 className="font-heading text-3xl font-semibold tracking-tight sm:text-4xl">{greeting}</h1>
         <p className="text-sm leading-relaxed text-muted-foreground sm:text-base">
           Your civic profile is up to date. Layak reviews your current situation against the latest 2026 government
           schemes — STR, JKM Warga Emas, LHDN Form B reliefs. Takes about 4 minutes.

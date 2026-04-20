@@ -1,18 +1,16 @@
-import { ActiveApplications } from '@/components/evaluation/active-applications'
-import { EvaluationHeroCard } from '@/components/evaluation/evaluation-hero-card'
-import { RecentActivity } from '@/components/evaluation/recent-activity'
-import { PERSISTENCE_ENABLED } from '@/lib/feature-flags'
+import { EvaluationOverviewClient } from '@/components/evaluation/evaluation-overview-client'
 
-export default function EvaluationSummaryPage() {
+export default function EvaluationOverviewPage() {
   return (
-    <div className="mx-auto flex max-w-5xl flex-col gap-6">
-      <EvaluationHeroCard name={PERSISTENCE_ENABLED ? 'Aisyah' : undefined} />
-      {PERSISTENCE_ENABLED && (
-        <div className="grid grid-cols-1 gap-6 lg:grid-cols-[1fr_22rem]">
-          <ActiveApplications />
-          <RecentActivity />
-        </div>
-      )}
+    <div className="mx-auto flex max-w-3xl flex-col gap-6">
+      <header className="flex flex-col gap-2">
+        <h1 className="font-heading text-3xl font-semibold tracking-tight sm:text-4xl">My Evaluations</h1>
+        <p className="text-sm leading-relaxed text-muted-foreground sm:text-base">
+          We&rsquo;ve processed your documents and calculated your eligibility across federal and state schemes based
+          on your income profile and household status.
+        </p>
+      </header>
+      <EvaluationOverviewClient />
     </div>
   )
 }

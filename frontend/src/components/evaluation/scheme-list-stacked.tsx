@@ -1,0 +1,92 @@
+'use client'
+
+import { useState } from 'react'
+import { ChevronDown, ChevronUp, ExternalLink } from 'lucide-react'
+
+import { Button } from '@/components/ui/button'
+import type { SchemeMatch } from '@/lib/agent-types'
+import { cn } from '@/lib/utils'
+
+type Props = {
+  matches: SchemeMatch[]
+}
+
+function formatRm(value: number): string {
+  return `RM ${value.toLocaleString('en-MY', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
+}
+
+function SchemeRow({ match }: { match: SchemeMatch }) {
+  const [expanded, setExpanded] = useState(false)
+
+  return (
+    <li className="rounded-lg border border-border bg-card p-5 transition-colors">
+      <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
+        <div className="flex min-w-0 flex-col gap-1">
+          <h3 className="font-heading text-base font-semibold tracking-tight">{match.scheme_name}</h3>
+          <p className="text-xs text-muted-foreground">{match.summary}</p>
+        </div>
+        <div className="shrink-0 text-left sm:text-right">
+          <p className="font-heading text-base font-semibold">{formatRm(match.annual_rm)}</p>
+          <p className="font-mono text-[10px] uppercase tracking-[0.14em] text-muted-foreground">per year (est.)</p>
+        </div>
+      </div>
+      <div className="mt-3 flex">
+        <Button
+          type="button"
+          variant="ghost"
+          size="sm"
+          className="px-0 text-primary hover:bg-transparent"
+          onClick={() => setExpanded(v => !v)}
+          aria-expanded={expanded}
+        >
+          {expanded ? (
+            <ChevronUp className="mr-1.5 size-4" aria-hidden />
+          ) : (
+            <ChevronDown className="mr-1.5 size-4" aria-hidden />
+          )}
+          Why I qualify
+        </Button>
+      </div>
+      <div
+        className={cn(
+          'grid transition-[grid-template-rows] duration-300 ease-in-out',
+          expanded ? 'grid-rows-[1fr]' : 'grid-rows-[0fr]'
+        )}
+      >
+        <div className="overflow-hidden">
+          <div className="mt-3 flex flex-col gap-3 border-t border-border pt-3">
+            <p className="text-sm leading-relaxed">{match.why_qualify}</p>
+            <a
+              href={match.portal_url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex w-fit items-center gap-1.5 text-xs text-primary underline-offset-2 hover:underline"
+            >
+              <ExternalLink className="size-3" aria-hidden />
+              Open {match.agency} portal
+            </a>
+          </div>
+        </div>
+      </div>
+    </li>
+  )
+}
+
+export function SchemeListStacked({ matches }: Props) {
+  const qualifying = matches.filter(m => m.qualifies).sort((a, b) => b.annual_rm - a.annual_rm)
+
+  if (qualifying.length === 0) return null
+
+  return (
+    <section className="flex flex-col gap-3">
+      <p className="font-mono text-[11px] uppercase tracking-[0.14em] text-muted-foreground">
+        Eligible schemes ({qualifying.length})
+      </p>
+      <ul className="flex flex-col gap-3">
+        {qualifying.map(match => (
+          <SchemeRow key={match.scheme_id} match={match} />
+        ))}
+      </ul>
+    </section>
+  )
+}

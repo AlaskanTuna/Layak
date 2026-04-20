@@ -5,4 +5,4 @@
  * are still being built by PO1.
  */
 
-export const PERSISTENCE_ENABLED = false
+export const PERSISTENCE_ENABLED = true

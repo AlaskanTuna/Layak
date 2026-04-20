@@ -5,8 +5,9 @@ import { useEffect } from 'react'
 
 import { CodeExecutionPanel } from '@/components/evaluation/code-execution-panel'
 import { useEvaluation } from '@/components/evaluation/evaluation-provider'
+import { EvaluationUpsideHero } from '@/components/evaluation/evaluation-upside-hero'
 import { PacketDownload } from '@/components/evaluation/packet-download'
-import { RankedList } from '@/components/evaluation/ranked-list'
+import { SchemeCardGrid } from '@/components/evaluation/scheme-card-grid'
 import { Button } from '@/components/ui/button'
 
 export function EvaluationResultsClient() {
@@ -29,9 +30,17 @@ export function EvaluationResultsClient() {
     return null
   }
 
+  const qualifyingCount = state.matches.filter(m => m.qualifies).length
+  const totalAnnualRm = state.upside?.total_annual_rm ?? 0
+
   return (
-    <div className="flex flex-col gap-4">
-      <RankedList matches={state.matches} totalAnnualRm={state.upside?.total_annual_rm ?? null} />
+    <div className="flex flex-col gap-6">
+      <EvaluationUpsideHero
+        totalAnnualRm={totalAnnualRm}
+        schemeCount={qualifyingCount}
+        packet={state.packet}
+      />
+      <SchemeCardGrid matches={state.matches} />
       {state.upside && <CodeExecutionPanel upside={state.upside} />}
       <PacketDownload packet={state.packet} />
       <div className="flex">

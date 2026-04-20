@@ -5,27 +5,10 @@ import { Download, FileDown, ShieldCheck } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import type { Packet, PacketDraft } from '@/lib/agent-types'
+import { base64ToBlob, triggerDownload } from '@/lib/packet-download-utils'
 
 type Props = {
   packet: Packet | null
-}
-
-function base64ToBlob(b64: string, mime = 'application/pdf'): Blob {
-  const bin = atob(b64)
-  const bytes = new Uint8Array(bin.length)
-  for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i)
-  return new Blob([bytes], { type: mime })
-}
-
-function triggerDownload(blob: Blob, filename: string): void {
-  const url = URL.createObjectURL(blob)
-  const a = document.createElement('a')
-  a.href = url
-  a.download = filename
-  document.body.appendChild(a)
-  a.click()
-  document.body.removeChild(a)
-  URL.revokeObjectURL(url)
 }
 
 function DraftRow({ draft }: { draft: PacketDraft }) {
@@ -84,8 +67,8 @@ export function PacketDownload({ packet }: Props) {
         ))}
         {!anyDownloadable && (
           <p className="text-xs italic text-muted-foreground">
-            WeasyPrint packet generator lands in Phase 1 Task 5 (paired wiring block). Until then the packet
-            shell is rendered so you can see where the download CTAs will sit.
+            WeasyPrint packet generator lands in Phase 1 Task 5 (paired wiring block). Until then the packet shell is
+            rendered so you can see where the download CTAs will sit.
           </p>
         )}
       </CardContent>

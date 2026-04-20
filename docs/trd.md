@@ -378,7 +378,7 @@ Budget 2026 announced RM600/month; no gov.my PDF yet reflects the uplift (JKM fe
 
 ### 9.6 Demo document specimens — RESOLVED
 
-Closed by commit landing the three synthetic HTML documents at `frontend/public/demo/` (`mykad.html`, `grab-earnings.html`, `tnb-bill.html`) with a render guide at `frontend/public/demo/README.md`. Next serves them at `/demo/<name>.html` during `pnpm dev`; Cmd+P → Save as PDF produces the demo artefacts. All three carry the repeated diagonal `SYNTHETIC — FOR DEMO ONLY` watermark, pin to `backend/app/fixtures/aisyah.py` (name, IC `900324-06-4321`, monthly income RM2,800, address shared between MyKad and TNB), and avoid any replication of the Malaysian coat of arms, holographic foil, or chip contacts. Pitch deck slide 1 must also disclose the documents as synthetic.
+Closed by commit landing the three synthetic HTML documents at `docs/demo/` (`mykad.html`, `grab-earnings.html`, `tnb-bill.html`) with a render guide at `docs/demo/README.md`. The files are the docs-side source of truth and can be opened directly from the workspace or served from any local static host. All three carry the repeated diagonal `SYNTHETIC — FOR DEMO ONLY` watermark, pin to `backend/app/fixtures/aisyah.py` (name, IC `900324-06-4321`, monthly income RM2,800, address shared between MyKad and TNB), and avoid any replication of the Malaysian coat of arms, holographic foil, or chip contacts. Pitch deck slide 1 must also disclose the documents as synthetic.
 
 Original decisions (preserved for audit trail):
 

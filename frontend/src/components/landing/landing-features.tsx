@@ -50,7 +50,7 @@ export function LandingFeatures() {
                   <div className="flex size-9 items-center justify-center rounded-md bg-primary/10 text-primary">
                     <Icon className="size-4" aria-hidden />
                   </div>
-                  <span className="font-mono text-xs text-muted-foreground">0{idx + 1}</span>
+                  <span className="text-xs text-muted-foreground">0{idx + 1}</span>
                 </div>
                 <div className="flex flex-col gap-1">
                   <h3 className="font-heading text-sm font-semibold">{step.title}</h3>

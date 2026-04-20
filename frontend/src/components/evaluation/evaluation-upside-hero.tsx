@@ -24,7 +24,7 @@ export function EvaluationUpsideHero({ totalAnnualRm, schemeCount, packet, empty
 
   return (
     <section className="flex flex-col gap-5 rounded-xl border border-border bg-card p-6 shadow-sm sm:p-8">
-      <p className="font-mono text-[11px] uppercase tracking-[0.18em] text-muted-foreground">
+      <p className="text-[11px] uppercase tracking-[0.18em] text-muted-foreground">
         Total Potential Relief
       </p>
 

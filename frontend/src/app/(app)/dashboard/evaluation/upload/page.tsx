@@ -14,7 +14,7 @@ export default function EvaluationUploadPage() {
         Back to evaluations
       </Link>
       <header className="flex flex-col gap-2">
-        <p className="font-mono text-[11px] uppercase tracking-[0.18em] text-primary">Step · Upload</p>
+        <p className="text-[11px] uppercase tracking-[0.18em] text-primary">Step · Upload</p>
         <h1 className="font-heading text-3xl font-semibold tracking-tight sm:text-4xl">Upload documents</h1>
         <p className="text-sm leading-relaxed text-muted-foreground sm:text-base">
           Provide the documents below to verify your eligibility for the scheme corpus. Ensure all text is clear and

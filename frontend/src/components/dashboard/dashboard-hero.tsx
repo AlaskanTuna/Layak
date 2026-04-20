@@ -12,7 +12,7 @@ export function DashboardHero({ name }: Props) {
   return (
     <section className="relative overflow-hidden rounded-xl border border-primary/15 bg-gradient-to-br from-primary/8 via-primary/3 to-transparent p-6 sm:p-8">
       <div className="flex flex-col gap-3 sm:max-w-2xl">
-        <p className="flex items-center gap-1.5 font-mono text-[11px] uppercase tracking-[0.18em] text-primary">
+        <p className="flex items-center gap-1.5 text-[11px] uppercase tracking-[0.18em] text-primary">
           <ShieldCheck className="size-3.5" aria-hidden />
           Dashboard
         </p>

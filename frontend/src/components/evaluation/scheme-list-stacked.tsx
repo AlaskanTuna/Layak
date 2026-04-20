@@ -31,7 +31,7 @@ function SchemeRow({ match }: { match: SchemeMatch }) {
             <span className="text-lg font-normal text-muted-foreground">RM</span>{' '}
             <span className="text-2xl font-semibold text-primary">{formatRm(match.annual_rm)}</span>
           </p>
-          <p className="font-mono text-[10px] uppercase tracking-[0.14em] text-muted-foreground">per year (est.)</p>
+          <p className="text-[10px] uppercase tracking-[0.14em] text-muted-foreground">per year (est.)</p>
         </div>
       </div>
       <div className="mt-3 flex">
@@ -82,7 +82,7 @@ export function SchemeListStacked({ matches, empty = false }: Props) {
 
   return (
     <section className="flex flex-col gap-3">
-      <p className="font-mono text-[11px] uppercase tracking-[0.14em] text-muted-foreground">
+      <p className="text-[11px] uppercase tracking-[0.14em] text-muted-foreground">
         Eligible schemes ({empty ? '—' : count})
       </p>
       {empty || qualifying.length === 0 ? (
@@ -90,7 +90,7 @@ export function SchemeListStacked({ matches, empty = false }: Props) {
           <div className="flex size-10 items-center justify-center rounded-md bg-muted text-muted-foreground">
             <Inbox className="size-5" aria-hidden />
           </div>
-          <p className="font-mono text-[11px] uppercase tracking-[0.18em] text-muted-foreground">None</p>
+          <p className="text-[11px] uppercase tracking-[0.18em] text-muted-foreground">None</p>
           <p className="max-w-xs text-xs leading-relaxed text-muted-foreground">
             Scheme matches will appear here after your first evaluation completes.
           </p>

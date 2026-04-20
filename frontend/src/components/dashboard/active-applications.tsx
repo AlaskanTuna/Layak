@@ -7,7 +7,7 @@ export function ActiveApplications() {
         <h2 className="font-heading text-xl font-semibold tracking-tight">Active Applications</h2>
         <span
           aria-disabled
-          className="font-mono text-[11px] uppercase tracking-[0.14em] text-muted-foreground/60"
+          className="text-[11px] uppercase tracking-[0.14em] text-muted-foreground/60"
         >
           View all
         </span>
@@ -16,7 +16,7 @@ export function ActiveApplications() {
         <div className="flex size-10 items-center justify-center rounded-md bg-muted text-muted-foreground">
           <FileCheck className="size-5" aria-hidden />
         </div>
-        <p className="font-mono text-[11px] uppercase tracking-[0.18em] text-muted-foreground">None</p>
+        <p className="text-[11px] uppercase tracking-[0.18em] text-muted-foreground">None</p>
         <p className="max-w-xs text-xs leading-relaxed text-muted-foreground">
           Submitted applications will appear here with their disbursement status.
         </p>

@@ -8,7 +8,7 @@ export function RecentActivity() {
         <div className="flex size-10 items-center justify-center rounded-md bg-muted text-muted-foreground">
           <Clock className="size-5" aria-hidden />
         </div>
-        <p className="font-mono text-[11px] uppercase tracking-[0.18em] text-muted-foreground">None</p>
+        <p className="text-[11px] uppercase tracking-[0.18em] text-muted-foreground">None</p>
         <p className="max-w-xs text-xs leading-relaxed text-muted-foreground">
           Uploads, evaluations, and submissions will stream here as they happen.
         </p>

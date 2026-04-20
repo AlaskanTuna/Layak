@@ -46,7 +46,7 @@ export function HowItWorksContent() {
         <ol className="flex flex-col gap-3">
           {STEPS.map(step => (
             <li key={step.step} className="rounded-md border border-border bg-card p-4">
-              <p className="font-mono text-xs text-muted-foreground">{step.step}</p>
+              <p className="text-xs text-muted-foreground">{step.step}</p>
               <p className="mt-1 text-sm leading-relaxed">{step.body}</p>
             </li>
           ))}

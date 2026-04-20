@@ -72,11 +72,11 @@ type Props = {
 
 function SlotPill({ required }: { required: boolean }) {
   return required ? (
-    <span className="inline-flex items-center rounded-full border border-amber-500/30 bg-amber-500/10 px-2 py-0.5 font-mono text-[10px] font-medium uppercase tracking-[0.14em] text-amber-700 dark:text-amber-400">
+    <span className="inline-flex items-center rounded-full border border-amber-500/30 bg-amber-500/10 px-2 py-0.5 text-[10px] font-medium uppercase tracking-[0.14em] text-amber-700 dark:text-amber-400">
       Required
     </span>
   ) : (
-    <span className="inline-flex items-center rounded-full border border-border bg-muted px-2 py-0.5 font-mono text-[10px] font-medium uppercase tracking-[0.14em] text-muted-foreground">
+    <span className="inline-flex items-center rounded-full border border-border bg-muted px-2 py-0.5 text-[10px] font-medium uppercase tracking-[0.14em] text-muted-foreground">
       Optional
     </span>
   )
@@ -114,7 +114,7 @@ function UploadSlotCard({ spec, state, inputId, disabled, inputRef, onChange, on
             </div>
             <div className="flex min-w-0 flex-col">
               <span className="truncate text-sm font-medium">{file.name}</span>
-              <span className="font-mono text-[10px] uppercase tracking-[0.14em] text-muted-foreground">
+              <span className="text-[10px] uppercase tracking-[0.14em] text-muted-foreground">
                 {formatSize(file.size)}
               </span>
             </div>
@@ -146,7 +146,7 @@ function UploadSlotCard({ spec, state, inputId, disabled, inputRef, onChange, on
             <span className="font-medium text-primary">Click to upload</span>{' '}
             <span className="text-muted-foreground">or drag and drop</span>
           </p>
-          <p className="font-mono text-[10px] uppercase tracking-[0.14em] text-muted-foreground">
+          <p className="text-[10px] uppercase tracking-[0.14em] text-muted-foreground">
             JPG, PNG, or PDF up to 10MB
           </p>
         </label>

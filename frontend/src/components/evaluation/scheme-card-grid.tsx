@@ -38,7 +38,7 @@ export function SchemeCardGrid({ matches }: Props) {
     <section className="flex flex-col gap-4">
       <div className="flex items-baseline justify-between">
         <h2 className="font-heading text-lg font-semibold tracking-tight">Eligible Schemes</h2>
-        <span className="font-mono text-[11px] uppercase tracking-[0.14em] text-muted-foreground">
+        <span className="text-[11px] uppercase tracking-[0.14em] text-muted-foreground">
           {qualifying.length} {qualifying.length === 1 ? 'match' : 'matches'}
         </span>
       </div>
@@ -55,13 +55,13 @@ export function SchemeCardGrid({ matches }: Props) {
               )}
             >
               <header className="flex flex-col gap-2">
-                <span className="font-mono text-[10px] uppercase tracking-[0.14em] text-primary">{category}</span>
+                <span className="text-[10px] uppercase tracking-[0.14em] text-primary">{category}</span>
                 <h3 className="font-heading text-base font-semibold tracking-tight">{match.scheme_name}</h3>
                 <p className="text-xs leading-relaxed text-muted-foreground">{match.summary}</p>
               </header>
 
               <div className="flex flex-1 flex-col gap-1 rounded-md border border-border/60 bg-background/60 p-3">
-                <p className="font-mono text-[10px] uppercase tracking-[0.14em] text-muted-foreground">
+                <p className="text-[10px] uppercase tracking-[0.14em] text-muted-foreground">
                   Why you qualify
                 </p>
                 <p className="text-xs leading-relaxed">{match.why_qualify}</p>
@@ -69,7 +69,7 @@ export function SchemeCardGrid({ matches }: Props) {
 
               <footer className="flex items-end justify-between gap-3">
                 <div className="flex flex-col">
-                  <p className="font-mono text-[10px] uppercase tracking-[0.14em] text-muted-foreground">Est. Value</p>
+                  <p className="text-[10px] uppercase tracking-[0.14em] text-muted-foreground">Est. Value</p>
                   <p className="font-heading text-sm font-semibold">{formatRm(match.annual_rm)}</p>
                 </div>
                 <Button

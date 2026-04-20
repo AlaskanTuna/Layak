@@ -12,16 +12,38 @@
 
 ## Table of Contents
 
-1. Architecture Overview
-2. Architecture Diagram (ASCII)
-3. Component Responsibilities
-4. Data Flow
-5. Google AI Ecosystem Integration
-6. External Dependencies
-7. Security & Secrets
-8. Feasible-Minimum Tech Stack (Plan B)
-9. Open Questions
-10. Team & Delivery Responsibilities
+1. [Architecture Overview](#1-architecture-overview)
+2. [Architecture Diagram (ASCII)](#2-architecture-diagram-ascii)
+3. [System topology](#21-system-topology)
+4. [Agent internal tool-call flow](#22-agent-internal-tool-call-flow)
+5. [Component Responsibilities](#3-component-responsibilities)
+6. [Data Flow](#4-data-flow)
+7. [Google AI Ecosystem Integration](#5-google-ai-ecosystem-integration)
+8. [Model routing](#51-model-routing)
+9. [Vertex AI Search](#52-vertex-ai-search)
+10. [Handbook stack alignment](#53-handbook-stack-alignment)
+11. [Cloud Run deploy commands](#54-cloud-run-deploy-commands)
+12. [External Dependencies](#6-external-dependencies)
+13. [Government source PDFs (cached in-repo under `backend/data/schemes/`)](#61-government-source-pdfs-cached-in-repo-under-backenddataschemes)
+14. [Supplementary datasets (framing, not rule-critical)](#62-supplementary-datasets-framing-not-rule-critical)
+15. [Open-source libraries](#63-open-source-libraries)
+16. [Repo layout](#64-repo-layout)
+17. [Data & storage](#65-data--storage)
+18. [Pre-commit hooks (Husky + lint-staged)](#66-pre-commit-hooks-husky--lint-staged)
+19. [Security & Secrets](#7-security--secrets)
+20. [Feasible-Minimum Tech Stack (Plan B)](#8-feasible-minimum-tech-stack-plan-b)
+21. [Open Questions](#9-open-questions)
+22. [Handbook orchestrator mismatch](#91-handbook-orchestrator-mismatch)
+23. [Vertex AI Search collapse trigger](#92-vertex-ai-search-collapse-trigger)
+24. [GCP project and region pinning](#93-gcp-project-and-region-pinning)
+25. [Backend layout — RESOLVED](#94-backend-layout--resolved)
+26. [JKM Warga Emas rate](#95-jkm-warga-emas-rate)
+27. [Demo document specimens](#96-demo-document-specimens)
+28. [Team & Delivery Responsibilities](#10-team--delivery-responsibilities)
+29. [Roles at a glance](#101-roles-at-a-glance)
+30. [Phase ownership matrix](#102-phase-ownership-matrix)
+31. [Cross-cutting responsibilities](#103-cross-cutting-responsibilities)
+32. [Swap & escalation rules](#104-swap--escalation-rules)
 
 ---
 

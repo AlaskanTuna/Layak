@@ -4,6 +4,13 @@
 
 ---
 
+## [20/04/26] - Added indexed tables of contents to PRD and TRD
+
+- Added linked tables of contents to `docs/prd.md` and `docs/trd.md` so the section structure is easier to scan and jump between.
+- Kept the existing content unchanged; this was a navigation-only docs update.
+
+---
+
 ## [20/04/26] - Committed scheme source PDFs
 
 - Downloaded 6 of 6 PDFs into `backend/data/schemes/` (committed via `9138113` with scaffold filenames; renamed to lowercase kebab-case in a follow-up commit): `risalah-str-2026.pdf` (533 KB), `bk-01.pdf` (418 KB), `jkm18.pdf` (1.1 MB), `pr-no-4-2024.pdf` (524 KB), `explanatory-notes-be2025.pdf` (846 KB), `rf-filing-programme-for-2026.pdf` (557 KB).

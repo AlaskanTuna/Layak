@@ -10,6 +10,38 @@
 
 ---
 
+## Table of Contents
+
+1. [Problem Statement](#1-problem-statement)
+2. [Project Aim & Objectives](#2-project-aim--objectives)
+3. [Target Users](#3-target-users)
+   1. [Primary persona — Aisyah, 34, Grab driver, Kuantan (locked)](#31-primary-persona--aisyah-34-grab-driver-kuantan-locked)
+   2. [Secondary personas (OUT OF SCOPE for v1)](#32-secondary-personas-out-of-scope-for-v1)
+   3. [User assumptions](#33-user-assumptions)
+4. [Functional Requirements](#4-functional-requirements)
+   1. [FR-1 — Single-page web app on Cloud Run](#fr-1--single-page-web-app-on-cloud-run)
+   2. [FR-2 — Document upload widget (three files)](#fr-2--document-upload-widget-three-files)
+   3. [FR-3 — Multimodal extraction into strict JSON profile](#fr-3--multimodal-extraction-into-strict-json-profile)
+   4. [FR-4 — Hardcoded eligibility rule engine](#fr-4--hardcoded-eligibility-rule-engine)
+   5. [FR-5 — Gemini Code Execution arithmetic](#fr-5--gemini-code-execution-arithmetic)
+   6. [FR-6 — Ranked scheme list](#fr-6--ranked-scheme-list)
+   7. [FR-7 — Provenance panel](#fr-7--provenance-panel)
+   8. [FR-8 — Draft packet PDF generator](#fr-8--draft-packet-pdf-generator)
+   9. [FR-9 — "Why I qualify" explanation per scheme](#fr-9--why-i-qualify-explanation-per-scheme)
+   10. [FR-10 — Aisyah seed-data demo-mode fallback](#fr-10--aisyah-seed-data-demo-mode-fallback)
+5. [Non-Functional Requirements](#5-non-functional-requirements)
+   1. [NFR-1 — Performance](#nfr-1--performance)
+   2. [NFR-2 — Grounding & transparency](#nfr-2--grounding--transparency)
+   3. [NFR-3 — Privacy](#nfr-3--privacy)
+   4. [NFR-4 — Accessibility & responsiveness](#nfr-4--accessibility--responsiveness)
+   5. [NFR-5 — Reliability](#nfr-5--reliability)
+   6. [NFR-6 — Security](#nfr-6--security)
+6. [Scope Boundaries](#6-scope-boundaries)
+   1. [In scope (v1 — demo-night deliverables)](#61-in-scope-v1--demo-night-deliverables)
+   2. [Out of scope (v1 — explicit)](#62-out-of-scope-v1--explicit)
+   3. [Emergency de-scope plan](#63-emergency-de-scope-plan)
+7. [Disclaimers](#7-disclaimers)
+
 > **Team & delivery responsibilities moved.** See `docs/trd.md` §10 for the role split (PO1 Hao, PO2 Adam), the phase ownership matrix mapping every `docs/plan.md` task to a human owner, cross-cutting responsibilities, and swap / escalation rules.
 
 ---

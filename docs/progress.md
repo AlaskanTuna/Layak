@@ -4,6 +4,19 @@
 
 ---
 
+## [21/04/26] - Synced frontend Aisyah fixture to Phase 1 Task 4 rule-engine output
+
+- Merged `origin/main` (commits `5b072b8` Task 4 rule engine + `2f7155d` §6.19 fix) into the `frontend` branch. Conflicts were additive in `docs/progress.md` + `docs/plan.md` only — resolved by concatenating entries in chronological order.
+- The rule engine produced different Aisyah figures than the initial Task 2 commit-2 fixture mirror. New live totals: **JKM Warga Emas RM7,200 + LHDN Form B RM558 + STR 2026 RM450 = RM8,208/year** (was RM9,408). Both clear the plan.md ≥RM7,000 headline.
+  - STR dropped from an assumed RM1,200 (higher tier) to the correct RM450 — Aisyah lands in the 1–2 children bucket × RM2,501–5,000 band of the risalah p.2 tier table.
+  - LHDN dropped from an assumed flat RM1,008 to RM558 — real YA2025 bracket math: RM33,600 annual chargeable income minus RM30,500 stacked reliefs → RM3,100 taxable → RM0 tax after reliefs, saving the full RM558 that was otherwise owed.
+- Rewrote `frontend/src/fixtures/aisyah-response.ts` to mirror the rule-engine output verbatim: `AISYAH_SCHEME_MATCHES` now sorted by `annual_rm` desc, `scheme_name` / `summary` / `why_qualify` strings regenerated per the engine's final copy, LHDN citations expanded to 6 entries (added §6.19.3 split between §49(1)(a)/§49(1)(b) and §6.11.3 lifestyle). `AISYAH_UPSIDE` Python snippet + stdout + `total_annual_rm` + `per_scheme_rm` all updated. `AISYAH_PACKET.drafts[]` reordered to match.
+- `AISYAH_CLASSIFICATION.per_capita_monthly_rm` already RM700 — no change. Added a Form B filer note.
+- `pnpm run lint` clean. `pnpm run build` clean.
+- Next: push `frontend`, fast-forward `main`, push `main` so Hao has a single pull before starting Phase 1 Task 3.
+
+---
+
 ## [20/04/26] - Phase 1 Task 2 commit 3: results view — ranked list, scheme cards, provenance panel, code execution trace
 
 - Wrote `frontend/src/components/results/provenance-panel.tsx` — given `RuleCitation[]`, renders each citation as a clickable card (`rule_id`, `source_pdf · page_ref`). Clicking opens a shadcn `Dialog` with the passage text as a blockquote plus an external "Open source PDF" link (when `source_url` is present). Grounds FR-7.

@@ -21,6 +21,7 @@
 7. Security & Secrets
 8. Feasible-Minimum Tech Stack (Plan B)
 9. Open Questions
+10. Team & Delivery Responsibilities
 
 ---
 
@@ -357,3 +358,60 @@ Budget 2026 announced RM600/month; no gov.my PDF yet reflects the uplift (JKM fe
 - TNB utility bill — no official specimen PDF exists on tnb.com.my; generate a synthetic bill from observed layouts with no real account or meter numbers.
 
 All three are PDPA 2010 / NRR 1990 compliant only so long as they are labelled SYNTHETIC on every page and in slide 1 of the pitch deck.
+
+## 10. Team & Delivery Responsibilities
+
+Two developers, two strong-lane focus areas, one hard submit deadline (21 Apr 23:00 MYT). Ownership is mapped directly to `docs/plan.md` tasks and `docs/roadmap.md` phase milestones so nothing falls between lanes.
+
+### 10.1 Roles at a glance
+
+| Role     | Name | Focus                            | Primary areas they own                                                                                                                                                                                                                                             |
+| -------- | ---- | -------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| **PO1**  | Hao  | AI · backend · infra             | `backend/` tree; this TRD §3 (component responsibilities), §4 (data flow), §5 (Google AI ecosystem integration); GCP project + Secret Manager + Gemini API key; rule-engine correctness against cached scheme PDFs; hackathon Google-Form submission.              |
+| **PO2**  | Adam | Frontend · UX · responsiveness   | `frontend/` tree; `docs/prd.md` §4 (FR-1…FR-10 UI contracts) and §6 (in-/out-of-scope surfacing in UI); shadcn component integration; upload widget + SSE consumer + ranked-scheme list + provenance panel; pitch deck (Canva); responsiveness pass and UI polish. |
+| **Both** | —    | Integration · rehearsal · submit | Frontend ↔ backend wiring (Phase 1 midday block); synthetic demo documents validation; three clean 90-second demo rehearsals; submission package (README + video + deck); 23:00–23:59 buffer-zone resubmit if anything breaks.                                     |
+
+> **NOTE:** Agent-role conventions (PL / PG / QA / AD) in `docs/roles.md` are orthogonal — those apply to AI agents working on the repo (Claude Code, Codex, etc.), not to the two human developers. The `.claude/CLAUDE.md` working-convention override grants agent-commit permission for this project; human reviews before push.
+
+### 10.2 Phase ownership matrix
+
+Each row below maps to a specific task in `docs/plan.md` or a milestone in `docs/roadmap.md`. **Owner** is primary; `Both` = paired block. When a matching task in `plan.md` is fully ticked, the matrix row is considered delivered.
+
+| Phase | Task                                                                                                                                              | Owner                                   | Anchor                                                          |
+| ----- | ------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------- | --------------------------------------------------------------- |
+| **0** | Docs decomposition → PRD / TRD / roadmap / plan / progress                                                                                        | PO2 (solo tonight)                      | `docs/plan.md` Phase 0 tasks 1–2, commits `4eab9cb`, `484e83d`  |
+| **0** | `.claude/` project instructions + skills inventory                                                                                                | PO2                                     | `docs/plan.md` Phase 0 task 3, commit `f266a56`                 |
+| **0** | Next.js 16 + React 19 + Tailwind 4 + shadcn + Husky scaffold                                                                                      | PO2                                     | `docs/plan.md` Phase 0 task 4, commit `fcbe6b5`                 |
+| **0** | Refactor into `frontend/` + `backend/` pnpm workspace                                                                                             | PO2                                     | `docs/plan.md` Phase 0 task 6, commits `b7bf34a`, `5171838`     |
+| **0** | Download + commit six scheme source PDFs into `backend/data/schemes/` (renamed to lowercase kebab-case)                                           | Either (mechanical)                     | `docs/plan.md` Phase 0 task 7, commits `9138113`, `d57694b`     |
+| **0** | GCP project signup; enable Vertex AI + Cloud Run + Artifact Registry + Secret Manager + Discovery Engine APIs; Gemini API key → Secret Manager    | PO1 (Hao)                               | `docs/roadmap.md` Phase 0 exit gate · **BLOCKED on PO1 signup** |
+| **0** | Hello-world FastAPI → Gemini → Cloud Run container (`v0.0.1-helloworld` tag)                                                                      | Both                                    | `docs/roadmap.md` Phase 0 exit gate · blocked on GCP            |
+| **1** | Pydantic `Profile` / `SchemeMatch` / `Packet`; FastAPI skeleton with `POST /api/agent/intake` SSE stub; ADK `SequentialAgent` + 2–3 FunctionTools | PO1                                     | `docs/plan.md` Phase 1 task 1                                   |
+| **1** | Upload widget (FR-2), SSE consumer, ranked-scheme list skeleton (FR-6), provenance panel layout (FR-7), demo-mode banner (FR-10)                  | PO2                                     | `docs/plan.md` Phase 1 task 2                                   |
+| **1** | Five-step orchestration (extract → classify → match → compute_upside → generate_packet); Vertex AI Search indexing; hour-12 Plan B trigger        | PO1 (PO2 wires SSE events into UI)      | `docs/plan.md` Phase 1 task 3 · this TRD §8                     |
+| **1** | Rule engine: STR 2026 household tier, JKM Warga Emas per-capita means test, five LHDN Form B reliefs; unit tests vs cached PDFs                   | PO1                                     | `docs/plan.md` Phase 1 task 4                                   |
+| **1** | Wire frontend ↔ backend end-to-end: real SSE, live provenance, Code Execution on stage, WeasyPrint drafts downloadable                            | Both                                    | `docs/plan.md` Phase 1 task 5                                   |
+| **1** | Cloud Run deploy with `--min-instances=1 --cpu-boost`, Secret-Manager-injected `GEMINI_API_KEY`                                                   | PO1                                     | `docs/plan.md` Phase 1 task 6                                   |
+| **1** | Responsiveness pass at 375 / 768 / 1440; three clean demo rehearsals of the 90-second Aisyah flow                                                 | PO2 (responsiveness) / Both (rehearsal) | `docs/plan.md` Phase 1 task 6                                   |
+| **2** | UI polish: copy review, empty states, obvious-bug sweep                                                                                           | PO2                                     | `docs/plan.md` Phase 2 task 1                                   |
+| **2** | README final pass: features, setup, AI disclosure (Rules §4.2), architecture overview (ASCII from this TRD)                                       | PO1                                     | `docs/plan.md` Phase 2 task 1                                   |
+| **2** | 3-min demo video: script → 2 takes → caption if time → unlisted YouTube                                                                           | PO1                                     | `docs/plan.md` Phase 2 task 2                                   |
+| **2** | 15-slide pitch deck in Canva: problem → user → solution → demo → architecture → tech → impact → business → team → export `pitch.pdf`              | PO2                                     | `docs/plan.md` Phase 2 task 3                                   |
+| **2** | Fill + submit Google Form: repo URL, Cloud Run URL, video URL, `pitch.pdf`, GitHub profiles, track + category                                     | PO1 (Team Lead submits)                 | `docs/plan.md` Phase 2 task 4                                   |
+| **2** | 23:00–23:59 buffer: resubmit if any link breaks                                                                                                   | Both                                    | `docs/roadmap.md` Phase 2                                       |
+
+### 10.3 Cross-cutting responsibilities
+
+- **Synthetic demo documents** (MyKad, payslip, TNB utility bill — this TRD §9.6): PO2 designs the visual templates; PO1 validates extraction compatibility with Gemini 2.5 Flash before demo rehearsal. Every page watermarked "SYNTHETIC — FOR DEMO ONLY"; fictional IC number; AI-generated face disclosed on slide 1 of the pitch deck.
+- **Code review on `main`**: for substantive commits (not formatting or doc-only), the other developer reads the diff before the next commit lands on top. Hard pass after feature freeze (21 Apr 18:00) — trust and keep moving.
+- **Progress logging**: after every meaningful milestone, append a dated entry to `docs/progress.md` (format in `.claude/CLAUDE.md`) and tick matching items in `docs/plan.md`. Applies to both devs.
+- **Conventional Commits**: every commit follows `.claude/CLAUDE.md` → Git Commit Convention (`<type>(scope): <description>`, imperative mood, single sentence, no body, no trailing period). Allowed types: `feat`, `fix`, `refactor`, `docs`, `test`, `chore`, `style`, `perf`. Allowed scopes in the project's CLAUDE.md.
+- **AI-coding tool disclosure**: Claude Code, Codex, or any agentic coder used inside the hackathon window must be named in the README AI Disclosure section (Rules §4.2). PO1 writes that section during Phase 2 README pass.
+
+### 10.4 Swap & escalation rules
+
+- **PO1 blocked on ADK-Python migration past the 4-hour budget** (this TRD §10 feasibility note inside the source research brief `docs/project-idea.md` §10): PO2 takes on Cloud Run deploy scaffold so the deploy is unblocked the moment PO1's backend turns green.
+- **Vertex AI Search setup stalls past sprint hour 12**: PO1 calls the trigger; team collapses to Plan B inline-PDF grounding (this TRD §8). ADK-Python and the five-step pipeline stay intact; only the retrieval FunctionTool changes.
+- **Pipeline still unstable at sprint hour 18**: activate the emergency de-scope list in `docs/prd.md` §6.3 — drop PDF packet → drop Code Execution arithmetic → drop two of the five LHDN reliefs → fall back to Aisyah seed fixtures. PO1 proposes, PO2 seconds, both execute in parallel.
+- **Either dev blocked for more than 30 minutes**: ask the other for a 5-minute pair-check before scope-switching. Don't suffer in silence.
+- **Feature freeze at 21 Apr 18:00 (sprint hour 10/10 of Phase 1)**: no new endpoints, pages, or flows. Bug fixes only until code freeze at 21 Apr 21:00. Submission-metadata-only commits after code freeze.

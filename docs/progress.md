@@ -6,7 +6,7 @@
 
 ## [20/04/26] - Committed scheme source PDFs
 
-- Downloaded 6 of 6 PDFs into `backend/data/schemes/`: `RISALAH STR 2026.pdf` (533 KB), `BK-01.pdf` (418 KB), `JKM18.pdf` (1.1 MB), `pr-no-4-2024.pdf` (524 KB), `explanatorynotes_be2025.pdf` (846 KB), `rf-filing-programme-for-2026.pdf` (557 KB).
+- Downloaded 6 of 6 PDFs into `backend/data/schemes/` (committed via `9138113` with scaffold filenames; renamed to lowercase kebab-case in a follow-up commit): `risalah-str-2026.pdf` (533 KB), `bk-01.pdf` (418 KB), `jkm18.pdf` (1.1 MB), `pr-no-4-2024.pdf` (524 KB), `explanatory-notes-be2025.pdf` (846 KB), `rf-filing-programme-for-2026.pdf` (557 KB).
 - Each verified: size ≥ 1 KB, `%PDF` magic header confirmed on all six files.
 - Removed placeholder `backend/data/schemes/.gitkeep`.
 - No URLs failed; all six `gov.my` / `hasil.gov.my` / `jkm.gov.my` endpoints responded HTTP 200 without bot-blocking.

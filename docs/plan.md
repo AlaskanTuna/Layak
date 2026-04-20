@@ -99,7 +99,7 @@
 
 **Implementation:**
 
-- [x] Download the six PDFs into `backend/data/schemes/`: `RISALAH STR 2026.pdf`, `BK-01.pdf`, `JKM18.pdf`, `pr-no-4-2024.pdf`, `explanatorynotes_be2025.pdf`, `rf-filing-programme-for-2026.pdf` (canonical URLs in `docs/trd.md` §6.1).
+- [x] Download the six PDFs into `backend/data/schemes/` (committed as `risalah-str-2026.pdf`, `bk-01.pdf`, `jkm18.pdf`, `pr-no-4-2024.pdf`, `explanatory-notes-be2025.pdf`, `rf-filing-programme-for-2026.pdf`; canonical URLs in `docs/trd.md` §6.1).
 - [x] Verify each file: size ≥ 1 KB, first four bytes are the `%PDF` magic header.
 - [x] For any URL that returns an error page or bot-block, report it so the human can browser-download and drop the file in.
 - [x] Delete `backend/data/schemes/.gitkeep` once at least one real PDF lands.
@@ -173,7 +173,7 @@
 **Implementation — PO1 (Hao):**
 
 - [ ] **Vertex AI Search seed**: `backend/scripts/seed_vertex_ai_search.py` — reads the six PDFs from `backend/data/schemes/`, creates a Discovery Engine data store `layak-schemes-v1` in `asia-southeast1`, uploads + indexes all six, waits for indexing to complete. Idempotent; safe to re-run.
-- [ ] **Canary query test**: `search("STR 2026 household income threshold")` returns at least one passage from `RISALAH STR 2026.pdf`; same for JKM and LHDN. Assert in the seed script.
+- [ ] **Canary query test**: `search("STR 2026 household income threshold")` returns at least one passage from `risalah-str-2026.pdf`; same for JKM and LHDN. Assert in the seed script.
 - [ ] **Expand FunctionTools from 2 to 5**:
   - `extract_profile` → Gemini 2.5 Flash multimodal with `Profile` as structured output. Replace the stub.
   - `classify_household` → Gemini 2.5 Flash → `{has_children_under_18, has_elderly_dependant, income_band}`.
@@ -204,7 +204,7 @@
 **Implementation — PO1 (Hao):**
 
 - [ ] `backend/app/rules/__init__.py` — re-exports `str_2026`, `jkm_warga_emas`, `lhdn_form_b`.
-- [ ] `backend/app/rules/str_2026.py` — household-with-children tier table from `RISALAH STR 2026.pdf`. Function: `match(profile) -> SchemeMatch`.
+- [ ] `backend/app/rules/str_2026.py` — household-with-children tier table from `risalah-str-2026.pdf`. Function: `match(profile) -> SchemeMatch`.
 - [ ] `backend/app/rules/jkm_warga_emas.py` — per-capita means test: `household_income / household_size ≤ food-PLI RM1,236` (DOSM 2024). Default rate RM600/month (Budget 2026); fallback copy RM500/month if the gazetted rate can't be confirmed in JKM18.
 - [ ] `backend/app/rules/lhdn_form_b.py` — five YA2025 reliefs per `pr-no-4-2024.pdf`: individual RM9,000; parent medical up to RM8,000; child #16a RM2,000 × 2; EPF+life #17 up to RM7,000; lifestyle #9 up to RM2,500. Reject any `ya != "ya_2025"` at import time.
 - [ ] **Each rule returns** `SchemeMatch.rule_citations[]` as `{rule_id, source_pdf, page_ref, passage_anchor}` — the frontend provenance panel consumes this verbatim.

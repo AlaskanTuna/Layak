@@ -159,7 +159,7 @@ A single end-to-end journey from upload to download, narrated at component level
 
 ### 5.2 Vertex AI Search
 
-**Primary retrieval layer for v1.** A single Vertex AI Search data store is populated one-time from the three committed scheme PDFs (`RISALAH STR 2026.pdf`, `JKM18.pdf`, `public-ruling-no-4-2024.pdf`, plus the LHDN explanatory notes for BE2025). Vertex AI Search handles chunking, embedding, indexing, and serving. The `match_schemes` FunctionTool wraps the Search endpoint and returns `(passage, source_pdf_url, page_ref)` tuples that populate the provenance panel for every eligibility claim.
+**Primary retrieval layer for v1.** A single Vertex AI Search data store is populated one-time from the six committed scheme PDFs in `backend/data/schemes/` (`risalah-str-2026.pdf`, `bk-01.pdf`, `jkm18.pdf`, `pr-no-4-2024.pdf`, `explanatory-notes-be2025.pdf`, `rf-filing-programme-for-2026.pdf`). Vertex AI Search handles chunking, embedding, indexing, and serving. The `match_schemes` FunctionTool wraps the Search endpoint and returns `(passage, source_pdf_url, page_ref)` tuples that populate the provenance panel for every eligibility claim.
 
 **Rationale.** The hackathon Technical Mandate (Handbook §3, "The Context") names Vertex AI Search as a required ecosystem component. The pitch narrative benefits visibly from a dedicated retrieval layer backing every number on-screen — this is the specific credibility beat that separates Layak from the MyGov Malaysia and NYC MyCity chatbot failures.
 
@@ -200,11 +200,11 @@ Required IAM: `roles/secretmanager.secretAccessor` on the Cloud Run service acco
 
 | Scheme                              | File                               | Canonical URL                                                                                           |
 | ----------------------------------- | ---------------------------------- | ------------------------------------------------------------------------------------------------------- |
-| STR 2026 eligibility infographic    | `RISALAH STR 2026.pdf`             | https://bantuantunai.hasil.gov.my/FAQ/RISALAH%20STR%202026.pdf                                          |
-| STR 2026 application form           | `BK-01.pdf`                        | https://bantuantunai.hasil.gov.my/Borang/BK-01%20(Borang%20Permohonan%20&%20Kemaskini%20STR%202026).pdf |
-| JKM Warga Emas application form     | `JKM18.pdf`                        | https://www.jkm.gov.my/jkm/uploads/files/Bahagian%20PW/BORANG%20PERMOHONAN%20JKM%2018%20(2022)(1).pdf   |
+| STR 2026 eligibility infographic    | `risalah-str-2026.pdf`             | https://bantuantunai.hasil.gov.my/FAQ/RISALAH%20STR%202026.pdf                                          |
+| STR 2026 application form           | `bk-01.pdf`                        | https://bantuantunai.hasil.gov.my/Borang/BK-01%20(Borang%20Permohonan%20&%20Kemaskini%20STR%202026).pdf |
+| JKM Warga Emas application form     | `jkm18.pdf`                        | https://www.jkm.gov.my/jkm/uploads/files/Bahagian%20PW/BORANG%20PERMOHONAN%20JKM%2018%20(2022)(1).pdf   |
 | LHDN Public Ruling 4/2024 (reliefs) | `pr-no-4-2024.pdf`                 | https://www.hasil.gov.my/media/d2wh4ykj/pr-no-4-2024.pdf                                                |
-| LHDN explanatory notes BE2025       | `explanatorynotes_be2025.pdf`      | https://www.hasil.gov.my/media/pshpbomm/explanatorynotes_be2025_2.pdf                                   |
+| LHDN explanatory notes BE2025       | `explanatory-notes-be2025.pdf`     | https://www.hasil.gov.my/media/pshpbomm/explanatorynotes_be2025_2.pdf                                   |
 | LHDN filing programme 2026          | `rf-filing-programme-for-2026.pdf` | https://www.hasil.gov.my/media/fqog1423/rf-filing-programme-for-2026.pdf                                |
 
 **Licensing note.** Malaysian government-published PDFs are cached verbatim for reference. Layak displays source URLs prominently and does not claim authorship. Treat as reference-only fair use for the hackathon; for post-demo distribution, seek formal permission.

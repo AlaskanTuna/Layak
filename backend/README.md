@@ -23,11 +23,11 @@ backend/
 │   └── schema/                   # Pydantic models (Profile, SchemeMatch, Packet)
 ├── data/
 │   └── schemes/                  # Source PDFs (git-versioned; the repo is the bucket)
-│       ├── RISALAH STR 2026.pdf
-│       ├── BK-01.pdf
-│       ├── JKM18.pdf
+│       ├── risalah-str-2026.pdf
+│       ├── bk-01.pdf
+│       ├── jkm18.pdf
 │       ├── pr-no-4-2024.pdf
-│       ├── explanatorynotes_be2025.pdf
+│       ├── explanatory-notes-be2025.pdf
 │       └── rf-filing-programme-for-2026.pdf
 └── scripts/
     └── seed_vertex_ai_search.py  # One-time data-store seeder (idempotent)

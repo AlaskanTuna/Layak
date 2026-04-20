@@ -4,6 +4,19 @@
 
 ---
 
+## [21/04/26] - Synced frontend Aisyah fixture to Hao's Task 3 Path 1 stub outputs (classify notes, compute_upside stdout, packet filenames)
+
+After merging `origin/main` (Hao's Task 3 Path 1 + demo-doc redesign), the frontend mock fixture drifted from backend stub output in three places — mock-mode would have shown different strings than wired-mode. Aligned verbatim.
+
+- **Classify notes** (`AISYAH_CLASSIFICATION.notes`) — replaced my three expository notes with the five Hao's `classify_household` stub derives from the profile: `Household size: 4.`, `Per-capita monthly income: RM700.`, `Filer category: FORM B.`, `2 child(ren) under 18 in household.`, `1 parent dependant(s) aged 60+.`
+- **Compute upside stdout + Python snippet** (`AISYAH_UPSIDE`) — replaced my short `"Total annual upside: RMx,xxx"` format with Hao's deterministic `{:<42s}{:>12,}` table format. Stdout now reads `Scheme … Annual (RM) / ─── / JKM Warga Emas — dependent elderly payment … 7,200 / LHDN Form B — five YA2025 reliefs … 558 / STR 2026 — Household with children tier … 450 / ─── / Total upside (annual) … 8,208`. Python snippet mirrors `backend/app/agents/tools/compute_upside.py:_python_snippet` line-for-line.
+- **Packet filenames** (`AISYAH_PACKET.drafts[].filename`) — replaced my lowercase kebab-case filenames with Hao's `_FILENAME_TEMPLATES` output slugged by `ic_last4=4321`: `JKM18-warga-emas-draft-4321.pdf`, `LHDN-form-b-relief-summary-4321.pdf`, `BK-01-STR2026-draft-4321.pdf`. Matches what the `PacketDownload` component will receive from the real backend.
+- No schema changes — `Profile`, `SchemeMatch`, `HouseholdClassification`, `ComputeUpsideResult`, `Packet`, `PacketDraft` all stable across the merge. No `agent-types.ts` edits needed.
+- Re-alignment may be needed when Hao's Path 2 (real Gemini Code Execution) lands — actual Python output may differ from the stub's template-filled snippet. Left a note in `AISYAH_UPSIDE` for re-sync.
+- `pnpm run lint` clean. `pnpm run build` clean.
+
+---
+
 ## [21/04/26] - Phase 1 Task 5 PO2 prep: packet download card, error recovery card, mobile polish on scheme card
 
 Front-loading the three PO2 items for Task 5 so the 12:30 paired wiring block is a straight SSE-endpoint swap rather than a build-and-wire session.

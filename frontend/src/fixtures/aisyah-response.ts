@@ -44,9 +44,11 @@ export const AISYAH_CLASSIFICATION: HouseholdClassification = {
   income_band: 'b40_household_with_children',
   per_capita_monthly_rm: 700,
   notes: [
-    'Household income RM2,800 / 4 members = RM700 per capita per month.',
-    'Below food-PLI threshold of RM1,236 (DOSM 2024) — triggers JKM Warga Emas means test.',
-    'Form B filer — five YA2025 reliefs stack for the LHDN rule.'
+    'Household size: 4.',
+    'Per-capita monthly income: RM700.',
+    'Filer category: FORM B.',
+    '2 child(ren) under 18 in household.',
+    '1 parent dependant(s) aged 60+.'
   ]
 }
 
@@ -191,19 +193,29 @@ export const AISYAH_SCHEME_MATCHES: SchemeMatch[] = [
 ]
 
 export const AISYAH_UPSIDE: ComputeUpsideResult = {
-  python_snippet: `schemes = {
-    "jkm_warga_emas": 7200.0,
-    "lhdn_form_b": 558.0,
-    "str_2026": 450.0,
-}
-total = sum(schemes.values())
-print(f"Total annual upside: RM{total:,.2f}")
-for scheme, rm in sorted(schemes.items(), key=lambda kv: -kv[1]):
-    print(f"  {scheme}: RM{rm:,.2f}")`,
-  stdout: `Total annual upside: RM8,208.00
-  jkm_warga_emas: RM7,200.00
-  lhdn_form_b: RM558.00
-  str_2026: RM450.00`,
+  python_snippet: `# Layak — annual RM upside computation
+# Gemini Code Execution would run this in a sandbox under Gemini 2.5 Pro.
+
+jkm_warga_emas = 7200  # JKM Warga Emas — dependent elderly payment
+lhdn_form_b = 558  # LHDN Form B — five YA2025 reliefs
+str_2026 = 450  # STR 2026 — Household with children tier
+
+total = jkm_warga_emas + lhdn_form_b + str_2026
+
+print("{:<42s}{:>12s}".format("Scheme", "Annual (RM)"))
+print("-" * 55)
+print("{:<42s}{:>12,}".format('JKM Warga Emas — dependent elderly payment', jkm_warga_emas))
+print("{:<42s}{:>12,}".format('LHDN Form B — five YA2025 reliefs', lhdn_form_b))
+print("{:<42s}{:>12,}".format('STR 2026 — Household with children tier', str_2026))
+print("-" * 55)
+print("{:<42s}{:>12,}".format("Total upside (annual)", total))`,
+  stdout: `Scheme                                     Annual (RM)
+-------------------------------------------------------
+JKM Warga Emas — dependent elderly payment       7,200
+LHDN Form B — five YA2025 reliefs                  558
+STR 2026 — Household with children tier            450
+-------------------------------------------------------
+Total upside (annual)                            8,208`,
   total_annual_rm: 8208,
   per_scheme_rm: {
     jkm_warga_emas: 7200,
@@ -214,9 +226,9 @@ for scheme, rm in sorted(schemes.items(), key=lambda kv: -kv[1]):
 
 export const AISYAH_PACKET: Packet = {
   drafts: [
-    { scheme_id: 'jkm_warga_emas', filename: 'jkm18-warga-emas-draft.pdf', blob_bytes_b64: null },
-    { scheme_id: 'lhdn_form_b', filename: 'lhdn-form-b-ya2025-draft.pdf', blob_bytes_b64: null },
-    { scheme_id: 'str_2026', filename: 'bk01-str-2026-draft.pdf', blob_bytes_b64: null }
+    { scheme_id: 'jkm_warga_emas', filename: 'JKM18-warga-emas-draft-4321.pdf', blob_bytes_b64: null },
+    { scheme_id: 'lhdn_form_b', filename: 'LHDN-form-b-relief-summary-4321.pdf', blob_bytes_b64: null },
+    { scheme_id: 'str_2026', filename: 'BK-01-STR2026-draft-4321.pdf', blob_bytes_b64: null }
   ],
   generated_at: '2026-04-21T03:30:00Z'
 }

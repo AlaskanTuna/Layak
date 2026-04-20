@@ -22,8 +22,6 @@
 - [x] Read `.claude/CLAUDE.md` and `.claude/settings.json`; list `.claude/skills/` contents.
 - [x] Report findings and blockers to the PO before proceeding.
 
----
-
 ### 2. Feature: Decompose project-idea into PRD / TRD
 
 **Purpose/Issue:** Turn `docs/project-idea.md` into a product contract (`docs/prd.md`), a technical contract (`docs/trd.md`), and roadmap updates that reflect the locked decisions. Apply the PO's overrides: ADK-Python v1.31 GA (not Genkit), Vertex AI Search primary with inline 1M-context as Plan B at sprint hour 12, Aisyah locked as Form B filer, stateless architecture (no DB / no GCS / no Firestore in v1), and a hard feature freeze at hour 20/24.
@@ -36,22 +34,18 @@
 - [x] Tick `docs/plan.md` items and append a dated summary to `docs/progress.md`.
 - [x] Commit `docs: decompose project-idea into prd, trd, and roadmap updates`.
 
----
-
 ### 3. Feature: Initialize `.claude/` for shared agentic coding
 
 **Purpose/Issue:** Fill `.claude/CLAUDE.md` with project-specific conventions (one-liner, tech stack snapshot, working conventions including agent-commit permission, re-read discipline) and inventory `.claude/skills/` to surface duplicates and gaps. No new skills are created in this task — gaps are reported only.
 
 **Implementation:**
 
-- [ ] Update `.claude/CLAUDE.md` with project one-liner, current-phase reference, tech-stack snapshot, working conventions, critical do-nots, and re-read discipline.
-- [ ] Add the agent-commit permission note under working conventions, per PO override.
-- [ ] Inventory every `.claude/skills/<skill>/SKILL.md` with a one-line summary; flag duplicates for human review.
-- [ ] Report gaps for this project (Next.js + shadcn scaffolding, Cloud Run deploy, Gemini API calling conventions, PDF generation). Do not create skills.
-- [ ] Confirm `.claude/` is tracked in git; if `.gitignore` excludes it, remove the exclusion.
-- [ ] Commit `chore(claude): initialize project-specific CLAUDE.md and inventory skills`.
-
----
+- [x] Update `.claude/CLAUDE.md` with project one-liner, current-phase reference, tech-stack snapshot, working conventions, critical do-nots, and re-read discipline.
+- [x] Add the agent-commit permission note under working conventions, per PO override.
+- [x] Inventory every `.claude/skills/<skill>/SKILL.md` with a one-line summary; flag duplicates for human review.
+- [x] Report gaps for this project (Next.js + shadcn scaffolding, Cloud Run deploy, Gemini API calling conventions, PDF generation). Do not create skills.
+- [x] Confirm `.claude/` is tracked in git; if `.gitignore` excludes it, remove the exclusion.
+- [x] Commit `chore(claude): initialize project-specific CLAUDE.md and inventory skills`.
 
 ### 4. Feature: Scaffold Next.js frontend tooling
 
@@ -71,8 +65,6 @@
 - [ ] Create stub landing page at `src/app/page.tsx` (single "Layak" card + disabled Lucide "Start" button, ≤40 lines).
 - [ ] Run `pnpm lint` and `pnpm build`; surface warnings but do not fix pre-existing template noise.
 - [ ] Commit `chore(frontend): scaffold Next.js + Tailwind + shadcn + Husky + Lucide` (include lockfile).
-
----
 
 ### 5. Feature: Push and handoff
 
@@ -100,8 +92,6 @@
 - [ ] Wire ADK-Python `SequentialAgent` with two or three `FunctionTool`s (extract, match) against the Gemini API.
 - [ ] Local smoke test: stub returns a valid SSE stream end-to-end.
 
----
-
 ### 2. Feature: Frontend scaffolding to mock data
 
 **Purpose/Issue:** _(to be filled at task start)_
@@ -112,8 +102,6 @@
 - [ ] Build the SSE consumer and per-step progress placeholders.
 - [ ] Build the ranked-scheme list skeleton with mock data.
 - [ ] Build the provenance panel layout (FR-7) with placeholder citations.
-
----
 
 ### 3. Feature: Orchestration layer (agent chains ≥3 steps)
 
@@ -126,8 +114,6 @@
 - [ ] Canary retrieval query returns non-empty passages for each scheme.
 - [ ] Trigger-point check at sprint hour 12: if Vertex AI Search is not green, collapse to the Plan B inline-PDF grounding in `docs/trd.md` §8.
 
----
-
 ### 4. Feature: Rule engine (STR, JKM Warga Emas, 5 LHDN reliefs)
 
 **Purpose/Issue:** _(to be filled at task start)_
@@ -138,8 +124,6 @@
 - [ ] Encode JKM Warga Emas per-capita means test against food-PLI RM1,236 (DOSM 2024); default rate RM600/month, fallback copy RM500/month.
 - [ ] Encode five LHDN Form B reliefs for YA2025: individual (RM9,000), parent medical (up to RM8,000), child 16a ×2 (RM2,000 each), EPF+life #17 (up to RM7,000), lifestyle #9 (up to RM2,500).
 - [ ] Unit tests assert every threshold matches the cached scheme PDF under `backend/data/schemes/`.
-
----
 
 ### 5. Feature: Wire frontend ↔ backend end-to-end
 
@@ -152,8 +136,6 @@
 - [ ] Gemini Code Execution streams Python computations on-stage.
 - [ ] WeasyPrint produces three DRAFT-watermarked PDFs downloadable from the results view.
 - [ ] Happy path runs end-to-end locally against the full Aisyah fixture set.
-
----
 
 ### 6. Feature: Cloud Run deploy and responsiveness pass
 
@@ -182,8 +164,6 @@
 - [ ] Copy review, empty states, obvious-bug sweep.
 - [ ] README final pass: features, setup, AI disclosure (names Claude Code per Rules §4.2), architecture overview with ASCII diagrams from `docs/trd.md`.
 
----
-
 ### 2. Feature: 3-minute demo video
 
 **Purpose/Issue:** _(to be filled at task start)_
@@ -194,8 +174,6 @@
 - [ ] Edit, caption if time permits.
 - [ ] Upload unlisted to YouTube; submission-form URL copied.
 
----
-
 ### 3. Feature: Pitch deck (≤15 slides)
 
 **Purpose/Issue:** _(to be filled at task start)_
@@ -204,8 +182,6 @@
 
 - [ ] Canva deck: problem → user → solution → demo → architecture → tech → impact → business model → team.
 - [ ] Export PDF; commit to repo root as `pitch.pdf`.
-
----
 
 ### 4. Feature: Final submission
 
@@ -216,5 +192,9 @@
 - [ ] Fill and submit the Google Form against every required field (repo URL, Cloud Run URL, video URL, deck PDF, GitHub profile links, track + category).
 - [ ] Verify each link in the confirmation email.
 - [ ] Resubmit if anything breaks during the 23:00–23:59 buffer.
+
+---
+
+## Phase X: ...
 
 ---

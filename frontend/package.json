@@ -4,10 +4,10 @@
   "private": true,
   "scripts": {
     "predev": "test -L .env.local || ln -sf ../.env .env.local",
-    "dev": "next dev --webpack",
+    "dev": "sh -c '[ -f .env.local ] && { set -a; . ./.env.local; set +a; }; exec next dev --webpack'",
     "prebuild": "test -L .env.local || ln -sf ../.env .env.local",
-    "build": "next build --webpack",
-    "start": "next start",
+    "build": "sh -c '[ -f .env.local ] && { set -a; . ./.env.local; set +a; }; exec next build --webpack'",
+    "start": "sh -c '[ -f .env.local ] && { set -a; . ./.env.local; set +a; }; exec next start'",
     "lint": "eslint"
   },
   "dependencies": {

@@ -4,6 +4,28 @@
 
 ---
 
+## [20/04/26] - Fixed LHDN §6.20 → §6.19 miscitation and tightened rule-engine test coverage from audit findings
+
+Post-commit subagent audits (rule correctness, test coverage, plan.md adherence) surfaced three real issues in the rule engine. All fixed here.
+
+- **Fix 1 — wrong PR section.** `backend/app/rules/lhdn_form_b.py` previously cited `PR 4/2024 §6.20 (doc p.47)` for the EPF + life-insurance combined RM7,000 cap. §6.20 is actually "Premium for insurance on education or for medical benefits" (pypdf p.56, doc p.53). The correct section is **§6.19** — "Deduction for insurance premiums/Takaful contribution and contribution to an approved scheme" (pypdf p.49, doc p.46), with the YA2023+ table on pypdf p.50 (doc p.47).
+- **Fix 2 — wrong individual-category passage.** The citation passage quoted the now-deleted public-servant flat RM7,000 rule under §49(1A)(c), which was struck by Act 845 effective YA2023. For non-public-servant individuals like Aisyah (Form B self-employed), §6.19.3 splits the relief into **RM3,000 for life insurance under §49(1)(a)** plus **RM4,000 for EPF under §49(1)(b)**. New constants `LIFE_INSURANCE_CAP_RM = 3000.0` and `EPF_CAP_RM = 4000.0` expose the split; `EPF_LIFE_17_COMBINED_CAP_RM` is now derived as their sum so Aisyah's numeric saving (RM558) is unchanged but the provenance is accurate.
+- **Tightened test coverage.** Added five new tests in `backend/tests/`:
+  - `test_epf_life_sub_caps_on_pr_s6_19_3_doc_p47` — asserts both RM3,000 and RM4,000 sub-caps appear on pypdf p.50 alongside `§49(1)(a)` and `§49(1)(b)`.
+  - `test_combined_epf_life_equals_sum_of_sub_caps` — guards against drift between the combined public-facing cap and the two split caps.
+  - `test_pr_s6_19_heading_not_s6_20` — regression guard against the miscitation: asserts §6.19 heading is on pypdf p.49 and §6.20 heading on pypdf p.56.
+  - `test_aisyah_triggers_all_five_reliefs_with_gazetted_caps` (replaces the key-only assertion) — asserts each of the five reliefs returns its exact gazetted cap (9,000 / 8,000 / 4,000 / 7,000 / 2,500).
+  - `test_no_parent_dependant_drops_parent_medical` — profiles without a parent dependant do not get the parent-medical cap and do not get child_16a; only `{individual, lifestyle_9, epf_life_17}` remain.
+  - `test_income_exactly_5000_is_inclusive` + `test_income_exactly_2500_is_band_1` — STR band-boundary inclusivity tests (band ceilings are ≤ per risalah "RM2,501-RM5,000").
+- **Pytest: 39 passed in 2.71 s.** Ruff `check` and `format --check` clean across 23 files. Aisyah combined total unchanged at **RM8,208/yr**.
+
+Findings the audit flagged that were **not** acted on (cosmetic or external to PDF-grounding contract):
+
+- `SUPPORTED_YA = "ya_2025" ; if SUPPORTED_YA != "ya_2025": raise ImportError(...)` — audit called this "dead code". Intent of the guard is to catch silent edits (change the constant → module fails to import), which it does under that specific edit path; left as documented dormant-by-design.
+- JKM Warga Emas citations use `source_pdf="jkm18.pdf"` for the RM1,236 food-PLI and RM600 Budget-2026 rate even though those specific numbers are external to jkm18.pdf (DOSM and Budget speech respectively). The `passage` and `page_ref` fields honestly label the external references; this is a nominal grounding that the frontend can render truthfully. Noted for PO2 to design the provenance panel UI around.
+
+---
+
 ## [20/04/26] - Encoded STR / JKM Warga Emas / LHDN Form B rule engine with PDF-grounded unit tests (plan.md Phase 1 Task 4)
 
 - Added `backend/app/rules/` with three scheme modules, each exposing a `match(profile) -> SchemeMatch` entry point and sharing a common `RuleCitation`-populated provenance surface:

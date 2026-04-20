@@ -43,11 +43,28 @@ def test_child_16a_amount_on_pr_doc_p41(pdf_text: dict[str, dict[int, str]]) -> 
     assert "48(1)(a)" in page.replace(" ", "")
 
 
-def test_epf_life_17_cap_on_pr_doc_p47(pdf_text: dict[str, dict[int, str]]) -> None:
-    """RM7,000 EPF + life-insurance combined cap appears on pypdf p.50 (doc p.47)."""
+def test_epf_life_sub_caps_on_pr_s6_19_3_doc_p47(pdf_text: dict[str, dict[int, str]]) -> None:
+    """§6.19.3 YA2023+ individual sub-caps: RM3,000 life (§49(1)(a)) + RM4,000 EPF (§49(1)(b))."""
     page = pdf_text["pr-no-4-2024.pdf"][50]
-    assert _has_amount(page, f"{int(lhdn_form_b.EPF_LIFE_17_COMBINED_CAP_RM):,}")
+    assert _has_amount(page, f"{int(lhdn_form_b.LIFE_INSURANCE_CAP_RM):,}")
+    assert _has_amount(page, f"{int(lhdn_form_b.EPF_CAP_RM):,}")
     assert "49(1)(a)" in page.replace(" ", "")
+    assert "49(1)(b)" in page.replace(" ", "")
+
+
+def test_combined_epf_life_equals_sum_of_sub_caps() -> None:
+    """The public-facing RM7,000 combined cap is the sum of the two §6.19.3 sub-caps."""
+    assert (
+        lhdn_form_b.EPF_LIFE_17_COMBINED_CAP_RM == lhdn_form_b.LIFE_INSURANCE_CAP_RM + lhdn_form_b.EPF_CAP_RM == 7000.0
+    )
+
+
+def test_pr_s6_19_heading_not_s6_20(pdf_text: dict[str, dict[int, str]]) -> None:
+    """Guard against the previous miscitation: life/EPF lives in §6.19, not §6.20."""
+    page_6_19_heading = pdf_text["pr-no-4-2024.pdf"][49]
+    assert "6.19 Deduction for insurance premiums" in page_6_19_heading
+    page_6_20_heading = pdf_text["pr-no-4-2024.pdf"][56]
+    assert "6.20 Premium for insurance on education" in page_6_20_heading
 
 
 def test_lifestyle_9_cap_on_pr_doc_p29(pdf_text: dict[str, dict[int, str]]) -> None:
@@ -65,8 +82,8 @@ def test_form_b_deadline_appears_in_filing_programme(pdf_text: dict[str, dict[in
     assert "30 June 2026" in full
 
 
-def test_aisyah_triggers_all_five_reliefs(aisyah: Profile) -> None:
-    """Aisyah's profile triggers individual + parent medical + child (×2) + EPF+life + lifestyle."""
+def test_aisyah_triggers_all_five_reliefs_with_gazetted_caps(aisyah: Profile) -> None:
+    """Aisyah's profile triggers all five reliefs — each returns its gazetted cap."""
     reliefs = lhdn_form_b._applicable_reliefs(aisyah)
     assert set(reliefs.keys()) == {
         "individual",
@@ -75,7 +92,33 @@ def test_aisyah_triggers_all_five_reliefs(aisyah: Profile) -> None:
         "parent_medical",
         "child_16a",
     }
-    assert reliefs["child_16a"] == 2 * lhdn_form_b.CHILD_16A_PER_CHILD_RM
+    assert reliefs["individual"] == lhdn_form_b.INDIVIDUAL_RELIEF_RM == 9000.0
+    assert reliefs["parent_medical"] == lhdn_form_b.PARENT_MEDICAL_CAP_RM == 8000.0
+    assert reliefs["child_16a"] == 2 * lhdn_form_b.CHILD_16A_PER_CHILD_RM == 4000.0
+    assert reliefs["epf_life_17"] == lhdn_form_b.EPF_LIFE_17_COMBINED_CAP_RM == 7000.0
+    assert reliefs["lifestyle_9"] == lhdn_form_b.LIFESTYLE_9_CAP_RM == 2500.0
+
+
+def test_no_parent_dependant_drops_parent_medical() -> None:
+    """Profile without a parent dependant does not get the parent-medical relief."""
+    p = Profile(
+        name="No parent",
+        ic_last4="0010",
+        age=30,
+        monthly_income_rm=3000,
+        household_size=1,
+        dependants=[],
+        household_flags=HouseholdFlags(
+            has_children_under_18=False,
+            has_elderly_dependant=False,
+            income_band="b40_household",
+        ),
+        form_type="form_b",
+    )
+    reliefs = lhdn_form_b._applicable_reliefs(p)
+    assert "parent_medical" not in reliefs
+    assert "child_16a" not in reliefs
+    assert set(reliefs.keys()) == {"individual", "lifestyle_9", "epf_life_17"}
 
 
 def test_aisyah_match_returns_positive_tax_saving(aisyah: Profile) -> None:

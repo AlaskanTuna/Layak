@@ -91,6 +91,20 @@ def test_income_above_5000_does_not_qualify() -> None:
     assert result.annual_rm == 0.0
 
 
+def test_income_exactly_5000_is_inclusive() -> None:
+    """The RM5,000 band ceiling is inclusive (≤), per risalah p.2 'RM2,501-RM5,000'."""
+    result = str_2026.match(_profile(5000, (10, 8)))
+    assert result.qualifies is True
+    assert result.annual_rm == str_2026.STR_HOUSEHOLD_ANNUAL_RM["2501_5000"]["1_2"]
+
+
+def test_income_exactly_2500_is_band_1() -> None:
+    """Income RM2,500 exactly lands in band 1 (≤RM2,500), not band 2."""
+    result = str_2026.match(_profile(2500, (10, 8)))
+    assert result.qualifies is True
+    assert result.annual_rm == str_2026.STR_HOUSEHOLD_ANNUAL_RM["le_2500"]["1_2"]
+
+
 def test_no_children_under_18_does_not_qualify() -> None:
     """With-children tier excludes couples with no children under 18."""
     result = str_2026.match(_profile(2000, ()))

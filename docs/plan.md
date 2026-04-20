@@ -212,8 +212,8 @@
   - `test_str_2026.py` — asserts every tier threshold and child-count multiplier matches the PDF; Aisyah profile lands in the expected band.
   - `test_jkm_warga_emas.py` — Aisyah's father (age 70, household RM2,800 / 4 members = RM700/capita) qualifies.
   - `test_lhdn_form_b.py` — each relief returns its gazetted cap; Aisyah (two children + gig income + parent in household) triggers all five.
-- [x] Run `pytest -q` from `backend/`; ensure green. **Result: 34 passed in 2.75 s.**
-- [ ] Commit `feat(lambda): encode str jkm lhdn rule engine with unit tests`.
+- [x] Run `pytest -q` from `backend/`; ensure green. **Result: 34 passed in 2.75 s**, grew to **39 passed in 2.71 s** after audit follow-up (`5b072b8`, `956065b`).
+- [x] Commit `feat(lambda): encode str jkm lhdn rule engine with unit tests` (commit `5b072b8`, followed by audit-fix commit `956065b`).
 
 **Exit criteria:** all three modules expose `match(profile) -> SchemeMatch` with populated `rule_citations`; `pytest` green; Aisyah's combined matches sum to ≥ RM7,000/year (PRD headline sanity target); `match_schemes` FunctionTool from task 3 delegates here instead of stubs.
 

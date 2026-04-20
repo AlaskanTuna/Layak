@@ -28,12 +28,19 @@ if SUPPORTED_YA != "ya_2025":
         "Update the cap constants against the matching-year Public Ruling before changing this."
     )
 
-# Relief caps (RM) — pr-no-4-2024.pdf.
-# Each cap is asserted to appear on its cited page in test_lhdn_form_b.py.
+# Relief caps (RM) — pr-no-4-2024.pdf. Each cap is asserted to appear on its
+# cited page in test_lhdn_form_b.py.
 INDIVIDUAL_RELIEF_RM = 9000.0
 PARENT_MEDICAL_CAP_RM = 8000.0
 CHILD_16A_PER_CHILD_RM = 2000.0
-EPF_LIFE_17_COMBINED_CAP_RM = 7000.0
+# PR §6.19.3 splits the combined life-insurance + EPF relief for non-public-
+# servant individuals (YA2023+) into two separate sub-caps under paragraphs
+# 49(1)(a) and 49(1)(b) of the ITA — RM3,000 for life insurance/family Takaful
+# and RM4,000 for EPF. Summed, they equal the pre-YA2023 combined RM7,000.
+# The public-servant flat RM7,000 under §49(1A)(c) was deleted effective YA2023.
+LIFE_INSURANCE_CAP_RM = 3000.0
+EPF_CAP_RM = 4000.0
+EPF_LIFE_17_COMBINED_CAP_RM = LIFE_INSURANCE_CAP_RM + EPF_CAP_RM
 LIFESTYLE_9_CAP_RM = 2500.0
 
 _FORM_B_DEADLINE = "30 June 2026"
@@ -112,10 +119,12 @@ def _citations() -> list[RuleCitation]:
         RuleCitation(
             rule_id="lhdn.form_b.epf_life_17",
             source_pdf="pr-no-4-2024.pdf",
-            page_ref="PR 4/2024 §6.20 (doc p.47) — ITA paragraph 49(1)(a)",
+            page_ref="PR 4/2024 §6.19 / §6.19.3 (doc p.46–48) — ITA paragraphs 49(1)(a), 49(1)(b)",
             passage=(
-                "Life insurance premium / family Takaful contribution payments of up to "
-                "RM7,000 under paragraph 49(1)(a) of the ITA."
+                "§6.19.3 table: effective YA 2023, individuals (other than public servants) "
+                "are restricted to RM3,000 for life insurance premium / family Takaful "
+                "contribution under paragraph 49(1)(a) and RM4,000 for EPF contributions "
+                "under paragraph 49(1)(b) — combined relief up to RM7,000."
             ),
             source_url="https://www.hasil.gov.my/media/d2wh4ykj/pr-no-4-2024.pdf",
         ),

@@ -135,7 +135,7 @@
   - `match_schemes(profile)` → returns 3 canned `SchemeMatch` objects (real rule engine arrives in task 4).
 - [x] SSE event shape (lock this now — the frontend depends on it): `step_started {step}`, `step_result {step, data}`, `done {packet}`, `error {step, message}`. Discriminator key is `type` (e.g. `{"type":"step_started","step":"extract"}`) — documented at the top of `backend/app/schema/events.py` and `backend/app/main.py`.
 - [x] Local smoke test: `curl -N -F ic=@fixtures/ic.pdf -F payslip=@fixtures/payslip.pdf -F utility=@fixtures/tnb.pdf http://localhost:8080/api/agent/intake` emits at least 4 events in under 3s and terminates cleanly. **Result: 5 events in 573 ms** (2 × `step_started` + 2 × `step_result` + 1 × `done`).
-- [ ] Commit `feat(lambda): scaffold fastapi and adk sequentialagent with stub functiontools`.
+- [x] Commit `feat(lambda): scaffold fastapi and adk sequentialagent with stub functiontools` (commit `a48f77c`).
 
 **Exit criteria:** service stands up on `:8080`; smoke-test curl streams a full SSE response with stubbed data; SSE event shape documented in a one-line comment in `backend/app/main.py` so PO2 can consume it.
 
@@ -157,8 +157,8 @@
 - [x] **Ranked scheme list (FR-6) + "Why I qualify" (FR-9)**: `scheme-card.tsx` (shadcn `Card` with RM/year, agency badge, summary, "Why I qualify" expander carrying the justification + ProvenancePanel + agency portal link) and `ranked-list.tsx` (descending by annual RM; total annual RM banner in header; eight out-of-scope schemes from PRD §6.2 as greyed "Checking… (v2)" cards in a grid).
 - [x] **Provenance panel (FR-7)**: `provenance-panel.tsx` — each rule citation renders as `rule_id → source PDF (page_ref)` in a clickable card; click opens shadcn `Dialog` with the passage text as a blockquote plus a "Open source PDF" external link. Bonus: `code-execution-panel.tsx` renders Gemini Code Execution Python + stdout as a paired `<pre>` block on the results view (advance-wires Task 3 PO2 sync point).
 - [x] **Mock SSE mode**: `NEXT_PUBLIC_USE_MOCK_SSE=1` env flag replays events from `aisyah-response.ts` with staggered `setTimeout`s so the UI animation rhythm is testable without the backend.
-- [ ] **Responsiveness smoke**: eyeball 375 / 768 / 1440 in Chrome DevTools. No horizontal scroll.
-- [ ] Commit in 2–3 chunks: `feat(ui): add upload widget and demo-mode banner`, `feat(ui): add pipeline stepper and sse consumer hook`, `feat(ui): add results view with ranked list and provenance panel`.
+- [ ] **Responsiveness smoke**: eyeball 375 / 768 / 1440 in Chrome DevTools. No horizontal scroll. (Deferred to Task 6 responsiveness pass.)
+- [x] Commit in 2–3 chunks: `feat(ui): add upload widget and demo-mode banner` (`2443838`), `feat(ui): add pipeline stepper and sse consumer hook` (`fe07710`), `feat(ui): add results view with ranked list and provenance panel` (`ef1c3f0`).
 
 **Exit criteria:** load page → click "Use Aisyah sample documents" → full 5-step pipeline plays out visually → ranked list + provenance panel + total RM render, all from mock data with no backend running; three viewports render clean.
 
@@ -184,9 +184,9 @@
 
 **Implementation — PO2 (Adam), sync points:**
 
-- [ ] When PO1 confirms `step_started: "classify"` and `"compute_upside"` events are live, extend `pipeline-stepper.tsx` labels. (The generic SSE hook from task 2 should already handle them.)
-- [ ] Render Code Execution stdout (Python snippet + output) inside the `compute_upside` step-result panel in a small `<pre>` — this is the judge-trust moment.
-- [ ] Render provenance passages from `match_schemes` in the panel; click-through links point at `/api/schemes/<filename>` (PO1 exposes as static route) or the public source URL from `docs/trd.md` §6.1.
+- [x] When PO1 confirms `step_started: "classify"` and `"compute_upside"` events are live, extend `pipeline-stepper.tsx` labels. (Generic SSE hook + `PIPELINE_STEPS` / `STEP_LABELS` in `agent-types.ts` already handle all five steps — no change needed on label arrival; delivered as part of Task 2 commit `fe07710`.)
+- [x] Render Code Execution stdout (Python snippet + output) inside the `compute_upside` step-result panel in a small `<pre>` — this is the judge-trust moment. (`CodeExecutionPanel.tsx` in Task 2 commit `ef1c3f0`.)
+- [x] Render provenance passages from `match_schemes` in the panel; click-through links point at `/api/schemes/<filename>` (PO1 exposes as static route) or the public source URL from `docs/trd.md` §6.1. (`ProvenancePanel.tsx` in Task 2 commit `ef1c3f0` — uses `source_url` from `RuleCitation` directly; no static-route dependency.)
 
 - [ ] Commit (PO1): `feat(lambda): add vertex ai search seed and expand to 5 functiontools`.
 - [ ] Commit (PO2): `feat(ui): render classify and compute_upside steps with code execution trace`.

@@ -8,16 +8,213 @@
 
 ## Phase 0: Scaffolding
 
-### 1. Feature: Project Bootstrap
+> Covers everything from 20 Apr idea-lock through the pre-sprint handoff. Target exit: tomorrow morning the team can open the repo, run `pnpm dev`, and start on Phase 1 without untangling scaffolding.
 
-**Purpose/Issue:** Initialize the Layak workspace for the 24-hour sprint — decompose `docs/project-idea.md` into structured PRD/TRD, configure `.claude/` for shared agentic coding, and scaffold the Next.js frontend tooling. Backend is out of scope for this task; backend stack decisions land tomorrow.
+### 1. Feature: Read and Orient
+
+**Purpose/Issue:** Audit existing repo state, confirm `docs/project-idea.md` has real content, and surface convention conflicts (commit permission, `architecture.md` vs `trd.md`, AGENT-ONLY template) before decomposing anything.
 
 **Implementation:**
 
-- [x] Read and orient against existing repo state, `docs/project-idea.md`, `docs/roadmap.md`, and `docs/roles.md`.
-- [x] Decompose `docs/project-idea.md` into `docs/prd.md` (product requirements) and `docs/trd.md` (technical requirements); patch `docs/roadmap.md` decision log, non-goals, and architecture.md → trd.md reference.
-- [ ] Initialize `.claude/CLAUDE.md` with project-specific conventions (incl. agent-commit permission note); inventory `.claude/skills/` and flag gaps.
-- [ ] Scaffold Next.js 14 + Tailwind + shadcn/ui + Lucide; wire Husky + lint-staged + Prettier; set WSL HMR polling; stub landing page; add `.env.example`.
-- [ ] Push all commits to `origin/main` and produce the handoff report.
+- [x] Inventory `docs/`, `.claude/`, `src/`, `.github/` with `ls -la`.
+- [x] Confirm branch is `main` and the tree is clean enough to proceed.
+- [x] Read `docs/project-idea.md`, `docs/roadmap.md`, `docs/roles.md`, and the placeholder `docs/{prd,trd,plan,progress,diagrams,test}.md`.
+- [x] Read `.claude/CLAUDE.md` and `.claude/settings.json`; list `.claude/skills/` contents.
+- [x] Report findings and blockers to the PO before proceeding.
+
+---
+
+### 2. Feature: Decompose project-idea into PRD / TRD
+
+**Purpose/Issue:** Turn `docs/project-idea.md` into a product contract (`docs/prd.md`), a technical contract (`docs/trd.md`), and roadmap updates that reflect the locked decisions. Apply the PO's overrides: ADK-Python v1.31 GA (not Genkit), Vertex AI Search primary with inline 1M-context as Plan B at sprint hour 12, Aisyah locked as Form B filer, stateless architecture (no DB / no GCS / no Firestore in v1), and a hard feature freeze at hour 20/24.
+
+**Implementation:**
+
+- [x] Write `docs/prd.md` (problem, aim, persona, FR-1…FR-10 with falsifiable acceptance criteria, NFRs, scope, emergency de-scope plan, disclaimers).
+- [x] Write `docs/trd.md` (architecture overview, ASCII diagrams, component table, 10-step data flow, handbook stack alignment, external dependencies, security, Plan B, open questions).
+- [x] Patch `docs/roadmap.md` (project name, Phase 0 milestone `architecture.md` → `trd.md`, decision log, non-goals).
+- [x] Tick `docs/plan.md` items and append a dated summary to `docs/progress.md`.
+- [x] Commit `docs: decompose project-idea into prd, trd, and roadmap updates`.
+
+---
+
+### 3. Feature: Initialize `.claude/` for shared agentic coding
+
+**Purpose/Issue:** Fill `.claude/CLAUDE.md` with project-specific conventions (one-liner, tech stack snapshot, working conventions including agent-commit permission, re-read discipline) and inventory `.claude/skills/` to surface duplicates and gaps. No new skills are created in this task — gaps are reported only.
+
+**Implementation:**
+
+- [ ] Update `.claude/CLAUDE.md` with project one-liner, current-phase reference, tech-stack snapshot, working conventions, critical do-nots, and re-read discipline.
+- [ ] Add the agent-commit permission note under working conventions, per PO override.
+- [ ] Inventory every `.claude/skills/<skill>/SKILL.md` with a one-line summary; flag duplicates for human review.
+- [ ] Report gaps for this project (Next.js + shadcn scaffolding, Cloud Run deploy, Gemini API calling conventions, PDF generation). Do not create skills.
+- [ ] Confirm `.claude/` is tracked in git; if `.gitignore` excludes it, remove the exclusion.
+- [ ] Commit `chore(claude): initialize project-specific CLAUDE.md and inventory skills`.
+
+---
+
+### 4. Feature: Scaffold Next.js frontend tooling
+
+**Purpose/Issue:** Bring the repo to a state where the team can start building UI tomorrow morning — Next.js 14 + Tailwind + shadcn/ui + Lucide + Husky + Prettier, with WSL-friendly HMR polling and a stub landing page. Do not touch backend; no AI wiring; no Cloud Run deploy.
+
+**Implementation:**
+
+- [ ] Verify `pnpm`, `node`, `git` versions; stop and ask if `pnpm` is missing.
+- [ ] Scaffold Next.js 14 App Router (TypeScript, Tailwind, ESLint, `src/` dir, `@/*` alias, `--no-turbo`, pnpm) without overwriting `docs/`, `.claude/`, `.git/`, `README.md`, or existing configs.
+- [ ] Initialize shadcn/ui (slate, CSS variables, `src/app/globals.css`) and add the minimum component set: button, card, input, label, textarea, alert, badge, dialog, form, progress, separator, sonner, tabs, toast.
+- [ ] Install `lucide-react`.
+- [ ] Install Husky + lint-staged; write `.husky/pre-commit` → `pnpm lint-staged`; add `lint-staged` block to `package.json` (ESLint `--fix` on ts/tsx/js/jsx; Prettier `--write` on md/json/css).
+- [ ] Install Prettier + `prettier-plugin-tailwindcss` if not already present.
+- [ ] Configure WSL HMR polling in `next.config.mjs` (poll=800ms, aggregateTimeout=300ms, ignore `node_modules`); keep standard webpack path.
+- [ ] Update `.gitignore` to cover `.env`, `.env.local`, `.next/`, `node_modules/`, `dist/`, `*.log`, `.DS_Store`, `coverage/`; keep `.claude/` tracked.
+- [ ] Create `.env.example` at repo root with `GOOGLE_API_KEY`, `GEMINI_API_KEY`, `GOOGLE_CLOUD_PROJECT` placeholders.
+- [ ] Create stub landing page at `src/app/page.tsx` (single "Layak" card + disabled Lucide "Start" button, ≤40 lines).
+- [ ] Run `pnpm lint` and `pnpm build`; surface warnings but do not fix pre-existing template noise.
+- [ ] Commit `chore(frontend): scaffold Next.js + Tailwind + shadcn + Husky + Lucide` (include lockfile).
+
+---
+
+### 5. Feature: Push and handoff
+
+**Purpose/Issue:** Push all scaffolding commits to `origin/main` and produce the handoff report the team can pick up from tomorrow morning. No further code changes after this task.
+
+**Implementation:**
+
+- [ ] `git push origin main`.
+- [ ] Produce the report: docs changes, `.claude/` changes, frontend changes, versions (`pnpm`, `node`, `next`), skills inventory + flagged gaps, warnings encountered, tomorrow's first task under roadmap Phase 1, and decisions still blocked on the PO (backend stack, GCP project ID, Vertex AI Search data store, Cloud Run region).
+
+---
+
+## Phase 1: Core Build
+
+> Maps to `docs/roadmap.md` Phase 1 — "One critical user journey. End-to-end. On Cloud Run. No side quests." Implementation lists below are forward-looking scaffolds. Each task is expanded with real detail when it is picked up, per the repo agent workflow.
+
+### 1. Feature: Backend data models and agent wiring
+
+**Purpose/Issue:** _(to be filled at task start)_
+
+**Implementation:**
+
+- [ ] Define Pydantic `Profile`, `SchemeMatch`, `Packet` models per `docs/trd.md` §3.
+- [ ] Stand up FastAPI skeleton with `POST /api/agent/intake` returning a stub SSE stream.
+- [ ] Wire ADK-Python `SequentialAgent` with two or three `FunctionTool`s (extract, match) against the Gemini API.
+- [ ] Local smoke test: stub returns a valid SSE stream end-to-end.
+
+---
+
+### 2. Feature: Frontend scaffolding to mock data
+
+**Purpose/Issue:** _(to be filled at task start)_
+
+**Implementation:**
+
+- [ ] Build the upload widget (FR-2) with three separately-labelled file inputs and camera support.
+- [ ] Build the SSE consumer and per-step progress placeholders.
+- [ ] Build the ranked-scheme list skeleton with mock data.
+- [ ] Build the provenance panel layout (FR-7) with placeholder citations.
+
+---
+
+### 3. Feature: Orchestration layer (agent chains ≥3 steps)
+
+**Purpose/Issue:** _(to be filled at task start)_
+
+**Implementation:**
+
+- [ ] Wire `FunctionTool`s end-to-end: extract → classify → match → compute_upside → generate_packet.
+- [ ] Index the three scheme PDFs into Vertex AI Search via `backend/scripts/seed_vertex_ai_search.py` (exact path subject to backend-layout decision).
+- [ ] Canary retrieval query returns non-empty passages for each scheme.
+- [ ] Trigger-point check at sprint hour 12: if Vertex AI Search is not green, collapse to the Plan B inline-PDF grounding in `docs/trd.md` §8.
+
+---
+
+### 4. Feature: Rule engine (STR, JKM Warga Emas, 5 LHDN reliefs)
+
+**Purpose/Issue:** _(to be filled at task start)_
+
+**Implementation:**
+
+- [ ] Encode STR 2026 household-with-children tier thresholds (Pydantic v2).
+- [ ] Encode JKM Warga Emas per-capita means test against food-PLI RM1,236 (DOSM 2024); default rate RM600/month, fallback copy RM500/month.
+- [ ] Encode five LHDN Form B reliefs for YA2025: individual (RM9,000), parent medical (up to RM8,000), child 16a ×2 (RM2,000 each), EPF+life #17 (up to RM7,000), lifestyle #9 (up to RM2,500).
+- [ ] Unit tests assert every threshold matches the cached scheme PDF under `backend/data/schemes/`.
+
+---
+
+### 5. Feature: Wire frontend ↔ backend end-to-end
+
+**Purpose/Issue:** _(to be filled at task start)_
+
+**Implementation:**
+
+- [ ] Replace mock SSE events with real agent output from `POST /api/agent/intake`.
+- [ ] Provenance panel renders Vertex AI Search passages + URLs for every numeric claim.
+- [ ] Gemini Code Execution streams Python computations on-stage.
+- [ ] WeasyPrint produces three DRAFT-watermarked PDFs downloadable from the results view.
+- [ ] Happy path runs end-to-end locally against the full Aisyah fixture set.
+
+---
+
+### 6. Feature: Cloud Run deploy and responsiveness pass
+
+**Purpose/Issue:** _(to be filled at task start)_
+
+**Implementation:**
+
+- [ ] Deploy frontend (`gcloud run deploy`) and backend (`adk deploy cloud_run --with_ui`), both with `--min-instances=1 --cpu-boost`.
+- [ ] Inject `GEMINI_API_KEY` via Secret Manager (`--set-secrets=GEMINI_API_KEY=gemini-api-key:latest`).
+- [ ] Happy path works on the public Cloud Run URL from an incognito browser.
+- [ ] Responsiveness pass at 375 / 768 / 1440 viewports.
+- [ ] Seed Aisyah demo-mode button (FR-10) rehearsed cleanly three times back-to-back.
+
+---
+
+## Phase 2: Submission Package
+
+> Maps to `docs/roadmap.md` Phase 2 — ship clean, complete artifacts. Tasks below are picked up on demo-day evening, post feature-freeze.
+
+### 1. Feature: UI polish and README final pass
+
+**Purpose/Issue:** _(to be filled at task start)_
+
+**Implementation:**
+
+- [ ] Copy review, empty states, obvious-bug sweep.
+- [ ] README final pass: features, setup, AI disclosure (names Claude Code per Rules §4.2), architecture overview with ASCII diagrams from `docs/trd.md`.
+
+---
+
+### 2. Feature: 3-minute demo video
+
+**Purpose/Issue:** _(to be filled at task start)_
+
+**Implementation:**
+
+- [ ] Script and two takes of the 90-second Aisyah flow.
+- [ ] Edit, caption if time permits.
+- [ ] Upload unlisted to YouTube; submission-form URL copied.
+
+---
+
+### 3. Feature: Pitch deck (≤15 slides)
+
+**Purpose/Issue:** _(to be filled at task start)_
+
+**Implementation:**
+
+- [ ] Canva deck: problem → user → solution → demo → architecture → tech → impact → business model → team.
+- [ ] Export PDF; commit to repo root as `pitch.pdf`.
+
+---
+
+### 4. Feature: Final submission
+
+**Purpose/Issue:** _(to be filled at task start)_
+
+**Implementation:**
+
+- [ ] Fill and submit the Google Form against every required field (repo URL, Cloud Run URL, video URL, deck PDF, GitHub profile links, track + category).
+- [ ] Verify each link in the confirmation email.
+- [ ] Resubmit if anything breaks during the 23:00–23:59 buffer.
 
 ---

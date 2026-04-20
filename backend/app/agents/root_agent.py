@@ -1,42 +1,54 @@
 """RootAgent — ADK-Python SequentialAgent composition for the five-step pipeline.
 
-Phase 1 Task 1 (this file):
-  - Wraps the two stub callables as ADK `FunctionTool`s so Task 3 can bind them
-    onto real Gemini-backed `LlmAgent` sub-agents without reshaping.
-  - Instantiates a `SequentialAgent` shell with placeholder `LlmAgent` sub-agents
-    (no `model` set — they are structural stand-ins, never executed in Task 1).
+Phase 1 Task 3 Path 1 (scaffolding-only tonight; Gemini wiring at sprint start):
+  - Wraps all five stub callables as ADK `FunctionTool`s so the real Task 3
+    sub-agents can bind them onto Gemini-backed `LlmAgent`s without reshaping.
+  - Instantiates a `SequentialAgent` shell with five placeholder `LlmAgent`
+    sub-agents (no `model` set — structural stand-ins, never executed by ADK
+    in stub mode). Each placeholder's `description` names the Task 3 target
+    model + tool binding so the swap is mechanical.
   - Exports `stream_agent_events()`, a direct async orchestrator that bypasses
-    `SequentialAgent.run_async()` and emits the locked SSE event stream from the
-    stubs. Task 3 replaces this with the ADK runner + Gemini 2.5 Pro orchestration.
+    `SequentialAgent.run_async()` and emits the locked SSE event stream from
+    the stubs. Task 3 Path 2 replaces this with the ADK runner + real Gemini
+    calls.
 
 Locked SSE wire shape (see app/schema/events.py and docs/plan.md Phase 1 Task 1):
 
     step_started → step_result → ... → done | error
+
+Step order: extract → classify → match → compute_upside → generate → done.
 """
 
 from __future__ import annotations
 
 import asyncio
 from collections.abc import AsyncIterator
-from datetime import UTC, datetime
 
 from google.adk.agents import LlmAgent, SequentialAgent
 from google.adk.tools import FunctionTool
 
+from app.agents.tools.classify import classify_household
+from app.agents.tools.compute_upside import compute_upside
 from app.agents.tools.extract import extract_profile
+from app.agents.tools.generate_packet import generate_packet
 from app.agents.tools.match import match_schemes
 from app.schema.events import (
+    ClassifyResult,
     DoneEvent,
     ErrorEvent,
     ExtractResult,
+    GenerateResult,
     MatchResult,
     StepResultEvent,
     StepStartedEvent,
 )
-from app.schema.packet import Packet
 
+# Tool registry — Task 3 Path 2 binds these to Gemini-backed LlmAgents.
 extract_tool = FunctionTool(extract_profile)
+classify_tool = FunctionTool(classify_household)
 match_tool = FunctionTool(match_schemes)
+compute_upside_tool = FunctionTool(compute_upside)
+generate_packet_tool = FunctionTool(generate_packet)
 
 root_agent = SequentialAgent(
     name="layak_root_agent",
@@ -44,28 +56,57 @@ root_agent = SequentialAgent(
     sub_agents=[
         LlmAgent(
             name="extractor_stub",
-            description="Stub extractor. Task 3: Gemini 2.5 Flash multimodal + Profile schema.",
+            description=(
+                "Stub extractor. Task 3 Path 2: Gemini 2.5 Flash multimodal reading "
+                "IC + payslip + utility-bill uploads into a Profile with structured output."
+            ),
+        ),
+        LlmAgent(
+            name="classifier_stub",
+            description=(
+                "Stub classifier. Task 3 Path 2: Gemini 2.5 Flash structured output "
+                "emitting household-flags + per-capita income + income band."
+            ),
         ),
         LlmAgent(
             name="matcher_stub",
-            description="Stub matcher. Task 3: rule engine + Vertex AI Search grounding.",
+            description=(
+                "Stub matcher. Task 3 Path 2: Vertex AI Search retrieves passage + URL "
+                "per rule, then the rule engine in app/rules/ validates thresholds."
+            ),
+        ),
+        LlmAgent(
+            name="upside_computer_stub",
+            description=(
+                "Stub compute_upside. Task 3 Path 2: Gemini 2.5 Pro with code_execution "
+                "runs Python in a sandbox; stdout streamed to the UI verbatim."
+            ),
+        ),
+        LlmAgent(
+            name="packet_generator_stub",
+            description=(
+                "Stub packet generator. Task 5: WeasyPrint renders three Jinja HTML "
+                "templates into PDFs watermarked 'DRAFT — NOT SUBMITTED'."
+            ),
         ),
     ],
 )
 
 # Visible step transitions for the frontend stepper in stub mode; real Gemini
-# latency in Task 3 makes this unnecessary.
+# latency in Task 3 Path 2 makes this unnecessary.
 _STUB_STEP_DELAY_S = 0.25
 
 
 async def stream_agent_events(
     uploads: dict[str, tuple[str, bytes]],
 ) -> AsyncIterator[StepStartedEvent | StepResultEvent | DoneEvent | ErrorEvent]:
-    """Stream the agent pipeline as ordered SSE events.
+    """Stream the five-step pipeline as ordered SSE events.
 
-    Task 1 scaffold emits only the `extract` and `match` step pairs plus a terminal
-    `done` event with an empty packet. The missing `classify`, `compute_upside`, and
-    `generate` steps land in Task 3 (orchestration) and Task 5 (WeasyPrint packet).
+    Task 3 Path 1 scaffold emits all five step pairs plus a terminal `done`
+    event. Data payloads come from the stub tools (extract returns Aisyah
+    fixture, match delegates to the rule engine in Task 4, etc.). The wire
+    format is identical to Task 3 Path 2 so the frontend does not need to
+    change when real Gemini calls replace the stubs.
 
     Args:
         uploads: Mapping of `{"ic"|"payslip"|"utility": (filename, bytes)}`.
@@ -83,12 +124,26 @@ async def stream_agent_events(
         )
         yield StepResultEvent(step="extract", data=ExtractResult(profile=profile))
 
+        yield StepStartedEvent(step="classify")
+        await asyncio.sleep(_STUB_STEP_DELAY_S)
+        classification = await classify_household(profile)
+        yield StepResultEvent(step="classify", data=ClassifyResult(classification=classification))
+
         yield StepStartedEvent(step="match")
         await asyncio.sleep(_STUB_STEP_DELAY_S)
         matches = await match_schemes(profile)
         yield StepResultEvent(step="match", data=MatchResult(matches=matches))
 
-        packet = Packet(drafts=[], generated_at=datetime.now(UTC))
+        yield StepStartedEvent(step="compute_upside")
+        await asyncio.sleep(_STUB_STEP_DELAY_S)
+        trace = await compute_upside(matches)
+        yield StepResultEvent(step="compute_upside", data=trace)
+
+        yield StepStartedEvent(step="generate")
+        await asyncio.sleep(_STUB_STEP_DELAY_S)
+        packet = await generate_packet(profile, matches)
+        yield StepResultEvent(step="generate", data=GenerateResult(packet=packet))
+
         yield DoneEvent(packet=packet)
-    except Exception as exc:  # noqa: BLE001 — we want every failure surfaced to the UI.
+    except Exception as exc:  # noqa: BLE001 — surface every failure to the UI.
         yield ErrorEvent(step=None, message=f"{type(exc).__name__}: {exc}")

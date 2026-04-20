@@ -10,7 +10,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Separator } from '@/components/ui/separator'
 
-export function SignInForm() {
+export function SignUpForm() {
   const router = useRouter()
 
   function handleGuest() {
@@ -20,8 +20,8 @@ export function SignInForm() {
   return (
     <Card className="w-full max-w-sm">
       <CardHeader className="text-center">
-        <CardTitle className="font-heading text-2xl">Welcome back</CardTitle>
-        <CardDescription>Sign in with email or continue as a guest.</CardDescription>
+        <CardTitle className="font-heading text-2xl">Create an account</CardTitle>
+        <CardDescription>Sign up with email or continue as a guest. Sign-up lands in v2 — guest for now.</CardDescription>
       </CardHeader>
       <CardContent className="flex flex-col gap-5">
         <Button type="button" size="lg" onClick={handleGuest} className="w-full">
@@ -42,21 +42,25 @@ export function SignInForm() {
           }}
         >
           <div className="flex flex-col gap-1.5">
+            <Label htmlFor="name">Full name</Label>
+            <Input id="name" type="text" placeholder="Aisyah binti Mohd" autoComplete="name" disabled />
+          </div>
+          <div className="flex flex-col gap-1.5">
             <Label htmlFor="email">Email</Label>
             <Input id="email" type="email" placeholder="you@example.com" autoComplete="email" disabled />
           </div>
           <div className="flex flex-col gap-1.5">
             <Label htmlFor="password">Password</Label>
-            <Input id="password" type="password" placeholder="••••••••" autoComplete="current-password" disabled />
+            <Input id="password" type="password" placeholder="••••••••" autoComplete="new-password" disabled />
           </div>
           <Button type="submit" variant="outline" disabled>
-            Sign in (disabled — use guest)
+            Sign up (disabled — use guest)
           </Button>
         </form>
         <p className="text-center text-xs text-muted-foreground">
-          No account?{' '}
-          <Link href="/sign-up" className="text-primary underline underline-offset-2">
-            Sign up
+          Already have an account?{' '}
+          <Link href="/sign-in" className="text-primary underline underline-offset-2">
+            Sign in
           </Link>
         </p>
       </CardContent>

@@ -18,7 +18,10 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: 'Layak',
   description:
-    'Agentic AI concierge for Malaysian social-assistance schemes. Draft packet only — never submits on your behalf.'
+    'Agentic AI concierge for Malaysian social-assistance schemes. Draft packet only — never submits on your behalf.',
+  icons: {
+    icon: '/favicon.ico'
+  }
 }
 
 export default function RootLayout({

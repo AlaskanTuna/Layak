@@ -4,6 +4,8 @@ import { useState } from 'react'
 
 import { DemoModeBanner } from '@/components/home/demo-mode-banner'
 import { PipelineStepper } from '@/components/pipeline/pipeline-stepper'
+import { CodeExecutionPanel } from '@/components/results/code-execution-panel'
+import { RankedList } from '@/components/results/ranked-list'
 import { Button } from '@/components/ui/button'
 import { UploadWidget, type UploadFiles } from '@/components/upload/upload-widget'
 import { useAgentPipeline } from '@/lib/sse-client'
@@ -38,17 +40,13 @@ export function HomeClient() {
         <>
           <PipelineStepper state={state} />
           {showResults && (
-            <div className="flex flex-col gap-2 rounded-md border border-dashed border-border p-4 text-sm text-muted-foreground">
-              <p>Pipeline finished. Ranked scheme list and provenance panel land in the next commit.</p>
-              {state.upside && (
-                <p>
-                  Total annual upside:{' '}
-                  <span className="font-medium text-foreground">
-                    RM{state.upside.total_annual_rm.toLocaleString('en-MY', { minimumFractionDigits: 2 })}
-                  </span>
-                </p>
-              )}
-            </div>
+            <>
+              <RankedList
+                matches={state.matches}
+                totalAnnualRm={state.upside?.total_annual_rm ?? null}
+              />
+              {state.upside && <CodeExecutionPanel upside={state.upside} />}
+            </>
           )}
           <div className="flex">
             <Button type="button" variant="outline" onClick={handleReset}>

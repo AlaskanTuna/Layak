@@ -4,6 +4,18 @@
 
 ---
 
+## [20/04/26] - Phase 1 Task 2 commit 3: results view — ranked list, scheme cards, provenance panel, code execution trace
+
+- Wrote `frontend/src/components/results/provenance-panel.tsx` — given `RuleCitation[]`, renders each citation as a clickable card (`rule_id`, `source_pdf · page_ref`). Clicking opens a shadcn `Dialog` with the passage text as a blockquote plus an external "Open source PDF" link (when `source_url` is present). Grounds FR-7.
+- Wrote `frontend/src/components/results/scheme-card.tsx` — shadcn `Card` with agency `Badge`, scheme name, right-aligned "RMx,xxx per year (est.)" block, and `summary` description. "Why I qualify" toggle (`aria-expanded`) reveals the justification paragraph, the `ProvenancePanel`, and an "Open <agency> portal" external link. Grounds FR-6 + FR-9.
+- Wrote `frontend/src/components/results/ranked-list.tsx` — filters to `qualifies=true`, sorts by `annual_rm` desc, renders a total-upside banner (uses `upside.total_annual_rm` when available, else sums `annual_rm`). Below the ranked cards, a "Checking… (v2)" section lists eight out-of-scope schemes from PRD §6.2 AC line 173 (i-Saraan, PERKESO SKSPS, MyKasih, eKasih, PADU sync, state-level aid, SARA claim flow, appeal workflow) as a 2-col grid of `opacity-60` cards.
+- Wrote `frontend/src/components/results/code-execution-panel.tsx` — dedicated card rendering the Gemini Code Execution `python_snippet` and `stdout` as two `<pre>` blocks with `Code2` / `Terminal` icons. Advance-wires the Task 3 PO2 sync point ("Render Code Execution stdout in a small `<pre>` — this is the judge-trust moment") so commit 3 looks demo-complete in mock mode today.
+- Rewired `frontend/src/components/home/home-client.tsx` results phase: replaces the placeholder with `<RankedList matches={state.matches} totalAnnualRm={state.upside?.total_annual_rm ?? null} />` followed by `<CodeExecutionPanel upside={state.upside} />` (rendered only when `upside` is present, so real-mode pre-Task-3 still renders cleanly).
+- `pnpm run lint` clean. `pnpm run build` clean — 6.3 s compile, two routes prerendered static.
+- Deferred to Task 5 / Task 6: responsiveness eyeball at 375 / 768 / 1440 viewports (final checkpoint manual QA), packet download button (FR-8, wired in Task 5 alongside WeasyPrint), error recovery card on `error` SSE events.
+
+---
+
 ## [20/04/26] - Phase 1 Task 2 commit 2: SSE consumer hook, pipeline stepper, Aisyah fixture
 
 - Wrote `frontend/src/lib/agent-types.ts` — TS mirror of `backend/app/schema/*.py` Pydantic models (`Profile`, `HouseholdClassification`, `SchemeMatch`, `RuleCitation`, `Packet`, `AgentEvent` discriminated union). Field names stay snake_case to match the JSON wire format. Exported `PIPELINE_STEPS` and `STEP_LABELS` constants.

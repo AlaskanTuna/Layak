@@ -1,11 +1,9 @@
 'use client'
 
 import { useId, useRef, useState } from 'react'
-import { FileText, Sparkles, Upload, X } from 'lucide-react'
+import { ArrowRight, FileText, Sparkles, UploadCloud, X } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
 import { cn } from '@/lib/utils'
 
 const MAX_FILE_BYTES = 10 * 1024 * 1024
@@ -20,12 +18,28 @@ type SlotSpec = {
   slot: UploadSlot
   label: string
   hint: string
+  required: boolean
 }
 
 const SLOT_SPECS: SlotSpec[] = [
-  { slot: 'ic', label: 'MyKad (IC)', hint: 'Front of your Malaysian identity card.' },
-  { slot: 'payslip', label: 'Payslip or income statement', hint: 'Most recent month; self-employed filers can upload a bank statement.' },
-  { slot: 'utility', label: 'Utility bill', hint: 'TNB, Air Selangor, or similar — within the last three months.' }
+  {
+    slot: 'ic',
+    label: 'MyKad (IC)',
+    hint: 'Front of your Malaysian identity card, clearly showing your details.',
+    required: true
+  },
+  {
+    slot: 'payslip',
+    label: 'Payslip or income statement',
+    hint: 'Latest month if available; self-employed filers can upload a bank statement or LHDN form.',
+    required: true
+  },
+  {
+    slot: 'utility',
+    label: 'Utility bill',
+    hint: 'Water, electricity, or broadband bill for address verification — within the last three months.',
+    required: false
+  }
 ]
 
 function validate(file: File): string | null {
@@ -56,6 +70,110 @@ type Props = {
   disabled?: boolean
 }
 
+function SlotPill({ required }: { required: boolean }) {
+  return required ? (
+    <span className="inline-flex items-center rounded-full border border-amber-500/30 bg-amber-500/10 px-2 py-0.5 font-mono text-[10px] font-medium uppercase tracking-[0.14em] text-amber-700 dark:text-amber-400">
+      Required
+    </span>
+  ) : (
+    <span className="inline-flex items-center rounded-full border border-border bg-muted px-2 py-0.5 font-mono text-[10px] font-medium uppercase tracking-[0.14em] text-muted-foreground">
+      Optional
+    </span>
+  )
+}
+
+type SlotProps = {
+  spec: SlotSpec
+  state: FileSlotState
+  inputId: string
+  disabled: boolean
+  inputRef: (el: HTMLInputElement | null) => void
+  onChange: (file: File | null) => void
+  onClear: () => void
+}
+
+function UploadSlotCard({ spec, state, inputId, disabled, inputRef, onChange, onClear }: SlotProps) {
+  const { file, error } = state
+  const errorId = `${inputId}-error`
+
+  return (
+    <div className="flex flex-col gap-3 rounded-xl border border-border bg-card p-5 shadow-sm">
+      <div className="flex flex-col gap-1.5">
+        <div className="flex items-center gap-2">
+          <p className="font-heading text-base font-semibold tracking-tight">{spec.label}</p>
+          <SlotPill required={spec.required} />
+        </div>
+        <p className="text-xs leading-relaxed text-muted-foreground">{spec.hint}</p>
+      </div>
+
+      {file ? (
+        <div className="flex items-center justify-between gap-3 rounded-lg border border-primary/30 bg-primary/5 p-3">
+          <div className="flex min-w-0 items-center gap-3">
+            <div className="flex size-9 shrink-0 items-center justify-center rounded-md bg-primary/10 text-primary">
+              <FileText className="size-4" aria-hidden />
+            </div>
+            <div className="flex min-w-0 flex-col">
+              <span className="truncate text-sm font-medium">{file.name}</span>
+              <span className="font-mono text-[10px] uppercase tracking-[0.14em] text-muted-foreground">
+                {formatSize(file.size)}
+              </span>
+            </div>
+          </div>
+          <Button
+            type="button"
+            variant="ghost"
+            size="icon"
+            onClick={onClear}
+            aria-label={`Clear ${spec.label}`}
+            disabled={disabled}
+          >
+            <X className="size-4" aria-hidden />
+          </Button>
+        </div>
+      ) : (
+        <label
+          htmlFor={inputId}
+          className={cn(
+            'flex cursor-pointer flex-col items-center justify-center gap-2 rounded-lg border border-dashed border-border bg-background/40 px-6 py-8 text-center transition-colors hover:border-primary/40 hover:bg-background/70',
+            error && 'border-destructive/40 bg-destructive/5 hover:border-destructive/60',
+            disabled && 'pointer-events-none opacity-50'
+          )}
+        >
+          <div className="flex size-10 items-center justify-center rounded-md bg-muted text-muted-foreground">
+            <UploadCloud className="size-5" aria-hidden />
+          </div>
+          <p className="text-sm">
+            <span className="font-medium text-primary">Click to upload</span>{' '}
+            <span className="text-muted-foreground">or drag and drop</span>
+          </p>
+          <p className="font-mono text-[10px] uppercase tracking-[0.14em] text-muted-foreground">
+            JPG, PNG, or PDF up to 10MB
+          </p>
+        </label>
+      )}
+
+      <input
+        ref={inputRef}
+        id={inputId}
+        type="file"
+        accept={ACCEPT_ATTR}
+        capture="environment"
+        disabled={disabled}
+        aria-invalid={error ? true : undefined}
+        aria-describedby={error ? errorId : undefined}
+        className="sr-only"
+        onChange={e => onChange(e.target.files?.[0] ?? null)}
+      />
+
+      {error && (
+        <p id={errorId} className="text-xs text-destructive" role="alert">
+          {error}
+        </p>
+      )}
+    </div>
+  )
+}
+
 export function UploadWidget({ onSubmit, onUseSamples, disabled = false }: Props) {
   const reactId = useId()
   const [state, setState] = useState<Record<UploadSlot, FileSlotState>>({
@@ -69,7 +187,9 @@ export function UploadWidget({ onSubmit, onUseSamples, disabled = false }: Props
     utility: null
   })
 
-  const allValid = (['ic', 'payslip', 'utility'] as const).every(s => state[s].file !== null && state[s].error === null)
+  const requiredFilled = (['ic', 'payslip'] as const).every(s => state[s].file !== null && state[s].error === null)
+  const anyErrors = (['ic', 'payslip', 'utility'] as const).some(s => state[s].error !== null)
+  const canSubmit = requiredFilled && !anyErrors
 
   function handleFileChange(slot: UploadSlot, file: File | null) {
     if (!file) {
@@ -87,87 +207,53 @@ export function UploadWidget({ onSubmit, onUseSamples, disabled = false }: Props
   }
 
   function handleSubmit() {
-    if (!allValid) return
-    onSubmit({
+    if (!canSubmit) return
+    const utility = state.utility.file
+    const files: UploadFiles = {
       ic: state.ic.file!,
       payslip: state.payslip.file!,
-      utility: state.utility.file!
-    })
+      utility: utility ?? state.ic.file!
+    }
+    onSubmit(files)
   }
 
   return (
     <div className="flex flex-col gap-5">
-      <p className="text-sm text-muted-foreground">
-        We store nothing. Draft only — you submit manually. Max 10 MB per file. Image or PDF.
-      </p>
-
       <div className="flex flex-col gap-4">
-        {SLOT_SPECS.map(({ slot, label, hint }) => {
-          const { file, error } = state[slot]
-          const inputId = `${reactId}-${slot}`
-          const errorId = `${reactId}-${slot}-error`
+        {SLOT_SPECS.map(spec => {
+          const inputId = `${reactId}-${spec.slot}`
           return (
-            <div key={slot} className="flex flex-col gap-1.5">
-              <Label htmlFor={inputId}>{label}</Label>
-              <p className="text-xs text-muted-foreground">{hint}</p>
-              <div className="flex items-center gap-2">
-                <Input
-                  ref={(el: HTMLInputElement | null) => {
-                    inputRefs.current[slot] = el
-                  }}
-                  id={inputId}
-                  type="file"
-                  accept={ACCEPT_ATTR}
-                  capture="environment"
-                  disabled={disabled}
-                  aria-invalid={error ? true : undefined}
-                  aria-describedby={error ? errorId : undefined}
-                  className={cn('file:mr-2', file && 'text-sm')}
-                  onChange={e => handleFileChange(slot, e.target.files?.[0] ?? null)}
-                />
-                {file && (
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => handleClear(slot)}
-                    aria-label={`Clear ${label}`}
-                  >
-                    <X className="size-4" aria-hidden />
-                  </Button>
-                )}
-              </div>
-              {file && (
-                <p className="flex items-center gap-1.5 text-xs text-muted-foreground">
-                  <FileText className="size-3.5" aria-hidden />
-                  <span className="truncate">{file.name}</span>
-                  <span className="shrink-0">· {formatSize(file.size)}</span>
-                </p>
-              )}
-              {error && (
-                <p id={errorId} className="text-xs text-destructive" role="alert">
-                  {error}
-                </p>
-              )}
-            </div>
+            <UploadSlotCard
+              key={spec.slot}
+              spec={spec}
+              state={state[spec.slot]}
+              inputId={inputId}
+              disabled={disabled}
+              inputRef={el => {
+                inputRefs.current[spec.slot] = el
+              }}
+              onChange={file => handleFileChange(spec.slot, file)}
+              onClear={() => handleClear(spec.slot)}
+            />
           )
         })}
       </div>
 
-      <div className="flex flex-col gap-2 sm:flex-row">
-        <Button type="button" onClick={handleSubmit} disabled={disabled || !allValid} className="flex-1">
-          <Upload className="mr-2 size-4" aria-hidden />
-          Continue
-        </Button>
+      <div className="flex flex-col items-start gap-4 border-t border-border pt-5 sm:flex-row sm:items-center sm:justify-between">
         <Button
           type="button"
-          variant="outline"
+          variant="ghost"
+          size="sm"
           onClick={onUseSamples}
           disabled={disabled}
-          className="flex-1"
+          className="px-0 text-muted-foreground hover:bg-transparent hover:text-foreground"
         >
-          <Sparkles className="mr-2 size-4" aria-hidden />
+          <Sparkles className="mr-1.5 size-4" aria-hidden />
           Use Aisyah sample documents
+        </Button>
+        <Button type="button" onClick={handleSubmit} disabled={disabled || !canSubmit} size="lg">
+          Continue evaluation
+          <ArrowRight className="ml-1.5 size-4" aria-hidden />
         </Button>
       </div>
     </div>

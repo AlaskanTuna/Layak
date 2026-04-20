@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { ChevronDown, ChevronUp, ExternalLink } from 'lucide-react'
+import { ChevronDown, ChevronUp, ExternalLink, Inbox } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
 import type { SchemeMatch } from '@/lib/agent-types'
@@ -9,24 +9,28 @@ import { cn } from '@/lib/utils'
 
 type Props = {
   matches: SchemeMatch[]
+  empty?: boolean
 }
 
 function formatRm(value: number): string {
-  return `RM ${value.toLocaleString('en-MY', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
+  return value.toLocaleString('en-MY', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
 }
 
 function SchemeRow({ match }: { match: SchemeMatch }) {
   const [expanded, setExpanded] = useState(false)
 
   return (
-    <li className="rounded-lg border border-border bg-card p-5 transition-colors">
-      <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
+    <li className="rounded-lg border border-border bg-card p-5 shadow-sm transition-colors">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
         <div className="flex min-w-0 flex-col gap-1">
-          <h3 className="font-heading text-base font-semibold tracking-tight">{match.scheme_name}</h3>
-          <p className="text-xs text-muted-foreground">{match.summary}</p>
+          <h3 className="font-heading text-lg font-semibold tracking-tight">{match.scheme_name}</h3>
+          <p className="text-xs leading-relaxed text-muted-foreground">{match.summary}</p>
         </div>
-        <div className="shrink-0 text-left sm:text-right">
-          <p className="font-heading text-base font-semibold">{formatRm(match.annual_rm)}</p>
+        <div className="shrink-0 text-left tabular-nums sm:text-right">
+          <p className="font-heading">
+            <span className="text-lg font-normal text-muted-foreground">RM</span>{' '}
+            <span className="text-2xl font-semibold text-primary">{formatRm(match.annual_rm)}</span>
+          </p>
           <p className="font-mono text-[10px] uppercase tracking-[0.14em] text-muted-foreground">per year (est.)</p>
         </div>
       </div>
@@ -72,21 +76,32 @@ function SchemeRow({ match }: { match: SchemeMatch }) {
   )
 }
 
-export function SchemeListStacked({ matches }: Props) {
+export function SchemeListStacked({ matches, empty = false }: Props) {
   const qualifying = matches.filter(m => m.qualifies).sort((a, b) => b.annual_rm - a.annual_rm)
-
-  if (qualifying.length === 0) return null
+  const count = empty ? 0 : qualifying.length
 
   return (
     <section className="flex flex-col gap-3">
       <p className="font-mono text-[11px] uppercase tracking-[0.14em] text-muted-foreground">
-        Eligible schemes ({qualifying.length})
+        Eligible schemes ({empty ? '—' : count})
       </p>
-      <ul className="flex flex-col gap-3">
-        {qualifying.map(match => (
-          <SchemeRow key={match.scheme_id} match={match} />
-        ))}
-      </ul>
+      {empty || qualifying.length === 0 ? (
+        <div className="flex flex-col items-center gap-3 rounded-lg border border-dashed border-border bg-card/40 px-6 py-10 text-center">
+          <div className="flex size-10 items-center justify-center rounded-md bg-muted text-muted-foreground">
+            <Inbox className="size-5" aria-hidden />
+          </div>
+          <p className="font-mono text-[11px] uppercase tracking-[0.18em] text-muted-foreground">None</p>
+          <p className="max-w-xs text-xs leading-relaxed text-muted-foreground">
+            Scheme matches will appear here after your first evaluation completes.
+          </p>
+        </div>
+      ) : (
+        <ul className="flex flex-col gap-3">
+          {qualifying.map(match => (
+            <SchemeRow key={match.scheme_id} match={match} />
+          ))}
+        </ul>
+      )}
     </section>
   )
 }

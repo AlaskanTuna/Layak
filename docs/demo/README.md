@@ -9,24 +9,25 @@ uploads in the Layak demo:
 
 ## Render to PDF
 
-The files are static and inline-styled, no build step. Next's dev server
-serves them at:
+The files are static and inline-styled, no build step. They live beside
+this README in `docs/demo/`, so you can open them directly from the
+workspace or point any local static server at this folder.
 
-- <http://localhost:3000/demo/mykad.html>
-- <http://localhost:3000/demo/grab-earnings.html>
-- <http://localhost:3000/demo/tnb-bill.html>
+- [mykad.html](mykad.html)
+- [grab-earnings.html](grab-earnings.html)
+- [tnb-bill.html](tnb-bill.html)
 
-In Chrome: open the URL → **Cmd/Ctrl + P** → **Save as PDF** → Destination
-`Save as PDF`. Each file declares its own `@page` size (card for MyKad, A4
-for the others), so a single print-to-PDF pass produces a correctly sized
-demo PDF.
+In Chrome: open the HTML file → **Cmd/Ctrl + P** → **Save as PDF** →
+Destination `Save as PDF`. Each file declares its own `@page` size (card
+for MyKad, A4 for the others), so a single print-to-PDF pass produces a
+correctly sized demo PDF.
 
 Chrome print-dialog settings to set on every doc:
 
 - **More settings** → uncheck **Headers and footers** (otherwise Chrome
   stamps the file URL on the PDF).
 - **Margins**: `None` or `Default` (each doc declares its own `@page
-  margin`, so Chrome's outer margin is redundant).
+margin`, so Chrome's outer margin is redundant).
 - **Background graphics**: on — the coloured headers / accents rely on it.
 - **Scale**: `Default`.
 
@@ -40,11 +41,11 @@ google-chrome \
   --headless --disable-gpu \
   --print-to-pdf=mykad.pdf --no-pdf-header-footer \
   --virtual-time-budget=2000 \
-  "http://localhost:3000/demo/mykad.html"
+  "file:///absolute/path/to/your/checkout/docs/demo/mykad.html"
 ```
 
-You can also open the HTML directly via `file://` if the Next dev server
-isn't running; the files don't depend on anything Next does.
+You can also open the HTML directly via `file://`; the files don't depend
+on anything Next does.
 
 ## Data fidelity
 
@@ -54,7 +55,7 @@ Every field pins to `backend/app/fixtures/aisyah.py`:
 - IC: `900324-06-4321` (last four = `4321`, invariant)
 - Monthly income: `RM2,800` (Grab net payout — hard target)
 - Address: identical across MyKad and TNB (`No. 42, Jalan IM 7/10, Bandar
-  Indera Mahkota, 25200 Kuantan, Pahang`)
+Indera Mahkota, 25200 Kuantan, Pahang`)
 - Form type: `Form B` (self-employed)
 
 The address cross-check is the signal the `classify` agent step uses to

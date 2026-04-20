@@ -10,6 +10,20 @@
 
 ---
 
+## 0. Team & Responsibilities
+
+| Role               | Name           | Focus                   | Owns                                                                                                                                                                                           |
+| ------------------ | -------------- | ----------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **P1 (Team Lead)** | _[TBD]_        | AI / backend / infra    | FastAPI + ADK-Python RootAgent; Pydantic rule engine (STR / JKM / LHDN); Vertex AI Search seed script; Gemini integration (Pro / Flash / Code Execution); Cloud Run deploy; GCP project setup. |
+| **P2 (Co-dev)**    | Adam           | Frontend / UX           | Next.js App Router pages; upload widget + SSE client; shadcn component integration; ranked-scheme list; provenance panel; "Why I qualify" UX; draft-packet download; responsiveness + polish.  |
+| **Both**           | Adam + _[TBD]_ | Integration / rehearsal | Frontend ↔ backend wiring session (Phase 1 midday); demo-data seeding; mobile/desktop responsiveness pass; three clean demo rehearsals; submission package assembly (README, video, deck).     |
+
+Pairing convention follows `docs/roadmap.md`: `P1` = AI/backend, `P2` = frontend/infra, `Both` = paired blocks. Swap lanes if velocity demands (e.g. P2 takes on Cloud Run deploy if P1 is blocked on rule-engine debug).
+
+Agent-role conventions (PL / PG / QA / AD) in `docs/roles.md` are orthogonal — those apply to AI agents working on the repo (Claude Code, Codex, etc.), not to the two human developers.
+
+---
+
 ## 1. Problem Statement
 
 Malaysia's social-assistance estate is fragmented. The Ministry of Finance's _Economic Outlook 2024_ states that 167 schemes are currently being implemented by 17 ministries and agencies, producing both inclusion and exclusion errors. A citizen who would qualify for three or more schemes must discover them on separate portals, decode separate eligibility rubrics, and re-enter the same documents into separate forms — work that the state, not the citizen, should be doing.

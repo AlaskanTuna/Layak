@@ -37,15 +37,20 @@ export function Sidebar({ mobileOpen, onMobileClose }: SidebarProps) {
   function renderContent(isCollapsed: boolean) {
     return (
       <>
-        <div className="flex h-[var(--topbar-height)] shrink-0 items-center border-b border-[var(--glass-border)] px-4">
-          <Link href="/" className="flex items-center gap-2.5 overflow-hidden" aria-label="Layak home">
+        <div
+          className={cn(
+            'flex h-[var(--topbar-height)] shrink-0 items-center border-b border-[var(--glass-border)] transition-[padding] duration-200 ease-in-out',
+            isCollapsed ? 'justify-center px-0' : 'px-4'
+          )}
+        >
+          <Link href="/" className="flex items-center overflow-hidden" aria-label="Layak home">
             <div className="flex size-8 shrink-0 items-center justify-center rounded-md bg-primary font-heading text-sm font-semibold text-primary-foreground">
               L
             </div>
             <span
               className={cn(
-                'font-heading text-base font-semibold tracking-tight transition-opacity duration-200',
-                isCollapsed ? 'pointer-events-none opacity-0' : 'opacity-100'
+                'whitespace-nowrap font-heading text-base font-semibold tracking-tight transition-[max-width,margin-left,opacity] duration-200 ease-in-out',
+                isCollapsed ? 'pointer-events-none ml-0 max-w-0 opacity-0' : 'ml-2.5 max-w-xs opacity-100'
               )}
             >
               Layak
@@ -66,7 +71,8 @@ export function Sidebar({ mobileOpen, onMobileClose }: SidebarProps) {
               >
                 <span
                   className={cn(
-                    'flex h-9 w-full items-center gap-3 rounded-md px-2.5 text-sm transition-colors',
+                    'flex h-9 w-full items-center rounded-md text-sm transition-[padding,background-color,color] duration-200 ease-in-out',
+                    isCollapsed ? 'justify-center px-0' : 'justify-start px-2.5',
                     active
                       ? 'bg-sidebar-accent text-sidebar-accent-foreground'
                       : 'text-sidebar-foreground/80 hover:bg-sidebar-accent/60 hover:text-sidebar-foreground'
@@ -75,8 +81,8 @@ export function Sidebar({ mobileOpen, onMobileClose }: SidebarProps) {
                   <Icon className="size-4 shrink-0" aria-hidden />
                   <span
                     className={cn(
-                      'flex-1 truncate transition-opacity duration-200',
-                      isCollapsed ? 'pointer-events-none opacity-0' : 'opacity-100'
+                      'truncate transition-[max-width,margin-left,opacity] duration-200 ease-in-out',
+                      isCollapsed ? 'pointer-events-none ml-0 max-w-0 opacity-0' : 'ml-3 max-w-xs opacity-100'
                     )}
                   >
                     {item.label}
@@ -86,17 +92,6 @@ export function Sidebar({ mobileOpen, onMobileClose }: SidebarProps) {
             )
           })}
         </nav>
-
-        <div className="mt-auto border-t border-[var(--glass-border)] px-3 py-3">
-          <p
-            className={cn(
-              'text-[11px] leading-relaxed text-sidebar-foreground/60 transition-opacity duration-200',
-              isCollapsed ? 'pointer-events-none opacity-0' : 'opacity-100'
-            )}
-          >
-            DRAFT packets only. Not affiliated with any government agency.
-          </p>
-        </div>
       </>
     )
   }
@@ -113,7 +108,7 @@ export function Sidebar({ mobileOpen, onMobileClose }: SidebarProps) {
         }
         className={cn(
           'fixed inset-y-0 left-0 z-30 hidden flex-col overflow-hidden',
-          'w-[var(--sidebar-current-width)] transition-[width] duration-200 ease-in-out',
+          'w-[var(--sidebar-current-width)] transition-[width] duration-300 ease-in-out',
           'sidebar-glass text-sidebar-foreground',
           'md:flex'
         )}
@@ -125,7 +120,7 @@ export function Sidebar({ mobileOpen, onMobileClose }: SidebarProps) {
         aria-hidden
         onClick={() => setCollapsed(true)}
         className={cn(
-          'fixed inset-0 z-[25] hidden bg-black/20 transition-opacity duration-200 md:block',
+          'fixed inset-0 z-[25] hidden bg-black/10 backdrop-blur-md transition-opacity duration-300 ease-in-out md:block',
           collapsed ? 'pointer-events-none opacity-0' : 'opacity-100'
         )}
       />
@@ -134,7 +129,7 @@ export function Sidebar({ mobileOpen, onMobileClose }: SidebarProps) {
         aria-hidden
         onClick={onMobileClose}
         className={cn(
-          'fixed inset-0 z-40 bg-black/50 transition-opacity duration-200 md:hidden',
+          'fixed inset-0 z-40 bg-black/40 backdrop-blur-md transition-opacity duration-300 ease-in-out md:hidden',
           mobileOpen ? 'opacity-100' : 'pointer-events-none opacity-0'
         )}
       />
@@ -142,7 +137,7 @@ export function Sidebar({ mobileOpen, onMobileClose }: SidebarProps) {
       <aside
         className={cn(
           'fixed inset-y-0 left-0 z-50 flex w-[var(--sidebar-width)] flex-col overflow-hidden bg-sidebar text-sidebar-foreground',
-          'transition-transform duration-200 ease-in-out md:hidden',
+          'transition-transform duration-300 ease-in-out md:hidden',
           mobileOpen ? 'translate-x-0' : '-translate-x-full'
         )}
       >

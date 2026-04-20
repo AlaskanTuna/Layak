@@ -37,12 +37,7 @@ export function Sidebar({ mobileOpen, onMobileClose }: SidebarProps) {
   function renderContent(isCollapsed: boolean) {
     return (
       <>
-        <div
-          className={cn(
-            'flex h-[var(--topbar-height)] shrink-0 items-center border-b border-[var(--glass-border)] transition-[padding] duration-200 ease-in-out',
-            isCollapsed ? 'justify-center px-0' : 'px-4'
-          )}
-        >
+        <div className="flex h-[var(--topbar-height)] shrink-0 items-center border-b border-[var(--glass-border)] pl-4">
           <Link href="/" className="flex items-center overflow-hidden" aria-label="Layak home">
             <div className="flex size-8 shrink-0 items-center justify-center rounded-md bg-primary font-heading text-sm font-semibold text-primary-foreground">
               L
@@ -71,8 +66,7 @@ export function Sidebar({ mobileOpen, onMobileClose }: SidebarProps) {
               >
                 <span
                   className={cn(
-                    'flex h-9 w-full items-center rounded-md text-sm transition-[padding,background-color,color] duration-200 ease-in-out',
-                    isCollapsed ? 'justify-center px-0' : 'justify-start px-2.5',
+                    'flex h-9 w-full items-center rounded-md pl-4 text-sm transition-[background-color,color] duration-200 ease-in-out',
                     active
                       ? 'bg-sidebar-accent text-sidebar-accent-foreground'
                       : 'text-sidebar-foreground/80 hover:bg-sidebar-accent/60 hover:text-sidebar-foreground'

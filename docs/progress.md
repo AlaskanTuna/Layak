@@ -4,6 +4,18 @@
 
 ---
 
+## [20/04/26] - Phase 1 Task 2 commit 1: landing view, upload widget, demo-mode banner
+
+- Flipped root `.env.example` `NEXT_PUBLIC_BACKEND_URL` from `:8000` to `:8080` to match `backend/app/main.py:13` (uvicorn `--port 8080`) and Cloud Run's default `PORT=8080`. Frontend branch only; backend untouched.
+- Wrote `frontend/src/components/upload/upload-widget.tsx` — three separately-labelled file inputs (IC, payslip, utility) with `accept="image/*,application/pdf"`, mobile `capture="environment"`, controlled per-slot state, per-slot clear button, inline validation (`aria-invalid` + linked `aria-describedby`) rejecting files > 10 MB and non-image/non-PDF MIME types. "Continue" button disabled until all three slots are valid; "Use Aisyah sample documents" button sits adjacent (responsive row on sm+). Covers FR-2.
+- Wrote `frontend/src/components/home/demo-mode-banner.tsx` — shadcn `Alert` in amber with `Sparkles` icon and copy "Running against Aisyah — a synthetic Grab driver …". Light + dark mode palette.
+- Wrote `frontend/src/components/home/home-client.tsx` — `'use client'` orchestrator holding a three-phase state (`landing` | `processing` | `results`) and `isDemoMode` flag. Submit + "Use Aisyah" handlers both flip phase to `processing`; banner surfaces only in demo mode. Real SSE trigger + fixture replay land in Task 2 commit 2.
+- Replaced `frontend/src/app/page.tsx` stub with a server component wrapping `HomeClient` inside shadcn `Card` + `CardContent`; copy references the extract → classify → match → rank → generate pipeline and the DRAFT invariant.
+- `pnpm run lint` clean. `pnpm run build` clean — compiled in 8.5 s, two routes prerendered (`/`, `/_not-found`).
+- Deferred to commit 2: `frontend/src/fixtures/aisyah-response.ts`, SSE consumer hook (`sse-client.ts`), pipeline stepper. Deferred to commit 3: ranked-list + scheme-card + provenance panel.
+
+---
+
 ## [20/04/26] - Scaffolded backend: Pydantic schemas, FastAPI SSE endpoint, ADK SequentialAgent with 2 stub FunctionTools
 
 - Installed Python 3.12.8 user-scope at `C:\Users\User\AppData\Local\Programs\Python\Python312` (TRD §6.3 pins 3.12; only 3.10 was present locally). Backend venv at `backend/.venv/`, gitignored via the existing `.venv/` rule (`.gitignore` line 133).

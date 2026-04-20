@@ -149,9 +149,9 @@
 
 **Implementation — PO2 (Adam):**
 
-- [ ] Replace `frontend/src/app/page.tsx` stub with the real landing view (upload widget above the fold + trust copy "We store nothing. Draft only — you submit manually.").
-- [ ] **Upload widget (FR-2)**: `frontend/src/components/upload/upload-widget.tsx` — three separately-labelled inputs (IC, payslip, utility) with `accept="image/*,application/pdf"` and `capture="environment"` for mobile camera. Reject files > 10 MB and non-image/non-PDF MIME types inline (not via toast).
-- [ ] **"Use Aisyah sample documents" button (FR-10)**: loads `frontend/src/fixtures/aisyah-response.ts` and skips the upload step; renders a "DEMO MODE" banner.
+- [x] Replace `frontend/src/app/page.tsx` stub with the real landing view (upload widget above the fold + trust copy "We store nothing. Draft only — you submit manually.").
+- [x] **Upload widget (FR-2)**: `frontend/src/components/upload/upload-widget.tsx` — three separately-labelled inputs (IC, payslip, utility) with `accept="image/*,application/pdf"` and `capture="environment"` for mobile camera. Reject files > 10 MB and non-image/non-PDF MIME types inline (not via toast).
+- [x] **"Use Aisyah sample documents" button (FR-10)**: button + DEMO MODE banner landed in commit 1; actual fixture replay wires up in commit 2 alongside the SSE consumer.
 - [ ] **SSE consumer (shared infra)**: `frontend/src/lib/sse-client.ts` — `useEventSource()` React hook parses `step_started | step_result | done | error` per task 1's locked event shape; exposes `{currentStep, stepResults, isDone, error}`.
 - [ ] **Pipeline stepper (FR-3/4/5 visual)**: `frontend/src/components/pipeline/pipeline-stepper.tsx` — renders the five steps with shadcn `Progress` + labels; each step lights up on `step_started`, checkmarks on `step_result`.
 - [ ] **Ranked scheme list (FR-6) + "Why I qualify" (FR-9)**: `scheme-card.tsx` (shadcn `Card` with RM/year, summary, expander) and `ranked-list.tsx` (descending by annual RM; total RM in header; out-of-scope schemes as greyed "Checking… (v2)" cards per `docs/prd.md` §6.2).

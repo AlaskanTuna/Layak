@@ -49,15 +49,15 @@
 
 /* Light mode — warm sand palette with alternating tones for section contrast */
 :root {
-  --background: oklch(0.945 0.012 82); /* light sand base */
-  --foreground: oklch(0.21 0.008 55); /* soft charcoal */
-  --card: oklch(0.975 0.008 82); /* ivory lift above background */
+  --background: oklch(0.945 0.012 82);
+  --foreground: oklch(0.21 0.008 55);
+  --card: oklch(0.975 0.008 82);
   --card-foreground: oklch(0.21 0.008 55);
   --popover: oklch(0.975 0.008 82);
   --popover-foreground: oklch(0.21 0.008 55);
-  --primary: oklch(0.47 0.065 177); /* deep teal */
+  --primary: oklch(0.47 0.065 177);
   --primary-foreground: oklch(0.975 0.008 82);
-  --secondary: oklch(0.88 0.02 82); /* darker sand — for section contrast */
+  --secondary: oklch(0.88 0.02 82);
   --secondary-foreground: oklch(0.21 0.008 55);
   --muted: oklch(0.88 0.02 82);
   --muted-foreground: oklch(0.5 0.015 65);
@@ -73,27 +73,28 @@
   --chart-4: oklch(0.35 0.05 177);
   --chart-5: oklch(0.75 0.06 177);
   --radius: 0.625rem;
-  --sidebar: oklch(0.945 0.012 82);
+  --sidebar: oklch(0.88 0.02 82);
   --sidebar-foreground: oklch(0.21 0.008 55);
   --sidebar-primary: oklch(0.47 0.065 177);
   --sidebar-primary-foreground: oklch(0.975 0.008 82);
-  --sidebar-accent: oklch(0.88 0.02 82);
+  --sidebar-accent: oklch(0.82 0.022 80);
   --sidebar-accent-foreground: oklch(0.21 0.008 55);
-  --sidebar-border: oklch(0.82 0.022 80);
+  --sidebar-border: transparent;
   --sidebar-ring: oklch(0.47 0.065 177);
   --sidebar-width: 220px;
   --sidebar-collapsed: 64px;
   --topbar-height: 56px;
   --glass-blur: 16px;
-  --glass-bg: oklch(0.945 0.012 82 / 0.72);
-  --glass-border: oklch(0.21 0.008 55 / 0.08);
+  /* Chrome (sidebar, topbar, footer) is darker than --background for contrast */
+  --glass-bg: oklch(0.88 0.02 82);
+  --glass-border: transparent;
 }
 
 /* Dark mode — warm ink with cozy lifted surfaces */
 .dark {
-  --background: oklch(0.168 0.008 55); /* warm near-black */
+  --background: oklch(0.168 0.008 55);
   --foreground: oklch(0.955 0.006 82);
-  --card: oklch(0.225 0.01 55); /* lifted surface */
+  --card: oklch(0.225 0.01 55);
   --card-foreground: oklch(0.955 0.006 82);
   --popover: oklch(0.225 0.01 55);
   --popover-foreground: oklch(0.955 0.006 82);
@@ -114,16 +115,16 @@
   --chart-3: oklch(0.75 0.08 176);
   --chart-4: oklch(0.45 0.06 176);
   --chart-5: oklch(0.85 0.05 176);
-  --sidebar: oklch(0.195 0.009 55);
+  --sidebar: oklch(0.13 0.008 55);
   --sidebar-foreground: oklch(0.955 0.006 82);
   --sidebar-primary: oklch(0.59 0.085 176);
   --sidebar-primary-foreground: oklch(0.168 0.008 55);
   --sidebar-accent: oklch(0.285 0.014 55);
   --sidebar-accent-foreground: oklch(0.955 0.006 82);
-  --sidebar-border: oklch(0.35 0.016 58);
+  --sidebar-border: transparent;
   --sidebar-ring: oklch(0.59 0.085 176);
-  --glass-bg: oklch(0.168 0.008 55 / 0.72);
-  --glass-border: oklch(0.955 0.006 82 / 0.08);
+  --glass-bg: oklch(0.13 0.008 55);
+  --glass-border: transparent;
 }
 
 @layer base {
@@ -133,28 +134,18 @@
   body {
     @apply bg-background text-foreground;
     position: relative;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.45'/%3E%3C/svg%3E");
+    background-size: 240px 240px;
+    background-attachment: fixed;
+    background-blend-mode: soft-light;
   }
   html {
     @apply font-sans;
   }
 }
 
-/* Grain overlay — cozy retro feel, very subtle, above content but non-interactive */
-body::after {
-  content: '';
-  position: fixed;
-  inset: 0;
-  pointer-events: none;
-  z-index: 100;
-  opacity: 0.04;
-  mix-blend-mode: overlay;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='256' height='256'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
-  background-size: 256px 256px;
-}
-
-.dark body::after {
-  opacity: 0.06;
-  mix-blend-mode: soft-light;
+.dark body {
+  background-blend-mode: overlay;
 }
 
 .sidebar-glass {

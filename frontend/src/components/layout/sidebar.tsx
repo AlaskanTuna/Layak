@@ -5,6 +5,7 @@ import { usePathname } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import { BookOpen, LayoutDashboard, Library, Menu, Sparkles, type LucideIcon } from 'lucide-react'
 
+import { BrandMark } from '@/components/layout/brand-mark'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
 
@@ -37,11 +38,9 @@ export function Sidebar({ mobileOpen, onMobileClose }: SidebarProps) {
   function renderContent(isCollapsed: boolean) {
     return (
       <>
-        <div className="flex h-[var(--topbar-height)] shrink-0 items-center border-b border-[var(--glass-border)] pl-4">
+        <div className="flex h-[var(--topbar-height)] shrink-0 items-center pl-4">
           <Link href="/" className="flex items-center overflow-hidden" aria-label="Layak home">
-            <div className="flex size-8 shrink-0 items-center justify-center rounded-md bg-primary font-heading text-sm font-semibold text-primary-foreground">
-              L
-            </div>
+            <BrandMark />
             <span
               className={cn(
                 'whitespace-nowrap font-heading text-base font-semibold tracking-tight transition-[max-width,margin-left,opacity] duration-200 ease-in-out',

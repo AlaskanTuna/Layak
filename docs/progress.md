@@ -40,6 +40,45 @@
 
 ---
 
+## [20/04/26] - Fixed LHDN §6.20 → §6.19 miscitation and tightened rule-engine test coverage from audit findings
+
+Post-commit subagent audits (rule correctness, test coverage, plan.md adherence) surfaced three real issues in the rule engine. All fixed here.
+
+- **Fix 1 — wrong PR section.** `backend/app/rules/lhdn_form_b.py` previously cited `PR 4/2024 §6.20 (doc p.47)` for the EPF + life-insurance combined RM7,000 cap. §6.20 is actually "Premium for insurance on education or for medical benefits" (pypdf p.56, doc p.53). The correct section is **§6.19** — "Deduction for insurance premiums/Takaful contribution and contribution to an approved scheme" (pypdf p.49, doc p.46), with the YA2023+ table on pypdf p.50 (doc p.47).
+- **Fix 2 — wrong individual-category passage.** The citation passage quoted the now-deleted public-servant flat RM7,000 rule under §49(1A)(c), which was struck by Act 845 effective YA2023. For non-public-servant individuals like Aisyah (Form B self-employed), §6.19.3 splits the relief into **RM3,000 for life insurance under §49(1)(a)** plus **RM4,000 for EPF under §49(1)(b)**. New constants `LIFE_INSURANCE_CAP_RM = 3000.0` and `EPF_CAP_RM = 4000.0` expose the split; `EPF_LIFE_17_COMBINED_CAP_RM` is now derived as their sum so Aisyah's numeric saving (RM558) is unchanged but the provenance is accurate.
+- **Tightened test coverage.** Added five new tests in `backend/tests/`:
+  - `test_epf_life_sub_caps_on_pr_s6_19_3_doc_p47` — asserts both RM3,000 and RM4,000 sub-caps appear on pypdf p.50 alongside `§49(1)(a)` and `§49(1)(b)`.
+  - `test_combined_epf_life_equals_sum_of_sub_caps` — guards against drift between the combined public-facing cap and the two split caps.
+  - `test_pr_s6_19_heading_not_s6_20` — regression guard against the miscitation: asserts §6.19 heading is on pypdf p.49 and §6.20 heading on pypdf p.56.
+  - `test_aisyah_triggers_all_five_reliefs_with_gazetted_caps` (replaces the key-only assertion) — asserts each of the five reliefs returns its exact gazetted cap (9,000 / 8,000 / 4,000 / 7,000 / 2,500).
+  - `test_no_parent_dependant_drops_parent_medical` — profiles without a parent dependant do not get the parent-medical cap and do not get child_16a; only `{individual, lifestyle_9, epf_life_17}` remain.
+  - `test_income_exactly_5000_is_inclusive` + `test_income_exactly_2500_is_band_1` — STR band-boundary inclusivity tests (band ceilings are ≤ per risalah "RM2,501-RM5,000").
+- **Pytest: 39 passed in 2.71 s.** Ruff `check` and `format --check` clean across 23 files. Aisyah combined total unchanged at **RM8,208/yr**.
+
+Findings the audit flagged that were **not** acted on (cosmetic or external to PDF-grounding contract):
+
+- `SUPPORTED_YA = "ya_2025" ; if SUPPORTED_YA != "ya_2025": raise ImportError(...)` — audit called this "dead code". Intent of the guard is to catch silent edits (change the constant → module fails to import), which it does under that specific edit path; left as documented dormant-by-design.
+- JKM Warga Emas citations use `source_pdf="jkm18.pdf"` for the RM1,236 food-PLI and RM600 Budget-2026 rate even though those specific numbers are external to jkm18.pdf (DOSM and Budget speech respectively). The `passage` and `page_ref` fields honestly label the external references; this is a nominal grounding that the frontend can render truthfully. Noted for PO2 to design the provenance panel UI around.
+
+---
+
+## [20/04/26] - Encoded STR / JKM Warga Emas / LHDN Form B rule engine with PDF-grounded unit tests (plan.md Phase 1 Task 4)
+
+- Added `backend/app/rules/` with three scheme modules, each exposing a `match(profile) -> SchemeMatch` entry point and sharing a common `RuleCitation`-populated provenance surface:
+  - `str_2026.py` — household-with-children tier table transcribed from `risalah-str-2026.pdf` p.2 (`Nilai Bantuan STR & SARA 2026`). Two income bands (≤RM2,500 and RM2,501–5,000) × three child-count buckets (1–2, 3–4, ≥5). Bucket-0 values are preserved in the dict so the unit test can assert every PDF cell resolves, but `match()` only qualifies profiles with ≥1 child under 18 AND income ≤RM5,000. Returns STR only — SARA is out-of-scope per `docs/prd.md §6.2`.
+  - `jkm_warga_emas.py` — per-capita means test `monthly_income / household_size ≤ FOOD_PLI_RM 1,236` (DOSM 2024) combined with `WARGA_EMAS_AGE_THRESHOLD = 60` applied against `dependants[].relationship == "parent"`. Rate constants: `WARGA_EMAS_MONTHLY_RM = 600` (Budget 2026) with `WARGA_EMAS_FALLBACK_MONTHLY_RM = 500` kept per `docs/trd.md §9.5`. Annual payout: `600 × 12 = RM7,200`.
+  - `lhdn_form_b.py` — five YA2025 relief caps transcribed from `pr-no-4-2024.pdf` (PR 4/2024, 27 Dec 2024): individual RM9,000 (§6.1 doc p.9, ITA §46(1)(a)), parent medical RM8,000 (§6.2.1 doc p.9, ITA §46(1)(c)), child #16a RM2,000 per unmarried child under 18 (§6.18.2(a) doc p.41, ITA §§48(1)(a)/48(2)(a)), EPF + life insurance RM7,000 combined (§6.20 doc p.47, ITA §49(1)(a)), lifestyle #9 RM2,500 (§6.11.3 doc p.29). Tax saving computed by bracketing the annual income through `_malaysia_tax_ya2025()` (YA2025 Schedule 1 ITA brackets) with and without reliefs; delta is the user-facing upside. Form B deadline 30 June 2026 cited from `rf-filing-programme-for-2026.pdf` doc p.2 Example 2. Module rejects `SUPPORTED_YA != "ya_2025"` at import via an `if/raise ImportError` guard so editing the year without refreshing caps fails loud.
+- Citations (`app/schema/scheme.py → RuleCitation`): field is `passage` per `docs/trd.md §3`; `docs/plan.md` Task 4 calls it `passage_anchor` — same concept, different name across the two docs. Every citation carries `rule_id`, `source_pdf`, `page_ref` (document-labelled page, not pypdf index), `passage`, and a canonical `source_url`.
+- Aisyah rule-engine totals (smoke-tested end-to-end through the SSE endpoint): **STR RM450 + JKM Warga Emas RM7,200 + LHDN Form B RM558 = RM8,208/yr**, clearing the `docs/plan.md` ≥RM7,000 headline target with RM1,208 of margin.
+- Wired `backend/app/agents/tools/match.py` to delegate to the rule engine (plan.md Task 4 exit criterion): composes the three `match(profile)` calls, filters non-qualifying matches out, sorts descending by `annual_rm` so the highest-upside scheme renders first in the frontend ranked list (FR-6).
+- Made `backend/app/fixtures/aisyah.py` a live computation rather than a static list: `AISYAH_SCHEME_MATCHES` is now populated by `_compute_aisyah_matches()` at module load, so fixture and engine output cannot drift. The previous Task 1 hand-written matches (STR RM1,200 / LHDN RM1,008) were superseded by the engine's grounded values.
+- Added `backend/tests/` with `conftest.py` (session-scoped `pdf_text` fixture that `pypdf`-extracts all six cached scheme PDFs into `{pdf_name → {pypdf_page_index: text}}`) plus three test modules (`test_str_2026.py`, `test_jkm_warga_emas.py`, `test_lhdn_form_b.py`). **34 tests pass in 2.75 s.** Every relief cap constant has a paired test asserting the RM value appears verbatim on its cited page, and every scheme has an Aisyah-vs-expected match test plus a non-qualifying edge case.
+- Added `pypdf>=5.0` to `[project.optional-dependencies].dev` in `backend/pyproject.toml` (installed version `pypdf 6.10.2`). Test-only dep; does not enter the Cloud Run image.
+- Post-Task-4 SSE smoke test (uvicorn `127.0.0.1:8081`): 5 events in 576 ms. The `step_result {step: "match"}` payload now emits three real `SchemeMatch` objects produced by the rule engine, sorted descending by `annual_rm`, each with populated `rule_citations`.
+- Ruff `check` and `format --check` clean across 23 app + test files.
+
+---
+
 ## [20/04/26] - Scaffolded backend: Pydantic schemas, FastAPI SSE endpoint, ADK SequentialAgent with 2 stub FunctionTools
 
 - Installed Python 3.12.8 user-scope at `C:\Users\User\AppData\Local\Programs\Python\Python312` (TRD §6.3 pins 3.12; only 3.10 was present locally). Backend venv at `backend/.venv/`, gitignored via the existing `.venv/` rule (`.gitignore` line 133).

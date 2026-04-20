@@ -4,6 +4,18 @@
 
 ---
 
+## [21/04/26] - Task 3 Path 1 audit fixes: seed script serving_config path, ADC pre-check, pre-canary wait
+
+Three parallel subagent audits on `6f263ee`: plan-adherence (Path 1 fully compliant, green), SSE wire-shape stability (stable, 2 flags for Path 2 awareness), seed-script production-readiness (1 bug, 3 flags). Bug fix + two flag-upgrades landed here.
+
+- **Bug fix — seed script canary would fail on first live run.** `_run_canaries` used `serving_config = "{store_path}/servingConfigs/default_search"` but the canonical v1 name is `default_serving_config`. Every canary would have returned `NotFound` / `PERMISSION_DENIED`, surfacing as `[ERR ]` and an exit-2 even when indexing succeeded. One-line change in `backend/scripts/seed_vertex_ai_search.py:_run_canaries`; comment cites the audit so future drift is caught.
+- **ADC pre-check** — new `_check_adc()` runs at the top of `_execute()` calling `google.auth.default()`. Missing ADC now fails fast with "Run: gcloud auth application-default login" instead of a cryptic mid-stream error from the first `get_data_store` call.
+- **Pre-canary wait bumped 60 s → 180 s** — first-index latency on a fresh Discovery Engine data store for a 6-PDF corpus is typically 2-5 min. The previous 60 s sleep guaranteed one false MISS retry on every fresh seed; 180 s gets past the median first-index time without burning too much wall clock on re-runs.
+- Audit flags **not acted on** (cosmetic / Path 2 concerns): drift-detect for existing store reconciling different content_config (acceptable for a sprint seed); per-step try/except in `stream_agent_events()` to populate `ErrorEvent.step` (Path 2 UX refinement); `ComputeUpsideResult` projecting real Gemini Code Execution output down to the four locked fields — documented as a trap in the Path 2 implementation TODO by the SSE-stability audit.
+- **Verified**: ruff `check` + `format --check` clean on 27 files, dry-run seed script runs, `pytest -q` 39 passed in 3.13 s.
+
+---
+
 ## [21/04/26] - Scaffolded Phase 1 Task 3 Path 1: 5-step orchestration with stub tools and Vertex AI Search seed skeleton
 
 Path 1 per the CLAUDE.md "no Gemini or Vertex AI call until sprint start" guardrail — the 5-tool ADK shell + seed-script skeleton lands tonight; real Gemini Flash/Pro wiring + live Discovery Engine indexing lands in Path 2 at sprint start.

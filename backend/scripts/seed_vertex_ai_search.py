@@ -218,7 +218,10 @@ def _run_canaries(client: SearchServiceClient, store_path: str) -> bool:
     """Run each canary query and return True iff all hit the expected PDF."""
     from google.cloud.discoveryengine_v1.types import SearchRequest
 
-    serving_config = f"{store_path}/servingConfigs/default_search"
+    # Canonical v1 serving-config name is `default_serving_config`, NOT
+    # `default_search` — the latter is documented in many older tutorials and
+    # produces a NotFound. Audit (subagent, commit `6f263ee`) caught this.
+    serving_config = f"{store_path}/servingConfigs/default_serving_config"
     all_ok = True
     for q in CANARY_QUERIES:
         expected = q["expect_pdf"]
@@ -242,12 +245,30 @@ def _run_canaries(client: SearchServiceClient, store_path: str) -> bool:
     return all_ok
 
 
+def _check_adc() -> None:
+    """Fail fast with a readable message if Application Default Credentials aren't set up."""
+    try:
+        import google.auth
+    except ImportError as e:  # pragma: no cover
+        raise SystemExit(f"google-auth not installed: {e}") from e
+    try:
+        google.auth.default()
+    except Exception as e:  # noqa: BLE001
+        raise SystemExit(
+            "error: Application Default Credentials not configured.\n"
+            "Run: gcloud auth application-default login\n"
+            f"Original: {type(e).__name__}: {e}"
+        ) from e
+
+
 def _execute(args: argparse.Namespace) -> int:
     try:
         from google.cloud import discoveryengine_v1 as de
     except ImportError as e:
         print(f"error: google-cloud-discoveryengine is required for --execute: {e}", file=sys.stderr)
         return 1
+
+    _check_adc()
 
     pdfs = _list_pdfs()
     if not pdfs:
@@ -263,10 +284,15 @@ def _execute(args: argparse.Namespace) -> int:
     store_path = _ensure_data_store(client_data, args.project, args.location, args.data_store, args.verbose)
     _import_pdfs(client_doc, store_path, pdfs, args.verbose)
 
-    print("\nWaiting 60 s for indexing to settle before running canaries ...")
+    # First-index latency on a fresh DE data store is typically 2-5 minutes
+    # for a small corpus; 180 s is the minimum practical wait before the
+    # canaries have any chance to hit. On re-runs (content already indexed)
+    # this is wasted time but still safer than a false MISS.
+    indexing_wait_s = 180
+    print(f"\nWaiting {indexing_wait_s} s for indexing to settle before running canaries ...")
     import time
 
-    time.sleep(60)
+    time.sleep(indexing_wait_s)
 
     print("\nRunning canary queries:")
     all_ok = _run_canaries(client_search, store_path)

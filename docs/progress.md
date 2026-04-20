@@ -4,6 +4,18 @@
 
 ---
 
+## [20/04/26] - Phase 1 Task 2 commit 2: SSE consumer hook, pipeline stepper, Aisyah fixture
+
+- Wrote `frontend/src/lib/agent-types.ts` — TS mirror of `backend/app/schema/*.py` Pydantic models (`Profile`, `HouseholdClassification`, `SchemeMatch`, `RuleCitation`, `Packet`, `AgentEvent` discriminated union). Field names stay snake_case to match the JSON wire format. Exported `PIPELINE_STEPS` and `STEP_LABELS` constants.
+- Wrote `frontend/src/fixtures/aisyah-response.ts` — canned replay mirroring `backend/app/fixtures/aisyah.py` verbatim (STR RM1,200 + JKM RM7,200 + LHDN RM1,008 = RM9,408/yr). Adds forward-looking fixtures the backend doesn't emit yet: `AISYAH_CLASSIFICATION`, `AISYAH_UPSIDE` (Python snippet + stdout), `AISYAH_PACKET`. `AISYAH_MOCK_EVENTS` is a 11-event ordered replay totalling ~3.8 s end-to-end.
+- Wrote `frontend/src/lib/sse-client.ts` — `useAgentPipeline()` hook exposing `{state, start, reset}`. `start({mode:"mock"})` replays the fixture via staggered `setTimeout`s; `start({mode:"real", files})` POSTs multipart `FormData` to `${NEXT_PUBLIC_BACKEND_URL}/api/agent/intake` and consumes the `text/event-stream` body via `ReadableStream` + manual `data: …\n\n` chunk parser. `NEXT_PUBLIC_USE_MOCK_SSE=1` env flag forces mock for all real submissions. `AbortController` + `setTimeout` handles cleaned up on unmount or `reset()`. Reducer (`applyEvent`) is split out so the same logic drives both paths.
+- Wrote `frontend/src/components/pipeline/pipeline-stepper.tsx` — shadcn `Progress` bar (percent complete) over an `<ol>` of five labelled rows. Each row carries a status icon (spinner / check / red alert / empty circle) and a textual state label. Active row picks up a `primary/5` tint, errored row a `destructive/5` tint. `aria-current="step"` on the active row for assistive tech.
+- Rewrote `frontend/src/components/home/home-client.tsx` — derives display phase from `state.phase` (eliminates a `set-state-in-effect` ESLint error from the first pass). Submit + demo-mode handlers both call `start(...)`; `handleReset` clears fixture state and returns to landing. Results phase renders a placeholder with the total RM upside (real ranked list + provenance panel land in commit 3).
+- `pnpm run lint` clean (after one correction). `pnpm run build` clean — 4.5 s compile, two routes prerendered static.
+- Deferred to commit 3: `ranked-list.tsx`, `scheme-card.tsx`, `provenance-panel.tsx`, "Why I qualify" expander (FR-9), click-through source PDFs dialog (FR-7), out-of-scope "Checking… (v2)" cards (PRD §6.2).
+
+---
+
 ## [20/04/26] - Phase 1 Task 2 commit 1: landing view, upload widget, demo-mode banner
 
 - Flipped root `.env.example` `NEXT_PUBLIC_BACKEND_URL` from `:8000` to `:8080` to match `backend/app/main.py:13` (uvicorn `--port 8080`) and Cloud Run's default `PORT=8080`. Frontend branch only; backend untouched.

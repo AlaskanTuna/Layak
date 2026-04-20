@@ -2,17 +2,17 @@
 
 import { useState } from 'react'
 
-import { DemoModeBanner } from '@/components/home/demo-mode-banner'
-import { ErrorRecoveryCard } from '@/components/home/error-recovery-card'
-import { PipelineStepper } from '@/components/pipeline/pipeline-stepper'
-import { CodeExecutionPanel } from '@/components/results/code-execution-panel'
-import { PacketDownload } from '@/components/results/packet-download'
-import { RankedList } from '@/components/results/ranked-list'
+import { CodeExecutionPanel } from '@/components/evaluation/code-execution-panel'
+import { DemoModeBanner } from '@/components/evaluation/demo-mode-banner'
+import { ErrorRecoveryCard } from '@/components/evaluation/error-recovery-card'
+import { PacketDownload } from '@/components/evaluation/packet-download'
+import { PipelineStepper } from '@/components/evaluation/pipeline-stepper'
+import { RankedList } from '@/components/evaluation/ranked-list'
+import { UploadWidget, type UploadFiles } from '@/components/evaluation/upload-widget'
 import { Button } from '@/components/ui/button'
-import { UploadWidget, type UploadFiles } from '@/components/upload/upload-widget'
-import { useAgentPipeline } from '@/lib/sse-client'
+import { useAgentPipeline } from '@/hooks/use-agent-pipeline'
 
-export function HomeClient() {
+export function EvaluationClient() {
   const [isDemoMode, setIsDemoMode] = useState(false)
   const { state, start, reset } = useAgentPipeline()
 

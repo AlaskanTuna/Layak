@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import { ChevronDown, ChevronUp, ExternalLink } from 'lucide-react'
 
-import { ProvenancePanel } from '@/components/results/provenance-panel'
+import { ProvenancePanel } from '@/components/evaluation/provenance-panel'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'

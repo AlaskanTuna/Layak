@@ -1,4 +1,4 @@
-import { SchemeCard } from '@/components/results/scheme-card'
+import { SchemeCard } from '@/components/evaluation/scheme-card'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import type { SchemeMatch } from '@/lib/agent-types'
 

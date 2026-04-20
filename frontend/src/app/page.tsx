@@ -1,4 +1,4 @@
-import { HomeClient } from '@/components/home/home-client'
+import { EvaluationClient } from '@/components/evaluation/evaluation-client'
 
 export default function Home() {
   return (
@@ -11,7 +11,7 @@ export default function Home() {
           is a DRAFT — you submit manually.
         </p>
       </header>
-      <HomeClient />
+      <EvaluationClient />
     </div>
   )
 }

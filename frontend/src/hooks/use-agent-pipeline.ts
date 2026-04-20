@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from 'react'
 
+import type { UploadFiles } from '@/components/evaluation/upload-widget'
 import { AISYAH_MOCK_EVENTS } from '@/fixtures/aisyah-response'
 import type {
   AgentEvent,
@@ -13,7 +14,6 @@ import type {
   Step
 } from '@/lib/agent-types'
 import { PIPELINE_STEPS } from '@/lib/agent-types'
-import type { UploadFiles } from '@/components/upload/upload-widget'
 
 export type StepStatus = 'pending' | 'active' | 'complete' | 'error'
 

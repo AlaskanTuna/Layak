@@ -3,8 +3,8 @@
 import { AlertCircle, Check, Loader2 } from 'lucide-react'
 
 import { Progress } from '@/components/ui/progress'
+import type { PipelineState, StepStatus } from '@/hooks/use-agent-pipeline'
 import { PIPELINE_STEPS, STEP_LABELS, type Step } from '@/lib/agent-types'
-import type { PipelineState, StepStatus } from '@/lib/sse-client'
 import { cn } from '@/lib/utils'
 
 type Props = {

@@ -271,6 +271,33 @@ layak/
 - **Vertex AI Search data store** is populated one-time by `backend/scripts/seed_vertex_ai_search.py`. The script is idempotent and re-runnable.
 - **No GCS bucket, no Firestore, no Cloud SQL, no Redis** — none are provisioned in v1.
 
+### 6.6 Pre-commit hooks (Husky + lint-staged)
+
+Layak uses **Husky** to ship git hooks with the repo. Hooks live in `.husky/` (tracked in git); on `pnpm install`, the root `prepare: husky` script auto-configures git's `core.hooksPath` to point there, so every developer gets the same hooks on the first install — no per-machine setup required.
+
+**lint-staged** runs commands only on _staged_ files, keeping pre-commit checks fast. Configs:
+
+- Frontend: `frontend/package.json → "lint-staged"` runs `eslint --fix` on `**/*.{ts,tsx,js,jsx}`.
+- Root: `package.json → "lint-staged"` runs `prettier --write` on `*.{md,json,yml,yaml}` and `docs/**/*.md`.
+
+**The hook** is `.husky/pre-commit`:
+
+```sh
+pnpm --dir frontend exec lint-staged   # ESLint --fix on staged frontend ts/tsx/js/jsx
+pnpm exec lint-staged                  # Prettier --write on staged root md/json/yaml
+```
+
+Both invocations use `pnpm exec` to bypass the pnpm v10 bare-script shortcut which misroutes `pnpm -C frontend lint-staged` as a recursive workspace command.
+
+**Developer experience:**
+
+- `git commit` runs the hook automatically; on failure, the commit aborts with the failing tool's output.
+- Any auto-fixes from ESLint / Prettier are re-added to the staged set transparently.
+- Emergency bypass (avoid): `git commit --no-verify`.
+- Adding a new check (e.g. a type-check pre-push): append to `.husky/pre-commit` or create a new hook file such as `.husky/pre-push` — both are tracked and propagate to the team on next `pnpm install`.
+
+**Why Husky and not raw git hooks:** raw hooks live in `.git/hooks/` which is outside git tracking, so they can't be versioned or shared. Husky flips that by keeping hook scripts in-repo and wiring them in on install.
+
 ## 7. Security & Secrets
 
 - `.env` is git-ignored; `.env.example` is the only committed template.

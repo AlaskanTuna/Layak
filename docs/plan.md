@@ -110,75 +110,175 @@
 
 ## Phase 1: Core Build
 
-> Maps to `docs/roadmap.md` Phase 1 — "One critical user journey. End-to-end. On Cloud Run. No side quests." Implementation lists below are forward-looking scaffolds. Each task is expanded with real detail when it is picked up, per the repo agent workflow.
+> Maps to `docs/roadmap.md` Phase 1 — "One critical user journey. End-to-end. On Cloud Run. No side quests." Six tasks from 08:30 to 18:00 on 21 Apr (sprint hour 0 → 10). **Feature freeze at 18:00 / sprint hour 10.** Ownership follows `docs/prd.md` §0 phase matrix; file paths below are suggestions that can be refined in-flight.
+
+> **Before you start Phase 1 (08:00 standup checklist):**
+>
+> - [ ] GCP project live; Vertex AI, Cloud Run, Artifact Registry, Secret Manager, Discovery Engine APIs enabled (Phase 0, PO1).
+> - [ ] `GEMINI_API_KEY` in GCP Secret Manager as `gemini-api-key`; also in local `.env.local` for dev (PO1).
+> - [ ] Six scheme PDFs present under `backend/data/schemes/` (Phase 0 task 7 — **done**, commit `9138113`).
+> - [ ] Both laptops can `gcloud auth login` + `pnpm run dev` successfully.
 
 ### 1. Feature: Backend data models and agent wiring
 
-**Purpose/Issue:** _(to be filled at task start)_
+**Owner:** PO1 (Hao). **Roadmap block:** 21 Apr 08:30 → 10:30 MYT. **Depends on:** Phase 0 skeleton (`backend/`), PDFs committed (Phase 0 task 7), GCP live, `GEMINI_API_KEY` accessible locally.
 
-**Implementation:**
+**Purpose/Issue:** Stand up the minimum backend the frontend can talk to during the 12:30 wiring block — Pydantic data contract, a FastAPI SSE endpoint, an ADK `SequentialAgent` with 2 stubbed `FunctionTool`s that emit a deterministic event stream. No Vertex AI Search yet (task 3), no real rule engine (task 4), no packet generation (task 5).
 
-- [ ] Define Pydantic `Profile`, `SchemeMatch`, `Packet` models per `docs/trd.md` §3.
-- [ ] Stand up FastAPI skeleton with `POST /api/agent/intake` returning a stub SSE stream.
-- [ ] Wire ADK-Python `SequentialAgent` with two or three `FunctionTool`s (extract, match) against the Gemini API.
-- [ ] Local smoke test: stub returns a valid SSE stream end-to-end.
+**Implementation — PO1 (Hao):**
 
-### 2. Feature: Frontend scaffolding to mock data
+- [ ] Scaffold the Python package: `backend/pyproject.toml`, `backend/app/{__init__.py,main.py}`, `backend/app/schema/`, `backend/app/agents/`. Install `fastapi`, `uvicorn`, `google-adk==1.31.*`, `google-genai`, `pydantic==2.*`, `python-multipart`.
+- [ ] Define Pydantic v2 models in `backend/app/schema/`: `Profile`, `SchemeMatch` (with `rule_citations[]`), `Packet`, `ProvenanceRecord`. Follow `docs/trd.md` §3.
+- [ ] FastAPI entry at `backend/app/main.py`: `POST /api/agent/intake` accepts three `UploadFile` params (`ic`, `payslip`, `utility`); returns an SSE stream (`starlette.responses.EventSourceResponse` or manual `text/event-stream`).
+- [ ] ADK `SequentialAgent` in `backend/app/agents/root_agent.py` with 2 `FunctionTool`s for this task:
+  - `extract_profile(ic, payslip, utility)` → returns a canned Aisyah `Profile` fixture (real Gemini wiring arrives in task 3).
+  - `match_schemes(profile)` → returns 3 canned `SchemeMatch` objects (real rule engine arrives in task 4).
+- [ ] SSE event shape (lock this now — the frontend depends on it): `step_started {step}`, `step_result {step, data}`, `done {packet}`, `error {step, message}`.
+- [ ] Local smoke test: `curl -N -F ic=@fixtures/ic.pdf -F payslip=@fixtures/payslip.pdf -F utility=@fixtures/tnb.pdf http://localhost:8080/api/agent/intake` emits at least 4 events in under 3s and terminates cleanly.
+- [ ] Commit `feat(lambda): scaffold fastapi and adk sequentialagent with stub functiontools`.
 
-**Purpose/Issue:** _(to be filled at task start)_
+**Exit criteria:** service stands up on `:8080`; smoke-test curl streams a full SSE response with stubbed data; SSE event shape documented in a one-line comment in `backend/app/main.py` so PO2 can consume it.
 
-**Implementation:**
+---
 
-- [ ] Build the upload widget (FR-2) with three separately-labelled file inputs and camera support.
-- [ ] Build the SSE consumer and per-step progress placeholders.
-- [ ] Build the ranked-scheme list skeleton with mock data.
-- [ ] Build the provenance panel layout (FR-7) with placeholder citations.
+### 2. Feature: Frontend scaffolding with mock data
 
-### 3. Feature: Orchestration layer (agent chains ≥3 steps)
+**Owner:** PO2 (Adam). **Roadmap block:** 21 Apr 08:30 → 12:00 MYT (can start tonight — no backend needed). **Depends on:** Phase 0 frontend scaffold (done).
 
-**Purpose/Issue:** _(to be filled at task start)_
+**Purpose/Issue:** Build every screen the Aisyah flow needs against mock data so the UI is visually complete before the 12:30 wiring block. When task 1 is ready, integration collapses to a one-line SSE endpoint swap, not a UI debug session. Covers FR-1 through FR-10 except live extraction.
 
-**Implementation:**
+**Implementation — PO2 (Adam):**
 
-- [ ] Wire `FunctionTool`s end-to-end: extract → classify → match → compute_upside → generate_packet.
-- [ ] Index the three scheme PDFs into Vertex AI Search via `backend/scripts/seed_vertex_ai_search.py` (exact path subject to backend-layout decision).
-- [ ] Canary retrieval query returns non-empty passages for each scheme.
-- [ ] Trigger-point check at sprint hour 12: if Vertex AI Search is not green, collapse to the Plan B inline-PDF grounding in `docs/trd.md` §8.
+- [ ] Replace `frontend/src/app/page.tsx` stub with the real landing view (upload widget above the fold + trust copy "We store nothing. Draft only — you submit manually.").
+- [ ] **Upload widget (FR-2)**: `frontend/src/components/upload/upload-widget.tsx` — three separately-labelled inputs (IC, payslip, utility) with `accept="image/*,application/pdf"` and `capture="environment"` for mobile camera. Reject files > 10 MB and non-image/non-PDF MIME types inline (not via toast).
+- [ ] **"Use Aisyah sample documents" button (FR-10)**: loads `frontend/src/fixtures/aisyah-response.ts` and skips the upload step; renders a "DEMO MODE" banner.
+- [ ] **SSE consumer (shared infra)**: `frontend/src/lib/sse-client.ts` — `useEventSource()` React hook parses `step_started | step_result | done | error` per task 1's locked event shape; exposes `{currentStep, stepResults, isDone, error}`.
+- [ ] **Pipeline stepper (FR-3/4/5 visual)**: `frontend/src/components/pipeline/pipeline-stepper.tsx` — renders the five steps with shadcn `Progress` + labels; each step lights up on `step_started`, checkmarks on `step_result`.
+- [ ] **Ranked scheme list (FR-6) + "Why I qualify" (FR-9)**: `scheme-card.tsx` (shadcn `Card` with RM/year, summary, expander) and `ranked-list.tsx` (descending by annual RM; total RM in header; out-of-scope schemes as greyed "Checking… (v2)" cards per `docs/prd.md` §6.2).
+- [ ] **Provenance panel (FR-7)**: `provenance-panel.tsx` — each rule citation as `rule → source PDF (page n)`; click opens shadcn `Dialog` with the passage text; click-through links to raw PDFs (mock for now).
+- [ ] **Mock SSE mode**: `NEXT_PUBLIC_USE_MOCK_SSE=1` env flag replays events from `aisyah-response.ts` with staggered `setTimeout`s so the UI animation rhythm is testable without the backend.
+- [ ] **Responsiveness smoke**: eyeball 375 / 768 / 1440 in Chrome DevTools. No horizontal scroll.
+- [ ] Commit in 2–3 chunks: `feat(ui): add upload widget and demo-mode banner`, `feat(ui): add pipeline stepper and sse consumer hook`, `feat(ui): add results view with ranked list and provenance panel`.
+
+**Exit criteria:** load page → click "Use Aisyah sample documents" → full 5-step pipeline plays out visually → ranked list + provenance panel + total RM render, all from mock data with no backend running; three viewports render clean.
+
+---
+
+### 3. Feature: Orchestration layer (5-step agent + Vertex AI Search)
+
+**Owner:** PO1 drives; PO2 wires new SSE event labels at sync points. **Roadmap block:** 21 Apr 10:30 → 12:00 MYT + partial afternoon. **Depends on:** Task 1, Phase 0 task 7 (**six** scheme PDFs committed — all six passed verification in commit `9138113`), GCP project with Discovery Engine API enabled.
+
+**Purpose/Issue:** Upgrade the 2-tool stub from task 1 to the full five-step pipeline, with **Vertex AI Search** grounding every rule lookup against a passage + URL from the committed PDFs. This is the agentic moment the demo sells — all five steps emit visible SSE events, performance budget < 10s total end-to-end.
+
+**Implementation — PO1 (Hao):**
+
+- [ ] **Vertex AI Search seed**: `backend/scripts/seed_vertex_ai_search.py` — reads the six PDFs from `backend/data/schemes/`, creates a Discovery Engine data store `layak-schemes-v1` in `asia-southeast1`, uploads + indexes all six, waits for indexing to complete. Idempotent; safe to re-run.
+- [ ] **Canary query test**: `search("STR 2026 household income threshold")` returns at least one passage from `RISALAH STR 2026.pdf`; same for JKM and LHDN. Assert in the seed script.
+- [ ] **Expand FunctionTools from 2 to 5**:
+  - `extract_profile` → Gemini 2.5 Flash multimodal with `Profile` as structured output. Replace the stub.
+  - `classify_household` → Gemini 2.5 Flash → `{has_children_under_18, has_elderly_dependant, income_band}`.
+  - `match_schemes` → for each of {STR, JKM, LHDN}, queries Vertex AI Search, then delegates to the rule engine (task 4); until task 4 lands, stub with `qualifies=True`.
+  - `compute_upside` → Gemini Code Execution (`tools: [{codeExecution: {}}]`) runs Python computing annual RM per scheme + total; emit the Python snippet + stdout as a `step_result` payload so the UI shows it on stage.
+  - `generate_packet` → stubbed; WeasyPrint lands in task 5.
+- [ ] **Plan B trigger (sprint hour 12 ≈ 14:30 MYT)**: if Vertex AI Search setup isn't green or canary queries return empty by 14:30, flip to inline-PDF grounding per `docs/trd.md` §8 — drop the Search client, replace with a local `{pdf_name → pages}` lookup that Gemini 2.5 Pro reads inline (~80K tokens, well under the 200K cheap tier). ADK and the five-step pipeline stay intact. PO1 calls the trigger; both accept without re-debate.
+
+**Implementation — PO2 (Adam), sync points:**
+
+- [ ] When PO1 confirms `step_started: "classify"` and `"compute_upside"` events are live, extend `pipeline-stepper.tsx` labels. (The generic SSE hook from task 2 should already handle them.)
+- [ ] Render Code Execution stdout (Python snippet + output) inside the `compute_upside` step-result panel in a small `<pre>` — this is the judge-trust moment.
+- [ ] Render provenance passages from `match_schemes` in the panel; click-through links point at `/api/schemes/<filename>` (PO1 exposes as static route) or the public source URL from `docs/trd.md` §6.1.
+
+- [ ] Commit (PO1): `feat(lambda): add vertex ai search seed and expand to 5 functiontools`.
+- [ ] Commit (PO2): `feat(ui): render classify and compute_upside steps with code execution trace`.
+
+**Exit criteria:** `POST /api/agent/intake` with Aisyah fixtures emits a full SSE stream (5 × `step_started` + `step_result`, one `done`); Vertex AI Search canary queries return non-empty for STR / JKM / LHDN **or** Plan B collapse was called cleanly before 14:30; Code Execution step shows a Python snippet + numeric output in the UI.
+
+---
 
 ### 4. Feature: Rule engine (STR, JKM Warga Emas, 5 LHDN reliefs)
 
-**Purpose/Issue:** _(to be filled at task start)_
+**Owner:** PO1 (Hao). **Roadmap block:** 21 Apr 10:30 → 12:00 MYT (parallel to task 3 if time allows). **Depends on:** Phase 0 task 7 (scheme PDFs committed).
 
-**Implementation:**
+**Purpose/Issue:** Encode the three scheme rulesets as Pydantic v2 models. Every threshold must be sourced from a cached PDF under `backend/data/schemes/` and covered by a unit test asserting the numeric value matches the PDF. This is the credibility differentiator — no judge can challenge a number on stage if every number cites its source page.
 
-- [ ] Encode STR 2026 household-with-children tier thresholds (Pydantic v2).
-- [ ] Encode JKM Warga Emas per-capita means test against food-PLI RM1,236 (DOSM 2024); default rate RM600/month, fallback copy RM500/month.
-- [ ] Encode five LHDN Form B reliefs for YA2025: individual (RM9,000), parent medical (up to RM8,000), child 16a ×2 (RM2,000 each), EPF+life #17 (up to RM7,000), lifestyle #9 (up to RM2,500).
-- [ ] Unit tests assert every threshold matches the cached scheme PDF under `backend/data/schemes/`.
+**Implementation — PO1 (Hao):**
+
+- [ ] `backend/app/rules/__init__.py` — re-exports `str_2026`, `jkm_warga_emas`, `lhdn_form_b`.
+- [ ] `backend/app/rules/str_2026.py` — household-with-children tier table from `RISALAH STR 2026.pdf`. Function: `match(profile) -> SchemeMatch`.
+- [ ] `backend/app/rules/jkm_warga_emas.py` — per-capita means test: `household_income / household_size ≤ food-PLI RM1,236` (DOSM 2024). Default rate RM600/month (Budget 2026); fallback copy RM500/month if the gazetted rate can't be confirmed in JKM18.
+- [ ] `backend/app/rules/lhdn_form_b.py` — five YA2025 reliefs per `pr-no-4-2024.pdf`: individual RM9,000; parent medical up to RM8,000; child #16a RM2,000 × 2; EPF+life #17 up to RM7,000; lifestyle #9 up to RM2,500. Reject any `ya != "ya_2025"` at import time.
+- [ ] **Each rule returns** `SchemeMatch.rule_citations[]` as `{rule_id, source_pdf, page_ref, passage_anchor}` — the frontend provenance panel consumes this verbatim.
+- [ ] **Unit tests** in `backend/tests/`:
+  - `test_str_2026.py` — asserts every tier threshold and child-count multiplier matches the PDF; Aisyah profile lands in the expected band.
+  - `test_jkm_warga_emas.py` — Aisyah's father (age 70, household RM2,800 / 4 members = RM700/capita) qualifies.
+  - `test_lhdn_form_b.py` — each relief returns its gazetted cap; Aisyah (two children + gig income + parent in household) triggers all five.
+- [ ] Run `pytest -q` from `backend/`; ensure green.
+- [ ] Commit `feat(lambda): encode str jkm lhdn rule engine with unit tests`.
+
+**Exit criteria:** all three modules expose `match(profile) -> SchemeMatch` with populated `rule_citations`; `pytest` green; Aisyah's combined matches sum to ≥ RM7,000/year (PRD headline sanity target); `match_schemes` FunctionTool from task 3 delegates here instead of stubs.
+
+---
 
 ### 5. Feature: Wire frontend ↔ backend end-to-end
 
-**Purpose/Issue:** _(to be filled at task start)_
+**Owner:** Both (Adam + Hao), paired at one machine. **Roadmap block:** 21 Apr 12:30 → 14:30 MYT. **Depends on:** Tasks 1, 2, 3, 4 all landed and local-smoke-green.
 
-**Implementation:**
+**Purpose/Issue:** Pull frontend out of mock mode onto the real backend. Every SSE event lands correctly in the UI; every provenance citation renders with a working click-through; WeasyPrint drafts download. End of block: local end-to-end happy path against the Aisyah fixtures is demo-ready.
 
-- [ ] Replace mock SSE events with real agent output from `POST /api/agent/intake`.
-- [ ] Provenance panel renders Vertex AI Search passages + URLs for every numeric claim.
-- [ ] Gemini Code Execution streams Python computations on-stage.
-- [ ] WeasyPrint produces three DRAFT-watermarked PDFs downloadable from the results view.
-- [ ] Happy path runs end-to-end locally against the full Aisyah fixture set.
+**Implementation — Both, paired:**
 
-### 6. Feature: Cloud Run deploy and responsiveness pass
+- [ ] `NEXT_PUBLIC_API_URL=http://localhost:8080` in `frontend/.env.local`; document in `.env.example`.
+- [ ] `frontend/src/lib/sse-client.ts` points at `${NEXT_PUBLIC_API_URL}/api/agent/intake`; remove the mock-mode flag (or move it behind a dev-only toggle).
+- [ ] **Happy path**: upload Aisyah fixtures via the widget → five SSE events fire → ranked list + provenance + total RM render → Code Execution panel shows Python → draft packet downloads.
 
-**Purpose/Issue:** _(to be filled at task start)_
+**Implementation — PO1 (Hao):**
 
-**Implementation:**
+- [ ] WeasyPrint packet generator in `backend/app/agents/tools/generate_packet.py` — reads three Jinja HTML templates (`backend/app/templates/bk01.html.jinja`, `jkm18.html.jinja`, `lhdn.html.jinja`), renders with profile + matches, watermarks "DRAFT — NOT SUBMITTED" on every page.
+- [ ] Decide delivery: `GET /api/agent/packet/{id}` returns a ZIP of the three PDFs **OR** base64-embed the packet in the final `done` SSE event (keeps the service stateless — consistent with `docs/trd.md` §6.5).
+- [ ] Dockerfile / container config: install `libpango`, `libcairo`, `libgdk-pixbuf` (WeasyPrint system deps).
 
-- [ ] Deploy frontend (`gcloud run deploy`) and backend (`adk deploy cloud_run --with_ui`), both with `--min-instances=1 --cpu-boost`.
-- [ ] Inject `GEMINI_API_KEY` via Secret Manager (`--set-secrets=GEMINI_API_KEY=gemini-api-key:latest`).
-- [ ] Happy path works on the public Cloud Run URL from an incognito browser.
-- [ ] Responsiveness pass at 375 / 768 / 1440 viewports.
-- [ ] Seed Aisyah demo-mode button (FR-10) rehearsed cleanly three times back-to-back.
+**Implementation — PO2 (Adam):**
+
+- [ ] `frontend/src/components/results/packet-download.tsx` — download button appears after `done`; click triggers ZIP save or renders three separate PDF links.
+- [ ] **Error surface**: on `error` SSE event, show a recovery card with "Use sample documents" button (FR-3 AC) — avoid a dead-end.
+- [ ] Mobile polish pass on the upload widget (375px — consider a stepper if three side-by-side inputs feel cramped).
+
+- [ ] Commit (paired): `feat(ui): wire real sse stream and packet download to backend`.
+
+**Exit criteria:** live happy path runs against Aisyah fixtures in under 10 seconds locally (warm); three draft PDFs download and are visibly watermarked; no hardcoded secrets; no console errors on the happy path.
+
+---
+
+### 6. Feature: Cloud Run deploy, responsiveness, and demo rehearsal
+
+**Owner:** PO1 deploys; PO2 owns responsiveness; Both rehearse. **Roadmap block:** 21 Apr 14:30 → 17:30 MYT. **🔒 Feature freeze at 18:00.** **Depends on:** Task 5 (e2e happy path green locally), GCP live with required APIs, `gemini-api-key` in Secret Manager.
+
+**Purpose/Issue:** Put the live URL in front of a stranger browser. Cloud Run deploy is a Project 2030 submission requirement (handbook). Every minute past 16:00 eats rehearsal time; every minute past 17:30 risks feature-freeze slip.
+
+**Implementation — PO1 (Hao), deploy:**
+
+- [ ] Confirm APIs enabled on the GCP project: Cloud Run, Artifact Registry, Discovery Engine, Secret Manager, Vertex AI.
+- [ ] Push `gemini-api-key` to Secret Manager; grant `roles/secretmanager.secretAccessor` to the Cloud Run runtime service account.
+- [ ] **Backend deploy** (from `backend/`): `adk deploy cloud_run --with_ui --region asia-southeast1 --min-instances 1 --cpu-boost --set-secrets GEMINI_API_KEY=gemini-api-key:latest`.
+- [ ] **Frontend deploy** (from `frontend/`): `gcloud run deploy layak-frontend --source . --region asia-southeast1 --min-instances 1 --cpu-boost --allow-unauthenticated --set-env-vars NEXT_PUBLIC_API_URL=<backend-url>`.
+- [ ] **Post-deploy incognito check**: happy path runs against production from a fresh tab.
+- [ ] Backend hardening (second pass): structured 4xx/5xx error responses; request-scoped logging with **no PII** (no IC, no name, no document bytes); CORS pinned to the frontend origin; rate-limit on `/api/agent/intake`.
+
+**Implementation — PO2 (Adam), responsiveness + polish:**
+
+- [ ] Responsiveness pass at **375 / 768 / 1440** (Chrome DevTools device toolbar). Upload widget, stepper, results view, provenance panel, download CTA — no horizontal scroll, no clipped text.
+- [ ] Accessibility smoke: tab-through reaches every interactive element; screen-reader labels on the three file inputs; alt text on icons; WCAG 2.1 AA colour contrast on body copy.
+- [ ] Copy polish: plain-English explanations in `scheme-card.tsx` expanders — no legalese, no "pursuant to."
+
+**Implementation — Both, rehearsal:**
+
+- [ ] Three clean back-to-back 90-second demo rehearsals from the live URL. Keep `--min-instances=1` active through the rehearsal window.
+- [ ] Note any flake; if non-critical, log for Phase 2 polish. If it kills the demo, fix it before 17:30.
+- [ ] Set a reminder to curl the frontend URL one hour before the actual demo slot to pre-warm.
+
+- [ ] Commit config tweaks under `chore(infra)` scope.
+
+**Exit criteria:** frontend Cloud Run URL loads in incognito from another network; full happy path completes in < 10s (warm); three viewports clean; three back-to-back rehearsals hit the same RM-upside number and all five visible steps; **feature freeze declared at 18:00** — any work after that is bug-fix-only until code freeze at 21:00.
 
 ---
 

@@ -219,24 +219,56 @@ Use parquet mirrors over `storage.dosm.gov.my`; live `api.data.gov.my` endpoints
 
 ### 6.3 Open-source libraries
 
-| Library      | Version                     | License      |
-| ------------ | --------------------------- | ------------ |
-| Next.js      | 14.x                        | MIT          |
-| React        | 18.x                        | MIT          |
-| Tailwind CSS | 3.4.x                       | MIT          |
-| shadcn/ui    | latest (copy-in components) | MIT          |
-| Lucide React | ^0.x                        | ISC          |
-| FastAPI      | 0.115+                      | MIT          |
-| Pydantic     | v2                          | MIT          |
-| ADK-Python   | 1.31 (GA)                   | Apache 2.0   |
-| WeasyPrint   | 62+                         | BSD-3-Clause |
+| Library      | Version                                                  | License      |
+| ------------ | -------------------------------------------------------- | ------------ |
+| Next.js      | 16.2.4                                                   | MIT          |
+| React        | 19.2.4                                                   | MIT          |
+| Tailwind CSS | 4.2.x                                                    | MIT          |
+| shadcn/ui    | 4.3.1 (preset: `base-nova`, `@base-ui/react` primitives) | MIT          |
+| Lucide React | 1.8.x                                                    | ISC          |
+| ESLint       | 9.x (flat config)                                        | MIT          |
+| FastAPI      | 0.115+                                                   | MIT          |
+| Pydantic     | v2                                                       | MIT          |
+| ADK-Python   | 1.31 (GA)                                                | Apache 2.0   |
+| WeasyPrint   | 62+                                                      | BSD-3-Clause |
 
-### 6.4 Data & storage layout
+### 6.4 Repo layout
+
+Monorepo via pnpm workspace. One lockfile at root; one `prepare: husky` script at root.
+
+```
+layak/
+├── frontend/                     Next.js 16 workspace package (layak-frontend)
+│   ├── src/
+│   │   ├── app/                  App Router: layout, page, globals.css
+│   │   ├── components/ui/        shadcn primitives (12 components)
+│   │   └── lib/utils.ts          cn() helper
+│   ├── public/                   static assets
+│   ├── AGENTS.md                 Next.js 16 framework warning for agents
+│   ├── components.json           shadcn config (base-nova preset, Tailwind 4)
+│   ├── eslint.config.mjs         ESLint 9 flat config
+│   ├── next.config.ts            webpack HMR polling (poll=800ms)
+│   ├── package.json
+│   └── tsconfig.json
+├── backend/                      FastAPI + ADK-Python (Phase 1 scaffolds)
+│   ├── app/                      FastAPI + RootAgent (Phase 1)
+│   ├── data/schemes/             source PDFs, git-versioned
+│   ├── scripts/
+│   │   └── seed_vertex_ai_search.py   one-time Vertex AI Search data-store seeder
+│   └── README.md
+├── docs/                         PRD, TRD, roadmap, plan, progress
+├── .claude/                      project instructions, skills inventory
+├── .husky/                       git pre-commit hook
+├── package.json                  root orchestrator (husky, lint-staged, prettier)
+└── pnpm-workspace.yaml
+```
+
+### 6.5 Data & storage
 
 - **No application database** in v1. Layak is stateless: user documents and profiles live only in request-scope memory and are discarded at response-end.
-- **Scheme rules** are encoded as typed Pydantic v2 models in `backend/app/rules/` (or equivalent; exact path subject to backend-layout decisions).
+- **Scheme rules** are encoded as typed Pydantic v2 models in `backend/app/rules/` (Phase 1 scaffold).
 - **Scheme PDFs** are the source of truth and live at `backend/data/schemes/`, versioned in git. The repo is the bucket.
-- **Vertex AI Search data store** is populated one-time by `backend/scripts/seed_vertex_ai_search.py` (or equivalent path). The script is idempotent and re-runnable.
+- **Vertex AI Search data store** is populated one-time by `backend/scripts/seed_vertex_ai_search.py`. The script is idempotent and re-runnable.
 - **No GCS bucket, no Firestore, no Cloud SQL, no Redis** — none are provisioned in v1.
 
 ## 7. Security & Secrets
@@ -283,9 +315,9 @@ Use parquet mirrors over `storage.dosm.gov.my`; live `api.data.gov.my` endpoints
 - [BLOCKED ON INFRA SETUP] Cloud Run region (candidate: `asia-southeast1` for latency).
 - [BLOCKED ON INFRA SETUP] Vertex AI Search data store ID and region.
 
-### 9.4 Backend layout
+### 9.4 Backend layout — RESOLVED
 
-Does the backend live at `backend/` alongside the Next.js root, or as a separate sibling repo? v1 assumes single-repo with `backend/` directory (no subtree split). Paths like `backend/data/schemes/`, `backend/scripts/seed_vertex_ai_search.py`, and `backend/app/rules/` are stated in this document as canonical for v1 but remain subject to a formal backend-layout decision before backend scaffolding begins (next sprint day). None of these paths block tonight's frontend-only scaffold.
+Monorepo via pnpm workspace. Frontend lives at `frontend/` (workspace package `layak-frontend`); backend lives at `backend/` (Python app, not a pnpm package). Backend skeleton and `README.md` landed in Phase 0; `backend/app/`, `backend/scripts/seed_vertex_ai_search.py`, and the six committed scheme PDFs under `backend/data/schemes/` are canonical paths. See §6.4 for the full repo layout.
 
 ### 9.5 JKM Warga Emas rate
 

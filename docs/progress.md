@@ -4,6 +4,21 @@
 
 ---
 
+## [20/04/26] - Refactored into frontend/ + backend/ pnpm workspace
+
+- Moved the Next.js scaffold from repo root into `frontend/` as a pnpm workspace package `layak-frontend`. Preserved git rename history via `git mv`. Files moved: `src/`, `public/`, `tsconfig.json`, `next.config.ts`, `postcss.config.mjs`, `eslint.config.mjs`, `components.json`, `AGENTS.md`, `.env.example`, `next-env.d.ts`.
+- Created `backend/` skeleton with `data/schemes/.gitkeep`, `scripts/.gitkeep`, and a `README.md` pinning the Phase 1 layout from `docs/trd.md` (FastAPI + ADK-Python + WeasyPrint, stateless, repo-is-the-bucket).
+- Split `package.json`: root is now a thin workspace orchestrator (husky, lint-staged, prettier, prettier-plugin-tailwindcss, concurrently); `frontend/package.json` keeps all Next.js / React / Tailwind / shadcn deps. Root scripts forward via `pnpm -C frontend <cmd>` for dev, build, start, lint.
+- Created root `pnpm-workspace.yaml` listing `frontend` as the workspace package; moved `ignoredBuiltDependencies` (sharp, unrs-resolver) here and deleted the scaffold-shipped nested `frontend/pnpm-workspace.yaml`.
+- Deleted root `pnpm-lock.yaml` + `node_modules/`; reran `pnpm install` at root to regenerate a single workspace lockfile.
+- Deleted the root `CLAUDE.md` shipped by the Next.js scaffold (1-liner `@AGENTS.md`) — redundant with `.claude/CLAUDE.md`. `AGENTS.md` moved into `frontend/` where its Next.js 16 warning is properly scoped.
+- Updated `.husky/pre-commit` to run `pnpm -C frontend lint-staged` (ESLint on frontend ts/tsx) followed by `pnpm lint-staged` (Prettier on root docs).
+- Verified `pnpm run lint` and `pnpm run build` still pass via the workspace forward. Noted that the bare `pnpm lint` hits a pnpm v10 workspace shortcut that bypasses our script — canonical invocation is `pnpm run lint`.
+- Updated `docs/trd.md` §6.3 (current versions), §6.4 (repo layout diagram), §9.4 (closed the backend-layout open question); updated `.claude/CLAUDE.md` Architecture, Tech Stack paths, Commands block, Code Style paths.
+- Pinned workspace TypeScript in `.vscode/settings.json` (`typescript.tsdk: "frontend/node_modules/typescript/lib"`, `enablePromptUseWorkspaceTsdk: true`) so VSCode users see the workspace's `typescript@5.9.3` instead of the editor's bundled version. First time VSCode opens a `.ts` file it prompts to switch — accept once.
+
+---
+
 ## [20/04/26] - Scaffolded Next.js 16 frontend tooling
 
 - Scaffolded Next.js 16.2.4 + React 19.2.4 + Tailwind 4.2.2 + ESLint 9 flat config into the repo via a temp-dir merge (preserved `docs/`, `.claude/`, `.git/`, existing `.prettierrc`/`.prettierignore`/`README.md`). Renamed package to `layak`; dropped legacy `.eslintrc.cjs` and `src/.gitkeep`.

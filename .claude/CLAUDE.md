@@ -28,6 +28,21 @@ The full architecture contract lives in `docs/trd.md`. Do **not** create `docs/a
 
 Two-service app: **Next.js 16 frontend** (React 19, Tailwind 4) and **FastAPI + ADK-Python backend**, both on Cloud Run. The `RootAgent` (Gemini 2.5 Pro, ADK `SequentialAgent`) orchestrates five `FunctionTool`s. Vertex AI Search is the primary RAG layer over three committed scheme PDFs in `backend/data/schemes/`. The app is **stateless** — no DB, no GCS, no Firestore in v1; scheme rules are hardcoded Pydantic models; the repo is the source of truth for the scheme corpus.
 
+### Repo layout (pnpm workspace monorepo)
+
+```
+layak/
+├── frontend/          Next.js 16 app — self-contained package (layak-frontend)
+├── backend/           FastAPI + ADK-Python service (Phase 1 scaffolds)
+│   ├── data/schemes/    source PDFs, git-versioned
+│   └── scripts/         seed_vertex_ai_search.py lands here
+├── docs/              PRD, TRD, roadmap, plan, progress
+├── .claude/           project instructions + skills
+├── .husky/            git hooks
+├── package.json       root orchestrator (husky, lint-staged, prettier)
+└── pnpm-workspace.yaml
+```
+
 Plan B (at sprint hour 12 if Vertex AI Search setup stalls): collapse to Gemini 2.5 Pro inline-PDF grounding in its 1M-token context. Keep ADK-Python and the five-step pipeline intact. See `docs/trd.md` §8.
 
 ---
@@ -37,10 +52,10 @@ Plan B (at sprint hour 12 if Vertex AI Search setup stalls): collapse to Gemini 
 ### Frontend
 
 - **Framework:** Next.js 16 App Router (`--webpack` forced in scripts; Turbopack is the 16 default but the WSL webpack-polling config below is tried-and-true), React 19, TypeScript 5.
-- **Next.js 16 note.** The scaffold ships `AGENTS.md` + root `CLAUDE.md` warning that Next.js 16 has breaking changes vs prior training data. Read `node_modules/next/dist/docs/` before writing framework-sensitive code. Heed deprecation notices in `next dev` output.
+- **Next.js 16 note.** `frontend/AGENTS.md` (shipped by the scaffold) warns that Next.js 16 has breaking changes vs prior training data. Read `frontend/node_modules/next/dist/docs/` before writing framework-sensitive code. Heed deprecation notices in `next dev` output.
 - **Styling:** Tailwind CSS, shadcn/ui (slate, CSS variables), Lucide React icons.
 - **Tooling:** pnpm (packageManager=pnpm@10.33.0, engines.node=24.x), Husky + lint-staged, Prettier + `prettier-plugin-tailwindcss`, ESLint.
-- **Dev experience:** `next.config.mjs` sets WSL-friendly HMR polling (`poll: 800`, `aggregateTimeout: 300`, ignore `node_modules`).
+- **Dev experience:** `frontend/next.config.ts` sets WSL-friendly webpack HMR polling (`poll: 800`, `aggregateTimeout: 300`, ignore `node_modules`).
 
 ### Backend
 
@@ -57,26 +72,29 @@ Plan B (at sprint hour 12 if Vertex AI Search setup stalls): collapse to Gemini 
 - **Secrets:** GCP Secret Manager (`gemini-api-key`). Injected via `--set-secrets=GEMINI_API_KEY=gemini-api-key:latest`. Cloud Run service account holds `roles/secretmanager.secretAccessor` and the minimum Vertex AI roles.
 - **APIs required:** Vertex AI, Cloud Run, Artifact Registry, Secret Manager, Discovery Engine (Vertex AI Search).
 - **CI/CD:** `.github/workflows/` placeholder — workflows land during Phase 1 hardening.
-- **Data layout:** Scheme PDFs at `backend/data/schemes/` (versioned in git); one-time seed via `backend/scripts/seed_vertex_ai_search.py` (exact path subject to backend-layout decision). No application database.
+- **Data layout:** Scheme PDFs at `backend/data/schemes/` (versioned in git); one-time seed via `backend/scripts/seed_vertex_ai_search.py`. No application database.
 
 ---
 
 ## Commands
 
 ```bash
-# Frontend (from repo root)
-pnpm install                    # install deps
-pnpm dev                        # start Next.js dev server on :3000
-pnpm lint                       # ESLint
-pnpm build                      # production build check
-pnpm format                     # prettier --write .
-pnpm exec prettier --write <files>
+# From repo root (workspace orchestrator forwards to frontend/)
+pnpm install                    # install all workspace deps
+pnpm dev                        # → pnpm -C frontend dev (next dev --webpack, :3000)
+pnpm build                      # → pnpm -C frontend build (next build --webpack)
+pnpm start                      # → pnpm -C frontend start
+pnpm run lint                   # ESLint via workspace forward (use `run` — `pnpm lint` hits a pnpm v10 built-in)
+pnpm format                     # prettier --write . (repo-wide)
 
 # Husky hook runs on every commit
-pnpm lint-staged                # ESLint on staged ts/tsx/js/jsx; Prettier on staged md/json/css
+pnpm -C frontend lint-staged    # ESLint --fix on staged frontend ts/tsx/js/jsx
+pnpm lint-staged                # Prettier --write on staged root md/json/yaml
 
-# shadcn/ui (once scaffolded)
-pnpm dlx shadcn@latest add <component>
+# Frontend-scoped commands (run directly in the workspace)
+pnpm -C frontend dlx shadcn@latest add <component>
+pnpm -C frontend add <pkg>
+pnpm -C frontend add -D <dev-pkg>
 
 # Google Cloud (do NOT run in Phase 0)
 gcloud auth login
@@ -97,7 +115,7 @@ git push origin main
 ## Code Style
 
 - **Naming:** `camelCase` for TS/JS variables and functions; `PascalCase` for React components and TS types; `snake_case` for Python modules, functions, and Pydantic field aliases only if required for external schemas.
-- **Imports:** Use the `@/*` alias for intra-frontend imports; keep component folder structure flat under `src/components/<domain>/`. shadcn/ui primitives live at `src/components/ui/`.
+- **Imports:** Use the `@/*` alias for intra-frontend imports; keep component folder structure flat under `frontend/src/components/<domain>/`. shadcn/ui primitives live at `frontend/src/components/ui/`.
 - **Server vs client components:** Default to server components; mark client components explicitly with `"use client"` at the top.
 - **Types:** No `any`. Prefer `unknown` + narrowing. Prefer Zod / Pydantic schemas at boundary points.
 - **Error handling:** Validate at system boundaries (user uploads, Gemini responses, Vertex AI Search hits). Do not wrap internal framework calls in try/catch.

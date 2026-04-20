@@ -127,14 +127,14 @@
 
 **Implementation — PO1 (Hao):**
 
-- [ ] Scaffold the Python package: `backend/pyproject.toml`, `backend/app/{__init__.py,main.py}`, `backend/app/schema/`, `backend/app/agents/`. Install `fastapi`, `uvicorn`, `google-adk==1.31.*`, `google-genai`, `pydantic==2.*`, `python-multipart`.
-- [ ] Define Pydantic v2 models in `backend/app/schema/`: `Profile`, `SchemeMatch` (with `rule_citations[]`), `Packet`, `ProvenanceRecord`. Follow `docs/trd.md` §3.
-- [ ] FastAPI entry at `backend/app/main.py`: `POST /api/agent/intake` accepts three `UploadFile` params (`ic`, `payslip`, `utility`); returns an SSE stream (`starlette.responses.EventSourceResponse` or manual `text/event-stream`).
-- [ ] ADK `SequentialAgent` in `backend/app/agents/root_agent.py` with 2 `FunctionTool`s for this task:
+- [x] Scaffold the Python package: `backend/pyproject.toml`, `backend/app/{__init__.py,main.py}`, `backend/app/schema/`, `backend/app/agents/`. Install `fastapi`, `uvicorn`, `google-adk==1.31.*`, `google-genai`, `pydantic==2.*`, `python-multipart`.
+- [x] Define Pydantic v2 models in `backend/app/schema/`: `Profile`, `SchemeMatch` (with `rule_citations[]`), `Packet`, `ProvenanceRecord`. Follow `docs/trd.md` §3. (Named `RuleCitation` to match TRD §3 field name `rule_citations`; the term `ProvenanceRecord` in the plan and `RuleCitation` in the code are aliases for the same model.)
+- [x] FastAPI entry at `backend/app/main.py`: `POST /api/agent/intake` accepts three `UploadFile` params (`ic`, `payslip`, `utility`); returns an SSE stream (`starlette.responses.EventSourceResponse` or manual `text/event-stream`). (Manual `text/event-stream` via `starlette.responses.StreamingResponse`.)
+- [x] ADK `SequentialAgent` in `backend/app/agents/root_agent.py` with 2 `FunctionTool`s for this task:
   - `extract_profile(ic, payslip, utility)` → returns a canned Aisyah `Profile` fixture (real Gemini wiring arrives in task 3).
   - `match_schemes(profile)` → returns 3 canned `SchemeMatch` objects (real rule engine arrives in task 4).
-- [ ] SSE event shape (lock this now — the frontend depends on it): `step_started {step}`, `step_result {step, data}`, `done {packet}`, `error {step, message}`.
-- [ ] Local smoke test: `curl -N -F ic=@fixtures/ic.pdf -F payslip=@fixtures/payslip.pdf -F utility=@fixtures/tnb.pdf http://localhost:8080/api/agent/intake` emits at least 4 events in under 3s and terminates cleanly.
+- [x] SSE event shape (lock this now — the frontend depends on it): `step_started {step}`, `step_result {step, data}`, `done {packet}`, `error {step, message}`. Discriminator key is `type` (e.g. `{"type":"step_started","step":"extract"}`) — documented at the top of `backend/app/schema/events.py` and `backend/app/main.py`.
+- [x] Local smoke test: `curl -N -F ic=@fixtures/ic.pdf -F payslip=@fixtures/payslip.pdf -F utility=@fixtures/tnb.pdf http://localhost:8080/api/agent/intake` emits at least 4 events in under 3s and terminates cleanly. **Result: 5 events in 573 ms** (2 × `step_started` + 2 × `step_result` + 1 × `done`).
 - [ ] Commit `feat(lambda): scaffold fastapi and adk sequentialagent with stub functiontools`.
 
 **Exit criteria:** service stands up on `:8080`; smoke-test curl streams a full SSE response with stubbed data; SSE event shape documented in a one-line comment in `backend/app/main.py` so PO2 can consume it.

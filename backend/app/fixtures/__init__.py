@@ -1,0 +1,3 @@
+from app.fixtures.aisyah import AISYAH_PROFILE, AISYAH_SCHEME_MATCHES
+
+__all__ = ["AISYAH_PROFILE", "AISYAH_SCHEME_MATCHES"]

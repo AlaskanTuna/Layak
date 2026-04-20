@@ -4,6 +4,23 @@
 
 ---
 
+## [20/04/26] - Scaffolded backend: Pydantic schemas, FastAPI SSE endpoint, ADK SequentialAgent with 2 stub FunctionTools
+
+- Installed Python 3.12.8 user-scope at `C:\Users\User\AppData\Local\Programs\Python\Python312` (TRD §6.3 pins 3.12; only 3.10 was present locally). Backend venv at `backend/.venv/`, gitignored via the existing `.venv/` rule (`.gitignore` line 133).
+- Declared deps in `backend/pyproject.toml`: `fastapi>=0.115`, `uvicorn[standard]>=0.30`, `pydantic>=2.7`, `python-multipart>=0.0.9`, `google-adk>=1.31,<1.32`, `google-genai>=1.0`. Optional `dev` extras: `pytest`, `pytest-asyncio`, `httpx`, `ruff`. Installed versions landed at `google-adk 1.31.0`, `google-genai 1.73.1`, `fastapi 0.136.0`, `pydantic 2.13.2`, `uvicorn 0.44.0`.
+- Wrote Pydantic v2 schemas under `backend/app/schema/`: `profile.py` (`Profile`, `Dependant`, `HouseholdFlags`, `HouseholdClassification`, `FormType`, `IncomeBand`, `Relationship`), `scheme.py` (`SchemeMatch`, `RuleCitation`, `SchemeId`), `packet.py` (`Packet`, `PacketDraft`), `events.py` (`StepStartedEvent`, `StepResultEvent`, `DoneEvent`, `ErrorEvent`, `ExtractResult`, `ClassifyResult`, `MatchResult`, `ComputeUpsideResult`, `GenerateResult`, discriminated `AgentEvent`). Every model uses `ConfigDict(extra="forbid")`. Privacy invariant enforced at the schema level — `Profile.ic_last4` is `Field(pattern=r"^\d{4}$")`, the only IC representation that may leave request-scope memory (NFR-3).
+- Locked SSE wire shape with `type` discriminator: `{"type":"step_started","step":...}`, `{"type":"step_result","step":...,"data":...}`, `{"type":"done","packet":...}`, `{"type":"error","step":...,"message":...}`. Documented at the top of `backend/app/schema/events.py` and `backend/app/main.py` so PO2's frontend SSE consumer reads the exact format.
+- Wrote the two stub FunctionTools under `backend/app/agents/tools/`: `extract.py` (`extract_profile(ic_bytes, payslip_bytes, utility_bytes) -> Profile`) and `match.py` (`match_schemes(profile) -> list[SchemeMatch]`). Both return the canned Aisyah fixture regardless of input. Real Gemini 2.5 Flash wiring lands in Phase 1 Task 3; real rule engine lands in Task 4.
+- Wrote canned fixture at `backend/app/fixtures/aisyah.py` — `AISYAH_PROFILE` (Form B filer, RM2,800/mo, 2 children under 18, father age 70) and `AISYAH_SCHEME_MATCHES` (STR 2026 RM1,200, JKM Warga Emas RM7,200, LHDN Form B five-relief tax delta RM1,008 → total RM9,408/yr, clears plan.md Task 4 headline ≥RM7,000/yr). Every `SchemeMatch` carries ≥1 `RuleCitation` pointing at one of the six committed PDFs under `backend/data/schemes/`.
+- Wrote `backend/app/agents/root_agent.py`: 2 `FunctionTool` instances wrapping the stubs, a `SequentialAgent` shell (`layak_root_agent`) with 2 placeholder `LlmAgent` sub-agents (no `model` set — structural stand-ins for Task 3's Gemini-backed replacements), and `stream_agent_events()` — a direct async orchestrator that bypasses `SequentialAgent.run_async()` and yields ordered SSE events from the stubs. Task 3 swaps this for the real ADK runner.
+- Wrote `backend/app/main.py` with `POST /api/agent/intake` (multipart `ic` + `payslip` + `utility`) streaming SSE via `StreamingResponse` with `Cache-Control: no-cache`, `X-Accel-Buffering: no`. CORS pinned to `http://localhost:3000` for dev wiring against the frontend Next.js origin. Also added `GET /healthz`.
+- Used `Annotated[UploadFile, File()]` instead of default-arg `File(...)` to satisfy `ruff B008` while keeping FastAPI's multipart detection.
+- **Ruff: `check` clean, `format --check` clean** across the 14 app files.
+- **Smoke test passed: 5 SSE events in 573 ms** (target ≥4 events in <3 s). Sequence: `step_started(extract)` → `step_result(extract, profile=Aisyah)` → `step_started(match)` → `step_result(match, 3 SchemeMatch)` → `done(empty Packet)`. Endpoint closes cleanly.
+- Deferred to matching tasks: `classify_household`, `compute_upside`, `generate_packet` tools (Task 3 / 5); `app/rules/` module (Task 4); WeasyPrint deps (Task 5); Dockerfile + Cloud Run deploy (Task 6).
+
+---
+
 ## [20/04/26] - Added indexed tables of contents to PRD and TRD
 
 - Added linked tables of contents to `docs/prd.md` and `docs/trd.md` so the section structure is easier to scan and jump between.

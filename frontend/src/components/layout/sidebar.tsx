@@ -38,7 +38,7 @@ export function Sidebar({ mobileOpen, onMobileClose }: SidebarProps) {
   function renderContent(isCollapsed: boolean) {
     return (
       <>
-        <div className="flex h-[var(--topbar-height)] shrink-0 items-center pl-4">
+        <div className="flex h-[var(--topbar-height)] shrink-0 items-center border-b border-[var(--glass-border)] pl-4">
           <Link href="/" className="flex items-center overflow-hidden" aria-label="Layak home">
             <BrandMark />
             <span

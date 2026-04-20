@@ -1,27 +1,30 @@
-"""Stub `match_schemes` FunctionTool for Phase 1 Task 1.
+"""`match_schemes` FunctionTool — delegates to the rule engine.
 
-Task 4 replaces this with a Pydantic rule engine covering STR 2026, JKM Warga Emas,
-and five LHDN Form B reliefs, each citing a source PDF via Vertex AI Search (Task 3).
-The stub returns the canned Aisyah matches so the SSE stream shape is stable and the
-frontend can be developed against a fixed expected output.
+Phase 1 Task 4 replaces the Task 1 stub with real rule-engine delegation. Each
+scheme's dedicated module (`app.rules.str_2026`, `app.rules.jkm_warga_emas`,
+`app.rules.lhdn_form_b`) exposes a `match(profile) -> SchemeMatch`. This tool
+composes the three and filters out non-qualifying matches so the frontend
+ranked list only surfaces the schemes the profile actually qualifies for.
 """
 
 from __future__ import annotations
 
-from app.fixtures.aisyah import AISYAH_SCHEME_MATCHES
+from app.rules import jkm_warga_emas, lhdn_form_b, str_2026
 from app.schema.profile import Profile
 from app.schema.scheme import SchemeMatch
+
+_RULES = (str_2026, jkm_warga_emas, lhdn_form_b)
 
 
 async def match_schemes(profile: Profile) -> list[SchemeMatch]:
     """Match a profile to eligible schemes with rule citations.
 
-    Args:
-        profile: Validated citizen profile from the extract step.
-
-    Returns:
-        A list of `SchemeMatch` objects, one per scheme the profile qualifies for.
-        Each match carries at least one `RuleCitation` (grounding invariant NFR-2).
+    Returns only qualifying `SchemeMatch`es, sorted descending by `annual_rm` so
+    the highest-upside schemes render first in the ranked list (docs/prd.md FR-6).
+    Non-qualifying matches are filtered out — the frontend can still render
+    out-of-scope schemes as `Checking… (v2)` cards per docs/prd.md §6.2.
     """
-    del profile
-    return AISYAH_SCHEME_MATCHES
+    results = [module.match(profile) for module in _RULES]
+    qualifying = [m for m in results if m.qualifies]
+    qualifying.sort(key=lambda m: m.annual_rm, reverse=True)
+    return qualifying

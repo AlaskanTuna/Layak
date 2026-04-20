@@ -203,19 +203,21 @@
 
 **Implementation — PO1 (Hao):**
 
-- [ ] `backend/app/rules/__init__.py` — re-exports `str_2026`, `jkm_warga_emas`, `lhdn_form_b`.
-- [ ] `backend/app/rules/str_2026.py` — household-with-children tier table from `risalah-str-2026.pdf`. Function: `match(profile) -> SchemeMatch`.
-- [ ] `backend/app/rules/jkm_warga_emas.py` — per-capita means test: `household_income / household_size ≤ food-PLI RM1,236` (DOSM 2024). Default rate RM600/month (Budget 2026); fallback copy RM500/month if the gazetted rate can't be confirmed in JKM18.
-- [ ] `backend/app/rules/lhdn_form_b.py` — five YA2025 reliefs per `pr-no-4-2024.pdf`: individual RM9,000; parent medical up to RM8,000; child #16a RM2,000 × 2; EPF+life #17 up to RM7,000; lifestyle #9 up to RM2,500. Reject any `ya != "ya_2025"` at import time.
-- [ ] **Each rule returns** `SchemeMatch.rule_citations[]` as `{rule_id, source_pdf, page_ref, passage_anchor}` — the frontend provenance panel consumes this verbatim.
-- [ ] **Unit tests** in `backend/tests/`:
+- [x] `backend/app/rules/__init__.py` — re-exports `str_2026`, `jkm_warga_emas`, `lhdn_form_b`.
+- [x] `backend/app/rules/str_2026.py` — household-with-children tier table from `risalah-str-2026.pdf`. Function: `match(profile) -> SchemeMatch`.
+- [x] `backend/app/rules/jkm_warga_emas.py` — per-capita means test: `household_income / household_size ≤ food-PLI RM1,236` (DOSM 2024). Default rate RM600/month (Budget 2026); fallback copy RM500/month if the gazetted rate can't be confirmed in JKM18.
+- [x] `backend/app/rules/lhdn_form_b.py` — five YA2025 reliefs per `pr-no-4-2024.pdf`: individual RM9,000; parent medical up to RM8,000; child #16a RM2,000 × 2; EPF+life #17 up to RM7,000; lifestyle #9 up to RM2,500. Reject any `ya != "ya_2025"` at import time. (Implemented as a module-level `SUPPORTED_YA = "ya_2025"` guarded by an `if`/`raise ImportError` so an edit to any other value trips at import.)
+- [x] **Each rule returns** `SchemeMatch.rule_citations[]` as `{rule_id, source_pdf, page_ref, passage_anchor}` — the frontend provenance panel consumes this verbatim. (Field is `passage` on `RuleCitation`, aligned with `docs/trd.md §3`; `passage_anchor` and `passage` are the same concept under different names in plan.md vs trd.md.)
+- [x] **Unit tests** in `backend/tests/`:
   - `test_str_2026.py` — asserts every tier threshold and child-count multiplier matches the PDF; Aisyah profile lands in the expected band.
   - `test_jkm_warga_emas.py` — Aisyah's father (age 70, household RM2,800 / 4 members = RM700/capita) qualifies.
   - `test_lhdn_form_b.py` — each relief returns its gazetted cap; Aisyah (two children + gig income + parent in household) triggers all five.
-- [ ] Run `pytest -q` from `backend/`; ensure green.
+- [x] Run `pytest -q` from `backend/`; ensure green. **Result: 34 passed in 2.75 s.**
 - [ ] Commit `feat(lambda): encode str jkm lhdn rule engine with unit tests`.
 
 **Exit criteria:** all three modules expose `match(profile) -> SchemeMatch` with populated `rule_citations`; `pytest` green; Aisyah's combined matches sum to ≥ RM7,000/year (PRD headline sanity target); `match_schemes` FunctionTool from task 3 delegates here instead of stubs.
+
+_All four exit-criteria items met: Aisyah total = **RM8,208/year** (STR RM450 + JKM Warga Emas RM7,200 + LHDN Form B RM558); `backend/app/agents/tools/match.py` now delegates to the rule engine, sorts descending by `annual_rm`, and filters non-qualifying matches out._
 
 ---
 

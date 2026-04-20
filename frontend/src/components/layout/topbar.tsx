@@ -3,6 +3,7 @@
 import Link from 'next/link'
 
 import { BrandMark } from '@/components/layout/brand-mark'
+import { Breadcrumbs } from '@/components/layout/breadcrumbs'
 import { NotificationMenu } from '@/components/layout/notification-menu'
 import { MobileMenuButton } from '@/components/layout/sidebar'
 import { ThemeToggle } from '@/components/layout/theme-toggle'
@@ -20,6 +21,7 @@ export function Topbar({ onMenuClick }: TopbarProps) {
         <BrandMark size="sm" />
         <span className="font-heading text-base font-semibold tracking-tight">Layak</span>
       </Link>
+      <Breadcrumbs />
       <div className="ml-auto flex items-center gap-1">
         <ThemeToggle />
         <NotificationMenu />

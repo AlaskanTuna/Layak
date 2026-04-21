@@ -180,6 +180,7 @@ export function ManualEntryForm({ onSubmit, onUseSamples, disabled = false, pref
             </Field>
             <Field label="Employment type" error={formState.errors.employment_type?.message}>
               <fieldset className="flex flex-col gap-1.5" disabled={disabled}>
+                <legend className="sr-only">Employment type</legend>
                 <label className="flex items-start gap-2 text-sm">
                   <input type="radio" value="gig" {...register('employment_type')} className="mt-1" />
                   <span>

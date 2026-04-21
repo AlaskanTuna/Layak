@@ -52,6 +52,7 @@ export function EvaluationUploadClient() {
 
   function handleReset() {
     setDemoMode(false)
+    setMode(initialMode)
     reset()
   }
 
@@ -78,7 +79,9 @@ export function EvaluationUploadClient() {
           {showError && (
             <ErrorRecoveryCard
               message={state.error ?? 'Unknown error.'}
-              onUseSamples={mode === 'manual' ? handleUseSamplesManual : handleUseSamplesUpload}
+              // Error-recovery "Use samples" always falls back to the known-good
+              // mock-replay path, regardless of which intake mode failed.
+              onUseSamples={handleUseSamplesUpload}
               onReset={handleReset}
             />
           )}

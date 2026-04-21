@@ -467,6 +467,40 @@ _All four exit-criteria items met: Aisyah total = **RM8,208/year** (STR RM450 + 
 
 **Exit criteria:** the sample-documents button uses the real upload path and still works when mock SSE is disabled.
 
+### 6. Feature: Manual Entry Mode (privacy alternative to document upload)
+
+**Owner:** PO1 (Hao). **Depends on:** Phase 1 Task 4 rule engine (stable), Phase 1 Task 5 classify/match/compute_upside/generate tools accepting a fully-populated `Profile` (stable). **Does NOT depend on** Phase 2 Task 4 or any later Phase 3/4 task — self-contained parallel track.
+
+**Purpose/Issue:** Privacy-cautious users bounce at the "upload MyKad / payslip / TNB" step. This task adds an intake-page toggle that swaps the three upload cards for a structured form collecting the same data the OCR step would produce, weakening the privacy invariant from "we briefly touch the documents" to "we never touch them at all." Design spec: `docs/superpowers/specs/2026-04-21-manual-entry-mode-design.md`. PRD: FR-21.
+
+**Implementation — PO1 (Hao):**
+
+_Backend:_
+
+- [ ] Add `backend/app/schema/manual_entry.py` — a Pydantic `ManualEntryPayload` model matching §3.4 of the design spec (name, date_of_birth, ic_last4, monthly_income_rm, employment_type, address, dependants).
+- [ ] Add `backend/app/agents/tools/build_profile.py` with two helpers:
+  - [ ] `derive_household_flags(monthly_income_rm, dependants) -> HouseholdFlags` — pure-Python reimplementation of the income-band / children-under-18 / elderly-dependant logic the extract Gemini prompt applies today. The Aisyah case (RM2,800 + 2 children + 1 elderly parent) **must** return `income_band="b40_household_with_children"`, `has_children_under_18=True`, `has_elderly_dependant=True`.
+  - [ ] `build_profile_from_manual_entry(payload)` — derives `age` from DOB in `asia-southeast1` TZ, maps `employment_type` to `form_type` (`gig → form_b`, `salaried → form_be`), sets `household_size = 1 + len(dependants)`, calls `derive_household_flags`, constructs the `Profile`. No Gemini call.
+- [ ] Add `POST /api/agent/intake_manual` to `backend/app/main.py` — JSON body, same SSE response format as `/api/agent/intake`, emits a synthetic `step_started`/`step_result` pair for `extract` carrying the built Profile, then runs the existing classify → match → compute_upside → generate pipeline unchanged. Inherits the same auth policy as `/api/agent/intake` (unauthed v1, authed v2).
+- [ ] Unit tests `backend/tests/test_manual_entry.py`:
+  - [ ] `build_profile_from_manual_entry(aisyah_payload) == AISYAH_PROFILE` — field-for-field, including `household_flags.income_band`. Pins the income-band heuristic to the fixture.
+  - [ ] Feeding that built Profile through `match_schemes(...)` produces `AISYAH_SCHEME_MATCHES`. Regression protection on the rule-engine side of the round-trip.
+  - [ ] 422 boundary tests for every validation rule: name empty, bad DOB format / future DOB / < 0 years old, `ic_last4` not 4 digits, `monthly_income_rm` negative / over sanity cap, `employment_type` not in `{gig, salaried}`, relationship enum out of range, > 15 dependants, address over 500 chars.
+  - [ ] SSE shape assertion on the happy path: `extract` step_result carries `{profile: Profile}` whose `model_dump()` equals what the upload path would have emitted.
+
+_Frontend:_
+
+- [ ] Add `frontend/src/components/evaluation/intake-mode-toggle.tsx` — segmented toggle with `"upload"` (default) and `"manual"` states; `?mode=manual` query preloads the manual tab.
+- [ ] Add `frontend/src/components/evaluation/manual-entry-form.tsx` — react-hook-form + zod schema mirroring the backend validation rules; four sections (Identity / Income / Address / Household) with a dynamic dependants list ("Add dependant" button).
+- [ ] Update `frontend/src/hooks/use-agent-pipeline.ts` — extend `StartOptions` with `{ mode: 'manual'; payload: ManualEntryPayload }` and add a `startManual` path that POSTs JSON to `/api/agent/intake_manual` and reuses `parseSseStream`.
+- [ ] Update the stepper label to render "Profile prepared" (not "Extracted") when the pipeline was started in manual mode.
+- [ ] Wire "Use Aisyah sample documents" in manual mode to pre-fill every field from the frontend fixture (not auto-submit).
+- [ ] Commit in two chunks: `feat(lambda): add /api/agent/intake_manual endpoint and manual-entry profile builder`, `feat(ui): add manual-entry form and intake-mode toggle`.
+
+**Sizing estimate:** ~6-10 hours realistic for one PO1 working solo — ~3h backend (schema + build_profile + route + tests) + ~5h frontend (toggle + form + hook + pre-fill + stepper-label) assuming react-hook-form + zod is already wired (add 1-2h if not). Buffer for the income-band heuristic sync.
+
+**Exit criteria:** landing page shows the toggle; typing the Aisyah values into the manual form and clicking **Generate packet** produces the same ranked-scheme list, total RM upside, and provenance citations as the upload path against the Aisyah fixture documents; no full IC number crosses the wire; all tests green; ruff clean.
+
 ---
 
 ## Phase 4: Dashboard UX (History, Stats, Settings)

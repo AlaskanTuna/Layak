@@ -227,6 +227,19 @@ A single end-to-end journey from upload to download, narrated at component level
 9. On completion, backend writes the final state, emits `done`, and the frontend routes to `/dashboard/evaluation/results/[id]`.
 10. `/results/[id]` reads the Firestore document first; on refresh or deep-link it falls back to Firestore realtime updates until the doc is complete.
 
+### 4.2 Manual Entry alternate flow (FR-21)
+
+Privacy-first alternative to §4 for users unwilling to upload the documents themselves. Design spec: `docs/superpowers/specs/2026-04-21-manual-entry-mode-design.md`.
+
+1. On the intake page, the user switches the segmented toggle to **Enter manually**. The three upload cards are replaced by a four-section form (Identity / Income / Address / Household).
+2. The user types: full name, date of birth, IC last-4, monthly income RM, employment type (gig vs. salaried), optional address, and a dynamic list of dependants (relationship + age + optional IC last-4). Household size is derived on the server as `1 + len(dependants)` and never entered directly.
+3. Next.js POSTs `application/json` to `/api/agent/intake_manual` instead of multipart `/api/agent/intake`. In v2 the same `Authorization: Bearer` header is attached.
+4. FastAPI validates the payload through a Pydantic `ManualEntryPayload` model and builds a `Profile` via `backend/app/agents/tools/build_profile.py::build_profile_from_manual_entry` — no Gemini call.
+5. The backend opens the same SSE response, emits a synthetic `step_started`/`step_result` pair for the `extract` step whose `data.profile` is the built `Profile`, then runs classify → match → compute_upside → generate **unchanged**. The UI stepper renders all five steps with the extract-step label changed to "Profile prepared".
+6. No full IC number is transmitted. Only `ic_last4` and `date_of_birth` are accepted as identity inputs; `age` is derived server-side in the `asia-southeast1` timezone.
+7. Endpoint auth parity: v1 intake is unauthed → manual endpoint is unauthed; v2 intake is authed → manual endpoint is authed. No feature-specific bypass.
+8. Persistence (v2): the resulting `evaluations/{evalId}` is indistinguishable from an upload-path evaluation, so the history view, results page, and PDPA export/delete cascades treat both modes as one.
+
 ## 5. Google AI Ecosystem Integration
 
 ### 5.1 Model routing

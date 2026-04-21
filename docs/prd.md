@@ -40,6 +40,7 @@
    18. [FR-18 — Nightly 30-day free-tier prune (Cloud Scheduler + Cloud Run Job)](#fr-18--nightly-30-day-free-tier-prune-cloud-scheduler--cloud-run-job)
    19. [FR-19 — Marketing landing page at /](#fr-19--marketing-landing-page-at-)
    20. [FR-20 — Privacy notice + terms pages (/privacy, /terms)](#fr-20--privacy-notice--terms-pages-privacy-terms)
+   21. [FR-21 — Manual Entry Mode (privacy alternative to document upload)](#fr-21--manual-entry-mode-privacy-alternative-to-document-upload)
 5. [Non-Functional Requirements](#5-non-functional-requirements)
    1. [NFR-1 — Performance](#nfr-1--performance)
    2. [NFR-2 — Grounding & transparency](#nfr-2--grounding--transparency)
@@ -348,6 +349,24 @@ Each requirement below ties to one of the in-scope v1 and v2 deliverables. Accep
 - [ ] `/terms` renders a static terms page.
 - [ ] Both pages are reachable from the landing footer.
 - [ ] The sign-up consent copy references the privacy notice.
+
+### FR-21 — Manual Entry Mode (privacy alternative to document upload)
+
+**Description.** An intake-page toggle lets users replace the three document uploads with a structured form that collects the same fields the OCR step would produce. Users who are unwilling to hand their MyKad / payslip / utility bill to an LLM can type the information instead, and the five-step pipeline runs unchanged from classify onward. Design spec: `docs/superpowers/specs/2026-04-21-manual-entry-mode-design.md`.
+
+**Acceptance criteria:**
+
+- [ ] The intake page exposes a segmented toggle with "Upload documents" (default) and "Enter manually" options, visible on both the v1 landing and the v2 `/dashboard/evaluation/new` route.
+- [ ] The manual form has four sections — Identity (full name, date of birth, IC last-4), Income (monthly RM, employment type), Address (optional), Household (dynamic dependants list: relationship + age + optional IC last-4).
+- [ ] Household size is derived server-side as `1 + len(dependants)` and never asked for directly.
+- [ ] No full IC number is transmitted on the wire — only `ic_last4` and `date_of_birth` are accepted as identity inputs.
+- [ ] `employment_type` is a two-value input (`"gig"` or `"salaried"`) and maps server-side to `Profile.form_type` — `gig → form_b`, `salaried → form_be`.
+- [ ] `build_profile_from_manual_entry` applied to the Aisyah payload produces a `Profile` equal to `AISYAH_PROFILE` field-for-field, including `household_flags.income_band`. Feeding that built Profile through the rule engine produces `AISYAH_SCHEME_MATCHES` — the same ranked schemes and total RM upside the upload path produces.
+- [ ] Validation errors return HTTP 422 with field-level messages the form can bind to.
+- [ ] "Use Aisyah sample documents" in manual mode pre-fills every form field with the fixture values and is idempotent on repeat clicks.
+- [ ] `?mode=manual` query parameter preloads the manual tab on first paint.
+- [ ] The stepper still shows all five steps; the `extract` step label reads "Profile prepared" in manual mode.
+- [ ] The manual path inherits whatever auth policy applies to `/api/agent/intake` at the time (unauthed in v1, authed in v2).
 
 ## 5. Non-Functional Requirements
 

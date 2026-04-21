@@ -2,11 +2,11 @@
 <html lang="ms">
   <head>
     <meta charset="utf-8" />
-    <title>TNB · Bil Elektrik (synthetic) — Farhan bin Razak</title>
+    <title>TNB · Bil Elektrik (synthetic) — Farhan bin Mohd Yusof</title>
     <style>
       @page {
         size: A4;
-        margin: 12mm;
+        margin: 14mm;
       }
 
       * {
@@ -35,22 +35,23 @@
       .page {
         width: 210mm;
         min-height: 297mm;
-        background: #ffffff;
+        background: #fff;
         padding: 9mm 10mm 10mm;
         position: relative;
-        box-shadow: 0 8px 28px rgba(0, 0, 0, 0.08);
         overflow: hidden;
         display: flex;
         flex-direction: column;
         gap: 4mm;
+        box-shadow: 0 8px 28px rgba(0, 0, 0, 0.08);
       }
 
       @media print {
         body {
-          background: #ffffff;
+          background: #fff;
           padding: 0;
           display: block;
         }
+
         .page {
           width: auto;
           min-height: auto;
@@ -60,7 +61,6 @@
         }
       }
 
-      /* ── Header ───────────────────────────────────────────────────────── */
       header.top {
         display: flex;
         justify-content: space-between;
@@ -69,7 +69,7 @@
 
       .pill {
         background: #0a3d7e;
-        color: #ffffff;
+        color: #fff;
         padding: 2mm 6mm;
         border-radius: 3mm;
         font-size: 4mm;
@@ -86,12 +86,12 @@
       .brand-mark {
         width: 10mm;
         height: 10mm;
-        background: #d92e2a;
-        border-radius: 1.4mm;
-        color: #ffffff;
         display: flex;
         align-items: center;
         justify-content: center;
+        border-radius: 1.4mm;
+        background: #d92e2a;
+        color: #fff;
       }
 
       .brand-mark svg {
@@ -108,10 +108,9 @@
         line-height: 1.05;
       }
 
-      /* ── Customer / bill grid ─────────────────────────────────────────── */
       .info-grid {
         display: grid;
-        grid-template-columns: 1.4fr 1fr 1fr;
+        grid-template-columns: 1.3fr 1fr 1fr;
         gap: 3mm;
       }
 
@@ -154,7 +153,6 @@
         line-height: 1.35;
       }
 
-      /* ── Barcode + JomPAY row ─────────────────────────────────────────── */
       .scan-row {
         display: grid;
         grid-template-columns: 1.6fr 1fr;
@@ -188,7 +186,6 @@
           #111 2.6mm 3mm,
           transparent 3mm 3.4mm
         );
-        background-size: 100% 100%;
       }
 
       .barcode-num {
@@ -196,7 +193,6 @@
         color: #1a2540;
         letter-spacing: 0.25mm;
         font-family: 'Courier New', Courier, monospace;
-        text-align: left;
       }
 
       .jompay {
@@ -211,7 +207,7 @@
 
       .jompay-badge {
         background: #0a3d7e;
-        color: #ffffff;
+        color: #fff;
         font-size: 3.8mm;
         font-weight: 500;
         letter-spacing: 0.3mm;
@@ -252,7 +248,6 @@
         margin-top: 0.6mm;
       }
 
-      /* ── Payment area: Jumlah Bil + Ringkasan ─────────────────────────── */
       .pay-area {
         display: grid;
         grid-template-columns: 58mm 1fr;
@@ -261,7 +256,7 @@
 
       .amount-card {
         background: #0a3d7e;
-        color: #ffffff;
+        color: #fff;
         padding: 4mm 5mm;
         border-radius: 1.8mm;
         display: flex;
@@ -282,7 +277,7 @@
       }
 
       .amount-card .cta {
-        background: #ffffff;
+        background: #fff;
         color: #0a3d7e;
         font-weight: 500;
         text-align: center;
@@ -326,7 +321,7 @@
       }
 
       .summary-card {
-        background: #ffffff;
+        background: #fff;
         border: 0.3mm solid #c5d1e4;
         border-radius: 1.4mm;
         padding: 2.5mm 3mm;
@@ -353,20 +348,18 @@
       .summary .hint {
         font-size: 2.3mm;
         color: #6b758a;
-        letter-spacing: 0.1mm;
       }
 
-      /* ── 6-month chart ────────────────────────────────────────────────── */
       .chart-block {
         border-top: 0.3mm solid #e1e6ef;
         padding-top: 3mm;
       }
 
       .chart-title {
+        margin-bottom: 2mm;
         font-size: 3.2mm;
         color: #0a3d7e;
         letter-spacing: 0.2mm;
-        margin-bottom: 2mm;
       }
 
       .chart-grid {
@@ -391,22 +384,21 @@
         align-items: center;
         justify-content: flex-end;
         padding-right: 2mm;
-        color: #ffffff;
+        color: #fff;
         font-size: 2.5mm;
         font-variant-numeric: tabular-nums;
       }
 
-      /* ── Maklumat Tambahan ────────────────────────────────────────────── */
       .extra-block {
         border-top: 0.3mm solid #e1e6ef;
         padding-top: 3mm;
       }
 
       .extra-title {
+        margin-bottom: 2mm;
         font-size: 3.2mm;
         color: #0a3d7e;
         letter-spacing: 0.2mm;
-        margin-bottom: 2mm;
       }
 
       .extra-grid {
@@ -433,15 +425,13 @@
         font-variant-numeric: tabular-nums;
       }
 
-      /* ── Tip banner ───────────────────────────────────────────────────── */
       .tip-banner {
         position: relative;
         margin-top: auto;
         background: #0a3d7e;
-        color: #ffffff;
+        color: #fff;
         border-radius: 1.8mm;
         padding: 4mm 6mm;
-        overflow: hidden;
         display: grid;
         grid-template-columns: 1fr 36mm;
         gap: 4mm;
@@ -455,37 +445,40 @@
       }
 
       .tip-sub {
+        margin-top: 1.4mm;
         font-size: 2.8mm;
         opacity: 0.92;
-        margin-top: 1.4mm;
         font-style: italic;
       }
 
       .tip-photo {
         position: relative;
         height: 18mm;
-        background:
-          linear-gradient(135deg, rgba(255, 255, 255, 0.15), transparent 50%),
-          linear-gradient(180deg, #3a5a8a 0%, #24396a 100%);
-        border-radius: 1.2mm;
         overflow: hidden;
+        border-radius: 1.2mm;
+        background: linear-gradient(180deg, #3a5a8a 0%, #24396a 100%);
       }
 
-      .tip-photo img {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-        display: block;
-        filter: saturate(0.95) contrast(1.02) brightness(0.95);
-      }
-
-      .tip-photo .tip-overlay {
+      .tip-photo::before {
+        content: '';
         position: absolute;
-        inset: 0;
-        background: linear-gradient(180deg, rgba(10, 61, 126, 0.18), rgba(10, 61, 126, 0.5));
+        inset: auto 4mm 0 4mm;
+        height: 10mm;
+        border-radius: 1mm 1mm 0 0;
+        background: linear-gradient(180deg, #efefef 0%, #c9d3df 100%);
       }
 
-      /* ── Footer ───────────────────────────────────────────────────────── */
+      .tip-photo::after {
+        content: 'TERRACE HOUSE';
+        position: absolute;
+        left: 50%;
+        top: 4mm;
+        transform: translateX(-50%);
+        font-size: 2mm;
+        letter-spacing: 0.3mm;
+        color: rgba(255, 255, 255, 0.9);
+      }
+
       footer.legal {
         display: grid;
         grid-template-columns: 1fr auto;
@@ -497,7 +490,6 @@
         line-height: 1.45;
       }
 
-      /* ── Watermark ────────────────────────────────────────────────────── */
       .wm-layer {
         position: absolute;
         inset: 0;
@@ -560,10 +552,10 @@
             <div class="field-body">
               <div class="label">Alamat Pos</div>
               <div class="value">
-                Farhan bin Razak<br />
-                No. 18, Jalan Setia Jaya 3/2<br />
-                Bandar Indera Mahkota<br />
-                40170 Shah Alam, Selangor
+                Cikgu Farhan bin Mohd Yusof<br />
+                No. 24, Jalan Putera 3/2<br />
+                Taman Putera Subang<br />
+                47600 Subang Jaya, Selangor
               </div>
             </div>
           </div>
@@ -591,7 +583,7 @@
             <span class="field-icon" aria-hidden="true"></span>
             <div class="field-body">
               <div class="label">No. Invois</div>
-              <div class="value">TNB-2026-03-0820012</div>
+              <div class="value">TNB-2026-03-FMY-2405</div>
             </div>
           </div>
           <div class="field">
@@ -608,7 +600,7 @@
             <span class="field-icon" aria-hidden="true"></span>
             <div class="field-body">
               <div class="label">No. Akaun</div>
-              <div class="value">081-0076-2241</div>
+              <div class="value">083-4124-7751</div>
             </div>
           </div>
           <div class="field">
@@ -622,17 +614,14 @@
             <span class="field-icon" aria-hidden="true"></span>
             <div class="field-body">
               <div class="label">Tarif</div>
-              <div class="value">Domestik (A)</div>
+              <div class="value">Tarif A — Domestic</div>
             </div>
           </div>
           <div class="field">
             <span class="field-icon" aria-hidden="true"></span>
             <div class="field-body">
-              <div class="label">Jumlah Bayaran Diterima</div>
-              <div class="value">
-                Tempoh 11.02.2026 – 11.03.2026<br />
-                RM74.80
-              </div>
+              <div class="label">Rumah</div>
+              <div class="value">Double-storey terrace</div>
             </div>
           </div>
         </div>
@@ -642,7 +631,7 @@
         <div class="scan-box">
           <div class="scan-title">Sila Imbas bagi pembayaran di Kios @Kedai Tenaga</div>
           <div class="barcode" aria-hidden="true"></div>
-          <div class="barcode-num">0820012345600265 04262026 04302026 007246 001</div>
+          <div class="barcode-num">0834124775100265 04262026 04302026 015240 001</div>
         </div>
 
         <div class="jompay">
@@ -654,12 +643,10 @@
             <dt>Biller Code:</dt>
             <dd>9191</dd>
             <dt>Ref-1:</dt>
-            <dd>081-0076-2241</dd>
+            <dd>083-4124-7751</dd>
             <dt>Ref-2:</dt>
-            <dd>TNB-2026-03-0820012</dd>
-            <div class="foot">
-              JomPAY di Perbankan Internet dan Telefon Mudah dengan akaun semasa, simpanan atau kad kredit.
-            </div>
+            <dd>TNB-2026-03-FMY-2405</dd>
+            <div class="foot">JomPAY di perbankan internet dan telefon mudah dengan akaun semasa, simpanan atau kad kredit.</div>
           </dl>
         </div>
       </section>
@@ -667,10 +654,10 @@
       <section class="pay-area">
         <div class="amount-card">
           <div class="label">Jumlah Bil Anda</div>
-          <div class="amount">RM72.46</div>
+          <div class="amount">RM152.40</div>
           <div class="cta">KLIK DISINI UNTUK PEMBAYARAN</div>
-          <div class="due">Sila Bayar Sebelum</div>
-          <div class="due-date">30 April 2026</div>
+          <div class="due">Sila Bayar Pada atau Sebelum</div>
+          <div class="due-date">26 April 2026</div>
         </div>
 
         <div class="summary">
@@ -683,7 +670,7 @@
             <div class="op">+</div>
             <div class="summary-card">
               <div class="small">Caj Semasa (RM)</div>
-              <div class="val">72.46</div>
+              <div class="val">152.40</div>
             </div>
             <div class="op">+</div>
             <div class="summary-card">
@@ -698,18 +685,12 @@
       <section class="chart-block">
         <div class="chart-title">Caj Elektrik Anda Bagi Tempoh 6 Bulan</div>
         <div class="chart-grid">
-          <div class="m">OKT</div>
-          <div class="bar" style="width: 78%">RM 68.50</div>
-          <div class="m">NOV</div>
-          <div class="bar" style="width: 82%">RM 71.20</div>
-          <div class="m">DIS</div>
-          <div class="bar" style="width: 90%">RM 75.80</div>
-          <div class="m">JAN</div>
-          <div class="bar" style="width: 86%">RM 73.40</div>
-          <div class="m">FEB</div>
-          <div class="bar" style="width: 81%">RM 70.90</div>
-          <div class="m">MAC</div>
-          <div class="bar" style="width: 84%">RM 72.46</div>
+          <div class="m">OKT</div><div class="bar" style="width: 74%">RM 138.60</div>
+          <div class="m">NOV</div><div class="bar" style="width: 77%">RM 142.20</div>
+          <div class="m">DIS</div><div class="bar" style="width: 79%">RM 145.90</div>
+          <div class="m">JAN</div><div class="bar" style="width: 81%">RM 148.10</div>
+          <div class="m">FEB</div><div class="bar" style="width: 83%">RM 150.60</div>
+          <div class="m">MAC</div><div class="bar" style="width: 85%">RM 152.40</div>
         </div>
       </section>
 
@@ -717,32 +698,14 @@
         <div class="extra-title">Maklumat Tambahan untuk Anda</div>
         <div class="extra-grid">
           <div>
-            <div class="extra-row">
-              <span class="lbl">Bacaan Semasa</span>
-              <span class="val">4,501 kWh</span>
-            </div>
-            <div class="extra-row">
-              <span class="lbl">Bacaan Terdahulu</span>
-              <span class="val">4,218 kWh</span>
-            </div>
-            <div class="extra-row">
-              <span class="lbl">Jumlah Penggunaan</span>
-              <span class="val">283 kWh</span>
-            </div>
+            <div class="extra-row"><span class="lbl">Bacaan Semasa</span><span class="val">8,742 kWh</span></div>
+            <div class="extra-row"><span class="lbl">Bacaan Terdahulu</span><span class="val">8,362 kWh</span></div>
+            <div class="extra-row"><span class="lbl">Jumlah Penggunaan</span><span class="val">380 kWh</span></div>
           </div>
           <div>
-            <div class="extra-row">
-              <span class="lbl">First 200 kWh @ RM0.218</span>
-              <span class="val">RM 43.60</span>
-            </div>
-            <div class="extra-row">
-              <span class="lbl">Next 83 kWh @ RM0.334</span>
-              <span class="val">RM 27.72</span>
-            </div>
-            <div class="extra-row">
-              <span class="lbl">KWTBB 1.6%</span>
-              <span class="val">RM 1.14</span>
-            </div>
+            <div class="extra-row"><span class="lbl">First 200 kWh</span><span class="val">RM 43.60</span></div>
+            <div class="extra-row"><span class="lbl">Next 180 kWh</span><span class="val">RM 73.80</span></div>
+            <div class="extra-row"><span class="lbl">ICPT + KWTBB</span><span class="val">RM 34.78</span></div>
           </div>
         </div>
       </section>
@@ -750,15 +713,9 @@
       <section class="tip-banner">
         <div>
           <div class="tip-title">TIP MENINGKATKAN KECEKAPAN TENAGA</div>
-          <div class="tip-sub">Matikan lampu jika tidak digunakan.</div>
+          <div class="tip-sub">Gunakan lampu LED dan tetapkan penghawa dingin pada suhu sederhana.</div>
         </div>
-        <div class="tip-photo">
-          <img
-            src="https://images.unsplash.com/photo-1509395176047-4a66953fd231?auto=format&fit=crop&w=800&q=80"
-            alt="Sample lightbulb image for the TNB energy-saving tip"
-          />
-          <div class="tip-overlay" aria-hidden="true"></div>
-        </div>
+        <div class="tip-photo" aria-hidden="true"></div>
       </section>
 
       <footer class="legal">
@@ -771,8 +728,8 @@
       </footer>
 
       <div class="wm-layer" aria-hidden="true">
-        <span class="wm top">For Demo</span>
-        <span class="wm bot">For Demo</span>
+        <span class="wm top">SYNTHETIC — FOR DEMO ONLY</span>
+        <span class="wm bot">SYNTHETIC — FOR DEMO ONLY</span>
       </div>
     </div>
   </body>

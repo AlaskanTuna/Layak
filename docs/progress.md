@@ -4,6 +4,25 @@
 
 ---
 
+## [21/04/26] - Phase 2 Task 4 PO1: auth-gate re-enable + integration smoke runbook (browser check pending)
+
+PO1's half of Phase 2 Task 4 — the automated parts of the integration smoke plus the final un-bridging of the auth gate. Live browser check (fresh-browser sign-in flow) still owned jointly by PO1 + PO2 per the Task 4 "Both" owner line.
+
+- **Un-bridged the auth gate in `backend/app/main.py`.** Removed the `PHASE-2-TASK-3-BRIDGE` comment block and the two commented-out `user: CurrentUser` lines; restored the `from app.auth import CurrentUser` import, made `user: CurrentUser` the first signature parameter on both `/api/agent/intake` and `/api/agent/intake_manual`, and threaded `_ = user` through as a Phase 3 placeholder on both routes. `backend/tests/test_manual_entry.py` restored the `test_intake_manual_rejects_missing_auth` 401-assertion (had been removed during the bridge window, replaced with a stub comment that's now gone).
+- **Live backend smoke captured as runbook §3** (`docs/runbook.md`). Five automated checks (three curl, one multipart curl, one Firestore list):
+  - `GET /health` → HTTP 200, `{"status":"ok","version":"0.1.0"}` ✓
+  - `POST /api/agent/intake_manual` (valid JSON body, no bearer) → **401** (auth gate active; was 200 streaming the full pipeline BEFORE the cleanup — prior bridge deployment let unauthed traffic through)
+  - `POST /api/agent/intake_manual` (valid JSON body, malformed bearer) → **401**
+  - `POST /api/agent/intake` (multipart body, no bearer) → **401**
+  - `gcloud firestore documents list --collection=users --project=layak-myaifuturehackathon` → enumerates (empty on fresh project; populates after first authed sign-in).
+- **Live browser check deferred to joint PO1+PO2 session.** Five checkboxes documented in runbook §3.3 covering the browser path: fresh profile → OAuth → `/dashboard` auto-renders → `users/{uid}` Firestore doc appears → authed SSE POST carries Bearer header → sign-out redirects.
+- **Why this matters.** Before the un-bridge, the PO2 follow-up deploy had the Firebase Admin secret mounted but intake routes were still bypassing `Depends(current_user)` — so real uploads silently ran as anonymous. PO1's Task 4 work closes that hole by flipping the gate on and verifying the 401 behaviour end-to-end against the deployed revision.
+- **Commit message:** `feat(auth): re-enable bearer auth on intake endpoints; add phase 2 task 4 smoke runbook`.
+- **Backend checks:** pytest 88/88 green; ruff clean. `test_intake_manual_rejects_missing_auth` passes against the restored gate.
+- **Audit (two subagents in parallel)**: correctness audit of the auth un-bridge + forward-compat audit against Phase 3 evaluations persistence. No Criticals flagged (see audit summary in chat).
+
+---
+
 ## [21/04/26] - Phase 2 Task 2 follow-up: Firebase Admin secret live, backend + frontend redeployed via CI/CD
 
 PO2 completed the last deferred checkbox of Phase 2 Task 2 on PO1's behalf. Firebase Admin SDK is now fully configured in production, the backend deployment carries the Admin key via Secret Manager, and both services were redeployed together through the freshly-minted GitHub Actions workflow so the auth-enforcing backend and the Firebase-signed-in frontend cut over as one release.

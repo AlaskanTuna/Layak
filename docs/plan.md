@@ -384,9 +384,9 @@ _All four exit-criteria items met: Aisyah total = **RM8,208/year** (STR RM450 + 
 
 **Implementation — Both:**
 
-- [ ] Sign in from a fresh browser profile, then confirm `/dashboard` renders without a manual refresh.
-- [ ] Confirm `users/{userId}` exists in Firestore after the first authed request.
-- [ ] Hit one backend endpoint with the injected bearer token and verify the response is 200, not a redirect or anonymous fallback.
+- [x] **Automated backend smoke** (PO1) — `docs/runbook.md` §3.1 captures five curl checks: `/health` → 200; `/api/agent/intake_manual` without bearer → **401**; with malformed bearer → **401**; multipart `/api/agent/intake` without bearer → **401**; Firestore `users` collection is reachable via `gcloud firestore documents list`. All five automatable checks pass post-deploy.
+- [x] **Auth gate re-enable + redeploy** (PO1) — removed the `PHASE-2-TASK-3-BRIDGE` block in `backend/app/main.py` and restored `user: CurrentUser` on both `/api/agent/intake` and `/api/agent/intake_manual`. Restored the `test_intake_manual_rejects_missing_auth` 401 assertion. Pushed to `main`; CI/CD (`cloud-run-deploy.yml`) auto-deployed the auth-gated backend revision. Live smoke confirms no-auth requests now return 401 (they streamed the full pipeline before the cleanup).
+- [ ] **Live browser check** (Both — Adam + Hao) — five manual checkboxes captured in `docs/runbook.md` §3.3: fresh-browser sign-in → `/dashboard` renders without refresh → gcloud confirms `users/{uid}` doc populated → DevTools Network shows Bearer-authed `POST /api/agent/intake_manual` returns 200 SSE stream → sign-out redirects back to `/sign-in`. **Owns by both; tick when executed jointly pre-demo.**
 
 **Exit criteria:** fresh browser → Google sign-in → `/dashboard` renders → user doc exists → authed fetch succeeds.
 
@@ -492,7 +492,7 @@ _Frontend:_
 - [x] Update `frontend/src/components/evaluation/pipeline-stepper.tsx` with a `labelOverrides` prop; manual mode passes `{ extract: 'Profile prepared' }` to make the step label accurate.
 - [x] Update `frontend/src/components/evaluation/evaluation-upload-client.tsx` to host the toggle, route between UploadWidget and ManualEntryForm, and pass the label overrides down. `?mode=manual` query param honoured on initial render.
 - [x] Wire "Use Aisyah sample data" inside `ManualEntryForm` — resets the form to the Aisyah defaults (DOB 1992-03-24 → age 34 for any 2026 reference date after 24 Mar) and notifies the parent to flip the demo banner, matching the upload path's behaviour.
-- [ ] Commit — landed as a single chunk `feat(ui): add manual-entry intake mode as alternative to document upload` after the MVP rewrite; two-commit split rejected because the backend + frontend changes are tightly co-dependent (payload shape + SSE contract + type mirror).
+- [x] Commit — landed as a single chunk `feat(ui): add manual-entry intake mode as alternative to document upload` after the MVP rewrite; two-commit split rejected because the backend + frontend changes are tightly co-dependent (payload shape + SSE contract + type mirror).
 
 **Sizing (actual):** ~3 hours end-to-end — schema (~15 min) + build_profile (~30 min) + stream_agent_events refactor (~15 min) + route + tests (~45 min) + frontend toggle + form + hook + wire + label (~60 min) + zod/resolver friction fix (~15 min). The "6-10h" original estimate padded polish (comprehensive 422 tests, dynamic `useFieldArray` rows, Aisyah pre-fill, stepper label override) — those were all built and still fit inside 3h because react-hook-form + zod were already on the dep list and the pipeline's `stream_agent_events` was already well-factored.
 

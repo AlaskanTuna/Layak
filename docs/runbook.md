@@ -139,3 +139,66 @@ curl -sS -o /dev/null -w "HTTP %{http_code}\n" \
 #   curl -X POST -H "Authorization: Bearer $ID_TOKEN" -F ic=@... -F payslip=@... -F utility=@... \
 #     https://layak-backend-297019726346.asia-southeast1.run.app/api/agent/intake
 ```
+
+---
+
+## 3. Phase 2 Task 4 — Integration smoke (auth path end-to-end)
+
+First joint check that Firebase Auth + backend Admin SDK + Firestore are all talking to each other. Depends on Phase 2 Tasks 1-3 landing and the auth-gated backend revision being live.
+
+### 3.1 Automated backend smoke (curl)
+
+Five checks that do not require a browser. Run against the currently-deployed backend; all five should pass before the browser check.
+
+```bash
+BACKEND=https://layak-backend-297019726346.asia-southeast1.run.app
+
+# 1. Health — unauthed, always 200.
+curl -sS -w "\nHTTP %{http_code}\n" "${BACKEND}/health"
+# Expected: HTTP 200, body {"status":"ok","version":"0.1.0"}
+
+# 2. Intake without bearer — expect 401.
+curl -sS -o /dev/null -w "HTTP %{http_code}\n" \
+  -X POST "${BACKEND}/api/agent/intake_manual" \
+  -H "Content-Type: application/json" \
+  -d '{"name":"Test","date_of_birth":"1990-01-01","ic_last4":"1234","monthly_income_rm":1000,"employment_type":"gig","address":null,"dependants":[]}'
+# Expected: HTTP 401 (auth gate)
+
+# 3. Intake with malformed bearer — expect 401, NOT 500.
+curl -sS -o /dev/null -w "HTTP %{http_code}\n" \
+  -X POST "${BACKEND}/api/agent/intake_manual" \
+  -H "Authorization: Bearer not-a-real-token" \
+  -H "Content-Type: application/json" \
+  -d '{"name":"Test","date_of_birth":"1990-01-01","ic_last4":"1234","monthly_income_rm":1000,"employment_type":"gig","address":null,"dependants":[]}'
+# Expected: HTTP 401 (Firebase Admin verify_id_token rejects)
+
+# 4. Multipart intake without bearer — expect 401.
+printf '%%PDF-1.4\n%%EOF\n' > /tmp/fake.pdf
+curl -sS -o /dev/null -w "HTTP %{http_code}\n" \
+  -X POST "${BACKEND}/api/agent/intake" \
+  -F "ic=@/tmp/fake.pdf" -F "payslip=@/tmp/fake.pdf" -F "utility=@/tmp/fake.pdf"
+rm /tmp/fake.pdf
+# Expected: HTTP 401 (same auth gate)
+```
+
+### 3.2 Firestore users collection check
+
+```bash
+# Confirm the `users` collection is reachable and enumerate any existing docs.
+# On a fresh project this returns empty; once a user signs in once, one doc appears.
+gcloud firestore documents list \
+  --collection=users \
+  --project=layak-myaifuturehackathon \
+  --limit=5
+```
+
+### 3.3 Live browser check (manual — Adam + Hao)
+
+- [ ] Open the deployed frontend in a fresh browser profile (no existing session): `https://layak-frontend-297019726346.asia-southeast1.run.app`.
+- [ ] Click **Continue with Google** on `/sign-in`. Complete OAuth.
+- [ ] Page should redirect to `/dashboard` **without a manual refresh** — the `<AuthGuard>` sees the `onAuthStateChanged` callback and lets the child tree render.
+- [ ] In a second tab, run §3.2 gcloud — the `users/{uid}` doc should now exist with `tier="free"`, `createdAt`, `lastLoginAt`, and the Google profile fields populated. The `uid` matches the UID shown under the user menu avatar.
+- [ ] From `/dashboard/evaluation/upload`, start one evaluation (Manual Entry mode with Aisyah sample is fastest). Watch DevTools → Network: the `POST /api/agent/intake_manual` request carries an `Authorization: Bearer eyJhbGci…` header; the response is a 200 SSE stream (not 401, not a redirect).
+- [ ] Sign out. Navigate to `/dashboard`. Expect redirect to `/sign-in` within one frame.
+
+Task 4 is complete when all three automated checks in §3.1 pass AND the five manual checks in §3.3 are ticked by at least one team member.

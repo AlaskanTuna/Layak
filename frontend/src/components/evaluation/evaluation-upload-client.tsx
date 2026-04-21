@@ -3,12 +3,14 @@
 import { useRouter, useSearchParams } from 'next/navigation'
 import { useEffect, useState } from 'react'
 
+import { QuotaMeter } from '@/components/dashboard/quota-meter'
 import { ErrorRecoveryCard } from '@/components/evaluation/error-recovery-card'
 import { useEvaluation } from '@/components/evaluation/evaluation-provider'
 import { type IntakeMode, IntakeModeToggle } from '@/components/evaluation/intake-mode-toggle'
 import { ManualEntryForm } from '@/components/evaluation/manual-entry-form'
 import { PipelineStepper } from '@/components/evaluation/pipeline-stepper'
 import { UploadWidget, type UploadSubmission } from '@/components/evaluation/upload-widget'
+import { UpgradeWaitlistModal } from '@/components/settings/upgrade-waitlist-modal'
 import { Button } from '@/components/ui/button'
 import type { ManualEntryPayload, Step } from '@/lib/agent-types'
 import { cn } from '@/lib/utils'
@@ -20,7 +22,12 @@ const MANUAL_MODE_LABEL_OVERRIDES: Partial<Record<Step, string>> = {
 export function EvaluationUploadClient() {
   const router = useRouter()
   const searchParams = useSearchParams()
-  const { state, start, reset, setDemoMode } = useEvaluation()
+  const { state, start, reset, setDemoMode, acknowledgeQuotaExceeded } = useEvaluation()
+  // Modal open state is derived directly from `state.quotaExceeded` —
+  // dismissing the modal calls `acknowledgeQuotaExceeded()` which clears
+  // it on the pipeline side, naturally closing the modal. Avoids the
+  // React 19 set-state-in-effect lint and the cascade-render risk.
+  const waitlistOpen = state.quotaExceeded != null
   const initialMode: IntakeMode = searchParams?.get('mode') === 'manual' ? 'manual' : 'upload'
   const [mode, setMode] = useState<IntakeMode>(initialMode)
   // Per-tab demo flag — when the user clicks "Use Aisyah sample data" on a
@@ -91,10 +98,15 @@ export function EvaluationUploadClient() {
   const showError = state.phase === 'error'
   const labelOverrides = mode === 'manual' ? MANUAL_MODE_LABEL_OVERRIDES : undefined
 
+  function handleWaitlistOpenChange(open: boolean) {
+    if (!open) acknowledgeQuotaExceeded()
+  }
+
   return (
     <div className="flex flex-col gap-4">
       {showIntake && (
         <>
+          <QuotaMeter />
           <IntakeModeToggle value={mode} onChange={handleModeChange} />
           {/* Both widgets stay mounted so partial form state survives a tab switch. */}
           <div className={cn(mode !== 'upload' && 'hidden')} aria-hidden={mode !== 'upload'}>
@@ -130,6 +142,20 @@ export function EvaluationUploadClient() {
           )}
         </>
       )}
+      <UpgradeWaitlistModal
+        open={waitlistOpen}
+        onOpenChange={handleWaitlistOpenChange}
+        context={
+          state.quotaExceeded
+            ? {
+                kind: 'rate_limit',
+                resetAt: state.quotaExceeded.resetAt,
+                limit: state.quotaExceeded.limit,
+                windowHours: state.quotaExceeded.windowHours
+              }
+            : undefined
+        }
+      />
     </div>
   )
 }

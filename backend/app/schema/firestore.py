@@ -70,6 +70,22 @@ class StepStates(BaseModel):
     generate: StepState = "pending"
 
 
+class ComputeUpsideTrace(BaseModel):
+    """Persisted trace of the `compute_upside` step's Gemini Code Execution call.
+
+    The frontend `CodeExecutionPanel` renders the `<pre>` blocks for the
+    Python source and stdout verbatim, so we persist them on the Firestore
+    doc. Without this, a results page hydrated from Firestore (post-refresh
+    or via a deep link) shows an empty panel.
+    """
+
+    model_config = ConfigDict(extra="forbid")
+
+    pythonSnippet: str = ""  # noqa: N815 — Firestore field is camelCase
+    stdout: str = ""
+    perSchemeRM: dict[str, float] = Field(default_factory=dict)  # noqa: N815
+
+
 class EvaluationDoc(BaseModel):
     """Mirror of `evaluations/{evalId}` — written by the intake route.
 
@@ -89,5 +105,6 @@ class EvaluationDoc(BaseModel):
     classification: HouseholdClassification | None = None
     matches: list[SchemeMatch] = Field(default_factory=list)
     totalAnnualRM: float = Field(default=0.0, ge=0)  # noqa: N815
+    upsideTrace: ComputeUpsideTrace | None = None  # noqa: N815
     stepStates: StepStates = Field(default_factory=StepStates)  # noqa: N815
     error: EvaluationError | None = None

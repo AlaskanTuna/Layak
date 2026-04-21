@@ -143,8 +143,17 @@ def _mirror_to_firestore(  # noqa: PLR0912 — per-event-type dispatch is natura
             # `data` is `MatchResult {matches}`.
             updates["matches"] = [m.model_dump(mode="json") for m in data.matches]
         elif event.step == "compute_upside":
-            # `data` IS the `ComputeUpsideResult` — carries `total_annual_rm`.
+            # `data` IS the `ComputeUpsideResult` — carries the executed code,
+            # its stdout, the total upside, and the per-scheme breakdown.
+            # Persisting the trace lets the results page rebuild the Code
+            # Execution panel after a refresh / deep link instead of rendering
+            # empty `<pre>` blocks.
             updates["totalAnnualRM"] = float(data.total_annual_rm)
+            updates["upsideTrace"] = {
+                "pythonSnippet": data.python_snippet,
+                "stdout": data.stdout,
+                "perSchemeRM": {k: float(v) for k, v in data.per_scheme_rm.items()},
+            }
         # `generate` step_result carries the packet; we do NOT persist packet
         # bytes (spec §3.7 — packets are regenerated on demand).
         doc_ref.update(updates)

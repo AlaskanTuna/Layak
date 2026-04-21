@@ -159,6 +159,13 @@ export type EvaluationErrorDoc = {
   message: string
 }
 
+/** Persisted trace of the `compute_upside` step's Gemini Code Execution call. */
+export type ComputeUpsideTrace = {
+  pythonSnippet: string
+  stdout: string
+  perSchemeRM: Record<string, number>
+}
+
 /** Mirror of `evaluations/{evalId}` returned by `GET /api/evaluations/{id}`. */
 export type EvaluationDoc = {
   userId: string
@@ -169,6 +176,7 @@ export type EvaluationDoc = {
   classification: HouseholdClassification | null
   matches: SchemeMatch[]
   totalAnnualRM: number
+  upsideTrace: ComputeUpsideTrace | null
   stepStates: EvaluationStepStates
   error: EvaluationErrorDoc | null
 }

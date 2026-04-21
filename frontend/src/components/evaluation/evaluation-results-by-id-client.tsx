@@ -45,19 +45,22 @@ function docToPipelineState(doc: EvaluationDoc): PipelineState {
     PIPELINE_STEPS.map(step => [step, mapStepState(doc.stepStates[step] ?? 'pending')])
   ) as Record<Step, StepStatus>
 
-  // The persistence layer doesn't write the upside snippet/stdout into
-  // Firestore (those are render-time outputs of the compute_upside step).
-  // Reconstruct just enough for the CodeExecutionPanel to skip cleanly
-  // when missing, and surface what we do have when it's complete.
+  // The persistence layer mirrors the compute_upside trace so the panel
+  // rebuilds verbatim after a refresh / deep link. Pre-trace evaluations
+  // (written before the field landed) fall back to deriving the per-scheme
+  // breakdown from `matches` so the meter still has totals — but the Python
+  // snippet + stdout will be empty and the CodeExecutionPanel will hide.
   const upside: ComputeUpsideResult | null =
     doc.stepStates.compute_upside === 'complete'
       ? {
-          python_snippet: '',
-          stdout: '',
+          python_snippet: doc.upsideTrace?.pythonSnippet ?? '',
+          stdout: doc.upsideTrace?.stdout ?? '',
           total_annual_rm: doc.totalAnnualRM,
-          per_scheme_rm: Object.fromEntries(
-            doc.matches.filter(m => m.qualifies).map(m => [m.scheme_id, m.annual_rm])
-          )
+          per_scheme_rm:
+            doc.upsideTrace?.perSchemeRM ??
+            Object.fromEntries(
+              doc.matches.filter(m => m.qualifies).map(m => [m.scheme_id, m.annual_rm])
+            )
         }
       : null
 
@@ -236,9 +239,15 @@ export function EvaluationResultsByIdClient({ evalId }: { evalId: string }) {
             empty={!isComplete}
           />
           <SchemeCardGrid matches={doc.matches} />
-          {pipelineState.upside && pipelineState.upside.total_annual_rm > 0 && (
-            <CodeExecutionPanel upside={pipelineState.upside} />
-          )}
+          {pipelineState.upside &&
+            pipelineState.upside.total_annual_rm > 0 &&
+            // Only render the panel when we actually have a trace to show —
+            // older evals predating `upsideTrace` persistence would otherwise
+            // render empty <pre> blocks.
+            (pipelineState.upside.python_snippet !== '' ||
+              pipelineState.upside.stdout !== '') && (
+              <CodeExecutionPanel upside={pipelineState.upside} />
+            )}
         </>
       )}
 

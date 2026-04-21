@@ -13,7 +13,7 @@ from typing import Any
 from unittest.mock import MagicMock
 
 import pytest
-from firebase_admin import firestore
+from google.cloud.firestore_v1 import SERVER_TIMESTAMP
 
 from app.fixtures.aisyah import AISYAH_PROFILE, AISYAH_SCHEME_MATCHES
 from app.schema.events import (
@@ -65,7 +65,7 @@ def test_create_running_evaluation_writes_initial_shape_no_profile(
     payload = doc_ref.set.call_args.args[0]
     assert payload["userId"] == "uid-aisyah"
     assert payload["status"] == "running"
-    assert payload["createdAt"] is firestore.SERVER_TIMESTAMP
+    assert payload["createdAt"] is SERVER_TIMESTAMP
     assert payload["profile"] is None
     assert payload["classification"] is None
     assert payload["matches"] == []
@@ -204,7 +204,7 @@ async def test_persist_done_event_stamps_completed(doc_ref: MagicMock) -> None:
     assert done.eval_id == "eval-xyz"
     payload = doc_ref.update.call_args.args[0]
     assert payload["status"] == "complete"
-    assert payload["completedAt"] is firestore.SERVER_TIMESTAMP
+    assert payload["completedAt"] is SERVER_TIMESTAMP
     assert payload["stepStates.generate"] == "complete"
 
 

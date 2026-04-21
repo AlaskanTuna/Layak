@@ -346,3 +346,23 @@ def test_delete_evaluation_503_when_firestore_raises(client: tuple[TestClient, M
     resp = tc.delete("/api/evaluations/eval-xyz", headers={"Authorization": "Bearer valid"})
     assert resp.status_code == 503
     assert "delete" in resp.json()["detail"].lower()
+
+
+def test_delete_evaluation_cors_preflight_allows_delete(
+    client: tuple[TestClient, MagicMock],
+) -> None:
+    """Browser preflight for authed DELETE must succeed for multi-delete to work."""
+    tc, _ = client
+    resp = tc.options(
+        "/api/evaluations/eval-xyz",
+        headers={
+            "Origin": "https://layak-frontend-297019726346.asia-southeast1.run.app",
+            "Access-Control-Request-Method": "DELETE",
+            "Access-Control-Request-Headers": "authorization",
+        },
+    )
+    assert resp.status_code == 200
+    assert resp.headers["access-control-allow-origin"] == (
+        "https://layak-frontend-297019726346.asia-southeast1.run.app"
+    )
+    assert "DELETE" in resp.headers["access-control-allow-methods"]

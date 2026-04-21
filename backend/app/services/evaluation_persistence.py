@@ -29,7 +29,7 @@ from collections.abc import AsyncIterator
 from typing import Any
 
 from fastapi import HTTPException, status
-from firebase_admin import firestore
+from google.cloud.firestore_v1 import SERVER_TIMESTAMP
 
 from app.agents.gemini import sanitize_error_message
 from app.schema.events import (
@@ -71,7 +71,7 @@ def create_running_evaluation(
     payload: dict[str, Any] = {
         "userId": user_id,
         "status": "running",
-        "createdAt": firestore.SERVER_TIMESTAMP,
+        "createdAt": SERVER_TIMESTAMP,
         "completedAt": None,
         "profile": profile.model_dump(mode="json") if profile is not None else None,
         "classification": None,
@@ -109,8 +109,12 @@ async def persist_event_stream(
     async for event in events:
         try:
             _mirror_to_firestore(event, doc_ref)
-        except Exception:  # noqa: BLE001 — never break the SSE stream on persistence failure.
-            _logger.exception("Firestore mirror failed for eval_id=%s event=%s", eval_id, event.type)
+        except Exception:  # noqa: BLE001, pylint: disable=broad-exception-caught
+            _logger.exception(
+                "Firestore mirror failed for eval_id=%s event=%s",
+                eval_id,
+                event.type,
+            )
 
         if isinstance(event, DoneEvent | ErrorEvent):
             # Pydantic models are frozen via ConfigDict(extra="forbid") but
@@ -163,7 +167,7 @@ def _mirror_to_firestore(  # noqa: PLR0912 — per-event-type dispatch is natura
         doc_ref.update(
             {
                 "status": "complete",
-                "completedAt": firestore.SERVER_TIMESTAMP,
+                "completedAt": SERVER_TIMESTAMP,
                 "stepStates.generate": "complete",
             }
         )
@@ -173,7 +177,7 @@ def _mirror_to_firestore(  # noqa: PLR0912 — per-event-type dispatch is natura
         doc_ref.update(
             {
                 "status": "error",
-                "completedAt": firestore.SERVER_TIMESTAMP,
+                "completedAt": SERVER_TIMESTAMP,
                 "error": {
                     "step": event.step,
                     "message": sanitize_error_message(event.message),

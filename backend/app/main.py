@@ -65,7 +65,7 @@ app.add_middleware(
         "https://layak-frontend-i2t7hf6seq-as.a.run.app",
     ],
     allow_origin_regex=r"http://localhost:\d+",
-    allow_methods=["GET", "POST", "OPTIONS"],
+    allow_methods=["GET", "POST", "DELETE", "OPTIONS"],
     allow_headers=["*"],
 )
 

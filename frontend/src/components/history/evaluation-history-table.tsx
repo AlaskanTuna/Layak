@@ -7,6 +7,7 @@ import { ArrowRight, ChevronLeft, ChevronRight, Loader2, Trash2 } from 'lucide-r
 import { StatusPill } from '@/components/ui/status-pill'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
+import { Checkbox } from '@/components/ui/checkbox'
 import type { EvaluationListItem, EvaluationStatus } from '@/lib/agent-types'
 import { authedFetch } from '@/lib/firebase'
 import { cn } from '@/lib/utils'
@@ -185,15 +186,11 @@ export function EvaluationHistoryTable({ items, onRefresh }: Props) {
             <thead>
               <tr className="border-b border-border bg-muted/40 text-left text-[11px] uppercase tracking-[0.14em] text-muted-foreground">
                 <th scope="col" className="w-10 px-4 py-2.5">
-                  <input
-                    type="checkbox"
+                  <Checkbox
                     aria-label={allOnPageSelected ? 'Deselect all on page' : 'Select all on page'}
-                    checked={allOnPageSelected}
-                    ref={el => {
-                      if (el) el.indeterminate = !allOnPageSelected && someOnPageSelected
-                    }}
-                    onChange={event => togglePage(event.target.checked)}
-                    className="size-4 cursor-pointer rounded border border-input accent-primary"
+                    checked={!allOnPageSelected && someOnPageSelected ? 'indeterminate' : allOnPageSelected}
+                    onCheckedChange={togglePage}
+                    className="cursor-pointer"
                   />
                 </th>
                 <th scope="col" className="px-4 py-2.5 font-medium">Status</th>
@@ -215,12 +212,11 @@ export function EvaluationHistoryTable({ items, onRefresh }: Props) {
                     className="border-b border-border last:border-0 hover:bg-muted/30 data-[selected]:bg-primary/5"
                   >
                     <td className="px-4 py-3">
-                      <input
-                        type="checkbox"
+                      <Checkbox
                         aria-label={`Select evaluation from ${formatTimestamp(item.createdAt)}`}
                         checked={isSelected}
-                        onChange={event => toggleOne(item.id, event.target.checked)}
-                        className="size-4 cursor-pointer rounded border border-input accent-primary"
+                        onCheckedChange={checked => toggleOne(item.id, checked)}
+                        className="cursor-pointer"
                       />
                     </td>
                     <td className="px-4 py-3">

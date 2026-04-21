@@ -702,3 +702,10 @@ Findings the audit flagged that were **not** acted on (cosmetic or external to P
 - Ticked Phase 0 task 1 items 1 and 2 in `docs/plan.md`.
 
 ---
+
+## [11/MM/YY] - Auth Pages Polished & PDPA Wireframe
+
+- Integrated specific Next.js 16/Tailwind 4 layouts for `/sign-in` and `/sign-up`.
+- Polished font unification to prefer `Geist` sans exclusively for main UI headers and content.
+- Polished Dark Mode layout variables within `.dark` selector (slate shades, `oklch`).
+- Integrated PDPA Consent routing (`X-PDPA-Consent` header triggering on first app auth via `/api/quota`) within `backend/app/auth.py`.

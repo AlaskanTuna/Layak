@@ -22,8 +22,8 @@ from app import auth as auth_module
 @pytest.fixture(autouse=True)
 def _reset_module_state() -> None:
     """Clear process-wide `firebase_admin` + Firestore singletons between tests."""
-    auth_module._app = None
-    auth_module._firestore_client = None
+    auth_module._state.app = None
+    auth_module._state.firestore_client = None
 
 
 @pytest.fixture

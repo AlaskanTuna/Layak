@@ -32,13 +32,21 @@ import firebase_admin
 from fastapi import Depends, Header, HTTPException, Request, status
 from firebase_admin import auth as fb_auth
 from firebase_admin import credentials, firestore
+from google.cloud.firestore_v1 import SERVER_TIMESTAMP  # type: ignore[attr-defined, unused-ignore]
 
 _logger = logging.getLogger(__name__)
 
 _FIREBASE_ADMIN_KEY_ENV = "FIREBASE_ADMIN_KEY"
 _init_lock = Lock()
-_app: firebase_admin.App | None = None
-_firestore_client: Any | None = None
+
+
+@dataclass(slots=True)
+class _FirebaseState:
+    app: firebase_admin.App | None = None
+    firestore_client: Any | None = None
+
+
+_state = _FirebaseState()
 
 
 @dataclass(frozen=True, slots=True)
@@ -73,12 +81,9 @@ def _init_firebase_admin() -> firebase_admin.App:
     misconfigured" states, not "bad token," so a 401 would mislead the
     client.
     """
-    global _app
-    if _app is not None:
-        return _app
     with _init_lock:
-        if _app is not None:
-            return _app
+        if _state.app is not None:
+            return _state.app
         raw = os.environ.get(_FIREBASE_ADMIN_KEY_ENV)
         if not raw:
             raise HTTPException(
@@ -88,7 +93,9 @@ def _init_firebase_admin() -> firebase_admin.App:
         try:
             cred_dict = json.loads(raw)
             cred = credentials.Certificate(cred_dict)
-            _app = firebase_admin.initialize_app(cred)
+            app = firebase_admin.initialize_app(cred)
+            _state.app = app
+            return app
         except json.JSONDecodeError as exc:
             _logger.exception("FIREBASE_ADMIN_KEY is not valid JSON")
             raise HTTPException(
@@ -103,16 +110,15 @@ def _init_firebase_admin() -> firebase_admin.App:
                 status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
                 detail="Firebase Admin key is malformed",
             ) from exc
-        return _app
+        raise RuntimeError("Firebase Admin initialisation failed unexpectedly")
 
 
 def _get_firestore() -> Any:
     """Return the process-wide Firestore client, initialising on first use."""
-    global _firestore_client
     _init_firebase_admin()
-    if _firestore_client is None:
-        _firestore_client = firestore.client()
-    return _firestore_client
+    if _state.firestore_client is None:
+        _state.firestore_client = firestore.client()
+    return _state.firestore_client
 
 
 def get_firestore() -> Any:
@@ -136,7 +142,7 @@ def verify_firebase_id_token(id_token: str) -> dict[str, Any]:
     return fb_auth.verify_id_token(id_token)
 
 
-def _upsert_user_doc(uid: str, claims: dict[str, Any]) -> str:
+def _upsert_user_doc(uid: str, claims: dict[str, Any], has_consent: bool = False) -> str:
     """Lazy-create `users/{uid}` on first touch; refresh `lastLoginAt` after.
 
     Returns the user's current `tier` ("free" or "pro") — read from the
@@ -155,28 +161,34 @@ def _upsert_user_doc(uid: str, claims: dict[str, Any]) -> str:
     db = _get_firestore()
     ref = db.collection("users").document(uid)
     snapshot = ref.get()
+
+    update_data: dict[str, Any] = {"lastLoginAt": SERVER_TIMESTAMP}
+    if has_consent:
+        update_data["pdpaConsentAt"] = SERVER_TIMESTAMP
+
     if snapshot.exists:
-        ref.update({"lastLoginAt": firestore.SERVER_TIMESTAMP})
+        ref.update(update_data)
         data = snapshot.to_dict() or {}
         tier = data.get("tier", "free")
         return tier if tier in ("free", "pro") else "free"
-    ref.set(
-        {
-            "email": claims.get("email"),
-            "displayName": claims.get("name"),
-            "photoURL": claims.get("picture"),
-            "tier": "free",
-            "createdAt": firestore.SERVER_TIMESTAMP,
-            "lastLoginAt": firestore.SERVER_TIMESTAMP,
-            "pdpaConsentAt": None,
-        }
-    )
+
+    new_doc = {
+        "email": claims.get("email"),
+        "displayName": claims.get("name"),
+        "photoURL": claims.get("picture"),
+        "tier": "free",
+        "createdAt": SERVER_TIMESTAMP,
+        "lastLoginAt": SERVER_TIMESTAMP,
+        "pdpaConsentAt": SERVER_TIMESTAMP if has_consent else None,
+    }
+    ref.set(new_doc)
     return "free"
 
 
 async def current_user(
     request: Request,
     authorization: Annotated[str | None, Header()] = None,
+    x_pdpa_consent: Annotated[str | None, Header()] = None,
 ) -> UserInfo:
     """FastAPI dependency — verify the bearer token, lazy-create the user doc.
 
@@ -230,7 +242,8 @@ async def current_user(
             headers={"WWW-Authenticate": "Bearer"},
         )
 
-    tier = _upsert_user_doc(uid, claims)
+    has_consent = x_pdpa_consent == "true"
+    tier = _upsert_user_doc(uid, claims, has_consent)
 
     request.state.user_id = uid
     return UserInfo(

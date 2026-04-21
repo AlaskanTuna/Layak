@@ -8,7 +8,7 @@ import { useTranslation } from 'react-i18next'
 
 import { GoogleIcon } from '@/components/auth/google-icon'
 import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+
 import { useAuth } from '@/lib/auth-context'
 import { signInWithGoogle } from '@/lib/firebase'
 
@@ -38,39 +38,42 @@ export function SignInForm() {
   }
 
   return (
-    <Card className="w-full max-w-sm">
-      <CardHeader className="text-center">
-        <CardTitle className="font-heading text-2xl">{t('auth.signIn.title')}</CardTitle>
-        <CardDescription>{t('auth.signIn.description')}</CardDescription>
-      </CardHeader>
-      <CardContent className="flex flex-col gap-5">
+    <div className="flex w-full flex-col justify-center space-y-6 sm:w-100">
+      <div className="flex flex-col space-y-2 text-center">
+        <h1 className="font-heading text-3xl font-semibold tracking-tight">{t('auth.signIn.title')}</h1>
+        <p className="text-sm text-muted-foreground">{t('auth.signIn.description')}</p>
+      </div>
+
+      <div className="grid gap-6">
         <Button
           type="button"
           size="lg"
           onClick={handleGoogle}
           disabled={pending || loading}
-          className="w-full"
+          className="w-full text-base h-12"
         >
           {pending ? (
-            <Loader2 className="mr-1.5 size-4 animate-spin" aria-hidden />
+            <Loader2 className="mr-2 size-5 animate-spin" aria-hidden />
           ) : (
-            <GoogleIcon className="mr-1.5 size-4" />
+            <GoogleIcon className="mr-2 size-5" />
           )}
           {t('common.button.continueWithGoogle')}
-          <ArrowRight className="ml-1.5 size-4" aria-hidden />
+          <ArrowRight className="ml-2 size-5 opacity-70" aria-hidden />
         </Button>
+
         {error && (
-          <p role="alert" className="text-center text-sm text-destructive">
+          <div className="rounded-md bg-destructive/15 p-3 text-sm text-destructive" role="alert">
             {error}
-          </p>
+          </div>
         )}
-        <p className="text-center text-xs text-muted-foreground">
-          {t('auth.signIn.noAccountPrefix')}{' '}
-          <Link href="/sign-up" className="text-primary underline underline-offset-2">
-            {t('auth.signIn.noAccountCta')}
-          </Link>
-        </p>
-      </CardContent>
-    </Card>
+      </div>
+
+      <p className="px-8 text-center text-sm text-muted-foreground">
+        {t('auth.signIn.noAccountPrefix')}{' '}
+        <Link href="/sign-up" className="font-medium text-primary underline-offset-4 hover:underline">
+          {t('auth.signIn.noAccountCta')}
+        </Link>
+      </p>
+    </div>
   )
 }

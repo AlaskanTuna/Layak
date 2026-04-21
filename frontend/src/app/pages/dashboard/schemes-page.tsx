@@ -3,7 +3,7 @@ import { SchemesOverview } from '@/components/schemes/schemes-overview'
 
 export function SchemesPage() {
   return (
-    <div className="mx-auto flex max-w-5xl flex-col gap-8">
+    <div className="flex flex-col gap-8">
       <PageHeading
         eyebrow="Scheme library"
         title="Every Malaysian scheme Layak reasons over."

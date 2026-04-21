@@ -3,7 +3,7 @@ import { PageHeading } from '@/components/layout/page-heading'
 
 export function EvaluationOverviewPage() {
   return (
-    <div className="mx-auto flex max-w-3xl flex-col gap-6">
+    <div className="flex flex-col gap-6">
       <PageHeading
         eyebrow="My evaluations"
         title="Your eligibility at a glance."

@@ -3,7 +3,7 @@ import { PageHeading } from '@/components/layout/page-heading'
 
 export function HowItWorksPage() {
   return (
-    <div className="mx-auto flex max-w-3xl flex-col gap-8">
+    <div className="flex flex-col gap-8">
       <PageHeading
         eyebrow="How it works"
         title="From three uploads to a ready-to-lodge packet, in about a minute."

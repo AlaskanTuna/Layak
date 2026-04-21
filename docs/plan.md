@@ -8,7 +8,7 @@
 
 ## Phase 0: Scaffolding
 
-> Covers everything from 20 Apr idea-lock through the pre-sprint handoff. Target exit: tomorrow morning the team can open the repo, run `pnpm dev`, and start on Phase 1 without untangling scaffolding.
+> Covers the initial setup and handoff before Phase 1. Keep the repo simple enough that the team can open it, run `pnpm dev`, and start building without untangling scaffolding.
 
 ### 1. Feature: Read and Orient
 
@@ -24,7 +24,7 @@
 
 ### 2. Feature: Decompose project-idea into PRD / TRD
 
-**Purpose/Issue:** Turn `docs/project-idea.md` into a product contract (`docs/prd.md`), a technical contract (`docs/trd.md`), and roadmap updates that reflect the locked decisions. Apply the PO's overrides: ADK-Python v1.31 GA (not Genkit), Vertex AI Search primary with inline 1M-context as Plan B at sprint hour 12, Aisyah locked as Form B filer, stateless architecture (no DB / no GCS / no Firestore in v1), and a hard feature freeze at hour 20/24.
+**Purpose/Issue:** Turn `docs/project-idea.md` into a product contract (`docs/prd.md`), a technical contract (`docs/trd.md`), and roadmap updates that reflect the locked decisions. Apply the PO's overrides: ADK-Python v1.31 GA (not Genkit), Vertex AI Search primary with inline 1M-context as Plan B, Aisyah locked as Form B filer, and stateless architecture (no DB / no GCS / no Firestore in v1).
 
 **Implementation:**
 
@@ -49,7 +49,7 @@
 
 ### 4. Feature: Scaffold Next.js frontend tooling
 
-**Purpose/Issue:** Bring the repo to a state where the team can start building UI tomorrow morning — Next.js 16 + React 19 + Tailwind 4 + shadcn/ui + Lucide + Husky + Prettier, with WSL-friendly webpack HMR polling and a stub landing page. Do not touch backend; no AI wiring; no Cloud Run deploy.
+**Purpose/Issue:** Bring the repo to a state where the team can start building UI — Next.js 16 + React 19 + Tailwind 4 + shadcn/ui + Lucide + Husky + Prettier, with WSL-friendly webpack HMR polling and a stub landing page.
 
 **Implementation:**
 
@@ -68,12 +68,12 @@
 
 ### 5. Feature: Push and handoff
 
-**Purpose/Issue:** Push all scaffolding commits to `origin/main` and produce the handoff report the team can pick up from tomorrow morning. No further code changes after this task.
+**Purpose/Issue:** Push all scaffolding commits to `origin/main` and produce the handoff report the team can pick up from.
 
 **Implementation:**
 
 - [x] `git push origin main`.
-- [x] Produce the report: docs changes, `.claude/` changes, frontend changes, versions (`pnpm`, `node`, `next`), skills inventory + flagged gaps, warnings encountered, tomorrow's first task under roadmap Phase 1, and decisions still blocked on the PO (backend stack, GCP project ID, Vertex AI Search data store, Cloud Run region).
+- [x] Produce the report: docs changes, `.claude/` changes, frontend changes, versions (`pnpm`, `node`, `next`), skills inventory + flagged gaps, warnings encountered, next task under Phase 1, and decisions still blocked on the PO (backend stack, GCP project ID, Vertex AI Search data store, Cloud Run region).
 
 ### 6. Refinement: Refactor into frontend/ + backend/ workspace layout
 
@@ -95,7 +95,7 @@
 
 ### 7. Feature: Commit scheme source PDFs
 
-**Purpose/Issue:** The Phase 1 rule engine (task 4) and Vertex AI Search seed script (task 3) both read from the six source PDFs catalogued in `docs/trd.md` §6.1. Downloading and committing them tonight removes a dependency for tomorrow's PO1 backend work — no GCP, no backend scaffold needed. Some `gov.my` URLs bot-block automated fetches (see `docs/trd.md` §6 gotcha list); manual browser download is the documented fallback.
+**Purpose/Issue:** The Phase 1 rule engine (task 4) and Vertex AI Search seed script (task 3) both read from the six source PDFs catalogued in `docs/trd.md` §6.1. Downloading and committing them removes a dependency for PO1 backend work. Some `gov.my` URLs bot-block automated fetches (see `docs/trd.md` §6 gotcha list); manual browser download is the documented fallback.
 
 **Implementation:**
 
@@ -110,9 +110,9 @@
 
 ## Phase 1: Core Build
 
-> Maps to `docs/roadmap.md` Phase 1 — "One critical user journey. End-to-end. On Cloud Run. No side quests." Six tasks from 08:30 to 18:00 on 21 Apr (sprint hour 0 → 10). **Feature freeze at 18:00 / sprint hour 10.** Ownership follows `docs/prd.md` §0 phase matrix; file paths below are suggestions that can be refined in-flight.
+> Maps to `docs/roadmap.md` Phase 1 — "One critical user journey. End-to-end. On Cloud Run. No side quests." Ownership follows `docs/prd.md` §0 phase matrix; file paths below are suggestions that can be refined in-flight.
 
-> **Before you start Phase 1 (08:00 standup checklist):**
+> **Phase 1 readiness checklist:**
 >
 > - [x] GCP project live; Vertex AI, Cloud Run, Artifact Registry, Secret Manager, Discovery Engine APIs enabled (Phase 0, PO1).
 > - [x] `GEMINI_API_KEY` in GCP Secret Manager as `gemini-api-key`; also in local `.env.local` for dev (PO1).
@@ -121,9 +121,9 @@
 
 ### 1. Feature: Backend data models and agent wiring
 
-**Owner:** PO1 (Hao). **Roadmap block:** 21 Apr 08:30 → 10:30 MYT. **Depends on:** Phase 0 skeleton (`backend/`), PDFs committed (Phase 0 task 7), GCP live, `GEMINI_API_KEY` accessible locally.
+**Owner:** PO1 (Hao). **Depends on:** Phase 0 skeleton (`backend/`), PDFs committed (Phase 0 task 7), GCP live, `GEMINI_API_KEY` accessible locally.
 
-**Purpose/Issue:** Stand up the minimum backend the frontend can talk to during the 12:30 wiring block — Pydantic data contract, a FastAPI SSE endpoint, an ADK `SequentialAgent` with 2 stubbed `FunctionTool`s that emit a deterministic event stream. No Vertex AI Search yet (task 3), no real rule engine (task 4), no packet generation (task 5).
+**Purpose/Issue:** Stand up the minimum backend the frontend can talk to — Pydantic data contract, a FastAPI SSE endpoint, an ADK `SequentialAgent` with 2 stubbed `FunctionTool`s that emit a deterministic event stream. No Vertex AI Search yet (task 3), no real rule engine (task 4), no packet generation (task 5).
 
 **Implementation — PO1 (Hao):**
 
@@ -143,9 +143,9 @@
 
 ### 2. Feature: Frontend scaffolding with mock data
 
-**Owner:** PO2 (Adam). **Roadmap block:** 21 Apr 08:30 → 12:00 MYT (can start tonight — no backend needed). **Depends on:** Phase 0 frontend scaffold (done).
+**Owner:** PO2 (Adam). **Depends on:** Phase 0 frontend scaffold (done).
 
-**Purpose/Issue:** Build every screen the Aisyah flow needs against mock data so the UI is visually complete before the 12:30 wiring block. When task 1 is ready, integration collapses to a one-line SSE endpoint swap, not a UI debug session. Covers FR-1 through FR-10 except live extraction.
+**Purpose/Issue:** Build every screen the Aisyah flow needs against mock data so the UI is visually complete. When task 1 is ready, integration collapses to a one-line SSE endpoint swap, not a UI debug session. Covers FR-1 through FR-10 except live extraction.
 
 **Implementation:**
 
@@ -166,7 +166,7 @@
 
 ### 3. Feature: Orchestration layer (5-step agent + Vertex AI Search)
 
-**Owner:** PO1 drives; PO2 wires new SSE event labels at sync points. **Roadmap block:** 21 Apr 10:30 → 12:00 MYT + partial afternoon. **Depends on:** Task 1, Phase 0 task 7 (**six** scheme PDFs committed — all six passed verification in commit `9138113`), GCP project with Discovery Engine API enabled.
+**Owner:** PO1 drives; PO2 wires new SSE event labels at sync points. **Depends on:** Task 1, Phase 0 task 7 (**six** scheme PDFs committed — all six passed verification in commit `9138113`), GCP project with Discovery Engine API enabled.
 
 **Purpose/Issue:** Upgrade the 2-tool stub from task 1 to the full five-step pipeline, with **Vertex AI Search** grounding every rule lookup against a passage + URL from the committed PDFs. This is the agentic moment the demo sells — all five steps emit visible SSE events, performance budget < 10s total end-to-end.
 
@@ -182,7 +182,7 @@
   - `match_schemes` → for each of {STR, JKM, LHDN}, queries Vertex AI Search, then delegates to the rule engine (task 4); until task 4 lands, stub with `qualifies=True`. _(**Path 2 partial** — rule engine delegation done since Task 4. Vertex AI Search enrichment deferred as a follow-up: requires `gcloud auth application-default login` + `seed_vertex_ai_search.py --execute` run, both of which are blocked on the user completing the interactive ADC OAuth flow. Rule engine's hardcoded citations act as Plan B grounding until VAIS is live.)_
   - `compute_upside` → Gemini Code Execution (`tools: [{codeExecution: {}}]`) runs Python computing annual RM per scheme + total; emit the Python snippet + stdout as a `step_result` payload so the UI shows it on stage. _(**Path 2 ✓ real Gemini 2.5 Flash** with `Tool(code_execution=ToolCodeExecution())` enabled. `_extract_exec_parts()` walks `response.candidates[].content.parts[]` pulling `executable_code.code` and `code_execution_result.output`. **Downgraded from 2.5 Pro to 2.5 Flash** because the free-tier demo key returns `429 RESOURCE_EXHAUSTED` on Pro; Flash supports the same tool with identical payload shape and is safely under quota. `total_annual_rm` + `per_scheme_rm` computed server-side as authoritative values regardless of Gemini's script output.)_
   - `generate_packet` → stubbed; WeasyPrint lands in task 5. _(Path 1 stub retained — returns filename-only `PacketDraft`s slugged by `profile.ic_last4`. `blob_bytes_b64` stays `None` until Task 5.)_
-- [ ] **Plan B trigger (sprint hour 12 ≈ 14:30 MYT)**: if Vertex AI Search setup isn't green or canary queries return empty by 14:30, flip to inline-PDF grounding per `docs/trd.md` §8 — drop the Search client, replace with a local `{pdf_name → pages}` lookup that Gemini 2.5 Pro reads inline (~80K tokens, well under the 200K cheap tier). ADK and the five-step pipeline stay intact. PO1 calls the trigger; both accept without re-debate.
+- [ ] **Plan B trigger**: if Vertex AI Search setup isn't green or canary queries return empty, flip to inline-PDF grounding per `docs/trd.md` §8 — drop the Search client, replace with a local `{pdf_name → pages}` lookup that Gemini 2.5 Pro reads inline (~80K tokens, well under the 200K cheap tier). ADK and the five-step pipeline stay intact.
 
 **Implementation — PO2 (Adam), sync points:**
 
@@ -193,13 +193,13 @@
 - [x] Commit (PO1): `feat(lambda): add vertex ai search seed and expand to 5 functiontools`.
 - [x] Commit (PO2): `feat(ui): render classify and compute_upside steps with code execution trace`.
 
-**Exit criteria:** `POST /api/agent/intake` with Aisyah fixtures emits a full SSE stream (5 × `step_started` + `step_result`, one `done`); Vertex AI Search canary queries return non-empty for STR / JKM / LHDN **or** Plan B collapse was called cleanly before 14:30; Code Execution step shows a Python snippet + numeric output in the UI.
+**Exit criteria:** `POST /api/agent/intake` with Aisyah fixtures emits a full SSE stream (5 × `step_started` + `step_result`, one `done`); Vertex AI Search canary queries return non-empty for STR / JKM / LHDN **or** Plan B collapse was called cleanly; Code Execution step shows a Python snippet + numeric output in the UI.
 
 ---
 
 ### 4. Feature: Rule engine (STR, JKM Warga Emas, 5 LHDN reliefs)
 
-**Owner:** PO1 (Hao). **Roadmap block:** 21 Apr 10:30 → 12:00 MYT (parallel to task 3 if time allows). **Depends on:** Phase 0 task 7 (scheme PDFs committed).
+**Owner:** PO1 (Hao). **Depends on:** Phase 0 task 7 (scheme PDFs committed).
 
 **Purpose/Issue:** Encode the three scheme rulesets as Pydantic v2 models. Every threshold must be sourced from a cached PDF under `backend/data/schemes/` and covered by a unit test asserting the numeric value matches the PDF. This is the credibility differentiator — no judge can challenge a number on stage if every number cites its source page.
 
@@ -225,7 +225,7 @@ _All four exit-criteria items met: Aisyah total = **RM8,208/year** (STR RM450 + 
 
 ### 5. Feature: Wire frontend ↔ backend end-to-end
 
-**Owner:** Both (Adam + Hao), paired at one machine. **Roadmap block:** 21 Apr 12:30 → 14:30 MYT. **Depends on:** Tasks 1, 2, 3, 4 all landed and local-smoke-green.
+**Owner:** Both (Adam + Hao), paired at one machine. **Depends on:** Tasks 1, 2, 3, 4 all landed and local-smoke-green.
 
 **Purpose/Issue:** Pull frontend out of mock mode onto the real backend. Every SSE event lands correctly in the UI; every provenance citation renders with a working click-through; WeasyPrint drafts download. End of block: local end-to-end happy path against the Aisyah fixtures is demo-ready.
 
@@ -255,9 +255,9 @@ _All four exit-criteria items met: Aisyah total = **RM8,208/year** (STR RM450 + 
 
 ### 6. Feature: Cloud Run deploy, responsiveness, and demo rehearsal
 
-**Owner:** PO1 deploys; PO2 owns responsiveness; Both rehearse. **Roadmap block:** 21 Apr 14:30 → 17:30 MYT. **🔒 Feature freeze at 18:00.** **Depends on:** Task 5 (e2e happy path green locally), GCP live with required APIs, `gemini-api-key` in Secret Manager.
+**Owner:** PO1 deploys; PO2 owns responsiveness; Both rehearse. **Depends on:** Task 5 (e2e happy path green locally), GCP live with required APIs, `gemini-api-key` in Secret Manager.
 
-**Purpose/Issue:** Put the live URL in front of a stranger browser. Cloud Run deploy is a Project 2030 submission requirement (handbook). Every minute past 16:00 eats rehearsal time; every minute past 17:30 risks feature-freeze slip.
+**Purpose/Issue:** Put the live URL in front of a stranger browser. Cloud Run deploy is a Project 2030 submission requirement (handbook).
 
 **Implementation — PO1 (Hao), deploy:**
 
@@ -276,13 +276,13 @@ _All four exit-criteria items met: Aisyah total = **RM8,208/year** (STR RM450 + 
 
 **Implementation — Both, rehearsal:**
 
-- [ ] Three clean back-to-back 90-second demo rehearsals from the live URL. Keep `--min-instances=1` active through the rehearsal window.
-- [ ] Note any flake; if non-critical, log for Phase 2 polish. If it kills the demo, fix it before 17:30.
-- [ ] Set a reminder to curl the frontend URL one hour before the actual demo slot to pre-warm.
+- [ ] Three clean back-to-back demo rehearsals from the live URL. Keep `--min-instances=1` active during rehearsals.
+- [ ] Note any flake; if non-critical, log for Phase 2 polish. If it kills the demo, fix it promptly.
+- [ ] Set a reminder to curl the frontend URL before the live check.
 
 - [ ] Commit config tweaks under `chore(infra)` scope.
 
-**Exit criteria:** frontend Cloud Run URL loads in incognito from another network; full happy path completes in < 10s (warm); three viewports clean; three back-to-back rehearsals hit the same RM-upside number and all five visible steps; **feature freeze declared at 18:00** — any work after that is bug-fix-only until code freeze at 21:00.
+**Exit criteria:** frontend Cloud Run URL loads in incognito from another network; full happy path completes in < 10s (warm); three viewports clean; three back-to-back rehearsals hit the same RM-upside number and all five visible steps.
 
 ---
 
@@ -636,7 +636,7 @@ _All four exit-criteria items met: Aisyah total = **RM8,208/year** (STR RM450 + 
 **Implementation — PO1 (Hao):**
 
 - [ ] Implement `backend/scripts/prune_free_tier.py` against the `users` and `evaluations` collections.
-- [ ] Deploy the job as `layak-prune-free-tier` and schedule it for 02:00 MYT via Cloud Scheduler.
+- [ ] Deploy the job as `layak-prune-free-tier` and schedule it nightly via Cloud Scheduler.
 - [ ] Keep the job logging the deleted-doc count to Cloud Logging so retention runs are visible.
 
 **Exit criteria:** the nightly prune job runs on schedule and deletes only free-tier evaluations older than 30 days.
@@ -687,21 +687,21 @@ _All four exit-criteria items met: Aisyah total = **RM8,208/year** (STR RM450 + 
 
 **Owner:** Both (Adam + Hao). **Depends on:** the live domain, the final demo flow, and the finished landing/legal pages.
 
-**Purpose/Issue:** Refresh the submission artifacts so they match the SaaS pivot instead of the hackathon demo. The README, video, deck, and form submission all need to reflect the new product shape and the new deadline.
+**Purpose/Issue:** Refresh the submission artifacts so they match the SaaS pivot instead of the hackathon demo. The README, video, deck, and form submission all need to reflect the new product shape.
 
 **Implementation — Both:**
 
 - [ ] Update `README.md` for the v2 SaaS flow, the Firebase-backed architecture, and the new live URL.
 - [ ] Re-record the demo video so it matches the signed-in workflow and the persisted history screens.
-- [ ] Update the deck, export `pitch.pdf`, and resubmit the Google Form before 24 Apr 23:59 MYT.
+- [ ] Update the deck, export `pitch.pdf`, and resubmit the Google Form.
 
-**Exit criteria:** the repo contains refreshed submission artifacts and the final form is resubmitted against the updated deadline.
+**Exit criteria:** the repo contains refreshed submission artifacts and the final form is resubmitted.
 
 ---
 
 ## Phase X: Submission Package
 
-> Maps to `docs/roadmap.md` Phase X — ship clean, complete artifacts. Tasks below are picked up on demo-day evening, post feature-freeze; hard submit is 24 Apr 23:59 MYT and the buffer window shifts to 25 Apr 00:00–00:59 MYT.
+> Covers the final submission artifacts. Keep it simple and complete.
 
 ### 1. Feature: UI polish and README final pass
 
@@ -718,8 +718,8 @@ _All four exit-criteria items met: Aisyah total = **RM8,208/year** (STR RM450 + 
 
 **Implementation:**
 
-- [ ] Script and two takes of the 90-second Aisyah flow.
-- [ ] Edit, caption if time permits.
+- [ ] Script and two takes of the Aisyah flow.
+- [ ] Edit and caption if needed.
 - [ ] Upload unlisted to YouTube; submission-form URL copied.
 
 ### 3. Feature: Pitch deck (≤15 slides)
@@ -739,6 +739,6 @@ _All four exit-criteria items met: Aisyah total = **RM8,208/year** (STR RM450 + 
 
 - [ ] Fill and submit the Google Form against every required field (repo URL, Cloud Run URL, video URL, deck PDF, GitHub profile links, track + category).
 - [ ] Verify each link in the confirmation email.
-- [ ] Resubmit if anything breaks during the 00:00–00:59 buffer.
+- [ ] Resubmit if anything breaks.
 
 ---

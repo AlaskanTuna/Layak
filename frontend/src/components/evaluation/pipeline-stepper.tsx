@@ -9,6 +9,8 @@ import { cn } from '@/lib/utils'
 
 type Props = {
   state: PipelineState
+  /** Optional per-step label overrides — e.g. manual-entry mode replaces "Extract profile" with "Profile prepared". */
+  labelOverrides?: Partial<Record<Step, string>>
 }
 
 function StepIcon({ status }: { status: StepStatus }) {
@@ -35,9 +37,10 @@ function completedCount(state: PipelineState): number {
   return PIPELINE_STEPS.filter(step => state.stepStates[step] === 'complete').length
 }
 
-export function PipelineStepper({ state }: Props) {
+export function PipelineStepper({ state, labelOverrides }: Props) {
   const completed = completedCount(state)
   const percent = Math.round((completed / PIPELINE_STEPS.length) * 100)
+  const labelFor = (step: Step) => labelOverrides?.[step] ?? STEP_LABELS[step]
 
   return (
     <div className="flex flex-col gap-3">
@@ -59,7 +62,7 @@ export function PipelineStepper({ state }: Props) {
             >
               <StepIcon status={status} />
               <span className={cn('flex-1', status === 'pending' && 'text-muted-foreground')}>
-                {STEP_LABELS[step]}
+                {labelFor(step)}
               </span>
               <span className="text-xs text-muted-foreground">{statusLabel(status)}</span>
             </li>

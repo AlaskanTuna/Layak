@@ -37,7 +37,9 @@ if _DOTENV.is_file():
             os.environ[_k] = _v
 
 from app.agents.root_agent import stream_agent_events  # noqa: E402 — after dotenv load
+from app.agents.tools.build_profile import build_profile_from_manual_entry  # noqa: E402
 from app.auth import CurrentUser  # noqa: E402 — after dotenv load
+from app.schema.manual_entry import ManualEntryPayload  # noqa: E402
 
 app = FastAPI(title="Layak Backend", version="0.1.0")
 
@@ -86,6 +88,38 @@ async def intake(
 
     async def event_stream() -> AsyncIterator[bytes]:
         async for event in stream_agent_events(uploads):
+            yield f"data: {event.model_dump_json()}\n\n".encode()
+
+    return StreamingResponse(
+        event_stream(),
+        media_type="text/event-stream",
+        headers={
+            "Cache-Control": "no-cache",
+            "Connection": "keep-alive",
+            "X-Accel-Buffering": "no",
+        },
+    )
+
+
+@app.post("/api/agent/intake_manual")
+async def intake_manual(
+    user: CurrentUser,
+    payload: ManualEntryPayload,
+) -> StreamingResponse:
+    """Privacy-first alternative to `/api/agent/intake` — JSON body, no OCR.
+
+    The client hands us the fields the OCR extract step would have derived,
+    we build a `Profile` in pure Python, and the rest of the five-step
+    pipeline runs unchanged. The SSE wire still emits all five steps so the
+    frontend stepper is unchanged.
+
+    Contract: docs/prd.md FR-21 + docs/superpowers/specs/2026-04-21-manual-entry-mode-design.md.
+    """
+    _ = user  # Phase 3 scopes `evaluations/{evalId}` on user.uid.
+    profile = build_profile_from_manual_entry(payload)
+
+    async def event_stream() -> AsyncIterator[bytes]:
+        async for event in stream_agent_events(prebuilt_profile=profile):
             yield f"data: {event.model_dump_json()}\n\n".encode()
 
     return StreamingResponse(

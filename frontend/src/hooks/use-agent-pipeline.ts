@@ -8,6 +8,7 @@ import type {
   AgentEvent,
   ComputeUpsideResult,
   HouseholdClassification,
+  ManualEntryPayload,
   Packet,
   Profile,
   SchemeMatch,
@@ -33,6 +34,7 @@ export type PipelineState = {
 export type StartOptions =
   | { mode: 'mock' }
   | { mode: 'real'; files: UploadFiles }
+  | { mode: 'manual'; payload: ManualEntryPayload }
 
 const INITIAL_STEP_STATES: Record<Step, StepStatus> = {
   extract: 'pending',
@@ -154,26 +156,11 @@ export function useAgentPipeline(): {
     })
   }, [cleanup])
 
-  const startReal = useCallback(
-    (files: UploadFiles) => {
-      cleanup()
-      setState({ ...INITIAL_STATE, phase: 'streaming' })
-
-      const controller = new AbortController()
-      abortRef.current = controller
-
-      const form = new FormData()
-      form.append('ic', files.ic)
-      form.append('payslip', files.payslip)
-      form.append('utility', files.utility)
-
+  const streamFromResponse = useCallback(
+    (controller: AbortController, request: () => Promise<Response>) => {
       ;(async () => {
         try {
-          const res = await fetch(`${getBackendUrl()}/api/agent/intake`, {
-            method: 'POST',
-            body: form,
-            signal: controller.signal
-          })
+          const res = await request()
           if (!res.ok || !res.body) {
             throw new Error(`Backend returned ${res.status} ${res.statusText}`)
           }
@@ -192,18 +179,64 @@ export function useAgentPipeline(): {
         }
       })()
     },
-    [cleanup]
+    []
+  )
+
+  const startReal = useCallback(
+    (files: UploadFiles) => {
+      cleanup()
+      setState({ ...INITIAL_STATE, phase: 'streaming' })
+
+      const controller = new AbortController()
+      abortRef.current = controller
+
+      const form = new FormData()
+      form.append('ic', files.ic)
+      form.append('payslip', files.payslip)
+      form.append('utility', files.utility)
+
+      streamFromResponse(controller, () =>
+        fetch(`${getBackendUrl()}/api/agent/intake`, {
+          method: 'POST',
+          body: form,
+          signal: controller.signal
+        })
+      )
+    },
+    [cleanup, streamFromResponse]
+  )
+
+  const startManual = useCallback(
+    (payload: ManualEntryPayload) => {
+      cleanup()
+      setState({ ...INITIAL_STATE, phase: 'streaming' })
+
+      const controller = new AbortController()
+      abortRef.current = controller
+
+      streamFromResponse(controller, () =>
+        fetch(`${getBackendUrl()}/api/agent/intake_manual`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload),
+          signal: controller.signal
+        })
+      )
+    },
+    [cleanup, streamFromResponse]
   )
 
   const start = useCallback(
     (opts: StartOptions) => {
       if (opts.mode === 'mock' || shouldForceMock()) {
         startMock()
+      } else if (opts.mode === 'manual') {
+        startManual(opts.payload)
       } else {
         startReal(opts.files)
       }
     },
-    [startMock, startReal]
+    [startMock, startReal, startManual]
   )
 
   useEffect(() => cleanup, [cleanup])

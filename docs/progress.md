@@ -4,6 +4,31 @@
 
 ---
 
+## [21/04/26] - Phase 3 Task 6 PO1: Manual Entry Mode — privacy-first intake alternative (FR-21)
+
+Shipped the "Enter manually" toggle alongside the existing three-document upload. Privacy-cautious users can now type name / DOB / IC last-4 / income / employment type / optional address / dependants list instead of uploading MyKad, payslip, and TNB bill. The Gemini OCR `extract` step is bypassed; classify → match → compute_upside → generate run unchanged. Full IC never crosses the wire — only `ic_last4` + `date_of_birth` are accepted as identity inputs.
+
+- **Backend — new files**:
+  - `backend/app/schema/manual_entry.py` (33 lines) — `ManualEntryPayload` Pydantic v2 model: name, `date_of_birth: date`, `ic_last4` (regex-4-digit), `monthly_income_rm` (0 ≤ x ≤ 1M), `employment_type ∈ {gig, salaried}`, optional `address` (max 500), `dependants: list[DependantInput]` (max 15). `extra="forbid"` on both models.
+  - `backend/app/agents/tools/build_profile.py` (92 lines) — `_classify_income_band` transcribes the six bands from `extract.py:42-47` (`< 1,500` → `b40_hardcore`; `1,500-2,500` → `b40_household`; `2,501-5,000` with kids → `b40_household_with_children` else fallback `b40_household`; `5,001-10,000` → `m40`; `> 10,000` → `t20`). `derive_household_flags` handles the `<18` / `≥60` dependant gates. `_age_from_dob(dob, today)` is `today`-injectable for deterministic tests. `build_profile_from_manual_entry(payload, today=None)` assembles the `Profile` with `household_size = 1 + len(dependants)` and `form_type = {gig→form_b, salaried→form_be}`. Name is stripped but **not** uppercased — the `AISYAH_PROFILE` fixture stores mixed case and changing it would ripple through the demo UI.
+- **Backend — refactor**:
+  - `backend/app/agents/root_agent.py::stream_agent_events` now takes `uploads | None` **OR** `prebuilt_profile: Profile | None` (XOR). When `prebuilt_profile` is passed, the Gemini OCR call is skipped but the synthetic `step_started/step_result: extract` pair still fires so the frontend stepper sees the same 5-step wire shape.
+  - `backend/app/main.py` adds `POST /api/agent/intake_manual` — JSON body, same SSE response format, same `CurrentUser` dependency so v2 auth policy applies identically. `/health` still unauthed.
+- **Backend — tests**: `backend/tests/test_manual_entry.py` (33 tests). Coverage: parametrised `_classify_income_band` across all six bands + edges; `derive_household_flags` on Aisyah + age-18-not-under-18 + parent-59-not-elderly; `_age_from_dob` before/on/after birthday; `build_profile_from_manual_entry(aisyah) == AISYAH_PROFILE` (the deterministic round-trip); `match_schemes(built) == AISYAH_SCHEME_MATCHES` (rule-engine parity); validation boundaries (empty name, bad IC, negative income, unknown employment type, extra fields, > 15 dependants, bad relationship enum); SSE route integration (missing auth → 401, malformed body → 422, full Aisyah stream → 11 events in the expected order with `extract.step_result` carrying the built Profile). **88/88 full suite green; ruff clean.**
+- **Frontend — new files**:
+  - `frontend/src/components/evaluation/intake-mode-toggle.tsx` — segmented radio-group toggle (Lucide `FileText` / `KeyboardIcon`), lifts state to the parent.
+  - `frontend/src/components/evaluation/manual-entry-form.tsx` (~280 lines) — react-hook-form + zod v4 schema, four Card-wrapped sections (Identity / Income / Address / Household). Dependants via `useFieldArray` with per-row relationship dropdown + age + optional IC last-4. "Use Aisyah sample data" button resets to the fixture values and notifies the parent to flip the demo banner. Zod uses plain `z.number()` + RHF `valueAsNumber: true` (not `z.coerce.number()`) to sidestep a resolver-type mismatch between `@hookform/resolvers@5` and `zod@4`.
+- **Frontend — extensions**:
+  - `frontend/src/lib/agent-types.ts` adds `ManualEntryPayload`, `DependantInput`, `EmploymentType`, and `Profile.address?: string | null` (previously present on the backend schema but missing from the TS mirror).
+  - `frontend/src/hooks/use-agent-pipeline.ts` extends `StartOptions` with `{ mode: 'manual'; payload: ManualEntryPayload }`. Factored a shared `streamFromResponse` helper so `startReal` and `startManual` share the SSE consumer + abort + error-handling code.
+  - `frontend/src/components/evaluation/pipeline-stepper.tsx` adds a `labelOverrides?: Partial<Record<Step, string>>` prop; manual mode passes `{ extract: 'Profile prepared' }`.
+  - `frontend/src/components/evaluation/evaluation-upload-client.tsx` hosts the toggle, routes between `UploadWidget` and `ManualEntryForm`, honours `?mode=manual` query param on first paint, and threads the label override into the stepper.
+- **Checks**: backend `pytest` 88/88 + `ruff` clean. Frontend `pnpm lint` clean; `tsc --noEmit` clean (Next.js 16 internal `.next/dev/types` cold-build type noise ignored — not introduced by this change).
+- **Sizing reality check**: landed in ~3 hours end-to-end vs the original ~6-10h estimate. The pad came from polish items that all got built regardless (dynamic dependants rows, pre-fill button, comprehensive validation tests, stepper label override) but fit inside 3h because react-hook-form + zod were already installed and `stream_agent_events` was already factored cleanly enough to accept a prebuilt `Profile`.
+- **Not shipped to prod this turn**: `layak-backend-00003-j75` still serves v1. The authed + manual-capable revision lands alongside Phase 2 Task 2's post-Firebase-setup deploy.
+
+---
+
 ## [21/04/26] - Phase 2 Task 2 PO1: Firebase Admin SDK boundary + authed /api/agent/intake
 
 PO1's slice of Phase 2 Task 2 — the backend now verifies Firebase ID tokens on `/api/agent/intake` and lazy-creates `users/{uid}` on first touch. Code-only this turn; redeploy deferred until the Firebase service-account secret is populated and Phase 2 Task 3 can mint real ID tokens for an end-to-end smoke.

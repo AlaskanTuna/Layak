@@ -44,6 +44,7 @@ from app.schema.events import (
     StepResultEvent,
     StepStartedEvent,
 )
+from app.schema.profile import Profile
 
 # Tool registry — Task 3 Path 2 binds these to Gemini-backed LlmAgents.
 extract_tool = FunctionTool(extract_profile)
@@ -101,9 +102,20 @@ _INTER_STEP_DELAY_S = 0.1
 
 
 async def stream_agent_events(
-    uploads: dict[str, tuple[str, bytes]],
+    uploads: dict[str, tuple[str, bytes]] | None = None,
+    *,
+    prebuilt_profile: Profile | None = None,
 ) -> AsyncIterator[StepStartedEvent | StepResultEvent | DoneEvent | ErrorEvent]:
     """Stream the five-step pipeline as ordered SSE events.
+
+    Two entry modes:
+
+    - **Upload path** (default, FR-2/FR-3): pass `uploads={"ic"|"payslip"|"utility":
+      (filename, bytes)}`. Gemini OCR runs `extract_profile` on the three files.
+    - **Manual-entry path** (FR-21): pass `prebuilt_profile=<Profile>`. Extract
+      is skipped, but the SSE wire still emits a synthetic `step_started`/
+      `step_result` pair for `extract` so the frontend stepper animation is
+      unchanged.
 
     Each step that's in-flight when an exception is raised is recorded as
     `current_step`, so the terminal `ErrorEvent` can identify the failing step
@@ -114,22 +126,25 @@ async def stream_agent_events(
     5+-digit runs and cap length — this prevents a hallucinated full MyKad IC
     from leaking via a `Profile.model_validate_json` `ValidationError`.
 
-    Args:
-        uploads: Mapping of `{"ic"|"payslip"|"utility": (filename, bytes)}`.
-
     Yields:
         Pydantic event models in the order the frontend expects to render them.
     """
+    if (uploads is None) == (prebuilt_profile is None):
+        raise ValueError("stream_agent_events requires exactly one of `uploads` or `prebuilt_profile`")
     current_step: Step | None = None
     try:
         current_step = "extract"
         yield StepStartedEvent(step=current_step)
         await asyncio.sleep(_INTER_STEP_DELAY_S)
-        profile = await extract_profile(
-            uploads["ic"][1],
-            uploads["payslip"][1],
-            uploads["utility"][1],
-        )
+        if prebuilt_profile is not None:
+            profile = prebuilt_profile
+        else:
+            assert uploads is not None  # narrowed by the XOR check above
+            profile = await extract_profile(
+                uploads["ic"][1],
+                uploads["payslip"][1],
+                uploads["utility"][1],
+            )
         yield StepResultEvent(step=current_step, data=ExtractResult(profile=profile))
 
         current_step = "classify"

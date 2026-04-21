@@ -41,6 +41,27 @@ export type Profile = {
   dependants: Dependant[]
   household_flags: HouseholdFlags
   form_type: FormType
+  address?: string | null
+}
+
+export type EmploymentType = 'gig' | 'salaried'
+
+export type DependantInput = {
+  relationship: Relationship
+  age: number
+  ic_last4: string | null
+}
+
+/** Body of `POST /api/agent/intake_manual` — manual-entry alternative to the three-document upload (FR-21). */
+export type ManualEntryPayload = {
+  name: string
+  /** ISO-8601 `YYYY-MM-DD`. */
+  date_of_birth: string
+  ic_last4: string
+  monthly_income_rm: number
+  employment_type: EmploymentType
+  address: string | null
+  dependants: DependantInput[]
 }
 
 export type HouseholdClassification = {

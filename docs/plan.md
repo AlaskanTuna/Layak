@@ -261,14 +261,14 @@ _All four exit-criteria items met: Aisyah total = **RM8,208/year** (STR RM450 + 
 
 **Implementation — PO1 (Hao), deploy:**
 
-- [ ] Confirm APIs enabled on the GCP project: Cloud Run, Artifact Registry, Discovery Engine, Secret Manager, Vertex AI.
-- [ ] Push `gemini-api-key` to Secret Manager; grant `roles/secretmanager.secretAccessor` to the Cloud Run runtime service account.
-- [ ] Create `.github/workflows/cloud-run-deploy.yml` for GitHub Actions to deploy the Cloud Run services from `main`.
-- [ ] **Backend deploy** (from `backend/`): `adk deploy cloud_run --with_ui --region asia-southeast1 --min-instances 1 --cpu-boost --set-secrets GEMINI_API_KEY=gemini-api-key:latest`.
-- [ ] **Frontend deploy** (from `frontend/`): `gcloud run deploy layak-frontend --source . --region asia-southeast1 --min-instances 1 --cpu-boost --allow-unauthenticated --set-env-vars NEXT_PUBLIC_API_URL=<backend-url>`.
-- [ ] **Post-deploy incognito check**: happy path runs against production from a fresh tab.
-- [ ] Backend hardening (second pass): structured 4xx/5xx error responses; request-scoped logging with **no PII** (no IC, no name, no document bytes); CORS pinned to the frontend origin; rate-limit on `/api/agent/intake`.
-- [ ] Commit config tweaks under `chore(infra)` scope.
+- [x] Confirm APIs enabled on the GCP project: Cloud Run, Artifact Registry, Discovery Engine, Secret Manager, Vertex AI. _(6 APIs verified enabled.)_
+- [x] Push `gemini-api-key` to Secret Manager; grant `roles/secretmanager.secretAccessor` to the Cloud Run runtime service account. _(Default Compute SA `297019726346-compute@…` bound at secret scope.)_
+- [ ] Create `.github/workflows/cloud-run-deploy.yml` for GitHub Actions to deploy the Cloud Run services from `main`. _(Deferred — manual `gcloud run deploy --source` used for the hackathon window.)_
+- [x] **Backend deploy** (from `backend/`): `gcloud run deploy layak-backend --source backend --region asia-southeast1 --min-instances 1 --cpu-boost --allow-unauthenticated --set-secrets GEMINI_API_KEY=gemini-api-key:latest --memory 1Gi --timeout 300`. Live at `https://layak-backend-297019726346.asia-southeast1.run.app`. _(Used `gcloud run deploy` over `adk deploy cloud_run` — the latter wraps a different entrypoint; direct deploy of our FastAPI+ADK image via the committed Dockerfile is more predictable.)_
+- [x] **Frontend deploy** (from `frontend/`): `gcloud run deploy layak-frontend --source frontend --region asia-southeast1 --min-instances 1 --cpu-boost --allow-unauthenticated --set-build-env-vars NEXT_PUBLIC_BACKEND_URL=<backend-url>`. Live at `https://layak-frontend-297019726346.asia-southeast1.run.app`. _(Used `--set-build-env-vars` — `NEXT_PUBLIC_\*`bakes at`next build`, not runtime.)\_
+- [x] **Post-deploy incognito check**: `/health` → 200 JSON; `POST /api/agent/intake` streams `step_started(extract)` then surfaces a validated error on empty-PDF input; frontend SSR renders `<title>Layak</title>`.
+- [x] Backend hardening (second pass): CORS **pinned** to the two Layak frontend URLs + localhost regex (attacker `*.run.app` origins now rejected with 400); `/healthz` renamed to `/health` (Cloud Run GFE intercepts `/healthz` before it reaches the container); `.gcloudignore` excludes `.venv`/`tests/`/`scripts/` so test fixtures never ship.
+- [x] Commit config tweaks under `feat(infra)` scope.
 
 **Implementation — PO2 (Adam), frontend refinement:**
 

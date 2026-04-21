@@ -4,6 +4,27 @@
 
 ---
 
+## [21/04/26] - Task 6 PO1: backend + frontend deployed to Cloud Run with CORS lockdown
+
+PO1's slice of Phase 1 Task 6 — both services live on Cloud Run in `asia-southeast1`, `min-instances=1 --cpu-boost` to guarantee no cold start during the demo window.
+
+- **Live URLs**:
+  - Frontend: `https://layak-frontend-297019726346.asia-southeast1.run.app`
+  - Backend: `https://layak-backend-297019726346.asia-southeast1.run.app`
+- **Backend deploy**: `gcloud run deploy layak-backend --source backend --region asia-southeast1 --min-instances 1 --cpu-boost --allow-unauthenticated --set-secrets GEMINI_API_KEY=gemini-api-key:latest --memory 1Gi --timeout 300`. Revision `layak-backend-00003-j75` currently serving 100% traffic. Built from the committed `backend/Dockerfile` (python:3.12-slim + WeasyPrint native deps + uvicorn PID-1).
+- **Frontend deploy**: `gcloud run deploy layak-frontend --source frontend --region asia-southeast1 --min-instances 1 --cpu-boost --allow-unauthenticated --set-build-env-vars NEXT_PUBLIC_BACKEND_URL=<backend-url> --memory 512Mi --timeout 60`. Buildpack auto-detected Next.js 16; `NEXT_PUBLIC_BACKEND_URL` correctly baked at `next build`.
+- **IAM bootstrap** (one-off): granted `roles/secretmanager.secretAccessor` to the default Compute SA `297019726346-compute@developer.gserviceaccount.com` on the `gemini-api-key` secret; project Owner role on `haosdevs@gmail.com` to unblock Cloud Build staging-bucket creation.
+- **Routing discovery**: Cloud Run GFE silently returns a generic 404 for `/healthz` before traffic ever reaches the container (log-trace confirmed: `/` and `/api/agent/intake` both hit uvicorn, `/healthz` never did). Renamed `/healthz` → `/health` in `backend/app/main.py` and redeployed. `/health` → `{"status":"ok","version":"0.1.0"}` 200.
+- **CORS lockdown** (audit Critical): the original `allow_origin_regex` accepted any `https://*.run.app`, which would let any attacker-hosted Cloud Run service drive the SSE pipeline from a victim's browser and exfiltrate the extracted profile JSON. Pinned to the two Layak frontend URLs (exact-match `allow_origins=[…]`) plus a localhost-only `allow_origin_regex`. Verified: `Origin: https://attacker.run.app` → 400; legit frontend → 200 with reflected `access-control-allow-origin`; `http://localhost:3000` dev origin → 200.
+- **`.gcloudignore` files**: added to both `backend/` and `frontend/` so `.venv/`, `tests/`, `scripts/`, `node_modules/`, `.next/`, and `.env*` stay out of the source-deploy upload.
+- **Post-deploy incognito smoke**:
+  - `GET /health` → 200 `{"status":"ok"}`.
+  - `POST /api/agent/intake` with three dummy PDFs → `step_started(extract)` then `error` with sanitised Gemini `INVALID_ARGUMENT: The document has no pages.` (confirms secret injection + SSE wire + error-path plumbing).
+  - `GET /` on frontend → 200 with `<title>Layak</title>`; Next.js 16 SSR content rendered.
+- **Audit pass** (subagent `general-purpose`, reviewed deploy YAML + IAM + CORS): Critical issue (CORS wildcard) was fixed inline this turn; Warnings (maxScale=3 scaling cap, default Compute SA with project-editor grade, no revision pinning) logged for post-hackathon cleanup; no Gemini key leakage in the frontend bundle; mock-fallback path (`startMock()` in `use-agent-pipeline.ts`) still reachable as the demo safety net.
+
+---
+
 ## [21/04/26] - Task 5 PO2 final sweep: dev-only mock replay toggle and local happy-path smoke
 
 The last Task 5 frontend guardrail is now dev-only (`NODE_ENV !== 'production' && NEXT_PUBLIC_USE_MOCK_SSE=1`), so production builds always hit the real backend while demo replay stays available in development. Verified with a backend SSE smoke against generated Aisyah PDFs: 5 `step_started`, 5 `step_result`, 1 `done`, 0 `error`; all three draft packet filenames were returned with base64 bytes. Frontend `pnpm lint` and `pnpm build` stayed green.

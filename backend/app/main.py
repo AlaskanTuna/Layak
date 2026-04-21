@@ -42,16 +42,24 @@ app = FastAPI(title="Layak Backend", version="0.1.0")
 
 app.add_middleware(
     CORSMiddleware,
-    # Dev: regex matches any localhost port (PO2 runs :6767, scaffold default is :3000).
-    # Prod: the Cloud Run frontend URL is added to `allow_origins` at Task 6 deploy time.
+    # Dev: any localhost port. Prod: ONLY the two Cloud Run URLs that back the
+    # Layak frontend. A broad `*.run.app` allowlist would let any attacker-hosted
+    # Cloud Run service drive the SSE pipeline from a victim's browser and
+    # exfiltrate the extracted profile JSON — locked down after the Task 6 audit.
+    allow_origins=[
+        "https://layak-frontend-297019726346.asia-southeast1.run.app",
+        "https://layak-frontend-i2t7hf6seq-as.a.run.app",
+    ],
     allow_origin_regex=r"http://localhost:\d+",
     allow_methods=["GET", "POST", "OPTIONS"],
     allow_headers=["*"],
 )
 
 
-@app.get("/healthz")
-async def healthz() -> dict[str, str]:
+@app.get("/health")
+async def health() -> dict[str, str]:
+    # Cloud Run / Knative intercepts `/healthz` at the GFE layer before it
+    # reaches the container — use `/health` so smoke tests hit the app.
     return {"status": "ok", "version": app.version}
 
 

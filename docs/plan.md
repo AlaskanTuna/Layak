@@ -263,7 +263,7 @@ _All four exit-criteria items met: Aisyah total = **RM8,208/year** (STR RM450 + 
 
 - [x] Confirm APIs enabled on the GCP project: Cloud Run, Artifact Registry, Discovery Engine, Secret Manager, Vertex AI. _(6 APIs verified enabled.)_
 - [x] Push `gemini-api-key` to Secret Manager; grant `roles/secretmanager.secretAccessor` to the Cloud Run runtime service account. _(Default Compute SA `297019726346-compute@…` bound at secret scope.)_
-- [ ] Create `.github/workflows/cloud-run-deploy.yml` for GitHub Actions to deploy the Cloud Run services from `main`. _(Deferred — manual `gcloud run deploy --source` used for the hackathon window.)_
+- [x] Create `.github/workflows/cloud-run-deploy.yml` for GitHub Actions to deploy the Cloud Run services from `main`. _(Un-deferred after the 24 April deadline extension. Keyless auth via Workload Identity Federation: pool `github-actions`, OIDC provider `github` with `attribute.repository=='AlaskanTuna/myai-future-hackathon'` condition, SA `github-actions-deployer` holding `run.admin` + `cloudbuild.builds.editor` + `artifactregistry.writer` + `storage.admin` at project scope plus `iam.serviceAccountUser` narrowed to the Compute SA, and `iam.workloadIdentityUser` binding restricted to the repo principalSet. Workflow triggers on push to `main` with `backend/**` / `frontend/**` paths filter plus `workflow_dispatch` (choice input: both / backend / frontend). `dorny/paths-filter@v3` gates per-service jobs so only the changed service redeploys. Backend flags mirror current manual deploy (`--set-secrets GEMINI_API_KEY=gemini-api-key:latest`); frontend bakes `NEXT_PUBLIC_BACKEND_URL` + six `NEXT_PUBLIC_FIREBASE_\*`values via`--set-build-env-vars`— Firebase Web SDK values are public by design. Follow-up: when PO1 lands Task 2 Firebase Admin secret, extend the backend`--set-secrets`with`FIREBASE*ADMIN_KEY=firebase-admin-key:latest` in the same commit that adds the secret.)*
 - [x] **Backend deploy** (from `backend/`): `gcloud run deploy layak-backend --source backend --region asia-southeast1 --min-instances 1 --cpu-boost --allow-unauthenticated --set-secrets GEMINI_API_KEY=gemini-api-key:latest --memory 1Gi --timeout 300`. Live at `https://layak-backend-297019726346.asia-southeast1.run.app`. _(Used `gcloud run deploy` over `adk deploy cloud_run` — the latter wraps a different entrypoint; direct deploy of our FastAPI+ADK image via the committed Dockerfile is more predictable.)_
 - [x] **Frontend deploy** (from `frontend/`): `gcloud run deploy layak-frontend --source frontend --region asia-southeast1 --min-instances 1 --cpu-boost --allow-unauthenticated --set-build-env-vars NEXT_PUBLIC_BACKEND_URL=<backend-url>`. Live at `https://layak-frontend-297019726346.asia-southeast1.run.app`. _(Used `--set-build-env-vars` — `NEXT_PUBLIC_\*`bakes at`next build`, not runtime.)\_
 - [x] **Post-deploy incognito check**: `/health` → 200 JSON; `POST /api/agent/intake` streams `step_started(extract)` then surfaces a validated error on empty-PDF input; frontend SSR renders `<title>Layak</title>`.
@@ -292,9 +292,9 @@ _All four exit-criteria items met: Aisyah total = **RM8,208/year** (STR RM450 + 
 
 **Implementation:**
 
-- [ ] Set `frontend/src/app/(app)/layout.tsx` to the shared shell: `max-w-5xl mx-auto px-4 md:px-6`.
-- [ ] Remove page-level width overrides from `frontend/src/app/(app)/**` so dashboard, evaluation, results, schemes, and settings all inherit the same container.
-- [ ] Keep the visual rhythm consistent across `/dashboard`, `/dashboard/evaluation`, `/dashboard/evaluation/upload`, `/dashboard/evaluation/results/[id]`, `/dashboard/schemes`, and `/settings`.
+- [x] Set `frontend/src/app/(app)/layout.tsx` to the shared shell: `max-w-5xl mx-auto px-4 md:px-6`. _(AppShell `main` now owns `mx-auto w-full max-w-5xl`.)_
+- [x] Remove page-level width overrides from `frontend/src/app/(app)/**` so dashboard, evaluation, results, schemes, and settings all inherit the same container. _(Dropped page-level `mx-auto`/`max-w-*` wrappers from the authed pages.)_
+- [x] Keep the visual rhythm consistent across `/dashboard`, `/dashboard/evaluation`, `/dashboard/evaluation/upload`, `/dashboard/evaluation/results/[id]`, `/dashboard/schemes`, and `/settings`. _(Dashboard, evaluation, schemes, and settings now inherit one shell width.)_
 
 **Exit criteria:** every authenticated route uses the same shell width and no page introduces its own competing max-width.
 
@@ -306,9 +306,9 @@ _All four exit-criteria items met: Aisyah total = **RM8,208/year** (STR RM450 + 
 
 **Implementation:**
 
-- [ ] Inline the How It Works pipeline visual into `frontend/src/app/page.tsx` and keep the section on the public landing.
-- [ ] Delete `frontend/src/app/(app)/dashboard/how-it-works/page.tsx` and any route wiring that still points at `/dashboard/how-it-works`.
-- [ ] Remove stale links or breadcrumbs in `frontend/src/components/layout/sidebar.tsx` and related nav code so `/` is the only How It Works destination.
+- [x] Inline the How It Works pipeline visual into `frontend/src/app/page.tsx` and keep the section on the public landing. _(Inline `#how-it-works` now renders on the landing page.)_
+- [x] Delete `frontend/src/app/(app)/dashboard/how-it-works/page.tsx` and any route wiring that still points at `/dashboard/how-it-works`. _(Deleted both dashboard How It Works page files and retired the route.)_
+- [x] Remove stale links or breadcrumbs in `frontend/src/components/layout/sidebar.tsx` and related nav code so `/` is the only How It Works destination. _(Sidebar entry removed; header/footer now point to `/#how-it-works`, breadcrumb label dropped.)_
 
 **Exit criteria:** the landing page shows the full How It Works content inline and `/dashboard/how-it-works` is gone.
 
@@ -320,9 +320,9 @@ _All four exit-criteria items met: Aisyah total = **RM8,208/year** (STR RM450 + 
 
 **Implementation:**
 
-- [ ] Remove the `"DRAFT packets only — you stay in control"` copy from `frontend/src/app/page.tsx`.
-- [ ] Check the landing CTA and nearby trust copy for any duplicate wording and trim it to the watermark invariant.
-- [ ] Leave the packet watermark text untouched; the landing page should stop restating it.
+- [x] Remove the `"DRAFT packets only — you stay in control"` copy from `frontend/src/app/page.tsx`. _(Removed the ShieldCheck badge and duplicate draft-control sentence from `landing-hero.tsx`.)_
+- [x] Check the landing CTA and nearby trust copy for any duplicate wording and trim it to the watermark invariant. _(Audited CTA/features; no duplicate draft-control copy remained.)_
+- [x] Leave the packet watermark text untouched; the landing page should stop restating it. _(Backend `DRAFT — NOT SUBMITTED` watermark stayed untouched.)_
 
 **Exit criteria:** the landing page no longer repeats the draft-control line and the invariant is implied by the packet watermark only.
 
@@ -369,10 +369,10 @@ _All four exit-criteria items met: Aisyah total = **RM8,208/year** (STR RM450 + 
 
 **Implementation — PO2 (Adam):**
 
-- [ ] Create `frontend/src/lib/firebase.ts` for `initializeApp`, `getAuth`, Google provider setup, and the fetch wrapper that injects `Authorization: Bearer <id-token>`.
-- [ ] Add `frontend/src/components/auth/auth-guard.tsx` and wrap `frontend/src/app/(app)/layout.tsx` so dashboard routes redirect to `/sign-in` when no Firebase session exists.
-- [ ] Implement `frontend/src/app/sign-in/page.tsx` and `frontend/src/app/sign-up/page.tsx` with the shared "Continue with Google" flow and the PDPA consent checkbox on sign-up.
-- [ ] Add `NEXT_PUBLIC_FIREBASE_*` env plumbing in `frontend/.env.example` and the local `frontend/.env.local` flow so the client SDK boots cleanly in dev and prod.
+- [x] Create `frontend/src/lib/firebase.ts` for `initializeApp`, `getAuth`, Google provider setup, and the fetch wrapper that injects `Authorization: Bearer <id-token>`. _(Lazy app/auth init via `getFirebaseApp` + `getFirebaseAuth`; `signInWithGoogle` uses `signInWithPopup` with `prompt: 'select_account'`; `authedFetch` attaches bearer iff `currentUser` exists and passes through otherwise so unauthed preview traffic still reaches the pre-auth backend revision.)_
+- [x] Add `frontend/src/components/auth/auth-guard.tsx` and wrap `frontend/src/app/(app)/layout.tsx` so dashboard routes redirect to `/sign-in` when no Firebase session exists. _(Client-only `<AuthGuard>` renders a Loader while `onAuthStateChanged` is pending, then `router.replace('/sign-in')` for anons; route group `(app)/layout.tsx` now wraps `<AppShell>` in `<AuthGuard>`; `<AuthProvider>` mounted in root `layout.tsx` inside `ThemeProvider` so `(auth)` and `(marketing)` also see auth state for the signed-in-redirect case.)_
+- [x] Implement `frontend/src/app/sign-in/page.tsx` and `frontend/src/app/sign-up/page.tsx` with the shared "Continue with Google" flow and the PDPA consent checkbox on sign-up. _(Actual paths are `(auth)/sign-in/page.tsx` and `(auth)/sign-up/page.tsx` — plan was stale from the route-group refactor. Thin re-exports point at `src/app/pages/auth/sign-{in,up}-page.tsx`, which render `SignInForm` / `SignUpForm`. Both forms: remove v1 "Continue as guest" / disabled email-password inputs, replace with Google button + multi-color G icon, redirect to `/dashboard` on success, surface error text under the button. Sign-up adds a PDPA consent checkbox gating the Google button with `Privacy` / `Terms` links; persistence of `pdpaConsentAt` deferred to Phase 5 Task 3 per the v2 SaaS pivot spec. Old "Guest" badge in `user-menu.tsx` replaced with `user.displayName` / `user.email` + real `signOut()`. `use-agent-pipeline.ts` now calls `authedFetch(...)` instead of `fetch(...)` so the bearer lands on `POST /api/agent/intake` once PO1 redeploys Task 2.)_
+- [x] Add `NEXT_PUBLIC_FIREBASE_*` env plumbing in `frontend/.env.example` and the local `frontend/.env.local` flow so the client SDK boots cleanly in dev and prod. _(Repo-root `.env` / `.env.example` own the contract — `frontend/.env.local` is already a symlink to `../.env` via the `predev` hook. Populated all six `NEXT_PUBLIC_FIREBASE_\*`keys plus the future`FIREBASE*ADMIN_KEY`placeholder for PO1's backend cutover. Web App registered via`firebase apps:create WEB "Layak Web"`→ App ID`1:297019726346:web:8399534a56cf8ea5dc5df3`; config pulled via `firebase apps:sdkconfig WEB`.)*
 
 **Exit criteria:** a signed-in browser reaches `/dashboard`, the ID token is attached to backend requests, and the frontend redirects anonymous users to the auth page.
 

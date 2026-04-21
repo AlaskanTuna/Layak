@@ -3,7 +3,7 @@ import { SettingsPlaceholder } from '@/components/settings/settings-placeholder'
 
 export function SettingsPage() {
   return (
-    <div className="mx-auto flex max-w-3xl flex-col gap-6">
+    <div className="flex flex-col gap-6">
       <PageHeading
         eyebrow="Settings"
         title="Your defaults and preferences."

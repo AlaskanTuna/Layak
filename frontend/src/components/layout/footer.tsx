@@ -14,7 +14,7 @@ export function Footer() {
         <span aria-hidden className="opacity-40">
           ·
         </span>
-        <Link href="/dashboard/how-it-works" className="transition-colors hover:text-foreground">
+        <Link href="/#how-it-works" className="transition-colors hover:text-foreground">
           How it Works
         </Link>
       </div>

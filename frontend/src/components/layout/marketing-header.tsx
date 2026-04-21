@@ -13,7 +13,7 @@ export function MarketingHeader() {
       </Link>
       <nav className="ml-auto flex items-center gap-1">
         <ThemeToggle />
-        <Button render={<Link href="/dashboard/how-it-works" />} size="sm" variant="ghost">
+        <Button render={<Link href="/#how-it-works" />} size="sm" variant="ghost">
           How it works
         </Button>
         <Button render={<Link href="/sign-in" />} size="sm">

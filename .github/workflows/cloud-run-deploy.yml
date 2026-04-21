@@ -1,0 +1,117 @@
+name: Deploy to Cloud Run
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - backend/**
+      - frontend/**
+      - .github/workflows/cloud-run-deploy.yml
+  workflow_dispatch:
+    inputs:
+      services:
+        description: Which services to deploy
+        type: choice
+        options: [both, backend, frontend]
+        default: both
+
+permissions:
+  contents: read
+  id-token: write
+
+env:
+  GCP_PROJECT: layak-myaifuturehackathon
+  GCP_REGION: asia-southeast1
+  WIF_PROVIDER: projects/297019726346/locations/global/workloadIdentityPools/github-actions/providers/github
+  DEPLOY_SA: github-actions-deployer@layak-myaifuturehackathon.iam.gserviceaccount.com
+  BACKEND_URL: https://layak-backend-297019726346.asia-southeast1.run.app
+  FIREBASE_API_KEY: AIzaSyAOkuoODA2epkzPw2Vva1lYrnG3lIqAxXE
+  FIREBASE_AUTH_DOMAIN: layak-myaifuturehackathon.firebaseapp.com
+  FIREBASE_PROJECT_ID: layak-myaifuturehackathon
+  FIREBASE_STORAGE_BUCKET: layak-myaifuturehackathon.firebasestorage.app
+  FIREBASE_MESSAGING_SENDER_ID: '297019726346'
+  FIREBASE_APP_ID: '1:297019726346:web:8399534a56cf8ea5dc5df3'
+
+jobs:
+  detect-changes:
+    name: Detect changed services
+    runs-on: ubuntu-latest
+    outputs:
+      backend: ${{ steps.filter.outputs.backend }}
+      frontend: ${{ steps.filter.outputs.frontend }}
+    steps:
+      - uses: actions/checkout@v4
+      - id: filter
+        uses: dorny/paths-filter@v3
+        with:
+          filters: |
+            backend:
+              - 'backend/**'
+            frontend:
+              - 'frontend/**'
+
+  deploy-backend:
+    name: Deploy backend
+    needs: detect-changes
+    if: >-
+      (github.event_name == 'push' && needs.detect-changes.outputs.backend == 'true')
+      || (github.event_name == 'workflow_dispatch' && (github.event.inputs.services == 'both' || github.event.inputs.services == 'backend'))
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    concurrency:
+      group: deploy-backend-${{ github.ref }}
+      cancel-in-progress: false
+    steps:
+      - uses: actions/checkout@v4
+      - id: auth
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ env.WIF_PROVIDER }}
+          service_account: ${{ env.DEPLOY_SA }}
+      - uses: google-github-actions/setup-gcloud@v2
+      - name: gcloud run deploy layak-backend
+        run: |
+          gcloud run deploy layak-backend \
+            --source backend \
+            --project "$GCP_PROJECT" \
+            --region "$GCP_REGION" \
+            --min-instances 1 \
+            --cpu-boost \
+            --allow-unauthenticated \
+            --set-secrets GEMINI_API_KEY=gemini-api-key:latest \
+            --memory 1Gi \
+            --timeout 300 \
+            --quiet
+
+  deploy-frontend:
+    name: Deploy frontend
+    needs: detect-changes
+    if: >-
+      (github.event_name == 'push' && needs.detect-changes.outputs.frontend == 'true')
+      || (github.event_name == 'workflow_dispatch' && (github.event.inputs.services == 'both' || github.event.inputs.services == 'frontend'))
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    concurrency:
+      group: deploy-frontend-${{ github.ref }}
+      cancel-in-progress: false
+    steps:
+      - uses: actions/checkout@v4
+      - id: auth
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ env.WIF_PROVIDER }}
+          service_account: ${{ env.DEPLOY_SA }}
+      - uses: google-github-actions/setup-gcloud@v2
+      - name: gcloud run deploy layak-frontend
+        run: |
+          gcloud run deploy layak-frontend \
+            --source frontend \
+            --project "$GCP_PROJECT" \
+            --region "$GCP_REGION" \
+            --min-instances 1 \
+            --cpu-boost \
+            --allow-unauthenticated \
+            --set-build-env-vars "NEXT_PUBLIC_BACKEND_URL=$BACKEND_URL,NEXT_PUBLIC_FIREBASE_API_KEY=$FIREBASE_API_KEY,NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=$FIREBASE_AUTH_DOMAIN,NEXT_PUBLIC_FIREBASE_PROJECT_ID=$FIREBASE_PROJECT_ID,NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET=$FIREBASE_STORAGE_BUCKET,NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=$FIREBASE_MESSAGING_SENDER_ID,NEXT_PUBLIC_FIREBASE_APP_ID=$FIREBASE_APP_ID" \
+            --memory 512Mi \
+            --timeout 60 \
+            --quiet

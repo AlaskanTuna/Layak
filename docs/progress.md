@@ -29,6 +29,84 @@ Shipped the "Enter manually" toggle alongside the existing three-document upload
 
 ---
 
+## [21/04/26] - Phase 1 Task 6 CI/CD: GitHub Actions Cloud Run deploy via Workload Identity Federation
+
+Un-deferred the Phase 1 Task 6 CI/CD item now that the deadline moved to 24 April. Keyless auth wired end-to-end from GitHub Actions to GCP, with a single workflow file driving per-service deploys off `main`.
+
+- **WIF infrastructure** (gcloud, one-time): pool `github-actions` + OIDC provider `github` with issuer `https://token.actions.githubusercontent.com` and attribute condition `assertion.repository=='AlaskanTuna/myai-future-hackathon'` — restricts impersonation to this exact repo. SA `github-actions-deployer@layak-myaifuturehackathon.iam.gserviceaccount.com` holds `roles/run.admin`, `roles/cloudbuild.builds.editor`, `roles/artifactregistry.writer`, `roles/storage.admin` at project scope, plus `roles/iam.serviceAccountUser` narrowed to the Compute SA (not project-wide) so the deployer can "act as" the runtime SA without blanket impersonation of every SA in the project. Final binding: `roles/iam.workloadIdentityUser` on the deployer SA with `principalSet://…/attribute.repository/AlaskanTuna/myai-future-hackathon` — only workflows from this repo can mint tokens for the SA.
+- **`.github/workflows/cloud-run-deploy.yml`** — triggers on push to `main` with paths filter `backend/**` + `frontend/**` + the workflow file itself; plus `workflow_dispatch` with a `services` choice input (both / backend / frontend). Permissions: `id-token: write` (required for WIF), `contents: read`. Env block centralises the project ID, region, WIF provider resource name, deployer SA, backend URL, and the six public `NEXT_PUBLIC_FIREBASE_*` values.
+- **Three jobs**: `detect-changes` runs `dorny/paths-filter@v3` to emit `backend` / `frontend` booleans; `deploy-backend` and `deploy-frontend` each `needs: detect-changes` with `if` conditions that combine the push-branch filter output OR the dispatch input. Both deploy jobs use `google-github-actions/auth@v2` → `setup-gcloud@v2` → `gcloud run deploy --source`. Per-job `concurrency: deploy-{service}-{ref}` with `cancel-in-progress: false` prevents parallel revision races on the same service while keeping backend and frontend independent.
+- **Backend deploy command** mirrors current manual flags: `--source backend --min-instances 1 --cpu-boost --allow-unauthenticated --set-secrets GEMINI_API_KEY=gemini-api-key:latest --memory 1Gi --timeout 300`. Deliberately does **not** yet include `FIREBASE_ADMIN_KEY=firebase-admin-key:latest` — that secret doesn't exist yet. PO1 will add that in the same commit that runs runbook §2 to create the `layak-firebase-admin` SA, mint the key, and populate the secret.
+- **Frontend deploy command** adds `--set-build-env-vars` for `NEXT_PUBLIC_BACKEND_URL` plus all six `NEXT_PUBLIC_FIREBASE_*` keys so the Firebase Web SDK boots in the production bundle. These values are public by Firebase design (access control lives in Firestore rules and the backend Admin SDK), so they live in the workflow env block, not in GitHub Secrets.
+- **Safe first-push semantics** — the initial commit of this file touches only `.github/workflows/cloud-run-deploy.yml`, which is in the trigger paths but not in the `detect-changes` filter. The workflow fires, both service filter outputs come back false, both deploy jobs evaluate to `if: false` and skip. Net: no production deploy from this commit. PO1's next push (Task 2 Firebase-admin wiring or any `backend/**` change) will be the first real deploy through CI/CD.
+- **Verification path** — once PO1 or PO2 needs to confirm WIF auth end-to-end, run `gh workflow run cloud-run-deploy.yml --ref main -f services=frontend` for a single-service smoke. Frontend redeploy is safe (it just rebuilds against the same live backend URL); backend redeploy regresses the demo until the Firebase Admin secret lands.
+- **Runbook linkage** — Phase 1 Task 6 item ticked in `docs/plan.md` with the annotation pointing at the WIF setup + follow-up. Runbook §2 (Firebase Admin service account) is unchanged — it now doubles as the Task 6 follow-up PO1 picks up when doing Task 2 deploy.
+- **`.github/workflows/.gitkeep`** removed — directory now holds real content.
+
+---
+
+## [21/04/26] - Added root README.md with live URLs, stack, and deploy commands
+
+Delegated to Copilot CLI, `README.md` now serves as the repo's top-level operator doc (`docs: add root readme with live urls, stack, and deploy commands`, commit `0b5875e`). It consolidates live URLs, overview, architecture pointer, versioned tech stack, repo layout, local dev, deploy commands, docs links, and status/licence so the repo has one copy-pasteable landing page for onboarding and deploy context.
+
+- **Live URLs / deploys** — frontend/backend Cloud Run URLs and the exact `gcloud run deploy` commands are now surfaced at the top of the repo.
+- **Docs links** — the root doc now points at `docs/prd.md`, `docs/trd.md`, `docs/roadmap.md`, `docs/plan.md`, and `docs/progress.md`.
+- **Scope** — no code paths changed; this is a docs-only landing page for operator context.
+
+---
+
+## [21/04/26] - Phase 1 Task 9 PO2: draft-control copy removal
+
+Cherry-picked `9174b3a` (`refactor(frontend): remove redundant draft-control copy from landing`) from PO2 source commit `877beef` into `frontend/src/components/landing/landing-hero.tsx`. Removed the ShieldCheck-badged "DRAFT packets only — you stay in control" span and the trailing "Every packet is a DRAFT you lodge yourself." sentence; scoped audit of `landing-cta.tsx` and `landing-features.tsx` found no duplicate copy, and the backend watermark `DRAFT — NOT SUBMITTED` in `backend/app/templates/_base.html.jinja` stayed untouched.
+
+- **`frontend/src/components/landing/landing-hero.tsx`** — dropped the badge copy and the duplicate draft-control sentence.
+- **Scope check** — `landing-cta.tsx` and `landing-features.tsx` were audited; no follow-up removals were needed.
+- **Validation** — lint + build stayed clean.
+
+---
+
+## [21/04/26] - Phase 1 Task 8 PO2: how-it-works move + Gemini Code Execution rename
+
+Cherry-picked `d9e25bb` (`refactor(frontend): move how-it-works to landing and drop dashboard route`) from PO2 source commit `9f98138`; one merge conflict was resolved by taking the deletion of `frontend/src/app/pages/dashboard/how-it-works-page.tsx`. `frontend/src/components/how-it-works/how-it-works-content.tsx` now says "On-stage arithmetic" / "Python" in Step 04, `frontend/src/app/pages/marketing/landing-page.tsx` renders `<section id="how-it-works"><HowItWorksContent /></section>`, and the sidebar/footer/header/breadcrumb route wiring now points to `/#how-it-works` or drops the stale label. The dashboard route files were deleted, and the route table now shows 11 prerendered static routes.
+
+- **Landing page** — How It Works now renders inline on the marketing landing page.
+- **Route cleanup** — the dashboard How It Works page files were deleted, and stale sidebar/footer/header/breadcrumb links were removed.
+- **Copy rename** — Step 04 and the stack card now use "On-stage arithmetic" / "Python" instead of Gemini Code Execution.
+- **Validation** — lint + build stayed clean.
+
+---
+
+## [21/04/26] - Phase 1 Task 7 PO2: width-consistency pass
+
+Cherry-picked `5c19386` (`refactor(frontend): normalise width shell on authed routes`) from PO2 source commit `f407e3d` to move the width boundary into `frontend/src/components/layout/app-shell.tsx`. Added `mx-auto w-full max-w-5xl` to the shell `<main>` and stripped page-level `mx-auto`/`max-w-*` wrappers from `dashboard-page.tsx`, `how-it-works-page.tsx` (before it was deleted), `schemes-page.tsx`, `evaluation-overview-page.tsx`, `evaluation-upload-page.tsx`, `evaluation-results-page.tsx`, and `settings-page.tsx`, so the narrower `max-w-3xl` screens now expand to the shared shell width.
+
+- **`frontend/src/components/layout/app-shell.tsx`** — shell `<main>` now owns the width contract.
+- **Authed pages** — page-level width wrappers were removed from the dashboard, evaluation, schemes, and settings pages.
+- **Outcome** — the former narrower screens now inherit `max-w-5xl` from the shell.
+- **Validation** — lint + build stayed clean.
+
+---
+
+## [21/04/26] - Phase 2 Task 3 PO2: Frontend Firebase Web SDK + AuthGuard + Google sign-in/up + PDPA consent
+
+PO2's slice of Phase 2 Task 3 — the browser now has a real Firebase Auth client, dashboard routes redirect anons to `/sign-in`, and `POST /api/agent/intake` sends a bearer token once the Admin-SDK revision is redeployed. Handoff-ready for the Phase 2 Task 4 joint smoke; no redeploy this turn per the "stop at the handoff" directive.
+
+- **Firebase project stood up end-to-end (infra, not code).** The `layak-myaifuturehackathon` GCP project had Firebase the concept but zero Firebase the infra — no Firestore DB, no Identity Toolkit, no Web App. Enabled `firestore.googleapis.com` + `identitytoolkit.googleapis.com`, provisioned Firestore Native DB in `asia-southeast1` as `(default)`, confirmed the Google sign-in provider the user enabled via Console is live (OAuth client `297019726346-78mbvndtm8oll3ntodb9rai60lhqp9ti`), and deployed PO1's `firestore.rules` + `firestore.indexes.json` via `firebase deploy --only firestore:rules,firestore:indexes`. Registered the Web App `Layak Web` via `firebase apps:create WEB` → App ID `1:297019726346:web:8399534a56cf8ea5dc5df3` and pulled the six-key SDK config with `firebase apps:sdkconfig WEB`.
+- **`frontend/src/lib/firebase.ts`** — lazy singleton boundary. `getFirebaseApp()` + `getFirebaseAuth()` cache instances per-module, `assertConfig()` throws with a named key list if any `NEXT_PUBLIC_FIREBASE_*` is missing so misconfig fails loud at first call instead of silently returning null. `signInWithGoogle()` forces `prompt: 'select_account'` so the popup always presents the account picker (avoids the silent-Google-identity trap when a user wants to switch accounts). `authedFetch(input, init)` reads `getFirebaseAuth().currentUser`, calls `getIdToken()` if present, injects `Authorization: Bearer <token>` onto a cloned `Headers`, and falls through to plain `fetch` for anonymous calls — keeps the pre-auth backend revision usable during the cutover window.
+- **`frontend/src/lib/auth-context.tsx`** — minimal `<AuthProvider>` + `useAuth()` hook. Single `onAuthStateChanged` subscription in a root-level `useEffect`, state is `{ user, loading }`; loading starts `true` and flips to `false` on first callback so the guard can render a loader without flashing unauthed content. Unsubscribes on unmount.
+- **`frontend/src/components/auth/auth-guard.tsx`** — redirects to `/sign-in` via `router.replace()` when `!loading && !user`, otherwise renders children. Shows an `aria-live="polite"` Loader2 spinner during the `loading` window or the one-frame gap before `router.replace()` unmounts the guard. Used from `frontend/src/app/(app)/layout.tsx` which now wraps `<AppShell>` in `<AuthGuard>`.
+- **Root `frontend/src/app/layout.tsx`** — mounts `<AuthProvider>` inside `<ThemeProvider>` so auth state is readable across all three route groups (`(app)`, `(auth)`, `(marketing)`). Needed because `/sign-in` and `/sign-up` redirect signed-in users forward to `/dashboard` on mount.
+- **`frontend/src/components/sign-in/sign-in-form.tsx`** — rewritten. Removed the v1 "Continue as guest" primary button and the disabled email+password inputs (v2 is Google-only per the pivot spec). Single Google-branded button with the multi-colour G SVG icon (new `frontend/src/components/auth/google-icon.tsx`, 4-path inline SVG, no brand-icon dep). Spinner swap on `pending`; error copy surfaces under the button with `role="alert"`; `useEffect` redirects to `/dashboard` if `useAuth()` reports a user.
+- **`frontend/src/components/sign-up/sign-up-form.tsx`** — same Google button + the PDPA consent checkbox. Raw `<input type="checkbox">` styled with `accent-primary` + shadcn-consistent radius rather than adding the shadcn `Checkbox` primitive for a single use site. The button's `disabled` prop is ORed against `!consent` so the signup flow is gated on consent before the OAuth popup opens. Copy links to `/privacy` and `/terms`, which are Phase 5 Task 2 deliverables — the anchors will 404 until then, acceptable trade per the route-group precedent.
+- **`frontend/src/components/layout/user-menu.tsx`** — real sign-out + real identity. Avatar initial derives from `displayName` or `email` (was hardcoded `"G"` for guest). Menu header shows `displayName` + `email` (truncated). Sign-out swaps the `<Link href="/sign-in">` destructive link for a `<button>` that calls `signOutCurrentUser()` then `router.replace('/sign-in')`; `signingOut` state keeps the button disabled during the await window so a double click can't fire two revoke calls.
+- **`frontend/src/hooks/use-agent-pipeline.ts`** — swapped `fetch(...)` → `authedFetch(...)` on the `/api/agent/intake` SSE POST. `authedFetch` preserves streaming (it passes init through to native `fetch`), so the existing `parseSseStream(res.body)` generator is untouched. During the interim (backend pre-auth revision still serving), the missing-token fallback path in `authedFetch` returns a no-header fetch and the upload still works; once PO1 redeploys with `FIREBASE_ADMIN_KEY` wired, the same code path enforces the bearer.
+- **Env plumbing.** Repo-root `.env` (gitignored) got real `NEXT_PUBLIC_FIREBASE_*` values from the sdkconfig dump plus a `FIREBASE_ADMIN_KEY=` placeholder for the upcoming backend redeploy. Repo-root `.env.example` mirrors the keys as empty placeholders with doc comments clarifying that the Web SDK config values are **not** secrets — they're public project identifiers, access is gated by Firestore rules + backend Admin SDK, not by opacity. The existing `frontend/.env.local` → `../.env` symlink (created by the `predev` hook) means both backend (`python-dotenv`) and frontend (Next.js) read from the same source.
+- **`pnpm add firebase`** → `firebase 12.12.1` locked in `frontend/package.json`. pnpm flagged three ignored build scripts (`@firebase/util`, `msw`, `protobufjs`) — these are peer dependencies of unused Firebase modules (Remote Config, mock service worker, gRPC); safe to leave unapproved since we only import from `firebase/app` + `firebase/auth`.
+- **Smoke: `pnpm run lint` clean; `pnpm run build` clean — 12 routes prerendered static.** One mid-build type error fixed before passing: `assertConfig()` initially used an `asserts firebaseConfig is Record<…, string>` signature referencing a module-level `firebaseConfig`, which TS rejects — assertion signatures can only name formal parameters. Downgraded to a regular `void` return; `FirebaseOptions` permits the optional-string shape so the downstream `initializeApp(firebaseConfig)` still typechecks.
+- **Not done this turn (per PO2 directive "stop at the handoff prior Phase 2 Task 4").** No `pnpm dev` + browser smoke. No frontend redeploy. Backend redeploy with `--set-secrets=FIREBASE_ADMIN_KEY=...` stays PO1's call after the Task 4 joint sign-in-from-fresh-browser check.
+
+---
+
 ## [21/04/26] - Phase 2 Task 2 PO1: Firebase Admin SDK boundary + authed /api/agent/intake
 
 PO1's slice of Phase 2 Task 2 — the backend now verifies Firebase ID tokens on `/api/agent/intake` and lazy-creates `users/{uid}` on first touch. Code-only this turn; redeploy deferred until the Firebase service-account secret is populated and Phase 2 Task 3 can mint real ID tokens for an end-to-end smoke.

@@ -253,9 +253,9 @@ _All four exit-criteria items met: Aisyah total = **RM8,208/year** (STR RM450 + 
 
 ---
 
-### 6. Feature: Cloud Run deploy, responsiveness, and demo rehearsal
+### 6. Feature: Cloud Run deploy, frontend refinement, and demo rehearsal
 
-**Owner:** PO1 deploys; PO2 owns responsiveness; Both rehearse. **Depends on:** Task 5 (e2e happy path green locally), GCP live with required APIs, `gemini-api-key` in Secret Manager.
+**Owner:** PO1 deploys; PO2 handles frontend refinement after deployment; Both rehearse. **Depends on:** Task 5 (e2e happy path green locally), GCP live with required APIs, `gemini-api-key` in Secret Manager.
 
 **Purpose/Issue:** Put the live URL in front of a stranger browser. Cloud Run deploy is a Project 2030 submission requirement (handbook).
 
@@ -268,20 +268,17 @@ _All four exit-criteria items met: Aisyah total = **RM8,208/year** (STR RM450 + 
 - [ ] **Frontend deploy** (from `frontend/`): `gcloud run deploy layak-frontend --source . --region asia-southeast1 --min-instances 1 --cpu-boost --allow-unauthenticated --set-env-vars NEXT_PUBLIC_API_URL=<backend-url>`.
 - [ ] **Post-deploy incognito check**: happy path runs against production from a fresh tab.
 - [ ] Backend hardening (second pass): structured 4xx/5xx error responses; request-scoped logging with **no PII** (no IC, no name, no document bytes); CORS pinned to the frontend origin; rate-limit on `/api/agent/intake`.
+- [ ] Commit config tweaks under `chore(infra)` scope.
 
-**Implementation — PO2 (Adam), responsiveness + polish:**
+**Implementation — PO2 (Adam), frontend refinement:**
 
-- [ ] Responsiveness pass at **375 / 768 / 1440** (Chrome DevTools device toolbar). Upload widget, stepper, results view, provenance panel, download CTA — no horizontal scroll, no clipped text.
-- [ ] Accessibility smoke: tab-through reaches every interactive element; screen-reader labels on the three file inputs; alt text on icons; WCAG 2.1 AA colour contrast on body copy.
-- [ ] Copy polish: plain-English explanations in `scheme-card.tsx` expanders — no legalese, no "pursuant to."
+- [ ] Frontend refinement pass after deploy: responsiveness at **375 / 768 / 1440** (Chrome DevTools device toolbar), accessibility smoke, and plain-English copy polish in `scheme-card.tsx` expanders — no horizontal scroll, no clipped text, no legalese.
 
 **Implementation — Both, rehearsal:**
 
 - [ ] Three clean back-to-back demo rehearsals from the live URL. Keep `--min-instances=1` active during rehearsals.
 - [ ] Note any flake; if non-critical, log for Phase 2 polish. If it kills the demo, fix it promptly.
 - [ ] Set a reminder to curl the frontend URL before the live check.
-
-- [ ] Commit config tweaks under `chore(infra)` scope.
 
 **Exit criteria:** frontend Cloud Run URL loads in incognito from another network; full happy path completes in < 10s (warm); three viewports clean; three back-to-back rehearsals hit the same RM-upside number and all five visible steps.
 

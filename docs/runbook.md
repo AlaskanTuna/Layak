@@ -184,13 +184,20 @@ rm /tmp/fake.pdf
 ### 3.2 Firestore users collection check
 
 ```bash
-# Confirm the `users` collection is reachable and enumerate any existing docs.
-# On a fresh project this returns empty; once a user signs in once, one doc appears.
-gcloud firestore documents list \
-  --collection=users \
+# (1) Confirm the Firestore DB itself exists and is in the right region.
+gcloud firestore databases list \
   --project=layak-myaifuturehackathon \
-  --limit=5
+  --format="value(name,type,locationId)"
+# Expected: projects/layak-myaifuturehackathon/databases/(default)	FIRESTORE_NATIVE	asia-southeast1
+
+# (2) Enumerate any existing `users` docs via the Firestore REST API.
+# Empty `{}` on a fresh project; one doc per signed-in user afterwards.
+TOKEN=$(gcloud auth print-access-token)
+curl -sS -H "Authorization: Bearer $TOKEN" \
+  "https://firestore.googleapis.com/v1/projects/layak-myaifuturehackathon/databases/(default)/documents/users?pageSize=5"
 ```
+
+> `gcloud firestore` has no built-in `documents list` subcommand — use the Firestore REST API via `gcloud auth print-access-token` for quick read-only checks. For richer queries, use the Firebase Console UI or a Python `firebase_admin.firestore` script.
 
 ### 3.3 Live browser check (manual — Adam + Hao)
 

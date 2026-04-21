@@ -62,7 +62,8 @@ Copilot comes in cold with no session context. The prompt must be self-contained
 3. **Preservation contract** — what must **not** change (line-by-line if needed: "PRESERVE verbatim: all Phase 0 tasks, existing ticked checkboxes…"). This is the single highest-leverage instruction.
 4. **Change list** — numbered, surgical. Each item specifies: where to insert, what to say, what style to match. Reference the spec section (`per spec §8.2`) so Copilot can fan out without inventing content.
 5. **Style contract** — one short paragraph ("match existing voice: imperative, terse, no emojis, don't rewrite anything not called out").
-6. **Report instruction** — "After saving the file, print a one-sentence summary of what changed." Gives the caller a quick sanity signal.
+6. **Report instruction** — "After saving the file, print a one-sentence summary of what changed, then stop." Gives the caller a quick sanity signal.
+7. **GitHub handoff** — explicitly tell Copilot not to commit, push, create branches, or open PRs. The main agent handles all GitHub work after reviewing the file changes.
 
 ## Verification
 
@@ -109,12 +110,12 @@ copilot -p "The timeline of docs/progress.md is messed up. Use 'gh' and 'git log
   --effort high --yolo --silent 2>&1
 ```
 
-In that example, Copilot writes the commit and push itself — only do that when the task is fully self-contained and the commit scope is exactly what the caller wants. For anything touching the docs contract or code, have Copilot edit only; push from the main agent after spot-checking.
+In that example, Copilot edits the file only and reports back. The main agent reviews the result, then handles any commit, push, or PR work.
 
 ## Caveats
 
 - **Branch awareness**: Copilot operates on the current working directory's branch. `git checkout <branch>` before dispatch if the target branch matters.
 - **Working directory**: `copilot` inherits the shell's cwd. Run from the repo root.
 - **Secrets**: `--yolo` grants unrestricted tool access. Don't use the skill in sessions where Copilot could touch `.env`, keys, or `gcloud` state beyond the task scope.
-- **Commit permissions**: Copilot under `--yolo` can `git commit` and `git push`. The main agent is still responsible for the result; verify before considering the task done.
+- **Commit permissions**: Do not instruct Copilot to `git commit`, `git push`, or open PRs for delegated jobs. The main agent is responsible for all GitHub actions after verifying the result.
 - **Rate limits**: Parallel dispatches share the caller's Copilot quota. If a job fails with a rate-limit error, back off and retry serially.

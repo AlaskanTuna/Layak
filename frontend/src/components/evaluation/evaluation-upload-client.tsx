@@ -34,9 +34,15 @@ export function EvaluationUploadClient() {
 
   useEffect(() => {
     if (state.phase === 'done') {
-      router.push('/dashboard/evaluation/results')
+      // Real + manual intake stamp `evalId` from the SSE done event; mock
+      // mode (dev escape hatch) leaves it null and falls back to the
+      // in-memory results route.
+      const next = state.evalId
+        ? `/dashboard/evaluation/results/${state.evalId}`
+        : '/dashboard/evaluation/results'
+      router.push(next)
     }
-  }, [state.phase, router])
+  }, [state.phase, state.evalId, router])
 
   function handleModeChange(next: IntakeMode) {
     setMode(next)

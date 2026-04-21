@@ -17,8 +17,15 @@ export function EvaluationResultsClient() {
   useEffect(() => {
     if (state.phase === 'idle') {
       router.replace('/dashboard/evaluation/upload')
+      return
     }
-  }, [state.phase, router])
+    // If we landed here directly (e.g. user visited /results without going
+    // through upload first) but the pipeline is real / manual mode, hand
+    // off to the persisted route.
+    if (state.phase === 'done' && state.evalId) {
+      router.replace(`/dashboard/evaluation/results/${state.evalId}`)
+    }
+  }, [state.phase, state.evalId, router])
 
   function handleReset() {
     setDemoMode(false)

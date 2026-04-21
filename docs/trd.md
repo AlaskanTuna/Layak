@@ -330,7 +330,8 @@ Monorepo via pnpm workspace. One lockfile at root; one `prepare: husky` script a
 layak/
 ├── frontend/                     Next.js 16 workspace package (layak-frontend)
 │   ├── src/
-│   │   ├── app/                  App Router: layout, page, globals.css
+│   │   ├── app/                  App Router: route wrappers, layout, globals.css
+│   │   │   └── pages/            page modules imported by the route wrappers
 │   │   ├── components/ui/        shadcn primitives (12 components)
 │   │   └── lib/utils.ts          cn() helper
 │   ├── public/                   static assets
@@ -352,6 +353,8 @@ layak/
 ├── package.json                  root orchestrator (husky, lint-staged, prettier)
 └── pnpm-workspace.yaml
 ```
+
+Route files under `frontend/src/app/(app|auth|marketing)/**/page.tsx` stay as thin wrappers; the page implementations now live in `frontend/src/app/pages/**`.
 
 ### 6.5 Data & storage
 

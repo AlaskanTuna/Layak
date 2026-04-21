@@ -4,6 +4,12 @@
 
 ---
 
+## [21/04/26] - Frontend page-module refactor: split route implementations out of App Router
+
+Moved the dashboard, evaluation, auth, marketing, settings, and How It Works page implementations into `frontend/src/app/pages/**` while keeping the route `page.tsx` files as thin re-export wrappers. Verified the affected frontend build still compiles and prerenders the touched routes through the new module path.
+
+---
+
 ## [21/04/26] - Task 3 Path 2: wired real Gemini 2.5 Flash into extract / classify / compute_upside (Vertex AI Search still pending ADC login)
 
 Path 1 stubs replaced with real Gemini calls. End-to-end SSE stream against the three synthetic Aisyah demo PDFs (rendered via Edge headless from `frontend/public/demo/*.html`): **11 events in 59 s** (median Gemini call ~15-20 s per tool). No error events; all 5 step pairs + terminal `done`. Backend tests 39/39 still pass.

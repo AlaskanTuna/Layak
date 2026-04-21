@@ -1,5 +1,1 @@
-import { SignUpForm } from '@/components/sign-up/sign-up-form'
-
-export default function SignUpPage() {
-  return <SignUpForm />
-}
+export { SignUpPage as default } from '@/app/pages/auth/sign-up-page'

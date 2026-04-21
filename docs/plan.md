@@ -769,6 +769,104 @@ _Frontend:_
 
 ---
 
+## Phase 7: v2 Polish (Usability + Form BE expansion)
+
+> Goal: ship the usability + reach upgrades that turn the working SaaS pivot into a hackathon-winning demo. Pre-submission polish only — no new architecture, no new persistence layers, no new orchestrator.
+
+### 1. Feature: Form BE filer support (salaried path alongside gig)
+
+**Owner:** PO1 (Hao). **Depends on:** Phase 1 task 4 (rule engine), Phase 1 task 3 (orchestrator), the existing `Profile.form_type` schema field.
+
+**Purpose/Issue:** Today's pipeline is locked to Form B (self-employed Aisyah). Most working Malaysians file Form BE (salaried). Broadening unlocks the "Citizens First" pitch from gig workers to teachers, nurses, civil servants. The `form_type` schema field already exists; ManualEntry already exposes `employment_type: 'gig' | 'salaried'`. The gap is downstream: classifier prompt, packet template, classify-step Pydantic emission.
+
+**Implementation — PO1 (Hao):**
+
+- [ ] Extend `backend/app/agents/tools/classify.py` so the classifier prompt derives `form_type` from `employment_type` (`salaried` → `form_be`, `gig` → `form_b`) instead of hardcoding `form_b`. Add an inline test case in the prompt for a salaried profile.
+- [ ] Audit each LHDN scheme rule under `backend/app/rules/` — most personal reliefs (#1 individual, #16a child, parent medical, #17 EPF+life, #9 lifestyle) apply to BOTH forms identically. Document any rule that genuinely differs in a comment.
+- [ ] Add a Form BE Jinja template alongside the Form B template in `backend/app/templates/lhdn_form_*.html`. Same field set — just the agency-form layout differs.
+- [ ] Update `backend/app/agents/tools/generate_packet.py` to pick the right Jinja template based on `profile.form_type`.
+- [ ] Add `backend/tests/test_classify_form_be.py` — at minimum: salaried profile → classifier emits `form_type: 'form_be'`; gig profile → classifier emits `form_type: 'form_b'` (regression).
+
+**Exit criteria:** running the pipeline with `employment_type: 'salaried'` produces a Form BE draft packet end-to-end without regressing the existing Aisyah Form B path.
+
+### 2. Feature: Cikgu Farhan salaried persona fixtures
+
+**Owner:** PO1 (Hao). **Depends on:** Phase 7 task 1 (Form BE support).
+
+**Purpose/Issue:** A second persona reinforces the "broad citizens" pitch and gives the demo video a side-by-side moment. `docs/demo/farhan/` already has the source HTML drafted by the parallel agent — wire them through the same fixture pipeline Aisyah uses.
+
+**Implementation — PO1 (Hao):**
+
+- [ ] Confirm `docs/demo/farhan/{mykad,payslip,tnb-bill}.html` exist and render cleanly via the existing `backend/scripts/generate_aisyah_fixtures.py` pattern. Refactor that script (or extend it) to also emit `frontend/public/fixtures/farhan-{mykad,payslip,utility}.pdf`.
+- [ ] Add `frontend/src/lib/farhan-fixtures.ts` mirroring `aisyah-fixtures.ts` (`loadFarhanFixtureFiles()` + `FARHAN_DEPENDANT_OVERRIDES`).
+- [ ] Add a second "Use Farhan sample data" button next to the existing Aisyah CTA in `frontend/src/components/evaluation/upload-widget.tsx` (or whichever component wires the sample-load).
+- [ ] Update `frontend/public/fixtures/` references in `frontend/src/components/landing/` if the landing page features a persona card.
+
+**Exit criteria:** clicking "Use Farhan sample data" runs the live pipeline against the salaried persona end-to-end and produces a Form BE draft packet.
+
+### 3. Feature: Profile edit step between extract and classify
+
+**Owner:** PO2 (Adam). **Depends on:** Phase 1 task 5 (frontend SSE wiring), Phase 3 task 1 (persistence layer).
+
+**Purpose/Issue:** Gemini Vision OCR is good but not perfect — names, IC fragments, RM amounts, addresses can drift. Today the user can't correct mistakes; the wrong extract flows straight into classify. A brief edit-and-confirm step between extract and classify catches OCR errors before they cascade through the pipeline. Biggest single usability win for non-Aisyah documents.
+
+**Implementation — PO2 (Adam):**
+
+- [ ] After the `step_result: extract` SSE event lands, pause the streaming pipeline and render an editable profile form pre-populated with the extracted fields in `frontend/src/components/evaluation/profile-edit-step.tsx`.
+- [ ] On Save, POST the corrected profile back via a new backend endpoint `POST /api/agent/intake/{eval_id}/profile` that updates the in-flight Firestore doc and resumes the pipeline at classify.
+- [ ] On Cancel, abandon the run (existing reset path).
+- [ ] Wire a Skip toggle defaulted off — power users + the demo can bypass the gate.
+- [ ] Add `backend/tests/test_intake_profile_edit.py` covering the edit endpoint contract (auth-gated, owner-checked, schema-validated).
+
+**Exit criteria:** the user sees their extracted profile, can edit any field, and the corrected values flow through classify → match → compute_upside → generate.
+
+### 4. Feature: Inline PDF preview on the results page
+
+**Owner:** PO2 (Adam). **Depends on:** Phase 3 task 1 (persisted packet endpoint).
+
+**Purpose/Issue:** Users currently download the ZIP, extract it, and open each PDF in their OS to verify content. An inline preview lets them inspect each draft in-browser before downloading — faster trust loop, fewer wasted downloads. Three PDFs per packet, accordion-style preview.
+
+**Implementation — PO2 (Adam):**
+
+- [ ] Add `frontend/src/components/evaluation/draft-packet-preview.tsx` rendering each of the three draft PDFs as an `<iframe src=...>` (or `<embed>`) inside an accordion / tab strip.
+- [ ] Source per-PDF blobs by extending the backend `GET /api/evaluations/{id}/packet` response shape OR adding a sibling `GET /api/evaluations/{id}/packet/{scheme_id}` that returns one PDF directly (decide based on payload size).
+- [ ] Mount the preview above the existing "Download all drafts" CTA on `frontend/src/components/evaluation/evaluation-results-by-id-client.tsx`.
+- [ ] Keep the existing ZIP download CTA — preview is additive, not a replacement.
+
+**Exit criteria:** the results page shows all three draft PDFs inline; users can verify content without downloading.
+
+### 5. Feature: Mobile responsiveness pass (375 / 768 / 1440)
+
+**Owner:** PO2 (Adam). **Depends on:** all v2 surfaces shipped through Phase 5.
+
+**Purpose/Issue:** Aisyah is a Grab driver on a phone — the citizen-first narrative requires the app to actually work on mobile. Walk every route at three breakpoints, fix layout regressions.
+
+**Implementation — PO2 (Adam):**
+
+- [ ] Walk these routes at 375 / 768 / 1440: `/`, `/sign-in`, `/sign-up`, `/dashboard`, `/dashboard/evaluation`, `/dashboard/evaluation/upload`, `/dashboard/evaluation/results/[id]`, `/settings`, `/privacy`, `/terms`. Log every overflow / clipped CTA / unreadable text in a single PR-description checklist.
+- [ ] Fix in priority order: dashboard hero, upload widget, results page (the demo flow surfaces).
+- [ ] Confirm the sidebar collapses to the existing mobile drawer at <`md:` breakpoint and the topbar avatar menu still opens cleanly.
+- [ ] Add a `pnpm -C frontend lint` + `pnpm -C frontend build` smoke before pushing.
+
+**Exit criteria:** zero horizontal scroll at 375px; every CTA reachable; the demo flow is filmable on a phone.
+
+### 6. Feature: Error recovery copy + structured CTAs
+
+**Owner:** PO1 (Hao). **Depends on:** the existing `humanize_error_message` helper in `backend/app/agents/gemini.py` and `frontend/src/components/evaluation/error-recovery-card.tsx`.
+
+**Purpose/Issue:** The skeleton is already there — `humanize_error_message` categorises Gemini errors into quota_exhausted / service_unavailable / deadline_exceeded / permission_denied / extract_validation, and `error-recovery-card.tsx` switches on a quota substring to surface "Switch to Manual Entry". Finish the wiring so EVERY category has friendly copy + a clear next step.
+
+**Implementation — PO1 (Hao):**
+
+- [ ] Promote the backend's error-category enum to the SSE `ErrorEvent` payload so the frontend can render category-specific UI without substring-matching.
+- [ ] Extend `error-recovery-card.tsx` to switch on the category and render: appropriate copy, retry button (for transient errors), Switch-to-Manual CTA (for quota), and a link to `/settings` (for permission_denied) where the user can confirm tier / sign in again.
+- [ ] Add unit + light snapshot tests for each category branch.
+- [ ] Mirror the new copy across `frontend/src/lib/i18n/locales/{en,ms,zh}.json`.
+
+**Exit criteria:** every documented Gemini failure mode shows a category-tailored card with at least one actionable button; no raw error text leaks to the user.
+
+---
+
 ## Phase X: Submission Package
 
 > Covers the final submission artifacts. Keep it simple and complete.

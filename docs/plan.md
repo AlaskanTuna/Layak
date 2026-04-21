@@ -735,11 +735,11 @@ _Frontend:_
 
 ### 6. Feature: Migrate Gemini surface from AI Studio API key to Vertex AI
 
-**Owner:** PO1 (Hao). **Depends on:** Phase 6 Task 3 (Cloud Run deploy plumbing already understands Secret Manager) — NOT a hard block; this can ship before Task 3 if the team prioritises unblocking the live demo.
+**Owner:** PO2 (Adam). **Depends on:** Phase 6 Task 3 (Cloud Run deploy plumbing already understands Secret Manager) — NOT a hard block; this can ship before Task 3 if the team prioritises unblocking the live demo.
 
 **Purpose/Issue:** The Gemini API key obtained via AI Studio keeps silently demoting the project from Tier 1 to Free tier even with billing active. Free tier caps Gemini 2.5 Flash at 20 RPD, which the live pipeline blows past every demo run — verified 22/20 today, with `429 RESOURCE_EXHAUSTED` on the classify step. Vertex AI uses the GCP project's IAM + billing directly, bypasses the AI Studio key tier-management bug, and draws correctly on the project's $25 Google Cloud Credit.
 
-**Implementation — PO1 (Hao):**
+**Implementation — PO2 (Adam):**
 
 - [ ] Enable the Vertex AI API on `layak-myaifuturehackathon` (`gcloud services enable aiplatform.googleapis.com` — already enabled per Phase 0 but verify).
 - [ ] Grant the Cloud Run service account `roles/aiplatform.user` (least-privilege, lets it call `predict`/`generateContent` on Vertex AI models in the project).

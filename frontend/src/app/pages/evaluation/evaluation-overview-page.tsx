@@ -17,14 +17,14 @@ export function EvaluationOverviewPage() {
         eyebrow={t('evaluation.overview.eyebrow')}
         title={t('evaluation.overview.title')}
         description={t('evaluation.overview.description')}
-      >
-        <div className="mt-2 flex flex-wrap items-center gap-3">
-          <Button render={<Link href="/dashboard/evaluation/upload" />}>
+        action={
+          <Button render={<Link href="/dashboard/evaluation/upload" />} size="lg">
             <Plus className="mr-1 size-4" aria-hidden />
             {t('evaluation.overview.createCta')}
           </Button>
-          <QuotaMeter />
-        </div>
+        }
+      >
+        <QuotaMeter className="mt-2" />
       </PageHeading>
       <EvaluationHistorySection />
     </div>

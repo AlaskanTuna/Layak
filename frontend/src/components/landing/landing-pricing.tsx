@@ -17,7 +17,10 @@ export function LandingPricing() {
           {t('marketing.pricing.title', 'Simple, transparent pricing')}
         </h2>
         <p className="max-w-2xl text-muted-foreground sm:text-lg">
-          {t('marketing.pricing.description', 'Start tracking your welfare eligibility for free. Upgrade to Pro when you need more power.')}
+          {t(
+            'marketing.pricing.description',
+            'Start tracking your welfare eligibility for free. Upgrade to Pro when you need more power.'
+          )}
         </p>
       </div>
 
@@ -26,12 +29,16 @@ export function LandingPricing() {
         <Card className="flex flex-col">
           <CardHeader>
             <CardTitle className="text-2xl font-bold">{t('marketing.pricing.freeTier.name', 'Free')}</CardTitle>
-            <CardDescription>{t('marketing.pricing.freeTier.description', 'For individuals exploring their eligibility.')}</CardDescription>
+            <CardDescription>
+              {t('marketing.pricing.freeTier.description', 'For individuals exploring their eligibility.')}
+            </CardDescription>
           </CardHeader>
           <CardContent className="flex flex-1 flex-col justify-between">
             <div className="mb-6 flex items-baseline gap-2">
               <span className="text-4xl font-bold tracking-tight">{t('marketing.pricing.freeTier.price', 'RM 0')}</span>
-              <span className="text-sm font-medium text-muted-foreground">/{t('marketing.pricing.freeTier.period', 'forever')}</span>
+              <span className="text-sm font-medium text-muted-foreground">
+                /{t('marketing.pricing.freeTier.period', 'forever')}
+              </span>
             </div>
             <ul className="mb-6 space-y-3 flex-1 text-sm text-muted-foreground">
               {[
@@ -57,14 +64,20 @@ export function LandingPricing() {
           <CardHeader>
             <div className="flex items-center justify-between">
               <CardTitle className="text-2xl font-bold">{t('marketing.pricing.proTier.name', 'Pro')}</CardTitle>
-              <span className="rounded-full bg-primary/10 px-2.5 py-1 font-heading text-xs font-semibold text-primary">Waitlist</span>
+              <span className="rounded-full bg-primary/10 px-2.5 py-1 font-heading text-xs font-semibold text-primary">
+                Waitlist
+              </span>
             </div>
-            <CardDescription>{t('marketing.pricing.proTier.description', 'For high-volume users and agencies.')}</CardDescription>
+            <CardDescription>
+              {t('marketing.pricing.proTier.description', 'For high-volume users and agencies.')}
+            </CardDescription>
           </CardHeader>
           <CardContent className="flex flex-1 flex-col justify-between">
             <div className="mb-6 flex items-baseline gap-2">
               <span className="text-4xl font-bold tracking-tight">{t('marketing.pricing.proTier.price', 'RM 15')}</span>
-              <span className="text-sm font-medium text-muted-foreground">/{t('marketing.pricing.proTier.period', 'month')}</span>
+              <span className="text-sm font-medium text-muted-foreground">
+                /{t('marketing.pricing.proTier.period', 'month')}
+              </span>
             </div>
             <ul className="mb-6 space-y-3 flex-1 text-sm text-muted-foreground">
               {[

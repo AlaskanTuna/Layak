@@ -47,6 +47,7 @@
   --radius-4xl: calc(var(--radius) * 2.6);
 }
 
+/* Light mode — warm sand palette with alternating tones for section contrast */
 :root {
   --background: oklch(0.945 0.012 82);
   --foreground: oklch(0.21 0.008 55);
@@ -88,6 +89,7 @@
   --glass-border: oklch(0.21 0.008 55 / 0.08);
 }
 
+/* Dark mode — sleek dark slate */
 .dark {
   --background: oklch(0.145 0 0);
   --foreground: oklch(0.985 0 0);
@@ -128,7 +130,6 @@
   * {
     @apply border-border outline-ring/50;
   }
-
   body {
     @apply bg-background text-foreground;
     position: relative;
@@ -137,7 +138,6 @@
     background-attachment: fixed;
     background-blend-mode: soft-light;
   }
-
   html {
     @apply font-sans;
   }
@@ -159,57 +159,6 @@
   backdrop-filter: blur(var(--glass-blur));
   -webkit-backdrop-filter: blur(var(--glass-blur));
   border-bottom: 1px solid var(--glass-border);
-}
-
-.hero-sheen {
-  position: relative;
-  overflow: hidden;
-  border: 1px solid color-mix(in oklch, var(--primary) 12%, var(--border));
-  background:
-    linear-gradient(
-      135deg,
-      color-mix(in oklch, var(--card) 86%, white) 0%,
-      color-mix(in oklch, var(--background) 94%, transparent) 100%
-    );
-  box-shadow:
-    0 18px 80px color-mix(in oklch, var(--primary) 10%, transparent),
-    inset 0 1px 0 color-mix(in oklch, white 48%, transparent);
-}
-
-.hero-sheen::before {
-  content: '';
-  position: absolute;
-  inset: -15% auto auto -8%;
-  width: 22rem;
-  height: 22rem;
-  border-radius: 9999px;
-  background: radial-gradient(circle, color-mix(in oklch, var(--primary) 16%, transparent), transparent 70%);
-  pointer-events: none;
-}
-
-.hero-sheen::after {
-  content: '';
-  position: absolute;
-  inset: auto -12% -22% auto;
-  width: 18rem;
-  height: 18rem;
-  border-radius: 9999px;
-  background: radial-gradient(circle, color-mix(in oklch, var(--accent-foreground) 8%, transparent), transparent 68%);
-  pointer-events: none;
-}
-
-.section-shell {
-  position: relative;
-  overflow: hidden;
-  border-radius: calc(var(--radius) * 2.4);
-  border: 1px solid color-mix(in oklch, var(--primary) 10%, var(--border));
-  background:
-    linear-gradient(
-      180deg,
-      color-mix(in oklch, var(--card) 88%, white) 0%,
-      color-mix(in oklch, var(--background) 96%, transparent) 100%
-    );
-  box-shadow: 0 14px 56px color-mix(in oklch, var(--foreground) 6%, transparent);
 }
 
 * {

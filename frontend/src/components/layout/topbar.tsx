@@ -17,7 +17,6 @@ type TopbarProps = {
 
 export function Topbar({ onMenuClick }: TopbarProps) {
   const { t } = useTranslation()
-
   return (
     <header className="topbar-glass sticky top-0 z-20 flex h-[var(--topbar-height)] items-center gap-2 px-3 md:px-4 backdrop-blur-md">
       <MobileMenuButton onClick={onMenuClick} />

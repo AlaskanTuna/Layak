@@ -10,7 +10,7 @@ type Props = {
 
 export function PageHeading({ eyebrow, title, description, action, children }: Props) {
   return (
-    <section className="hero-sheen rounded-[1.75rem] p-6 sm:p-8">
+    <section className="relative overflow-hidden rounded-xl border border-primary/15 bg-gradient-to-br from-primary/8 via-primary/3 to-transparent p-6 sm:p-8">
       <div className="flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between">
         <div className="flex flex-1 flex-col gap-3 sm:max-w-2xl">
           {eyebrow && (

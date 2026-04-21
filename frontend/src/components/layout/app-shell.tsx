@@ -20,9 +20,7 @@ export function AppShell({ children }: Props) {
       <Sidebar mobileOpen={mobileOpen} onMobileClose={handleMobileClose} />
       <div className="flex min-h-svh flex-col md:pl-[var(--sidebar-collapsed)]">
         <Topbar onMenuClick={handleMobileOpen} />
-        <main className="mx-auto min-h-[calc(100svh-var(--topbar-height))] w-full max-w-5xl flex-1 px-4 py-6 md:px-6 md:py-8">
-          {children}
-        </main>
+        <main className="mx-auto min-h-[calc(100svh-var(--topbar-height))] w-full max-w-5xl flex-1 px-4 py-6 md:px-6 md:py-8">{children}</main>
         <Footer />
       </div>
     </>

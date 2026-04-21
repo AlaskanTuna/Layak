@@ -142,70 +142,149 @@ curl -sS -o /dev/null -w "HTTP %{http_code}\n" \
 
 ---
 
-## 3. Phase 2 Task 4 — Integration smoke (auth path end-to-end)
+## 3. Phase 2 Task 4 — integration smoke test
 
-First joint check that Firebase Auth + backend Admin SDK + Firestore are all talking to each other. Depends on Phase 2 Tasks 1-3 landing and the auth-gated backend revision being live.
+End-to-end check that fresh-browser sign-in lands on `/dashboard`, that an authed backend call upserts `users/{uid}` in Firestore, and that `/api/agent/intake` returns 200 (not a redirect or anonymous fallback) with the bearer token attached.
 
-### 3.1 Automated backend smoke (curl)
+### 3.0 Prerequisites
 
-Five checks that do not require a browser. Run against the currently-deployed backend; all five should pass before the browser check.
+- Cloud Run host on the Firebase **Authorized domains** list (Identity Toolkit Admin API → §3.5 fix recipe). Without this, `signInWithPopup` throws `auth/unauthorized-domain` before the rest of the test can run.
+- Backend reachable at `https://layak-backend-297019726346.asia-southeast1.run.app/health` → 200.
+- Frontend reachable at `https://layak-frontend-297019726346.asia-southeast1.run.app`.
 
-```bash
-BACKEND=https://layak-backend-297019726346.asia-southeast1.run.app
+### 3.1 Browser flow (manual)
 
-# 1. Health — unauthed, always 200.
-curl -sS -w "\nHTTP %{http_code}\n" "${BACKEND}/health"
-# Expected: HTTP 200, body {"status":"ok","version":"0.1.0"}
+Use a fresh incognito window so you exercise the cold-cache path.
 
-# 2. Intake without bearer — expect 401.
-curl -sS -o /dev/null -w "HTTP %{http_code}\n" \
-  -X POST "${BACKEND}/api/agent/intake_manual" \
-  -H "Content-Type: application/json" \
-  -d '{"name":"Test","date_of_birth":"1990-01-01","ic_last4":"1234","monthly_income_rm":1000,"employment_type":"gig","address":null,"dependants":[]}'
-# Expected: HTTP 401 (auth gate)
+1. Navigate to `https://layak-frontend-297019726346.asia-southeast1.run.app/sign-in`.
+2. Click **Continue with Google**, choose your account, accept consent.
+3. Confirm the URL becomes `/dashboard` **without a manual reload**. The `useEffect` redirect in `frontend/src/components/sign-in/sign-in-form.tsx` should fire as soon as `useAuth().user` flips to truthy.
 
-# 3. Intake with malformed bearer — expect 401, NOT 500.
-curl -sS -o /dev/null -w "HTTP %{http_code}\n" \
-  -X POST "${BACKEND}/api/agent/intake_manual" \
-  -H "Authorization: Bearer not-a-real-token" \
-  -H "Content-Type: application/json" \
-  -d '{"name":"Test","date_of_birth":"1990-01-01","ic_last4":"1234","monthly_income_rm":1000,"employment_type":"gig","address":null,"dependants":[]}'
-# Expected: HTTP 401 (Firebase Admin verify_id_token rejects)
+If `/dashboard` does not render automatically, check the DevTools console for `auth/unauthorized-domain` or token errors before retrying.
 
-# 4. Multipart intake without bearer — expect 401.
-printf '%%PDF-1.4\n%%EOF\n' > /tmp/fake.pdf
-curl -sS -o /dev/null -w "HTTP %{http_code}\n" \
-  -X POST "${BACKEND}/api/agent/intake" \
-  -F "ic=@/tmp/fake.pdf" -F "payslip=@/tmp/fake.pdf" -F "utility=@/tmp/fake.pdf"
-rm /tmp/fake.pdf
-# Expected: HTTP 401 (same auth gate)
+### 3.2 Capture the ID token from DevTools
+
+The Firebase modular SDK does not expose a `firebase` global, and a fresh `import('https://www.gstatic.com/.../firebase-auth.js')` returns a different module instance from the one the bundled app initialised — `getAuth()` on it throws `app/no-app`. Read the persisted user record from IndexedDB instead. `navigator.clipboard.writeText` requires page focus; clicking into DevTools de-focuses it, so the snippet `console.log`s a copy-friendly string instead.
+
+```js
+;(async () => {
+  const apiKey = 'AIzaSyAOkuoODA2epkzPw2Vva1lYrnG3lIqAxXE'
+  const open = indexedDB.open('firebaseLocalStorageDb')
+  const db = await new Promise((res, rej) => {
+    open.onsuccess = () => res(open.result)
+    open.onerror = () => rej(open.error)
+  })
+  const all = await new Promise((res, rej) => {
+    const r = db.transaction('firebaseLocalStorage').objectStore('firebaseLocalStorage').getAll()
+    r.onsuccess = () => res(r.result)
+    r.onerror = () => rej(r.error)
+  })
+  const entry = all.find((e) => e?.fbase_key?.startsWith(`firebase:authUser:${apiKey}`))
+  if (!entry) {
+    console.error('No Firebase user found in IDB')
+    return
+  }
+  const u = entry.value
+  const payload = JSON.stringify({
+    uid: u.uid,
+    email: u.email,
+    idToken: u.stsTokenManager.accessToken,
+    expiresAt: new Date(u.stsTokenManager.expirationTime).toISOString()
+  })
+  console.log('===PASTE-THIS-TO-CLAUDE===\n' + payload + '\n===END===')
+})()
 ```
 
-### 3.2 Firestore users collection check
+Tokens are valid for 1 hour from `auth_time`. Run the curl checks below within that window.
+
+### 3.3 Live browser check (joint pre-demo sign-off)
+
+The five checkboxes Phase 2 Task 4 is gated on. Run this together (PO1 + PO2) against the deploy you intend to demo. Tick each box only after observing the behaviour live.
+
+- [ ] **(1) Fresh incognito** — open a new private window at `https://layak-frontend-297019726346.asia-southeast1.run.app/sign-in`. No prior session cookies in scope.
+- [ ] **(2) `/dashboard` auto-redirect** — click _Continue with Google_, finish the account picker. URL becomes `/dashboard` **without a manual reload** — the `useEffect` in `frontend/src/components/sign-in/sign-in-form.tsx` fires on `useAuth().user`.
+- [ ] **(3) Firestore user doc populated** — pull the UID from the §3.2 IDB snippet (or Firebase Auth user-menu chip), then verify `users/{uid}` exists with the correct shape via §3.4. The `createTime` should be in the same second as the first `/api/agent/intake*` call in checkbox 4 — that's the proof that `_upsert_user_doc` ran on the auth dependency, not on sign-in alone.
+- [ ] **(4) Bearer-authed intake → 200** — open DevTools → Network, then run an evaluation through the dashboard (real upload via `/dashboard/evaluation/upload`, or the Manual Entry form against `/api/agent/intake_manual`). Confirm the POST shows `Authorization: Bearer <token>` in request headers and the response is `200 OK` with `content-type: text/event-stream`. Synthetic CLI fallback in §3.6.
+- [ ] **(5) Sign-out cleanup** — click the user menu in the topbar → _Sign out_. URL redirects to `/sign-in` and the entry under `Application → IndexedDB → firebaseLocalStorageDb → firebaseLocalStorage` whose key starts with `firebase:authUser:` is cleared.
+
+### 3.4 Confirm `users/{uid}` exists in Firestore
+
+The same gcloud OAuth token used to manage Firebase config (§3.5) reads Firestore via the REST API. Pass the UID printed in the DevTools snippet (or read it from the ID token claims):
 
 ```bash
-# (1) Confirm the Firestore DB itself exists and is in the right region.
-gcloud firestore databases list \
-  --project=layak-myaifuturehackathon \
-  --format="value(name,type,locationId)"
-# Expected: projects/layak-myaifuturehackathon/databases/(default)	FIRESTORE_NATIVE	asia-southeast1
+ACCESS_TOKEN=$(gcloud auth print-access-token)
+# Bash treats `UID` as readonly (your Unix UID, e.g. 1000); assigning it
+# silently fails and the curl below would then 404 against `users/1000`.
+# Use `FB_UID` (or any non-readonly name) for the Firebase UID.
+FB_UID="<paste-uid>"     # claims.uid from the decoded ID token
 
-# (2) Enumerate any existing `users` docs via the Firestore REST API.
-# Empty `{}` on a fresh project; one doc per signed-in user afterwards.
-TOKEN=$(gcloud auth print-access-token)
-curl -sS -H "Authorization: Bearer $TOKEN" \
-  "https://firestore.googleapis.com/v1/projects/layak-myaifuturehackathon/databases/(default)/documents/users?pageSize=5"
+curl -sS \
+  -H "Authorization: Bearer $ACCESS_TOKEN" \
+  -H "X-Goog-User-Project: layak-myaifuturehackathon" \
+  "https://firestore.googleapis.com/v1/projects/layak-myaifuturehackathon/databases/(default)/documents/users/${FB_UID}"
+# Expected: JSON body with fields email, displayName, photoURL, tier, createdAt,
+# lastLoginAt, pdpaConsentAt. A 404 `NOT_FOUND` means checkbox 4 in §3.3 never
+# executed (no authed call has been made, so `_upsert_user_doc` never ran).
 ```
 
-> `gcloud firestore` has no built-in `documents list` subcommand — use the Firestore REST API via `gcloud auth print-access-token` for quick read-only checks. For richer queries, use the Firebase Console UI or a Python `firebase_admin.firestore` script.
+### 3.5 Firebase Auth authorized domains (one-off fix recipe)
 
-### 3.3 Live browser check (manual — Adam + Hao)
+Cloud Run hostnames are not on Firebase's default authorized list. The default Identity Toolkit error self-diagnoses but offers no CLI path; this is the gcloud-only recipe.
 
-- [ ] Open the deployed frontend in a fresh browser profile (no existing session): `https://layak-frontend-297019726346.asia-southeast1.run.app`.
-- [ ] Click **Continue with Google** on `/sign-in`. Complete OAuth.
-- [ ] Page should redirect to `/dashboard` **without a manual refresh** — the `<AuthGuard>` sees the `onAuthStateChanged` callback and lets the child tree render.
-- [ ] In a second tab, run §3.2 gcloud — the `users/{uid}` doc should now exist with `tier="free"`, `createdAt`, `lastLoginAt`, and the Google profile fields populated. The `uid` matches the UID shown under the user menu avatar.
-- [ ] From `/dashboard/evaluation/upload`, start one evaluation (Manual Entry mode with Aisyah sample is fastest). Watch DevTools → Network: the `POST /api/agent/intake_manual` request carries an `Authorization: Bearer eyJhbGci…` header; the response is a 200 SSE stream (not 401, not a redirect).
-- [ ] Sign out. Navigate to `/dashboard`. Expect redirect to `/sign-in` within one frame.
+```bash
+ACCESS_TOKEN=$(gcloud auth print-access-token)
 
-Task 4 is complete when all three automated checks in §3.1 pass AND the five manual checks in §3.3 are ticked by at least one team member.
+# Read current list — PATCH replaces the array, so include defaults.
+curl -sS \
+  -H "Authorization: Bearer $ACCESS_TOKEN" \
+  -H "X-Goog-User-Project: layak-myaifuturehackathon" \
+  "https://identitytoolkit.googleapis.com/admin/v2/projects/layak-myaifuturehackathon/config" \
+  | grep -A 6 authorizedDomains
+
+# PATCH with the union (replace the run.app host with whatever you need to add).
+curl -sS -X PATCH \
+  -H "Authorization: Bearer $ACCESS_TOKEN" \
+  -H "X-Goog-User-Project: layak-myaifuturehackathon" \
+  -H "Content-Type: application/json" \
+  "https://identitytoolkit.googleapis.com/admin/v2/projects/layak-myaifuturehackathon/config?updateMask=authorizedDomains" \
+  -d '{
+    "authorizedDomains": [
+      "localhost",
+      "layak-myaifuturehackathon.firebaseapp.com",
+      "layak-myaifuturehackathon.web.app",
+      "layak-frontend-297019726346.asia-southeast1.run.app"
+    ]
+  }'
+```
+
+Wildcard hosts are not supported. Per-revision Cloud Run URLs (`*-i2t7hf6seq-as.a.run.app`) need to be added separately if you want to test against them.
+
+### 3.6 Synthetic CLI proof for §3.3 sub-step 4
+
+Useful when you want to exercise the auth gate without firing up a browser flow — e.g. confirming a fresh deploy still rejects the unauthed path and accepts a valid bearer. The bundled scheme PDFs are real binaries the multipart parser will accept; pipeline extraction quality is irrelevant here, only the response status and headers.
+
+```bash
+ID_TOKEN="<paste-token-from-§3.2>"
+BACKEND="https://layak-backend-297019726346.asia-southeast1.run.app"
+SCHEMES="$(git rev-parse --show-toplevel)/backend/data/schemes"
+
+# Control: unauthed → 401 (auth gate live).
+curl -sS -o /dev/null -w "HTTP %{http_code}\n" \
+  -X POST "$BACKEND/api/agent/intake"
+# Expected: HTTP 401
+
+# Authed multipart intake → 200 SSE.
+# `--max-time 8` cuts the stream early; status line lands in stdout before
+# the body starts streaming, so curl exit 28 (timeout) is expected and fine.
+curl -sS -D - -o /dev/null --max-time 8 --no-buffer \
+  -X POST \
+  -H "Authorization: Bearer $ID_TOKEN" \
+  -F "ic=@${SCHEMES}/bk-01.pdf" \
+  -F "payslip=@${SCHEMES}/risalah-str-2026.pdf" \
+  -F "utility=@${SCHEMES}/rf-filing-programme-for-2026.pdf" \
+  "$BACKEND/api/agent/intake" \
+  | head -1
+# Expected: HTTP/2 200 (followed by `content-type: text/event-stream`)
+```
+
+The HTTP/2 200 status line is dispatched the moment FastAPI returns the `StreamingResponse`, which only happens after `current_user` resolves and `_upsert_user_doc` writes — so observing 200 here is sufficient evidence that §3.3 sub-step 3 (Firestore upsert) and sub-step 4 (Bearer-authed 200) both succeeded against this revision.

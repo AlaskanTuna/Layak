@@ -190,8 +190,8 @@
 - [x] Render Code Execution stdout (Python snippet + output) inside the `compute_upside` step-result panel in a small `<pre>` — this is the judge-trust moment. (`CodeExecutionPanel.tsx` in Task 2 commit `ef1c3f0`.)
 - [x] Render provenance passages from `match_schemes` in the panel; click-through links point at `/api/schemes/<filename>` (PO1 exposes as static route) or the public source URL from `docs/trd.md` §6.1. (`ProvenancePanel.tsx` in Task 2 commit `ef1c3f0` — uses `source_url` from `RuleCitation` directly; no static-route dependency.)
 
-- [ ] Commit (PO1): `feat(lambda): add vertex ai search seed and expand to 5 functiontools`.
-- [ ] Commit (PO2): `feat(ui): render classify and compute_upside steps with code execution trace`.
+- [x] Commit (PO1): `feat(lambda): add vertex ai search seed and expand to 5 functiontools`.
+- [x] Commit (PO2): `feat(ui): render classify and compute_upside steps with code execution trace`.
 
 **Exit criteria:** `POST /api/agent/intake` with Aisyah fixtures emits a full SSE stream (5 × `step_started` + `step_result`, one `done`); Vertex AI Search canary queries return non-empty for STR / JKM / LHDN **or** Plan B collapse was called cleanly before 14:30; Code Execution step shows a Python snippet + numeric output in the UI.
 
@@ -231,7 +231,7 @@ _All four exit-criteria items met: Aisyah total = **RM8,208/year** (STR RM450 + 
 
 **Implementation — Both, paired:**
 
-- [ ] `NEXT_PUBLIC_BACKEND_URL=http://localhost:8000` in root `.env` (default value already in root `.env.example`; reaches Next.js via the `frontend/.env.local -> ../.env` symlink auto-created by `pnpm dev`).
+- [ ] `NEXT_PUBLIC_BACKEND_URL=http://localhost:8080` in root `.env` (default value already in root `.env.example`; reaches Next.js via the `frontend/.env.local -> ../.env` symlink auto-created by `pnpm dev`).
 - [ ] `frontend/src/lib/sse-client.ts` points at `${NEXT_PUBLIC_BACKEND_URL}/api/agent/intake`; remove the mock-mode flag (or move it behind a dev-only toggle).
 - [ ] **Happy path**: upload Aisyah fixtures via the widget → five SSE events fire → ranked list + provenance + total RM render → Code Execution panel shows Python → draft packet downloads.
 

@@ -733,6 +733,29 @@ _Frontend:_
 
 **Exit criteria:** the repo contains refreshed submission artifacts and the final form is resubmitted.
 
+### 6. Feature: Migrate Gemini surface from AI Studio API key to Vertex AI
+
+**Owner:** PO1 (Hao). **Depends on:** Phase 6 Task 3 (Cloud Run deploy plumbing already understands Secret Manager) — NOT a hard block; this can ship before Task 3 if the team prioritises unblocking the live demo.
+
+**Purpose/Issue:** The Gemini API key obtained via AI Studio keeps silently demoting the project from Tier 1 to Free tier even with billing active. Free tier caps Gemini 2.5 Flash at 20 RPD, which the live pipeline blows past every demo run — verified 22/20 today, with `429 RESOURCE_EXHAUSTED` on the classify step. Vertex AI uses the GCP project's IAM + billing directly, bypasses the AI Studio key tier-management bug, and draws correctly on the project's $25 Google Cloud Credit.
+
+**Implementation — PO1 (Hao):**
+
+- [ ] Enable the Vertex AI API on `layak-myaifuturehackathon` (`gcloud services enable aiplatform.googleapis.com` — already enabled per Phase 0 but verify).
+- [ ] Grant the Cloud Run service account `roles/aiplatform.user` (least-privilege, lets it call `predict`/`generateContent` on Vertex AI models in the project).
+- [ ] Refactor `backend/app/agents/gemini.py::get_client()` to construct a Vertex AI client via `google.genai.Client(vertexai=True, project=os.environ["GCP_PROJECT_ID"], location=os.environ.get("GCP_LOCATION", "asia-southeast1"))`. Drop the `api_key=` kwarg entirely. Keep the same `FAST_MODEL` / `ORCHESTRATOR_MODEL` constants — Vertex AI publisher model IDs are identical (`gemini-2.5-flash`, `gemini-2.5-pro`).
+- [ ] Update the `_load_key_from_dotenv` helper to fall back to `GCP_PROJECT_ID` / `GCP_LOCATION` instead of `GEMINI_API_KEY`. Raise a clearer error if the project ID env var is missing.
+- [ ] Update `.env.example` and the runbook to document `GCP_PROJECT_ID=layak-myaifuturehackathon` + `GCP_LOCATION=asia-southeast1` instead of `GEMINI_API_KEY=...`.
+- [ ] Update `.github/workflows/cloud-run-deploy.yml` backend job: drop `--set-secrets=GEMINI_API_KEY=gemini-api-key:latest`, add `--set-env-vars=GCP_PROJECT_ID=layak-myaifuturehackathon,GCP_LOCATION=asia-southeast1`.
+- [ ] Local dev path: `gcloud auth application-default login` (Application Default Credentials) so `genai.Client(vertexai=True)` picks up the user's gcloud session; document this in the runbook.
+- [ ] Cloud Run path: the existing service account already authenticates the container — once `roles/aiplatform.user` is granted no extra config is needed.
+- [ ] Update `backend/tests/test_gemini.py` (or add one if absent) — patch `genai.Client` and assert the construction kwargs flip from `api_key=` to `vertexai=True, project=..., location=...`.
+- [ ] Smoke: run one full evaluation against the live deploy (`/api/agent/intake_manual` with Aisyah payload) and confirm the 5-step pipeline completes end-to-end without a `429 RESOURCE_EXHAUSTED` error. Bonus: check Cloud Console → Vertex AI → Quotas to confirm requests are now drawing on the project quota, not the AI Studio Free tier.
+- [ ] After the migration is verified live, schedule deletion of the `gemini-api-key` Secret Manager entry (`gcloud secrets delete gemini-api-key`) — but only AFTER the rollout is stable for at least one demo cycle.
+- [ ] Update `docs/trd.md` §5.1 + §7 to replace every `GEMINI_API_KEY` reference with the Vertex AI ADC + project-based auth flow.
+
+**Exit criteria:** `/api/agent/intake_manual` and `/api/agent/intake` both complete the full 5-step pipeline against the live Cloud Run deploy without hitting Gemini Free-tier quota; Vertex AI Quotas page shows the requests landing on the project's quota; `gemini-api-key` secret is deleted after one stable demo cycle.
+
 ---
 
 ## Phase X: Submission Package

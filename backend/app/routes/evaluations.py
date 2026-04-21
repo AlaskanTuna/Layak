@@ -118,6 +118,27 @@ async def get_evaluation(user: CurrentUser, eval_id: str) -> EvaluationDoc:
         ) from exc
 
 
+@router.delete("/{eval_id}", status_code=status.HTTP_204_NO_CONTENT)
+async def delete_evaluation(user: CurrentUser, eval_id: str) -> Response:
+    """Delete a single evaluation owned by the caller.
+
+    404 in two cases (matching `get_evaluation`): missing doc, or wrong-owner.
+    A 403 would confirm existence to a guesser; 404 keeps the response shape
+    indistinguishable. Returns 204 with no body on success — the frontend
+    drops the row from its local cache and refetches the slim list.
+    """
+    _data, doc_ref = _load_owned_evaluation(eval_id, user.uid)
+    try:
+        doc_ref.delete()
+    except Exception as exc:  # noqa: BLE001 — surface as 503 so the client can retry.
+        _logger.exception("Failed to delete evaluations/%s for uid=%s", eval_id, user.uid)
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail="Failed to delete evaluation",
+        ) from exc
+    return Response(status_code=status.HTTP_204_NO_CONTENT)
+
+
 @router.get("/{eval_id}/packet")
 async def get_evaluation_packet(user: CurrentUser, eval_id: str) -> Response:
     """Regenerate the three draft PDFs from stored profile + matches, return as ZIP.

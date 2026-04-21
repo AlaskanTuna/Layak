@@ -25,7 +25,7 @@
     },
     "nav": {
       "dashboard": "仪表板",
-      "evaluation": "评估",
+      "evaluation": "我的评估",
       "schemes": "计划",
       "settings": "设置"
     },
@@ -231,7 +231,7 @@
     },
     "breadcrumb": {
       "dashboard": "仪表板",
-      "evaluation": "评估",
+      "evaluation": "我的评估",
       "upload": "上传",
       "results": "结果",
       "schemes": "计划",
@@ -246,7 +246,8 @@
     "overview": {
       "eyebrow": "我的评估",
       "title": "您的资格概览。",
-      "description": "每次运行中识别到的终身减免总额，以及过往评估的分页历史记录。"
+      "description": "您发现的最高减免金额，以及过往评估的分页历史记录。",
+      "createCta": "创建评估"
     },
     "results": {
       "eyebrow": "评估完成",

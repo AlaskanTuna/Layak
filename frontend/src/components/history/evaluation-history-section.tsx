@@ -105,7 +105,7 @@ export function EvaluationHistorySection() {
   return (
     <div className="flex flex-col gap-6">
       <AggregateStatsCards items={items} />
-      <EvaluationHistoryTable items={items} />
+      <EvaluationHistoryTable items={items} onRefresh={fetchHistory} />
     </div>
   )
 }

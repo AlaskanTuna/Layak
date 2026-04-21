@@ -25,7 +25,7 @@
     },
     "nav": {
       "dashboard": "Dashboard",
-      "evaluation": "Evaluation",
+      "evaluation": "My Evaluations",
       "schemes": "Schemes",
       "settings": "Settings"
     },
@@ -231,7 +231,7 @@
     },
     "breadcrumb": {
       "dashboard": "Dashboard",
-      "evaluation": "Evaluation",
+      "evaluation": "My Evaluations",
       "upload": "Upload",
       "results": "Results",
       "schemes": "Schemes",
@@ -246,7 +246,8 @@
     "overview": {
       "eyebrow": "My evaluations",
       "title": "Your eligibility at a glance.",
-      "description": "Lifetime relief identified across every run, plus a paginated history of past evaluations."
+      "description": "Your highest discovered relief and a paginated history of past evaluations.",
+      "createCta": "Create evaluation"
     },
     "results": {
       "eyebrow": "Assessment complete",

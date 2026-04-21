@@ -25,7 +25,7 @@
     },
     "nav": {
       "dashboard": "Papan Pemuka",
-      "evaluation": "Penilaian",
+      "evaluation": "Penilaian Saya",
       "schemes": "Skim",
       "settings": "Tetapan"
     },
@@ -231,7 +231,7 @@
     },
     "breadcrumb": {
       "dashboard": "Papan Pemuka",
-      "evaluation": "Penilaian",
+      "evaluation": "Penilaian Saya",
       "upload": "Muat Naik",
       "results": "Keputusan",
       "schemes": "Skim",
@@ -246,7 +246,8 @@
     "overview": {
       "eyebrow": "Penilaian saya",
       "title": "Kelayakan anda secara ringkas.",
-      "description": "Jumlah pelepasan sepanjang hayat yang dikenal pasti merentasi setiap larian, serta sejarah penilaian lepas yang berpaginasi."
+      "description": "Pelepasan tertinggi yang ditemui dan sejarah penilaian lepas yang berpaginasi.",
+      "createCta": "Cipta penilaian"
     },
     "results": {
       "eyebrow": "Penilaian selesai",

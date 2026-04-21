@@ -301,3 +301,48 @@ def test_get_packet_regenerates_zip(client: tuple[TestClient, MagicMock], monkey
     with zipfile.ZipFile(io.BytesIO(resp.content), "r") as zf:
         names = set(zf.namelist())
     assert names == {"str.pdf", "jkm.pdf", "lhdn.pdf"}
+
+
+# --- /api/evaluations/{id} (delete) --------------------------------------
+
+
+def test_delete_evaluation_requires_auth(client: tuple[TestClient, MagicMock]) -> None:
+    tc, _ = client
+    resp = tc.delete("/api/evaluations/abc")
+    assert resp.status_code == 401
+
+
+def test_delete_evaluation_204_when_owned(client: tuple[TestClient, MagicMock]) -> None:
+    tc, db = client
+    eval_doc = _wire_get_by_id(db, _make_eval_snapshot())
+    resp = tc.delete("/api/evaluations/eval-xyz", headers={"Authorization": "Bearer valid"})
+    assert resp.status_code == 204
+    assert resp.content == b""
+    eval_doc.delete.assert_called_once()
+
+
+def test_delete_evaluation_404_when_missing(client: tuple[TestClient, MagicMock]) -> None:
+    tc, db = client
+    eval_doc = _wire_get_by_id(db, _make_eval_snapshot(exists=False))
+    resp = tc.delete("/api/evaluations/does-not-exist", headers={"Authorization": "Bearer valid"})
+    assert resp.status_code == 404
+    eval_doc.delete.assert_not_called()
+
+
+def test_delete_evaluation_404_when_not_owned(client: tuple[TestClient, MagicMock]) -> None:
+    """Deliberately 404, not 403 — never reveal another user's eval to a guesser."""
+    tc, db = client
+    eval_doc = _wire_get_by_id(db, _make_eval_snapshot(user_id="someone-else"))
+    resp = tc.delete("/api/evaluations/eval-xyz", headers={"Authorization": "Bearer valid"})
+    assert resp.status_code == 404
+    eval_doc.delete.assert_not_called()
+
+
+def test_delete_evaluation_503_when_firestore_raises(client: tuple[TestClient, MagicMock]) -> None:
+    """Firestore failure surfaces as 503 with a retry-friendly detail."""
+    tc, db = client
+    eval_doc = _wire_get_by_id(db, _make_eval_snapshot())
+    eval_doc.delete.side_effect = RuntimeError("firestore unavailable")
+    resp = tc.delete("/api/evaluations/eval-xyz", headers={"Authorization": "Bearer valid"})
+    assert resp.status_code == 503
+    assert "delete" in resp.json()["detail"].lower()

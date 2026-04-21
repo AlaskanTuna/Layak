@@ -1,7 +1,7 @@
 'use client'
 
 import { useMemo } from 'react'
-import { CheckCircle2, FileText, Wallet } from 'lucide-react'
+import { CheckCircle2, FileText, TrendingUp } from 'lucide-react'
 
 import { Card } from '@/components/ui/card'
 import type { EvaluationListItem } from '@/lib/agent-types'
@@ -17,23 +17,23 @@ type Props = {
 
 /**
  * Phase 4 Task 2 — derives the three top-of-dashboard metrics from the same
- * `GET /api/evaluations` response the history table consumes. The list endpoint
- * deliberately omits per-eval scheme details (slim row), so "unique schemes
- * qualified" is approximated via the completed-run count — the data needed for
- * a real scheme set lives behind `/api/evaluations/{id}` and is too expensive
- * to fan out from a list view.
+ * `GET /api/evaluations` response the history table consumes. Summing the per-
+ * run RM totals would double-count (each evaluation re-scores the same person),
+ * so we surface the *highest* discovered relief as the meaningful upside number
+ * instead. "Unique schemes qualified" is substituted with "Successful runs"
+ * because the slim list endpoint omits per-eval scheme arrays.
  */
 export function AggregateStatsCards({ items }: Props) {
-  const { totalRuns, totalRm, completedRuns } = useMemo(() => {
-    let total = 0
+  const { totalRuns, peakRm, completedRuns } = useMemo(() => {
+    let peak = 0
     let complete = 0
     for (const item of items) {
       if (item.status === 'complete') {
-        total += item.totalAnnualRM
         complete += 1
+        if (item.totalAnnualRM > peak) peak = item.totalAnnualRM
       }
     }
-    return { totalRuns: items.length, totalRm: total, completedRuns: complete }
+    return { totalRuns: items.length, peakRm: peak, completedRuns: complete }
   }, [items])
 
   return (
@@ -47,9 +47,9 @@ export function AggregateStatsCards({ items }: Props) {
         value={totalRuns.toString()}
       />
       <StatCard
-        icon={<Wallet className="size-4 text-muted-foreground" aria-hidden />}
-        label="Lifetime RM identified"
-        value={`RM ${RM.format(totalRm)}`}
+        icon={<TrendingUp className="size-4 text-muted-foreground" aria-hidden />}
+        label="Highest result"
+        value={completedRuns > 0 ? `RM ${RM.format(peakRm)}` : '—'}
       />
       <StatCard
         icon={<CheckCircle2 className="size-4 text-muted-foreground" aria-hidden />}

@@ -4,6 +4,25 @@
 
 ---
 
+## [22/04/26] - Phase 3 Task 2 PO1: free-tier rate-limit preflight (5 evals / 24h)
+
+Free-tier users now hit a preflight quota check BEFORE the intake route opens its SSE stream. The 6th evaluation within a rolling 24-hour window returns HTTP 429 with `X-RateLimit-Reset` plus a JSON body shaped for the Phase 4 waitlist modal and `QuotaMeter`. Pro-tier users bypass the check entirely. Spec §3.6's race-condition trade-off (1-2 over-cap submissions on concurrent requests) is accepted as documented.
+
+- **`backend/app/services/rate_limit.py` (new).** `enforce_quota(db, user)` runs `.where("userId","==",uid).where("createdAt",">=",now-24h).count().get()` and returns:
+  - `None` if Pro tier (skips Firestore entirely) or if the count is under `FREE_TIER_LIMIT = 5`.
+  - `JSONResponse(status_code=429, ...)` otherwise — body `{error:"rate_limit", tier:"free", limit:5, windowHours:24, resetAt:<ISO-8601>, message}`; headers `X-RateLimit-Limit`, `X-RateLimit-Remaining`, `X-RateLimit-Reset` (unix seconds), `Retry-After` (seconds).
+  - `_estimate_reset_at` runs a secondary `order_by("createdAt").limit(1).stream()` to find the oldest eval in window; reset = oldest + 24h. Falls back to `now + 24h` when the lookup fails or returns empty.
+  - Fail-open on Firestore errors — a transient outage shouldn't hard-block users; the race-condition trade-off already accepts minor over-cap slippage.
+- **`backend/app/auth.py`**: extended `UserInfo` with `tier: str = "free"` (default for ergonomics). `_upsert_user_doc` now returns the tier read from the existing snapshot — no extra Firestore round-trip because we already had the snapshot in hand. `current_user` threads the returned tier into the constructed `UserInfo`.
+- **`backend/app/main.py`**: both `/api/agent/intake` and `/api/agent/intake_manual` call `enforce_quota(db, user)` AFTER `CurrentUser` resolves but BEFORE `create_running_evaluation` writes anything. On 429 the route returns the response directly — no Firestore write, no SSE stream, no model time consumed. Route return type widened from `StreamingResponse` to `Response` to reflect the two-shape return.
+- **Audit followup (Phase 3 Task 1 Warning)**: fixed the stale 403/404 docstrings in `backend/app/routes/evaluations.py` — the code correctly returns 404 (not 403) on wrong-owner access to avoid leaking existence, but the docstrings said otherwise. Rewrote both the method and the `_load_owned_evaluation` helper comments.
+- **Tests**: `backend/tests/test_rate_limit.py` — 10 cases. Unit tests for `enforce_quota`: Pro bypass (asserts `db.collection` is NEVER called), free under cap, free at zero, 429 body + headers shape (validates every header and body key including ISO-8601 `resetAt` alignment to the oldest-eval `+24h`), 429 above cap, reset-time fallback when oldest-lookup is empty (→ `now + 24h`), reset-time fallback on `order_by` exception (→ `now + 24h`), fail-open on count-query exception (→ None), count-shape tolerance for the bare-`.value` SDK variant (driven by `_extract_count`'s three-level descent). Plus one integration test against `/api/agent/intake_manual` that mocks an at-cap count, asserts the route returns 429 with `X-RateLimit-Limit` + `Retry-After` headers and a `{error:"rate_limit"}` body, AND asserts `eval_collection.document` was never called — proving no Firestore write happened on a rate-limited request.
+- **Fixture updates**: existing `test_manual_entry.py` and `test_evaluations_routes.py` user-snapshot mocks now explicitly set `to_dict.return_value = {"tier": "free"}` so `_upsert_user_doc`'s tier read resolves deterministically instead of relying on MagicMock's truthy-but-uncastable auto-attribute.
+- **Full backend suite: 123/123 green** (113 prior + 10 new). Ruff clean.
+- **Not yet deployed**; commit + push + CI/CD redeploy lands next, then live smoke.
+
+---
+
 ## [21/04/26] - Phase 3 Task 1 PO1: evaluations persistence layer + read routes + packet regen
 
 PO1's Phase 3 Task 1 — every evaluation now lands in `evaluations/{evalId}` Firestore alongside the SSE stream, with list/get/packet read endpoints on top. Packets stay unpersisted (regenerated on demand from stored profile + matches, per spec §3.7). Addresses all three forward-compat Gaps flagged by the Phase 2 Task 4 subagent audit.

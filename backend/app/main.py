@@ -21,7 +21,7 @@ from collections.abc import AsyncIterator
 from pathlib import Path
 from typing import Annotated
 
-from fastapi import FastAPI, File, Form, HTTPException, UploadFile, status
+from fastapi import FastAPI, File, Form, HTTPException, Response, UploadFile, status
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import ValidationError
 from starlette.responses import StreamingResponse
@@ -47,6 +47,7 @@ from app.services.evaluation_persistence import (  # noqa: E402
     create_running_evaluation,
     persist_event_stream,
 )
+from app.services.rate_limit import enforce_quota  # noqa: E402
 
 app = FastAPI(title="Layak Backend", version="0.1.0")
 
@@ -90,7 +91,7 @@ async def intake(
     payslip: Annotated[UploadFile, File()],
     utility: Annotated[UploadFile, File()],
     dependants: Annotated[str | None, Form()] = None,
-) -> StreamingResponse:
+) -> Response:
     """Stream the five-step agent pipeline as Server-Sent Events.
 
     Authed: caller must supply `Authorization: Bearer <firebase-id-token>`.
@@ -126,10 +127,18 @@ async def intake(
                 detail=f"Invalid dependants JSON: {exc}",
             ) from exc
 
+    db = get_firestore()
+
+    # Phase 3 Task 2 preflight — free-tier cap check before any Firestore
+    # write or SSE stream opens. Pro tier bypasses.
+    limited = enforce_quota(db, user)
+    if limited is not None:
+        return limited
+
     # Pre-SSE Firestore write. On failure this raises HTTPException(503) and
     # the client never sees an SSE stream open — consistent with the frontend
     # treating 5xx as retryable.
-    eval_id, doc_ref = create_running_evaluation(get_firestore(), user_id=user.uid)
+    eval_id, doc_ref = create_running_evaluation(db, user_id=user.uid)
 
     events = stream_agent_events(uploads, dependants_override=dependants_override)
 
@@ -144,7 +153,7 @@ async def intake(
 async def intake_manual(
     user: CurrentUser,
     payload: ManualEntryPayload,
-) -> StreamingResponse:
+) -> Response:
     """Privacy-first alternative to `/api/agent/intake` — JSON body, no OCR.
 
     Authed: same `current_user` gate as the multipart intake above.
@@ -160,8 +169,16 @@ async def intake_manual(
     """
     profile = build_profile_from_manual_entry(payload)
 
+    db = get_firestore()
+
+    # Phase 3 Task 2 preflight — free-tier cap check before any Firestore
+    # write or SSE stream opens. Pro tier bypasses.
+    limited = enforce_quota(db, user)
+    if limited is not None:
+        return limited
+
     eval_id, doc_ref = create_running_evaluation(
-        get_firestore(),
+        db,
         user_id=user.uid,
         profile=profile,
     )

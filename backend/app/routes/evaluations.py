@@ -99,11 +99,12 @@ async def list_evaluations(
 
 @router.get("/{eval_id}", response_model=EvaluationDoc)
 async def get_evaluation(user: CurrentUser, eval_id: str) -> EvaluationDoc:
-    """Return one evaluation in full. 404 if absent; 403 if owned by someone else.
+    """Return one evaluation in full.
 
-    The 403 path is important: without it, any authed user who guesses an
-    evalId could read it via the Admin-SDK-backed route. Firestore rules
-    protect client reads; this check protects server reads.
+    404 in two cases: (a) the doc doesn't exist, (b) it does but belongs to
+    another user. Deliberately **not** 403 on the wrong-owner case — a 403
+    would confirm the doc exists and leak that signal to a guesser. Firestore
+    rules protect client reads; this check protects server (Admin SDK) reads.
     """
     data, _ref = _load_owned_evaluation(eval_id, user.uid)
     # Pydantic validation catches drifts between Firestore shape and schema.
@@ -159,10 +160,11 @@ async def get_evaluation_packet(user: CurrentUser, eval_id: str) -> Response:
 
 
 def _load_owned_evaluation(eval_id: str, user_uid: str) -> tuple[dict[str, Any], Any]:
-    """Fetch an evaluation + enforce owner-gate. Raises 403/404 on mismatch.
+    """Fetch an evaluation + enforce owner-gate. Raises 404 on missing or wrong-owner.
 
     Returns `(doc_data, doc_ref)` so callers that need to update the doc
     after reading (e.g. Phase 4 delete cascade) skip the second lookup.
+    The wrong-owner case returns 404, not 403, to avoid leaking existence.
     """
     db = get_firestore()
     doc_ref = db.collection("evaluations").document(eval_id)

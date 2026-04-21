@@ -72,8 +72,10 @@ def client(monkeypatch: pytest.MonkeyPatch) -> tuple[TestClient, MagicMock]:
     monkeypatch.setattr(auth_module, "_init_firebase_admin", lambda: MagicMock())
 
     # Auth user-doc mock — upsert path, snapshot.exists=True (user already exists).
+    # `to_dict` supplies the `tier` field that `_upsert_user_doc` now returns.
     users_snap = MagicMock()
     users_snap.exists = True
+    users_snap.to_dict.return_value = {"tier": "free"}
     users_doc = MagicMock()
     users_doc.get.return_value = users_snap
     users_collection = MagicMock()
@@ -164,6 +166,7 @@ def test_list_evaluations_respects_limit(client: tuple[TestClient, MagicMock]) -
 
     users_snap = MagicMock()
     users_snap.exists = True
+    users_snap.to_dict.return_value = {"tier": "free"}
     users_doc = MagicMock()
     users_doc.get.return_value = users_snap
     users_collection = MagicMock()

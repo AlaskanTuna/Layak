@@ -221,9 +221,12 @@ def client(monkeypatch: pytest.MonkeyPatch) -> TestClient:
     monkeypatch.setenv("FIREBASE_ADMIN_KEY", json.dumps({"type": "service_account"}))
     monkeypatch.setattr(auth_module, "_init_firebase_admin", lambda: MagicMock())
 
-    # users collection mock — default snapshot for lazy-upsert
+    # users collection mock — default snapshot for lazy-upsert.
+    # Phase 3 Task 2: `_upsert_user_doc` now reads `tier` from the snapshot
+    # to surface it on `UserInfo`; explicit to_dict response keeps this deterministic.
     users_snapshot = MagicMock()
     users_snapshot.exists = True
+    users_snapshot.to_dict.return_value = {"tier": "free"}
     users_doc = MagicMock()
     users_doc.get.return_value = users_snapshot
 

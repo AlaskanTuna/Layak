@@ -49,12 +49,19 @@ class UserInfo:
     `request.user_id`. `email` / `display_name` / `photo_url` come from the
     verified ID-token claims and are cached onto `users/{uid}` on first touch
     so later endpoints can read them without calling Firebase Auth again.
+
+    `tier` ("free" | "pro") is read from `users/{uid}.tier` on every auth
+    cycle — it's the single field that flips without a re-sign-in, so it
+    must be fresh per request rather than cached at sign-in time. Phase 3
+    Task 2 consumes it for rate-limit decisions; first-touch users default
+    to "free".
     """
 
     uid: str
     email: str | None
     display_name: str | None
     photo_url: str | None
+    tier: str = "free"
 
 
 def _init_firebase_admin() -> firebase_admin.App:
@@ -129,8 +136,13 @@ def verify_firebase_id_token(id_token: str) -> dict[str, Any]:
     return fb_auth.verify_id_token(id_token)
 
 
-def _upsert_user_doc(uid: str, claims: dict[str, Any]) -> None:
+def _upsert_user_doc(uid: str, claims: dict[str, Any]) -> str:
     """Lazy-create `users/{uid}` on first touch; refresh `lastLoginAt` after.
+
+    Returns the user's current `tier` ("free" or "pro") — read from the
+    existing doc, or `"free"` on fresh creation. Phase 3 Task 2 consumes it
+    for rate-limit enforcement, so piggybacking on the snapshot we already
+    fetched beats a second round-trip per request.
 
     Shape per spec §3.3:
         email, displayName, photoURL, tier ∈ {"free", "pro"},
@@ -145,7 +157,9 @@ def _upsert_user_doc(uid: str, claims: dict[str, Any]) -> None:
     snapshot = ref.get()
     if snapshot.exists:
         ref.update({"lastLoginAt": firestore.SERVER_TIMESTAMP})
-        return
+        data = snapshot.to_dict() or {}
+        tier = data.get("tier", "free")
+        return tier if tier in ("free", "pro") else "free"
     ref.set(
         {
             "email": claims.get("email"),
@@ -157,6 +171,7 @@ def _upsert_user_doc(uid: str, claims: dict[str, Any]) -> None:
             "pdpaConsentAt": None,
         }
     )
+    return "free"
 
 
 async def current_user(
@@ -215,7 +230,7 @@ async def current_user(
             headers={"WWW-Authenticate": "Bearer"},
         )
 
-    _upsert_user_doc(uid, claims)
+    tier = _upsert_user_doc(uid, claims)
 
     request.state.user_id = uid
     return UserInfo(
@@ -223,6 +238,7 @@ async def current_user(
         email=claims.get("email"),
         display_name=claims.get("name"),
         photo_url=claims.get("picture"),
+        tier=tier,
     )
 
 

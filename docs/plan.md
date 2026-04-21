@@ -421,11 +421,13 @@ _All four exit-criteria items met: Aisyah total = **RM8,208/year** (STR RM450 + 
 
 **Implementation — PO1 (Hao):**
 
-- [ ] Add the preflight quota check in `backend/app/main.py` or a dedicated service layer before `/api/agent/intake` starts streaming.
-- [ ] Query `evaluations` with `userId == uid` over the rolling 24-hour window and return HTTP 429 with `X-RateLimit-Reset` when the cap is hit.
-- [ ] Keep the rate-limit response shaped for the frontend waitlist modal and `QuotaMeter` reset timer.
+- [x] Add the preflight quota check in `backend/app/main.py` or a dedicated service layer before `/api/agent/intake` starts streaming. _(Landed as `backend/app/services/rate_limit.py::enforce_quota(db, user)` — called from both `/api/agent/intake` and `/api/agent/intake_manual` AFTER `CurrentUser` resolves but BEFORE `create_running_evaluation` writes anything. Returns `JSONResponse` 429 when capped; returns `None` when allowed and the route proceeds. Pro tier bypasses the Firestore call entirely.)_
+- [x] Query `evaluations` with `userId == uid` over the rolling 24-hour window and return HTTP 429 with `X-RateLimit-Reset` when the cap is hit. _(Uses `.where("userId","==",uid).where("createdAt",">=",now-24h).count().get()` via the existing `(userId ASC, createdAt DESC)` composite index. `X-RateLimit-Reset` (unix seconds), `X-RateLimit-Limit`, `X-RateLimit-Remaining`, `Retry-After` all emitted. `_extract_count` descends up to three levels so both documented Firestore SDK response shapes handle. Fail-open on Firestore errors per spec §3.6 race-condition note — quota is a UX guardrail, not a billing boundary.)_
+- [x] Keep the rate-limit response shaped for the frontend waitlist modal and `QuotaMeter` reset timer. _(JSON body: `{error:"rate_limit", tier:"free", limit:5, windowHours:24, resetAt:<ISO-8601>, message}`. `resetAt` = oldest-eval-in-window `+ 24h`; falls back to `now + 24h` if the oldest-eval lookup fails. Extended `UserInfo` with `tier: str = "free"` — sourced from `users/{uid}.tier` during `_upsert_user_doc`'s existing snapshot read, no extra Firestore round-trip. Audit followup: fixed stale 403/404 docstrings in `routes/evaluations.py` — they claimed 403 but the code correctly returns 404 to avoid leaking existence.)_
 
 **Exit criteria:** the 6th evaluation inside 24 hours returns 429 before SSE opens and includes a reset time.
+
+**Tests:** `backend/tests/test_rate_limit.py` (10 cases) — Pro bypass (asserts no Firestore call), free under cap, free at zero, 429 body + headers shape, 429 above cap, reset-time fallback when oldest-lookup empty, reset-time fallback on Firestore exception, fail-open on count-query outage, count-shape tolerance, plus an integration test hitting `/api/agent/intake_manual` end-to-end with a mocked at-cap count asserting the route never creates the evaluations doc. Backend suite: **123/123** green; ruff clean.
 
 ### 3. Feature: Frontend 3-route split
 

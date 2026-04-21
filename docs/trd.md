@@ -346,7 +346,6 @@ layak/
 │   ├── data/schemes/             source PDFs, git-versioned
 │   ├── scripts/
 │   │   └── seed_vertex_ai_search.py   one-time Vertex AI Search data-store seeder
-│   └── README.md
 ├── docs/                         PRD, TRD, roadmap, plan, progress
 ├── .claude/                      project instructions, skills inventory
 ├── .husky/                       git pre-commit hook
@@ -355,6 +354,7 @@ layak/
 ```
 
 Route files under `frontend/src/app/(app|auth|marketing)/**/page.tsx` stay as thin wrappers; the page implementations now live in `frontend/src/app/pages/**`.
+The backend setup notes that used to live in `backend/README.md` are now captured here in §6.4 and §5.4.
 
 ### 6.5 Data & storage
 
@@ -463,7 +463,7 @@ Both invocations use `pnpm exec` to bypass the pnpm v10 bare-script shortcut whi
 
 ### 9.4 Backend layout — RESOLVED
 
-Monorepo via pnpm workspace. Frontend lives at `frontend/` (workspace package `layak-frontend`); backend lives at `backend/` (Python app, not a pnpm package). Backend skeleton and `README.md` landed in Phase 0; `backend/app/`, `backend/scripts/seed_vertex_ai_search.py`, and the six committed scheme PDFs under `backend/data/schemes/` are canonical paths. See §6.4 for the full repo layout.
+Monorepo via pnpm workspace. Frontend lives at `frontend/` (workspace package `layak-frontend`); backend lives at `backend/` (Python app, not a pnpm package). Backend skeleton landed in Phase 0; the setup notes that used to live in `backend/README.md` are captured here in §6.4 and §5.4. `backend/app/`, `backend/scripts/seed_vertex_ai_search.py`, and the six committed scheme PDFs under `backend/data/schemes/` are canonical paths. See §6.4 for the full repo layout.
 
 ### 9.5 JKM Warga Emas rate
 
@@ -471,7 +471,7 @@ Budget 2026 announced RM600/month; no gov.my PDF yet reflects the uplift (JKM fe
 
 ### 9.6 Demo document specimens — RESOLVED
 
-Closed by commit landing the three synthetic HTML documents at `docs/demo/` (`mykad.html`, `grab-earnings.html`, `tnb-bill.html`) with a render guide at `docs/demo/README.md`. The files are the docs-side source of truth and can be opened directly from the workspace or served from any local static host. All three carry the repeated diagonal `SYNTHETIC — FOR DEMO ONLY` watermark, pin to `backend/app/fixtures/aisyah.py` (name, IC `900324-06-4321`, monthly income RM2,800, address shared between MyKad and TNB), and avoid any replication of the Malaysian coat of arms, holographic foil, or chip contacts. Pitch deck slide 1 must also disclose the documents as synthetic.
+Closed by commit landing the three synthetic HTML documents at `docs/demo/` (`mykad.html`, `grab-earnings.html`, `tnb-bill.html`). The files are the docs-side source of truth and can be opened directly from the workspace or served from any local static host; the render guide now lives here instead of `docs/demo/README.md`. All three carry the repeated diagonal `SYNTHETIC — FOR DEMO ONLY` watermark, pin to `backend/app/fixtures/aisyah.py` (name, IC `900324-06-4321`, monthly income RM2,800, address shared between MyKad and TNB), and avoid any replication of the Malaysian coat of arms, holographic foil, or chip contacts. Pitch deck slide 1 must also disclose the documents as synthetic.
 
 Original decisions (preserved for audit trail):
 

@@ -263,6 +263,7 @@ _All four exit-criteria items met: Aisyah total = **RM8,208/year** (STR RM450 + 
 
 - [ ] Confirm APIs enabled on the GCP project: Cloud Run, Artifact Registry, Discovery Engine, Secret Manager, Vertex AI.
 - [ ] Push `gemini-api-key` to Secret Manager; grant `roles/secretmanager.secretAccessor` to the Cloud Run runtime service account.
+- [ ] Create `.github/workflows/cloud-run-deploy.yml` for GitHub Actions to deploy the Cloud Run services from `main`.
 - [ ] **Backend deploy** (from `backend/`): `adk deploy cloud_run --with_ui --region asia-southeast1 --min-instances 1 --cpu-boost --set-secrets GEMINI_API_KEY=gemini-api-key:latest`.
 - [ ] **Frontend deploy** (from `frontend/`): `gcloud run deploy layak-frontend --source . --region asia-southeast1 --min-instances 1 --cpu-boost --allow-unauthenticated --set-env-vars NEXT_PUBLIC_API_URL=<backend-url>`.
 - [ ] **Post-deploy incognito check**: happy path runs against production from a fresh tab.

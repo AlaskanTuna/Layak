@@ -28,7 +28,7 @@ Do **not** use it for:
 copilot -p "$(cat <<'EOF'
 <one self-contained prompt>
 EOF
-)" --model "GPT-5.4 mini" --reasoning-effort=high --yolo --silent 2>&1
+)" --model gpt-5.4-mini --reasoning-effort=high --yolo --silent 2>&1
 ```
 
 Run in background (`run_in_background: true`) when the job is long. You'll get a notification on completion and the output lands in the tool's output file; don't poll.
@@ -38,20 +38,20 @@ Run in background (`run_in_background: true`) when the job is long. You'll get a
 | Flag                      | Why                                                                                                                                             |
 | ------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------- |
 | `-p, --prompt`            | Non-interactive mode (exits after completion). Required.                                                                                        |
-| `--reasoning-effort=high` | Max reasoning budget; worth it for structural doc rewrites.                                                                                     |
+| `--reasoning-effort=high` | Max reasoning budget; worth it for structural doc rewrites on supported models.                                                                 |
 | `--yolo`                  | Equivalent to `--allow-all-tools --allow-all-paths --allow-all-urls`. Copilot needs this to read and write files without the confirmation gate. |
 | `--silent` / `-s`         | Strip stats; only the final agent response is emitted. Keeps output parseable.                                                                  |
 
 ## Model selection
 
-Use GPT-5.4 mini first, with Claude Haiku 4.5 as the fallback when the requested model is unavailable or rejected by the CLI.
+Use `gpt-5.4-mini` first, with `claude-haiku-4.5` as the fallback when the requested model is unavailable or rejected by the CLI.
 
-- **Primary:** `--model "GPT-5.4 mini"`
-- **Fallback:** `--model "Claude Haiku 4.5"`
+- **Primary:** `--model gpt-5.4-mini --reasoning-effort=high`
+- **Fallback:** `--model claude-haiku-4.5` (omit `--reasoning-effort`; this model rejects effort configuration)
 
 If either model name is rejected, consult the current Copilot CLI docs or run `copilot --help` / `copilot -p "list available models"` to confirm the exact model string supported by the installed build.
 
-Keep the reasoning effort at `high` for this skill's delegated doc work. If the task is outside that scope, do not use this skill.
+Keep the reasoning effort at `high` for this skill's delegated doc work when using the primary model. If the task needs the fallback model, omit the effort flag. If the task is outside that scope, do not use this skill.
 
 ## Writing the prompt
 

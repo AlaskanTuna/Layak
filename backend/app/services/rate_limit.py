@@ -135,6 +135,14 @@ def _estimate_reset_at(db: Any, user: UserInfo, now: datetime) -> datetime:
     """Conservative reset timer: the timestamp at which the OLDEST eval in
     the current window ages out. Falls back to `now + 24h` if the lookup
     fails or returns nothing (worst-case UX; test covers it).
+
+    Queries DESCENDING so the same `(userId ASC, createdAt DESC)` composite
+    that powers the list-evals view + count query handles this too — we
+    don't want to add a second composite just for the reset timer. The
+    oldest-in-window is then `rows[-1]` from the returned set. The limit is
+    `FREE_TIER_LIMIT + 5` to cover the spec-§3.6 race-condition slop where
+    up to 1-2 over-cap submissions are accepted; with `limit=5+5` we still
+    see the true oldest even when count is slightly above the cap.
     """
     try:
         window_start = now - FREE_TIER_WINDOW
@@ -142,14 +150,17 @@ def _estimate_reset_at(db: Any, user: UserInfo, now: datetime) -> datetime:
             db.collection("evaluations")
             .where("userId", "==", user.uid)
             .where("createdAt", ">=", window_start)
-            .order_by("createdAt")
-            .limit(1)
+            .order_by("createdAt", direction="DESCENDING")
+            .limit(FREE_TIER_LIMIT + 5)
         )
-        for snap in oldest_query.stream():
-            data = snap.to_dict() or {}
-            oldest = data.get("createdAt")
-            if isinstance(oldest, datetime):
-                return oldest + FREE_TIER_WINDOW
+        rows = list(oldest_query.stream())
+        if not rows:
+            return now + FREE_TIER_WINDOW
+        oldest_snap = rows[-1]  # DESC order → last element is earliest createdAt
+        data = oldest_snap.to_dict() or {}
+        oldest = data.get("createdAt")
+        if isinstance(oldest, datetime):
+            return oldest + FREE_TIER_WINDOW
     except Exception:  # noqa: BLE001 — fall through to the worst-case estimate.
         _logger.exception("Rate-limit reset lookup failed for uid=%s", user.uid)
     return now + FREE_TIER_WINDOW

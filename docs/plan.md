@@ -237,9 +237,9 @@ _All four exit-criteria items met: Aisyah total = **RM8,208/year** (STR RM450 + 
 
 **Implementation — PO1 (Hao):**
 
-- [ ] WeasyPrint packet generator in `backend/app/agents/tools/generate_packet.py` — reads three Jinja HTML templates (`backend/app/templates/bk01.html.jinja`, `jkm18.html.jinja`, `lhdn.html.jinja`), renders with profile + matches, watermarks "DRAFT — NOT SUBMITTED" on every page.
-- [ ] Decide delivery: `GET /api/agent/packet/{id}` returns a ZIP of the three PDFs **OR** base64-embed the packet in the final `done` SSE event (keeps the service stateless — consistent with `docs/trd.md` §6.5).
-- [ ] Dockerfile / container config: install `libpango`, `libcairo`, `libgdk-pixbuf` (WeasyPrint system deps).
+- [x] WeasyPrint packet generator in `backend/app/agents/tools/generate_packet.py` — reads three Jinja HTML templates (`backend/app/templates/bk01.html.jinja`, `jkm18.html.jinja`, `lhdn.html.jinja`), renders with profile + matches, watermarks "DRAFT — NOT SUBMITTED" on every page. _(Done in commit `6ff2b64`. Shared `_base.html.jinja` with `@page` + fixed watermark layer; 3 scheme-specific child templates. In-process smoke: 3 PDFs at 23-27 KB each, `%PDF-` magic, `DRAFT` + `NOT SUBMITTED` verified via pypdf text extraction, Aisyah name + IC last-4 rendered, no full-IC leak.)_
+- [x] Decide delivery: base64-embed in `done` event. _(`PacketDraft.blob_bytes_b64` carried in `DoneEvent.packet` — stateless, consistent with `docs/trd.md` §6.5. No `/api/agent/packet/{id}` endpoint.)_
+- [x] Dockerfile / container config: install `libpango`, `libcairo`, `libgdk-pixbuf` (WeasyPrint system deps). _(Done: `backend/Dockerfile` on `python:3.12-slim` installs pango/pangoft2/harfbuzz/cairo/gdk-pixbuf + dejavu + liberation fonts + shared-mime-info via apt. Windows dev needs GTK+ Windows runtime — documented in the module docstring.)_
 
 **Implementation:**
 

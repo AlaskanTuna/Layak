@@ -1,0 +1,108 @@
+{% extends "_base.html.jinja" %}
+
+{% block title %}JKM18 · Permohonan Bantuan Warga Emas (Draft){% endblock %}
+{% block agency %}Jabatan Kebajikan Masyarakat (JKM) · Bantuan Warga Emas · <a href="{{ match.portal_url }}">{{ match.portal_url }}</a>{% endblock %}
+
+{% block body %}
+<section>
+  <h2>Bahagian I — Pemohon (mewakili warga emas)</h2>
+  <div class="field-grid">
+    <div class="label">Nama Pemohon</div>
+    <div class="value">{{ profile.name }}</div>
+
+    <div class="label">Kad Pengenalan (4 akhir)</div>
+    <div class="value">••••-••-{{ profile.ic_last4 }}</div>
+
+    <div class="label">Hubungan dengan Penerima</div>
+    <div class="value">Anak kepada warga emas (isi rumah bersama)</div>
+
+    <div class="label">Pendapatan Bulanan Pemohon</div>
+    <div class="value">RM {{ '{:,.2f}'.format(profile.monthly_income_rm) }}</div>
+
+    {% if profile.address %}
+    <div class="label">Alamat Isi Rumah</div>
+    <div class="value">{{ profile.address }}</div>
+    {% endif %}
+  </div>
+</section>
+
+<section>
+  <h2>Bahagian II — Maklumat Warga Emas (Penerima)</h2>
+  {% if elderly %}
+  <div class="field-grid">
+    <div class="label">Hubungan</div>
+    <div class="value">{{ elderly.relationship | title }}</div>
+
+    <div class="label">Umur</div>
+    <div class="value">{{ elderly.age }} tahun</div>
+
+    <div class="label">Status Kelayakan Umur</div>
+    <div class="value">Memenuhi had umur 60 tahun dan ke atas</div>
+  </div>
+  {% else %}
+  <p>Tiada tanggungan warga emas disyor dalam profil pemohon.</p>
+  {% endif %}
+</section>
+
+<section>
+  <h2>Bahagian III — Ujian Pendapatan Per Kapita</h2>
+  <table class="amounts">
+    <thead>
+      <tr>
+        <th>Butiran</th>
+        <th class="num">Nilai</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Pendapatan isi rumah bulanan</td>
+        <td class="num">RM {{ '{:,.2f}'.format(profile.monthly_income_rm) }}</td>
+      </tr>
+      <tr>
+        <td>Saiz isi rumah</td>
+        <td class="num">{{ profile.household_size }}</td>
+      </tr>
+      <tr>
+        <td>Pendapatan per kapita</td>
+        <td class="num">RM {{ '{:,.2f}'.format(per_capita) }}</td>
+      </tr>
+      <tr>
+        <td>Had food-PLI (DOSM 2024)</td>
+        <td class="num">RM 1,236.00</td>
+      </tr>
+      <tr class="total">
+        <td>Anggaran Bayaran Setahun (RM600 × 12, Budget 2026)</td>
+        <td class="num">RM {{ '{:,.2f}'.format(match.annual_rm) }}</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="callout">
+    <strong>Nota kadar:</strong> kadar bulanan Budget 2026 ialah RM600/bulan. Sekiranya
+    JKM belum menggazetkan kemas kini ini pada tarikh permohonan, kadar lalai kekal
+    RM500/bulan sehingga pengesahan rasmi diterima.
+  </div>
+</section>
+
+<section>
+  <h2>Bahagian IV — Justifikasi Kelayakan</h2>
+  <p>{{ match.why_qualify }}</p>
+</section>
+
+<section>
+  <h2>Bahagian V — Rujukan Sumber (Provenance)</h2>
+  <ul class="citations">
+    {% for c in match.rule_citations %}
+    <li>
+      <span class="rule-id">{{ c.rule_id }}</span> — {{ c.passage }}
+      <span class="src">Sumber: {{ c.source_pdf }} · {{ c.page_ref }}{% if c.source_url %} · <a href="{{ c.source_url }}">{{ c.source_url }}</a>{% endif %}</span>
+    </li>
+    {% endfor %}
+  </ul>
+</section>
+
+<section class="signature-block">
+  <div class="slot">Tandatangan Pemohon / Tarikh</div>
+  <div class="slot">Saksi / Pegawai JKM</div>
+</section>
+{% endblock %}

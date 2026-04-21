@@ -1,0 +1,114 @@
+{% extends "_base.html.jinja" %}
+
+{% block title %}STR 2026 · Borang BK-01 (Draft){% endblock %}
+{% block agency %}LHDN (HASiL) · Sumbangan Tunai Rahmah 2026 · <a href="{{ match.portal_url }}">{{ match.portal_url }}</a>{% endblock %}
+
+{% block body %}
+<section>
+  <h2>Bahagian I — Maklumat Pemohon</h2>
+  <div class="field-grid">
+    <div class="label">Nama Pemohon</div>
+    <div class="value">{{ profile.name }}</div>
+
+    <div class="label">Kad Pengenalan (4 akhir)</div>
+    <div class="value">••••-••-{{ profile.ic_last4 }}</div>
+
+    <div class="label">Umur</div>
+    <div class="value">{{ profile.age }} tahun</div>
+
+    <div class="label">Jenis Borang Cukai</div>
+    <div class="value">{{ profile.form_type | upper | replace('_', ' ') }}</div>
+
+    <div class="label">Pendapatan Bulanan</div>
+    <div class="value">RM {{ '{:,.2f}'.format(profile.monthly_income_rm) }}</div>
+
+    {% if profile.address %}
+    <div class="label">Alamat Surat-menyurat</div>
+    <div class="value">{{ profile.address }}</div>
+    {% endif %}
+  </div>
+</section>
+
+<section>
+  <h2>Bahagian II — Isi Rumah</h2>
+  <div class="field-grid">
+    <div class="label">Saiz Isi Rumah</div>
+    <div class="value">{{ profile.household_size }} orang</div>
+
+    <div class="label">Anak Bawah 18 Tahun</div>
+    <div class="value">{{ children_under_18 }}</div>
+
+    <div class="label">Tanggungan Warga Emas</div>
+    <div class="value">{{ 'Ya' if profile.household_flags.has_elderly_dependant else 'Tiada' }}</div>
+
+    <div class="label">Kategori Pendapatan</div>
+    <div class="value">{{ profile.household_flags.income_band | upper | replace('_', ' ') }}</div>
+  </div>
+
+  {% if dependants %}
+  <table class="amounts">
+    <thead>
+      <tr>
+        <th>Hubungan</th>
+        <th>Umur</th>
+        <th class="num">Kelayakan Anak Bawah 18 (#16a)</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for d in dependants %}
+      <tr>
+        <td>{{ d.relationship | title }}</td>
+        <td>{{ d.age }}</td>
+        <td class="num">{{ 'Ya' if (d.relationship == 'child' and d.age < 18) else '—' }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% endif %}
+</section>
+
+<section>
+  <h2>Bahagian III — Kelayakan STR 2026</h2>
+  <p>{{ match.why_qualify }}</p>
+
+  <table class="amounts">
+    <thead>
+      <tr>
+        <th>Butiran</th>
+        <th class="num">Nilai</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Skim</td>
+        <td class="num">{{ match.scheme_name }}</td>
+      </tr>
+      <tr>
+        <td>Ringkasan Tier</td>
+        <td class="num">{{ match.summary }}</td>
+      </tr>
+      <tr class="total">
+        <td>Anggaran Bayaran Setahun</td>
+        <td class="num">RM {{ '{:,.2f}'.format(match.annual_rm) }}</td>
+      </tr>
+    </tbody>
+  </table>
+</section>
+
+<section>
+  <h2>Bahagian IV — Rujukan Sumber (Provenance)</h2>
+  <ul class="citations">
+    {% for c in match.rule_citations %}
+    <li>
+      <span class="rule-id">{{ c.rule_id }}</span> — {{ c.passage }}
+      <span class="src">Sumber: {{ c.source_pdf }} · {{ c.page_ref }}{% if c.source_url %} · <a href="{{ c.source_url }}">{{ c.source_url }}</a>{% endif %}</span>
+    </li>
+    {% endfor %}
+  </ul>
+</section>
+
+<section class="signature-block">
+  <div class="slot">Tandatangan Pemohon / Tarikh</div>
+  <div class="slot">Cop Rasmi (Pegawai HASiL)</div>
+</section>
+{% endblock %}

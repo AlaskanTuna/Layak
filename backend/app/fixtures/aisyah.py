@@ -36,6 +36,7 @@ AISYAH_PROFILE = Profile(
         income_band="b40_household_with_children",
     ),
     form_type="form_b",
+    address="No. 42, Jalan IM 7/10, Bandar Indera Mahkota, 25200 Kuantan, Pahang",
 )
 
 

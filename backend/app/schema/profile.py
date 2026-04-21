@@ -51,6 +51,10 @@ class Profile(BaseModel):
     dependants: list[Dependant] = Field(default_factory=list)
     household_flags: HouseholdFlags
     form_type: FormType
+    # Freeform address extracted from the IC / utility bill. Optional because
+    # some uploads don't carry it legibly; the rule engine doesn't gate on
+    # address, but the WeasyPrint packet renders it in the draft forms when set.
+    address: str | None = None
 
 
 class HouseholdClassification(BaseModel):

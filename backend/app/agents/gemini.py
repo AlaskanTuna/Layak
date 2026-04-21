@@ -78,7 +78,10 @@ def strip_json_fences(text: str) -> str:
     return stripped
 
 
-_DIGIT_RUN_RE = re.compile(r"\b\d{5,}\b")
+# Match either a raw 5+-digit run OR a MyKad-formatted IC with dash/space
+# separators (`900324-06-4321`, `900324 06 4321`). Ordered so the dashed form
+# wins: otherwise a naive `\d{5,}` would only redact `900324` and leave `4321`.
+_DIGIT_RUN_RE = re.compile(r"\b\d{6}[\s-]?\d{2}[\s-]?\d{4}\b|\b\d{5,}\b")
 
 
 def sanitize_error_message(message: str, max_len: int = 240) -> str:
@@ -87,9 +90,9 @@ def sanitize_error_message(message: str, max_len: int = 240) -> str:
 
     Pydantic `ValidationError.__str__` can embed the offending input — if Gemini
     hallucinates a 12-digit MyKad IC into a field that fails validation, the raw
-    IC would otherwise stream to the browser. Any run of 5+ digits gets replaced
-    with `[redacted]`. Also truncates to `max_len` characters so a verbose stack
-    trace doesn't flood the UI.
+    IC would otherwise stream to the browser. Both the raw 12-digit form and the
+    dashed `YYMMDD-PB-####` form get replaced with `[redacted]`. Also truncates
+    to `max_len` characters so a verbose stack trace doesn't flood the UI.
     """
     redacted = _DIGIT_RUN_RE.sub("[redacted]", message)
     if len(redacted) > max_len:

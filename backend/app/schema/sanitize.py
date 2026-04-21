@@ -56,7 +56,14 @@ _NEWLINE_RUN = re.compile(r"\n{3,}")
 
 def sanitize_free_text(value: str, *, max_length: int, allow_newlines: bool = False) -> str:
     """Strip control + format characters, NFKC-normalise, collapse whitespace,
-    truncate to `max_length` graphemes, and return.
+    truncate to `max_length` **code points**, and return.
+
+    The truncation counts Unicode code points (what `len()` reports), not
+    graphemes. A user with combining-mark spam can therefore hit the cap
+    sooner than visual length suggests; worst-case the cut lands mid-
+    combining-sequence and leaves an orphan accent. Deemed acceptable — the
+    caps (200/300) are well above any legitimate name/address so this is a
+    defence-in-depth trim, not a UX-facing length constraint.
 
     Raises:
         ValueError: when the input resolves to an empty string after cleaning.
@@ -108,11 +115,11 @@ def sanitize_free_text(value: str, *, max_length: int, allow_newlines: bool = Fa
 
 
 def sanitize_name(value: str) -> str:
-    """Single-line free-text name. 200 grapheme cap."""
+    """Single-line free-text name. 200 code-point cap."""
     return sanitize_free_text(value, max_length=200, allow_newlines=False)
 
 
 def sanitize_address(value: str) -> str:
-    """Multi-line address. 300 grapheme cap — tightened from the original 500
+    """Multi-line address. 300 code-point cap — tightened from the original 500
     to reduce prompt-token footprint without truncating real MY addresses."""
     return sanitize_free_text(value, max_length=300, allow_newlines=True)

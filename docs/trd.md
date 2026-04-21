@@ -1,12 +1,12 @@
 # Technical Requirements Document
 
 **Project**: Layak
-**Module**: Layak MVP (v1 — hackathon demo build)
+**Module**: Layak v1 (hackathon demo build) + v2 (production SaaS pivot)
 **Industry**: Malaysian GovTech / social-assistance delivery (Track 2 — Citizens First)
 **Team Size**: 2
 **Target Grade**: Project 2030 — MyAI Future Hackathon, National Open Champion
-**Document Version**: 0.1.0
-**Date**: 20 April 2026
+**Document Version**: 0.2.0
+**Date**: 21 April 2026
 
 ---
 
@@ -44,6 +44,13 @@
 30. [Phase ownership matrix](#102-phase-ownership-matrix)
 31. [Cross-cutting responsibilities](#103-cross-cutting-responsibilities)
 32. [Swap & escalation rules](#104-swap--escalation-rules)
+33. [v2 additions](#v2-additions)
+34. [v2 authenticated topology](#23-v2-authenticated-topology)
+35. [v2 authenticated flow](#41-v2-authenticated-flow)
+36. [Firestore as the session + archive layer](#55-firestore-as-the-session--archive-layer)
+37. [v2 environment variables](#67-v2-environment-variables)
+38. [Supabase fallback for v2 auth + DB layer](#82-supabase-fallback-for-v2-auth--db-layer)
+39. [Rate-limit race condition](#97-rate-limit-race-condition)
 
 ---
 
@@ -58,6 +65,10 @@ Layak is a two-service application: a **Next.js 16 App Router frontend** (React 
 5. **generate** — WeasyPrint renders three draft PDFs (BK-01, JKM18, LHDN relief summary) watermarked "DRAFT — NOT SUBMITTED".
 
 The backend streams each step to the frontend over Server-Sent Events so the agentic moment is visible on stage. The app is **stateless**: user documents are processed in-memory and discarded at request-end. Scheme rules are hardcoded as typed Pydantic models; scheme PDFs are committed to the repo under `backend/data/schemes/`. A one-time seed script uploads those PDFs into a Vertex AI Search data store. There is no application database, no GCS bucket, and no Firestore in v1 — the git repo is the source of truth for the scheme corpus.
+
+### v2 additions
+
+Layak v2 keeps the v1 stateless agent pipeline unchanged. The new layer adds Firebase Auth (Google OAuth only) for user identity, Firestore in `asia-southeast1` for `users`, `evaluations`, and `waitlist`, plus a Cloud Scheduler + Cloud Run Job pair that prunes free-tier history nightly at 02:00 MYT. Uploaded documents are still discarded immediately after extraction; auth, persistence, and tier gating are layered on top of the existing pipeline rather than replacing it.
 
 ## 2. Architecture Diagram (ASCII)
 
@@ -134,6 +145,37 @@ The backend streams each step to the frontend over Server-Sent Events so the age
  └───────────────────────────────────────────────────────────────────────┘
 ```
 
+### 2.3 v2 authenticated topology
+
+```
+┌──────────┐  OAuth popup  ┌──────────────────────────────┐  ID token  ┌──────────────────────────┐  Authorization: Bearer  ┌──────────────────────────────┐
+│ Browser  │──────────────►│ Firebase Auth SDK            │───────────►│ ID token (IndexedDB)     │───────────────────────►│ Next.js                      │
+└──────────┘               │ (Google OAuth only)          │            └──────────────────────────┘                         │ attaches header              │
+                           └──────────────────────────────┘                                                                  ▼
+                                                                                                           ┌──────────────────────────────────────┐
+                                                                                                           │ FastAPI                              │
+                                                                                                           │ firebase_admin.auth.verify_id_token  │
+                                                                                                           └─────────────────┬────────────────────┘
+                                                                                                                             ▼
+                                                                                                           ┌──────────────────────────────────────┐
+                                                                                                           │ rate-limit count query (Firestore)   │
+                                                                                                           └─────────────────┬────────────────────┘
+                                                                                                                             ▼
+                                                                                                           ┌──────────────────────────────────────┐
+                                                                                                           │ SequentialAgent                      │
+                                                                                                           └─────────────────┬────────────────────┘
+                                                                                                                             ▼
+                                                                                                           ┌──────────────────────────────────────┐
+                                                                                                           │ Firestore eval doc writes per step   │
+                                                                                                           └─────────────────┬────────────────────┘
+                                                                                                                             ├──────────────► SSE stream
+                                                                                                                             └──────────────► Firestore realtime fallback
+                                                                                                                                             ▼
+                                                                                                                                      results/[id]
+
+Cloud Scheduler (daily 02:00 MYT) ─────────► Cloud Run Job (prune) ─────────► Firestore
+```
+
 ## 3. Component Responsibilities
 
 | Component         | Responsibility                                                                       | Tech                                                                                        | Notes                                                                                       |
@@ -152,6 +194,10 @@ The backend streams each step to the frontend over Server-Sent Events so the age
 | Deploy            | Frontend + backend                                                                   | Cloud Run `--min-instances=1 --cpu-boost`                                                   | Warm 1 hour before demo slot.                                                               |
 | Scheme corpus     | Three source PDFs                                                                    | Git-versioned at `backend/data/schemes/`                                                    | Repo is the bucket; no GCS in v1.                                                           |
 | Seed script       | Index scheme PDFs into Vertex AI Search                                              | `backend/scripts/seed_vertex_ai_search.py` (exact path subject to backend-layout decisions) | One-time run; idempotent; checked into CI.                                                  |
+| Firebase Auth     | Google OAuth sign-in, ID-token issuance, IndexedDB token storage, client bootstrap   | Firebase Auth (Google OAuth only)                                                           | `Continue with Google`, `pdpaConsentAt` gate, fetch wrapper.                                |
+| Firestore         | Session + archive layer for users, evaluations, and waitlist                         | Firestore (`asia-southeast1`)                                                               | Flat collections, owner-gated reads, backend-only writes.                                   |
+| Cloud Scheduler   | Triggers nightly 30-day free-tier prune at 02:00 MYT                                 | Cloud Scheduler                                                                             | Schedules the Cloud Run Job once per day.                                                   |
+| Cloud Run Job     | Deletes stale free-tier evaluations older than 30 days                               | Cloud Run Job                                                                               | `backend/scripts/prune_free_tier.py`.                                                       |
 
 ## 4. Data Flow
 
@@ -167,6 +213,19 @@ A single end-to-end journey from upload to download, narrated at component level
 8. **Step 4 — compute_upside:** Gemini Code Execution runs three Python computations in a sandbox: STR household-tier lookup, JKM Warga Emas annualised rate, LHDN tax-liability delta across the five locked reliefs. The code and output are streamed to the UI.
 9. **Step 5 — generate_packet:** WeasyPrint composes three HTML-templated PDFs (BK-01, JKM18, LHDN relief summary) with the extracted profile values pre-filled. Every page is watermarked "DRAFT — NOT SUBMITTED" and footered with the disclaimer from PRD §7.
 10. **UI renders the ranked-scheme list, provenance panel, and packet download.** The user downloads the three PDFs. No data is persisted server-side; the request scope ends and memory is released.
+
+### 4.1 v2 authenticated flow
+
+1. User clicks "Continue with Google" on `/sign-in` or `/sign-up`.
+2. Firebase Auth completes Google OAuth and stores the ID token in IndexedDB.
+3. Next.js attaches `Authorization: Bearer <id-token>` on dashboard API requests.
+4. FastAPI runs `Depends(current_user)` / `firebase_admin.auth.verify_id_token` and injects the Firebase `uid`.
+5. Backend performs the free-tier rate-limit count query against Firestore before SSE opens.
+6. Backend creates `evaluations/{evalId}` with `status="running"`, `userId`, and `createdAt`.
+7. The existing ADK `SequentialAgent` pipeline runs unchanged.
+8. Each step writes to the Firestore evaluation doc and streams an SSE event to the frontend.
+9. On completion, backend writes the final state, emits `done`, and the frontend routes to `/dashboard/evaluation/results/[id]`.
+10. `/results/[id]` reads the Firestore document first; on refresh or deep-link it falls back to Firestore realtime updates until the doc is complete.
 
 ## 5. Google AI Ecosystem Integration
 
@@ -216,6 +275,14 @@ gcloud run deploy layak-backend \
 ```
 
 Required IAM: `roles/secretmanager.secretAccessor` on the Cloud Run service account for `gemini-api-key`. Required API enablements: Vertex AI, Cloud Run, Artifact Registry, Secret Manager, Vertex AI Search (Discovery Engine).
+
+### 5.5 Firestore as the session + archive layer
+
+- **Schema summary:** top-level flat collections `users`, `evaluations`, and `waitlist`; each record carries a `userId` field for owner-scoped queries.
+- **Composite index:** `evaluations` on `(userId ASC, createdAt DESC)`.
+- **Security rules summary:** backend-only writes; client reads gated on `request.auth.uid == resource.data.userId` (and `request.auth.uid == userId` for user docs).
+- **Rate-limit query pattern:** `.where("userId", "==", uid).where("createdAt", ">=", now - timedelta(hours=24)).count()`.
+- **Migration note:** the flat collection shape keeps cross-user rate-limit checks and history lookups simple without nested subcollections.
 
 ## 6. External Dependencies
 
@@ -321,6 +388,12 @@ Both invocations use `pnpm exec` to bypass the pnpm v10 bare-script shortcut whi
 
 **Why Husky and not raw git hooks:** raw hooks live in `.git/hooks/` which is outside git tracking, so they can't be versioned or shared. Husky flips that by keeping hook scripts in-repo and wiring them in on install.
 
+### 6.7 v2 environment variables
+
+- **Backend (Secret Manager):** `FIREBASE_ADMIN_KEY` (secret: `firebase-admin-key`).
+- **Frontend (build-time, publishable):** `NEXT_PUBLIC_FIREBASE_API_KEY`, `NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN`, `NEXT_PUBLIC_FIREBASE_PROJECT_ID`, `NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET`, `NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID`, `NEXT_PUBLIC_FIREBASE_APP_ID`.
+- **Retained from v1:** `GEMINI_API_KEY`, `VERTEX_AI_SEARCH_DATA_STORE`.
+
 ## 7. Security & Secrets
 
 - `.env` and `.env.*` are git-ignored repo-wide; `.env.example` / `.env.template` are the only committed templates (whitelisted in root `.gitignore`).
@@ -334,6 +407,14 @@ Both invocations use `pnpm exec` to bypass the pnpm v10 bare-script shortcut whi
 - Synthetic demo documents carry the "SYNTHETIC — FOR DEMO ONLY" watermark on every page. No real MyKad photos are used.
 - AI-disclosure text in README names Claude Code (Anthropic) per hackathon Rules §4.2.
 
+**ID-token verification middleware.** FastAPI applies `Depends(current_user)` on every `/api/**` dashboard endpoint except `/api/health`; the middleware is the only accepted path into authenticated backend reads and writes.
+
+**Firestore security rules.** All writes stay backend-only. Client reads are owner-gated with `request.auth.uid == resource.data.userId`, so the browser can only see its own `users` and `evaluations` documents.
+
+**PDPA 2010 posture.** Sign-up records consent in `pdpaConsentAt`, preserves the IC last-4 invariant, keeps free-tier history on a 30-day retention window, and exposes user-rights endpoints for export plus delete-cascade. Uploaded documents are still discarded after extraction.
+
+**Encryption.** Firestore uses default encryption at rest, while Cloud Run HTTPS and Firebase Auth TLS cover transport in transit.
+
 ## 8. Feasible-Minimum Tech Stack (Plan B)
 
 **Plan B scope.** If Vertex AI Search setup stalls past **sprint hour 12**, collapse the RAG layer to **Gemini 2.5 Pro inline-PDF grounding**. The three cached scheme PDFs (~80K tokens combined) are dropped directly into the system prompt; the RootAgent holds the entire corpus inline in its 1M-token context window. The `match_schemes` FunctionTool is rewritten to reference passages by `(pdf_filename, page)` pairs already in context rather than making a Search call.
@@ -341,6 +422,15 @@ Both invocations use `pnpm exec` to bypass the pnpm v10 bare-script shortcut whi
 **Plan B does not drop ADK-Python or the five-step pipeline.** The RootAgent, `SequentialAgent`, and `FunctionTool` bindings stay identical; only the retrieval FunctionTool implementation changes. Expected migration cost: ~1 hour (replace Search client calls with a local passage lookup). Cost per demo run rises marginally but stays well under RM1.
 
 **Ceiling collapse (hour 18+).** If the RootAgent itself is unstable at sprint hour 18, refer to PRD §6.3 emergency de-scope. The four-step cut list begins with dropping packet generation and ends with replacing live extraction with Aisyah seed data.
+
+### 8.2 Supabase fallback for v2 auth + DB layer
+
+- **Trigger:** Firebase Auth or Firestore blocker within the first sprint day of v2; PO1 calls the collapse trigger, and both accept without re-debate.
+- **Auth swap:** Supabase Auth Google provider.
+- **DB swap:** Supabase Postgres with RLS policies keyed on `auth.uid()`.
+- **Schema translation:** `users`, `evaluations`, and `waitlist` tables, with `JSONB` for embedded `Profile`, `classification`, and `matches`.
+- **RLS policy template:** `CREATE POLICY user_read_own ON evaluations FOR SELECT USING (auth.uid() = user_id);`
+- **Migration cost:** about 1 day; ADK `SequentialAgent` and SSE stay unchanged.
 
 ## 9. Open Questions
 
@@ -388,6 +478,10 @@ Original decisions (preserved for audit trail):
 
 All three are PDPA 2010 / NRR 1990 compliant only so long as they are labelled SYNTHETIC on every page and in slide 1 of the pitch deck.
 
+### 9.7 Rate-limit race condition
+
+**Acknowledged-and-accepted.** Concurrent free-tier submissions can squeeze past the 5/24 h cap by 1-2 evaluations. The cap is a UX guardrail, not a billing boundary, so this is not fixed in v2.
+
 ## 10. Team & Delivery Responsibilities
 
 Two developers, two strong-lane focus areas, one hard submit deadline (21 Apr 23:00 MYT). Ownership is mapped directly to `docs/plan.md` tasks and `docs/roadmap.md` phase milestones so nothing falls between lanes.
@@ -428,6 +522,11 @@ Each row below maps to a specific task in `docs/plan.md` or a milestone in `docs
 | **2** | 15-slide pitch deck in Canva: problem → user → solution → demo → architecture → tech → impact → business → team → export `pitch.pdf`              | PO2                                     | `docs/plan.md` Phase 2 task 3                                   |
 | **2** | Fill + submit Google Form: repo URL, Cloud Run URL, video URL, `pitch.pdf`, GitHub profiles, track + category                                     | PO1 (Team Lead submits)                 | `docs/plan.md` Phase 2 task 4                                   |
 | **2** | 23:00–23:59 buffer: resubmit if any link breaks                                                                                                   | Both                                    | `docs/roadmap.md` Phase 2                                       |
+| **2** | v2 SaaS Foundation (Auth + Firestore wiring)                                                                                                      | Both                                    | `docs/plan.md` Phase 2                                          |
+| **3** | v2 Persisted Evaluations + Rate Limiting                                                                                                          | Both                                    | `docs/plan.md` Phase 3                                          |
+| **4** | v2 Dashboard UX (History, Stats, Settings)                                                                                                        | Both                                    | `docs/plan.md` Phase 4                                          |
+| **5** | v2 Marketing Landing + Legal                                                                                                                      | PO2                                     | `docs/plan.md` Phase 5                                          |
+| **6** | v2 Production Cutover                                                                                                                             | Both                                    | `docs/plan.md` Phase 6                                          |
 
 ### 10.3 Cross-cutting responsibilities
 

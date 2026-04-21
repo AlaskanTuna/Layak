@@ -21,7 +21,8 @@
       "done": "Selesai",
       "cancel": "Batal",
       "maybeLater": "Nanti sahaja",
-      "startOver": "Mula semula"
+      "startOver": "Mula semula",
+      "retry": "Cuba semula"
     },
     "nav": {
       "dashboard": "Papan Pemuka",
@@ -208,16 +209,32 @@
       "greeting": "Selamat kembali.",
       "description": "Profil sivik anda terkini. Layak menyemak keadaan semasa anda terhadap skim kerajaan 2026 terkini — STR, JKM Warga Emas, pelepasan LHDN Borang B. Mengambil masa kira-kira 4 minit."
     },
+    "loading": "Memuatkan papan pemuka anda…",
+    "errorTitle": "Tidak dapat memuatkan papan pemuka",
+    "errorUnexpected": "Ralat tidak dijangka berlaku.",
     "activeApplications": {
-      "title": "Permohonan Aktif",
-      "viewAll": "Lihat semua",
-      "empty": "Tiada",
-      "emptyDescription": "Permohonan yang dihantar akan muncul di sini dengan status pembayarannya."
+      "title": "Draf permohonan sedia",
+      "empty": "Belum ada",
+      "emptyDescription": "Apabila penilaian selesai, tiga pakej draf permohonan akan muncul di sini supaya anda boleh menghantarnya kepada agensi.",
+      "startCta": "Mulakan penilaian",
+      "draftsReady": "{{count}} draf sedia untuk dihantar",
+      "totalRm": "Jumlah RM {{amount}}",
+      "openCta": "Buka pakej"
     },
     "recentActivity": {
       "title": "Aktiviti Terkini",
       "empty": "Tiada",
-      "emptyDescription": "Muat naik, penilaian, dan penghantaran akan dialirkan di sini apabila berlaku."
+      "emptyDescription": "Penilaian dialirkan di sini apabila berlaku.",
+      "viewAll": "Lihat semua penilaian",
+      "justNow": "Baru sahaja",
+      "minutesAgo": "{{count}} min lalu",
+      "hoursAgo": "{{count}} j lalu",
+      "daysAgo": "{{count}} h lalu",
+      "label": {
+        "complete": "Penilaian selesai",
+        "running": "Penilaian sedang berjalan",
+        "error": "Penilaian gagal"
+      }
     },
     "quota": {
       "tierFree": "Peringkat percuma · 24 jam",

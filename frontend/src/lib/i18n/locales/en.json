@@ -21,7 +21,8 @@
       "done": "Done",
       "cancel": "Cancel",
       "maybeLater": "Maybe later",
-      "startOver": "Start over"
+      "startOver": "Start over",
+      "retry": "Retry"
     },
     "nav": {
       "dashboard": "Dashboard",
@@ -239,16 +240,32 @@
       "greeting": "Welcome back.",
       "description": "Your civic profile is up to date. Layak reviews your current situation against the latest 2026 government schemes — STR, JKM Warga Emas, LHDN Form B reliefs. Takes about 4 minutes."
     },
+    "loading": "Loading your dashboard…",
+    "errorTitle": "Could not load dashboard",
+    "errorUnexpected": "An unexpected error occurred.",
     "activeApplications": {
-      "title": "Active Applications",
-      "viewAll": "View all",
-      "empty": "None",
-      "emptyDescription": "Submitted applications will appear here with their disbursement status."
+      "title": "Application drafts ready",
+      "empty": "None yet",
+      "emptyDescription": "When an evaluation completes, the three draft application packets land here so you can lodge them with the agencies.",
+      "startCta": "Start an evaluation",
+      "draftsReady": "{{count}} drafts ready to submit",
+      "totalRm": "RM {{amount}} total",
+      "openCta": "Open packet"
     },
     "recentActivity": {
       "title": "Recent Activity",
       "empty": "None",
-      "emptyDescription": "Uploads, evaluations, and submissions will stream here as they happen."
+      "emptyDescription": "Evaluations stream here as they happen.",
+      "viewAll": "View all evaluations",
+      "justNow": "Just now",
+      "minutesAgo": "{{count}} min ago",
+      "hoursAgo": "{{count}} h ago",
+      "daysAgo": "{{count}} d ago",
+      "label": {
+        "complete": "Evaluation complete",
+        "running": "Evaluation running",
+        "error": "Evaluation failed"
+      }
     },
     "quota": {
       "tierFree": "Free tier · 24 h",

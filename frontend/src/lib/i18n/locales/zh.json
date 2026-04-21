@@ -21,7 +21,8 @@
       "done": "完成",
       "cancel": "取消",
       "maybeLater": "稍后再说",
-      "startOver": "重新开始"
+      "startOver": "重新开始",
+      "retry": "重试"
     },
     "nav": {
       "dashboard": "仪表板",
@@ -208,16 +209,32 @@
       "greeting": "欢迎回来。",
       "description": "您的公民档案已是最新。Layak 将您当前的情况与 2026 年最新政府计划进行对比 —— STR、JKM Warga Emas、LHDN Form B 减免。大约需时 4 分钟。"
     },
+    "loading": "正在加载您的仪表板…",
+    "errorTitle": "无法加载仪表板",
+    "errorUnexpected": "发生了意外错误。",
     "activeApplications": {
-      "title": "活跃申请",
-      "viewAll": "查看全部",
-      "empty": "无",
-      "emptyDescription": "已提交的申请将在此处显示其发放状态。"
+      "title": "申请草稿已就绪",
+      "empty": "尚无内容",
+      "emptyDescription": "评估完成后，三份申请草稿包将出现在此处，您可以提交给相关机构。",
+      "startCta": "开始评估",
+      "draftsReady": "{{count}} 份草稿可提交",
+      "totalRm": "RM {{amount}} 总额",
+      "openCta": "打开包"
     },
     "recentActivity": {
       "title": "近期活动",
       "empty": "无",
-      "emptyDescription": "上传、评估和提交将在发生时实时显示在此处。"
+      "emptyDescription": "评估发生时实时显示在此处。",
+      "viewAll": "查看所有评估",
+      "justNow": "刚刚",
+      "minutesAgo": "{{count}} 分钟前",
+      "hoursAgo": "{{count}} 小时前",
+      "daysAgo": "{{count}} 天前",
+      "label": {
+        "complete": "评估已完成",
+        "running": "评估进行中",
+        "error": "评估失败"
+      }
     },
     "quota": {
       "tierFree": "免费层级 · 24 小时",

@@ -1,0 +1,488 @@
+{
+  "common": {
+    "brand": "Layak",
+    "aria": {
+      "layakHome": "Layak home",
+      "toggleTheme": "Toggle theme",
+      "languageSelector": "Change language",
+      "accountMenu": "Account menu",
+      "openMenu": "Open menu",
+      "notifications": "Notifications",
+      "notificationsUnread": "Notifications ({{count}} unread)",
+      "dismissNotification": "Dismiss notification",
+      "clearField": "Clear {{fieldName}}"
+    },
+    "button": {
+      "signIn": "Sign In",
+      "signOut": "Sign out",
+      "signingOut": "Signing out…",
+      "continueWithGoogle": "Continue with Google",
+      "howItWorks": "How it works",
+      "done": "Done",
+      "cancel": "Cancel",
+      "maybeLater": "Maybe later",
+      "startOver": "Start over"
+    },
+    "nav": {
+      "dashboard": "Dashboard",
+      "evaluation": "Evaluation",
+      "schemes": "Schemes",
+      "settings": "Settings"
+    },
+    "footer": {
+      "copyright": "© 2026 Layak",
+      "contact": "Contact Us",
+      "howItWorks": "How it Works"
+    },
+    "notifications": {
+      "title": "Notifications",
+      "clearAll": "Clear all",
+      "empty": "No notifications"
+    },
+    "stepper": {
+      "pending": "Pending",
+      "active": "In progress",
+      "complete": "Complete",
+      "error": "Failed"
+    },
+    "language": {
+      "en": "English",
+      "ms": "Bahasa Malaysia",
+      "zh": "简体中文"
+    },
+    "sectionBadge": {
+      "required": "Required",
+      "optional": "Optional"
+    }
+  },
+  "marketing": {
+    "hero": {
+      "headlinePart1": "Know every Malaysian scheme",
+      "headlinePart2": "you qualify for — in one upload.",
+      "description": "Layak reads your MyKad, payslip, and utility bill, then runs a five-step agent pipeline to match you against government schemes — STR, JKM Warga Emas, LHDN Form B reliefs, and more. Every number cites a source page.",
+      "getStarted": "Get Started"
+    },
+    "cta": {
+      "headline": "Ready to see what you qualify for?",
+      "description": "Sign in with Google is one click — no account setup needed. Three uploads, a ranked list, three draft packets. Takes under a minute."
+    },
+    "features": {
+      "sectionTitle": "How the agent works",
+      "sectionDescription": "Five steps. Every step streams to the UI in real time so you can see the reasoning as it happens.",
+      "step1": {
+        "title": "Extract",
+        "description": "Gemini Vision reads your three documents and pulls structured profile fields."
+      },
+      "step2": {
+        "title": "Classify",
+        "description": "Household size, per-capita income, filer category, dependants are derived."
+      },
+      "step3": {
+        "title": "Match",
+        "description": "Rule engine checks every profile against scheme thresholds with full citations."
+      },
+      "step4": {
+        "title": "Compute",
+        "description": "Gemini Code Execution sums annual upside across qualifying schemes on stage."
+      },
+      "step5": {
+        "title": "Generate",
+        "description": "WeasyPrint drafts three watermarked PDF packets — ready to review and submit."
+      }
+    },
+    "howItWorks": {
+      "pipelineTitle": "The pipeline",
+      "pipelineSubtitle": "Streaming · step-by-step",
+      "step1Body": "Gemini Vision reads your MyKad, payslip, and utility bill and pulls structured profile fields — name, IC, monthly income, household composition, address.",
+      "step2Body": "Household size, per-capita monthly income, filer category (Form B vs BE), and counts of children under 18 and elderly dependants 60+ are derived from the extracted profile.",
+      "step3Body": "The rule engine checks your derived profile against every scheme threshold — STR 2026 tiers, JKM Warga Emas eligibility, five LHDN Form B reliefs — and returns qualifying schemes with exact citations.",
+      "step4Body": "Gemini writes a Python snippet and runs it in Google's code sandbox to sum your annual upside across every qualifying scheme. The generated code and its output stream live to the UI, so you see the full working — not just a final number.",
+      "step5Body": "WeasyPrint renders three draft PDFs — BK-01 for STR, JKM18 for Warga Emas, a Form B relief summary for LHDN. Every page carries the watermark: DRAFT — NOT SUBMITTED.",
+      "statsSteps": "5",
+      "statsStepsLabel": "steps",
+      "statsTiming": "under a minute end-to-end",
+      "statsDrafts": "drafts only — you submit",
+      "stackTitle": "The agent stack",
+      "stackSubtitle": "What's under the hood",
+      "stackGeminiRole": "Orchestrates the agent pipeline and handles document understanding + classification.",
+      "stackVertexRole": "RAG layer over committed scheme PDFs — the source of every cited rule passage.",
+      "stackCodeExecRole": "Gemini writes and runs a Python snippet in Google's sandbox to compute your annual upside. Both the generated source and its stdout stream to the UI — verifiable math, not a black box.",
+      "stackWeasyRole": "HTML-to-PDF draft packet generator. Every page watermarked and agency-portal-ready.",
+      "finePrintTitle": "The fine print",
+      "finePrintDraft": "Layak never submits on your behalf. Every generated packet is a <strong>draft</strong> — you review it and lodge it manually via the agency's official portal.",
+      "finePrintEstimates": "Figures are estimates. The agency makes the final determination on every application.",
+      "finePrintIndependent": "Layak is an independent prototype. It is not affiliated with LHDN, JKM, the Treasury, or any other Malaysian government body.",
+      "finePrintCoverage": "Scheme coverage and thresholds reflect YA2025 / 2026 rules as of April 2026 and may change over time."
+    },
+    "privacy": {
+      "title": "Privacy Notice",
+      "effective": "Effective: 21 April 2026",
+      "intro": "Layak is a hackathon submission to the MyAI Future Hackathon. This notice describes what we collect, what we do with it, and the rights you keep under Malaysia's Personal Data Protection Act 2010 (PDPA).",
+      "section1Title": "1. What we collect",
+      "section1Google": "<strong>Google account profile</strong> when you sign in: email, display name, profile photo, and the Firebase user identifier.",
+      "section1Documents": "<strong>Documents you upload</strong> to run an evaluation — typically a MyKad, a payslip or income screenshot, and a utility bill.",
+      "section1History": "<strong>Evaluation history</strong>: the structured profile we extracted from your documents and the schemes you matched against, persisted in Firestore so you can see your past runs.",
+      "section1Consent": "<strong>Consent timestamp</strong> recorded when you tick the PDPA checkbox on sign-up.",
+      "section2Title": "2. What we do not store",
+      "section2MyKad": "Your full MyKad number — we keep only the last four digits.",
+      "section2Files": "The original bytes of your uploaded files. Extraction runs in-memory inside a single request, and the raw files are discarded once the structured profile is produced.",
+      "section2Logs": "IC numbers, authentication tokens, or document content in any log line.",
+      "section3Title": "3. Why we collect it",
+      "section3Matching": "To match you against locked Malaysian schemes (STR 2026, JKM Warga Emas, LHDN Form B reliefs).",
+      "section3Packets": "To generate your draft application packets, every page watermarked \"DRAFT — NOT SUBMITTED.\"",
+      "section3History": "To show you a history of your past evaluations on the dashboard.",
+      "section3FairUse": "To enforce per-user fair-use rate limits on the free tier.",
+      "section4Title": "4. Where it lives",
+      "section4Body": "All processing and storage happens in Google Cloud, <code>asia-southeast1</code> region. The Cloud Run services and the Firestore database are owned by the Layak team. Authentication is handled by Firebase Authentication, also under our project.",
+      "section5Title": "5. How long we keep it",
+      "section5FreeDelete": "Free-tier evaluations are deleted after 30 days by an automated nightly job.",
+      "section5ProKeep": "Pro-tier evaluations persist until you delete them.",
+      "section5AccountDelete": "You can request immediate deletion of your account and all linked records at any time from the Settings page.",
+      "section6Title": "6. Your PDPA rights",
+      "section6Access": "<strong>Access</strong> — download a JSON export of your profile and full evaluation history.",
+      "section6Deletion": "<strong>Deletion</strong> — remove your account, your Firestore records, and your Firebase Auth identity in one action.",
+      "section6Withdrawal": "<strong>Withdrawal</strong> — revoke consent by deleting your account. Further sign-in attempts will require fresh consent.",
+      "section7Title": "7. What we never do",
+      "section7NoSubmit": "We never submit anything on your behalf to LHDN, JPN, JKM, or any government portal. Every output is a draft packet you submit manually.",
+      "section7NoThirdParty": "We never share your data with third parties for advertising.",
+      "section7NoSell": "We do not sell your data.",
+      "section8Title": "8. Demo and hackathon scope",
+      "section8Body": "Layak is a non-production hackathon project. Use synthetic documents wherever possible during the demo period. Do not upload another person's MyKad or financial documents without their explicit consent.",
+      "section9Title": "9. Contact",
+      "section9Body": "Reach the team via the project's GitHub repository. For PDPA-specific queries, open an issue tagged <code>pdpa</code>."
+    },
+    "terms": {
+      "title": "Terms of Use",
+      "effective": "Effective: 21 April 2026",
+      "intro": "Layak is a research demonstration built for the MyAI Future Hackathon. By using it, you agree to the terms below.",
+      "section1Title": "1. Hackathon scope",
+      "section1Body": "Layak is a demonstration system, not a licensed financial, tax, or legal adviser. Outputs are educational and may be incomplete or out of date. Always confirm eligibility, amounts, and deadlines with the relevant agency (LHDN, JPN, JKM, or your local PPM) before acting on anything Layak shows you.",
+      "section2Title": "2. Draft packets only",
+      "section2Body": "Every application packet Layak generates is watermarked \"DRAFT — NOT SUBMITTED.\" Layak does not, and will not, file anything on your behalf with any Malaysian government portal. Submission is always manual and always your responsibility.",
+      "section3Title": "3. Acceptable use",
+      "section3OwnAccount": "Sign in with your own Google account.",
+      "section3OwnDocuments": "Upload documents that belong to you, or for which you have explicit consent.",
+      "section3NoEvade": "Do not use Layak to evade taxes, misrepresent eligibility, or apply for schemes you do not qualify for.",
+      "section4Title": "4. Account suspension",
+      "section4Body": "We may suspend or delete demo accounts that violate these terms or that abuse the free-tier rate limit (5 evaluations per rolling 24 hours).",
+      "section5Title": "5. As-is service",
+      "section5Body": "Layak is provided \"as is,\" without warranty of any kind. The team makes no representation that the service will be available, accurate, or fit for any specific purpose during or after the hackathon judging window.",
+      "section6Title": "6. Liability",
+      "section6Body": "To the extent permitted by Malaysian law, the Layak team is not liable for any direct, indirect, or consequential loss arising from your use of the service. You remain responsible for the accuracy of your own application packets and for any decisions you take based on Layak's output.",
+      "section7Title": "7. Changes",
+      "section7Body": "We may update these terms during the hackathon period. The effective date at the top of this page reflects the latest version.",
+      "section8Title": "8. Governing law",
+      "section8Body": "These terms are governed by the laws of Malaysia.",
+      "section9Title": "9. Contact",
+      "section9Body": "Reach the team via the project's GitHub repository."
+    }
+  },
+  "auth": {
+    "guard": {
+      "checkingSession": "Checking your session…"
+    },
+    "signIn": {
+      "title": "Welcome back",
+      "description": "Continue with your Google account to reach your dashboard.",
+      "noAccountPrefix": "No account?",
+      "noAccountCta": "Sign up",
+      "errorFailed": "Sign-in failed. Please try again."
+    },
+    "signUp": {
+      "title": "Create your account",
+      "description": "Sign up with Google. Layak never submits anything on your behalf — you stay in control of every draft packet.",
+      "consentPrefix": "I consent to Layak processing my uploaded documents (IC, payslip, utility bill) to match government schemes, per the",
+      "consentPrivacy": "Privacy Policy",
+      "consentAnd": "and",
+      "consentTerms": "Terms",
+      "consentSuffix": ".",
+      "hasAccountPrefix": "Already have an account?",
+      "hasAccountCta": "Sign In",
+      "errorFailed": "Sign-up failed. Please try again."
+    }
+  },
+  "dashboard": {
+    "hero": {
+      "eyebrow": "Dashboard",
+      "greetingWithName": "Welcome back, {{name}}.",
+      "greeting": "Welcome back.",
+      "description": "Your civic profile is up to date. Layak reviews your current situation against the latest 2026 government schemes — STR, JKM Warga Emas, LHDN Form B reliefs. Takes about 4 minutes."
+    },
+    "activeApplications": {
+      "title": "Active Applications",
+      "viewAll": "View all",
+      "empty": "None",
+      "emptyDescription": "Submitted applications will appear here with their disbursement status."
+    },
+    "recentActivity": {
+      "title": "Recent Activity",
+      "empty": "None",
+      "emptyDescription": "Uploads, evaluations, and submissions will stream here as they happen."
+    },
+    "quota": {
+      "tierFree": "Free tier · 24 h",
+      "tierPro": "Pro · unlimited",
+      "usage": "{{used}} / {{limit}}",
+      "remaining": "{{remaining}} left · resets in {{time}}",
+      "exhausted": "Quota resets in {{time}}",
+      "aria": "{{used}} of {{limit}} evaluations used",
+      "checking": "Checking quota…",
+      "unavailable": "Quota status unavailable"
+    },
+    "breadcrumb": {
+      "dashboard": "Dashboard",
+      "evaluation": "Evaluation",
+      "upload": "Upload",
+      "results": "Results",
+      "schemes": "Schemes",
+      "settings": "Settings",
+      "signIn": "Sign in",
+      "signUp": "Sign up"
+    }
+  },
+  "evaluation": {
+    "sampleLoadError": "Could not load Aisyah samples: {{error}}",
+    "unknownError": "Unknown error.",
+    "overview": {
+      "eyebrow": "My evaluations",
+      "title": "Your eligibility at a glance.",
+      "description": "Lifetime relief identified across every run, plus a paginated history of past evaluations."
+    },
+    "results": {
+      "eyebrow": "Assessment complete",
+      "title": "Based on your documents, you qualify for multiple relief schemes.",
+      "description": "Every number cites a source page; every packet is a DRAFT you submit yourself.",
+      "startAnother": "Start another evaluation",
+      "viewDetailed": "View detailed results",
+      "backToEvaluations": "Back to evaluations",
+      "loading": "Loading evaluation…",
+      "notFoundTitle": "Evaluation not found",
+      "notFoundBody": "We couldn't find this evaluation. It may have been deleted, or the link may be wrong.",
+      "errorTitle": "Could not load evaluation",
+      "errorUnexpected": "An unexpected error occurred.",
+      "retry": "Retry",
+      "startNew": "Start a new evaluation",
+      "failedTitle": "Evaluation failed",
+      "backendReturned": "Backend returned {{status}} {{statusText}}",
+      "byIdEyebrow": "Evaluation",
+      "byIdTitle": "Your eligibility results.",
+      "byIdDescription": "Hydrated from your saved evaluation. Numbers cite the rule and source page; every packet is a DRAFT you submit yourself."
+    },
+    "intake": {
+      "aria": "Intake method",
+      "upload": "Upload documents",
+      "manual": "Enter manually"
+    },
+    "stepper": {
+      "aria": "Pipeline progress",
+      "labels": {
+        "extract": "Extract profile",
+        "extractManual": "Profile prepared",
+        "classify": "Classify household",
+        "match": "Match schemes",
+        "compute_upside": "Compute upside",
+        "generate": "Generate drafts"
+      }
+    },
+    "upload": {
+      "sectionIc": "MyKad (IC)",
+      "hintIc": "Front of your Malaysian identity card, clearly showing your details.",
+      "sectionPayslip": "Payslip or income statement",
+      "hintPayslip": "Latest month if available; self-employed filers can upload a bank statement or LHDN form.",
+      "sectionUtility": "Utility bill",
+      "hintUtility": "Water, electricity, or broadband bill for address verification — within the last three months.",
+      "errorFileSize": "File is {{size}} MB — max is 10 MB.",
+      "errorFileType": "Unsupported file type ({{type}}). Upload an image or PDF.",
+      "dropzonePrimary": "Click to upload",
+      "dropzoneSecondary": "or drag and drop",
+      "dropzoneFormats": "JPG, PNG, or PDF up to 10MB",
+      "householdTitle": "Household",
+      "householdHint": "Documents don't list your dependants. Add children / parents / other household members here so schemes that gate on them (JKM Warga Emas, LHDN child relief) surface.",
+      "useSamples": "Use Aisyah sample documents",
+      "loadingSamples": "Loading samples…",
+      "continue": "Continue evaluation",
+      "eyebrow": "Step · Upload",
+      "pageTitle": "Upload documents.",
+      "pageDescription": "Provide the documents below to verify your eligibility for the scheme corpus. Ensure all text is clear and readable — the agent will extract, classify, match, rank, and draft application packets."
+    },
+    "manual": {
+      "identityTitle": "Identity",
+      "nameLabel": "Full name",
+      "dobLabel": "Date of birth",
+      "dobHelp": "Just type the numbers — we fill in the dashes. Or use the calendar icon.",
+      "dobPlaceholder": "YYYY-MM-DD",
+      "dobAria": "Open date picker",
+      "icLabel": "IC last 4 digits",
+      "icHelp": "We only collect the last 4 digits — your full MyKad never leaves your device.",
+      "incomeTitle": "Income",
+      "incomeLabel": "Monthly income (RM)",
+      "incomeHelp": "Net payout for gig work, basic pay for salaried.",
+      "employmentLabel": "Employment type",
+      "employmentGig": "Self-employed / gig",
+      "employmentGigHelp": "Grab, Foodpanda, freelance — files LHDN Form B.",
+      "employmentSalaried": "Salaried employee",
+      "employmentSalariedHelp": "Regular monthly salary — files LHDN Form BE.",
+      "utilityTitle": "Utility bill",
+      "addressLabel": "Home address",
+      "costLabel": "Monthly electricity cost (RM)",
+      "costHelp": "The RM amount on the bottom of your latest TNB bill. Most people remember this more easily than kWh.",
+      "costPlaceholder": "e.g. 95.40",
+      "kwhLabel": "Monthly electricity usage (kWh)",
+      "kwhHelp": "Optional — only if your bill lists \"Jumlah Penggunaan\".",
+      "kwhPlaceholder": "e.g. 220",
+      "householdTitle": "Household",
+      "useAisyah": "Use Aisyah sample data",
+      "clear": "Clear",
+      "submit": "Generate packet",
+      "zodRequired": "Required",
+      "zodDateFormat": "Use YYYY-MM-DD",
+      "zodNotRealDate": "Not a real date",
+      "zodYearMin": "Year must be 1900 or later",
+      "zodPastDate": "Must be a past date",
+      "zodIc4Digits": "4 digits",
+      "zodCostFormat": "Amount up to RM100,000 (e.g. 240 or 240.50)",
+      "zodKwhFormat": "Whole number up to 10,000"
+    },
+    "dependants": {
+      "description": "Add everyone else who shares your household. Children under 18 and parents aged 60+ unlock specific schemes. Household size: {{size}} (you + {{count}} {{plural}}).",
+      "dependantSingular": "dependant",
+      "dependantPlural": "dependants",
+      "empty": "No dependants yet. Click \"Add dependant\" to list each household member.",
+      "relationship": "Relationship",
+      "relationships": {
+        "child": "Child",
+        "parent": "Parent",
+        "spouse": "Spouse",
+        "sibling": "Sibling",
+        "other": "Other"
+      },
+      "age": "Age",
+      "agePlaceholder": "Age",
+      "icOptional": "IC last 4 (optional)",
+      "add": "Add dependant",
+      "removeAria": "Remove dependant {{index}}"
+    },
+    "demo": {
+      "title": "DEMO MODE",
+      "description": "Running against Aisyah — a synthetic Grab driver in Kuantan, two school-age children and one elderly dependant. No real MyKad is involved."
+    },
+    "error": {
+      "title": "Pipeline error",
+      "recoveryIntro": "Something broke mid-pipeline. You can run the full flow against synthetic Aisyah documents — useful for confirming the rest of the UI is healthy — or start over with fresh uploads.",
+      "switchToManual": "Switch to Manual Entry",
+      "trySamples": "Try with sample documents",
+      "startOver": "Start over"
+    },
+    "upside": {
+      "label": "Total Potential Relief",
+      "currency": "RM",
+      "empty": "Run your first evaluation to see your total potential annual relief across federal and state schemes.",
+      "start": "Start evaluation",
+      "description": "Across {{count}} {{schemeLabel}} and reliefs. Based on your income profile and household status.",
+      "schemeSingular": "scheme",
+      "schemePlural": "schemes",
+      "download": "Download all drafts",
+      "downloadWithCount": "Download all drafts ({{count}})",
+      "downloadPending": "Drafts pending"
+    },
+    "schemeCard": {
+      "heading": "Eligible Schemes",
+      "matchesSingular": "{{count}} match",
+      "matchesPlural": "{{count}} matches",
+      "noMatches": "No qualifying schemes found for your profile in this build.",
+      "whyQualify": "Why you qualify",
+      "whyIQualify": "Why I qualify",
+      "estValue": "Est. Value",
+      "startApp": "Start app",
+      "categoryAssistance": "Assistance",
+      "perYearEst": "per year (est.)",
+      "openAgencyPortal": "Open {{agency}} portal",
+      "emptyList": "Scheme matches will appear here after your first evaluation completes.",
+      "eligibleSchemesCount": "Eligible schemes ({{count}})"
+    },
+    "packet": {
+      "titleSingular": "Draft application packet ({{count}} file)",
+      "titlePlural": "Draft application packet ({{count}} files)",
+      "titleSchemeSingular": "Draft application packet ({{count}} scheme)",
+      "titleSchemePlural": "Draft application packet ({{count}} schemes)",
+      "description": "Every page carries a \"DRAFT — NOT SUBMITTED\" watermark. Layak never submits on your behalf. Review each PDF, then lodge it yourself via the agency's official portal.",
+      "download": "Download PDF",
+      "pending": "Pending backend",
+      "scheme": "scheme: {{id}}",
+      "downloadZip": "Download all drafts as ZIP",
+      "generatingZip": "Generating ZIP…",
+      "placeholderNotice": "WeasyPrint packet generator lands in Phase 1 Task 5 (paired wiring block). Until then the packet shell is rendered so you can see where the download CTAs will sit."
+    },
+    "codeExecution": {
+      "title": "Gemini Code Execution — upside computation",
+      "description": "The agent ran Python to compute per-scheme and total annual upside. Snippet and stdout are rendered verbatim.",
+      "python": "Python",
+      "stdout": "stdout"
+    }
+  },
+  "schemes": {
+    "pageEyebrow": "Scheme library",
+    "pageTitle": "Every Malaysian scheme Layak reasons over.",
+    "pageDescription": "Three federal schemes are live in this build. Five more land in v2 as we wire each one's rules, thresholds, and application form into the engine.",
+    "stats": {
+      "inScope": "in scope",
+      "coming": "coming in v2"
+    },
+    "sections": {
+      "inScopeTitle": "In scope · this build",
+      "comingTitle": "Coming in v2",
+      "comingCount": "{{count}} schemes"
+    },
+    "howWePick": {
+      "title": "How we pick what to support",
+      "description": "Layak prioritises schemes with publicly-documented thresholds, open application portals, and high real-world upside for low-to-middle-income Malaysians. Each rule we support is backed by a citable source — either a government PR document, gazetted form, or scheme brochure — so every RM figure in your evaluation traces back to a specific page."
+    },
+    "notAffiliated": "Not affiliated with LHDN, JKM, Treasury, or any other Malaysian government body.",
+    "labels": {
+      "cashTransfer": "Cash Transfer",
+      "welfare": "Welfare",
+      "taxRelief": "Tax Relief",
+      "typicalUpside": "Typical upside",
+      "upTo": "Up to RM",
+      "perYear": "/ year",
+      "agencyPortal": "Agency portal"
+    },
+    "str": {
+      "summary": "Sumbangan Tunai Rahmah — household and individual tiers based on per-capita income and household size."
+    },
+    "jkm": {
+      "summary": "Monthly RM 600 payment for a qualifying elderly dependant (aged 60+) in low-income households."
+    },
+    "lhdn": {
+      "summary": "Five self-employed reliefs: individual, spouse exemption, per-child, medical, and lifestyle."
+    },
+    "coming": {
+      "iSaraanDesc": "Self-employed EPF matching contribution.",
+      "perkesoDesc": "Self-employed social security scheme.",
+      "myKasihDesc": "Cashless food aid programme.",
+      "eKasihDesc": "National poor-household registry.",
+      "saraDesc": "Alternate tax-relief pathway."
+    }
+  },
+  "settings": {
+    "eyebrow": "Settings",
+    "title": "Your defaults and preferences.",
+    "description": "Most controls land in v2 — for now the page is a placeholder.",
+    "placeholderTitle": "Settings — v2",
+    "placeholderDescription": "Language, default profile values, data retention, and accessibility knobs will live here. This page is a structural placeholder so the route is already wired when the controls land.",
+    "upgrade": {
+      "title": "Get Layak Pro",
+      "descriptionDefault": "Upgrade to remove the free-tier cap and keep your evaluation history forever.",
+      "descriptionRateLimit": "You've hit the free tier cap of {{limit}} evaluations every {{hours}} hours. Pro removes the cap and keeps history forever.",
+      "feature1": "Unlimited evaluations — no rolling cap.",
+      "feature2": "History persists indefinitely (free tier auto-prunes after 30 days).",
+      "feature3": "Priority access to new schemes as they're added.",
+      "resetInfo": "Free quota resets at {{time}}.",
+      "successTitle": "You're on the waitlist.",
+      "successMessage": "We'll email <strong>{{email}}</strong> when Layak Pro is available.",
+      "emailFallback": "you",
+      "joinWaitlist": "Join waitlist",
+      "joining": "Adding…"
+    }
+  }
+}

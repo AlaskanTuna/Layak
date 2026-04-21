@@ -2,6 +2,7 @@
 
 import { useRouter, useSearchParams } from 'next/navigation'
 import { useEffect, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 
 import { ErrorRecoveryCard } from '@/components/evaluation/error-recovery-card'
 import { useEvaluation } from '@/components/evaluation/evaluation-provider'
@@ -15,11 +16,8 @@ import { AISYAH_DEPENDANT_OVERRIDES, loadAisyahFixtureFiles } from '@/lib/aisyah
 import type { ManualEntryPayload, Step } from '@/lib/agent-types'
 import { cn } from '@/lib/utils'
 
-const MANUAL_MODE_LABEL_OVERRIDES: Partial<Record<Step, string>> = {
-  extract: 'Profile prepared'
-}
-
 export function EvaluationUploadClient() {
+  const { t } = useTranslation()
   const router = useRouter()
   const searchParams = useSearchParams()
   const { state, start, reset, setDemoMode, acknowledgeQuotaExceeded } = useEvaluation()
@@ -127,7 +125,8 @@ export function EvaluationUploadClient() {
   const showIntake = state.phase === 'idle'
   const showStepper = state.phase === 'streaming' || state.phase === 'error' || state.phase === 'done'
   const showError = state.phase === 'error'
-  const labelOverrides = mode === 'manual' ? MANUAL_MODE_LABEL_OVERRIDES : undefined
+  const labelOverrides: Partial<Record<Step, string>> | undefined =
+    mode === 'manual' ? { extract: t('evaluation.stepper.labels.extractManual') } : undefined
 
   function handleWaitlistOpenChange(open: boolean) {
     if (!open) acknowledgeQuotaExceeded()
@@ -147,7 +146,7 @@ export function EvaluationUploadClient() {
             />
             {sampleLoadError && (
               <p className="mt-2 text-xs text-destructive" role="alert">
-                Could not load Aisyah samples: {sampleLoadError}
+                {t('evaluation.sampleLoadError', { error: sampleLoadError })}
               </p>
             )}
           </div>
@@ -165,7 +164,7 @@ export function EvaluationUploadClient() {
           <PipelineStepper state={state} labelOverrides={labelOverrides} />
           {showError && (
             <ErrorRecoveryCard
-              message={state.error ?? 'Unknown error.'}
+              message={state.error ?? t('evaluation.unknownError')}
               // "Use samples" falls back to the same upload path; on a
               // quota-exhausted error the card prefers the Manual Entry CTA
               // instead because the upload path would 429 the same way.
@@ -177,7 +176,7 @@ export function EvaluationUploadClient() {
           {!showError && (
             <div className="flex">
               <Button type="button" variant="outline" onClick={handleReset}>
-                Start over
+                {t('common.button.startOver')}
               </Button>
             </div>
           )}

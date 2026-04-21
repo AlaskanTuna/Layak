@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { Check, Crown, Loader2, Sparkles } from 'lucide-react'
+import { Trans, useTranslation } from 'react-i18next'
 
 import { Button } from '@/components/ui/button'
 import {
@@ -46,6 +47,7 @@ function formatResetTime(iso: string): string {
  * show a confirmation receipt without any backend write.
  */
 export function UpgradeWaitlistModal({ open, onOpenChange, context }: Props) {
+  const { t } = useTranslation()
   const { user } = useAuth()
   const [submitted, setSubmitted] = useState(false)
   const [busy, setBusy] = useState(false)
@@ -71,12 +73,15 @@ export function UpgradeWaitlistModal({ open, onOpenChange, context }: Props) {
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <Crown className="size-4 text-primary" aria-hidden />
-            Get Layak Pro
+            {t('settings.upgrade.title')}
           </DialogTitle>
           <DialogDescription>
             {context?.kind === 'rate_limit'
-              ? `You've hit the free tier cap of ${context.limit} evaluations every ${context.windowHours} hours. Pro removes the cap and keeps history forever.`
-              : 'Upgrade to remove the free-tier cap and keep your evaluation history forever.'}
+              ? t('settings.upgrade.descriptionRateLimit', {
+                  limit: context.limit,
+                  hours: context.windowHours
+                })
+              : t('settings.upgrade.descriptionDefault')}
           </DialogDescription>
         </DialogHeader>
 
@@ -87,17 +92,19 @@ export function UpgradeWaitlistModal({ open, onOpenChange, context }: Props) {
             </div>
             <div className="flex flex-col gap-1">
               <p className="font-heading text-base font-semibold tracking-tight">
-                You&rsquo;re on the waitlist.
+                {t('settings.upgrade.successTitle')}
               </p>
               <p className="text-sm text-muted-foreground">
-                We&rsquo;ll email <span className="font-medium text-foreground">{user?.email ?? 'you'}</span>{' '}
-                when Layak Pro is available.
+                <Trans
+                  i18nKey="settings.upgrade.successMessage"
+                  values={{ email: user?.email ?? t('settings.upgrade.emailFallback') }}
+                  components={{ strong: <span className="font-medium text-foreground" /> }}
+                />
               </p>
             </div>
             {context?.kind === 'rate_limit' && (
               <p className="text-xs text-muted-foreground">
-                Your free quota resets at{' '}
-                <span className="font-medium text-foreground">{formatResetTime(context.resetAt)}</span>.
+                {t('settings.upgrade.resetInfo', { time: formatResetTime(context.resetAt) })}
               </p>
             )}
           </div>
@@ -106,21 +113,20 @@ export function UpgradeWaitlistModal({ open, onOpenChange, context }: Props) {
             <ul className="flex flex-col gap-2 text-sm">
               <li className="flex items-start gap-2">
                 <Sparkles className="mt-0.5 size-3.5 shrink-0 text-primary" aria-hidden />
-                <span>Unlimited evaluations &mdash; no rolling cap.</span>
+                <span>{t('settings.upgrade.feature1')}</span>
               </li>
               <li className="flex items-start gap-2">
                 <Sparkles className="mt-0.5 size-3.5 shrink-0 text-primary" aria-hidden />
-                <span>History persists indefinitely (free tier auto-prunes after 30 days).</span>
+                <span>{t('settings.upgrade.feature2')}</span>
               </li>
               <li className="flex items-start gap-2">
                 <Sparkles className="mt-0.5 size-3.5 shrink-0 text-primary" aria-hidden />
-                <span>Priority access to new schemes as they&rsquo;re added.</span>
+                <span>{t('settings.upgrade.feature3')}</span>
               </li>
             </ul>
             {context?.kind === 'rate_limit' && (
               <p className="rounded-md border border-border bg-muted/40 px-3 py-2 text-xs text-muted-foreground">
-                Free quota resets at{' '}
-                <span className="font-medium text-foreground">{formatResetTime(context.resetAt)}</span>.
+                {t('settings.upgrade.resetInfo', { time: formatResetTime(context.resetAt) })}
               </p>
             )}
           </div>
@@ -129,21 +135,21 @@ export function UpgradeWaitlistModal({ open, onOpenChange, context }: Props) {
         <DialogFooter>
           {submitted ? (
             <Button type="button" onClick={handleClose}>
-              Done
+              {t('common.button.done')}
             </Button>
           ) : (
             <>
               <Button type="button" variant="outline" onClick={handleClose} disabled={busy}>
-                Maybe later
+                {t('common.button.maybeLater')}
               </Button>
               <Button type="button" onClick={handleConfirm} disabled={busy || !user}>
                 {busy ? (
                   <>
                     <Loader2 className="mr-1.5 size-4 animate-spin" aria-hidden />
-                    Adding…
+                    {t('settings.upgrade.joining')}
                   </>
                 ) : (
-                  'Join waitlist'
+                  t('settings.upgrade.joinWaitlist')
                 )}
               </Button>
             </>

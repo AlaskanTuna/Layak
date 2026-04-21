@@ -1,6 +1,7 @@
 'use client'
 
 import { Download, FileDown, ShieldCheck } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
@@ -12,6 +13,7 @@ type Props = {
 }
 
 function DraftRow({ draft }: { draft: PacketDraft }) {
+  const { t } = useTranslation()
   const canDownload = draft.blob_bytes_b64 != null
 
   function handleClick() {
@@ -26,7 +28,7 @@ function DraftRow({ draft }: { draft: PacketDraft }) {
         <FileDown className="size-4 shrink-0 text-muted-foreground" aria-hidden />
         <div className="flex min-w-0 flex-col">
           <span className="truncate text-sm font-medium">{draft.filename}</span>
-          <span className="text-xs text-muted-foreground">scheme: {draft.scheme_id}</span>
+          <span className="text-xs text-muted-foreground">{t('evaluation.packet.scheme', { id: draft.scheme_id })}</span>
         </div>
       </div>
       <Button
@@ -38,27 +40,30 @@ function DraftRow({ draft }: { draft: PacketDraft }) {
         className="shrink-0"
       >
         <Download className="mr-1.5 size-3.5" aria-hidden />
-        {canDownload ? 'Download PDF' : 'Pending backend'}
+        {canDownload ? t('evaluation.packet.download') : t('evaluation.packet.pending')}
       </Button>
     </div>
   )
 }
 
 export function PacketDownload({ packet }: Props) {
+  const { t } = useTranslation()
   if (!packet || packet.drafts.length === 0) return null
 
   const anyDownloadable = packet.drafts.some(d => d.blob_bytes_b64 != null)
+  const count = packet.drafts.length
 
   return (
     <Card>
       <CardHeader>
         <CardTitle className="flex items-center gap-2 text-sm">
           <ShieldCheck className="size-4 text-primary" aria-hidden />
-          Draft application packet ({packet.drafts.length} file{packet.drafts.length === 1 ? '' : 's'})
+          {count === 1
+            ? t('evaluation.packet.titleSingular', { count })
+            : t('evaluation.packet.titlePlural', { count })}
         </CardTitle>
         <CardDescription>
-          Every page carries a &ldquo;DRAFT — NOT SUBMITTED&rdquo; watermark. Layak never submits on your behalf.
-          Review each PDF, then lodge it yourself via the agency&rsquo;s official portal.
+          {t('evaluation.packet.description')}
         </CardDescription>
       </CardHeader>
       <CardContent className="flex flex-col gap-2">
@@ -67,8 +72,7 @@ export function PacketDownload({ packet }: Props) {
         ))}
         {!anyDownloadable && (
           <p className="text-xs italic text-muted-foreground">
-            WeasyPrint packet generator lands in Phase 1 Task 5 (paired wiring block). Until then the packet shell is
-            rendered so you can see where the download CTAs will sit.
+            {t('evaluation.packet.placeholderNotice')}
           </p>
         )}
       </CardContent>

@@ -2,6 +2,7 @@
 
 import { useRouter } from 'next/navigation'
 import { useEffect } from 'react'
+import { useTranslation } from 'react-i18next'
 
 import { CodeExecutionPanel } from '@/components/evaluation/code-execution-panel'
 import { useEvaluation } from '@/components/evaluation/evaluation-provider'
@@ -12,6 +13,7 @@ import { Button } from '@/components/ui/button'
 
 export function EvaluationResultsClient() {
   const router = useRouter()
+  const { t } = useTranslation()
   const { state, reset, setDemoMode } = useEvaluation()
 
   useEffect(() => {
@@ -52,7 +54,7 @@ export function EvaluationResultsClient() {
       <PacketDownload packet={state.packet} />
       <div className="flex">
         <Button type="button" variant="outline" onClick={handleReset}>
-          Start another evaluation
+          {t('evaluation.results.startAnother')}
         </Button>
       </div>
     </div>

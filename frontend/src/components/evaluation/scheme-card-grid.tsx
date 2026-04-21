@@ -1,4 +1,7 @@
+'use client'
+
 import { ArrowRight } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 
 import { Button } from '@/components/ui/button'
 import type { SchemeMatch } from '@/lib/agent-types'
@@ -12,23 +15,24 @@ function formatRm(value: number): string {
   return `RM ${value.toLocaleString('en-MY', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
 }
 
-function categoryFor(match: SchemeMatch): string {
+function categoryKeyFor(match: SchemeMatch): 'cashTransfer' | 'taxRelief' | 'welfare' | 'assistance' {
   const agency = match.agency.toLowerCase()
   const id = match.scheme_id.toLowerCase()
-  if (id.includes('str') || agency.includes('treasury')) return 'Cash Transfer'
-  if (agency.includes('lhdn')) return 'Tax Relief'
-  if (agency.includes('jkm')) return 'Welfare'
-  return 'Assistance'
+  if (id.includes('str') || agency.includes('treasury')) return 'cashTransfer'
+  if (agency.includes('lhdn')) return 'taxRelief'
+  if (agency.includes('jkm')) return 'welfare'
+  return 'assistance'
 }
 
 export function SchemeCardGrid({ matches }: Props) {
+  const { t } = useTranslation()
   const qualifying = matches.filter(m => m.qualifies).sort((a, b) => b.annual_rm - a.annual_rm)
 
   if (qualifying.length === 0) {
     return (
       <section className="rounded-lg border border-border bg-card p-6 text-center">
         <p className="text-sm text-muted-foreground">
-          No qualifying schemes found for your profile in this build.
+          {t('evaluation.schemeCard.noMatches')}
         </p>
       </section>
     )
@@ -37,15 +41,25 @@ export function SchemeCardGrid({ matches }: Props) {
   return (
     <section className="flex flex-col gap-4">
       <div className="flex items-baseline justify-between">
-        <h2 className="font-heading text-lg font-semibold tracking-tight">Eligible Schemes</h2>
+        <h2 className="font-heading text-lg font-semibold tracking-tight">{t('evaluation.schemeCard.heading')}</h2>
         <span className="text-[11px] uppercase tracking-[0.14em] text-muted-foreground">
-          {qualifying.length} {qualifying.length === 1 ? 'match' : 'matches'}
+          {qualifying.length === 1
+            ? t('evaluation.schemeCard.matchesSingular', { count: qualifying.length })
+            : t('evaluation.schemeCard.matchesPlural', { count: qualifying.length })}
         </span>
       </div>
       <ul className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
         {qualifying.map((match, index) => {
           const isTop = index === 0
-          const category = categoryFor(match)
+          const categoryKey = categoryKeyFor(match)
+          const category =
+            categoryKey === 'cashTransfer'
+              ? t('schemes.labels.cashTransfer')
+              : categoryKey === 'taxRelief'
+                ? t('schemes.labels.taxRelief')
+                : categoryKey === 'welfare'
+                  ? t('schemes.labels.welfare')
+                  : t('evaluation.schemeCard.categoryAssistance')
           return (
             <li
               key={match.scheme_id}
@@ -62,14 +76,14 @@ export function SchemeCardGrid({ matches }: Props) {
 
               <div className="flex flex-1 flex-col gap-1 rounded-md border border-border/60 bg-background/60 p-3">
                 <p className="text-[10px] uppercase tracking-[0.14em] text-muted-foreground">
-                  Why you qualify
+                  {t('evaluation.schemeCard.whyQualify')}
                 </p>
                 <p className="text-xs leading-relaxed">{match.why_qualify}</p>
               </div>
 
               <footer className="flex items-end justify-between gap-3">
                 <div className="flex flex-col">
-                  <p className="text-[10px] uppercase tracking-[0.14em] text-muted-foreground">Est. Value</p>
+                  <p className="text-[10px] uppercase tracking-[0.14em] text-muted-foreground">{t('evaluation.schemeCard.estValue')}</p>
                   <p className="font-heading text-sm font-semibold">{formatRm(match.annual_rm)}</p>
                 </div>
                 <Button
@@ -77,7 +91,7 @@ export function SchemeCardGrid({ matches }: Props) {
                   size="sm"
                   variant={isTop ? 'default' : 'outline'}
                 >
-                  Start app
+                  {t('evaluation.schemeCard.startApp')}
                   <ArrowRight className="ml-1 size-3.5" aria-hidden />
                 </Button>
               </footer>

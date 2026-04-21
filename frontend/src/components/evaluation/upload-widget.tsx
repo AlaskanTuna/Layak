@@ -2,6 +2,8 @@
 
 import { useId, useRef, useState } from 'react'
 import { ArrowRight, FileText, Loader2, Sparkles, UploadCloud, X } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
+import type { TFunction } from 'i18next'
 
 import { DependantsFieldset, type DependantInputRow } from '@/components/evaluation/dependants-fieldset'
 import { SectionBadge } from '@/components/evaluation/section-badge'
@@ -27,39 +29,24 @@ export type UploadSubmission = {
 
 type SlotSpec = {
   slot: UploadSlot
-  label: string
-  hint: string
+  labelKey: string
+  hintKey: string
   required: boolean
 }
 
 const SLOT_SPECS: SlotSpec[] = [
-  {
-    slot: 'ic',
-    label: 'MyKad (IC)',
-    hint: 'Front of your Malaysian identity card, clearly showing your details.',
-    required: true
-  },
-  {
-    slot: 'payslip',
-    label: 'Payslip or income statement',
-    hint: 'Latest month if available; self-employed filers can upload a bank statement or LHDN form.',
-    required: true
-  },
-  {
-    slot: 'utility',
-    label: 'Utility bill',
-    hint: 'Water, electricity, or broadband bill for address verification — within the last three months.',
-    required: true
-  }
+  { slot: 'ic', labelKey: 'evaluation.upload.sectionIc', hintKey: 'evaluation.upload.hintIc', required: true },
+  { slot: 'payslip', labelKey: 'evaluation.upload.sectionPayslip', hintKey: 'evaluation.upload.hintPayslip', required: true },
+  { slot: 'utility', labelKey: 'evaluation.upload.sectionUtility', hintKey: 'evaluation.upload.hintUtility', required: true }
 ]
 
-function validate(file: File): string | null {
+function validate(file: File, t: TFunction): string | null {
   if (file.size > MAX_FILE_BYTES) {
     const mb = (file.size / (1024 * 1024)).toFixed(1)
-    return `File is ${mb} MB — max is 10 MB.`
+    return t('evaluation.upload.errorFileSize', { size: mb })
   }
   if (!ACCEPTED_MIME_PREFIXES.some(prefix => file.type.startsWith(prefix))) {
-    return `Unsupported file type (${file.type || 'unknown'}). Upload an image or PDF.`
+    return t('evaluation.upload.errorFileType', { type: file.type || 'unknown' })
   }
   return null
 }
@@ -94,17 +81,20 @@ type SlotProps = {
 }
 
 function UploadSlotCard({ spec, state, inputId, disabled, inputRef, onChange, onClear }: SlotProps) {
+  const { t } = useTranslation()
   const { file, error } = state
   const errorId = `${inputId}-error`
+  const label = t(spec.labelKey)
+  const hint = t(spec.hintKey)
 
   return (
     <div className="flex flex-col gap-3 rounded-xl border border-border bg-card p-5 shadow-sm">
       <div className="flex flex-col gap-1.5">
         <div className="flex items-center gap-2">
-          <p className="font-heading text-base font-semibold tracking-tight">{spec.label}</p>
+          <p className="font-heading text-base font-semibold tracking-tight">{label}</p>
           <SectionBadge required={spec.required} />
         </div>
-        <p className="text-xs leading-relaxed text-muted-foreground">{spec.hint}</p>
+        <p className="text-xs leading-relaxed text-muted-foreground">{hint}</p>
       </div>
 
       {file ? (
@@ -125,7 +115,7 @@ function UploadSlotCard({ spec, state, inputId, disabled, inputRef, onChange, on
             variant="ghost"
             size="icon"
             onClick={onClear}
-            aria-label={`Clear ${spec.label}`}
+            aria-label={t('common.aria.clearField', { fieldName: label })}
             disabled={disabled}
           >
             <X className="size-4" aria-hidden />
@@ -144,11 +134,11 @@ function UploadSlotCard({ spec, state, inputId, disabled, inputRef, onChange, on
             <UploadCloud className="size-5" aria-hidden />
           </div>
           <p className="text-sm">
-            <span className="font-medium text-primary">Click to upload</span>{' '}
-            <span className="text-muted-foreground">or drag and drop</span>
+            <span className="font-medium text-primary">{t('evaluation.upload.dropzonePrimary')}</span>{' '}
+            <span className="text-muted-foreground">{t('evaluation.upload.dropzoneSecondary')}</span>
           </p>
           <p className="text-[10px] uppercase tracking-[0.14em] text-muted-foreground">
-            JPG, PNG, or PDF up to 10MB
+            {t('evaluation.upload.dropzoneFormats')}
           </p>
         </label>
       )}
@@ -176,6 +166,7 @@ function UploadSlotCard({ spec, state, inputId, disabled, inputRef, onChange, on
 }
 
 export function UploadWidget({ onSubmit, onUseSamples, disabled = false, samplesLoading = false }: Props) {
+  const { t } = useTranslation()
   const reactId = useId()
   const [state, setState] = useState<Record<UploadSlot, FileSlotState>>({
     ic: { file: null, error: null },
@@ -198,7 +189,7 @@ export function UploadWidget({ onSubmit, onUseSamples, disabled = false, samples
       setState(prev => ({ ...prev, [slot]: { file: null, error: null } }))
       return
     }
-    const error = validate(file)
+    const error = validate(file, t)
     setState(prev => ({ ...prev, [slot]: { file: error ? null : file, error } }))
   }
 
@@ -247,12 +238,13 @@ export function UploadWidget({ onSubmit, onUseSamples, disabled = false, samples
         <div className="flex flex-col gap-3 rounded-xl border border-border bg-card p-5 shadow-sm">
           <div className="flex flex-col gap-1.5">
             <div className="flex items-center gap-2">
-              <p className="font-heading text-base font-semibold tracking-tight">Household</p>
+              <p className="font-heading text-base font-semibold tracking-tight">
+                {t('evaluation.upload.householdTitle')}
+              </p>
               <SectionBadge required={false} />
             </div>
             <p className="text-xs leading-relaxed text-muted-foreground">
-              Documents don&apos;t list your dependants. Add children / parents / other household
-              members here so schemes that gate on them (JKM Warga Emas, LHDN child relief) surface.
+              {t('evaluation.upload.householdHint')}
             </p>
           </div>
           <DependantsFieldset value={dependants} onChange={setDependants} disabled={disabled} />
@@ -271,17 +263,17 @@ export function UploadWidget({ onSubmit, onUseSamples, disabled = false, samples
           {samplesLoading ? (
             <>
               <Loader2 className="mr-1.5 size-4 animate-spin" aria-hidden />
-              Loading samples…
+              {t('evaluation.upload.loadingSamples')}
             </>
           ) : (
             <>
               <Sparkles className="mr-1.5 size-4" aria-hidden />
-              Use Aisyah sample documents
+              {t('evaluation.upload.useSamples')}
             </>
           )}
         </Button>
         <Button type="button" onClick={handleSubmit} disabled={disabled || !canSubmit} size="lg">
-          Continue evaluation
+          {t('evaluation.upload.continue')}
           <ArrowRight className="ml-1.5 size-4" aria-hidden />
         </Button>
       </div>

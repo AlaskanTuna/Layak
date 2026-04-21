@@ -1,18 +1,21 @@
+'use client'
+
 import { Construction } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 
 export function SettingsPlaceholder() {
+  const { t } = useTranslation()
   return (
     <Card>
       <CardHeader>
         <CardTitle className="flex items-center gap-2 text-base">
           <Construction className="size-4 text-muted-foreground" aria-hidden />
-          Settings — v2
+          {t('settings.placeholderTitle')}
         </CardTitle>
         <CardDescription>
-          Language, default profile values, data retention, and accessibility knobs will live here. This page is a
-          structural placeholder so the route is already wired when the controls land.
+          {t('settings.placeholderDescription')}
         </CardDescription>
       </CardHeader>
       <CardContent />

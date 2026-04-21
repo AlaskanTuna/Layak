@@ -2,6 +2,7 @@
 
 import { Plus, Trash2 } from 'lucide-react'
 import type { ChangeEvent } from 'react'
+import { useTranslation } from 'react-i18next'
 
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -47,6 +48,7 @@ function clampAge(raw: string): number {
  * ManualEntryForm (full manual path). Stays dumb on purpose so each parent
  * manages its own validation/coercion. */
 export function DependantsFieldset({ value, onChange, disabled = false, max = 15 }: Props) {
+  const { t } = useTranslation()
   const update = (i: number, patch: Partial<DependantInputRow>) =>
     onChange(value.map((row, j) => (j === i ? { ...row, ...patch } : row)))
   const append = () => onChange([...value, newEmptyDependant()])
@@ -54,16 +56,16 @@ export function DependantsFieldset({ value, onChange, disabled = false, max = 15
 
   const count = value.length
   const householdSize = 1 + count
+  const pluralLabel = count === 1 ? t('evaluation.dependants.dependantSingular') : t('evaluation.dependants.dependantPlural')
 
   return (
     <div className="flex flex-col gap-3">
       <p className="text-xs text-muted-foreground">
-        Add everyone else who shares your household. Children under 18 and parents aged 60+ unlock
-        specific schemes. Household size: {householdSize} (you + {count} dependant{count === 1 ? '' : 's'}).
+        {t('evaluation.dependants.description', { size: householdSize, count, plural: pluralLabel })}
       </p>
       {count === 0 && (
         <p className="rounded-md border border-dashed px-3 py-2 text-sm text-muted-foreground">
-          No dependants yet. Click &ldquo;Add dependant&rdquo; to list each household member.
+          {t('evaluation.dependants.empty')}
         </p>
       )}
       <ul className="flex flex-col gap-3">
@@ -73,7 +75,7 @@ export function DependantsFieldset({ value, onChange, disabled = false, max = 15
             className="grid gap-2 rounded-md border border-border px-3 py-3 sm:grid-cols-[1fr_1fr_1fr_auto]"
           >
             <div className="flex flex-col gap-1.5">
-              <Label htmlFor={`dep-rel-${index}`}>Relationship</Label>
+              <Label htmlFor={`dep-rel-${index}`}>{t('evaluation.dependants.relationship')}</Label>
               <select
                 id={`dep-rel-${index}`}
                 disabled={disabled}
@@ -88,13 +90,13 @@ export function DependantsFieldset({ value, onChange, disabled = false, max = 15
                   // ignores the select's bg and defaults to white, which makes
                   // text invisible in dark mode.
                   <option key={r} value={r} className="bg-popover text-popover-foreground">
-                    {r}
+                    {t(`evaluation.dependants.relationships.${r}`)}
                   </option>
                 ))}
               </select>
             </div>
             <div className="flex flex-col gap-1.5">
-              <Label htmlFor={`dep-age-${index}`}>Age</Label>
+              <Label htmlFor={`dep-age-${index}`}>{t('evaluation.dependants.age')}</Label>
               <Input
                 id={`dep-age-${index}`}
                 type="number"
@@ -102,13 +104,13 @@ export function DependantsFieldset({ value, onChange, disabled = false, max = 15
                 min={0}
                 max={MAX_AGE}
                 disabled={disabled}
-                placeholder="Age"
+                placeholder={t('evaluation.dependants.agePlaceholder')}
                 value={Number.isFinite(row.age) ? row.age : ''}
                 onChange={e => update(index, { age: clampAge(e.target.value) })}
               />
             </div>
             <div className="flex flex-col gap-1.5">
-              <Label htmlFor={`dep-ic-${index}`}>IC last 4 (optional)</Label>
+              <Label htmlFor={`dep-ic-${index}`}>{t('evaluation.dependants.icOptional')}</Label>
               <Input
                 id={`dep-ic-${index}`}
                 inputMode="numeric"
@@ -123,7 +125,7 @@ export function DependantsFieldset({ value, onChange, disabled = false, max = 15
                 type="button"
                 variant="ghost"
                 size="icon"
-                aria-label={`Remove dependant ${index + 1}`}
+                aria-label={t('evaluation.dependants.removeAria', { index: index + 1 })}
                 disabled={disabled}
                 onClick={() => remove(index)}
               >
@@ -142,7 +144,7 @@ export function DependantsFieldset({ value, onChange, disabled = false, max = 15
         className="w-fit gap-1.5"
       >
         <Plus className="size-4" aria-hidden />
-        Add dependant
+        {t('evaluation.dependants.add')}
       </Button>
     </div>
   )

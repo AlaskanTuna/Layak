@@ -2,8 +2,9 @@
 
 import { zodResolver } from '@hookform/resolvers/zod'
 import { CalendarIcon, Eraser, Sparkles } from 'lucide-react'
-import { useEffect, useRef } from 'react'
+import { useEffect, useMemo, useRef } from 'react'
 import { Controller, type SubmitHandler, useForm, useWatch } from 'react-hook-form'
+import { useTranslation } from 'react-i18next'
 import { z } from 'zod'
 
 import { DependantsFieldset, type DependantInputRow } from '@/components/evaluation/dependants-fieldset'
@@ -18,71 +19,6 @@ import type { ManualEntryPayload, Relationship } from '@/lib/agent-types'
 
 const RELATIONSHIPS = ['child', 'parent', 'spouse', 'sibling', 'other'] as const satisfies readonly Relationship[]
 
-const dependantSchema = z.object({
-  relationship: z.enum(RELATIONSHIPS),
-  age: z.number().int().min(0).max(120),
-  ic_last4: z
-    .string()
-    .refine(v => v === '' || /^\d{4}$/.test(v), { message: '4 digits or blank' })
-})
-
-const manualEntrySchema = z.object({
-  name: z.string().trim().min(1, 'Required').max(200),
-  date_of_birth: z
-    .string()
-    .regex(/^\d{4}-\d{2}-\d{2}$/, 'Use YYYY-MM-DD')
-    // `superRefine` lets us dispatch distinct messages: "2026-22-22" is an
-    // impossible date, not a future date — the old single refine masked the
-    // real reason with "Must be a past date".
-    .superRefine((v, ctx) => {
-      const [y, m, d] = v.split('-').map(Number)
-      if (m < 1 || m > 12 || d < 1 || d > 31) {
-        ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'Not a real date' })
-        return
-      }
-      const parsed = new Date(v)
-      if (Number.isNaN(parsed.getTime())) {
-        ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'Not a real date' })
-        return
-      }
-      // Catches overflow cases like 2026-02-30 that `new Date` silently
-      // normalises (→ 2026-03-02). UTC getters match the ISO parser.
-      if (
-        parsed.getUTCFullYear() !== y ||
-        parsed.getUTCMonth() + 1 !== m ||
-        parsed.getUTCDate() !== d
-      ) {
-        ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'Not a real date' })
-        return
-      }
-      if (y < 1900) {
-        ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'Year must be 1900 or later' })
-        return
-      }
-      if (parsed > new Date()) {
-        ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'Must be a past date' })
-      }
-    }),
-  ic_last4: z.string().regex(/^\d{4}$/, '4 digits'),
-  monthly_income_rm: z.number().min(0).max(1_000_000),
-  employment_type: z.enum(['gig', 'salaried']),
-  // Address cap mirrors the backend's 300-char Pydantic limit. Tightened
-  // from 500 to reduce prompt-token footprint.
-  address: z.string().max(300),
-  // Electricity cost + consumption live as plain strings so an empty input
-  // doesn't fight RHF's `valueAsNumber: true` (which emits NaN). Submit
-  // handler coerces to `number | null`.
-  monthly_cost_rm: z
-    .string()
-    .refine(v => v === '' || (/^\d+(\.\d{1,2})?$/.test(v) && Number(v) <= 100000), {
-      message: 'Amount up to RM100,000 (e.g. 240 or 240.50)'
-    }),
-  monthly_kwh: z
-    .string()
-    .refine(v => v === '' || (/^\d+$/.test(v) && Number(v) <= 10000), { message: 'Whole number up to 10,000' }),
-  dependants: z.array(dependantSchema).max(15)
-})
-
 /** Insert dashes into a typed DOB so older users can type `20260421` and see
  * `2026-04-21` appear without hunting for the hyphen key. Also accepts a
  * pre-dashed input (strips and re-inserts) so the date-picker callback path
@@ -94,7 +30,17 @@ function formatDateMask(raw: string): string {
   return `${digits.slice(0, 4)}-${digits.slice(4, 6)}-${digits.slice(6)}`
 }
 
-type FormValues = z.infer<typeof manualEntrySchema>
+type FormValues = {
+  name: string
+  date_of_birth: string
+  ic_last4: string
+  monthly_income_rm: number
+  employment_type: 'gig' | 'salaried'
+  address: string
+  monthly_cost_rm: string
+  monthly_kwh: string
+  dependants: DependantInputRow[]
+}
 
 /**
  * Aisyah defaults for one-click pre-fill (FR-10 parity with upload-path samples).
@@ -145,6 +91,71 @@ export function ManualEntryForm({
   disabled = false,
   prefillAisyah = false
 }: Props) {
+  const { t } = useTranslation()
+
+  // Zod schema is built inside the component so refinement messages can call `t()`.
+  // `useMemo` keeps the reference stable across renders for the same language;
+  // the `t` dependency re-builds after a language switch so existing error
+  // messages pick up the new locale on the next validation pass.
+  const manualEntrySchema = useMemo(() => {
+    const dependantSchema = z.object({
+      relationship: z.enum(RELATIONSHIPS),
+      age: z.number().int().min(0).max(120),
+      ic_last4: z
+        .string()
+        .refine(v => v === '' || /^\d{4}$/.test(v), { message: t('evaluation.manual.zodIc4Digits') })
+    })
+
+    return z.object({
+      name: z.string().trim().min(1, t('evaluation.manual.zodRequired')).max(200),
+      date_of_birth: z
+        .string()
+        .regex(/^\d{4}-\d{2}-\d{2}$/, t('evaluation.manual.zodDateFormat'))
+        .superRefine((v, ctx) => {
+          const [y, m, d] = v.split('-').map(Number)
+          if (m < 1 || m > 12 || d < 1 || d > 31) {
+            ctx.addIssue({ code: z.ZodIssueCode.custom, message: t('evaluation.manual.zodNotRealDate') })
+            return
+          }
+          const parsed = new Date(v)
+          if (Number.isNaN(parsed.getTime())) {
+            ctx.addIssue({ code: z.ZodIssueCode.custom, message: t('evaluation.manual.zodNotRealDate') })
+            return
+          }
+          if (
+            parsed.getUTCFullYear() !== y ||
+            parsed.getUTCMonth() + 1 !== m ||
+            parsed.getUTCDate() !== d
+          ) {
+            ctx.addIssue({ code: z.ZodIssueCode.custom, message: t('evaluation.manual.zodNotRealDate') })
+            return
+          }
+          if (y < 1900) {
+            ctx.addIssue({ code: z.ZodIssueCode.custom, message: t('evaluation.manual.zodYearMin') })
+            return
+          }
+          if (parsed > new Date()) {
+            ctx.addIssue({ code: z.ZodIssueCode.custom, message: t('evaluation.manual.zodPastDate') })
+          }
+        }),
+      ic_last4: z.string().regex(/^\d{4}$/, t('evaluation.manual.zodIc4Digits')),
+      monthly_income_rm: z.number().min(0).max(1_000_000),
+      employment_type: z.enum(['gig', 'salaried']),
+      address: z.string().max(300),
+      monthly_cost_rm: z
+        .string()
+        .refine(v => v === '' || (/^\d+(\.\d{1,2})?$/.test(v) && Number(v) <= 100000), {
+          message: t('evaluation.manual.zodCostFormat')
+        }),
+      monthly_kwh: z
+        .string()
+        .refine(v => v === '' || (/^\d+$/.test(v) && Number(v) <= 10000), {
+          message: t('evaluation.manual.zodKwhFormat')
+        }),
+      dependants: z.array(dependantSchema).max(15)
+    })
+  }, [t])
+
   const form = useForm<FormValues>({
     resolver: zodResolver(manualEntrySchema),
     defaultValues: prefillAisyah ? AISYAH_DEFAULTS : EMPTY_DEFAULTS,
@@ -199,16 +210,16 @@ export function ManualEntryForm({
     <form onSubmit={handleSubmit(submit)} className="flex flex-col gap-4" noValidate>
       <Card>
         <CardHeader>
-          <SectionTitle title="Identity" required />
+          <SectionTitle title={t('evaluation.manual.identityTitle')} required />
         </CardHeader>
         <CardContent className="flex flex-col gap-3">
-          <Field label="Full name" error={formState.errors.name?.message} htmlFor="mef-name">
+          <Field label={t('evaluation.manual.nameLabel')} error={formState.errors.name?.message} htmlFor="mef-name">
             <Input id="mef-name" autoComplete="name" disabled={disabled} {...register('name')} />
           </Field>
           <div className="grid gap-3 sm:grid-cols-2">
             <Field
-              label="Date of birth"
-              help="Just type the numbers — we fill in the dashes. Or use the calendar icon."
+              label={t('evaluation.manual.dobLabel')}
+              help={t('evaluation.manual.dobHelp')}
               error={formState.errors.date_of_birth?.message}
               htmlFor="mef-dob"
             >
@@ -221,7 +232,7 @@ export function ManualEntryForm({
                       id="mef-dob"
                       type="text"
                       inputMode="numeric"
-                      placeholder="YYYY-MM-DD"
+                      placeholder={t('evaluation.manual.dobPlaceholder')}
                       autoComplete="bday"
                       maxLength={10}
                       disabled={disabled}
@@ -235,7 +246,7 @@ export function ManualEntryForm({
                       variant="outline"
                       size="icon"
                       disabled={disabled}
-                      aria-label="Open date picker"
+                      aria-label={t('evaluation.manual.dobAria')}
                       onClick={() => dobPickerRef.current?.showPicker?.()}
                     >
                       <CalendarIcon className="size-4" aria-hidden />
@@ -259,8 +270,8 @@ export function ManualEntryForm({
               />
             </Field>
             <Field
-              label="IC last 4 digits"
-              help="We only collect the last 4 digits — your full MyKad never leaves your device."
+              label={t('evaluation.manual.icLabel')}
+              help={t('evaluation.manual.icHelp')}
               error={formState.errors.ic_last4?.message}
               htmlFor="mef-ic4"
             >
@@ -279,13 +290,13 @@ export function ManualEntryForm({
 
       <Card>
         <CardHeader>
-          <SectionTitle title="Income" required />
+          <SectionTitle title={t('evaluation.manual.incomeTitle')} required />
         </CardHeader>
         <CardContent className="flex flex-col gap-3">
           <div className="grid gap-3 sm:grid-cols-2">
             <Field
-              label="Monthly income (RM)"
-              help="Net payout for gig work, basic pay for salaried."
+              label={t('evaluation.manual.incomeLabel')}
+              help={t('evaluation.manual.incomeHelp')}
               error={formState.errors.monthly_income_rm?.message}
               htmlFor="mef-income"
             >
@@ -299,21 +310,21 @@ export function ManualEntryForm({
                 {...register('monthly_income_rm', { valueAsNumber: true })}
               />
             </Field>
-            <Field label="Employment type" error={formState.errors.employment_type?.message}>
+            <Field label={t('evaluation.manual.employmentLabel')} error={formState.errors.employment_type?.message}>
               <fieldset className="flex flex-col gap-1.5" disabled={disabled}>
-                <legend className="sr-only">Employment type</legend>
+                <legend className="sr-only">{t('evaluation.manual.employmentLabel')}</legend>
                 <label className="flex items-start gap-2 text-sm">
                   <input type="radio" value="gig" {...register('employment_type')} className="mt-1" />
                   <span>
-                    <span className="font-medium">Self-employed / gig</span>
-                    <span className="block text-xs text-muted-foreground">Grab, Foodpanda, freelance — files LHDN Form B.</span>
+                    <span className="font-medium">{t('evaluation.manual.employmentGig')}</span>
+                    <span className="block text-xs text-muted-foreground">{t('evaluation.manual.employmentGigHelp')}</span>
                   </span>
                 </label>
                 <label className="flex items-start gap-2 text-sm">
                   <input type="radio" value="salaried" {...register('employment_type')} className="mt-1" />
                   <span>
-                    <span className="font-medium">Salaried employee</span>
-                    <span className="block text-xs text-muted-foreground">Regular monthly salary — files LHDN Form BE.</span>
+                    <span className="font-medium">{t('evaluation.manual.employmentSalaried')}</span>
+                    <span className="block text-xs text-muted-foreground">{t('evaluation.manual.employmentSalariedHelp')}</span>
                   </span>
                 </label>
               </fieldset>
@@ -324,10 +335,10 @@ export function ManualEntryForm({
 
       <Card>
         <CardHeader>
-          <SectionTitle title="Utility bill" required={false} />
+          <SectionTitle title={t('evaluation.manual.utilityTitle')} required={false} />
         </CardHeader>
         <CardContent className="flex flex-col gap-3">
-          <Field label="Home address" error={formState.errors.address?.message} htmlFor="mef-address">
+          <Field label={t('evaluation.manual.addressLabel')} error={formState.errors.address?.message} htmlFor="mef-address">
             <Textarea
               id="mef-address"
               rows={3}
@@ -337,8 +348,8 @@ export function ManualEntryForm({
             />
           </Field>
           <Field
-            label="Monthly electricity cost (RM)"
-            help="The RM amount on the bottom of your latest TNB bill. Most people remember this more easily than kWh."
+            label={t('evaluation.manual.costLabel')}
+            help={t('evaluation.manual.costHelp')}
             error={formState.errors.monthly_cost_rm?.message}
             htmlFor="mef-cost"
           >
@@ -349,14 +360,14 @@ export function ManualEntryForm({
               step="0.01"
               min={0}
               max={100000}
-              placeholder="e.g. 95.40"
+              placeholder={t('evaluation.manual.costPlaceholder')}
               disabled={disabled}
               {...register('monthly_cost_rm')}
             />
           </Field>
           <Field
-            label="Monthly electricity usage (kWh)"
-            help="Optional — only if your bill lists &ldquo;Jumlah Penggunaan&rdquo;."
+            label={t('evaluation.manual.kwhLabel')}
+            help={t('evaluation.manual.kwhHelp')}
             error={formState.errors.monthly_kwh?.message}
             htmlFor="mef-kwh"
           >
@@ -366,7 +377,7 @@ export function ManualEntryForm({
               inputMode="numeric"
               min={0}
               max={10000}
-              placeholder="e.g. 220"
+              placeholder={t('evaluation.manual.kwhPlaceholder')}
               disabled={disabled}
               {...register('monthly_kwh')}
             />
@@ -376,7 +387,7 @@ export function ManualEntryForm({
 
       <Card>
         <CardHeader>
-          <SectionTitle title="Household" required={false} />
+          <SectionTitle title={t('evaluation.manual.householdTitle')} required={false} />
         </CardHeader>
         <CardContent>
           <Controller
@@ -406,7 +417,7 @@ export function ManualEntryForm({
             className="gap-1.5"
           >
             <Sparkles className="size-4" aria-hidden />
-            Use Aisyah sample data
+            {t('evaluation.manual.useAisyah')}
           </Button>
           <Button
             type="button"
@@ -417,11 +428,11 @@ export function ManualEntryForm({
             className="gap-1.5 text-muted-foreground hover:text-foreground"
           >
             <Eraser className="size-4" aria-hidden />
-            Clear
+            {t('evaluation.manual.clear')}
           </Button>
         </div>
         <Button type="submit" disabled={disabled || formState.isSubmitting}>
-          Generate packet
+          {t('evaluation.manual.submit')}
         </Button>
       </div>
     </form>

@@ -1,5 +1,5 @@
 import { EvaluationResultsByIdClient } from '@/components/evaluation/evaluation-results-by-id-client'
-import { PageHeading } from '@/components/layout/page-heading'
+import { EvaluationResultsByIdHeading } from '@/components/evaluation/evaluation-results-by-id-heading'
 
 type RouteParams = Promise<{ id: string }>
 
@@ -14,11 +14,7 @@ export async function EvaluationResultsByIdPage({ params }: { params: RouteParam
   const { id } = await params
   return (
     <div className="flex flex-col gap-6">
-      <PageHeading
-        eyebrow="Evaluation"
-        title="Your eligibility results."
-        description="Hydrated from your saved evaluation. Numbers cite the rule and source page; every packet is a DRAFT you submit yourself."
-      />
+      <EvaluationResultsByIdHeading />
       <EvaluationResultsByIdClient evalId={id} />
     </div>
   )

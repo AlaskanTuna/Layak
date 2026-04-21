@@ -4,6 +4,7 @@ import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import { ArrowRight, Loader2 } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 
 import { GoogleIcon } from '@/components/auth/google-icon'
 import { Button } from '@/components/ui/button'
@@ -12,6 +13,7 @@ import { useAuth } from '@/lib/auth-context'
 import { signInWithGoogle } from '@/lib/firebase'
 
 export function SignUpForm() {
+  const { t } = useTranslation()
   const router = useRouter()
   const { user, loading } = useAuth()
   const [consent, setConsent] = useState(false)
@@ -33,17 +35,15 @@ export function SignUpForm() {
       router.replace('/dashboard')
     } catch (err) {
       setPending(false)
-      setError(err instanceof Error ? err.message : 'Sign-up failed. Please try again.')
+      setError(err instanceof Error ? err.message : t('auth.signUp.errorFailed'))
     }
   }
 
   return (
     <Card className="w-full max-w-sm">
       <CardHeader className="text-center">
-        <CardTitle className="font-heading text-2xl">Create your account</CardTitle>
-        <CardDescription>
-          Sign up with Google. Layak never submits anything on your behalf — you stay in control of every draft packet.
-        </CardDescription>
+        <CardTitle className="font-heading text-2xl">{t('auth.signUp.title')}</CardTitle>
+        <CardDescription>{t('auth.signUp.description')}</CardDescription>
       </CardHeader>
       <CardContent className="flex flex-col gap-5">
         <label className="flex items-start gap-2.5 text-sm">
@@ -55,16 +55,15 @@ export function SignUpForm() {
             aria-describedby="pdpa-consent-description"
           />
           <span id="pdpa-consent-description" className="text-muted-foreground">
-            I consent to Layak processing my uploaded documents (IC, payslip, utility bill) to match government schemes,
-            per the{' '}
+            {t('auth.signUp.consentPrefix')}{' '}
             <Link href="/privacy" className="text-primary underline underline-offset-2">
-              Privacy Policy
+              {t('auth.signUp.consentPrivacy')}
             </Link>{' '}
-            and{' '}
+            {t('auth.signUp.consentAnd')}{' '}
             <Link href="/terms" className="text-primary underline underline-offset-2">
-              Terms
+              {t('auth.signUp.consentTerms')}
             </Link>
-            .
+            {t('auth.signUp.consentSuffix')}
           </span>
         </label>
         <Button
@@ -79,7 +78,7 @@ export function SignUpForm() {
           ) : (
             <GoogleIcon className="mr-1.5 size-4" />
           )}
-          Continue with Google
+          {t('common.button.continueWithGoogle')}
           <ArrowRight className="ml-1.5 size-4" aria-hidden />
         </Button>
         {error && (
@@ -88,9 +87,9 @@ export function SignUpForm() {
           </p>
         )}
         <p className="text-center text-xs text-muted-foreground">
-          Already have an account?{' '}
+          {t('auth.signUp.hasAccountPrefix')}{' '}
           <Link href="/sign-in" className="text-primary underline underline-offset-2">
-            Sign In
+            {t('auth.signUp.hasAccountCta')}
           </Link>
         </p>
       </CardContent>

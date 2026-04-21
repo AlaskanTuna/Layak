@@ -1,4 +1,7 @@
+'use client'
+
 import { ShieldCheck } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 
 import { PageHeading } from '@/components/layout/page-heading'
 
@@ -7,17 +10,18 @@ type Props = {
 }
 
 export function DashboardHero({ name }: Props) {
-  const greeting = name ? `Welcome back, ${name}.` : 'Welcome back.'
+  const { t } = useTranslation()
+  const greeting = name ? t('dashboard.hero.greetingWithName', { name }) : t('dashboard.hero.greeting')
   return (
     <PageHeading
       eyebrow={
         <>
           <ShieldCheck className="size-3.5" aria-hidden />
-          Dashboard
+          {t('dashboard.hero.eyebrow')}
         </>
       }
       title={greeting}
-      description="Your civic profile is up to date. Layak reviews your current situation against the latest 2026 government schemes — STR, JKM Warga Emas, LHDN Form B reliefs. Takes about 4 minutes."
+      description={t('dashboard.hero.description')}
     />
   )
 }

@@ -4,6 +4,7 @@ import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { AlertTriangle, ArrowLeft, ArrowRight, Loader2 } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 
 import { CodeExecutionPanel } from '@/components/evaluation/code-execution-panel'
 import { EvaluationUpsideHero } from '@/components/evaluation/evaluation-upside-hero'
@@ -82,6 +83,7 @@ type FetchPhase = 'loading' | 'ready' | 'not_found' | 'error'
 
 export function EvaluationResultsByIdClient({ evalId }: { evalId: string }) {
   const router = useRouter()
+  const { t } = useTranslation()
   const { user, loading: authLoading } = useAuth()
   const [doc, setDoc] = useState<EvaluationDoc | null>(null)
   const [phase, setPhase] = useState<FetchPhase>('loading')
@@ -98,7 +100,7 @@ export function EvaluationResultsByIdClient({ evalId }: { evalId: string }) {
         return
       }
       if (!res.ok) {
-        setErrorMessage(`Backend returned ${res.status} ${res.statusText}`)
+        setErrorMessage(t('evaluation.results.backendReturned', { status: res.status, statusText: res.statusText }))
         setPhase('error')
         return
       }
@@ -109,7 +111,7 @@ export function EvaluationResultsByIdClient({ evalId }: { evalId: string }) {
       setErrorMessage(err instanceof Error ? err.message : String(err))
       setPhase('error')
     }
-  }, [evalId])
+  }, [evalId, t])
 
   // Initial hydrate — runs after Firebase auth resolves so authedFetch can
   // attach the Bearer token. AuthGuard upstream already guarantees `user`
@@ -143,7 +145,7 @@ export function EvaluationResultsByIdClient({ evalId }: { evalId: string }) {
     return (
       <div className="flex items-center gap-2 text-sm text-muted-foreground" role="status" aria-live="polite">
         <Loader2 className="size-4 animate-spin" aria-hidden />
-        Loading evaluation…
+        {t('evaluation.results.loading')}
       </div>
     )
   }
@@ -152,16 +154,16 @@ export function EvaluationResultsByIdClient({ evalId }: { evalId: string }) {
     return (
       <Alert variant="destructive">
         <AlertTriangle className="size-4" />
-        <AlertTitle>Evaluation not found</AlertTitle>
+        <AlertTitle>{t('evaluation.results.notFoundTitle')}</AlertTitle>
         <AlertDescription>
-          We couldn&rsquo;t find this evaluation. It may have been deleted, or the link may be wrong.
+          {t('evaluation.results.notFoundBody')}
           <div className="mt-3 flex gap-2">
             <Button variant="outline" size="sm" render={<Link href="/dashboard/evaluation" />}>
               <ArrowLeft className="mr-1.5 size-3.5" aria-hidden />
-              Back to evaluations
+              {t('evaluation.results.backToEvaluations')}
             </Button>
             <Button size="sm" render={<Link href="/dashboard/evaluation/upload" />}>
-              Start a new evaluation
+              {t('evaluation.results.startNew')}
               <ArrowRight className="ml-1.5 size-3.5" aria-hidden />
             </Button>
           </div>
@@ -174,9 +176,9 @@ export function EvaluationResultsByIdClient({ evalId }: { evalId: string }) {
     return (
       <Alert variant="destructive">
         <AlertTriangle className="size-4" />
-        <AlertTitle>Could not load evaluation</AlertTitle>
+        <AlertTitle>{t('evaluation.results.errorTitle')}</AlertTitle>
         <AlertDescription>
-          {errorMessage ?? 'An unexpected error occurred.'}
+          {errorMessage ?? t('evaluation.results.errorUnexpected')}
           <div className="mt-3 flex gap-2">
             <Button
               variant="outline"
@@ -186,10 +188,10 @@ export function EvaluationResultsByIdClient({ evalId }: { evalId: string }) {
                 void fetchDoc()
               }}
             >
-              Retry
+              {t('evaluation.results.retry')}
             </Button>
             <Button size="sm" render={<Link href="/dashboard/evaluation" />}>
-              Back to evaluations
+              {t('evaluation.results.backToEvaluations')}
             </Button>
           </div>
         </AlertDescription>
@@ -217,12 +219,12 @@ export function EvaluationResultsByIdClient({ evalId }: { evalId: string }) {
       {isError && (
         <Alert variant="destructive">
           <AlertTriangle className="size-4" />
-          <AlertTitle>Evaluation failed</AlertTitle>
+          <AlertTitle>{t('evaluation.results.failedTitle')}</AlertTitle>
           <AlertDescription>
-            {doc.error?.message ?? 'Unknown error.'}
+            {doc.error?.message ?? t('evaluation.unknownError')}
             <div className="mt-3 flex">
               <Button size="sm" onClick={handleStartAnother}>
-                Start another evaluation
+                {t('evaluation.results.startAnother')}
                 <ArrowRight className="ml-1.5 size-3.5" aria-hidden />
               </Button>
             </div>
@@ -256,7 +258,7 @@ export function EvaluationResultsByIdClient({ evalId }: { evalId: string }) {
       {isComplete && (
         <div className="flex">
           <Button type="button" variant="outline" onClick={handleStartAnother}>
-            Start another evaluation
+            {t('evaluation.results.startAnother')}
           </Button>
         </div>
       )}

@@ -1,6 +1,7 @@
 'use client'
 
 import { AlertTriangle, ListChecks, RotateCcw, Sparkles } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
@@ -25,6 +26,7 @@ function isQuotaExhausted(message: string): boolean {
 }
 
 export function ErrorRecoveryCard({ message, onUseSamples, onReset, onSwitchToManual }: Props) {
+  const { t } = useTranslation()
   const quotaExhausted = isQuotaExhausted(message)
 
   return (
@@ -32,32 +34,29 @@ export function ErrorRecoveryCard({ message, onUseSamples, onReset, onSwitchToMa
       <CardHeader>
         <CardTitle className="flex items-center gap-2 text-sm text-destructive">
           <AlertTriangle className="size-4" aria-hidden />
-          Pipeline error
+          {t('evaluation.error.title')}
         </CardTitle>
         <CardDescription className="text-destructive/90">{message}</CardDescription>
       </CardHeader>
       <CardContent className="flex flex-col gap-3">
         {!quotaExhausted && (
-          <p className="text-sm text-muted-foreground">
-            Something broke mid-pipeline. You can run the full flow against synthetic Aisyah documents — useful
-            for confirming the rest of the UI is healthy — or start over with fresh uploads.
-          </p>
+          <p className="text-sm text-muted-foreground">{t('evaluation.error.recoveryIntro')}</p>
         )}
         <div className="flex flex-col gap-2 sm:flex-row">
           {quotaExhausted && onSwitchToManual ? (
             <Button type="button" onClick={onSwitchToManual} className="flex-1">
               <ListChecks className="mr-2 size-4" aria-hidden />
-              Switch to Manual Entry
+              {t('evaluation.error.switchToManual')}
             </Button>
           ) : (
             <Button type="button" onClick={onUseSamples} className="flex-1">
               <Sparkles className="mr-2 size-4" aria-hidden />
-              Try with sample documents
+              {t('evaluation.error.trySamples')}
             </Button>
           )}
           <Button type="button" variant="outline" onClick={onReset} className="flex-1">
             <RotateCcw className="mr-2 size-4" aria-hidden />
-            Start over
+            {t('common.button.startOver')}
           </Button>
         </div>
       </CardContent>

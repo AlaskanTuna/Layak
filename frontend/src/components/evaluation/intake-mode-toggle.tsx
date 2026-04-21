@@ -1,6 +1,7 @@
 'use client'
 
 import { FileText, KeyboardIcon } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
@@ -21,22 +22,23 @@ type Props = {
  * the parent so the parent renders UploadWidget or ManualEntryForm.
  */
 export function IntakeModeToggle({ value, onChange, disabled = false }: Props) {
+  const { t } = useTranslation()
   return (
     <div
       role="radiogroup"
-      aria-label="Intake method"
+      aria-label={t('evaluation.intake.aria')}
       className="grid w-full grid-cols-2 gap-1 rounded-md border border-border bg-muted/30 p-1"
     >
       <ToggleButton
         icon={<FileText className="size-4" aria-hidden />}
-        label="Upload documents"
+        label={t('evaluation.intake.upload')}
         active={value === 'upload'}
         disabled={disabled}
         onClick={() => onChange('upload')}
       />
       <ToggleButton
         icon={<KeyboardIcon className="size-4" aria-hidden />}
-        label="Enter manually"
+        label={t('evaluation.intake.manual')}
         active={value === 'manual'}
         disabled={disabled}
         onClick={() => onChange('manual')}

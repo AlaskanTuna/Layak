@@ -1,0 +1,488 @@
+{
+  "common": {
+    "brand": "Layak",
+    "aria": {
+      "layakHome": "Laman utama Layak",
+      "toggleTheme": "Tukar tema",
+      "languageSelector": "Tukar bahasa",
+      "accountMenu": "Menu akaun",
+      "openMenu": "Buka menu",
+      "notifications": "Pemberitahuan",
+      "notificationsUnread": "Pemberitahuan ({{count}} belum dibaca)",
+      "dismissNotification": "Tutup pemberitahuan",
+      "clearField": "Kosongkan {{fieldName}}"
+    },
+    "button": {
+      "signIn": "Log Masuk",
+      "signOut": "Log keluar",
+      "signingOut": "Sedang log keluar…",
+      "continueWithGoogle": "Teruskan dengan Google",
+      "howItWorks": "Cara ia berfungsi",
+      "done": "Selesai",
+      "cancel": "Batal",
+      "maybeLater": "Nanti sahaja",
+      "startOver": "Mula semula"
+    },
+    "nav": {
+      "dashboard": "Papan Pemuka",
+      "evaluation": "Penilaian",
+      "schemes": "Skim",
+      "settings": "Tetapan"
+    },
+    "footer": {
+      "copyright": "© 2026 Layak",
+      "contact": "Hubungi Kami",
+      "howItWorks": "Cara ia berfungsi"
+    },
+    "notifications": {
+      "title": "Pemberitahuan",
+      "clearAll": "Kosongkan semua",
+      "empty": "Tiada pemberitahuan"
+    },
+    "stepper": {
+      "pending": "Menunggu",
+      "active": "Sedang berjalan",
+      "complete": "Selesai",
+      "error": "Gagal"
+    },
+    "language": {
+      "en": "English",
+      "ms": "Bahasa Malaysia",
+      "zh": "简体中文"
+    },
+    "sectionBadge": {
+      "required": "Wajib",
+      "optional": "Pilihan"
+    }
+  },
+  "marketing": {
+    "hero": {
+      "headlinePart1": "Ketahui setiap skim Malaysia",
+      "headlinePart2": "yang anda layak — dengan satu muat naik.",
+      "description": "Layak membaca MyKad, slip gaji, dan bil utiliti anda, kemudian menjalankan saluran ejen lima langkah untuk memadankan anda dengan skim kerajaan — STR, JKM Warga Emas, pelepasan LHDN Borang B, dan banyak lagi. Setiap nombor mempunyai rujukan sumber.",
+      "getStarted": "Mula Sekarang"
+    },
+    "cta": {
+      "headline": "Sedia untuk melihat apa yang anda layak?",
+      "description": "Log masuk dengan Google dalam satu klik — tiada pendaftaran akaun diperlukan. Tiga muat naik, senarai tersusun, tiga pakej draf. Kurang daripada seminit."
+    },
+    "features": {
+      "sectionTitle": "Cara ejen berfungsi",
+      "sectionDescription": "Lima langkah. Setiap langkah dihantar ke antara muka secara langsung supaya anda dapat melihat proses penaakulannya.",
+      "step1": {
+        "title": "Extract",
+        "description": "Gemini Vision membaca tiga dokumen anda dan mengeluarkan medan profil berstruktur."
+      },
+      "step2": {
+        "title": "Classify",
+        "description": "Saiz isi rumah, pendapatan per kapita, kategori pemfail, dan tanggungan diperoleh."
+      },
+      "step3": {
+        "title": "Match",
+        "description": "Enjin peraturan menyemak setiap profil terhadap ambang skim dengan rujukan lengkap."
+      },
+      "step4": {
+        "title": "Compute",
+        "description": "Gemini Code Execution menjumlahkan faedah tahunan merentasi skim yang layak di atas pentas."
+      },
+      "step5": {
+        "title": "Generate",
+        "description": "WeasyPrint menyediakan tiga pakej PDF bertanda air — sedia untuk disemak dan dihantar."
+      }
+    },
+    "howItWorks": {
+      "pipelineTitle": "Saluran",
+      "pipelineSubtitle": "Penstriman · langkah demi langkah",
+      "step1Body": "Gemini Vision membaca MyKad, slip gaji, dan bil utiliti anda, kemudian mengeluarkan medan profil berstruktur — nama, IC, pendapatan bulanan, komposisi isi rumah, alamat.",
+      "step2Body": "Saiz isi rumah, pendapatan bulanan per kapita, kategori pemfail (Borang B berbanding BE), serta bilangan anak di bawah 18 tahun dan tanggungan warga emas 60+ diperoleh daripada profil yang diekstrak.",
+      "step3Body": "Enjin peraturan menyemak profil anda terhadap setiap ambang skim — peringkat STR 2026, kelayakan JKM Warga Emas, lima pelepasan LHDN Borang B — dan memulangkan skim yang layak dengan rujukan tepat.",
+      "step4Body": "Gemini menulis skrip Python dan menjalankannya dalam kotak pasir kod Google untuk menjumlahkan faedah tahunan anda merentasi setiap skim yang layak. Kod yang dihasilkan dan keluarannya dihantar langsung ke antara muka, jadi anda dapat melihat keseluruhan pengiraan — bukan hanya angka akhir.",
+      "step5Body": "WeasyPrint menjana tiga PDF draf — BK-01 untuk STR, JKM18 untuk Warga Emas, ringkasan pelepasan Borang B untuk LHDN. Setiap halaman membawa tanda air: DRAFT — NOT SUBMITTED.",
+      "statsSteps": "5",
+      "statsStepsLabel": "langkah",
+      "statsTiming": "kurang daripada seminit dari awal hingga akhir",
+      "statsDrafts": "draf sahaja — anda yang menghantar",
+      "stackTitle": "Tindanan ejen",
+      "stackSubtitle": "Apa yang berada di belakang tabir",
+      "stackGeminiRole": "Mengorkestrasi saluran ejen dan mengendalikan pemahaman dokumen + pengelasan.",
+      "stackVertexRole": "Lapisan RAG ke atas PDF skim yang dikomitkan — sumber bagi setiap petikan peraturan yang dirujuk.",
+      "stackCodeExecRole": "Gemini menulis dan menjalankan skrip Python dalam kotak pasir Google untuk mengira faedah tahunan anda. Kod sumber yang dihasilkan dan keluarannya dihantar ke antara muka — pengiraan yang boleh disahkan, bukan kotak hitam.",
+      "stackWeasyRole": "Penjana pakej draf HTML-ke-PDF. Setiap halaman bertanda air dan sedia untuk portal agensi.",
+      "finePrintTitle": "Peringatan penting",
+      "finePrintDraft": "Layak tidak pernah menghantar bagi pihak anda. Setiap pakej yang dijana adalah <strong>draf</strong> — anda menyemaknya dan menghantarnya sendiri melalui portal rasmi agensi.",
+      "finePrintEstimates": "Angka adalah anggaran. Agensi membuat keputusan akhir bagi setiap permohonan.",
+      "finePrintIndependent": "Layak ialah prototaip bebas. Ia tidak bergabung dengan LHDN, JKM, Perbendaharaan, atau mana-mana badan kerajaan Malaysia.",
+      "finePrintCoverage": "Liputan skim dan ambang mencerminkan peraturan YA2025 / YA2026 setakat April 2026 dan mungkin berubah dari semasa ke semasa."
+    },
+    "privacy": {
+      "title": "Notis Privasi",
+      "effective": "Berkuat kuasa: 21 April 2026",
+      "intro": "Layak ialah penyertaan hackathon untuk MyAI Future Hackathon. Notis ini menerangkan apa yang kami kumpul, apa yang kami lakukan dengannya, dan hak yang anda kekalkan di bawah Akta Perlindungan Data Peribadi 2010 Malaysia (PDPA).",
+      "section1Title": "1. Apa yang kami kumpul",
+      "section1Google": "<strong>Profil akaun Google</strong> apabila anda log masuk: e-mel, nama paparan, foto profil, dan pengecam pengguna Firebase.",
+      "section1Documents": "<strong>Dokumen yang anda muat naik</strong> untuk menjalankan penilaian — biasanya MyKad, slip gaji atau tangkapan skrin pendapatan, dan bil utiliti.",
+      "section1History": "<strong>Sejarah penilaian</strong>: profil berstruktur yang kami ekstrak daripada dokumen anda dan skim yang dipadankan, disimpan di Firestore supaya anda dapat melihat larian lepas.",
+      "section1Consent": "<strong>Cap waktu persetujuan</strong> direkodkan apabila anda menanda kotak PDPA semasa mendaftar.",
+      "section2Title": "2. Apa yang kami tidak simpan",
+      "section2MyKad": "Nombor MyKad penuh anda — kami hanya menyimpan empat digit terakhir.",
+      "section2Files": "Bait asal fail yang anda muat naik. Pengekstrakan dijalankan dalam memori dalam satu permintaan, dan fail mentah dibuang sebaik sahaja profil berstruktur dihasilkan.",
+      "section2Logs": "Nombor IC, token pengesahan, atau kandungan dokumen dalam mana-mana baris log.",
+      "section3Title": "3. Kenapa kami mengumpulnya",
+      "section3Matching": "Untuk memadankan anda dengan skim Malaysia yang dikunci (STR 2026, JKM Warga Emas, pelepasan LHDN Borang B).",
+      "section3Packets": "Untuk menjana pakej permohonan draf anda, setiap halaman bertanda air \"DRAFT — NOT SUBMITTED.\"",
+      "section3History": "Untuk menunjukkan sejarah penilaian lepas anda di papan pemuka.",
+      "section3FairUse": "Untuk menguatkuasakan had kadar penggunaan saksama setiap pengguna pada peringkat percuma.",
+      "section4Title": "4. Di mana ia berada",
+      "section4Body": "Semua pemprosesan dan penyimpanan berlaku di Google Cloud, rantau <code>asia-southeast1</code>. Perkhidmatan Cloud Run dan pangkalan data Firestore dimiliki oleh pasukan Layak. Pengesahan dikendalikan oleh Firebase Authentication, juga di bawah projek kami.",
+      "section5Title": "5. Berapa lama kami menyimpannya",
+      "section5FreeDelete": "Penilaian peringkat percuma dipadam selepas 30 hari oleh kerja automatik setiap malam.",
+      "section5ProKeep": "Penilaian peringkat Pro kekal sehingga anda memadamnya.",
+      "section5AccountDelete": "Anda boleh meminta pemadaman segera akaun dan semua rekod berkaitan pada bila-bila masa dari halaman Tetapan.",
+      "section6Title": "6. Hak PDPA anda",
+      "section6Access": "<strong>Akses</strong> — muat turun eksport JSON profil dan sejarah penilaian penuh anda.",
+      "section6Deletion": "<strong>Pemadaman</strong> — alih keluar akaun, rekod Firestore, dan identiti Firebase Auth anda dalam satu tindakan.",
+      "section6Withdrawal": "<strong>Penarikan</strong> — tarik balik persetujuan dengan memadam akaun. Percubaan log masuk seterusnya memerlukan persetujuan baharu.",
+      "section7Title": "7. Apa yang kami tidak pernah buat",
+      "section7NoSubmit": "Kami tidak pernah menghantar apa-apa bagi pihak anda kepada LHDN, JPN, JKM, atau mana-mana portal kerajaan. Setiap output ialah pakej draf yang anda hantar secara manual.",
+      "section7NoThirdParty": "Kami tidak pernah berkongsi data anda dengan pihak ketiga untuk pengiklanan.",
+      "section7NoSell": "Kami tidak menjual data anda.",
+      "section8Title": "8. Skop demo dan hackathon",
+      "section8Body": "Layak ialah projek hackathon bukan pengeluaran. Gunakan dokumen sintetik di mana-mana yang mungkin semasa tempoh demo. Jangan muat naik MyKad atau dokumen kewangan orang lain tanpa persetujuan jelas mereka.",
+      "section9Title": "9. Hubungi",
+      "section9Body": "Hubungi pasukan melalui repositori GitHub projek. Untuk pertanyaan khusus PDPA, buka isu bertanda <code>pdpa</code>."
+    },
+    "terms": {
+      "title": "Terma Penggunaan",
+      "effective": "Berkuat kuasa: 21 April 2026",
+      "intro": "Layak ialah demonstrasi penyelidikan yang dibina untuk MyAI Future Hackathon. Dengan menggunakannya, anda bersetuju dengan terma di bawah.",
+      "section1Title": "1. Skop hackathon",
+      "section1Body": "Layak ialah sistem demonstrasi, bukan penasihat kewangan, cukai, atau undang-undang berlesen. Keluaran adalah pendidikan dan mungkin tidak lengkap atau sudah lapuk. Sentiasa sahkan kelayakan, jumlah, dan tarikh akhir dengan agensi berkaitan (LHDN, JPN, JKM, atau PPM tempatan anda) sebelum bertindak berdasarkan apa-apa yang ditunjukkan oleh Layak.",
+      "section2Title": "2. Pakej draf sahaja",
+      "section2Body": "Setiap pakej permohonan yang dijana oleh Layak bertanda air \"DRAFT — NOT SUBMITTED.\" Layak tidak, dan tidak akan, memfailkan apa-apa bagi pihak anda dengan mana-mana portal kerajaan Malaysia. Penghantaran sentiasa manual dan sentiasa menjadi tanggungjawab anda.",
+      "section3Title": "3. Penggunaan yang boleh diterima",
+      "section3OwnAccount": "Log masuk dengan akaun Google anda sendiri.",
+      "section3OwnDocuments": "Muat naik dokumen yang menjadi milik anda, atau yang anda mempunyai persetujuan jelas.",
+      "section3NoEvade": "Jangan gunakan Layak untuk mengelak cukai, menyalahgambarkan kelayakan, atau memohon skim yang anda tidak layak.",
+      "section4Title": "4. Penggantungan akaun",
+      "section4Body": "Kami mungkin menggantung atau memadam akaun demo yang melanggar terma ini atau yang menyalahgunakan had kadar peringkat percuma (5 penilaian setiap 24 jam bergulir).",
+      "section5Title": "5. Perkhidmatan sebagaimana adanya",
+      "section5Body": "Layak disediakan \"sebagaimana adanya,\" tanpa waranti dalam apa bentuk sekalipun. Pasukan ini tidak membuat perwakilan bahawa perkhidmatan akan tersedia, tepat, atau sesuai untuk mana-mana tujuan tertentu semasa atau selepas tetingkap pengadilan hackathon.",
+      "section6Title": "6. Liabiliti",
+      "section6Body": "Setakat yang dibenarkan oleh undang-undang Malaysia, pasukan Layak tidak bertanggungjawab atas sebarang kerugian langsung, tidak langsung, atau berbangkit akibat penggunaan perkhidmatan anda. Anda tetap bertanggungjawab ke atas ketepatan pakej permohonan anda sendiri dan sebarang keputusan yang anda buat berdasarkan output Layak.",
+      "section7Title": "7. Perubahan",
+      "section7Body": "Kami mungkin mengemas kini terma ini semasa tempoh hackathon. Tarikh berkuat kuasa di bahagian atas halaman ini mencerminkan versi terkini.",
+      "section8Title": "8. Undang-undang yang mengawal",
+      "section8Body": "Terma ini ditadbir oleh undang-undang Malaysia.",
+      "section9Title": "9. Hubungi",
+      "section9Body": "Hubungi pasukan melalui repositori GitHub projek."
+    }
+  },
+  "auth": {
+    "guard": {
+      "checkingSession": "Sedang menyemak sesi anda…"
+    },
+    "signIn": {
+      "title": "Selamat Kembali",
+      "description": "Teruskan dengan akaun Google anda untuk ke papan pemuka.",
+      "noAccountPrefix": "Tiada akaun?",
+      "noAccountCta": "Daftar",
+      "errorFailed": "Log masuk gagal. Sila cuba lagi."
+    },
+    "signUp": {
+      "title": "Cipta akaun anda",
+      "description": "Daftar dengan Google. Layak tidak pernah menghantar apa-apa bagi pihak anda — anda mengawal setiap pakej draf.",
+      "consentPrefix": "Saya bersetuju Layak memproses dokumen yang saya muat naik (IC, slip gaji, bil utiliti) untuk memadankan skim kerajaan, mengikut",
+      "consentPrivacy": "Dasar Privasi",
+      "consentAnd": "dan",
+      "consentTerms": "Terma",
+      "consentSuffix": ".",
+      "hasAccountPrefix": "Sudah ada akaun?",
+      "hasAccountCta": "Log Masuk",
+      "errorFailed": "Pendaftaran gagal. Sila cuba lagi."
+    }
+  },
+  "dashboard": {
+    "hero": {
+      "eyebrow": "Papan Pemuka",
+      "greetingWithName": "Selamat kembali, {{name}}.",
+      "greeting": "Selamat kembali.",
+      "description": "Profil sivik anda terkini. Layak menyemak keadaan semasa anda terhadap skim kerajaan 2026 terkini — STR, JKM Warga Emas, pelepasan LHDN Borang B. Mengambil masa kira-kira 4 minit."
+    },
+    "activeApplications": {
+      "title": "Permohonan Aktif",
+      "viewAll": "Lihat semua",
+      "empty": "Tiada",
+      "emptyDescription": "Permohonan yang dihantar akan muncul di sini dengan status pembayarannya."
+    },
+    "recentActivity": {
+      "title": "Aktiviti Terkini",
+      "empty": "Tiada",
+      "emptyDescription": "Muat naik, penilaian, dan penghantaran akan dialirkan di sini apabila berlaku."
+    },
+    "quota": {
+      "tierFree": "Peringkat percuma · 24 jam",
+      "tierPro": "Pro · tanpa had",
+      "usage": "{{used}} / {{limit}}",
+      "remaining": "{{remaining}} lagi · set semula dalam {{time}}",
+      "exhausted": "Kuota set semula dalam {{time}}",
+      "aria": "{{used}} daripada {{limit}} penilaian digunakan",
+      "checking": "Menyemak kuota…",
+      "unavailable": "Status kuota tidak tersedia"
+    },
+    "breadcrumb": {
+      "dashboard": "Papan Pemuka",
+      "evaluation": "Penilaian",
+      "upload": "Muat Naik",
+      "results": "Keputusan",
+      "schemes": "Skim",
+      "settings": "Tetapan",
+      "signIn": "Log masuk",
+      "signUp": "Daftar"
+    }
+  },
+  "evaluation": {
+    "sampleLoadError": "Tidak dapat memuat sampel Aisyah: {{error}}",
+    "unknownError": "Ralat tidak diketahui.",
+    "overview": {
+      "eyebrow": "Penilaian saya",
+      "title": "Kelayakan anda secara ringkas.",
+      "description": "Jumlah pelepasan sepanjang hayat yang dikenal pasti merentasi setiap larian, serta sejarah penilaian lepas yang berpaginasi."
+    },
+    "results": {
+      "eyebrow": "Penilaian selesai",
+      "title": "Berdasarkan dokumen anda, anda layak untuk pelbagai skim pelepasan.",
+      "description": "Setiap nombor merujuk halaman sumber; setiap pakej adalah DRAF yang anda hantar sendiri.",
+      "startAnother": "Mulakan penilaian lain",
+      "viewDetailed": "Lihat keputusan terperinci",
+      "backToEvaluations": "Kembali ke penilaian",
+      "loading": "Memuatkan penilaian…",
+      "notFoundTitle": "Penilaian tidak dijumpai",
+      "notFoundBody": "Kami tidak dapat mencari penilaian ini. Ia mungkin telah dipadam, atau pautan mungkin salah.",
+      "errorTitle": "Tidak dapat memuatkan penilaian",
+      "errorUnexpected": "Ralat tidak dijangka berlaku.",
+      "retry": "Cuba semula",
+      "startNew": "Mula penilaian baharu",
+      "failedTitle": "Penilaian gagal",
+      "backendReturned": "Backend memulangkan {{status}} {{statusText}}",
+      "byIdEyebrow": "Penilaian",
+      "byIdTitle": "Keputusan kelayakan anda.",
+      "byIdDescription": "Dimuatkan daripada penilaian anda yang disimpan. Angka merujuk peraturan dan halaman sumber; setiap pakej adalah DRAF yang anda hantar sendiri."
+    },
+    "intake": {
+      "aria": "Kaedah pengambilan",
+      "upload": "Muat naik dokumen",
+      "manual": "Masuk secara manual"
+    },
+    "stepper": {
+      "aria": "Kemajuan saluran",
+      "labels": {
+        "extract": "Ekstrak profil",
+        "extractManual": "Profil disediakan",
+        "classify": "Kelaskan isi rumah",
+        "match": "Padankan skim",
+        "compute_upside": "Kira faedah",
+        "generate": "Jana draf"
+      }
+    },
+    "upload": {
+      "sectionIc": "MyKad (IC)",
+      "hintIc": "Bahagian hadapan kad pengenalan Malaysia anda, memaparkan butiran anda dengan jelas.",
+      "sectionPayslip": "Slip gaji atau penyata pendapatan",
+      "hintPayslip": "Bulan terkini jika ada; pemfail bekerja sendiri boleh muat naik penyata bank atau borang LHDN.",
+      "sectionUtility": "Bil utiliti",
+      "hintUtility": "Bil air, elektrik, atau jalur lebar untuk pengesahan alamat — dalam tempoh tiga bulan lepas.",
+      "errorFileSize": "Fail adalah {{size}} MB — maksimum 10 MB.",
+      "errorFileType": "Jenis fail tidak disokong ({{type}}). Muat naik imej atau PDF.",
+      "dropzonePrimary": "Klik untuk muat naik",
+      "dropzoneSecondary": "atau seret dan lepas",
+      "dropzoneFormats": "JPG, PNG, atau PDF sehingga 10MB",
+      "householdTitle": "Isi rumah",
+      "householdHint": "Dokumen tidak menyenaraikan tanggungan anda. Tambah anak / ibu bapa / ahli isi rumah lain di sini supaya skim yang bergantung padanya (JKM Warga Emas, pelepasan anak LHDN) muncul.",
+      "useSamples": "Gunakan dokumen sampel Aisyah",
+      "loadingSamples": "Memuatkan sampel…",
+      "continue": "Teruskan penilaian",
+      "eyebrow": "Langkah · Muat naik",
+      "pageTitle": "Muat naik dokumen.",
+      "pageDescription": "Sediakan dokumen di bawah untuk mengesahkan kelayakan anda terhadap korpus skim. Pastikan semua teks jelas dan boleh dibaca — ejen akan mengekstrak, mengelaskan, memadankan, menilai, dan menjana pakej permohonan draf."
+    },
+    "manual": {
+      "identityTitle": "Identiti",
+      "nameLabel": "Nama penuh",
+      "dobLabel": "Tarikh lahir",
+      "dobHelp": "Taip nombor sahaja — kami akan isi sempang. Atau gunakan ikon kalendar.",
+      "dobPlaceholder": "YYYY-MM-DD",
+      "dobAria": "Buka pemilih tarikh",
+      "icLabel": "4 digit akhir IC",
+      "icHelp": "Kami hanya mengumpul 4 digit akhir — MyKad penuh anda tidak pernah meninggalkan peranti anda.",
+      "incomeTitle": "Pendapatan",
+      "incomeLabel": "Pendapatan bulanan (RM)",
+      "incomeHelp": "Bayaran bersih untuk kerja gig, gaji pokok untuk pekerja bergaji.",
+      "employmentLabel": "Jenis pekerjaan",
+      "employmentGig": "Bekerja sendiri / gig",
+      "employmentGigHelp": "Grab, Foodpanda, kerja bebas — mengemukakan Borang B LHDN.",
+      "employmentSalaried": "Pekerja bergaji",
+      "employmentSalariedHelp": "Gaji bulanan tetap — mengemukakan Borang BE LHDN.",
+      "utilityTitle": "Bil utiliti",
+      "addressLabel": "Alamat rumah",
+      "costLabel": "Kos elektrik bulanan (RM)",
+      "costHelp": "Jumlah RM di bahagian bawah bil TNB terkini anda. Kebanyakan orang mengingatinya lebih mudah daripada kWh.",
+      "costPlaceholder": "cth. 95.40",
+      "kwhLabel": "Penggunaan elektrik bulanan (kWh)",
+      "kwhHelp": "Pilihan — hanya jika bil anda menyenaraikan \"Jumlah Penggunaan\".",
+      "kwhPlaceholder": "cth. 220",
+      "householdTitle": "Isi rumah",
+      "useAisyah": "Gunakan data sampel Aisyah",
+      "clear": "Kosongkan",
+      "submit": "Jana pakej",
+      "zodRequired": "Wajib diisi",
+      "zodDateFormat": "Gunakan YYYY-MM-DD",
+      "zodNotRealDate": "Bukan tarikh yang sah",
+      "zodYearMin": "Tahun mesti 1900 atau lebih lewat",
+      "zodPastDate": "Mesti tarikh lepas",
+      "zodIc4Digits": "4 digit",
+      "zodCostFormat": "Jumlah sehingga RM100,000 (cth. 240 atau 240.50)",
+      "zodKwhFormat": "Nombor bulat sehingga 10,000"
+    },
+    "dependants": {
+      "description": "Tambah semua orang lain yang berkongsi isi rumah anda. Anak di bawah 18 tahun dan ibu bapa berumur 60+ membuka skim khusus. Saiz isi rumah: {{size}} (anda + {{count}} {{plural}}).",
+      "dependantSingular": "tanggungan",
+      "dependantPlural": "tanggungan",
+      "empty": "Belum ada tanggungan. Klik \"Tambah tanggungan\" untuk menyenaraikan setiap ahli isi rumah.",
+      "relationship": "Hubungan",
+      "relationships": {
+        "child": "Anak",
+        "parent": "Ibu bapa",
+        "spouse": "Pasangan",
+        "sibling": "Adik-beradik",
+        "other": "Lain-lain"
+      },
+      "age": "Umur",
+      "agePlaceholder": "Umur",
+      "icOptional": "4 digit akhir IC (pilihan)",
+      "add": "Tambah tanggungan",
+      "removeAria": "Alih keluar tanggungan {{index}}"
+    },
+    "demo": {
+      "title": "MOD DEMO",
+      "description": "Menjalankan terhadap Aisyah — pemandu Grab sintetik di Kuantan, dua anak berusia sekolah dan seorang tanggungan warga emas. Tiada MyKad sebenar terlibat."
+    },
+    "error": {
+      "title": "Ralat saluran",
+      "recoveryIntro": "Sesuatu rosak pada pertengahan saluran. Anda boleh jalankan aliran penuh terhadap dokumen sintetik Aisyah — berguna untuk mengesahkan bahagian UI lain sihat — atau mula semula dengan muat naik baharu.",
+      "switchToManual": "Tukar ke Masukan Manual",
+      "trySamples": "Cuba dengan dokumen sampel",
+      "startOver": "Mula semula"
+    },
+    "upside": {
+      "label": "Jumlah Potensi Pelepasan",
+      "currency": "RM",
+      "empty": "Jalankan penilaian pertama anda untuk melihat jumlah potensi pelepasan tahunan merentasi skim persekutuan dan negeri.",
+      "start": "Mula penilaian",
+      "description": "Merentasi {{count}} {{schemeLabel}} dan pelepasan. Berdasarkan profil pendapatan dan status isi rumah anda.",
+      "schemeSingular": "skim",
+      "schemePlural": "skim",
+      "download": "Muat turun semua draf",
+      "downloadWithCount": "Muat turun semua draf ({{count}})",
+      "downloadPending": "Draf belum sedia"
+    },
+    "schemeCard": {
+      "heading": "Skim Yang Layak",
+      "matchesSingular": "{{count}} padanan",
+      "matchesPlural": "{{count}} padanan",
+      "noMatches": "Tiada skim yang layak ditemui untuk profil anda dalam binaan ini.",
+      "whyQualify": "Mengapa anda layak",
+      "whyIQualify": "Mengapa saya layak",
+      "estValue": "Anggaran Nilai",
+      "startApp": "Mula permohonan",
+      "categoryAssistance": "Bantuan",
+      "perYearEst": "setahun (anggaran)",
+      "openAgencyPortal": "Buka portal {{agency}}",
+      "emptyList": "Padanan skim akan muncul di sini selepas penilaian pertama anda selesai.",
+      "eligibleSchemesCount": "Skim yang layak ({{count}})"
+    },
+    "packet": {
+      "titleSingular": "Pakej permohonan draf ({{count}} fail)",
+      "titlePlural": "Pakej permohonan draf ({{count}} fail)",
+      "titleSchemeSingular": "Pakej permohonan draf ({{count}} skim)",
+      "titleSchemePlural": "Pakej permohonan draf ({{count}} skim)",
+      "description": "Setiap halaman membawa tanda air \"DRAFT — NOT SUBMITTED\". Layak tidak pernah menghantar bagi pihak anda. Semak setiap PDF, kemudian hantar sendiri melalui portal rasmi agensi.",
+      "download": "Muat turun PDF",
+      "pending": "Menunggu backend",
+      "scheme": "skim: {{id}}",
+      "downloadZip": "Muat turun semua draf sebagai ZIP",
+      "generatingZip": "Menjana ZIP…",
+      "placeholderNotice": "Penjana pakej WeasyPrint akan hadir dalam Fasa 1 Tugas 5 (blok penyambungan berpasangan). Sehingga itu, bentuk pakej dipaparkan supaya anda dapat melihat di mana butang muat turun akan berada."
+    },
+    "codeExecution": {
+      "title": "Gemini Code Execution — pengiraan faedah",
+      "description": "Ejen menjalankan Python untuk mengira faedah setiap skim dan jumlah tahunan. Potongan kod dan stdout dipaparkan secara verbatim.",
+      "python": "Python",
+      "stdout": "stdout"
+    }
+  },
+  "schemes": {
+    "pageEyebrow": "Perpustakaan skim",
+    "pageTitle": "Setiap skim Malaysia yang Layak pertimbangkan.",
+    "pageDescription": "Tiga skim persekutuan tersedia dalam binaan ini. Lima lagi akan hadir dalam v2 apabila kami menyambungkan peraturan, ambang, dan borang permohonan setiap satu ke dalam enjin.",
+    "stats": {
+      "inScope": "dalam skop",
+      "coming": "akan datang dalam v2"
+    },
+    "sections": {
+      "inScopeTitle": "Dalam skop · binaan ini",
+      "comingTitle": "Akan datang dalam v2",
+      "comingCount": "{{count}} skim"
+    },
+    "howWePick": {
+      "title": "Cara kami memilih skim untuk disokong",
+      "description": "Layak mengutamakan skim dengan ambang yang didokumentasikan secara terbuka, portal permohonan terbuka, dan faedah sebenar yang tinggi untuk rakyat Malaysia berpendapatan rendah hingga sederhana. Setiap peraturan yang kami sokong disokong oleh sumber yang boleh dirujuk — sama ada dokumen PR kerajaan, borang diwartakan, atau risalah skim — supaya setiap angka RM dalam penilaian anda boleh dikesan ke halaman tertentu."
+    },
+    "notAffiliated": "Tidak bergabung dengan LHDN, JKM, Perbendaharaan, atau mana-mana badan kerajaan Malaysia.",
+    "labels": {
+      "cashTransfer": "Pindahan Tunai",
+      "welfare": "Kebajikan",
+      "taxRelief": "Pelepasan Cukai",
+      "typicalUpside": "Faedah biasa",
+      "upTo": "Sehingga RM",
+      "perYear": "/ tahun",
+      "agencyPortal": "Portal agensi"
+    },
+    "str": {
+      "summary": "Sumbangan Tunai Rahmah — peringkat isi rumah dan individu berdasarkan pendapatan per kapita dan saiz isi rumah."
+    },
+    "jkm": {
+      "summary": "Bayaran bulanan RM 600 untuk tanggungan warga emas yang layak (berumur 60+) dalam isi rumah berpendapatan rendah."
+    },
+    "lhdn": {
+      "summary": "Lima pelepasan bekerja sendiri: individu, pengecualian pasangan, setiap anak, perubatan, dan gaya hidup."
+    },
+    "coming": {
+      "iSaraanDesc": "Caruman padanan KWSP bekerja sendiri.",
+      "perkesoDesc": "Skim keselamatan sosial bekerja sendiri.",
+      "myKasihDesc": "Program bantuan makanan tanpa tunai.",
+      "eKasihDesc": "Daftar isi rumah miskin kebangsaan.",
+      "saraDesc": "Laluan pelepasan cukai alternatif."
+    }
+  },
+  "settings": {
+    "eyebrow": "Tetapan",
+    "title": "Lalai dan keutamaan anda.",
+    "description": "Kebanyakan kawalan akan tiba dalam v2 — buat masa ini halaman ini adalah pemegang tempat.",
+    "placeholderTitle": "Tetapan — v2",
+    "placeholderDescription": "Bahasa, nilai profil lalai, pengekalan data, dan kawalan kebolehcapaian akan berada di sini. Halaman ini adalah pemegang tempat struktur supaya laluan sudah dipasang apabila kawalan tiba.",
+    "upgrade": {
+      "title": "Dapatkan Layak Pro",
+      "descriptionDefault": "Naik taraf untuk membuang had peringkat percuma dan menyimpan sejarah penilaian anda selama-lamanya.",
+      "descriptionRateLimit": "Anda telah mencapai had peringkat percuma sebanyak {{limit}} penilaian setiap {{hours}} jam. Pro membuang had dan menyimpan sejarah selama-lamanya.",
+      "feature1": "Penilaian tanpa had — tiada had bergulir.",
+      "feature2": "Sejarah kekal tanpa had (peringkat percuma auto-padam selepas 30 hari).",
+      "feature3": "Akses keutamaan kepada skim baharu apabila ditambah.",
+      "resetInfo": "Kuota percuma set semula pada {{time}}.",
+      "successTitle": "Anda berada dalam senarai menunggu.",
+      "successMessage": "Kami akan menghantar e-mel kepada <strong>{{email}}</strong> apabila Layak Pro tersedia.",
+      "emailFallback": "anda",
+      "joinWaitlist": "Sertai senarai menunggu",
+      "joining": "Menambah…"
+    }
+  }
+}

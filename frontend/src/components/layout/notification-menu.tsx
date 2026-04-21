@@ -2,12 +2,14 @@
 
 import { Bell, X } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 
 import { Button } from '@/components/ui/button'
 import { notificationStore, useNotifications } from '@/lib/notification-store'
 import { cn } from '@/lib/utils'
 
 export function NotificationMenu() {
+  const { t } = useTranslation()
   const [isOpen, setIsOpen] = useState(false)
   const containerRef = useRef<HTMLDivElement>(null)
   const notifications = useNotifications()
@@ -37,7 +39,11 @@ export function NotificationMenu() {
         type="button"
         variant="ghost"
         size="icon"
-        aria-label={unreadCount > 0 ? `Notifications (${unreadCount} unread)` : 'Notifications'}
+        aria-label={
+          unreadCount > 0
+            ? t('common.aria.notificationsUnread', { count: unreadCount })
+            : t('common.aria.notifications')
+        }
         aria-haspopup="menu"
         aria-expanded={isOpen}
         onClick={() => setIsOpen(v => !v)}
@@ -60,7 +66,7 @@ export function NotificationMenu() {
         )}
       >
         <div className="flex items-center justify-between border-b border-border px-4 py-3">
-          <h3 className="text-sm font-semibold">Notifications</h3>
+          <h3 className="text-sm font-semibold">{t('common.notifications.title')}</h3>
           {notifications.length > 0 && (
             <Button
               type="button"
@@ -68,14 +74,14 @@ export function NotificationMenu() {
               size="xs"
               onClick={() => notificationStore.clearAll()}
             >
-              Clear all
+              {t('common.notifications.clearAll')}
             </Button>
           )}
         </div>
         {notifications.length === 0 ? (
           <div className="p-6 text-center">
             <Bell className="mx-auto size-8 text-muted-foreground/40" aria-hidden />
-            <p className="mt-2 text-sm text-muted-foreground">No notifications</p>
+            <p className="mt-2 text-sm text-muted-foreground">{t('common.notifications.empty')}</p>
           </div>
         ) : (
           <ul className="divide-y divide-border">
@@ -97,7 +103,7 @@ export function NotificationMenu() {
                 </div>
                 <button
                   type="button"
-                  aria-label="Dismiss notification"
+                  aria-label={t('common.aria.dismissNotification')}
                   onClick={event => {
                     event.stopPropagation()
                     notificationStore.dismiss(n.id)

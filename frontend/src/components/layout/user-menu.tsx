@@ -4,6 +4,7 @@ import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useEffect, useRef, useState } from 'react'
 import { LogOut, Settings } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 
 import { Button } from '@/components/ui/button'
 import { useAuth } from '@/lib/auth-context'
@@ -11,6 +12,7 @@ import { signOutCurrentUser } from '@/lib/firebase'
 import { cn } from '@/lib/utils'
 
 export function UserMenu() {
+  const { t } = useTranslation()
   const router = useRouter()
   const { user } = useAuth()
   const [isOpen, setIsOpen] = useState(false)
@@ -47,7 +49,7 @@ export function UserMenu() {
     }
   }
 
-  const displayName = user?.displayName ?? user?.email ?? 'Account'
+  const displayName = user?.displayName ?? user?.email ?? t('common.aria.accountMenu')
   const email = user?.email ?? ''
   const initial = (user?.displayName || user?.email || 'A').charAt(0).toUpperCase()
 
@@ -57,7 +59,7 @@ export function UserMenu() {
         type="button"
         variant="ghost"
         size="icon"
-        aria-label="Account menu"
+        aria-label={t('common.aria.accountMenu')}
         aria-haspopup="menu"
         aria-expanded={isOpen}
         onClick={() => setIsOpen(v => !v)}
@@ -88,7 +90,7 @@ export function UserMenu() {
             className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm transition-colors hover:bg-accent/60"
           >
             <Settings className="size-4" aria-hidden />
-            Settings
+            {t('common.nav.settings')}
           </Link>
         </div>
         <div className="border-t border-border p-1">
@@ -100,7 +102,7 @@ export function UserMenu() {
             className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm text-destructive transition-colors hover:bg-destructive/10 disabled:opacity-60"
           >
             <LogOut className="size-4" aria-hidden />
-            {signingOut ? 'Signing out…' : 'Sign out'}
+            {signingOut ? t('common.button.signingOut') : t('common.button.signOut')}
           </button>
         </div>
       </div>

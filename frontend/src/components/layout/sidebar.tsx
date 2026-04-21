@@ -4,6 +4,7 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import { LayoutDashboard, Library, Menu, Sparkles, type LucideIcon } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 
 import { BrandMark } from '@/components/layout/brand-mark'
 import { Button } from '@/components/ui/button'
@@ -11,14 +12,14 @@ import { cn } from '@/lib/utils'
 
 type NavItem = {
   href: string
-  label: string
+  labelKey: string
   icon: LucideIcon
 }
 
 const NAV_ITEMS: NavItem[] = [
-  { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
-  { href: '/dashboard/evaluation', label: 'Evaluation', icon: Sparkles },
-  { href: '/dashboard/schemes', label: 'Schemes', icon: Library }
+  { href: '/dashboard', labelKey: 'common.nav.dashboard', icon: LayoutDashboard },
+  { href: '/dashboard/evaluation', labelKey: 'common.nav.evaluation', icon: Sparkles },
+  { href: '/dashboard/schemes', labelKey: 'common.nav.schemes', icon: Library }
 ]
 
 type SidebarProps = {
@@ -27,6 +28,7 @@ type SidebarProps = {
 }
 
 export function Sidebar({ mobileOpen, onMobileClose }: SidebarProps) {
+  const { t } = useTranslation()
   const pathname = usePathname()
   const [collapsed, setCollapsed] = useState(true)
 
@@ -38,7 +40,7 @@ export function Sidebar({ mobileOpen, onMobileClose }: SidebarProps) {
     return (
       <>
         <div className="flex h-[var(--topbar-height)] shrink-0 items-center border-b border-[var(--glass-border)] pl-4">
-          <Link href="/" className="flex items-center overflow-hidden" aria-label="Layak home">
+          <Link href="/" className="flex items-center overflow-hidden" aria-label={t('common.aria.layakHome')}>
             <BrandMark />
             <span
               className={cn(
@@ -46,7 +48,7 @@ export function Sidebar({ mobileOpen, onMobileClose }: SidebarProps) {
                 isCollapsed ? 'pointer-events-none ml-0 max-w-0 opacity-0' : 'ml-2.5 max-w-xs opacity-100'
               )}
             >
-              Layak
+              {t('common.brand')}
             </span>
           </Link>
         </div>
@@ -55,11 +57,12 @@ export function Sidebar({ mobileOpen, onMobileClose }: SidebarProps) {
           {NAV_ITEMS.map(item => {
             const Icon = item.icon
             const active = pathname === item.href
+            const label = t(item.labelKey)
             return (
               <Link
-                key={item.label}
+                key={item.labelKey}
                 href={item.href}
-                aria-label={item.label}
+                aria-label={label}
                 aria-current={active ? 'page' : undefined}
               >
                 <span
@@ -77,7 +80,7 @@ export function Sidebar({ mobileOpen, onMobileClose }: SidebarProps) {
                       isCollapsed ? 'pointer-events-none ml-0 max-w-0 opacity-0' : 'ml-3 max-w-xs opacity-100'
                     )}
                   >
-                    {item.label}
+                    {label}
                   </span>
                 </span>
               </Link>
@@ -140,12 +143,13 @@ export function Sidebar({ mobileOpen, onMobileClose }: SidebarProps) {
 }
 
 export function MobileMenuButton({ onClick }: { onClick: () => void }) {
+  const { t } = useTranslation()
   return (
     <Button
       type="button"
       variant="ghost"
       size="icon"
-      aria-label="Open menu"
+      aria-label={t('common.aria.openMenu')}
       onClick={onClick}
       className="size-8 md:hidden"
     >

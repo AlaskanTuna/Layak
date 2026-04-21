@@ -1,10 +1,11 @@
 'use client'
 
 import { AlertCircle, Check, Loader2 } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 
 import { Progress } from '@/components/ui/progress'
 import type { PipelineState, StepStatus } from '@/hooks/use-agent-pipeline'
-import { PIPELINE_STEPS, STEP_LABELS, type Step } from '@/lib/agent-types'
+import { PIPELINE_STEPS, type Step } from '@/lib/agent-types'
 import { cn } from '@/lib/utils'
 
 type Props = {
@@ -20,32 +21,21 @@ function StepIcon({ status }: { status: StepStatus }) {
   return <div className="size-4 rounded-full border border-muted-foreground/40" aria-hidden />
 }
 
-function statusLabel(status: StepStatus): string {
-  switch (status) {
-    case 'pending':
-      return 'Pending'
-    case 'active':
-      return 'In progress'
-    case 'complete':
-      return 'Complete'
-    case 'error':
-      return 'Failed'
-  }
-}
-
 function completedCount(state: PipelineState): number {
   return PIPELINE_STEPS.filter(step => state.stepStates[step] === 'complete').length
 }
 
 export function PipelineStepper({ state, labelOverrides }: Props) {
+  const { t } = useTranslation()
   const completed = completedCount(state)
   const percent = Math.round((completed / PIPELINE_STEPS.length) * 100)
-  const labelFor = (step: Step) => labelOverrides?.[step] ?? STEP_LABELS[step]
+  const labelFor = (step: Step) => labelOverrides?.[step] ?? t(`evaluation.stepper.labels.${step}`)
+  const statusLabel = (status: StepStatus): string => t(`common.stepper.${status}`)
 
   return (
     <div className="flex flex-col gap-3">
       <Progress value={percent} />
-      <ol className="flex flex-col gap-2" aria-label="Pipeline progress">
+      <ol className="flex flex-col gap-2" aria-label={t('evaluation.stepper.aria')}>
         {PIPELINE_STEPS.map((step: Step) => {
           const status = state.stepStates[step]
           return (

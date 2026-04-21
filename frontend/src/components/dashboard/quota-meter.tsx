@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useState } from 'react'
 import { Loader2, Sparkles, Zap } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 
 import { Badge } from '@/components/ui/badge'
 import { useAuth } from '@/lib/auth-context'
@@ -41,6 +42,7 @@ type QuotaMeterProps = {
  * the parent route bumps the key after the agent pipeline finishes.
  */
 export function QuotaMeter({ refreshKey, className }: QuotaMeterProps) {
+  const { t } = useTranslation()
   const { user, loading: authLoading } = useAuth()
   const [quota, setQuota] = useState<QuotaResponse | null>(null)
   const [phase, setPhase] = useState<'loading' | 'ready' | 'error'>('loading')
@@ -73,7 +75,7 @@ export function QuotaMeter({ refreshKey, className }: QuotaMeterProps) {
     return (
       <div className={cn('flex items-center gap-2 text-xs text-muted-foreground', className)}>
         <Loader2 className="size-3.5 animate-spin" aria-hidden />
-        Checking quota…
+        {t('dashboard.quota.checking')}
       </div>
     )
   }
@@ -81,7 +83,7 @@ export function QuotaMeter({ refreshKey, className }: QuotaMeterProps) {
   if (phase === 'error' || !quota) {
     return (
       <div className={cn('text-xs text-muted-foreground', className)}>
-        Quota status unavailable
+        {t('dashboard.quota.unavailable')}
       </div>
     )
   }
@@ -91,7 +93,7 @@ export function QuotaMeter({ refreshKey, className }: QuotaMeterProps) {
       <div className={cn('flex items-center gap-2', className)}>
         <Badge variant="default" className="gap-1">
           <Sparkles className="size-3" aria-hidden />
-          Pro · unlimited
+          {t('dashboard.quota.tierPro')}
         </Badge>
       </div>
     )
@@ -112,7 +114,7 @@ export function QuotaMeter({ refreshKey, className }: QuotaMeterProps) {
         <div className="flex items-center gap-1.5">
           <Zap className="size-3.5 text-muted-foreground" aria-hidden />
           <span className="text-[11px] uppercase tracking-[0.14em] text-muted-foreground">
-            Free tier · 24 h
+            {t('dashboard.quota.tierFree')}
           </span>
         </div>
         <span
@@ -130,7 +132,7 @@ export function QuotaMeter({ refreshKey, className }: QuotaMeterProps) {
           aria-valuenow={quota.used}
           aria-valuemin={0}
           aria-valuemax={quota.limit}
-          aria-label={`${quota.used} of ${quota.limit} evaluations used`}
+          aria-label={t('dashboard.quota.aria', { used: quota.used, limit: quota.limit })}
           style={{ width: `${pct}%` }}
           className={cn(
             'h-full transition-all',
@@ -140,8 +142,11 @@ export function QuotaMeter({ refreshKey, className }: QuotaMeterProps) {
       </div>
       <p className="text-[11px] text-muted-foreground">
         {exhausted
-          ? `Quota resets in ${formatResetIn(quota.resetAt)}`
-          : `${quota.remaining} left · resets in ${formatResetIn(quota.resetAt)}`}
+          ? t('dashboard.quota.exhausted', { time: formatResetIn(quota.resetAt) })
+          : t('dashboard.quota.remaining', {
+              remaining: quota.remaining,
+              time: formatResetIn(quota.resetAt)
+            })}
       </p>
     </div>
   )

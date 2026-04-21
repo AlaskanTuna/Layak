@@ -1,0 +1,488 @@
+{
+  "common": {
+    "brand": "Layak",
+    "aria": {
+      "layakHome": "Layak 首页",
+      "toggleTheme": "切换主题",
+      "languageSelector": "切换语言",
+      "accountMenu": "账户菜单",
+      "openMenu": "打开菜单",
+      "notifications": "通知",
+      "notificationsUnread": "通知（{{count}} 条未读）",
+      "dismissNotification": "关闭通知",
+      "clearField": "清空 {{fieldName}}"
+    },
+    "button": {
+      "signIn": "登录",
+      "signOut": "退出登录",
+      "signingOut": "正在退出…",
+      "continueWithGoogle": "使用 Google 继续",
+      "howItWorks": "运作原理",
+      "done": "完成",
+      "cancel": "取消",
+      "maybeLater": "稍后再说",
+      "startOver": "重新开始"
+    },
+    "nav": {
+      "dashboard": "仪表板",
+      "evaluation": "评估",
+      "schemes": "计划",
+      "settings": "设置"
+    },
+    "footer": {
+      "copyright": "© 2026 Layak",
+      "contact": "联系我们",
+      "howItWorks": "运作原理"
+    },
+    "notifications": {
+      "title": "通知",
+      "clearAll": "全部清除",
+      "empty": "暂无通知"
+    },
+    "stepper": {
+      "pending": "待处理",
+      "active": "进行中",
+      "complete": "已完成",
+      "error": "失败"
+    },
+    "language": {
+      "en": "English",
+      "ms": "Bahasa Malaysia",
+      "zh": "简体中文"
+    },
+    "sectionBadge": {
+      "required": "必填",
+      "optional": "选填"
+    }
+  },
+  "marketing": {
+    "hero": {
+      "headlinePart1": "一次上传，",
+      "headlinePart2": "了解你符合资格的所有马来西亚政府计划。",
+      "description": "Layak 读取您的 MyKad、工资单和水电费账单，然后运行五步智能代理流程，将您与政府计划配对 —— STR、JKM Warga Emas、LHDN Form B 税务减免等。每个数字都附有出处引用。",
+      "getStarted": "立即开始"
+    },
+    "cta": {
+      "headline": "准备好了解您符合哪些资格了吗？",
+      "description": "只需一次点击即可使用 Google 登录 —— 无需设置账户。三次上传，一份排序列表，三份草拟申请包。用时不到一分钟。"
+    },
+    "features": {
+      "sectionTitle": "代理如何运作",
+      "sectionDescription": "五个步骤。每一步都实时传送到界面，让您亲眼看到推理过程。",
+      "step1": {
+        "title": "Extract",
+        "description": "Gemini Vision 读取您的三份文件并提取结构化的档案字段。"
+      },
+      "step2": {
+        "title": "Classify",
+        "description": "推导出家庭规模、人均收入、申报类别、受扶养人等信息。"
+      },
+      "step3": {
+        "title": "Match",
+        "description": "规则引擎将每份档案与计划门槛进行比对，并附上完整引用。"
+      },
+      "step4": {
+        "title": "Compute",
+        "description": "Gemini Code Execution 在舞台上汇总所有符合资格计划的年度收益。"
+      },
+      "step5": {
+        "title": "Generate",
+        "description": "WeasyPrint 生成三份带水印的 PDF 申请包 —— 可供审阅和提交。"
+      }
+    },
+    "howItWorks": {
+      "pipelineTitle": "处理流程",
+      "pipelineSubtitle": "流式传输 · 逐步进行",
+      "step1Body": "Gemini Vision 读取您的 MyKad、工资单和水电费账单，并提取结构化的档案字段 —— 姓名、身份证号、月收入、家庭构成和地址。",
+      "step2Body": "从提取的档案中推导出家庭规模、人均月收入、申报类别（Form B 与 BE）、18 岁以下子女人数和 60 岁以上年长受扶养人的人数。",
+      "step3Body": "规则引擎将您推导出的档案与每个计划门槛进行比对 —— STR 2026 层级、JKM Warga Emas 资格、五项 LHDN Form B 减免 —— 并返回附有精确引用的符合资格计划。",
+      "step4Body": "Gemini 编写 Python 代码片段并在 Google 代码沙箱中运行，汇总您在每个符合资格计划上的年度收益。生成的代码及其输出实时传送到界面，让您看到完整的演算过程 —— 不只是最终数字。",
+      "step5Body": "WeasyPrint 生成三份草拟 PDF —— BK-01 给 STR、JKM18 给 Warga Emas、Form B 减免摘要给 LHDN。每页都带有水印：DRAFT — NOT SUBMITTED。",
+      "statsSteps": "5",
+      "statsStepsLabel": "步骤",
+      "statsTiming": "全程不到一分钟",
+      "statsDrafts": "仅草稿 —— 由您提交",
+      "stackTitle": "代理技术栈",
+      "stackSubtitle": "幕后技术",
+      "stackGeminiRole": "协调代理流程，并处理文件理解与分类。",
+      "stackVertexRole": "覆盖已提交计划 PDF 的 RAG 层 —— 每段引用规则的来源。",
+      "stackCodeExecRole": "Gemini 在 Google 沙箱中编写并运行 Python 代码片段，计算您的年度收益。生成的源代码和标准输出均传送到界面 —— 可验证的数学运算，而非黑盒。",
+      "stackWeasyRole": "HTML 转 PDF 草拟申请包生成器。每页都带水印且可直接用于机构门户。",
+      "finePrintTitle": "重要说明",
+      "finePrintDraft": "Layak 从不代您提交。每个生成的申请包都是<strong>草稿</strong> —— 由您审阅并通过机构的官方门户亲自递交。",
+      "finePrintEstimates": "数字仅为估算。每项申请的最终决定由机构作出。",
+      "finePrintIndependent": "Layak 是独立的原型项目。与 LHDN、JKM、财政部或任何马来西亚政府机构均无关联。",
+      "finePrintCoverage": "计划覆盖范围和门槛反映截至 2026 年 4 月的 YA2025 / 2026 规则，可能随时变更。"
+    },
+    "privacy": {
+      "title": "隐私声明",
+      "effective": "生效日期：2026 年 4 月 21 日",
+      "intro": "Layak 是 MyAI Future Hackathon 的参赛作品。本声明说明我们收集哪些资料、如何使用，以及您在马来西亚《2010 年个人资料保护法》（PDPA）下保留的权利。",
+      "section1Title": "1. 我们收集的资料",
+      "section1Google": "<strong>Google 账户档案</strong>（当您登录时）：电子邮件、显示名称、头像和 Firebase 用户标识符。",
+      "section1Documents": "<strong>您上传的文件</strong>用于进行评估 —— 通常是 MyKad、工资单或收入截图，以及水电费账单。",
+      "section1History": "<strong>评估历史</strong>：我们从您的文件中提取的结构化档案以及您所配对的计划，存储在 Firestore 中以便您查看过往记录。",
+      "section1Consent": "<strong>同意时间戳</strong>，在您注册时勾选 PDPA 复选框时记录。",
+      "section2Title": "2. 我们不存储的资料",
+      "section2MyKad": "您的完整 MyKad 号码 —— 我们只保留最后四位数。",
+      "section2Files": "您上传文件的原始字节。提取过程在单次请求内以内存方式运行，一旦生成结构化档案，原始文件即被丢弃。",
+      "section2Logs": "任何日志行中的身份证号码、身份验证令牌或文件内容。",
+      "section3Title": "3. 为何收集这些资料",
+      "section3Matching": "为了将您与锁定的马来西亚计划配对（STR 2026、JKM Warga Emas、LHDN Form B 减免）。",
+      "section3Packets": "为了生成您的草拟申请包，每页都带有「DRAFT — NOT SUBMITTED」水印。",
+      "section3History": "为了在仪表板上向您展示过往评估历史。",
+      "section3FairUse": "为了在免费层级上执行每用户公平使用速率限制。",
+      "section4Title": "4. 资料存放地点",
+      "section4Body": "所有处理和存储都在 Google Cloud <code>asia-southeast1</code> 区域进行。Cloud Run 服务和 Firestore 数据库由 Layak 团队拥有。身份验证由 Firebase Authentication 处理，同样在我们的项目下。",
+      "section5Title": "5. 我们保留资料的期限",
+      "section5FreeDelete": "免费层级的评估在 30 天后由自动化夜间作业删除。",
+      "section5ProKeep": "Pro 层级的评估一直保留，直到您删除为止。",
+      "section5AccountDelete": "您可以随时从「设置」页面请求立即删除您的账户和所有相关记录。",
+      "section6Title": "6. 您的 PDPA 权利",
+      "section6Access": "<strong>访问</strong> —— 下载您档案和完整评估历史的 JSON 导出。",
+      "section6Deletion": "<strong>删除</strong> —— 一次操作即可移除您的账户、Firestore 记录和 Firebase Auth 身份。",
+      "section6Withdrawal": "<strong>撤回</strong> —— 通过删除账户撤回同意。后续登录将要求重新同意。",
+      "section7Title": "7. 我们绝不做的事",
+      "section7NoSubmit": "我们绝不代您向 LHDN、JPN、JKM 或任何政府门户提交任何内容。每个输出都是草拟申请包，由您手动提交。",
+      "section7NoThirdParty": "我们绝不与第三方共享您的数据用于广告。",
+      "section7NoSell": "我们不出售您的数据。",
+      "section8Title": "8. 演示与黑客松范围",
+      "section8Body": "Layak 是非生产性质的黑客松项目。在演示期间请尽量使用合成文件。未经他人明确同意，请勿上传他人的 MyKad 或财务文件。",
+      "section9Title": "9. 联系方式",
+      "section9Body": "通过项目的 GitHub 仓库联系团队。关于 PDPA 的具体疑问，请开启标记 <code>pdpa</code> 的 issue。"
+    },
+    "terms": {
+      "title": "使用条款",
+      "effective": "生效日期：2026 年 4 月 21 日",
+      "intro": "Layak 是为 MyAI Future Hackathon 构建的研究演示。使用本服务即表示您同意以下条款。",
+      "section1Title": "1. 黑客松范围",
+      "section1Body": "Layak 是演示系统，并非持牌财务、税务或法律顾问。输出内容仅供教育用途，可能不完整或已过时。在采取行动之前，请务必与相关机构（LHDN、JPN、JKM 或您当地的 PPM）确认资格、金额和截止日期。",
+      "section2Title": "2. 仅限草拟申请包",
+      "section2Body": "Layak 生成的每个申请包都带有「DRAFT — NOT SUBMITTED」水印。Layak 不会、也不会代您向任何马来西亚政府门户提交任何内容。提交始终为手动操作且始终由您负责。",
+      "section3Title": "3. 可接受的使用",
+      "section3OwnAccount": "使用您自己的 Google 账户登录。",
+      "section3OwnDocuments": "上传属于您本人或您获得明确同意使用的文件。",
+      "section3NoEvade": "请勿使用 Layak 逃税、虚报资格或申请您不符合资格的计划。",
+      "section4Title": "4. 账户停用",
+      "section4Body": "我们可能暂停或删除违反本条款或滥用免费层级速率限制（每 24 小时滚动 5 次评估）的演示账户。",
+      "section5Title": "5. 按现状提供",
+      "section5Body": "Layak 按「现状」提供，不附带任何形式的保证。团队不保证服务在黑客松评审期间或之后将可用、准确或适合任何特定目的。",
+      "section6Title": "6. 责任",
+      "section6Body": "在马来西亚法律允许的范围内，Layak 团队对因您使用本服务而产生的任何直接、间接或后果性损失概不负责。您仍需对您自己的申请包的准确性以及您根据 Layak 输出所作的任何决定负责。",
+      "section7Title": "7. 变更",
+      "section7Body": "我们可能在黑客松期间更新这些条款。本页顶部的生效日期反映最新版本。",
+      "section8Title": "8. 适用法律",
+      "section8Body": "这些条款受马来西亚法律管辖。",
+      "section9Title": "9. 联系方式",
+      "section9Body": "通过项目的 GitHub 仓库联系团队。"
+    }
+  },
+  "auth": {
+    "guard": {
+      "checkingSession": "正在检查您的会话…"
+    },
+    "signIn": {
+      "title": "欢迎回来",
+      "description": "使用您的 Google 账户继续进入仪表板。",
+      "noAccountPrefix": "还没有账户？",
+      "noAccountCta": "注册",
+      "errorFailed": "登录失败。请重试。"
+    },
+    "signUp": {
+      "title": "创建您的账户",
+      "description": "使用 Google 注册。Layak 从不代您提交任何内容 —— 每份草拟申请包均由您掌控。",
+      "consentPrefix": "我同意 Layak 依据以下文件处理我上传的文件（身份证、工资单、水电费账单）以配对政府计划：",
+      "consentPrivacy": "隐私政策",
+      "consentAnd": "及",
+      "consentTerms": "使用条款",
+      "consentSuffix": "。",
+      "hasAccountPrefix": "已有账户？",
+      "hasAccountCta": "登录",
+      "errorFailed": "注册失败。请重试。"
+    }
+  },
+  "dashboard": {
+    "hero": {
+      "eyebrow": "仪表板",
+      "greetingWithName": "欢迎回来，{{name}}。",
+      "greeting": "欢迎回来。",
+      "description": "您的公民档案已是最新。Layak 将您当前的情况与 2026 年最新政府计划进行对比 —— STR、JKM Warga Emas、LHDN Form B 减免。大约需时 4 分钟。"
+    },
+    "activeApplications": {
+      "title": "活跃申请",
+      "viewAll": "查看全部",
+      "empty": "无",
+      "emptyDescription": "已提交的申请将在此处显示其发放状态。"
+    },
+    "recentActivity": {
+      "title": "近期活动",
+      "empty": "无",
+      "emptyDescription": "上传、评估和提交将在发生时实时显示在此处。"
+    },
+    "quota": {
+      "tierFree": "免费层级 · 24 小时",
+      "tierPro": "Pro · 无限量",
+      "usage": "{{used}} / {{limit}}",
+      "remaining": "剩余 {{remaining}} · {{time}} 后重置",
+      "exhausted": "配额将于 {{time}} 后重置",
+      "aria": "已使用 {{used}} / {{limit}} 次评估",
+      "checking": "正在检查配额…",
+      "unavailable": "配额状态不可用"
+    },
+    "breadcrumb": {
+      "dashboard": "仪表板",
+      "evaluation": "评估",
+      "upload": "上传",
+      "results": "结果",
+      "schemes": "计划",
+      "settings": "设置",
+      "signIn": "登录",
+      "signUp": "注册"
+    }
+  },
+  "evaluation": {
+    "sampleLoadError": "无法加载 Aisyah 示例：{{error}}",
+    "unknownError": "未知错误。",
+    "overview": {
+      "eyebrow": "我的评估",
+      "title": "您的资格概览。",
+      "description": "每次运行中识别到的终身减免总额，以及过往评估的分页历史记录。"
+    },
+    "results": {
+      "eyebrow": "评估完成",
+      "title": "根据您的文件，您符合多项减免计划的资格。",
+      "description": "每个数字都附有来源页面；每个申请包都是 DRAFT，由您亲自提交。",
+      "startAnother": "开始另一次评估",
+      "viewDetailed": "查看详细结果",
+      "backToEvaluations": "返回评估列表",
+      "loading": "正在加载评估…",
+      "notFoundTitle": "未找到评估",
+      "notFoundBody": "我们找不到此评估。它可能已被删除，或链接可能有误。",
+      "errorTitle": "无法加载评估",
+      "errorUnexpected": "发生意外错误。",
+      "retry": "重试",
+      "startNew": "开始新评估",
+      "failedTitle": "评估失败",
+      "backendReturned": "后端返回 {{status}} {{statusText}}",
+      "byIdEyebrow": "评估",
+      "byIdTitle": "您的资格评估结果。",
+      "byIdDescription": "从您保存的评估中加载。数字引用规则和来源页面；每个申请包都是 DRAFT，由您亲自提交。"
+    },
+    "intake": {
+      "aria": "录入方式",
+      "upload": "上传文件",
+      "manual": "手动输入"
+    },
+    "stepper": {
+      "aria": "流程进度",
+      "labels": {
+        "extract": "提取档案",
+        "extractManual": "档案已就绪",
+        "classify": "分类家庭",
+        "match": "匹配计划",
+        "compute_upside": "计算收益",
+        "generate": "生成草稿"
+      }
+    },
+    "upload": {
+      "sectionIc": "MyKad（身份证）",
+      "hintIc": "马来西亚身份证正面，清晰显示您的资料。",
+      "sectionPayslip": "工资单或收入证明",
+      "hintPayslip": "最近一个月（如有）；自雇人士可上传银行对账单或 LHDN 表格。",
+      "sectionUtility": "水电费账单",
+      "hintUtility": "水、电或宽带账单，用于地址验证 —— 最近三个月内。",
+      "errorFileSize": "文件为 {{size}} MB —— 上限为 10 MB。",
+      "errorFileType": "不支持的文件类型（{{type}}）。请上传图片或 PDF。",
+      "dropzonePrimary": "点击上传",
+      "dropzoneSecondary": "或拖放文件",
+      "dropzoneFormats": "JPG、PNG 或 PDF，最大 10MB",
+      "householdTitle": "家庭",
+      "householdHint": "文件不会列出您的受扶养人。请在此添加子女／父母／其他家庭成员，以便相关计划（JKM Warga Emas、LHDN 子女减免）能够出现。",
+      "useSamples": "使用 Aisyah 示例文件",
+      "loadingSamples": "正在加载示例…",
+      "continue": "继续评估",
+      "eyebrow": "步骤 · 上传",
+      "pageTitle": "上传文件。",
+      "pageDescription": "请提供以下文件以验证您在计划组合中的资格。请确保所有文字清晰可读 —— 代理将会提取、分类、匹配、排名并生成草拟申请包。"
+    },
+    "manual": {
+      "identityTitle": "身份",
+      "nameLabel": "全名",
+      "dobLabel": "出生日期",
+      "dobHelp": "直接输入数字即可 —— 我们会自动补上连字符。或使用日历图标。",
+      "dobPlaceholder": "YYYY-MM-DD",
+      "dobAria": "打开日期选择器",
+      "icLabel": "身份证末 4 位",
+      "icHelp": "我们只收集末 4 位 —— 您的完整 MyKad 绝不会离开您的设备。",
+      "incomeTitle": "收入",
+      "incomeLabel": "月收入（RM）",
+      "incomeHelp": "零工为净收入，受薪员工为基本工资。",
+      "employmentLabel": "就业类型",
+      "employmentGig": "自雇／零工",
+      "employmentGigHelp": "Grab、Foodpanda、自由职业 —— 申报 LHDN Form B。",
+      "employmentSalaried": "受薪员工",
+      "employmentSalariedHelp": "固定月薪 —— 申报 LHDN Form BE。",
+      "utilityTitle": "水电费账单",
+      "addressLabel": "家庭地址",
+      "costLabel": "每月电费（RM）",
+      "costHelp": "您最近 TNB 账单底部显示的 RM 金额。大多数人记得金额比记 kWh 容易。",
+      "costPlaceholder": "例如 95.40",
+      "kwhLabel": "每月用电量（kWh）",
+      "kwhHelp": "选填 —— 仅当您的账单列出「Jumlah Penggunaan」时。",
+      "kwhPlaceholder": "例如 220",
+      "householdTitle": "家庭",
+      "useAisyah": "使用 Aisyah 示例数据",
+      "clear": "清除",
+      "submit": "生成申请包",
+      "zodRequired": "必填",
+      "zodDateFormat": "请使用 YYYY-MM-DD",
+      "zodNotRealDate": "不是有效日期",
+      "zodYearMin": "年份必须是 1900 或之后",
+      "zodPastDate": "必须是过去的日期",
+      "zodIc4Digits": "4 位数字",
+      "zodCostFormat": "金额最高 RM100,000（例如 240 或 240.50）",
+      "zodKwhFormat": "最高 10,000 的整数"
+    },
+    "dependants": {
+      "description": "添加与您共同居住的所有其他成员。18 岁以下子女和 60 岁以上父母可解锁特定计划。家庭规模：{{size}}（您 + {{count}} 位{{plural}}）。",
+      "dependantSingular": "受扶养人",
+      "dependantPlural": "受扶养人",
+      "empty": "尚无受扶养人。点击「添加受扶养人」以列出每位家庭成员。",
+      "relationship": "关系",
+      "relationships": {
+        "child": "子女",
+        "parent": "父母",
+        "spouse": "配偶",
+        "sibling": "兄弟姐妹",
+        "other": "其他"
+      },
+      "age": "年龄",
+      "agePlaceholder": "年龄",
+      "icOptional": "身份证末 4 位（选填）",
+      "add": "添加受扶养人",
+      "removeAria": "移除受扶养人 {{index}}"
+    },
+    "demo": {
+      "title": "演示模式",
+      "description": "使用 Aisyah 运行 —— 一位合成的关丹 Grab 司机，有两名学龄子女和一位年长受扶养人。不涉及任何真实 MyKad。"
+    },
+    "error": {
+      "title": "流程错误",
+      "recoveryIntro": "流程中途出错。您可以使用合成的 Aisyah 文件运行完整流程 —— 有助于确认界面其余部分正常 —— 或使用新文件重新开始。",
+      "switchToManual": "切换到手动输入",
+      "trySamples": "使用示例文件尝试",
+      "startOver": "重新开始"
+    },
+    "upside": {
+      "label": "潜在减免总额",
+      "currency": "RM",
+      "empty": "运行您的第一次评估，查看您在联邦和州级计划中的年度潜在减免总额。",
+      "start": "开始评估",
+      "description": "涵盖 {{count}} 项{{schemeLabel}}及减免。基于您的收入档案和家庭状况。",
+      "schemeSingular": "计划",
+      "schemePlural": "计划",
+      "download": "下载所有草稿",
+      "downloadWithCount": "下载所有草稿（{{count}}）",
+      "downloadPending": "草稿待处理"
+    },
+    "schemeCard": {
+      "heading": "符合资格的计划",
+      "matchesSingular": "{{count}} 项匹配",
+      "matchesPlural": "{{count}} 项匹配",
+      "noMatches": "本次构建中未找到符合您档案的计划。",
+      "whyQualify": "为何您符合资格",
+      "whyIQualify": "我为何符合资格",
+      "estValue": "预估价值",
+      "startApp": "开始申请",
+      "categoryAssistance": "援助",
+      "perYearEst": "每年（预估）",
+      "openAgencyPortal": "打开 {{agency}} 门户",
+      "emptyList": "您首次评估完成后，计划匹配将在此显示。",
+      "eligibleSchemesCount": "符合资格的计划（{{count}}）"
+    },
+    "packet": {
+      "titleSingular": "草拟申请包（{{count}} 份文件）",
+      "titlePlural": "草拟申请包（{{count}} 份文件）",
+      "titleSchemeSingular": "草拟申请包（{{count}} 项计划）",
+      "titleSchemePlural": "草拟申请包（{{count}} 项计划）",
+      "description": "每页都带有「DRAFT — NOT SUBMITTED」水印。Layak 从不代您提交。请审阅每份 PDF，然后亲自通过机构的官方门户递交。",
+      "download": "下载 PDF",
+      "pending": "等待后端",
+      "scheme": "计划：{{id}}",
+      "downloadZip": "以 ZIP 下载所有草稿",
+      "generatingZip": "正在生成 ZIP…",
+      "placeholderNotice": "WeasyPrint 申请包生成器将在第 1 阶段任务 5（配对布线块）上线。在此之前将渲染申请包外壳，以便您看到下载按钮将位于何处。"
+    },
+    "codeExecution": {
+      "title": "Gemini Code Execution —— 收益计算",
+      "description": "代理运行 Python 以计算每项计划及年度总收益。代码片段和 stdout 按原样显示。",
+      "python": "Python",
+      "stdout": "stdout"
+    }
+  },
+  "schemes": {
+    "pageEyebrow": "计划库",
+    "pageTitle": "Layak 推理的每一项马来西亚计划。",
+    "pageDescription": "本次构建中已上线三项联邦计划。另有五项将在 v2 推出，届时我们会将每项的规则、门槛和申请表接入引擎。",
+    "stats": {
+      "inScope": "已纳入",
+      "coming": "v2 即将推出"
+    },
+    "sections": {
+      "inScopeTitle": "已纳入 · 本次构建",
+      "comingTitle": "v2 即将推出",
+      "comingCount": "{{count}} 项计划"
+    },
+    "howWePick": {
+      "title": "我们如何选择支持的计划",
+      "description": "Layak 优先支持具有公开文档门槛、开放申请门户和高实际收益的计划，面向中低收入马来西亚人。我们支持的每条规则都有可引用的来源 —— 可能是政府 PR 文件、宪报登记表格或计划小册子 —— 因此您评估中的每个 RM 数字都可追溯到特定页面。"
+    },
+    "notAffiliated": "与 LHDN、JKM、财政部或任何其他马来西亚政府机构均无关联。",
+    "labels": {
+      "cashTransfer": "现金转账",
+      "welfare": "福利",
+      "taxRelief": "税务减免",
+      "typicalUpside": "典型收益",
+      "upTo": "最高 RM",
+      "perYear": "/ 年",
+      "agencyPortal": "机构门户"
+    },
+    "str": {
+      "summary": "Sumbangan Tunai Rahmah —— 根据人均收入和家庭规模划分的家庭和个人层级。"
+    },
+    "jkm": {
+      "summary": "每月 RM 600 补助金，适用于低收入家庭中符合资格的年长受扶养人（60 岁以上）。"
+    },
+    "lhdn": {
+      "summary": "五项自雇减免：个人、配偶豁免、每名子女、医疗和生活方式。"
+    },
+    "coming": {
+      "iSaraanDesc": "自雇 EPF 对应缴款。",
+      "perkesoDesc": "自雇社会保障计划。",
+      "myKasihDesc": "无现金食品援助计划。",
+      "eKasihDesc": "国家贫困家庭登记册。",
+      "saraDesc": "替代税务减免途径。"
+    }
+  },
+  "settings": {
+    "eyebrow": "设置",
+    "title": "您的默认设置和偏好。",
+    "description": "大多数控件将在 v2 推出 —— 目前此页面为占位页面。",
+    "placeholderTitle": "设置 —— v2",
+    "placeholderDescription": "语言、默认档案值、数据保留和可访问性控件将位于此处。此页面是结构性占位，以便控件推出时路由已就绪。",
+    "upgrade": {
+      "title": "升级至 Layak Pro",
+      "descriptionDefault": "升级以取消免费层级上限，并永久保留您的评估历史。",
+      "descriptionRateLimit": "您已达到免费层级每 {{hours}} 小时 {{limit}} 次评估的上限。Pro 取消上限并永久保留历史。",
+      "feature1": "无限评估 —— 无滚动上限。",
+      "feature2": "历史永久保留（免费层级 30 天后自动清除）。",
+      "feature3": "优先体验新计划。",
+      "resetInfo": "免费配额将于 {{time}} 重置。",
+      "successTitle": "您已加入候补名单。",
+      "successMessage": "Layak Pro 可用时我们将通过电子邮件通知 <strong>{{email}}</strong>。",
+      "emailFallback": "您",
+      "joinWaitlist": "加入候补名单",
+      "joining": "正在添加…"
+    }
+  }
+}

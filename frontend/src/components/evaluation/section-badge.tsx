@@ -1,3 +1,7 @@
+'use client'
+
+import { useTranslation } from 'react-i18next'
+
 import { cn } from '@/lib/utils'
 
 type Props = {
@@ -11,6 +15,7 @@ type Props = {
  * visually identical.
  */
 export function SectionBadge({ required, className }: Props) {
+  const { t } = useTranslation()
   return required ? (
     <span
       className={cn(
@@ -18,7 +23,7 @@ export function SectionBadge({ required, className }: Props) {
         className
       )}
     >
-      Required
+      {t('common.sectionBadge.required')}
     </span>
   ) : (
     <span
@@ -27,7 +32,7 @@ export function SectionBadge({ required, className }: Props) {
         className
       )}
     >
-      Optional
+      {t('common.sectionBadge.optional')}
     </span>
   )
 }

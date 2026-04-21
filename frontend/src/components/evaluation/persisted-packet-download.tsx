@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { AlertTriangle, Download, Loader2, ShieldCheck } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
@@ -27,6 +28,7 @@ function getBackendUrl(): string {
  * a download trigger.
  */
 export function PersistedPacketDownload({ evalId, matches }: Props) {
+  const { t } = useTranslation()
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
@@ -42,7 +44,7 @@ export function PersistedPacketDownload({ evalId, matches }: Props) {
         method: 'GET'
       })
       if (!res.ok) {
-        throw new Error(`Backend returned ${res.status} ${res.statusText}`)
+        throw new Error(t('evaluation.results.backendReturned', { status: res.status, statusText: res.statusText }))
       }
       const blob = await res.blob()
       triggerDownload(blob, `layak-packet-${evalId}.zip`)
@@ -58,11 +60,12 @@ export function PersistedPacketDownload({ evalId, matches }: Props) {
       <CardHeader>
         <CardTitle className="flex items-center gap-2 text-sm">
           <ShieldCheck className="size-4 text-primary" aria-hidden />
-          Draft application packet ({qualifyingCount} {qualifyingCount === 1 ? 'scheme' : 'schemes'})
+          {qualifyingCount === 1
+            ? t('evaluation.packet.titleSchemeSingular', { count: qualifyingCount })
+            : t('evaluation.packet.titleSchemePlural', { count: qualifyingCount })}
         </CardTitle>
         <CardDescription>
-          Every page carries a &ldquo;DRAFT — NOT SUBMITTED&rdquo; watermark. Layak never submits on your behalf.
-          Review each PDF, then lodge it yourself via the agency&rsquo;s official portal.
+          {t('evaluation.packet.description')}
         </CardDescription>
       </CardHeader>
       <CardContent className="flex flex-col gap-3">
@@ -70,12 +73,12 @@ export function PersistedPacketDownload({ evalId, matches }: Props) {
           {busy ? (
             <>
               <Loader2 className="mr-1.5 size-4 animate-spin" aria-hidden />
-              Generating ZIP…
+              {t('evaluation.packet.generatingZip')}
             </>
           ) : (
             <>
               <Download className="mr-1.5 size-4" aria-hidden />
-              Download all drafts as ZIP
+              {t('evaluation.packet.downloadZip')}
             </>
           )}
         </Button>

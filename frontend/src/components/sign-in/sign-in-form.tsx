@@ -4,6 +4,7 @@ import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import { ArrowRight, Loader2 } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 
 import { GoogleIcon } from '@/components/auth/google-icon'
 import { Button } from '@/components/ui/button'
@@ -12,6 +13,7 @@ import { useAuth } from '@/lib/auth-context'
 import { signInWithGoogle } from '@/lib/firebase'
 
 export function SignInForm() {
+  const { t } = useTranslation()
   const router = useRouter()
   const { user, loading } = useAuth()
   const [pending, setPending] = useState(false)
@@ -31,15 +33,15 @@ export function SignInForm() {
       router.replace('/dashboard')
     } catch (err) {
       setPending(false)
-      setError(err instanceof Error ? err.message : 'Sign-in failed. Please try again.')
+      setError(err instanceof Error ? err.message : t('auth.signIn.errorFailed'))
     }
   }
 
   return (
     <Card className="w-full max-w-sm">
       <CardHeader className="text-center">
-        <CardTitle className="font-heading text-2xl">Welcome back</CardTitle>
-        <CardDescription>Continue with your Google account to reach your dashboard.</CardDescription>
+        <CardTitle className="font-heading text-2xl">{t('auth.signIn.title')}</CardTitle>
+        <CardDescription>{t('auth.signIn.description')}</CardDescription>
       </CardHeader>
       <CardContent className="flex flex-col gap-5">
         <Button
@@ -54,7 +56,7 @@ export function SignInForm() {
           ) : (
             <GoogleIcon className="mr-1.5 size-4" />
           )}
-          Continue with Google
+          {t('common.button.continueWithGoogle')}
           <ArrowRight className="ml-1.5 size-4" aria-hidden />
         </Button>
         {error && (
@@ -63,9 +65,9 @@ export function SignInForm() {
           </p>
         )}
         <p className="text-center text-xs text-muted-foreground">
-          No account?{' '}
+          {t('auth.signIn.noAccountPrefix')}{' '}
           <Link href="/sign-up" className="text-primary underline underline-offset-2">
-            Sign up
+            {t('auth.signIn.noAccountCta')}
           </Link>
         </p>
       </CardContent>

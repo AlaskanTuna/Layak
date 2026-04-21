@@ -71,7 +71,7 @@ export function DashboardDataSection() {
         aria-live="polite"
       >
         <Loader2 className="size-4 animate-spin" aria-hidden />
-        {t('dashboard.loading')}
+        {t('dashboard.loading', { defaultValue: 'Loading your dashboard...' })}
       </div>
     )
   }
@@ -92,7 +92,7 @@ export function DashboardDataSection() {
                 void fetchHistory()
               }}
             >
-              {t('common.button.retry')}
+              {t('common.button.retry', { defaultValue: 'Retry' })}
             </Button>
           </div>
         </AlertDescription>

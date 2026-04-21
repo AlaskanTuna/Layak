@@ -1,4 +1,4 @@
-import { Hexagon } from 'lucide-react'
+import Image from 'next/image'
 
 import { cn } from '@/lib/utils'
 
@@ -8,17 +8,23 @@ type Props = {
 }
 
 export function BrandMark({ className, size = 'md' }: Props) {
-  const box = size === 'sm' ? 'size-7' : 'size-8'
-  const icon = size === 'sm' ? 'size-3.5' : 'size-4'
+  const box = size === 'sm' ? 'size-7 rounded-2xl' : 'size-9 rounded-[1.35rem]'
+
   return (
     <div
       className={cn(
-        'flex shrink-0 items-center justify-center rounded-md bg-primary text-primary-foreground',
+        'relative flex shrink-0 items-center justify-center overflow-hidden ring-1 ring-foreground/10 shadow-[0_12px_24px_color-mix(in_oklch,var(--primary)_20%,transparent)]',
         box,
         className
       )}
     >
-      <Hexagon className={icon} fill="currentColor" aria-hidden />
+      <Image
+        src="/brand/layak-logo-mark.png"
+        alt=""
+        fill
+        sizes={size === 'sm' ? '28px' : '36px'}
+        className="object-cover"
+      />
     </div>
   )
 }

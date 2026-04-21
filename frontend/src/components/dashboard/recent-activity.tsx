@@ -27,59 +27,57 @@ type Props = {
 }
 
 function relativeTime(value: string | null, t: (k: string, opts?: Record<string, unknown>) => string): string {
-  if (!value) return '—'
+  if (!value) return '-'
   const date = new Date(value)
-  if (Number.isNaN(date.getTime())) return '—'
+  if (Number.isNaN(date.getTime())) return '-'
   const diffMs = Date.now() - date.getTime()
   const diffMin = Math.floor(diffMs / 60_000)
-  if (diffMin < 1) return t('dashboard.recentActivity.justNow')
-  if (diffMin < 60) return t('dashboard.recentActivity.minutesAgo', { count: diffMin })
+  if (diffMin < 1) return t('dashboard.recentActivity.justNow', { defaultValue: 'Just now' })
+  if (diffMin < 60) return t('dashboard.recentActivity.minutesAgo', { count: diffMin, defaultValue: `${diffMin} min ago` })
   const diffHr = Math.floor(diffMin / 60)
-  if (diffHr < 24) return t('dashboard.recentActivity.hoursAgo', { count: diffHr })
+  if (diffHr < 24) return t('dashboard.recentActivity.hoursAgo', { count: diffHr, defaultValue: `${diffHr} h ago` })
   const diffDay = Math.floor(diffHr / 24)
-  return t('dashboard.recentActivity.daysAgo', { count: diffDay })
+  return t('dashboard.recentActivity.daysAgo', { count: diffDay, defaultValue: `${diffDay} d ago` })
 }
 
-/**
- * Compact timeline of the last N evaluations across every status. Status
- * dot + label + relative time + RM (when complete) + chevron link to the
- * persisted results page. Empty state when no evaluations exist; "View all"
- * footer link only renders when there's something to navigate to.
- */
 export function RecentActivity({ items }: Props) {
   const { t } = useTranslation()
   const slice = useMemo(() => items.slice(0, TIMELINE_LIMIT), [items])
 
   return (
     <section className="flex flex-col gap-4">
-      <h2 className="font-heading text-xl font-semibold tracking-tight">
-        {t('dashboard.recentActivity.title')}
-      </h2>
+      <h2 className="font-heading text-xl font-semibold tracking-tight">{t('dashboard.recentActivity.title')}</h2>
 
       {slice.length === 0 ? (
-        <div className="flex flex-col items-center gap-3 rounded-lg border border-dashed border-border bg-card/40 px-6 py-10 text-center">
-          <div className="flex size-10 items-center justify-center rounded-md bg-muted text-muted-foreground">
+        <div className="section-shell flex flex-col items-center gap-4 rounded-[1.5rem] px-6 py-8 text-center">
+          <div className="flex size-11 items-center justify-center rounded-2xl bg-primary/10 text-primary">
             <Clock className="size-5" aria-hidden />
           </div>
-          <p className="text-[11px] uppercase tracking-[0.18em] text-muted-foreground">
-            {t('dashboard.recentActivity.empty')}
+          <p className="text-[11px] uppercase tracking-[0.18em] text-primary">Timeline</p>
+          <p className="font-heading text-2xl font-semibold tracking-tight text-foreground">
+            Activity will appear here after your first run.
           </p>
-          <p className="max-w-xs text-xs leading-relaxed text-muted-foreground">
+          <p className="max-w-sm text-sm leading-7 text-muted-foreground">
             {t('dashboard.recentActivity.emptyDescription')}
           </p>
+          <Link
+            href="/dashboard/evaluation/upload"
+            className="text-sm font-medium text-primary transition-colors hover:text-primary/80"
+          >
+            Start with a sample-friendly upload
+            <ArrowRight className="ml-1 inline size-3.5" aria-hidden />
+          </Link>
         </div>
       ) : (
         <>
-          <Card className="gap-0 py-0">
+          <Card className="gap-0 border border-border/70 bg-background/78 py-0 shadow-sm">
             <ul>
               {slice.map((item, index) => {
                 const status = item.status as EvaluationStatus
                 const isLast = index === slice.length - 1
+
                 return (
-                  <li
-                    key={item.id}
-                    className={cn('border-border', !isLast && 'border-b')}
-                  >
+                  <li key={item.id} className={cn('border-border', !isLast && 'border-b')}>
                     <Link
                       href={`/dashboard/evaluation/results/${item.id}`}
                       className="flex items-center gap-3 px-4 py-3 transition-colors hover:bg-muted/30"
@@ -91,20 +89,16 @@ export function RecentActivity({ items }: Props) {
                       <div className="flex min-w-0 flex-1 flex-col">
                         <p className="truncate text-sm font-medium">
                           {t(`dashboard.recentActivity.label.${status}`, {
-                            defaultValue: t('dashboard.recentActivity.label.complete')
+                            defaultValue:
+                              status === 'running' ? 'Evaluation in progress' : status === 'error' ? 'Evaluation failed' : 'Evaluation complete'
                           })}
                         </p>
                         <p className="text-xs text-muted-foreground">
                           {relativeTime(item.createdAt, t)}
-                          {item.status === 'complete' && (
-                            <> · RM {RM.format(item.totalAnnualRM)}</>
-                          )}
+                          {item.status === 'complete' && <> • RM {RM.format(item.totalAnnualRM)}</>}
                         </p>
                       </div>
-                      <ArrowRight
-                        className="size-3.5 shrink-0 text-muted-foreground"
-                        aria-hidden
-                      />
+                      <ArrowRight className="size-3.5 shrink-0 text-muted-foreground" aria-hidden />
                     </Link>
                   </li>
                 )
@@ -115,7 +109,7 @@ export function RecentActivity({ items }: Props) {
             href="/dashboard/evaluation"
             className="self-end text-xs text-muted-foreground transition-colors hover:text-foreground"
           >
-            {t('dashboard.recentActivity.viewAll')}
+            {t('dashboard.recentActivity.viewAll', { defaultValue: 'View all' })}
             <ArrowRight className="ml-1 inline size-3" aria-hidden />
           </Link>
         </>

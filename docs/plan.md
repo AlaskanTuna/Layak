@@ -685,9 +685,9 @@ _Frontend:_
 
 **Implementation — PO1 (Hao):**
 
-- [ ] Store `firebase-admin-key` in Secret Manager and mount it as `FIREBASE_ADMIN_KEY` for the backend.
-- [ ] Deploy the backend with `adk deploy cloud_run --with_ui --region asia-southeast1 --min-instances 1 --cpu-boost --set-secrets GEMINI_API_KEY=gemini-api-key:latest --set-secrets FIREBASE_ADMIN_KEY=firebase-admin-key:latest`.
-- [ ] Deploy the frontend with `gcloud run deploy layak-frontend --source . --region asia-southeast1 --min-instances 1 --cpu-boost --allow-unauthenticated --set-env-vars NEXT_PUBLIC_API_URL=<backend-url>`.
+- [x] Store `firebase-admin-key` in Secret Manager and mount it as `FIREBASE_ADMIN_KEY` for the backend. _(PO2 landed on PO1's behalf during the Phase 2 Task 2 deploy. Secret `firebase-admin-key` created 21/04 with v1 minted under `umask 077`; Compute SA holds `roles/secretmanager.secretAccessor` on it. Live `layak-backend` revision confirms the env block carries `FIREBASE_ADMIN_KEY` resolved from `secretKeyRef{name:firebase-admin-key, key:latest}`.)_
+- [x] Deploy the backend with warm instances + the Firebase admin secret mounted. _(Original `adk deploy cloud_run` command obsoleted — production now ships through `.github/workflows/cloud-run-deploy.yml` (Workload Identity Federation, no long-lived keys). Backend job runs `gcloud run deploy layak-backend --source backend --min-instances 1 --cpu-boost --set-env-vars GOOGLE_CLOUD_PROJECT=...,GOOGLE_CLOUD_LOCATION=... --set-secrets FIREBASE_ADMIN_KEY=firebase-admin-key:latest`. The original `--set-secrets GEMINI_API_KEY=...` line is intentionally absent — Phase 6 Task 6 cut Gemini access over to Vertex AI ADC and that secret was deleted from Secret Manager. Live revision metadata confirms `minScale=1`, `startup-cpu-boost=true`, `cpu=1000m`, `memory=1Gi`.)_
+- [x] Deploy the frontend with warm instances on the same workflow. _(Same `cloud-run-deploy.yml` frontend job runs `gcloud run deploy layak-frontend --source frontend --min-instances 1 --cpu-boost --allow-unauthenticated --set-build-env-vars NEXT_PUBLIC_BACKEND_URL=...,NEXT_PUBLIC_FIREBASE__=...`. Build-env (not runtime env) is correct for Next.js — `NEXT*PUBLIC*_`is baked into the static bundle at`pnpm build`. Live `layak-frontend`revision confirms`minScale=1`+`startup-cpu-boost=true`.)\_
 
 **Exit criteria:** both Cloud Run services are deployed with warm-instance settings and the backend can read the Firebase admin key from Secret Manager.
 

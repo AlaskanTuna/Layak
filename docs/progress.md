@@ -4,6 +4,22 @@
 
 ---
 
+## [22/04/26] - Phase 4 Tasks 1+2 PO2: history table + aggregate stats cards on the dashboard summary
+
+PO2 landed the persistent dashboard the SaaS pivot has been pointing at — the `/dashboard/evaluation` summary now leads with three aggregate stat cards (Total evaluations, Lifetime RM identified, Successful runs) above a paginated history table that deep-links every row into `/dashboard/evaluation/results/[id]`. The transient SSE upside hero that used to render here was retired; live in-flight state already lives at `/dashboard/evaluation/upload` and on the persisted results route.
+
+`frontend/src/components/history/evaluation-history-section.tsx` (new) owns a single `GET /api/evaluations?limit=50` round trip on mount, then drives both children from one `EvaluationListItem[]`. Loading and error states render dedicated UI (spinner with `role="status" aria-live="polite"`; destructive Alert with a Retry button). The `react-hooks/set-state-in-effect` lint trips on the async-fetch call graph but the setState lands AFTER the await — silenced inline matching the pattern already in `quota-meter.tsx` and `evaluation-results-by-id-client.tsx`.
+
+`frontend/src/components/history/evaluation-history-table.tsx` (new) renders a compact table with status pill (`approved` / `processing` / `rejected` tones mapped from `complete` / `running` / `error`), a relative-time `Started` column ("Just now" → "N min ago" → "N h ago" → "N d ago" → absolute `dd MMM yyyy` for older), `tabular-nums` annual relief in MYR via `Intl.NumberFormat('en-MY')`, and a per-row View button rendered through a `Link` to the persisted results route. Pagination is client-side at 20 per page with Prev/Next controls hidden when only one page exists; the backend's slim list cap of 50 rows is comfortably above what a free user can accumulate (5 evals × 24h × 10d = 50 days of saturated usage). Empty state replaces the table entirely with a centred Card carrying the "Start your first evaluation" CTA.
+
+`frontend/src/components/history/aggregate-stats-cards.tsx` (new) folds the same `EvaluationListItem[]` once in a `useMemo` — only `status === 'complete'` rows contribute to the lifetime RM sum, and "Successful runs" stands in for the spec's "Unique schemes qualified" because the slim list endpoint omits per-eval scheme arrays (surfacing scheme IDs would need a backend list-shape extension owned by PO1's contract). Three-card grid stacks single-column on mobile, three-column from `sm:`, using the existing `Card` primitive plus the same eyebrow-label / tabular-numbers styling that the `QuotaMeter` strip in the page heading already establishes.
+
+`frontend/src/app/pages/evaluation/evaluation-overview-page.tsx` swapped its inline `EvaluationOverviewClient` import for `EvaluationHistorySection`; the orphaned `frontend/src/components/evaluation/evaluation-overview-client.tsx` was deleted (the SaaS pivot's persisted-results route at `/dashboard/evaluation/results/[id]` already covers what the inline view used to show, and CLAUDE.md's "no backwards-compatibility shims" rule applies). `frontend/src/app/(app)/dashboard/evaluation/page.tsx` is unchanged — it still re-exports the overview page wrapper.
+
+Frontend `pnpm lint` clean; `pnpm build` green (13 routes, all prerendered as static or dynamic per their existing config — no new SSR surface introduced).
+
+---
+
 ## [22/04/26] - Phase 6 Task 6 PO2: backend gemini surface cut over from AI Studio API key to Vertex AI
 
 AI Studio kept silently demoting the project from Tier 1 to Free tier even with billing active, and Free tier caps Gemini 2.5 Flash at 20 RPD. That was enough to blow up every demo run; today's live smoke hit 22/20 and the classify step returned `429 RESOURCE_EXHAUSTED`.

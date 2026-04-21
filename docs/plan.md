@@ -531,9 +531,9 @@ _Frontend:_
 
 **Implementation — PO2 (Adam):**
 
-- [ ] Add `frontend/src/components/history/evaluation-history-table.tsx` with 20-per-page pagination and row links to `/dashboard/evaluation/results/[id]`.
-- [ ] Wire the summary page in `frontend/src/app/(app)/dashboard/evaluation/page.tsx` to the table and its empty state.
-- [ ] Keep the empty state explicit: no history yet, with a CTA back to the upload route.
+- [x] Add `frontend/src/components/history/evaluation-history-table.tsx` with 20-per-page pagination and row links to `/dashboard/evaluation/results/[id]`. _(Pure presentational component; status/date/RM columns plus per-row View link. Pagination is client-side over the slim list rows the backend already caps at 50; cursor pagination via `nextPageToken` stays reserved until a free user crosses 5×10 days of saturated usage.)_
+- [x] Wire the summary page in `frontend/src/app/(app)/dashboard/evaluation/page.tsx` to the table and its empty state. _(New `frontend/src/components/history/evaluation-history-section.tsx` owns the single `GET /api/evaluations?limit=50` fetch and feeds both the AggregateStatsCards and the table. The page route re-export remains a thin wrapper.)_
+- [x] Keep the empty state explicit: no history yet, with a CTA back to the upload route. _(Empty case renders a centred Card with copy + a "Start your first evaluation" button rendered via Link to `/dashboard/evaluation/upload`.)_
 
 **Exit criteria:** the history page paginates, deep-links to results, and shows a clear empty state.
 
@@ -545,9 +545,9 @@ _Frontend:_
 
 **Implementation — PO2 (Adam):**
 
-- [ ] Add `frontend/src/components/history/aggregate-stats-cards.tsx` above the history table.
-- [ ] Derive the metrics from the Firestore-backed evaluation data already returned by the history query.
-- [ ] Keep the cards responsive and consistent with the dashboard shell.
+- [x] Add `frontend/src/components/history/aggregate-stats-cards.tsx` above the history table. _(Three-card grid: Total evaluations, Lifetime RM identified, Successful runs. Sits inside `EvaluationHistorySection` so both children consume the same fetch.)_
+- [x] Derive the metrics from the Firestore-backed evaluation data already returned by the history query. _(Folds the `EvaluationListItem[]` once in a `useMemo`. "Unique schemes qualified" was substituted with "Successful runs" because the slim list endpoint omits per-eval scheme arrays — surfacing scheme IDs cleanly would need a backend list-shape extension owned by PO1's contract.)_
+- [x] Keep the cards responsive and consistent with the dashboard shell. _(Stacks single-column on mobile, three-column from `sm:`; uses the existing `Card` primitive with eyebrow label + tabular-nums value styling that matches the QuotaMeter strip above.)_
 
 **Exit criteria:** the dashboard summary shows the three aggregate stats from persisted data.
 

@@ -1,4 +1,4 @@
-import { EvaluationOverviewClient } from '@/components/evaluation/evaluation-overview-client'
+import { EvaluationHistorySection } from '@/components/history/evaluation-history-section'
 import { PageHeading } from '@/components/layout/page-heading'
 import { QuotaMeter } from '@/components/dashboard/quota-meter'
 
@@ -8,13 +8,13 @@ export function EvaluationOverviewPage() {
       <PageHeading
         eyebrow="My evaluations"
         title="Your eligibility at a glance."
-        description="We process your documents and calculate eligibility across federal and state schemes based on your income profile and household status."
+        description="Lifetime relief identified across every run, plus a paginated history of past evaluations."
       >
         <div className="mt-2">
           <QuotaMeter />
         </div>
       </PageHeading>
-      <EvaluationOverviewClient />
+      <EvaluationHistorySection />
     </div>
   )
 }

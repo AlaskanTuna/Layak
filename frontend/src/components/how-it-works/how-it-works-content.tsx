@@ -1,7 +1,5 @@
-import Link from 'next/link'
 import {
   AlertTriangle,
-  ArrowRight,
   BookOpen,
   Calculator,
   FileSearch,
@@ -13,8 +11,6 @@ import {
   Sparkles,
   Timer
 } from 'lucide-react'
-
-import { Button } from '@/components/ui/button'
 
 type PipelineStep = {
   step: string
@@ -50,8 +46,8 @@ const PIPELINE: PipelineStep[] = [
     step: '04',
     title: 'Compute',
     icon: Calculator,
-    body: 'The agent runs live arithmetic on-stage, summing your annual upside across every qualifying scheme. Results stream to the UI so you see the full working, not just a final number.',
-    tools: ['On-stage arithmetic', 'Python']
+    body: 'Gemini writes a Python snippet and runs it in Google’s code sandbox to sum your annual upside across every qualifying scheme. The generated code and its output stream live to the UI, so you see the full working — not just a final number.',
+    tools: ['Gemini Code Execution', 'Python']
   },
   {
     step: '05',
@@ -80,8 +76,8 @@ const STACK: StackTool[] = [
     icon: BookOpen
   },
   {
-    name: 'On-stage arithmetic',
-    role: 'Live Python computation that streams totals and working to the UI — transparent upside math you can verify, not a black-box number.',
+    name: 'Gemini Code Execution',
+    role: 'Gemini writes and runs a Python snippet in Google’s sandbox to compute your annual upside. Both the generated source and its stdout stream to the UI — verifiable math, not a black box.',
     icon: Calculator
   },
   {
@@ -238,23 +234,6 @@ function FinePrint() {
   )
 }
 
-function StartCta() {
-  return (
-    <section className="flex flex-col items-start gap-3 rounded-xl border border-primary/20 bg-gradient-to-br from-primary/8 via-primary/3 to-transparent p-6 sm:flex-row sm:items-center sm:justify-between sm:p-8">
-      <div className="flex flex-col gap-1">
-        <h2 className="font-heading text-xl font-semibold tracking-tight">Ready to see what you qualify for?</h2>
-        <p className="text-sm text-muted-foreground">
-          Three uploads, a ranked list, three draft packets. Takes under a minute.
-        </p>
-      </div>
-      <Button render={<Link href="/dashboard/evaluation/upload" />} size="lg">
-        Start evaluation
-        <ArrowRight className="ml-1.5 size-4" aria-hidden />
-      </Button>
-    </section>
-  )
-}
-
 export function HowItWorksContent() {
   return (
     <div className="flex flex-col gap-8">
@@ -262,7 +241,6 @@ export function HowItWorksContent() {
       <PipelineTimeline />
       <AgentStack />
       <FinePrint />
-      <StartCta />
     </div>
   )
 }

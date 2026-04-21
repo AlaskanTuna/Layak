@@ -58,6 +58,7 @@ export function Sidebar({ mobileOpen, onMobileClose }: SidebarProps) {
             const Icon = item.icon
             const active = pathname === item.href
             const label = t(item.labelKey)
+
             return (
               <Link
                 key={item.labelKey}
@@ -144,6 +145,7 @@ export function Sidebar({ mobileOpen, onMobileClose }: SidebarProps) {
 
 export function MobileMenuButton({ onClick }: { onClick: () => void }) {
   const { t } = useTranslation()
+
   return (
     <Button
       type="button"

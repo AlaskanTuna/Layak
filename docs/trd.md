@@ -105,7 +105,7 @@ Layak v2 keeps the v1 stateless agent pipeline unchanged. The new layer adds Fir
                   │  source of truth; no GCS)      │
                   └────────────────────────────────┘
 
- GCP Secret Manager ── injects GEMINI_API_KEY ──► FastAPI Cloud Run service
+ GCP Secret Manager ── injects firebase-admin-key; Cloud Run service account provides Vertex AI ADC ──► FastAPI Cloud Run service
 ```
 
 ### 2.2 Agent internal tool-call flow
@@ -178,26 +178,26 @@ Cloud Scheduler (daily 02:00 MYT) ─────────► Cloud Run Job (
 
 ## 3. Component Responsibilities
 
-| Component         | Responsibility                                                                       | Tech                                                                                        | Notes                                                                                       |
-| ----------------- | ------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------- |
-| Frontend          | Upload widget, SSE consumer, ranked results, provenance panel, draft-packet download | Next.js 16.2 App Router, React 19, Tailwind 4, shadcn/ui, Lucide, ESLint 9 (flat config)    | Deployed to Cloud Run. English UI only (v1). Next.js 16 forces `--webpack` (see Plan B/§8). |
-| Backend API       | Single SSE endpoint hosting the agent pipeline                                       | FastAPI 0.115+, Python 3.12, async                                                          | `POST /api/agent/intake` accepts 3 multipart files.                                         |
-| RootAgent         | Five-step pipeline orchestrator                                                      | ADK-Python v1.31 GA, `SequentialAgent`, Gemini 2.5 Pro                                      | Five `FunctionTool`s bound at init.                                                         |
-| Extractor Worker  | IC / payslip / utility → Pydantic `Profile`                                          | Gemini 2.5 Flash (multimodal)                                                               | Strict JSON schema; no free text.                                                           |
-| Classifier Worker | Household flags, age flags, income band                                              | Gemini 2.5 Flash (structured output)                                                        | Deterministic schema.                                                                       |
-| Rule Engine       | STR tier, Warga Emas means test, 5 LHDN reliefs                                      | Pydantic v2 models, Python                                                                  | Hardcoded thresholds; sourced from cached PDFs.                                             |
-| RAG (primary)     | Grounded retrieval over 3 scheme PDFs                                                | Vertex AI Search data store, FunctionTool wrapper                                           | Each hit returns passage + URL for provenance.                                              |
-| RAG (Plan B)      | Inline PDFs in 1M context                                                            | Gemini 2.5 Pro context window                                                               | Collapse trigger: Vertex AI Search setup stall past sprint hour 12.                         |
-| Arithmetic        | Annual RM upside per scheme + total                                                  | Gemini Code Execution (`tools: [{codeExecution: {}}]`)                                      | 30-second sandbox; on-stage Python visible in SSE.                                          |
-| PDF Generator     | Three draft application PDFs                                                         | WeasyPrint 62+, HTML+CSS templates                                                          | Cloud Run container needs libpango, libcairo, libgdk-pixbuf.                                |
-| Secrets           | `GEMINI_API_KEY`                                                                     | GCP Secret Manager                                                                          | Injected via `--set-secrets=GEMINI_API_KEY=gemini-api-key:latest`.                          |
-| Deploy            | Frontend + backend                                                                   | Cloud Run `--min-instances=1 --cpu-boost`                                                   | Warm 1 hour before demo slot.                                                               |
-| Scheme corpus     | Three source PDFs                                                                    | Git-versioned at `backend/data/schemes/`                                                    | Repo is the bucket; no GCS in v1.                                                           |
-| Seed script       | Index scheme PDFs into Vertex AI Search                                              | `backend/scripts/seed_vertex_ai_search.py` (exact path subject to backend-layout decisions) | One-time run; idempotent; checked into CI.                                                  |
-| Firebase Auth     | Google OAuth sign-in, ID-token issuance, IndexedDB token storage, client bootstrap   | Firebase Auth (Google OAuth only)                                                           | `Continue with Google`, `pdpaConsentAt` gate, fetch wrapper.                                |
-| Firestore         | Session + archive layer for users, evaluations, and waitlist                         | Firestore (`asia-southeast1`)                                                               | Flat collections, owner-gated reads, backend-only writes.                                   |
-| Cloud Scheduler   | Triggers nightly 30-day free-tier prune at 02:00 MYT                                 | Cloud Scheduler                                                                             | Schedules the Cloud Run Job once per day.                                                   |
-| Cloud Run Job     | Deletes stale free-tier evaluations older than 30 days                               | Cloud Run Job                                                                               | `backend/scripts/prune_free_tier.py`.                                                       |
+| Component         | Responsibility                                                                       | Tech                                                                                        | Notes                                                                                                                              |
+| ----------------- | ------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------- |
+| Frontend          | Upload widget, SSE consumer, ranked results, provenance panel, draft-packet download | Next.js 16.2 App Router, React 19, Tailwind 4, shadcn/ui, Lucide, ESLint 9 (flat config)    | Deployed to Cloud Run. English UI only (v1). Next.js 16 forces `--webpack` (see Plan B/§8).                                        |
+| Backend API       | Single SSE endpoint hosting the agent pipeline                                       | FastAPI 0.115+, Python 3.12, async                                                          | `POST /api/agent/intake` accepts 3 multipart files.                                                                                |
+| RootAgent         | Five-step pipeline orchestrator                                                      | ADK-Python v1.31 GA, `SequentialAgent`, Gemini 2.5 Pro                                      | Five `FunctionTool`s bound at init.                                                                                                |
+| Extractor Worker  | IC / payslip / utility → Pydantic `Profile`                                          | Gemini 2.5 Flash (multimodal)                                                               | Strict JSON schema; no free text.                                                                                                  |
+| Classifier Worker | Household flags, age flags, income band                                              | Gemini 2.5 Flash (structured output)                                                        | Deterministic schema.                                                                                                              |
+| Rule Engine       | STR tier, Warga Emas means test, 5 LHDN reliefs                                      | Pydantic v2 models, Python                                                                  | Hardcoded thresholds; sourced from cached PDFs.                                                                                    |
+| RAG (primary)     | Grounded retrieval over 3 scheme PDFs                                                | Vertex AI Search data store, FunctionTool wrapper                                           | Each hit returns passage + URL for provenance.                                                                                     |
+| RAG (Plan B)      | Inline PDFs in 1M context                                                            | Gemini 2.5 Pro context window                                                               | Collapse trigger: Vertex AI Search setup stall past sprint hour 12.                                                                |
+| Arithmetic        | Annual RM upside per scheme + total                                                  | Gemini Code Execution (`tools: [{codeExecution: {}}]`)                                      | 30-second sandbox; on-stage Python visible in SSE.                                                                                 |
+| PDF Generator     | Three draft application PDFs                                                         | WeasyPrint 62+, HTML+CSS templates                                                          | Cloud Run container needs libpango, libcairo, libgdk-pixbuf.                                                                       |
+| Secrets           | `GOOGLE_CLOUD_PROJECT`, `GOOGLE_CLOUD_LOCATION`                                      | Cloud Run env vars + ADC                                                                    | Injected via `--set-env-vars=GOOGLE_CLOUD_PROJECT=...,GOOGLE_CLOUD_LOCATION=...`; Gemini auth rides the Cloud Run service account. |
+| Deploy            | Frontend + backend                                                                   | Cloud Run `--min-instances=1 --cpu-boost`                                                   | Warm 1 hour before demo slot.                                                                                                      |
+| Scheme corpus     | Three source PDFs                                                                    | Git-versioned at `backend/data/schemes/`                                                    | Repo is the bucket; no GCS in v1.                                                                                                  |
+| Seed script       | Index scheme PDFs into Vertex AI Search                                              | `backend/scripts/seed_vertex_ai_search.py` (exact path subject to backend-layout decisions) | One-time run; idempotent; checked into CI.                                                                                         |
+| Firebase Auth     | Google OAuth sign-in, ID-token issuance, IndexedDB token storage, client bootstrap   | Firebase Auth (Google OAuth only)                                                           | `Continue with Google`, `pdpaConsentAt` gate, fetch wrapper.                                                                       |
+| Firestore         | Session + archive layer for users, evaluations, and waitlist                         | Firestore (`asia-southeast1`)                                                               | Flat collections, owner-gated reads, backend-only writes.                                                                          |
+| Cloud Scheduler   | Triggers nightly 30-day free-tier prune at 02:00 MYT                                 | Cloud Scheduler                                                                             | Schedules the Cloud Run Job once per day.                                                                                          |
+| Cloud Run Job     | Deletes stale free-tier evaluations older than 30 days                               | Cloud Run Job                                                                               | `backend/scripts/prune_free_tier.py`.                                                                                              |
 
 ## 4. Data Flow
 
@@ -252,6 +252,8 @@ Privacy-first alternative to §4 for users unwilling to upload the documents the
 | On-stage arithmetic            | Gemini Code Execution (built-in tool on 2.5 Pro/Flash/Flash-Lite) | `tools: [{codeExecution: {}}]`; sandboxed Python; numpy/pandas bundled; 30s cap.                                                 |
 | Fallback if Pro rate-limits    | Gemini 2.5 Flash                                                  | Drop orchestrator to Flash; quality sufficient for the narrow rule-walk.                                                         |
 
+The backend constructs `genai.Client(vertexai=True, project=os.environ["GOOGLE_CLOUD_PROJECT"], location=os.environ.get("GOOGLE_CLOUD_LOCATION", "asia-southeast1"))`; ADC on the Cloud Run service account handles auth, and the Vertex AI publisher model IDs stay the same.
+
 ### 5.2 Vertex AI Search
 
 **Primary retrieval layer for v1.** A single Vertex AI Search data store is populated one-time from the six committed scheme PDFs in `backend/data/schemes/` (`risalah-str-2026.pdf`, `bk-01.pdf`, `jkm18.pdf`, `pr-no-4-2024.pdf`, `explanatory-notes-be2025.pdf`, `rf-filing-programme-for-2026.pdf`). Vertex AI Search handles chunking, embedding, indexing, and serving. The `match_schemes` FunctionTool wraps the Search endpoint and returns `(passage, source_pdf_url, page_ref)` tuples that populate the provenance panel for every eligibility claim.
@@ -281,13 +283,13 @@ gcloud run deploy layak-frontend --source . \
   --min-instances=1 --cpu-boost \
   --allow-unauthenticated
 
-# Secret injection at deploy time.
+# Vertex AI auth at deploy time.
 gcloud run deploy layak-backend \
-  --set-secrets=GEMINI_API_KEY=gemini-api-key:latest \
+  --set-env-vars=GOOGLE_CLOUD_PROJECT=...,GOOGLE_CLOUD_LOCATION=... \
   ...
 ```
 
-Required IAM: `roles/secretmanager.secretAccessor` on the Cloud Run service account for `gemini-api-key`. Required API enablements: Vertex AI, Cloud Run, Artifact Registry, Secret Manager, Vertex AI Search (Discovery Engine).
+Required IAM: ADC handles Gemini auth via the attached Cloud Run service account (default Compute SA; inherited `roles/editor` covers `aiplatform.user`). Keep `roles/secretmanager.secretAccessor` for `firebase-admin-key`. Required API enablements: Vertex AI, Cloud Run, Artifact Registry, Secret Manager, Vertex AI Search (Discovery Engine).
 
 ### 5.5 Firestore as the session + archive layer
 
@@ -408,16 +410,17 @@ Both invocations use `pnpm exec` to bypass the pnpm v10 bare-script shortcut whi
 
 - **Backend (Secret Manager):** `FIREBASE_ADMIN_KEY` (secret: `firebase-admin-key`).
 - **Frontend (build-time, publishable):** `NEXT_PUBLIC_FIREBASE_API_KEY`, `NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN`, `NEXT_PUBLIC_FIREBASE_PROJECT_ID`, `NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET`, `NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID`, `NEXT_PUBLIC_FIREBASE_APP_ID`.
-- **Retained from v1:** `GEMINI_API_KEY`, `VERTEX_AI_SEARCH_DATA_STORE`.
+- **Vertex AI auth:** `GOOGLE_CLOUD_PROJECT`, `GOOGLE_CLOUD_LOCATION`.
+- **Retained from v1:** `VERTEX_AI_SEARCH_DATA_STORE`.
 
 ## 7. Security & Secrets
 
 - `.env` and `.env.*` are git-ignored repo-wide; `.env.example` / `.env.template` are the only committed templates (whitelisted in root `.gitignore`).
-- **Secrets split: Secret Manager for production only; single root `.env` for dev.** This is the deliberate minimum — SM avoids leaking the Gemini key into Cloud Run deploy metadata and shell history without the overhead of SDK fetches or bootstrap scripts during the 26h sprint.
-  - **Production (Cloud Run)**: `GEMINI_API_KEY` is stored in GCP Secret Manager as `gemini-api-key` (create once via `gcloud secrets create gemini-api-key --replication-policy=automatic`; populate with `echo -n "<key>" | gcloud secrets versions add gemini-api-key --data-file=-`). Cloud Run services mount it via `--set-secrets=GEMINI_API_KEY=gemini-api-key:latest` at deploy time — the plaintext value never appears in the `gcloud run deploy` command or its history.
-  - **Development (local)**: a single gitignored `.env` at the repo root is the only local secrets file. Next.js reads it through a `frontend/.env.local -> ../.env` symlink auto-created by the `predev` and `prebuild` hooks in `frontend/package.json`; FastAPI loads it via `python-dotenv` pointed at the repo root. Each developer pastes the shared key into their own local `.env` once — never committed, shared out-of-band (Signal / 1Password / shared password manager — never Slack, never email, never the repo).
+- **Secrets split: Secret Manager for `firebase-admin-key` only; Gemini auth is project-based via Vertex AI ADC and the Cloud Run service account.** This keeps production deploys free of Gemini secret mounts while preserving the existing Firebase admin secret path.
+  - **Production (Cloud Run)**: inject `GOOGLE_CLOUD_PROJECT` and `GOOGLE_CLOUD_LOCATION` with `--set-env-vars=GOOGLE_CLOUD_PROJECT=...,GOOGLE_CLOUD_LOCATION=...`; ADC handles Gemini auth via the attached Cloud Run service account.
+  - **Development (local)**: a single gitignored `.env` at the repo root is the only local config file. Next.js reads it through a `frontend/.env.local -> ../.env` symlink auto-created by the `predev` and `prebuild` hooks in `frontend/package.json`; FastAPI loads it via `python-dotenv` pointed at the repo root. Run `gcloud auth application-default login` once for ADC.
   - Root `.env.example` is the single committed template catalogue of env var names; values stay blank.
-- Cloud Run service account has `roles/secretmanager.secretAccessor` plus the minimum Vertex AI access roles; no broader privilege.
+- Cloud Run service account has `roles/secretmanager.secretAccessor` for `firebase-admin-key` plus the minimum Vertex AI access roles; no broader privilege.
 - HTTPS-only (Cloud Run defaults).
 - No PII persisted. IC numbers appear in UI and packet as last-4-digits only; full IC is held only in request-scope memory on the backend and never logged.
 - Synthetic demo documents carry the "SYNTHETIC — FOR DEMO ONLY" watermark on every page. No real MyKad photos are used.
@@ -556,7 +559,7 @@ Each row below maps to a specific task in `docs/plan.md` or a milestone in `docs
 | **1** | Five-step orchestration (extract → classify → match → compute_upside → generate_packet); Vertex AI Search indexing; hour-12 Plan B trigger        | PO1 (PO2 wires SSE events into UI)      | `docs/plan.md` Phase 1 task 3 · this TRD §8                     |
 | **1** | Rule engine: STR 2026 household tier, JKM Warga Emas per-capita means test, five LHDN Form B reliefs; unit tests vs cached PDFs                   | PO1                                     | `docs/plan.md` Phase 1 task 4                                   |
 | **1** | Wire frontend ↔ backend end-to-end: real SSE, live provenance, Code Execution on stage, WeasyPrint drafts downloadable                            | Both                                    | `docs/plan.md` Phase 1 task 5                                   |
-| **1** | Cloud Run deploy with `--min-instances=1 --cpu-boost`, Secret-Manager-injected `GEMINI_API_KEY`                                                   | PO1                                     | `docs/plan.md` Phase 1 task 6                                   |
+| **1** | Cloud Run deploy with `--min-instances=1 --cpu-boost`, Vertex AI env vars + ADC                                                                   | PO1                                     | `docs/plan.md` Phase 1 task 6                                   |
 | **1** | Responsiveness pass at 375 / 768 / 1440; three clean demo rehearsals of the 90-second Aisyah flow                                                 | PO2 (responsiveness) / Both (rehearsal) | `docs/plan.md` Phase 1 task 6                                   |
 | **2** | UI polish: copy review, empty states, obvious-bug sweep                                                                                           | PO2                                     | `docs/plan.md` Phase 2 task 1                                   |
 | **2** | README final pass: features, setup, AI disclosure (Rules §4.2), architecture overview (ASCII from this TRD)                                       | PO1                                     | `docs/plan.md` Phase 2 task 1                                   |

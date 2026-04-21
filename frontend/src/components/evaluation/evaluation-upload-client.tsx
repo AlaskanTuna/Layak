@@ -66,6 +66,14 @@ export function EvaluationUploadClient() {
       {showIntake && (
         <>
           <IntakeModeToggle value={mode} onChange={setMode} />
+          {mode === 'upload' && (
+            <p className="rounded-md border border-border bg-muted/30 px-3 py-2 text-xs text-muted-foreground">
+              Heads up: MyKad / payslip / utility bill don&apos;t list your household members. If you have
+              children, a parent, or anyone else you support, choose <strong>Enter manually</strong> above for
+              a complete eligibility check — otherwise schemes that depend on dependants (JKM Warga Emas, LHDN
+              child relief) won&apos;t surface.
+            </p>
+          )}
           {mode === 'upload' ? (
             <UploadWidget onSubmit={handleSubmitUpload} onUseSamples={handleUseSamplesUpload} />
           ) : (

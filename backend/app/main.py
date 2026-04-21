@@ -38,8 +38,17 @@ if _DOTENV.is_file():
 
 from app.agents.root_agent import stream_agent_events  # noqa: E402 — after dotenv load
 from app.agents.tools.build_profile import build_profile_from_manual_entry  # noqa: E402
-from app.auth import CurrentUser  # noqa: E402 — after dotenv load
 from app.schema.manual_entry import ManualEntryPayload  # noqa: E402
+
+# ============================================================================
+# PHASE-2-TASK-3-BRIDGE: auth is wired end-to-end (backend/app/auth.py holds
+# the boundary) but the frontend does not yet attach `Authorization: Bearer`
+# on intake requests — that lands with Phase 2 Task 3 (PO2). Until then, the
+# two intake endpoints below run UNAUTHED so the deployed service is usable.
+# Re-enable by uncommenting `user: CurrentUser` on both routes — one line per
+# endpoint, diff is trivial.
+# from app.auth import CurrentUser  # noqa: E402 — after dotenv load
+# ============================================================================
 
 app = FastAPI(title="Layak Backend", version="0.1.0")
 
@@ -68,18 +77,12 @@ async def health() -> dict[str, str]:
 
 @app.post("/api/agent/intake")
 async def intake(
-    user: CurrentUser,
+    # user: CurrentUser,  # PHASE-2-TASK-3-BRIDGE — see block at top of file.
     ic: Annotated[UploadFile, File()],
     payslip: Annotated[UploadFile, File()],
     utility: Annotated[UploadFile, File()],
 ) -> StreamingResponse:
-    """Stream the five-step agent pipeline as Server-Sent Events.
-
-    Authed: caller must supply `Authorization: Bearer <firebase-id-token>`.
-    `current_user` verifies the token and lazy-creates `users/{uid}` on first
-    touch, so the SSE stream that follows already runs in the user's context.
-    """
-    _ = user  # Phase 3 uses user.uid to scope `evaluations/{evalId}` writes.
+    """Stream the five-step agent pipeline as Server-Sent Events."""
     uploads: dict[str, tuple[str, bytes]] = {
         "ic": (ic.filename or "ic.bin", await ic.read()),
         "payslip": (payslip.filename or "payslip.bin", await payslip.read()),
@@ -103,8 +106,8 @@ async def intake(
 
 @app.post("/api/agent/intake_manual")
 async def intake_manual(
-    user: CurrentUser,
     payload: ManualEntryPayload,
+    # user: CurrentUser,  # PHASE-2-TASK-3-BRIDGE — see block at top of file.
 ) -> StreamingResponse:
     """Privacy-first alternative to `/api/agent/intake` — JSON body, no OCR.
 
@@ -115,7 +118,6 @@ async def intake_manual(
 
     Contract: docs/prd.md FR-21 + docs/superpowers/specs/2026-04-21-manual-entry-mode-design.md.
     """
-    _ = user  # Phase 3 scopes `evaluations/{evalId}` on user.uid.
     profile = build_profile_from_manual_entry(payload)
 
     async def event_stream() -> AsyncIterator[bytes]:

@@ -12,6 +12,7 @@ import { PipelineStepper } from '@/components/evaluation/pipeline-stepper'
 import { UploadWidget, type UploadSubmission } from '@/components/evaluation/upload-widget'
 import { UpgradeWaitlistModal } from '@/components/settings/upgrade-waitlist-modal'
 import { Button } from '@/components/ui/button'
+import { AISYAH_DEPENDANT_OVERRIDES, loadAisyahFixtureFiles } from '@/lib/aisyah-fixtures'
 import type { ManualEntryPayload, Step } from '@/lib/agent-types'
 import { cn } from '@/lib/utils'
 
@@ -66,10 +67,32 @@ export function EvaluationUploadClient() {
     start({ mode: 'manual', payload })
   }
 
-  function handleUseSamplesUpload() {
+  const [loadingSamples, setLoadingSamples] = useState(false)
+  const [sampleLoadError, setSampleLoadError] = useState<string | null>(null)
+
+  async function handleUseSamplesUpload() {
     setDemoByTab(prev => ({ ...prev, upload: true }))
     setDemoMode(true)
-    start({ mode: 'mock' })
+    setSampleLoadError(null)
+    // Dev escape hatch — when NEXT_PUBLIC_USE_MOCK_SSE=1 the pipeline replays
+    // canned events; skip the fetch entirely.
+    const useMock =
+      process.env.NODE_ENV !== 'production' && process.env.NEXT_PUBLIC_USE_MOCK_SSE === '1'
+    if (useMock) {
+      start({ mode: 'mock' })
+      return
+    }
+    setLoadingSamples(true)
+    try {
+      const files = await loadAisyahFixtureFiles()
+      start({ mode: 'real', files, dependants: AISYAH_DEPENDANT_OVERRIDES })
+    } catch (err) {
+      setSampleLoadError(err instanceof Error ? err.message : String(err))
+      setDemoMode(false)
+      setDemoByTab(prev => ({ ...prev, upload: false }))
+    } finally {
+      setLoadingSamples(false)
+    }
   }
 
   function handleUseSamplesManual() {
@@ -110,7 +133,16 @@ export function EvaluationUploadClient() {
           <IntakeModeToggle value={mode} onChange={handleModeChange} />
           {/* Both widgets stay mounted so partial form state survives a tab switch. */}
           <div className={cn(mode !== 'upload' && 'hidden')} aria-hidden={mode !== 'upload'}>
-            <UploadWidget onSubmit={handleSubmitUpload} onUseSamples={handleUseSamplesUpload} />
+            <UploadWidget
+              onSubmit={handleSubmitUpload}
+              onUseSamples={handleUseSamplesUpload}
+              samplesLoading={loadingSamples}
+            />
+            {sampleLoadError && (
+              <p className="mt-2 text-xs text-destructive" role="alert">
+                Could not load Aisyah samples: {sampleLoadError}
+              </p>
+            )}
           </div>
           <div className={cn(mode !== 'manual' && 'hidden')} aria-hidden={mode !== 'manual'}>
             <ManualEntryForm

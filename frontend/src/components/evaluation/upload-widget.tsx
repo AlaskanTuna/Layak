@@ -1,7 +1,7 @@
 'use client'
 
 import { useId, useRef, useState } from 'react'
-import { ArrowRight, FileText, Sparkles, UploadCloud, X } from 'lucide-react'
+import { ArrowRight, FileText, Loader2, Sparkles, UploadCloud, X } from 'lucide-react'
 
 import { DependantsFieldset, type DependantInputRow } from '@/components/evaluation/dependants-fieldset'
 import { SectionBadge } from '@/components/evaluation/section-badge'
@@ -79,6 +79,8 @@ type Props = {
   onSubmit: (submission: UploadSubmission) => void
   onUseSamples: () => void
   disabled?: boolean
+  /** Reflects in-flight fetch of bundled Aisyah PDFs from /public/fixtures/. */
+  samplesLoading?: boolean
 }
 
 type SlotProps = {
@@ -173,7 +175,7 @@ function UploadSlotCard({ spec, state, inputId, disabled, inputRef, onChange, on
   )
 }
 
-export function UploadWidget({ onSubmit, onUseSamples, disabled = false }: Props) {
+export function UploadWidget({ onSubmit, onUseSamples, disabled = false, samplesLoading = false }: Props) {
   const reactId = useId()
   const [state, setState] = useState<Record<UploadSlot, FileSlotState>>({
     ic: { file: null, error: null },
@@ -263,11 +265,20 @@ export function UploadWidget({ onSubmit, onUseSamples, disabled = false }: Props
           variant="ghost"
           size="sm"
           onClick={onUseSamples}
-          disabled={disabled}
+          disabled={disabled || samplesLoading}
           className="px-0 text-muted-foreground hover:bg-transparent hover:text-foreground"
         >
-          <Sparkles className="mr-1.5 size-4" aria-hidden />
-          Use Aisyah sample documents
+          {samplesLoading ? (
+            <>
+              <Loader2 className="mr-1.5 size-4 animate-spin" aria-hidden />
+              Loading samples…
+            </>
+          ) : (
+            <>
+              <Sparkles className="mr-1.5 size-4" aria-hidden />
+              Use Aisyah sample documents
+            </>
+          )}
         </Button>
         <Button type="button" onClick={handleSubmit} disabled={disabled || !canSubmit} size="lg">
           Continue evaluation

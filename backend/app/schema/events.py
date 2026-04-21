@@ -83,6 +83,11 @@ class DoneEvent(BaseModel):
 
     type: Literal["done"] = "done"
     packet: Packet
+    # Phase 3 Task 1: populated with the `evaluations/{evalId}` doc ID so the
+    # frontend can route to `/dashboard/evaluation/results/[id]` on done.
+    # Optional so pre-Phase-3 callers that never touch Firestore still emit a
+    # valid Done event (e.g. the mock-replay fixture).
+    eval_id: str | None = None
 
 
 class ErrorEvent(BaseModel):
@@ -91,6 +96,9 @@ class ErrorEvent(BaseModel):
     type: Literal["error"] = "error"
     step: Step | None = None
     message: str = Field(min_length=1)
+    # Phase 3 Task 1: populated when the evaluation doc was already created
+    # before the error — lets the frontend link the user to the failed eval.
+    eval_id: str | None = None
 
 
 AgentEvent = Annotated[

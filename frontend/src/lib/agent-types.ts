@@ -124,8 +124,8 @@ export type StepResultEvent =
   | { type: 'step_result'; step: 'match'; data: MatchResult }
   | { type: 'step_result'; step: 'compute_upside'; data: ComputeUpsideResult }
   | { type: 'step_result'; step: 'generate'; data: GenerateResult }
-export type DoneEvent = { type: 'done'; packet: Packet }
-export type ErrorEvent = { type: 'error'; step: Step | null; message: string }
+export type DoneEvent = { type: 'done'; packet: Packet; eval_id?: string | null }
+export type ErrorEvent = { type: 'error'; step: Step | null; message: string; eval_id?: string | null }
 
 export type AgentEvent = StepStartedEvent | StepResultEvent | DoneEvent | ErrorEvent
 

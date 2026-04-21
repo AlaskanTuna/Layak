@@ -108,6 +108,17 @@ def _get_firestore() -> Any:
     return _firestore_client
 
 
+def get_firestore() -> Any:
+    """Public re-export of the process-wide Firestore client.
+
+    Route modules (e.g. Phase 3's `evaluations.py`) import this instead of
+    `_get_firestore` so the boundary stays clear: all Firebase surface area
+    flows through this module. Tests should stub this by monkey-patching
+    `app.auth.get_firestore` to return a mock.
+    """
+    return _get_firestore()
+
+
 def verify_firebase_id_token(id_token: str) -> dict[str, Any]:
     """Verify a Firebase ID token and return the decoded claims.
 

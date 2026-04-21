@@ -4,6 +4,30 @@
 
 ---
 
+## [21/04/26] - Phase 3 Task 1 PO1: evaluations persistence layer + read routes + packet regen
+
+PO1's Phase 3 Task 1 — every evaluation now lands in `evaluations/{evalId}` Firestore alongside the SSE stream, with list/get/packet read endpoints on top. Packets stay unpersisted (regenerated on demand from stored profile + matches, per spec §3.7). Addresses all three forward-compat Gaps flagged by the Phase 2 Task 4 subagent audit.
+
+- **`backend/app/services/evaluation_persistence.py` (new).** Two entry points:
+  - `create_running_evaluation(db, user_id, profile=None)` — inserts `evaluations/{evalId}` with `status="running"`, `userId`, `createdAt=SERVER_TIMESTAMP`, `stepStates` all `pending`, embedded `profile` when the manual path already has it (upload path passes `None`; extract fills it later). Raises `HTTPException(503)` on Firestore write failure so the intake route converts it to a retryable status before any SSE stream opens — fix for the forward-compat audit's mid-route-Firestore-failure Gap.
+  - `persist_event_stream(events, eval_id, doc_ref)` async generator that wraps `stream_agent_events`. Forwards every event verbatim, mirrors the event's effect to Firestore via `doc_ref.update(...)`, and stamps `eval_id` onto the yielded `DoneEvent` / `ErrorEvent` via `event.model_copy(update={"eval_id": ...})`. Firestore write failures mid-stream are logged + swallowed so SSE never hangs on a persistence hiccup. Error sanitisation runs via `sanitize_error_message` before the `error.message` hits Firestore (privacy invariant NFR-3).
+- **`backend/app/schema/firestore.py` (new).** Pydantic mirrors: `UserDoc`, `EvaluationDoc`, `StepStates` (per-step state: `pending|running|complete|error`), `EvaluationError` (`{step, message}`), plus `EvaluationStatus` / `Tier` / `StepState` literals. `extra="forbid"` across the board. Firestore's camelCase field names (`userId`, `createdAt`, `totalAnnualRM`) preserved with `# noqa: N815` suppressing the lint — the wire shape has to match Firestore and the frontend.
+- **`backend/app/schema/events.py`**: added optional `eval_id: str \| None = None` to `DoneEvent` + `ErrorEvent`. Frontend `agent-types.ts` mirrors — `DoneEvent.eval_id?` on the TypeScript side.
+- **`backend/app/auth.py`**: added public `get_firestore()` wrapper (re-export of `_get_firestore`) so Phase 3+ route modules get a clean public API without reaching for the module-private — addresses the forward-compat audit's first Gap.
+- **`backend/app/routes/evaluations.py` (new).** Three endpoints, all authed via `CurrentUser`:
+  - `GET /api/evaluations?limit=N` — paginated list (default 20, max 50), newest-first; uses the `(userId ASC, createdAt DESC)` composite index. Returns a slim `EvaluationListItem` per row (id / status / totalAnnualRM / createdAt / completedAt) — heavy profile + matches fields only on detail fetch.
+  - `GET /api/evaluations/{eval_id}` — full `EvaluationDoc`. Owner-gated: returns 404 (not 403) when `data.userId != user.uid` so existence of another user's eval is not leaked to a guesser.
+  - `GET /api/evaluations/{eval_id}/packet` — reads Firestore → rebuilds `Profile` + `SchemeMatch[]` via Pydantic validation → calls `generate_packet(...)` → zips the three base64-decoded PDFs with `ZIP_DEFLATED` → returns `Response(media_type="application/zip", Content-Disposition=attachment...)`. 409 if `profile` is still null (extract hasn't run); 500 on shape drift; 404 on missing or non-owner.
+- **`backend/app/main.py`**: intake routes now call `create_running_evaluation` before opening the stream and pipe events through `persist_event_stream`. Mounted the evaluations router. Factored repeated `StreamingResponse` headers into `_SSE_HEADERS`.
+- **Tests (25 new cases across two files)**:
+  - `backend/tests/test_evaluation_persistence.py` — 13 cases: `create_running_evaluation` initial shape (with / without profile) + 503 on Firestore failure; per-event-type mirror assertions for each of the five steps + done + error; Firestore failure swallow; order-preservation; privacy sanitisation on the error path (asserts a 12-digit IC in an error message is redacted to `[redacted]` before hitting Firestore); spec §3.7 packet-bytes-not-persisted invariant.
+  - `backend/tests/test_evaluations_routes.py` — 12 cases: list auth wall + uid scoping + limit respect; get-by-id happy path + 404 missing + 404 non-owner (not 403); packet auth wall + 404 non-owner + 409 missing profile + successful ZIP regen with the three draft filenames asserted.
+  - `backend/tests/test_manual_entry.py` client fixture updated to mock the evaluations collection with a predictable `"test-eval-id"`; streaming test now asserts `done.eval_id == "test-eval-id"`.
+- **Full backend suite: 113/113 green (88 prior + 25 new).** Ruff clean. Frontend `pnpm lint` + `tsc --noEmit` clean.
+- **Not deployed this turn; commit + push + CI/CD deploy happens next.**
+
+---
+
 ## [21/04/26] - Phase 2 Task 4 PO1: auth-gate re-enable + integration smoke runbook (browser check pending)
 
 PO1's half of Phase 2 Task 4 — the automated parts of the integration smoke plus the final un-bridging of the auth gate. Live browser check (fresh-browser sign-in flow) still owned jointly by PO1 + PO2 per the Task 4 "Both" owner line.

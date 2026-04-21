@@ -210,14 +210,37 @@ def test_dependant_input_rejects_bad_relationship() -> None:
 
 @pytest.fixture
 def client(monkeypatch: pytest.MonkeyPatch) -> TestClient:
-    """TestClient with auth stubbed and an unset Firebase key (auth won't touch Firestore)."""
+    """TestClient with auth + Firestore fully stubbed.
+
+    Two collections are mocked:
+      - `users/{uid}` — the auth-layer lazy-upsert path, snapshot.exists=True.
+      - `evaluations/{autoId}` — Phase 3 Task 1 persistence. `.document()` with
+        no argument (auto-id) returns a ref with `id="test-eval-id"`;
+        `.set()` / `.update()` are callable but no-op.
+    """
     monkeypatch.setenv("FIREBASE_ADMIN_KEY", json.dumps({"type": "service_account"}))
     monkeypatch.setattr(auth_module, "_init_firebase_admin", lambda: MagicMock())
 
+    # users collection mock — default snapshot for lazy-upsert
+    users_snapshot = MagicMock()
+    users_snapshot.exists = True
+    users_doc = MagicMock()
+    users_doc.get.return_value = users_snapshot
+
+    # evaluations collection mock — document() with no arg returns an auto-id ref
+    eval_ref = MagicMock()
+    eval_ref.id = "test-eval-id"
+    evaluations_collection = MagicMock()
+    evaluations_collection.document.return_value = eval_ref
+
+    users_collection = MagicMock()
+    users_collection.document.return_value = users_doc
+
+    def collection_side_effect(name: str) -> MagicMock:
+        return evaluations_collection if name == "evaluations" else users_collection
+
     db = MagicMock()
-    snapshot = MagicMock()
-    snapshot.exists = True
-    db.collection.return_value.document.return_value.get.return_value = snapshot
+    db.collection.side_effect = collection_side_effect
     monkeypatch.setattr(auth_module, "_get_firestore", lambda: db)
 
     verify = MagicMock(return_value={"uid": "test-uid", "email": "test@example.com"})
@@ -307,6 +330,11 @@ def test_intake_manual_accepts_aisyah_and_streams_sse(
     assert extract_result["step"] == "extract"
     assert extract_result["data"]["profile"]["name"] == "Aisyah binti Ahmad"
     assert extract_result["data"]["profile"]["household_flags"]["income_band"] == "b40_household_with_children"
+    # Phase 3 Task 1: done event carries the evaluations/{evalId} doc ID so the
+    # frontend can route to `/dashboard/evaluation/results/[id]`.
+    done_event = parsed[-1]
+    assert done_event["type"] == "done"
+    assert done_event["eval_id"] == "test-eval-id"
     # No Gemini call was made on the extract step — the profile equals what
     # `build_profile_from_manual_entry` produced deterministically.
     assert extract_result["data"]["profile"]["form_type"] == "form_b"

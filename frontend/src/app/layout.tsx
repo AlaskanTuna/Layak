@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import { Geist, Newsreader } from 'next/font/google'
 
+import { AuthProvider } from '@/lib/auth-context'
 import { ThemeProvider } from '@/providers/theme-provider'
 
 import './globals.css'
@@ -40,7 +41,7 @@ export default function RootLayout({
     >
       <body>
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
-          {children}
+          <AuthProvider>{children}</AuthProvider>
         </ThemeProvider>
       </body>
     </html>

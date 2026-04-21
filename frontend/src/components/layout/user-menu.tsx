@@ -1,14 +1,20 @@
 'use client'
 
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import { useEffect, useRef, useState } from 'react'
 import { LogOut, Settings } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
+import { useAuth } from '@/lib/auth-context'
+import { signOutCurrentUser } from '@/lib/firebase'
 import { cn } from '@/lib/utils'
 
 export function UserMenu() {
+  const router = useRouter()
+  const { user } = useAuth()
   const [isOpen, setIsOpen] = useState(false)
+  const [signingOut, setSigningOut] = useState(false)
   const containerRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
@@ -29,6 +35,22 @@ export function UserMenu() {
     }
   }, [isOpen])
 
+  async function handleSignOut() {
+    if (signingOut) return
+    setSigningOut(true)
+    try {
+      await signOutCurrentUser()
+      setIsOpen(false)
+      router.replace('/sign-in')
+    } catch {
+      setSigningOut(false)
+    }
+  }
+
+  const displayName = user?.displayName ?? user?.email ?? 'Account'
+  const email = user?.email ?? ''
+  const initial = (user?.displayName || user?.email || 'A').charAt(0).toUpperCase()
+
   return (
     <div ref={containerRef} className="relative">
       <Button
@@ -42,7 +64,7 @@ export function UserMenu() {
         className="size-8"
       >
         <span className="flex size-6 items-center justify-center rounded-full bg-primary/10 text-xs font-medium text-primary">
-          G
+          {initial}
         </span>
       </Button>
       <div
@@ -55,8 +77,8 @@ export function UserMenu() {
         )}
       >
         <div className="border-b border-border px-3 py-2.5">
-          <p className="text-sm font-medium">Guest</p>
-          <p className="text-xs text-muted-foreground">Signed in as guest</p>
+          <p className="truncate text-sm font-medium">{displayName}</p>
+          {email && <p className="truncate text-xs text-muted-foreground">{email}</p>}
         </div>
         <div className="p-1">
           <Link
@@ -70,15 +92,16 @@ export function UserMenu() {
           </Link>
         </div>
         <div className="border-t border-border p-1">
-          <Link
-            href="/sign-in"
+          <button
+            type="button"
             role="menuitem"
-            onClick={() => setIsOpen(false)}
-            className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm text-destructive transition-colors hover:bg-destructive/10"
+            onClick={handleSignOut}
+            disabled={signingOut}
+            className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm text-destructive transition-colors hover:bg-destructive/10 disabled:opacity-60"
           >
             <LogOut className="size-4" aria-hidden />
-            Sign out
-          </Link>
+            {signingOut ? 'Signing out…' : 'Sign out'}
+          </button>
         </div>
       </div>
     </div>

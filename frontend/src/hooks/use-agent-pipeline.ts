@@ -4,6 +4,7 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 
 import type { UploadFiles } from '@/components/evaluation/upload-widget'
 import { AISYAH_MOCK_EVENTS } from '@/fixtures/aisyah-response'
+import { authedFetch } from '@/lib/firebase'
 import type {
   AgentEvent,
   ComputeUpsideResult,
@@ -169,7 +170,7 @@ export function useAgentPipeline(): {
 
       ;(async () => {
         try {
-          const res = await fetch(`${getBackendUrl()}/api/agent/intake`, {
+          const res = await authedFetch(`${getBackendUrl()}/api/agent/intake`, {
             method: 'POST',
             body: form,
             signal: controller.signal

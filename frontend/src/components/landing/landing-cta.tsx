@@ -11,11 +11,11 @@ export function LandingCta() {
           Ready to see what you qualify for?
         </h2>
         <p className="max-w-2xl text-sm text-muted-foreground sm:text-base">
-          Guest mode is one click — no account needed. Three uploads, a ranked list, three draft packets. Takes under a
-          minute.
+          Sign in with Google is one click — no account setup needed. Three uploads, a ranked list, three draft packets.
+          Takes under a minute.
         </p>
         <Button render={<Link href="/sign-in" />} size="lg">
-          Continue as guest
+          Continue to sign in
           <ArrowRight className="ml-1.5 size-4" aria-hidden />
         </Button>
       </div>

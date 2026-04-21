@@ -48,6 +48,40 @@ FREE_TIER_LIMIT = 5
 FREE_TIER_WINDOW = timedelta(hours=24)
 
 
+def get_used_count(db: Any, user: UserInfo, *, now: datetime | None = None) -> int:
+    """Return the caller's evaluation count inside the rolling 24-hour window.
+
+    Public read-side helper consumed by `routes.quota.get_quota`. Mirrors the
+    same query `enforce_quota` runs but returns the raw count instead of a
+    429 response. Pro users get `0` (the meter UI hides under the
+    `tier === 'pro'` branch).
+
+    On Firestore failure returns `0` — same fail-open posture as
+    `enforce_quota`. The caller can still render the meter.
+    """
+    if user.tier != "free":
+        return 0
+    current_time = now if now is not None else datetime.now(UTC)
+    window_start = current_time - FREE_TIER_WINDOW
+    try:
+        count_snapshot = (
+            db.collection("evaluations")
+            .where("userId", "==", user.uid)
+            .where("createdAt", ">=", window_start)
+            .count()
+            .get()
+        )
+    except Exception:  # noqa: BLE001 — fail-open per existing posture.
+        _logger.exception("Quota count query failed for uid=%s", user.uid)
+        return 0
+    return _extract_count(count_snapshot)
+
+
+def estimate_reset_at(db: Any, user: UserInfo, now: datetime) -> datetime:
+    """Public re-export of the reset estimator used by `enforce_quota`."""
+    return _estimate_reset_at(db, user, now)
+
+
 def enforce_quota(db: Any, user: UserInfo, *, now: datetime | None = None) -> JSONResponse | None:
     """Preflight quota check.
 

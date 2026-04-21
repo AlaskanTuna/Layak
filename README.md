@@ -2,13 +2,6 @@
 
 Layak helps Malaysian citizens upload three documents and get a ranked, source-cited view of the social-assistance schemes they may claim, plus draft application PDFs.
 
-## Live URLs
-
-- Frontend: https://layak-frontend-297019726346.asia-southeast1.run.app
-- Backend: https://layak-backend-297019726346.asia-southeast1.run.app
-- Deployed region: asia-southeast1
-- GCP project ID: layak-myaifuturehackathon
-
 ## Overview
 
 Layak is built for the Project 2030: MyAI Future Hackathon Track 2 Citizens First brief. The v1 flow is straightforward: a user uploads IC, income, and utility documents, the agent extracts the profile, checks the locked scheme rules, ranks the matches, and generates draft packets. The app is designed for demo-night use and keeps the scope tight: grounded claims, visible provenance, and no live submission. It is centered on the Aisyah persona described in the product contract.
@@ -50,13 +43,10 @@ layak/
 - Frontend: `gcloud run deploy layak-frontend --source frontend --region asia-southeast1 --min-instances 1 --cpu-boost --allow-unauthenticated --set-build-env-vars NEXT_PUBLIC_BACKEND_URL=https://layak-backend-297019726346.asia-southeast1.run.app --memory 512Mi --timeout 60`
 - Backend: `gcloud run deploy layak-backend --source backend --region asia-southeast1 --min-instances 1 --cpu-boost --allow-unauthenticated --set-secrets GEMINI_API_KEY=gemini-api-key:latest --memory 1Gi --timeout 300`
 
-## Project Documentation
+## Live URLs
 
-- [Product Requirements](docs/prd.md)
-- [Technical Requirements](docs/trd.md)
-- [Roadmap](docs/roadmap.md)
-- [Plan](docs/plan.md)
-- [Progress](docs/progress.md)
+- Frontend: https://layak-frontend-297019726346.asia-southeast1.run.app
+- Backend: https://layak-backend-297019726346.asia-southeast1.run.app
 
 ## License / Status
 

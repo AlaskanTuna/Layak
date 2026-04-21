@@ -141,3 +141,70 @@ export const STEP_LABELS: Record<Step, string> = {
   compute_upside: 'Compute upside',
   generate: 'Generate drafts'
 }
+
+/* ------------------------------------------------------------------ */
+/* Firestore mirrors — see backend/app/schema/firestore.py             */
+/* ------------------------------------------------------------------ */
+
+export type EvaluationStatus = 'running' | 'complete' | 'error'
+
+export type Tier = 'free' | 'pro'
+
+export type EvaluationStepState = 'pending' | 'running' | 'complete' | 'error'
+
+export type EvaluationStepStates = Record<Step, EvaluationStepState>
+
+export type EvaluationErrorDoc = {
+  step: Step | null
+  message: string
+}
+
+/** Mirror of `evaluations/{evalId}` returned by `GET /api/evaluations/{id}`. */
+export type EvaluationDoc = {
+  userId: string
+  status: EvaluationStatus
+  createdAt: string | null
+  completedAt: string | null
+  profile: Profile | null
+  classification: HouseholdClassification | null
+  matches: SchemeMatch[]
+  totalAnnualRM: number
+  stepStates: EvaluationStepStates
+  error: EvaluationErrorDoc | null
+}
+
+export type EvaluationListItem = {
+  id: string
+  status: EvaluationStatus
+  totalAnnualRM: number
+  createdAt: string | null
+  completedAt: string | null
+}
+
+export type EvaluationListResponse = {
+  items: EvaluationListItem[]
+  nextPageToken: string | null
+}
+
+/** Mirror of `GET /api/quota` — Phase 3 Task 4 frontend QuotaMeter. */
+export type QuotaResponse = {
+  tier: Tier
+  /** Free tier: 5. Pro tier: -1 (unlimited sentinel). */
+  limit: number
+  used: number
+  /** Free tier: max(0, limit-used). Pro tier: -1. */
+  remaining: number
+  windowHours: number
+  /** ISO-8601 UTC. For Pro this is `now` (carries no meaning). */
+  resetAt: string
+}
+
+/** Mirror of the 429 body emitted by `enforce_quota`. */
+export type RateLimitErrorBody = {
+  error: 'rate_limit'
+  tier: Tier
+  limit: number
+  windowHours: number
+  resetAt: string
+  message: string
+}

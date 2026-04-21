@@ -3,13 +3,16 @@
 import { useRouter, useSearchParams } from 'next/navigation'
 import { useEffect, useState } from 'react'
 
+import { QuotaMeter } from '@/components/dashboard/quota-meter'
 import { ErrorRecoveryCard } from '@/components/evaluation/error-recovery-card'
 import { useEvaluation } from '@/components/evaluation/evaluation-provider'
 import { type IntakeMode, IntakeModeToggle } from '@/components/evaluation/intake-mode-toggle'
 import { ManualEntryForm } from '@/components/evaluation/manual-entry-form'
 import { PipelineStepper } from '@/components/evaluation/pipeline-stepper'
 import { UploadWidget, type UploadSubmission } from '@/components/evaluation/upload-widget'
+import { UpgradeWaitlistModal } from '@/components/settings/upgrade-waitlist-modal'
 import { Button } from '@/components/ui/button'
+import { AISYAH_DEPENDANT_OVERRIDES, loadAisyahFixtureFiles } from '@/lib/aisyah-fixtures'
 import type { ManualEntryPayload, Step } from '@/lib/agent-types'
 import { cn } from '@/lib/utils'
 
@@ -20,7 +23,12 @@ const MANUAL_MODE_LABEL_OVERRIDES: Partial<Record<Step, string>> = {
 export function EvaluationUploadClient() {
   const router = useRouter()
   const searchParams = useSearchParams()
-  const { state, start, reset, setDemoMode } = useEvaluation()
+  const { state, start, reset, setDemoMode, acknowledgeQuotaExceeded } = useEvaluation()
+  // Modal open state is derived directly from `state.quotaExceeded` —
+  // dismissing the modal calls `acknowledgeQuotaExceeded()` which clears
+  // it on the pipeline side, naturally closing the modal. Avoids the
+  // React 19 set-state-in-effect lint and the cascade-render risk.
+  const waitlistOpen = state.quotaExceeded != null
   const initialMode: IntakeMode = searchParams?.get('mode') === 'manual' ? 'manual' : 'upload'
   const [mode, setMode] = useState<IntakeMode>(initialMode)
   // Per-tab demo flag — when the user clicks "Use Aisyah sample data" on a
@@ -34,9 +42,15 @@ export function EvaluationUploadClient() {
 
   useEffect(() => {
     if (state.phase === 'done') {
-      router.push('/dashboard/evaluation/results')
+      // Real + manual intake stamp `evalId` from the SSE done event; mock
+      // mode (dev escape hatch) leaves it null and falls back to the
+      // in-memory results route.
+      const next = state.evalId
+        ? `/dashboard/evaluation/results/${state.evalId}`
+        : '/dashboard/evaluation/results'
+      router.push(next)
     }
-  }, [state.phase, router])
+  }, [state.phase, state.evalId, router])
 
   function handleModeChange(next: IntakeMode) {
     setMode(next)
@@ -53,10 +67,32 @@ export function EvaluationUploadClient() {
     start({ mode: 'manual', payload })
   }
 
-  function handleUseSamplesUpload() {
+  const [loadingSamples, setLoadingSamples] = useState(false)
+  const [sampleLoadError, setSampleLoadError] = useState<string | null>(null)
+
+  async function handleUseSamplesUpload() {
     setDemoByTab(prev => ({ ...prev, upload: true }))
     setDemoMode(true)
-    start({ mode: 'mock' })
+    setSampleLoadError(null)
+    // Dev escape hatch — when NEXT_PUBLIC_USE_MOCK_SSE=1 the pipeline replays
+    // canned events; skip the fetch entirely.
+    const useMock =
+      process.env.NODE_ENV !== 'production' && process.env.NEXT_PUBLIC_USE_MOCK_SSE === '1'
+    if (useMock) {
+      start({ mode: 'mock' })
+      return
+    }
+    setLoadingSamples(true)
+    try {
+      const files = await loadAisyahFixtureFiles()
+      start({ mode: 'real', files, dependants: AISYAH_DEPENDANT_OVERRIDES })
+    } catch (err) {
+      setSampleLoadError(err instanceof Error ? err.message : String(err))
+      setDemoMode(false)
+      setDemoByTab(prev => ({ ...prev, upload: false }))
+    } finally {
+      setLoadingSamples(false)
+    }
   }
 
   function handleUseSamplesManual() {
@@ -85,14 +121,28 @@ export function EvaluationUploadClient() {
   const showError = state.phase === 'error'
   const labelOverrides = mode === 'manual' ? MANUAL_MODE_LABEL_OVERRIDES : undefined
 
+  function handleWaitlistOpenChange(open: boolean) {
+    if (!open) acknowledgeQuotaExceeded()
+  }
+
   return (
     <div className="flex flex-col gap-4">
       {showIntake && (
         <>
+          <QuotaMeter />
           <IntakeModeToggle value={mode} onChange={handleModeChange} />
           {/* Both widgets stay mounted so partial form state survives a tab switch. */}
           <div className={cn(mode !== 'upload' && 'hidden')} aria-hidden={mode !== 'upload'}>
-            <UploadWidget onSubmit={handleSubmitUpload} onUseSamples={handleUseSamplesUpload} />
+            <UploadWidget
+              onSubmit={handleSubmitUpload}
+              onUseSamples={handleUseSamplesUpload}
+              samplesLoading={loadingSamples}
+            />
+            {sampleLoadError && (
+              <p className="mt-2 text-xs text-destructive" role="alert">
+                Could not load Aisyah samples: {sampleLoadError}
+              </p>
+            )}
           </div>
           <div className={cn(mode !== 'manual' && 'hidden')} aria-hidden={mode !== 'manual'}>
             <ManualEntryForm
@@ -124,6 +174,20 @@ export function EvaluationUploadClient() {
           )}
         </>
       )}
+      <UpgradeWaitlistModal
+        open={waitlistOpen}
+        onOpenChange={handleWaitlistOpenChange}
+        context={
+          state.quotaExceeded
+            ? {
+                kind: 'rate_limit',
+                resetAt: state.quotaExceeded.resetAt,
+                limit: state.quotaExceeded.limit,
+                windowHours: state.quotaExceeded.windowHours
+              }
+            : undefined
+        }
+      />
     </div>
   )
 }

@@ -13,6 +13,7 @@ import type {
   ManualEntryPayload,
   Packet,
   Profile,
+  RateLimitErrorBody,
   SchemeMatch,
   Step
 } from '@/lib/agent-types'
@@ -30,6 +31,11 @@ export type PipelineState = {
   matches: SchemeMatch[]
   upside: ComputeUpsideResult | null
   packet: Packet | null
+  /** Set when the backend SSE `done` event lands with a Firestore doc id.
+   * Mock mode (no backend round-trip) leaves this `null`. */
+  evalId: string | null
+  /** Populated when the backend returns 429 — drives the waitlist modal. */
+  quotaExceeded: RateLimitErrorBody | null
   error: string | null
 }
 
@@ -54,6 +60,8 @@ const INITIAL_STATE: PipelineState = {
   matches: [],
   upside: null,
   packet: null,
+  evalId: null,
+  quotaExceeded: null,
   error: null
 }
 
@@ -90,11 +98,22 @@ export function applyEvent(prev: PipelineState, event: AgentEvent): PipelineStat
       return next
     }
     case 'done':
-      return { ...prev, phase: 'done', packet: event.packet }
+      return {
+        ...prev,
+        phase: 'done',
+        packet: event.packet,
+        evalId: event.eval_id ?? prev.evalId
+      }
     case 'error': {
       const stepStates = { ...prev.stepStates }
       if (event.step) stepStates[event.step] = 'error'
-      return { ...prev, phase: 'error', error: event.message, stepStates }
+      return {
+        ...prev,
+        phase: 'error',
+        error: event.message,
+        stepStates,
+        evalId: event.eval_id ?? prev.evalId
+      }
     }
   }
 }
@@ -128,6 +147,7 @@ export function useAgentPipeline(): {
   state: PipelineState
   start: (opts: StartOptions) => void
   reset: () => void
+  acknowledgeQuotaExceeded: () => void
 } {
   const [state, setState] = useState<PipelineState>(INITIAL_STATE)
   const abortRef = useRef<AbortController | null>(null)
@@ -144,6 +164,10 @@ export function useAgentPipeline(): {
     cleanup()
     setState(INITIAL_STATE)
   }, [cleanup])
+
+  const acknowledgeQuotaExceeded = useCallback(() => {
+    setState(prev => (prev.quotaExceeded ? { ...prev, quotaExceeded: null } : prev))
+  }, [])
 
   const startMock = useCallback(() => {
     cleanup()
@@ -163,6 +187,22 @@ export function useAgentPipeline(): {
       ;(async () => {
         try {
           const res = await request()
+          // Phase 3 Task 4 — surface 429 as a structured quota state without
+          // ever entering `streaming`. The upload client opens the waitlist
+          // modal off `state.quotaExceeded`.
+          if (res.status === 429) {
+            const body = (await res.json().catch(() => null)) as RateLimitErrorBody | null
+            const fallback: RateLimitErrorBody = {
+              error: 'rate_limit',
+              tier: 'free',
+              limit: 5,
+              windowHours: 24,
+              resetAt: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
+              message: 'Free-tier evaluation quota reached.'
+            }
+            setState(() => ({ ...INITIAL_STATE, quotaExceeded: body ?? fallback }))
+            return
+          }
           if (!res.ok || !res.body) {
             throw new Error(`Backend returned ${res.status} ${res.statusText}`)
           }
@@ -249,7 +289,7 @@ export function useAgentPipeline(): {
 
   useEffect(() => cleanup, [cleanup])
 
-  return { state, start, reset }
+  return { state, start, reset, acknowledgeQuotaExceeded }
 }
 
 function markFirstActiveStepErrored(states: Record<Step, StepStatus>): Record<Step, StepStatus> {

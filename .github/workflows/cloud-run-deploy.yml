@@ -78,7 +78,7 @@ jobs:
             --min-instances 1 \
             --cpu-boost \
             --allow-unauthenticated \
-            --set-secrets GEMINI_API_KEY=gemini-api-key:latest \
+            --set-secrets GEMINI_API_KEY=gemini-api-key:latest,FIREBASE_ADMIN_KEY=firebase-admin-key:latest \
             --memory 1Gi \
             --timeout 300 \
             --quiet

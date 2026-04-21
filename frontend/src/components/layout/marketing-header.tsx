@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button'
 
 export function MarketingHeader() {
   return (
-    <header className="topbar-glass sticky top-0 z-20 flex h-[var(--topbar-height)] items-center px-4 md:px-6">
+    <header className="topbar-glass sticky top-0 z-20 flex h-[var(--topbar-height)] items-center px-4 md:px-6 backdrop-blur-md">
       <Link href="/" className="flex items-center gap-2" aria-label="Layak home">
         <BrandMark />
         <span className="font-heading text-base font-semibold tracking-tight">Layak</span>

@@ -15,7 +15,7 @@ type TopbarProps = {
 
 export function Topbar({ onMenuClick }: TopbarProps) {
   return (
-    <header className="topbar-glass sticky top-0 z-20 flex h-[var(--topbar-height)] items-center gap-2 px-3 md:px-4">
+    <header className="topbar-glass sticky top-0 z-20 flex h-[var(--topbar-height)] items-center gap-2 px-3 md:px-4 backdrop-blur-md">
       <MobileMenuButton onClick={onMenuClick} />
       <Link href="/dashboard" className="flex items-center gap-2 md:hidden" aria-label="Layak home">
         <BrandMark size="sm" />

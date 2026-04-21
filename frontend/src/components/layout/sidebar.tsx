@@ -101,7 +101,7 @@ export function Sidebar({ mobileOpen, onMobileClose }: SidebarProps) {
         className={cn(
           'fixed inset-y-0 left-0 z-30 hidden flex-col overflow-hidden',
           'w-[var(--sidebar-current-width)] transition-[width] duration-300 ease-in-out',
-          'sidebar-glass text-sidebar-foreground',
+          'sidebar-glass backdrop-blur-md text-sidebar-foreground',
           'md:flex'
         )}
       >

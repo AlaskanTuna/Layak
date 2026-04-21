@@ -116,6 +116,15 @@ export function EvaluationUploadClient() {
     reset()
   }
 
+  function handleSwitchToManual() {
+    // Quota-exhausted recovery — drop the failed pipeline state and flip
+    // the user into Manual Entry mode where the OCR step is synthetic.
+    setDemoByTab(prev => ({ ...prev, upload: false }))
+    setDemoMode(false)
+    setMode('manual')
+    reset()
+  }
+
   const showIntake = state.phase === 'idle'
   const showStepper = state.phase === 'streaming' || state.phase === 'error' || state.phase === 'done'
   const showError = state.phase === 'error'
@@ -162,10 +171,12 @@ export function EvaluationUploadClient() {
           {showError && (
             <ErrorRecoveryCard
               message={state.error ?? 'Unknown error.'}
-              // Error-recovery "Use samples" always falls back to the known-good
-              // mock-replay path, regardless of which intake mode failed.
+              // "Use samples" falls back to the same upload path; on a
+              // quota-exhausted error the card prefers the Manual Entry CTA
+              // instead because the upload path would 429 the same way.
               onUseSamples={handleUseSamplesUpload}
               onReset={handleReset}
+              onSwitchToManual={handleSwitchToManual}
             />
           )}
           {!showError && (

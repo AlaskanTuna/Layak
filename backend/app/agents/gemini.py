@@ -100,6 +100,91 @@ def sanitize_error_message(message: str, max_len: int = 240) -> str:
     return redacted
 
 
+# Friendly copy keyed off the upstream error category. Each entry maps a
+# `category` slug to the user-facing message — the slug also flows to the
+# frontend on the SSE error event so the UI can surface category-aware CTAs
+# (e.g. "Try Manual Entry" only when OCR is rate-limited).
+ERROR_CATEGORY_MESSAGES: dict[str, str] = {
+    "quota_exhausted": (
+        "Gemini's daily free-tier quota is exhausted. Try again later, or "
+        "switch to Manual Entry mode — it skips the OCR step and runs the rest "
+        "of the pipeline against the values you type in."
+    ),
+    "service_unavailable": (
+        "Gemini is temporarily unavailable. Please retry in a minute."
+    ),
+    "deadline_exceeded": (
+        "The Gemini request timed out. Try smaller documents or retry."
+    ),
+    "permission_denied": (
+        "Gemini access is misconfigured on the server. The team has been "
+        "notified — please try again later."
+    ),
+    "extract_validation": (
+        "We extracted the document but the result didn't fit our schema. "
+        "Try clearer scans, or use Manual Entry mode to bypass OCR."
+    ),
+}
+
+
+def categorize_error_message(raw: str) -> str | None:
+    """Return a `ERROR_CATEGORY_MESSAGES` slug for known upstream errors, or `None`.
+
+    Pure string matching — the google-genai SDK doesn't expose a stable error
+    code object across versions, so we sniff the formatted exception text.
+    Each branch is intentionally conservative: only flag errors whose user-
+    facing remediation differs from the default "something broke" path.
+
+    Both google.genai's `ClientError: 429 RESOURCE_EXHAUSTED` form and
+    google.api_core's `ResourceExhausted` (no underscore) class-name form
+    are matched — the SDK serialises differently across paths.
+    """
+    lowered = raw.lower()
+    if (
+        "429" in raw
+        or "resource_exhausted" in lowered
+        or "resourceexhausted" in lowered
+        or "quota" in lowered
+    ):
+        return "quota_exhausted"
+    if (
+        "503" in raw
+        or "service_unavailable" in lowered
+        or "serviceunavailable" in lowered
+        or "unavailable" in lowered
+    ):
+        return "service_unavailable"
+    if "504" in raw or "deadline_exceeded" in lowered or "deadlineexceeded" in lowered or "timeout" in lowered:
+        return "deadline_exceeded"
+    if (
+        "401" in raw
+        or "403" in raw
+        or "permission_denied" in lowered
+        or "permissiondenied" in lowered
+        or "unauthenticated" in lowered
+    ):
+        return "permission_denied"
+    # Pydantic schema drift on Gemini's structured output. Surface a clearer
+    # remediation than the raw `1 validation error for Profile ...` string.
+    if "validationerror" in lowered and ("profile" in lowered or "extract" in lowered):
+        return "extract_validation"
+    return None
+
+
+def humanize_error_message(raw: str, max_len: int = 240) -> str:
+    """User-facing copy for an upstream pipeline error.
+
+    For known categories returns the static remediation copy verbatim — those
+    strings carry no PII so digit redaction is unnecessary. For everything else
+    falls through to `sanitize_error_message` so unknown errors still get IC
+    redaction + truncation before reaching the UI.
+    """
+    category = categorize_error_message(raw)
+    if category is not None:
+        return ERROR_CATEGORY_MESSAGES[category]
+    return sanitize_error_message(raw, max_len)
+
+
 def detect_mime(filename: str, data: bytes) -> str:
     """Infer a MIME type from file magic bytes with filename-extension fallback."""
     if data.startswith(b"%PDF-"):

@@ -288,3 +288,176 @@ curl -sS -D - -o /dev/null --max-time 8 --no-buffer \
 ```
 
 The HTTP/2 200 status line is dispatched the moment FastAPI returns the `StreamingResponse`, which only happens after `current_user` resolves and `_upsert_user_doc` writes — so observing 200 here is sufficient evidence that §3.3 sub-step 3 (Firestore upsert) and sub-step 4 (Bearer-authed 200) both succeeded against this revision.
+
+---
+
+## 4. Nightly free-tier prune — Cloud Run Job + Cloud Scheduler (Phase 6 Task 1)
+
+Contract: `backend/scripts/prune_free_tier.py` deletes every `evaluations/{evalId}` whose owner has `tier == "free"` AND `createdAt < now - 30 days`. Pro-tier history is never touched. Job runs daily at 02:00 MYT (= 18:00 UTC). Spec: `docs/superpowers/specs/2026-04-21-v2-saas-pivot-design.md` §3.9; FR-18.
+
+The Job reuses the backend container image — same `backend/Dockerfile`, same Python deps — but overrides `CMD` at deploy time to run the prune entry point instead of uvicorn.
+
+### 4.1 One-time service account for the Job
+
+Keep the Job's identity distinct from the backend's Firebase Admin SA so a compromised prune job cannot read/verify ID tokens. This SA needs Firestore read + delete only.
+
+```bash
+gcloud iam service-accounts create layak-prune-job \
+  --display-name="Layak free-tier prune (Cloud Run Job)" \
+  --project=layak-myaifuturehackathon
+
+PRUNE_SA="layak-prune-job@layak-myaifuturehackathon.iam.gserviceaccount.com"
+
+gcloud projects add-iam-policy-binding layak-myaifuturehackathon \
+  --member="serviceAccount:${PRUNE_SA}" \
+  --role="roles/datastore.user"
+```
+
+> `roles/datastore.user` grants document read + write + delete on Firestore in Native mode — the script only issues stream + batch-delete operations, so this is the minimum viable role. Do **not** grant `roles/firebaseauth.admin`; the prune script never calls Firebase Auth.
+
+### 4.2 Build + deploy the Job
+
+The image is identical to the backend service. If a backend deploy just ran (§2.3), grab its digest; otherwise build fresh:
+
+```bash
+IMAGE="asia-southeast1-docker.pkg.dev/layak-myaifuturehackathon/cloud-run-source-deploy/layak-backend:latest"
+
+gcloud builds submit backend \
+  --tag="${IMAGE}" \
+  --project=layak-myaifuturehackathon
+```
+
+Create (first run) or update (subsequent runs) the Cloud Run Job. `--command python --args -m,scripts.prune_free_tier` overrides the image's `CMD`:
+
+```bash
+# First run:
+gcloud run jobs create layak-prune-free-tier \
+  --image="${IMAGE}" \
+  --region=asia-southeast1 \
+  --service-account="${PRUNE_SA}" \
+  --set-env-vars="GOOGLE_CLOUD_PROJECT=layak-myaifuturehackathon" \
+  --command=python \
+  --args=-m,scripts.prune_free_tier \
+  --max-retries=1 \
+  --task-timeout=300 \
+  --memory=512Mi \
+  --project=layak-myaifuturehackathon
+
+# Subsequent updates (same flags, `update` not `create`):
+gcloud run jobs update layak-prune-free-tier \
+  --image="${IMAGE}" \
+  --region=asia-southeast1 \
+  --project=layak-myaifuturehackathon
+```
+
+> `--max-retries=1` and `--task-timeout=300` are deliberate. The script is idempotent — a second run deletes whatever the first missed and logs a fresh summary — but we still prefer one retry rather than unbounded, because a Firestore outage longer than 5 min is an ops problem, not a job problem, and Cloud Scheduler surfaces the failure in its recent-runs panel.
+
+### 4.3 Schedule the Job via Cloud Scheduler
+
+02:00 MYT = 18:00 UTC. Scheduler expressions are in the scheduler's timezone; set it explicitly to avoid DST surprises (Malaysia doesn't observe DST, but the scheduler region can).
+
+```bash
+# One-time: enable the scheduler API.
+gcloud services enable cloudscheduler.googleapis.com --project=layak-myaifuturehackathon
+
+# Scheduler needs an SA that can invoke Cloud Run Jobs. Grant `roles/run.invoker`
+# on the job itself to a dedicated scheduler SA (or reuse the default Compute SA
+# with the same role).
+SCHED_SA="layak-scheduler@layak-myaifuturehackathon.iam.gserviceaccount.com"
+
+gcloud iam service-accounts create layak-scheduler \
+  --display-name="Layak Cloud Scheduler invoker" \
+  --project=layak-myaifuturehackathon 2>/dev/null || true
+
+gcloud run jobs add-iam-policy-binding layak-prune-free-tier \
+  --member="serviceAccount:${SCHED_SA}" \
+  --role="roles/run.invoker" \
+  --region=asia-southeast1 \
+  --project=layak-myaifuturehackathon
+
+# Create the daily schedule. 02:00 MYT → cron "0 2 * * *" in `Asia/Kuala_Lumpur`.
+# Cloud Run Admin API (the `:run` endpoint) accepts only OIDC ID tokens, NOT
+# OAuth2 access tokens — `--oauth-*` flags fail auth at invocation time. The
+# audience is the root of the Cloud Run Admin API host; the `Bearer` token
+# Scheduler mints is validated against that aud claim by the Admin API.
+gcloud scheduler jobs create http layak-prune-nightly \
+  --location=asia-southeast1 \
+  --schedule="0 2 * * *" \
+  --time-zone="Asia/Kuala_Lumpur" \
+  --uri="https://asia-southeast1-run.googleapis.com/apis/run.googleapis.com/v1/namespaces/layak-myaifuturehackathon/jobs/layak-prune-free-tier:run" \
+  --http-method=POST \
+  --oidc-service-account-email="${SCHED_SA}" \
+  --oidc-token-audience="https://asia-southeast1-run.googleapis.com/" \
+  --project=layak-myaifuturehackathon
+```
+
+> Scheduler also needs `roles/iam.serviceAccountTokenCreator` on `${SCHED_SA}` to mint the OIDC token. Grant it once:
+>
+> ```bash
+> gcloud iam service-accounts add-iam-policy-binding "${SCHED_SA}" \
+>   --member="serviceAccount:${SCHED_SA}" \
+>   --role="roles/iam.serviceAccountTokenCreator" \
+>   --project=layak-myaifuturehackathon
+> ```
+
+### 4.3.1 Coexistence with PDPA account deletion
+
+`DELETE /api/user` (spec §3.8, `backend/app/routes/user.py`) and this Job both batch-delete `evaluations/*` docs for the same user. If a free-tier user fires an account deletion while the Job is mid-flight, a doc already queued by one side can also be targeted by the other — Firestore treats `batch.delete()` on a missing doc as a harmless no-op, so the worst case is a wasted write and a `deletedEvaluations` count that briefly disagrees with independent spot-checks. No coordination primitive is needed; the Job is safe to re-run at any time.
+
+### 4.4 Verification
+
+```bash
+# One-off manual run — useful for smoke + demo dry-run.
+gcloud run jobs execute layak-prune-free-tier \
+  --region=asia-southeast1 \
+  --project=layak-myaifuturehackathon \
+  --wait
+
+# Tail the structured log line from the most recent execution.
+gcloud logging read '
+  resource.type="cloud_run_job"
+  resource.labels.job_name="layak-prune-free-tier"
+  jsonPayload.message:"prune_free_tier"
+' --limit=5 --format=json --project=layak-myaifuturehackathon
+```
+
+Expected stdout inside the Job's log:
+
+```json
+{
+  "severity": "INFO",
+  "message": "prune_free_tier complete",
+  "dryRun": false,
+  "deletedEvaluations": 42,
+  "freeUsersChecked": 17,
+  "cutoffIso": "2026-03-23T18:00:00+00:00",
+  "retentionDays": 30
+}
+```
+
+`severity:"ERROR"` + non-zero exit on any Firestore failure — the Cloud Scheduler run panel marks the trigger failed so operators notice without polling the Logs Explorer.
+
+### 4.5 Dry-run without side effects
+
+Useful before the first scheduled run and for debugging unexpected counts. `gcloud run jobs execute` does not accept `--args` as a per-execution override, so deploy a sibling Job that always runs with the `--dry-run` flag baked into its args:
+
+```bash
+gcloud run jobs create layak-prune-dryrun \
+  --image="${IMAGE}" \
+  --region=asia-southeast1 \
+  --service-account="${PRUNE_SA}" \
+  --set-env-vars="GOOGLE_CLOUD_PROJECT=layak-myaifuturehackathon" \
+  --command=python \
+  --args=-m,scripts.prune_free_tier,--dry-run \
+  --max-retries=0 \
+  --task-timeout=300 \
+  --memory=512Mi \
+  --project=layak-myaifuturehackathon
+
+gcloud run jobs execute layak-prune-dryrun \
+  --region=asia-southeast1 \
+  --project=layak-myaifuturehackathon \
+  --wait
+```
+
+The JSON payload carries `"dryRun":true` and `deletedEvaluations` reflects what **would** have been deleted; no batch commits are issued. The dry-run Job is not scheduled — run it by hand only.

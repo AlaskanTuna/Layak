@@ -48,6 +48,10 @@ RUN pip install --no-cache-dir --upgrade pip wheel \
 # App code (templates + schemas + tools + rules + agents + fixtures + main).
 COPY app ./app
 COPY data ./data
+# Operational scripts — the prune Cloud Run Job (Phase 6 Task 1) runs from
+# inside this image. `adk deploy cloud_run` + `gcloud run jobs deploy` share
+# the image; the Job overrides CMD via `--command python --args -m,scripts.prune_free_tier`.
+COPY scripts ./scripts
 
 # Cloud Run injects PORT; default to 8080 for local runs.
 ENV PORT=8080

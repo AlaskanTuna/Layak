@@ -671,9 +671,9 @@ _Frontend:_
 
 **Implementation — PO1 (Hao):**
 
-- [ ] Implement `backend/scripts/prune_free_tier.py` against the `users` and `evaluations` collections.
-- [ ] Deploy the job as `layak-prune-free-tier` and schedule it nightly via Cloud Scheduler.
-- [ ] Keep the job logging the deleted-doc count to Cloud Logging so retention runs are visible.
+- [x] Implement `backend/scripts/prune_free_tier.py` against the `users` and `evaluations` collections. _(Iterates `users.where("tier","==","free").stream()`, then per-user `evaluations.where("userId","==",uid).where("createdAt","<",now-30d).stream()`; batched `.delete()` at 450 ops/commit to stay under Firestore's 500-op batch cap. `--dry-run` flag counts without committing. 12 unit tests green. Dockerfile now `COPY scripts ./scripts` so the Job image carries the entry point.)_
+- [ ] Deploy the job as `layak-prune-free-tier` and schedule it nightly via Cloud Scheduler. _(Recipe landed at `docs/runbook.md` §4: dedicated `layak-prune-job` service account with `roles/datastore.user` only; `gcloud run jobs create` overrides `CMD` to `python -m scripts.prune_free_tier`; `gcloud scheduler jobs create http` fires at `0 2 * * *` in `Asia/Kuala_Lumpur`. Awaiting a live `gcloud` session to execute.)_
+- [x] Keep the job logging the deleted-doc count to Cloud Logging so retention runs are visible. _(Single structured-JSON line to stdout on every run — `severity`, `message`, `deletedEvaluations`, `freeUsersChecked`, `cutoffIso`, `retentionDays`, `dryRun`. Cloud Run Jobs forward stdout to Cloud Logging's `jsonPayload` automatically. Failures emit `severity:"ERROR"` and exit non-zero so Cloud Scheduler surfaces the failed run.)_
 
 **Exit criteria:** the nightly prune job runs on schedule and deletes only free-tier evaluations older than 30 days.
 

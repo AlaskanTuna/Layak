@@ -340,9 +340,9 @@ _All four exit-criteria items met: Aisyah total = **RM8,208/year** (STR RM450 + 
 
 **Implementation — PO1 (Hao):**
 
-- [ ] Wire the Firestore contract in `firestore.rules` and `firestore.indexes.json` for `users/{userId}`, `evaluations/{evalId}`, and `waitlist/{autoId}`.
-- [ ] Define the `evaluations(userId ASC, createdAt DESC)` composite index explicitly so history queries and rate-limit counts use the same shape.
-- [ ] Record the rollout command in the runbook: `gcloud firestore indexes composite create ...` for the `evaluations` history window, then deploy rules and indexes with the repo's Firebase deploy path.
+- [x] Wire the Firestore contract in `firestore.rules` and `firestore.indexes.json` for `users/{userId}`, `evaluations/{evalId}`, and `waitlist/{autoId}`. _(Repo-root `firestore.rules` + `firestore.indexes.json`, glued together by `firebase.json`.)_
+- [x] Define the `evaluations(userId ASC, createdAt DESC)` composite index explicitly so history queries and rate-limit counts use the same shape. _(Single composite index in `firestore.indexes.json`; `collectionGroup: evaluations`, `userId` ASC + `createdAt` DESC.)_
+- [x] Record the rollout command in the runbook: `gcloud firestore indexes composite create ...` for the `evaluations` history window, then deploy rules and indexes with the repo's Firebase deploy path. _(New `docs/runbook.md` §1: preferred path `firebase deploy --only firestore:rules,firestore:indexes`; gcloud fallback for the composite index; verification via `gcloud firestore indexes composite list`.)_
 
 **Exit criteria:** the repo has checked-in Firestore rules and index definitions for the `users`, `evaluations`, and `waitlist` collections, including the `userId + createdAt` composite index.
 

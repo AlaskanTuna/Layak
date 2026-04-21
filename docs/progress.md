@@ -4,6 +4,29 @@
 
 ---
 
+## [21/04/26] - Phase 2 Task 1 PO1: Firestore contract checked in (rules + composite index + rollout runbook)
+
+PO1's slice of Phase 2 Task 1 — the Firestore contract that later Phase 2/3 work will depend on. No deploy yet; this task ends at the repo having the rules, indexes, and Firebase project config committed, plus a repeatable rollout command recorded in the new runbook.
+
+- **`firebase.json` at repo root** — one-line config pointing at `firestore.rules` and `firestore.indexes.json`. Required for the Firebase CLI (`firebase deploy --only firestore:rules,firestore:indexes`) to pick up both files from a single `firebase deploy` call.
+- **`firestore.rules`** — transcribed verbatim from `docs/superpowers/specs/2026-04-21-v2-saas-pivot-design.md` §3.4. Three matchers:
+  - `users/{userId}` — client read only when `request.auth.uid == userId`; `allow write: if false` (backend Admin SDK bypasses rules).
+  - `evaluations/{evalId}` — client read only when `request.auth.uid == resource.data.userId`; `allow write: if false`.
+  - `waitlist/{entry}` — `allow create` if any authenticated user; reads/updates/deletes blocked.
+- **`firestore.indexes.json`** — one composite index covering the two hot queries: the `/dashboard/evaluation` history view (`orderBy createdAt desc, where userId == uid`) and the rate-limit count (`where userId == uid AND createdAt >= now - 24h`). Shape: `collectionGroup: evaluations`, `queryScope: COLLECTION`, fields `[userId ASC, createdAt DESC]`, empty `fieldOverrides`.
+- **New `docs/runbook.md` §1 "Firestore rollout (Phase 2 Task 1)"** — canonical rollout:
+  1. Pre-flight: `gcloud services enable firestore.googleapis.com firebase.googleapis.com`; one-time `gcloud firestore databases create --location=asia-southeast1 --type=firestore-native`.
+  2. Preferred deploy: `firebase use layak-myaifuturehackathon && firebase deploy --only firestore:rules,firestore:indexes`.
+  3. Alternative (composite index only, no rules): `gcloud firestore indexes composite create --collection-group=evaluations --query-scope=COLLECTION --field-config=field-path=userId,order=ascending --field-config=field-path=createdAt,order=descending`.
+  4. Verification: `gcloud firestore indexes composite list` shows the index; `firebase deploy --only firestore:rules --dry-run` shows no drift.
+- **`.firebaserc`** — minimal project binding (`"default": "layak-myaifuturehackathon"`). Added after the audit flagged that `firebase deploy` otherwise prompts/writes this on first run; committing it makes the runbook command deterministic on a fresh clone.
+- **Out of scope for this task**: no Firestore database provisioned; no Firebase project initialised; no Admin SDK / `backend/app/auth.py` — those belong to Phase 2 Task 2. All code changes are contract-only — zero runtime impact on the deployed v1 services.
+- **Audits (two subagents in parallel)**:
+  - **Correctness** (`general-purpose`): rules match spec §3.4 character-for-character; single composite index satisfies both the history view and the rate-limit count; `firebase.json` valid. Warnings (missing `.firebaserc`, bogus `--dry-run`, §1.2 vs §1.3 not mutually exclusive, `firebase.googleapis.com` scope creep) were addressed inline this turn before commit.
+  - **Forward-compatibility** (`general-purpose`): all six future operations (lazy-create user, evaluations write path, client realtime read on `/results/[id]`, rate-limit count, history view, waitlist create, PDPA cascade delete) are cleanly supported by the current contract — no amendment expected through Phase 4.
+
+---
+
 ## [21/04/26] - Task 6 PO1: backend + frontend deployed to Cloud Run with CORS lockdown
 
 PO1's slice of Phase 1 Task 6 — both services live on Cloud Run in `asia-southeast1`, `min-instances=1 --cpu-boost` to guarantee no cold start during the demo window.

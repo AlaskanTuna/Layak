@@ -609,9 +609,9 @@ _Frontend:_
 
 **Implementation — PO2 (Adam):**
 
-- [ ] Rewrite `frontend/src/app/page.tsx` to hold the hero, inline How It Works pipeline visual, pricing cards, and footer links.
-- [ ] Keep the CTA pointed at `/sign-in` and make the Free/Pro cards match the v2 launch story.
-- [ ] Ensure the landing page stays the public entry point for the product story, not a dashboard teaser.
+- [x] Rewrite `frontend/src/app/page.tsx` to hold the hero, inline How It Works pipeline visual, pricing cards, and footer links.
+- [x] Keep the CTA pointed at `/sign-in` and make the Free/Pro cards match the v2 launch story.
+- [x] Ensure the landing page stays the public entry point for the product story, not a dashboard teaser.
 
 **Exit criteria:** anonymous visitors land on a complete marketing page with hero, How It Works, pricing, and Google sign-in CTA.
 
@@ -623,9 +623,9 @@ _Frontend:_
 
 **Implementation — PO2 (Adam):**
 
-- [ ] Add `frontend/src/app/privacy/page.tsx` with the PDPA-compliant privacy notice.
-- [ ] Add `frontend/src/app/terms/page.tsx` with the terms of use content.
-- [ ] Link both pages from the landing footer and the sign-up consent copy.
+- [x] Add `frontend/src/app/privacy/page.tsx` with the PDPA-compliant privacy notice.
+- [x] Add `frontend/src/app/terms/page.tsx` with the terms of use content.
+- [x] Link both pages from the landing footer and the sign-up consent copy.
 
 **Exit criteria:** `/privacy` and `/terms` render as static pages and are reachable from the public UI.
 
@@ -637,9 +637,9 @@ _Frontend:_
 
 **Implementation — PO2 (Adam):**
 
-- [ ] Update `frontend/src/app/sign-up/page.tsx` so the checkbox must be ticked before the Google button opens OAuth.
-- [ ] Persist `pdpaConsentAt` on the user doc through the auth flow in `backend/app/auth.py`.
-- [ ] Keep the sign-up copy aligned with the `/privacy` notice and the footer links.
+- [x] Update `frontend/src/app/sign-up/page.tsx` so the checkbox must be ticked before the Google button opens OAuth.
+- [x] Persist `pdpaConsentAt` on the user doc through the auth flow in `backend/app/auth.py`.
+- [x] Keep the sign-up copy aligned with the `/privacy` notice and the footer links.
 
 **Exit criteria:** sign-up refuses OAuth until consent is checked and the consent timestamp is stored.
 
@@ -651,9 +651,9 @@ _Frontend:_
 
 **Implementation — PO2 (Adam):**
 
-- [ ] Share the full-viewport card layout between `frontend/src/app/sign-in/page.tsx` and `frontend/src/app/sign-up/page.tsx`.
-- [ ] Keep the loading spinner and error toast behavior consistent across both auth pages.
-- [ ] Route successful auth back to `/dashboard` without a detour.
+- [x] Share the full-viewport card layout between `frontend/src/app/sign-in/page.tsx` and `frontend/src/app/sign-up/page.tsx`.
+- [x] Keep the loading spinner and error toast behavior consistent across both auth pages.
+- [x] Route successful auth back to `/dashboard` without a detour.
 
 **Exit criteria:** the auth pages look polished, handle failure cleanly, and return the user to the dashboard on success.
 

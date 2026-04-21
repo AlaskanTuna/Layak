@@ -56,6 +56,37 @@
     }
   },
   "marketing": {
+    "pricing": {
+      "title": "Simple, transparent pricing",
+      "description": "Start tracking your welfare eligibility for free. Upgrade to Pro when you need more power.",
+      "freeTier": {
+        "name": "Free",
+        "description": "For individuals exploring their eligibility.",
+        "price": "RM 0",
+        "period": "forever",
+        "cta": "Get Started",
+        "features": [
+          "5 evaluations per 24 hours",
+          "30-day evaluation history",
+          "Access to STR, JKM, and LHDN schemes",
+          "Watermarked draft packets"
+        ]
+      },
+      "proTier": {
+        "name": "Pro",
+        "description": "For high-volume users and agencies.",
+        "price": "RM 15",
+        "period": "per month",
+        "cta": "Join the Waitlist",
+        "features": [
+          "Unlimited evaluations",
+          "Unlimited evaluation history",
+          "Priority processing queue",
+          "CSV export of all history",
+          "Early access to new schemes"
+        ]
+      }
+    },
     "hero": {
       "headlinePart1": "Know every Malaysian scheme",
       "headlinePart2": "you qualify for — in one upload.",

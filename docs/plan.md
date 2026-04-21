@@ -231,9 +231,9 @@ _All four exit-criteria items met: Aisyah total = **RM8,208/year** (STR RM450 + 
 
 **Implementation — Both, paired:**
 
-- [ ] `NEXT_PUBLIC_BACKEND_URL=http://localhost:8080` in root `.env` (default value already in root `.env.example`; reaches Next.js via the `frontend/.env.local -> ../.env` symlink auto-created by `pnpm dev`).
-- [ ] `frontend/src/lib/sse-client.ts` points at `${NEXT_PUBLIC_BACKEND_URL}/api/agent/intake`; remove the mock-mode flag (or move it behind a dev-only toggle).
-- [ ] **Happy path**: upload Aisyah fixtures via the widget → five SSE events fire → ranked list + provenance + total RM render → Code Execution panel shows Python → draft packet downloads.
+- [x] `NEXT_PUBLIC_BACKEND_URL=http://localhost:8080` in root `.env` (default value already in root `.env.example`; reaches Next.js via the `frontend/.env.local -> ../.env` symlink auto-created by `pnpm dev`).
+- [x] `frontend/src/lib/sse-client.ts` points at `${NEXT_PUBLIC_BACKEND_URL}/api/agent/intake`; remove the mock-mode flag (or move it behind a dev-only toggle).
+- [x] **Happy path**: upload Aisyah fixtures via the widget → five SSE events fire → ranked list + provenance + total RM render → Code Execution panel shows Python → draft packet downloads.
 
 **Implementation — PO1 (Hao):**
 
@@ -247,7 +247,7 @@ _All four exit-criteria items met: Aisyah total = **RM8,208/year** (STR RM450 + 
 - [x] **Error surface**: `frontend/src/components/home/error-recovery-card.tsx` — `destructive`-tinted card rendered when `state.phase === 'error'`, showing the SSE error message plus two actions: `Try with sample documents` (triggers mock replay) and `Start over` (resets). Covers FR-3 AC.
 - [x] Mobile polish pass on the upload widget (375px): no-op required — the widget already stacks the three inputs vertically on every breakpoint (`flex flex-col gap-4`), so no "side-by-side" squeeze exists. Bonus: tightened `scheme-card.tsx` header to stack vertically below `sm` (`flex-col sm:flex-row`) so the RM amount doesn't crowd long scheme names on 375px; `Badge` constrained to `w-fit`; title gets `break-words`.
 
-- [ ] Commit (paired): `feat(ui): wire real sse stream and packet download to backend`.
+- [x] Commit (paired): `feat(ui): wire real sse stream and packet download to backend`.
 
 **Exit criteria:** live happy path runs against Aisyah fixtures in under 10 seconds locally (warm); three draft PDFs download and are visibly watermarked; no hardcoded secrets; no console errors on the happy path.
 
@@ -478,7 +478,7 @@ _All four exit-criteria items met: Aisyah total = **RM8,208/year** (STR RM450 + 
 **Implementation — PO2 (Adam):**
 
 - [ ] Move the sample PDFs into `frontend/public/fixtures/` and point the "Use Aisyah sample documents" button at the real intake flow.
-- [ ] Keep `NEXT_PUBLIC_USE_MOCK_SSE` as a dev-only replay toggle in `frontend/src/fixtures/aisyah-response.ts`.
+- [x] Keep `NEXT_PUBLIC_USE_MOCK_SSE` as a dev-only replay toggle in `frontend/src/fixtures/aisyah-response.ts`.
 - [ ] Ensure `frontend/src/components/upload/upload-widget.tsx` posts the real files through `frontend/src/lib/firebase.ts` and the backend intake endpoint.
 
 **Exit criteria:** the sample-documents button uses the real upload path and still works when mock SSE is disabled.

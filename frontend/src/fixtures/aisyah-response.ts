@@ -1,5 +1,5 @@
 /**
- * Aisyah canned SSE replay for demo mode (FR-10) and `NEXT_PUBLIC_USE_MOCK_SSE=1`.
+ * Aisyah canned SSE replay for demo mode (FR-10) and the dev-only `NEXT_PUBLIC_USE_MOCK_SSE=1` escape hatch.
  *
  * Mirrors the live rule-engine output from `backend/app/fixtures/aisyah.py` (which
  * is computed against `backend/app/rules/{str_2026,jkm_warga_emas,lhdn_form_b}.py`).

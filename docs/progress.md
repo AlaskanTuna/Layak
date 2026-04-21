@@ -4,6 +4,12 @@
 
 ---
 
+## [21/04/26] - Task 5 PO2 final sweep: dev-only mock replay toggle and local happy-path smoke
+
+The last Task 5 frontend guardrail is now dev-only (`NODE_ENV !== 'production' && NEXT_PUBLIC_USE_MOCK_SSE=1`), so production builds always hit the real backend while demo replay stays available in development. Verified with a backend SSE smoke against generated Aisyah PDFs: 5 `step_started`, 5 `step_result`, 1 `done`, 0 `error`; all three draft packet filenames were returned with base64 bytes. Frontend `pnpm lint` and `pnpm build` stayed green.
+
+---
+
 ## [21/04/26] - Task 5 PO1: WeasyPrint packet generator with Jinja templates and DRAFT watermark (base64-embedded delivery)
 
 PO1's slice of Phase 1 Task 5 — the WeasyPrint draft-packet generator (commit `6ff2b64`). Replaces the Path 1 filename-only stub with real PDF generation. Delivery: base64-encoded PDF bytes in `PacketDraft.blob_bytes_b64`, carried verbatim in the terminal `DoneEvent.packet`. Stateless invariant (docs/trd.md §6.5) preserved — no `/api/agent/packet/{id}` endpoint, no request-scope persistence.
@@ -19,7 +25,7 @@ PO1's slice of Phase 1 Task 5 — the WeasyPrint draft-packet generator (commit 
 - **New `backend/Dockerfile`** (for Task 6): `python:3.12-slim` + apt install `libpango-1.0-0` / `libpangoft2-1.0-0` / `libharfbuzz0b` / `libcairo2` / `libgdk-pixbuf-2.0-0` / `shared-mime-info` / `fonts-dejavu-core` / `fonts-liberation`. `exec uvicorn` as PID 1 for Cloud Run SIGTERM.
 - **Cross-platform**: code is pure Python; native deps vary per-OS. Linux/Cloud Run uses Dockerfile apt installs. Windows dev needs GTK+ Windows runtime installer. macOS: `brew install pango`.
 - **In-process smoke (authoritative for Task 5 PO1)**: `generate_packet(AISYAH_PROFILE, AISYAH_SCHEME_MATCHES)` produced 3 PDFs (23-27 KB each). `pypdf` text extraction verified on every PDF: `DRAFT` + `NOT SUBMITTED` watermarks present, `AISYAH BINTI AHMAD` rendered, IC last-4 `4321` rendered, **no full-IC leak**.
-- **End-to-end SSE smoke (partial)**: Gemini 2.5 Flash rate-limited (503 UNAVAILABLE burst) intermittently blocks `extract` / `classify`. When all three Gemini calls succeed, the full 11-event stream reaches `DoneEvent` with base64-embedded PDFs. Orchestrator correctly reports `ErrorEvent.step="extract"` / `step="classify"` (Path 2 audit fix holds); `sanitize_error_message` redacts 5+-digit runs. Demo safety net: **"Use Aisyah sample documents"** replays the mock SSE fixture bypassing Gemini.
+- **End-to-end SSE smoke (partial)**: Gemini 2.5 Flash rate-limited (503 UNAVAILABLE burst) intermittently blocks `extract` / `classify`. When all three Gemini calls succeed, the full 11-event stream reaches `DoneEvent` with base64-embedded PDFs. Orchestrator correctly reports `ErrorEvent.step="extract"` / `step="classify"` (Path 2 audit fix holds); `sanitize_error_message` redacts 5+-digit runs. Demo safety net: **"Use Aisyah sample documents"** replays the mock SSE fixture bypassing Gemini, and the replay escape hatch is now dev-only.
 - **Verification**: ruff clean on 22 files, pytest 39/39 passed in 2.93 s.
 
 ---

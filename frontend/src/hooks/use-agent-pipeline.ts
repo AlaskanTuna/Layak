@@ -54,7 +54,7 @@ const INITIAL_STATE: PipelineState = {
 }
 
 function shouldForceMock(): boolean {
-  return process.env.NEXT_PUBLIC_USE_MOCK_SSE === '1'
+  return process.env.NODE_ENV !== 'production' && process.env.NEXT_PUBLIC_USE_MOCK_SSE === '1'
 }
 
 function getBackendUrl(): string {

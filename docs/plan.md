@@ -502,6 +502,21 @@ _Frontend:_
 
 **Exit criteria:** landing page shows the toggle; typing the Aisyah values into the manual form and clicking **Generate packet** produces the same ranked-scheme list, total RM upside, and provenance citations as the upload path against the Aisyah fixture documents; no full IC number crosses the wire; all tests green; ruff clean.
 
+**Post-launch hardening pass (22/04/26):**
+
+- [x] Utility bill section reverted from Required → Optional so users uncomfortable sharing address / bill can still run an evaluation.
+- [x] Added `monthly_cost_rm` field above `monthly_kwh` (users recall RM paid more readily than kWh consumed). Field threaded through `Profile` + `ManualEntryPayload` + extract prompt + Aisyah fixtures + frontend types.
+- [x] **Input sanitisation.** New `backend/app/schema/sanitize.py` — `sanitize_free_text` strips Unicode Cc/Cf/Cs/Co categories (control chars, RTL overrides, zero-width joiners, BOM, surrogates, private-use), NFKC-normalises, collapses whitespace, trims, enforces max-length. Applied via Pydantic `AfterValidator` to `ManualEntryPayload.name` (200 chars) and `.address` (300 chars, down from 500). 23 unit tests cover every Unicode category, common attack shapes (RTL override, zero-width injection), Malaysian happy paths (CJK names, diacritics), and empty-after-cleaning rejection.
+- [x] **Prompt-injection hardening.** Added a "Security" section to `classify_household`'s Gemini prompt instructing it to treat `name` + `address` as data only and ignore any text inside them that looks like instructions. Defense-in-depth alongside the content sanitiser — Gemini's response is still shape-validated via `HouseholdClassification.model_validate_json`.
+- [x] Address `max_length` tightened from 500 → 300 to reduce prompt-token footprint without truncating real MY addresses.
+- [x] Frontend zod schema mirrors the new 300-char address cap + `monthly_cost_rm` field; Aisyah demo defaults include `monthly_cost_rm: '95.40'` so the demo populates the whole utility card.
+
+**Other oversights noted (tracked for future hardening, not actioned here):**
+
+- Token-burn cap on the full payload (e.g., reject requests whose JSON-serialised ManualEntryPayload exceeds N bytes) — the per-field caps already bound total size, so this is belt-and-braces.
+- Frontend mirror of the sanitiser — currently the frontend sends raw input; server-side sanitisation is the authoritative line. Adding client-side as defence-in-depth would surface character-stripping to the user before submit.
+- Gemini structured-output schema (`response_schema=HouseholdClassification`) — would constrain even a successful prompt injection to the declared shape. Currently only `response_mime_type="application/json"` is set; schema was dropped earlier due to an `extra="forbid"` dialect rejection. Worth revisiting on a future Gemini SDK minor bump.
+
 ---
 
 ## Phase 4: Dashboard UX (History, Stats, Settings)
@@ -558,11 +573,13 @@ _Frontend:_
 
 **Implementation — PO1 (Hao):**
 
-- [ ] Add `backend/app/routes/user.py` with `GET /api/user/export` and `DELETE /api/user`.
-- [ ] Read `users/{userId}` plus all matching `evaluations` records and return them as a downloadable JSON attachment for export.
-- [ ] Cascade-delete `evaluations`, delete `users/{userId}`, and call `firebase_admin.auth.delete_user(uid)` on account removal.
+- [x] Add `backend/app/routes/user.py` with `GET /api/user/export` and `DELETE /api/user`. _(Mounted in `main.py` via `user_router`. Both endpoints authed via `CurrentUser`; only the caller's own data is touched.)_
+- [x] Read `users/{userId}` plus all matching `evaluations` records and return them as a downloadable JSON attachment for export. _(Returns `application/json` with `Content-Disposition: attachment; filename="layak-export-{uid}.json"` + `Cache-Control: no-store`. Body: `{uid, exportedAt:<ISO-8601 UTC>, schemaVersion:1, user, evaluations:[{id, ...}]}`. Evaluations ordered `createdAt DESC` via the existing `(userId ASC, createdAt DESC)` composite index. Timestamps serialised to ISO strings via `_serialise_doc`. Handles missing `users/{uid}` gracefully — returns `user: null`, 200 not 404.)_
+- [x] Cascade-delete `evaluations`, delete `users/{userId}`, and call `firebase_admin.auth.delete_user(uid)` on account removal. _(Firestore deletes in batches of 450 ops to stay under the 500-op-per-batch SDK cap. Order: evaluations → user doc → auth. `UserNotFoundError` is idempotent. Other Auth failures after Firestore success return 500 with a descriptive retry hint; Firestore side is idempotent-by-being-empty on retry. Returns 204 No Content on success.)_
 
 **Exit criteria:** export downloads the user bundle and delete removes the Firestore records plus the Firebase Auth account.
+
+**Tests:** `backend/tests/test_user_routes.py` — 10 cases covering auth wall (both endpoints), export happy path (user + 2 evals, ISO timestamp serialisation, uid-scoping, `Cache-Control: no-store`), export with no evals, export with missing user doc, delete cascade (3 evals + user doc = 4 batch ops, `auth.delete_user(uid)` called), delete idempotent when Auth record already gone (`UserNotFoundError`), delete 500 on Firestore failure (auth.delete_user NOT called — critical invariant), delete 500 on Auth failure after Firestore success (retry hint in detail), delete batches large eval counts (950 evals → multiple batch commits). Backend suite: **156/156 green**; ruff clean.
 
 ### 5. Feature: Waitlist Firestore collection + `UpgradeWaitlistModal`
 

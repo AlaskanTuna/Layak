@@ -48,6 +48,9 @@ Rules (enforce strictly):
 - `form_type`: `form_b` if the income document implies self-employment / gig
   work (Grab, e-wallet, i-Saraan, no EA Form); `form_be` if a regular salary
   slip from a named employer.
+- `monthly_cost_rm`: number — total monthly electricity cost in MYR from the
+  utility bill (TNB). Optional: omit or set to `null` if the total isn't
+  legible. Return a bare number; no currency symbol.
 - `monthly_kwh`: integer — total monthly electricity consumption in kWh from
   the utility bill (TNB). Optional: omit the field entirely or set it to
   `null` if the bill doesn't show consumption legibly. Never fabricate.

@@ -4,6 +4,37 @@
 
 ---
 
+## [22/04/26] - Phase 4 Task 4 PO1: PDPA export + cascade-delete endpoints
+
+PO1's Phase 4 Task 4 — authed users can now exercise PDPA 2010 §26 (data-subject access) and §34 (right-to-erasure) via two REST endpoints. No admin-impersonation path exposed; every caller only touches their own data.
+
+- **`backend/app/routes/user.py` (new).**
+  - `GET /api/user/export` — streams the caller's `users/{uid}` doc + all their `evaluations` (ordered `createdAt DESC`) as a JSON attachment. Body shape: `{uid, exportedAt:<ISO-8601 UTC>, schemaVersion:1, user, evaluations:[{id, ...rest}]}`. Headers: `Content-Disposition: attachment; filename="layak-export-{uid}.json"` + `Cache-Control: no-store` (personal data). Timestamps serialised through `_serialise_doc` which converts `DatetimeWithNanoseconds` to ISO strings.
+  - `DELETE /api/user` — cascade: (1) batch-delete every `evaluations/{evalId}` where `userId == uid` in chunks of 450 ops (stays under the 500-op-per-batch Firestore cap so Pro users with hundreds of evals still complete cleanly), (2) delete `users/{uid}`, (3) `fb_auth.delete_user(uid)`. Ordering is deliberate — Firestore-first, Auth-last — so a partial failure never leaves the user with an active session AND live records. `UserNotFoundError` on step 3 is idempotent (logged + treated as success on retry). Other Auth failures after Firestore success return 500 with a retry hint; the Firestore half is idempotent-by-being-empty on retry.
+- **`backend/app/main.py`**: mounted `user_router` alongside `evaluations_router`.
+- **Tests** — `backend/tests/test_user_routes.py` — 10 cases: auth wall on both endpoints; export happy path (asserts `eval_collection.where` scoped to `userId == uid`, validates ISO timestamp serialisation, attachment header, `Cache-Control: no-store`); export with no evals; export with missing user doc (200 + `user:null`, not 404); delete cascade (3 evals + user doc = 4 batch deletes, `auth.delete_user(uid)` called exactly once with the right uid); delete idempotent on `UserNotFoundError`; **critical invariant** — delete 500 on Firestore failure NEVER calls `auth.delete_user`; delete 500 on Auth failure after Firestore success returns a descriptive detail mentioning retry; delete batches 950 evals via multiple batch commits. All 10 pass.
+- **Full backend suite**: 156/156 green (123 prior + 10 new PDPA + 23 new sanitiser tests from the Manual Entry review below). Ruff clean.
+
+---
+
+## [22/04/26] - Manual Entry review: input sanitisation, monthly_cost_rm field, utility-bill reverted to Optional, address cap 500→300
+
+Post-launch hardening pass on Phase 3 Task 6 (Manual Entry Mode) following PO1's review. Every free-text field now runs through a Unicode-aware sanitiser before reaching Gemini prompts or WeasyPrint templates; the utility-bill section is optional again; RM cost now sits above kWh; prompt-injection backstop added on the classify step.
+
+- **`backend/app/schema/sanitize.py` (new).** Single place for free-text scrubbing. `sanitize_free_text(value, max_length, allow_newlines=False)` strips every character whose Unicode general category is `Cc` (control), `Cf` (format — includes zero-width joiner/non-joiner/BOM, LTR/RTL override, LTR/RTL embed, bidi isolate), `Cs` (surrogate), or `Co` (private-use). `\t` and `\n` are whitelisted explicitly; newlines downgrade to spaces on single-line fields. NFKC-normalises so fullwidth / halfwidth / compatibility variants collapse (prevents duplicate Firestore docs for visually-same names). Collapses `[ \t]+` runs to a single space; clamps 3+ newline runs to 2 (paragraph break). Raises `ValueError` on empty-after-cleaning so Pydantic re-raises as 422. Two wrappers: `sanitize_name` (200-grapheme cap, single-line) and `sanitize_address` (300-grapheme cap, multi-line).
+- **`backend/app/schema/manual_entry.py`**: `name` and `address` now typed as `Annotated[str, AfterValidator(sanitize_name)]` / `AfterValidator(sanitize_address)`. Address `max_length` tightened from 500 → 300. New `monthly_cost_rm: float | None` (ge=0, le=100_000). Field order on the payload: `address` → `monthly_cost_rm` → `monthly_kwh` → `dependants`.
+- **`backend/app/schema/profile.py`**: mirror `monthly_cost_rm: float | None`. Profile round-trips cleanly through Firestore.
+- **`backend/app/agents/tools/build_profile.py`**: threads `monthly_cost_rm` from payload → Profile.
+- **`backend/app/agents/tools/extract.py`**: added `monthly_cost_rm` bullet to the Gemini extract prompt so the upload path can populate it from the TNB bill's RM total when visible.
+- **`backend/app/agents/tools/classify.py`**: added a **Security** paragraph to the prompt — instructs Gemini to treat `name` and `address` as data-only, ignore any instruction-shaped text inside them. Defence-in-depth alongside the content sanitiser; Gemini response is still shape-validated through `HouseholdClassification.model_validate_json`.
+- **Frontend — `manual-entry-form.tsx`**: Utility bill section reverted from Required → **Optional** (green pill). New `monthly_cost_rm` field rendered **above** `monthly_kwh` with help copy that acknowledges users recall RM more readily than kWh (`"The RM amount on the bottom of your latest TNB bill. Most people remember this more easily than kWh."`). Address `<Textarea maxLength={300}>` matches the backend cap. Zod schema extended with `monthly_cost_rm` regex (`/^\d+(\.\d{1,2})?$/`, max 100,000). Aisyah default: `monthly_cost_rm: '95.40'` (realistic for a 220 kWh household in Kuantan).
+- **Frontend — `agent-types.ts`**: `Profile.monthly_cost_rm?` + `ManualEntryPayload.monthly_cost_rm` added.
+- **Tests** — `backend/tests/test_sanitize.py` (23 cases): control-char stripping; tab/newline preservation-when-allowed; newline downgrade-when-not; RTL override stripped; zero-width joiner + BOM stripped; bidi isolate stripped; CJK + diacritics preserved (Malaysian happy path); NFKC fullwidth→halfwidth; whitespace collapsing; surrounding-whitespace trim; empty-after-cleaning rejection; whitespace-only rejection; max-length truncation; non-string input rejection; `sanitize_name` 200-cap + whitespace reject + newline downgrade; `sanitize_address` 300-cap + newline preservation + control-strip-with-newlines + 3+-newline clamping; prompt-injection regression cases (RTL-embedded "system:" prefix stripped to visible text; legit "Ignore Ibrahim" name not stripped — sanitisation is NOT semantic filtering).
+- **Review findings documented** in `docs/plan.md` under Phase 3 Task 6's post-launch pass — including three noted-but-not-actioned items for future hardening: total-payload token cap (belt-and-braces on top of per-field caps), frontend mirror of the sanitiser (defence-in-depth UX), and Gemini structured-output schema revisit when the SDK's `extra="forbid"` dialect issue is resolved.
+- **Full backend suite**: 156/156 green; ruff clean. Frontend `pnpm lint` + `tsc --noEmit` clean.
+
+---
+
 ## [22/04/26] - Phase 3 Task 2 PO1: free-tier rate-limit preflight (5 evals / 24h)
 
 Free-tier users now hit a preflight quota check BEFORE the intake route opens its SSE stream. The 6th evaluation within a rolling 24-hour window returns HTTP 429 with `X-RateLimit-Reset` plus a JSON body shaped for the Phase 4 waitlist modal and `QuotaMeter`. Pro-tier users bypass the check entirely. Spec §3.6's race-condition trade-off (1-2 over-cap submissions on concurrent requests) is accepted as documented.

@@ -55,6 +55,11 @@ class Profile(BaseModel):
     # some uploads don't carry it legibly; the rule engine doesn't gate on
     # address, but the WeasyPrint packet renders it in the draft forms when set.
     address: str | None = None
+    # Monthly electricity cost in RM from the utility bill (TNB). Not
+    # currently consumed by any rule — reserved for a future electricity-
+    # subsidy match alongside `monthly_kwh`. Users typically recall the RM
+    # paid rather than the kWh consumed, so this is the more common input.
+    monthly_cost_rm: float | None = Field(default=None, ge=0, le=100_000)
     # Monthly electricity consumption in kWh from the utility bill (TNB). Not
     # currently consumed by any rule — reserved for a future electricity-
     # subsidy match (Bantuan Elektrik Rumah / TNB subsidy tier). Kept on

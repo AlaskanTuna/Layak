@@ -66,9 +66,17 @@ const manualEntrySchema = z.object({
   ic_last4: z.string().regex(/^\d{4}$/, '4 digits'),
   monthly_income_rm: z.number().min(0).max(1_000_000),
   employment_type: z.enum(['gig', 'salaried']),
-  address: z.string().max(500),
-  // kWh lives as a plain string in the form so an empty input doesn't fight
-  // RHF's `valueAsNumber: true` (which emits NaN). Submit handler coerces.
+  // Address cap mirrors the backend's 300-char Pydantic limit. Tightened
+  // from 500 to reduce prompt-token footprint.
+  address: z.string().max(300),
+  // Electricity cost + consumption live as plain strings so an empty input
+  // doesn't fight RHF's `valueAsNumber: true` (which emits NaN). Submit
+  // handler coerces to `number | null`.
+  monthly_cost_rm: z
+    .string()
+    .refine(v => v === '' || (/^\d+(\.\d{1,2})?$/.test(v) && Number(v) <= 100000), {
+      message: 'Amount up to RM100,000 (e.g. 240 or 240.50)'
+    }),
   monthly_kwh: z
     .string()
     .refine(v => v === '' || (/^\d+$/.test(v) && Number(v) <= 10000), { message: 'Whole number up to 10,000' }),
@@ -99,6 +107,7 @@ const AISYAH_DEFAULTS: FormValues = {
   monthly_income_rm: 2800,
   employment_type: 'gig',
   address: 'No. 42, Jalan IM 7/10, Bandar Indera Mahkota, 25200 Kuantan, Pahang',
+  monthly_cost_rm: '95.40',
   monthly_kwh: '220',
   dependants: [
     { relationship: 'child', age: 10, ic_last4: '' },
@@ -114,6 +123,7 @@ const EMPTY_DEFAULTS: FormValues = {
   monthly_income_rm: 0,
   employment_type: 'gig',
   address: '',
+  monthly_cost_rm: '',
   monthly_kwh: '',
   dependants: []
 }
@@ -158,6 +168,7 @@ export function ManualEntryForm({
       monthly_income_rm: values.monthly_income_rm,
       employment_type: values.employment_type,
       address: values.address.trim().length > 0 ? values.address.trim() : null,
+      monthly_cost_rm: values.monthly_cost_rm === '' ? null : Number(values.monthly_cost_rm),
       monthly_kwh: values.monthly_kwh === '' ? null : Number(values.monthly_kwh),
       dependants: values.dependants.map(d => ({
         relationship: d.relationship,
@@ -304,21 +315,39 @@ export function ManualEntryForm({
 
       <Card>
         <CardHeader>
-          <SectionTitle title="Utility bill" required />
+          <SectionTitle title="Utility bill" required={false} />
         </CardHeader>
         <CardContent className="flex flex-col gap-3">
           <Field label="Home address" error={formState.errors.address?.message} htmlFor="mef-address">
             <Textarea
               id="mef-address"
               rows={3}
-              maxLength={500}
+              maxLength={300}
               disabled={disabled}
               {...register('address')}
             />
           </Field>
           <Field
-            label="Monthly electricity (kWh)"
-            help="From your TNB bill — reserved for a future electricity-subsidy match."
+            label="Monthly electricity cost (RM)"
+            help="The RM amount on the bottom of your latest TNB bill. Most people remember this more easily than kWh."
+            error={formState.errors.monthly_cost_rm?.message}
+            htmlFor="mef-cost"
+          >
+            <Input
+              id="mef-cost"
+              type="number"
+              inputMode="decimal"
+              step="0.01"
+              min={0}
+              max={100000}
+              placeholder="e.g. 95.40"
+              disabled={disabled}
+              {...register('monthly_cost_rm')}
+            />
+          </Field>
+          <Field
+            label="Monthly electricity usage (kWh)"
+            help="Optional — only if your bill lists &ldquo;Jumlah Penggunaan&rdquo;."
             error={formState.errors.monthly_kwh?.message}
             htmlFor="mef-kwh"
           >

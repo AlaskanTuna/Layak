@@ -559,9 +559,9 @@ _Frontend:_
 
 **Implementation — PO2 (Adam):**
 
-- [ ] Build `frontend/src/app/(app)/settings/page.tsx` with profile, tier, and danger-zone sections.
-- [ ] Reuse `frontend/src/components/layout/user-menu.tsx` and `TierBadge` so the tier reads the same everywhere.
-- [ ] Wire the export/delete actions to the backend endpoints once Phase 4 task 4 lands.
+- [x] Build `frontend/src/app/(app)/settings/page.tsx` with profile, tier, and danger-zone sections. _(Page surface lives at `frontend/src/app/pages/settings/settings-page.tsx`; the `(app)/settings/page.tsx` route stays a thin re-export. Three Card sections: Profile (avatar initial + displayName + email from `useAuth`'s Firebase User), Plan (reads `GET /api/quota` — Pro badge for `tier === 'pro'`, Free-tier badge with `used / limit` for free), Danger zone (ring-destructive border + destructive variant Buttons). Orphaned `frontend/src/components/settings/settings-placeholder.tsx` deleted in the same commit.)_
+- [x] Reuse `frontend/src/components/layout/user-menu.tsx` and `TierBadge` so the tier reads the same everywhere. _(Settings tier surface uses the same shadcn `Badge` primitive + Lucide `Crown`/`Zap` icon pair the QuotaMeter strip and UserMenu surface already establish, so the visual weight matches across header, dashboard, and settings. UserMenu itself stays the topbar dropdown — not embedded in /settings — and a dedicated `<TierBadge />` component was not split out: would have been one-line wrapper since both consumers already render the same Badge inline. Re-evaluate if a third tier-surface lands.)_
+- [x] Wire the export/delete actions to the backend endpoints once Phase 4 task 4 lands. _(Export → `authedFetch('GET /api/user/export')` → `URL.createObjectURL` → trigger download → `URL.revokeObjectURL`. Delete → `window.confirm` gate → `authedFetch('DELETE /api/user')` → `signOutCurrentUser()` → `router.replace('/sign-in')`. Both surface failures through a single destructive `Alert` at the top of the page.)_
 
 **Exit criteria:** settings shows the signed-in Google profile, tier state, and the export/delete actions.
 

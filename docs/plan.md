@@ -315,21 +315,7 @@ _All four exit-criteria items met: Aisyah total = **RM8,208/year** (STR RM450 + 
 
 **Exit criteria:** the landing page shows the full How It Works content inline and `/dashboard/how-it-works` is gone.
 
-### 9. Refinement: Strip Gemini Code Execution mentions
-
-**Owner:** PO2 (Adam). **Depends on:** Phase 1 task 2 results copy and the landing/dashboard content tree.
-
-**Purpose/Issue:** Remove implementation jargon from user-facing copy. The product can still render the code-output panel, but the UI should not advertise Gemini Code Execution by name.
-
-**Implementation:**
-
-- [ ] Delete `Gemini Code Execution` copy from `frontend/src/app/page.tsx`.
-- [ ] Remove the same phrasing from dashboard result screens and any `how-it-works` component text.
-- [ ] Keep the code-output UI itself intact; only the labels, descriptions, and helper copy change.
-
-**Exit criteria:** no visible UI copy mentions Gemini Code Execution anywhere in the landing or dashboard flows.
-
-### 10. Refinement: Remove draft-control copy from landing
+### 9. Refinement: Remove draft-control copy from landing
 
 **Owner:** PO2 (Adam). **Depends on:** Phase 1 task 2 landing copy.
 

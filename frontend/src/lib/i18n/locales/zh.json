@@ -467,23 +467,41 @@
   },
   "settings": {
     "eyebrow": "设置",
-    "title": "您的默认设置和偏好。",
-    "description": "大多数控件将在 v2 推出 —— 目前此页面为占位页面。",
-    "placeholderTitle": "设置 —— v2",
-    "placeholderDescription": "语言、默认档案值、数据保留和可访问性控件将位于此处。此页面是结构性占位，以便控件推出时路由已就绪。",
+    "title": "您的账户和数据。",
+    "description": "您的个人资料、套餐与 PDPA 数据控制。",
+    "actionErrorTitle": "出现问题",
+    "profile": {
+      "title": "个人资料",
+      "description": "从您的 Google 账户获取。",
+      "unknownName": "未命名用户"
+    },
+    "tier": {
+      "title": "套餐",
+      "description": "您当前的评估套餐。",
+      "freeLabel": "免费套餐",
+      "proLabel": "Pro · 无限",
+      "freeHint": "免费套餐将评估限制在 24 小时滚动窗口内，历史记录在 30 天后自动清除。",
+      "usage": "本 24 小时内 {{used}} / {{limit}}"
+    },
+    "danger": {
+      "title": "危险区",
+      "description": "导出或删除 Layak 持有的与您相关的数据。",
+      "exportTitle": "导出您的数据",
+      "exportDescription": "下载您的账户资料和所有评估的 JSON 文件，依据 PDPA §26。",
+      "exportCta": "导出 JSON",
+      "deleteTitle": "删除账户",
+      "deleteDescription": "依据 PDPA §34，删除所有评估及您的账户记录，并撤销 Firebase Auth。此操作无法撤销。",
+      "deleteCta": "删除账户",
+      "deleteConfirm": "这将永久删除您的账户、所有评估和登录记录。是否继续？"
+    },
     "upgrade": {
-      "title": "升级至 Layak Pro",
-      "descriptionDefault": "升级以取消免费层级上限，并永久保留您的评估历史。",
-      "descriptionRateLimit": "您已达到免费层级每 {{hours}} 小时 {{limit}} 次评估的上限。Pro 取消上限并永久保留历史。",
+      "title": "已达免费上限",
+      "descriptionDefault": "您已达到免费层级评估上限。v2 中的 Pro 层级仅为占位说明 —— 目前尚无真实订阅产品。",
+      "descriptionRateLimit": "您已达到免费层级每 {{hours}} 小时 {{limit}} 次评估的上限。配额会自动重置 —— 无需任何注册。",
       "feature1": "无限评估 —— 无滚动上限。",
       "feature2": "历史永久保留（免费层级 30 天后自动清除）。",
       "feature3": "优先体验新计划。",
-      "resetInfo": "免费配额将于 {{time}} 重置。",
-      "successTitle": "您已加入候补名单。",
-      "successMessage": "Layak Pro 可用时我们将通过电子邮件通知 <strong>{{email}}</strong>。",
-      "emailFallback": "您",
-      "joinWaitlist": "加入候补名单",
-      "joining": "正在添加…"
+      "resetInfo": "免费配额将于 {{time}} 重置。"
     }
   }
 }

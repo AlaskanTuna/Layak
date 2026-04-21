@@ -467,23 +467,41 @@
   },
   "settings": {
     "eyebrow": "Tetapan",
-    "title": "Lalai dan keutamaan anda.",
-    "description": "Kebanyakan kawalan akan tiba dalam v2 — buat masa ini halaman ini adalah pemegang tempat.",
-    "placeholderTitle": "Tetapan — v2",
-    "placeholderDescription": "Bahasa, nilai profil lalai, pengekalan data, dan kawalan kebolehcapaian akan berada di sini. Halaman ini adalah pemegang tempat struktur supaya laluan sudah dipasang apabila kawalan tiba.",
+    "title": "Akaun dan data anda.",
+    "description": "Profil, peringkat, dan kawalan PDPA untuk data anda.",
+    "actionErrorTitle": "Sesuatu telah berlaku",
+    "profile": {
+      "title": "Profil",
+      "description": "Diambil daripada akaun Google anda.",
+      "unknownName": "Pengguna tanpa nama"
+    },
+    "tier": {
+      "title": "Pelan",
+      "description": "Peringkat penilaian semasa anda.",
+      "freeLabel": "Peringkat percuma",
+      "proLabel": "Pro · tanpa had",
+      "freeHint": "Peringkat percuma mengehadkan penilaian dalam tetingkap 24 jam bergulir dan memadam sejarah selepas 30 hari.",
+      "usage": "{{used}} / {{limit}} dalam 24 j ini"
+    },
+    "danger": {
+      "title": "Zon bahaya",
+      "description": "Eksport atau padam data yang Layak simpan tentang anda.",
+      "exportTitle": "Eksport data anda",
+      "exportDescription": "Memuat turun bundel JSON profil akaun dan setiap penilaian, mengikut PDPA §26.",
+      "exportCta": "Eksport JSON",
+      "deleteTitle": "Padam akaun",
+      "deleteDescription": "Memadam setiap penilaian dan rekod akaun anda, kemudian membatalkan Firebase Auth, mengikut PDPA §34. Tindakan ini tidak boleh dipulihkan.",
+      "deleteCta": "Padam akaun",
+      "deleteConfirm": "Ini akan memadam akaun anda, setiap penilaian, dan rekod log masuk anda secara kekal. Teruskan?"
+    },
     "upgrade": {
-      "title": "Dapatkan Layak Pro",
-      "descriptionDefault": "Naik taraf untuk membuang had peringkat percuma dan menyimpan sejarah penilaian anda selama-lamanya.",
-      "descriptionRateLimit": "Anda telah mencapai had peringkat percuma sebanyak {{limit}} penilaian setiap {{hours}} jam. Pro membuang had dan menyimpan sejarah selama-lamanya.",
+      "title": "Had percuma dicapai",
+      "descriptionDefault": "Anda telah mencapai had penilaian peringkat percuma. Peringkat Pro adalah naratif pemegang tempat dalam v2 — belum ada produk langganan sebenar.",
+      "descriptionRateLimit": "Anda telah mencapai had peringkat percuma sebanyak {{limit}} penilaian setiap {{hours}} jam. Had ini akan set semula secara automatik — tiada pendaftaran diperlukan.",
       "feature1": "Penilaian tanpa had — tiada had bergulir.",
       "feature2": "Sejarah kekal tanpa had (peringkat percuma auto-padam selepas 30 hari).",
       "feature3": "Akses keutamaan kepada skim baharu apabila ditambah.",
-      "resetInfo": "Kuota percuma set semula pada {{time}}.",
-      "successTitle": "Anda berada dalam senarai menunggu.",
-      "successMessage": "Kami akan menghantar e-mel kepada <strong>{{email}}</strong> apabila Layak Pro tersedia.",
-      "emailFallback": "anda",
-      "joinWaitlist": "Sertai senarai menunggu",
-      "joining": "Menambah…"
+      "resetInfo": "Kuota percuma set semula pada {{time}}."
     }
   }
 }

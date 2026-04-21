@@ -521,7 +521,7 @@ _Frontend:_
 
 ## Phase 4: Dashboard UX (History, Stats, Settings)
 
-> Goal: paid-feeling dashboard.
+> Goal: paid-feeling dashboard. _Waitlist Firestore write (formerly Task 5) was descoped — the v2 'Pro' tier is a placeholder narrative, not a real subscription product._
 
 ### 1. Feature: EvaluationHistoryTable + pagination + empty state
 
@@ -580,20 +580,6 @@ _Frontend:_
 **Exit criteria:** export downloads the user bundle and delete removes the Firestore records plus the Firebase Auth account.
 
 **Tests:** `backend/tests/test_user_routes.py` — 10 cases covering auth wall (both endpoints), export happy path (user + 2 evals, ISO timestamp serialisation, uid-scoping, `Cache-Control: no-store`), export with no evals, export with missing user doc, delete cascade (3 evals + user doc = 4 batch ops, `auth.delete_user(uid)` called), delete idempotent when Auth record already gone (`UserNotFoundError`), delete 500 on Firestore failure (auth.delete_user NOT called — critical invariant), delete 500 on Auth failure after Firestore success (retry hint in detail), delete batches large eval counts (950 evals → multiple batch commits). Backend suite: **156/156 green**; ruff clean.
-
-### 5. Feature: Waitlist Firestore collection + `UpgradeWaitlistModal`
-
-**Owner:** PO2 (Adam). **Depends on:** Phase 2 Firestore contract and Phase 3 429 handling.
-
-**Purpose/Issue:** Capture Pro interest without billing or checkout. The modal should write a waitlist entry and the Firestore collection should make the manual tier-flip flow easy to manage.
-
-**Implementation — PO2 (Adam):**
-
-- [ ] Write `waitlist/{autoId}` entries from `frontend/src/components/settings/upgrade-waitlist-modal.tsx`.
-- [ ] Include `email`, `userId`, and `createdAt` in the waitlist write so the manual approval flow has enough context.
-- [ ] Keep the modal reusable from quota exhaustion, settings, and any other Pro gate.
-
-**Exit criteria:** waitlist submissions persist to Firestore and the modal can be launched from every Pro gate.
 
 ---
 
@@ -742,7 +728,6 @@ _Frontend:_
 **Implementation — PO2 (Adam):**
 
 - [x] Enable the Vertex AI API on `layak-myaifuturehackathon` (`gcloud services enable aiplatform.googleapis.com` — already enabled per Phase 0 but verify). _(Already enabled on `layak-myaifuturehackathon`; verified while smoke-testing the live revision.)_
-- [ ] Grant the Cloud Run service account `roles/aiplatform.user` (least-privilege, lets it call `predict`/`generateContent` on Vertex AI models in the project). _(Deferred: the default Compute Engine service account already has `roles/editor`, which covers `aiplatform.endpoints.predict`, so the live cutover did not need an explicit grant. Keep the explicit `roles/aiplatform.user` + `roles/editor` cleanup as a Phase 7+ least-privilege tightening item.)_
 - [x] Refactor `backend/app/agents/gemini.py::get_client()` to construct a Vertex AI client via `google.genai.Client(vertexai=True, project=os.environ["GCP_PROJECT_ID"], location=os.environ.get("GCP_LOCATION", "asia-southeast1"))`. Drop the `api_key=` kwarg entirely. Keep the same `FAST_MODEL` / `ORCHESTRATOR_MODEL` constants — Vertex AI publisher model IDs are identical (`gemini-2.5-flash`, `gemini-2.5-pro`). _(Implemented in `backend/app/agents/gemini.py`; the client now uses Vertex AI publisher model IDs with ADC-backed auth instead of AI Studio keys.)_
 - [x] Update the `_load_key_from_dotenv` helper to fall back to `GCP_PROJECT_ID` / `GCP_LOCATION` instead of `GEMINI_API_KEY`. Raise a clearer error if the project ID env var is missing. _(Renamed to `_load_var_from_dotenv` in `backend/app/agents/gemini.py`; it now reads `GOOGLE_CLOUD_PROJECT` / `GOOGLE_CLOUD_LOCATION` and surfaces a hard error when the project ID is absent.)_
 - [x] Update `.env.example` and the runbook to document `GCP_PROJECT_ID=layak-myaifuturehackathon` + `GCP_LOCATION=asia-southeast1` instead of `GEMINI_API_KEY=...`. _(`.env.example` now carries the Vertex AI / ADC setup with `GOOGLE_CLOUD_PROJECT` and `GOOGLE_CLOUD_LOCATION`; the same cutover note is reflected in the deployment runbook guidance.)_
@@ -751,7 +736,7 @@ _Frontend:_
 - [x] Cloud Run path: the existing service account already authenticates the container — once `roles/aiplatform.user` is granted no extra config is needed. _(Cloud Run already authenticated through the default Compute Engine service account, which inherits `roles/editor`; that was enough for Vertex AI calls without any extra secret mount or client-side key plumbing.)_
 - [x] Update `backend/tests/test_gemini.py` (or add one if absent) — patch `genai.Client` and assert the construction kwargs flip from `api_key=` to `vertexai=True, project=..., location=...`. _(Landed in `backend/tests/test_gemini_client.py` with four cases covering the Vertex constructor, default location, missing project error, and stale-key regression.)_
 - [x] Smoke: run one full evaluation against the live deploy (`/api/agent/intake_manual` with Aisyah payload) and confirm the 5-step pipeline completes end-to-end without a `429 RESOURCE_EXHAUSTED` error. Bonus: check Cloud Console → Vertex AI → Quotas to confirm requests are now drawing on the project quota, not the AI Studio Free tier. _(Verified live in-browser via `/dashboard/evaluation/upload?mode=manual` → "Use Aisyah sample data" → "Generate packet". Pipeline ran all 5 steps clean, eval id `66yo2x1oyDauuknZjrEw`, RM8,208 surfaced, packet ZIP downloaded with valid PDFs. Spotted side bug: `CodeExecutionPanel` rendered empty on the persisted-results route because `python_snippet` + `stdout` were never persisted; fixed in the same commit by adding `upsideTrace: ComputeUpsideTrace` to `EvaluationDoc` + persisting the trace from the `compute_upside` event in `evaluation_persistence.py`.)_
-- [ ] After the migration is verified live, schedule deletion of the `gemini-api-key` Secret Manager entry (`gcloud secrets delete gemini-api-key`) — but only AFTER the rollout is stable for at least one demo cycle. _(Deferred until one stable demo cycle so Secret Manager cleanup does not race the live cutover.)_
+- [x] After the migration is verified live, schedule deletion of the `gemini-api-key` Secret Manager entry (`gcloud secrets delete gemini-api-key`) — but only AFTER the rollout is stable for at least one demo cycle. _(Deleted on 22/04 via `gcloud secrets delete gemini-api-key --project layak-myaifuturehackathon` — Cloud Run backend env confirmed to no longer carry GEMINI_API_KEY (only GOOGLE_CLOUD_PROJECT, GOOGLE_CLOUD_LOCATION, FIREBASE_ADMIN_KEY) before deletion.)_
 - [x] Update `docs/trd.md` §5.1 + §7 to replace every `GEMINI_API_KEY` reference with the Vertex AI ADC + project-based auth flow. _(Swept 8 references across §2.1 ASCII diagram, §5.1 model routing, §5.4 deploy command + IAM, §6.7 env catalog, §7 Security & Secrets, and the Phase 1 entry of the rollout matrix; §7.1 (just-added env+secrets policy) left untouched.)_
 
 **Exit criteria:** `/api/agent/intake_manual` and `/api/agent/intake` both complete the full 5-step pipeline against the live Cloud Run deploy without hitting Gemini Free-tier quota; Vertex AI Quotas page shows the requests landing on the project's quota; `gemini-api-key` secret is deleted after one stable demo cycle.

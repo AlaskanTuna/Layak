@@ -498,23 +498,41 @@
   },
   "settings": {
     "eyebrow": "Settings",
-    "title": "Your defaults and preferences.",
-    "description": "Most controls land in v2 — for now the page is a placeholder.",
-    "placeholderTitle": "Settings — v2",
-    "placeholderDescription": "Language, default profile values, data retention, and accessibility knobs will live here. This page is a structural placeholder so the route is already wired when the controls land.",
+    "title": "Your account and data.",
+    "description": "Profile, tier, and the PDPA controls for your data.",
+    "actionErrorTitle": "Something went wrong",
+    "profile": {
+      "title": "Profile",
+      "description": "Pulled from your Google account.",
+      "unknownName": "Unnamed user"
+    },
+    "tier": {
+      "title": "Plan",
+      "description": "Your current evaluation tier.",
+      "freeLabel": "Free tier",
+      "proLabel": "Pro · unlimited",
+      "freeHint": "Free tier caps evaluations to a rolling 24-hour window and prunes history after 30 days.",
+      "usage": "{{used}} / {{limit}} this 24 h"
+    },
+    "danger": {
+      "title": "Danger zone",
+      "description": "Export or remove the data Layak holds about you.",
+      "exportTitle": "Export your data",
+      "exportDescription": "Downloads a JSON bundle of your account profile and every evaluation, per PDPA §26.",
+      "exportCta": "Export JSON",
+      "deleteTitle": "Delete account",
+      "deleteDescription": "Removes every evaluation and your account record, then revokes Firebase Auth, per PDPA §34. This cannot be undone.",
+      "deleteCta": "Delete account",
+      "deleteConfirm": "This permanently deletes your account, every evaluation, and your sign-in record. Continue?"
+    },
     "upgrade": {
-      "title": "Get Layak Pro",
-      "descriptionDefault": "Upgrade to remove the free-tier cap and keep your evaluation history forever.",
-      "descriptionRateLimit": "You've hit the free tier cap of {{limit}} evaluations every {{hours}} hours. Pro removes the cap and keeps history forever.",
+      "title": "Free tier reached",
+      "descriptionDefault": "You've hit the free-tier evaluation cap. The Pro tier is a placeholder narrative in v2 — there is no real subscription product yet.",
+      "descriptionRateLimit": "You've hit the free-tier cap of {{limit}} evaluations every {{hours}} hours. The cap resets automatically — no signup required.",
       "feature1": "Unlimited evaluations — no rolling cap.",
       "feature2": "History persists indefinitely (free tier auto-prunes after 30 days).",
       "feature3": "Priority access to new schemes as they're added.",
-      "resetInfo": "Free quota resets at {{time}}.",
-      "successTitle": "You're on the waitlist.",
-      "successMessage": "We'll email <strong>{{email}}</strong> when Layak Pro is available.",
-      "emailFallback": "you",
-      "joinWaitlist": "Join waitlist",
-      "joining": "Adding…"
+      "resetInfo": "Free quota resets at {{time}}."
     }
   }
 }

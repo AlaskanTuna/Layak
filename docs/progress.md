@@ -4,6 +4,18 @@
 
 ---
 
+## [22/04/26] - Phase 4 Task 3 + Phase 6 Task 6 closeout PO2: settings page, modal scope-down, gemini-api-key Secret Manager deletion
+
+PO2 replaced the SettingsPlaceholder with a real account surface at frontend/src/app/pages/settings/settings-page.tsx (route exported from frontend/src/app/(app)/settings/page.tsx). Three Card sections: Profile (avatar initial + displayName + email pulled from useAuth's Firebase User), Plan (reads GET /api/quota; shows the Pro badge for tier === 'pro' or a Free-tier badge with `used / limit` for free), and Danger zone (Export your data → GET /api/user/export → triggers a JSON file download via createObjectURL/revokeObjectURL; Delete account → window.confirm gate → DELETE /api/user → signOutCurrentUser() → router.replace('/sign-in')). Wires PO1's PDPA endpoints from Phase 4 Task 4. The destructive Cards carry ring-destructive/30 + the destructive variant Button so the visual gravity matches the PDPA §34 cascade behind them. Orphaned frontend/src/components/settings/settings-placeholder.tsx deleted (unused after the page swap).
+
+The "Pro" tier in v2 is a placeholder narrative (Phase 4 Task 5 was descoped from plan.md in the same pass), so frontend/src/components/settings/upgrade-waitlist-modal.tsx no longer pretends to be a waitlist signup. Stripped the "Join waitlist" CTA, the busy state, the submitted state, the success-receipt branch, and the email confirmation copy. The dialog is now purely informational: title + Pro-features bullet list + (when opened off a 429) a reset-time hint, with a single "Done" button. The 429 path in frontend/src/components/evaluation/evaluation-upload-client.tsx is unchanged — it still derives `waitlistOpen` from `state.quotaExceeded != null` and shows the same modal, just without the fake signup. i18n keys cleaned up across en.json, ms.json, and zh.json: dropped successTitle, successMessage, emailFallback, joinWaitlist, joining; reworded title/descriptions so they no longer promise a signup.
+
+With the Vertex AI cutover stable since 22/04 (no quota errors, two clean evaluation runs), the legacy gemini-api-key Secret Manager entry was deleted via `gcloud secrets delete gemini-api-key --project layak-myaifuturehackathon --quiet`. Pre-flight verified the live Cloud Run service `layak-backend` env contained only GOOGLE_CLOUD_PROJECT, GOOGLE_CLOUD_LOCATION, and FIREBASE_ADMIN_KEY — no GEMINI_API_KEY reference left to break. The previously deferred least-privilege IAM tightening (`roles/aiplatform.user` explicit grant in place of the Compute SA's inherited `roles/editor`) was descoped from plan.md entirely — that's a Phase 7+ hardening item, not v2 scope. Phase 6 Task 6 is now fully closed.
+
+Frontend `pnpm lint` clean; `pnpm build` green. plan.md ticked accordingly.
+
+---
+
 ## [22/04/26] - Phase 4 Tasks 1+2 PO2: history table + aggregate stats cards on the dashboard summary
 
 PO2 landed the persistent dashboard the SaaS pivot has been pointing at — the `/dashboard/evaluation` summary now leads with three aggregate stat cards (Total evaluations, Lifetime RM identified, Successful runs) above a paginated history table that deep-links every row into `/dashboard/evaluation/results/[id]`. The transient SSE upside hero that used to render here was retired; live in-flight state already lives at `/dashboard/evaluation/upload` and on the persisted results route.

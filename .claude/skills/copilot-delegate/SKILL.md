@@ -28,32 +28,30 @@ Do **not** use it for:
 copilot -p "$(cat <<'EOF'
 <one self-contained prompt>
 EOF
-)" --effort high --yolo --silent 2>&1
+)" --model "GPT-5.4 mini" --reasoning-effort=high --yolo --silent 2>&1
 ```
 
 Run in background (`run_in_background: true`) when the job is long. You'll get a notification on completion and the output lands in the tool's output file; don't poll.
 
 ## Flags (locked for this project)
 
-| Flag              | Why                                                                                                                                             |
-| ----------------- | ----------------------------------------------------------------------------------------------------------------------------------------------- |
-| `-p, --prompt`    | Non-interactive mode (exits after completion). Required.                                                                                        |
-| `--effort high`   | Max reasoning budget; worth it for structural doc rewrites.                                                                                     |
-| `--yolo`          | Equivalent to `--allow-all-tools --allow-all-paths --allow-all-urls`. Copilot needs this to read and write files without the confirmation gate. |
-| `--silent` / `-s` | Strip stats; only the final agent response is emitted. Keeps output parseable.                                                                  |
+| Flag                      | Why                                                                                                                                             |
+| ------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------- |
+| `-p, --prompt`            | Non-interactive mode (exits after completion). Required.                                                                                        |
+| `--reasoning-effort=high` | Max reasoning budget; worth it for structural doc rewrites.                                                                                     |
+| `--yolo`                  | Equivalent to `--allow-all-tools --allow-all-paths --allow-all-urls`. Copilot needs this to read and write files without the confirmation gate. |
+| `--silent` / `-s`         | Strip stats; only the final agent response is emitted. Keeps output parseable.                                                                  |
 
 ## Model selection
 
-The Copilot CLI, as of this skill's first commit, documents three models:
+Use GPT-5.4 mini first, with Claude Haiku 4.5 as the fallback when the requested model is unavailable or rejected by the CLI.
 
-- **Claude Sonnet 4.5** (default — omit `--model`).
-- **Claude Sonnet 4** (`--model "Claude Sonnet 4"`).
-- **GPT-5** (`--model GPT-5`).
+- **Primary:** `--model "GPT-5.4 mini"`
+- **Fallback:** `--model "Claude Haiku 4.5"`
 
-**Do not pass `--model gpt-5.4-mini` or other variants** — they fail with
-`Error: Model "<name>" from --model flag is not available.` Run `copilot --help` or `copilot -p "list available models"` if unsure; the set can shift between releases.
+If either model name is rejected, consult the current Copilot CLI docs or run `copilot --help` / `copilot -p "list available models"` to confirm the exact model string supported by the installed build.
 
-Default (Sonnet 4.5) is the safe pick for doc tasks. Only pass `--model GPT-5` if the caller specifically asked for a GPT lane.
+Keep the reasoning effort at `high` for this skill's delegated doc work. If the task is outside that scope, do not use this skill.
 
 ## Writing the prompt
 

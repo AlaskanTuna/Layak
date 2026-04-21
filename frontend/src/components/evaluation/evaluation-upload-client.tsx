@@ -129,7 +129,10 @@ export function EvaluationUploadClient() {
     <div className="flex flex-col gap-4">
       {showIntake && (
         <>
-          <QuotaMeter />
+          {/* Upload page gives QuotaMeter the full column width so it sits
+              flush with the IntakeModeToggle below. The dashboard hero keeps
+              the default `max-w-sm` cap. */}
+          <QuotaMeter className="max-w-none" />
           <IntakeModeToggle value={mode} onChange={handleModeChange} />
           {/* Both widgets stay mounted so partial form state survives a tab switch. */}
           <div className={cn(mode !== 'upload' && 'hidden')} aria-hidden={mode !== 'upload'}>

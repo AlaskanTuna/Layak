@@ -2,7 +2,7 @@
 
 import { zodResolver } from '@hookform/resolvers/zod'
 import { CalendarIcon, Eraser, Sparkles } from 'lucide-react'
-import { useEffect } from 'react'
+import { useEffect, useRef } from 'react'
 import { Controller, type SubmitHandler, useForm, useWatch } from 'react-hook-form'
 import { z } from 'zod'
 
@@ -151,6 +151,12 @@ export function ManualEntryForm({
     mode: 'onBlur'
   })
   const { register, handleSubmit, control, formState, reset } = form
+  // Ref on the hidden `<input type="date">` so the visible calendar button can
+  // call `.showPicker()` programmatically — the old overlay-and-click-through
+  // approach didn't reliably trigger the native picker and also fired onBlur
+  // on the text input, flashing the "Use YYYY-MM-DD" error before the picker
+  // appeared.
+  const dobPickerRef = useRef<HTMLInputElement>(null)
   // `useWatch` is the memo-safe alternative to `form.watch()` — the React Compiler
   // plugin flags `watch()` because it can't reliably cache its result.
   const watchedDependants = (useWatch({ control, name: 'dependants' }) ?? []) as DependantInputRow[]
@@ -224,27 +230,30 @@ export function ManualEntryForm({
                       onBlur={field.onBlur}
                       className="flex-1"
                     />
-                    <div className="relative">
-                      <input
-                        type="date"
-                        aria-label="Pick date of birth from calendar"
-                        disabled={disabled}
-                        value={/^\d{4}-\d{2}-\d{2}$/.test(field.value) ? field.value : ''}
-                        onChange={e => field.onChange(formatDateMask(e.target.value))}
-                        className="peer absolute inset-0 cursor-pointer opacity-0"
-                      />
-                      <Button
-                        type="button"
-                        variant="outline"
-                        size="icon"
-                        disabled={disabled}
-                        aria-hidden
-                        tabIndex={-1}
-                        className="peer-focus-visible:ring-1 peer-focus-visible:ring-ring"
-                      >
-                        <CalendarIcon className="size-4" aria-hidden />
-                      </Button>
-                    </div>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="icon"
+                      disabled={disabled}
+                      aria-label="Open date picker"
+                      onClick={() => dobPickerRef.current?.showPicker?.()}
+                    >
+                      <CalendarIcon className="size-4" aria-hidden />
+                    </Button>
+                    {/* Hidden native date input — the visible button above
+                        calls `showPicker()` on this ref. `sr-only` keeps it
+                        off-screen + off the tab order without blocking the
+                        programmatic open. */}
+                    <input
+                      ref={dobPickerRef}
+                      type="date"
+                      tabIndex={-1}
+                      aria-hidden
+                      disabled={disabled}
+                      value={/^\d{4}-\d{2}-\d{2}$/.test(field.value) ? field.value : ''}
+                      onChange={e => field.onChange(formatDateMask(e.target.value))}
+                      className="sr-only"
+                    />
                   </div>
                 )}
               />

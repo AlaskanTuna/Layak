@@ -4,6 +4,14 @@
 
 ---
 
+## [22/04/26] - Phase 3 Tasks 3-5 PO2: persisted results route, QuotaMeter + 429 waitlist, real Aisyah fixtures
+
+PO2 landed the persisted results split, quota UI, and real fixture upload path so the Phase 3 dashboard flow now matches the Firestore-backed backend. `frontend/src/app/(app)/dashboard/evaluation/results/[id]/page.tsx` now owns the deep-link route, with `frontend/src/app/pages/evaluation/evaluation-results-by-id-page.tsx` and `frontend/src/components/evaluation/evaluation-results-by-id-client.tsx` handling the Firestore-first re-entry and 2s polling while `status === "running"`. `frontend/src/components/evaluation/persisted-packet-download.tsx` streams `GET /api/evaluations/{id}/packet` so regenerated ZIPs come from the stored doc instead of the transient SSE path.
+
+`frontend/src/components/dashboard/quota-meter.tsx` now reads `GET /api/quota` on mount and refresh, and the upload flow routes `429` responses through `frontend/src/hooks/use-agent-pipeline.ts` into `frontend/src/components/settings/upgrade-waitlist-modal.tsx` with the backend reset timestamp attached. `backend/app/routes/quota.py` exposes the public `get_used_count` and `estimate_reset_at` helpers extracted from `backend/app/services/rate_limit.py`, and `frontend/src/components/dashboard/dashboard-hero.tsx` plus the upload page now surface the quota state before the user hits the cap.
+
+`backend/scripts/generate_aisyah_fixtures.py` now builds the three synthetic PDFs with WeasyPrint, watermarks them `SYNTHETIC — FOR DEMO ONLY`, and lands them in `frontend/public/fixtures/`. `frontend/src/lib/aisyah-fixtures.ts` fetches those PDFs as `File` objects, applies `AISYAH_DEPENDANT_OVERRIDES`, and `frontend/src/components/upload/upload-widget.tsx` sends the real files through the live intake path while `NEXT_PUBLIC_USE_MOCK_SSE=1` remains the dev replay escape hatch. Frontend build green; backend ruff + 123/123 pytest still green. Phase 3 PO2 queue closed; awaiting joint pre-demo browser smoke for Phase 2 Task 4 sub-steps 4-5.
+
 ## [22/04/26] - Phase 3 Task 2 PO1: free-tier rate-limit preflight (5 evals / 24h)
 
 Free-tier users now hit a preflight quota check BEFORE the intake route opens its SSE stream. The 6th evaluation within a rolling 24-hour window returns HTTP 429 with `X-RateLimit-Reset` plus a JSON body shaped for the Phase 4 waitlist modal and `QuotaMeter`. Pro-tier users bypass the check entirely. Spec §3.6's race-condition trade-off (1-2 over-cap submissions on concurrent requests) is accepted as documented.

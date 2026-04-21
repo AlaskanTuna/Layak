@@ -431,6 +431,32 @@ Both invocations use `pnpm exec` to bypass the pnpm v10 bare-script shortcut whi
 
 **Encryption.** Firestore uses default encryption at rest, while Cloud Run HTTPS and Firebase Auth TLS cover transport in transit.
 
+### 7.1 Local environment + secrets policy
+
+1. Copy `.env.example` to `.env` at the repo root. Keep `.env` gitignored.
+   Run `gcloud auth application-default login` once on the dev machine so ADC exists for Vertex AI.
+   Run `pnpm install` once. The frontend `predev` hook in `frontend/package.json` symlinks `frontend/.env.local` to `../.env` before `pnpm dev`.
+   Keep the root file as the single source of truth for both services.
+   Do not duplicate values into per-service env files.
+2. The backend reads `GOOGLE_CLOUD_PROJECT` and `GOOGLE_CLOUD_LOCATION` from `.env` and constructs `genai.Client(vertexai=True, ...)` in `backend/app/agents/gemini.py::get_client()`.
+   Local auth comes from ADC. Production auth comes from the attached Cloud Run service account.
+   Do not reintroduce an AI Studio Gemini API key into this flow.
+   The client should never need a JSON key or OAuth refresh token for AI.
+3. Keep production secrets in GCP Secret Manager.
+   `firebase-admin-key` owns `FIREBASE_ADMIN_KEY`, and Cloud Run injects it with `--set-secrets FIREBASE_ADMIN_KEY=firebase-admin-key:latest`.
+   Leave the old `gemini-api-key` entry on the deprecation path until one stable demo cycle passes, then delete it per the Phase 6 Task 6 closing checkbox.
+   Rotate the secret through Secret Manager, not by editing deploy commands.
+4. Treat Firebase Web SDK keys as identifiers, not secrets.
+   The `NEXT_PUBLIC_FIREBASE_*` values only tell Google which project to talk to.
+   Access control comes from Firestore rules plus the backend Admin SDK boundary, not from obscuring those public fields.
+   The values are public because the browser must read them at build time.
+5. Keep `NEXT_PUBLIC_BACKEND_URL=http://localhost:8080` in local `.env`.
+   Cloud Run injects the production backend URL at deploy time with `--set-build-env-vars`, so the local default never ships.
+   Use the same value for local dev and preview builds; only Cloud Run overrides it.
+6. Keep `PORT=3000` for local Next.js runs.
+   Cloud Run injects its own `PORT`, so the local value is only for `pnpm dev` and `pnpm start`.
+   If the port changes locally, change the root `.env`, not the deploy config.
+
 ## 8. Feasible-Minimum Tech Stack (Plan B)
 
 **Plan B scope.** If Vertex AI Search setup stalls past **sprint hour 12**, collapse the RAG layer to **Gemini 2.5 Pro inline-PDF grounding**. The three cached scheme PDFs (~80K tokens combined) are dropped directly into the system prompt; the RootAgent holds the entire corpus inline in its 1M-token context window. The `match_schemes` FunctionTool is rewritten to reference passages by `(pdf_filename, page)` pairs already in context rather than making a Search call.

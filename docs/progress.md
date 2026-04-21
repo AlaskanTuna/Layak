@@ -4,6 +4,14 @@
 
 ---
 
+## [22/04/26] - Phase 6 Task 6 PO2: backend gemini surface cut over from AI Studio API key to Vertex AI
+
+AI Studio kept silently demoting the project from Tier 1 to Free tier even with billing active, and Free tier caps Gemini 2.5 Flash at 20 RPD. That was enough to blow up every demo run; today's live smoke hit 22/20 and the classify step returned `429 RESOURCE_EXHAUSTED`.
+
+`backend/app/agents/gemini.py` now builds `genai.Client(vertexai=True, project=..., location=...)` instead of forwarding `api_key=`. `_load_key_from_dotenv` is now `_load_var_from_dotenv`, `_resolve_project()` hard-fails when `GOOGLE_CLOUD_PROJECT` is missing, `_resolve_location()` defaults to `asia-southeast1`, and auth flows through ADC. `.github/workflows/cloud-run-deploy.yml` dropped `--set-secrets=GEMINI_API_KEY=...` in favor of `--set-env-vars=GOOGLE_CLOUD_PROJECT=...,GOOGLE_CLOUD_LOCATION=...`, and live revision `layak-backend-00017-bm7` deployed cleanly on run `24737949998` with `GEMINI_API_KEY` absent from the container env.
+
+`backend/tests/test_gemini_client.py` adds 4 cases that lock the constructor contract: `vertexai=True`, `asia-southeast1` defaulting, hard failure when `GOOGLE_CLOUD_PROJECT` is unset, and no `api_key=` forwarding even if stale env still exists. Full backend suite is 187/187 green and ruff is clean; local Vertex AI smoke also passed with `client.models.generate_content(model='gemini-2.5-flash', contents='Reply with exactly one word: VERTEX') -> VERTEX`. Still owed: in-browser end-to-end submit on the live deploy, `gemini-api-key` Secret Manager deletion after one stable demo cycle, the `docs/trd.md` §5.1+§7 sweep in the parallel cleanup task, and least-privilege IAM tightening later — the default Compute SA already inherits `roles/aiplatform.user` via `roles/editor` today, so no explicit grant was needed for this cutover.
+
 ## [22/04/26] - Phase 4 Task 4 PO1: PDPA export + cascade-delete endpoints
 
 PO1's Phase 4 Task 4 — authed users can now exercise PDPA 2010 §26 (data-subject access) and §34 (right-to-erasure) via two REST endpoints. No admin-impersonation path exposed; every caller only touches their own data.

@@ -4,6 +4,48 @@
 
 ---
 
+## [21/04/26] - Added root README.md with live URLs, stack, and deploy commands
+
+Delegated to Copilot CLI, `README.md` now serves as the repo's top-level operator doc (`docs: add root readme with live urls, stack, and deploy commands`, commit `0b5875e`). It consolidates live URLs, overview, architecture pointer, versioned tech stack, repo layout, local dev, deploy commands, docs links, and status/licence so the repo has one copy-pasteable landing page for onboarding and deploy context.
+
+- **Live URLs / deploys** — frontend/backend Cloud Run URLs and the exact `gcloud run deploy` commands are now surfaced at the top of the repo.
+- **Docs links** — the root doc now points at `docs/prd.md`, `docs/trd.md`, `docs/roadmap.md`, `docs/plan.md`, and `docs/progress.md`.
+- **Scope** — no code paths changed; this is a docs-only landing page for operator context.
+
+---
+
+## [21/04/26] - Phase 1 Task 9 PO2: draft-control copy removal
+
+Cherry-picked `9174b3a` (`refactor(frontend): remove redundant draft-control copy from landing`) from PO2 source commit `877beef` into `frontend/src/components/landing/landing-hero.tsx`. Removed the ShieldCheck-badged "DRAFT packets only — you stay in control" span and the trailing "Every packet is a DRAFT you lodge yourself." sentence; scoped audit of `landing-cta.tsx` and `landing-features.tsx` found no duplicate copy, and the backend watermark `DRAFT — NOT SUBMITTED` in `backend/app/templates/_base.html.jinja` stayed untouched.
+
+- **`frontend/src/components/landing/landing-hero.tsx`** — dropped the badge copy and the duplicate draft-control sentence.
+- **Scope check** — `landing-cta.tsx` and `landing-features.tsx` were audited; no follow-up removals were needed.
+- **Validation** — lint + build stayed clean.
+
+---
+
+## [21/04/26] - Phase 1 Task 8 PO2: how-it-works move + Gemini Code Execution rename
+
+Cherry-picked `d9e25bb` (`refactor(frontend): move how-it-works to landing and drop dashboard route`) from PO2 source commit `9f98138`; one merge conflict was resolved by taking the deletion of `frontend/src/app/pages/dashboard/how-it-works-page.tsx`. `frontend/src/components/how-it-works/how-it-works-content.tsx` now says "On-stage arithmetic" / "Python" in Step 04, `frontend/src/app/pages/marketing/landing-page.tsx` renders `<section id="how-it-works"><HowItWorksContent /></section>`, and the sidebar/footer/header/breadcrumb route wiring now points to `/#how-it-works` or drops the stale label. The dashboard route files were deleted, and the route table now shows 11 prerendered static routes.
+
+- **Landing page** — How It Works now renders inline on the marketing landing page.
+- **Route cleanup** — the dashboard How It Works page files were deleted, and stale sidebar/footer/header/breadcrumb links were removed.
+- **Copy rename** — Step 04 and the stack card now use "On-stage arithmetic" / "Python" instead of Gemini Code Execution.
+- **Validation** — lint + build stayed clean.
+
+---
+
+## [21/04/26] - Phase 1 Task 7 PO2: width-consistency pass
+
+Cherry-picked `5c19386` (`refactor(frontend): normalise width shell on authed routes`) from PO2 source commit `f407e3d` to move the width boundary into `frontend/src/components/layout/app-shell.tsx`. Added `mx-auto w-full max-w-5xl` to the shell `<main>` and stripped page-level `mx-auto`/`max-w-*` wrappers from `dashboard-page.tsx`, `how-it-works-page.tsx` (before it was deleted), `schemes-page.tsx`, `evaluation-overview-page.tsx`, `evaluation-upload-page.tsx`, `evaluation-results-page.tsx`, and `settings-page.tsx`, so the narrower `max-w-3xl` screens now expand to the shared shell width.
+
+- **`frontend/src/components/layout/app-shell.tsx`** — shell `<main>` now owns the width contract.
+- **Authed pages** — page-level width wrappers were removed from the dashboard, evaluation, schemes, and settings pages.
+- **Outcome** — the former narrower screens now inherit `max-w-5xl` from the shell.
+- **Validation** — lint + build stayed clean.
+
+---
+
 ## [21/04/26] - Phase 2 Task 3 PO2: Frontend Firebase Web SDK + AuthGuard + Google sign-in/up + PDPA consent
 
 PO2's slice of Phase 2 Task 3 — the browser now has a real Firebase Auth client, dashboard routes redirect anons to `/sign-in`, and `POST /api/agent/intake` sends a bearer token once the Admin-SDK revision is redeployed. Handoff-ready for the Phase 2 Task 4 joint smoke; no redeploy this turn per the "stop at the handoff" directive.

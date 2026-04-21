@@ -292,9 +292,9 @@ _All four exit-criteria items met: Aisyah total = **RM8,208/year** (STR RM450 + 
 
 **Implementation:**
 
-- [ ] Set `frontend/src/app/(app)/layout.tsx` to the shared shell: `max-w-5xl mx-auto px-4 md:px-6`.
-- [ ] Remove page-level width overrides from `frontend/src/app/(app)/**` so dashboard, evaluation, results, schemes, and settings all inherit the same container.
-- [ ] Keep the visual rhythm consistent across `/dashboard`, `/dashboard/evaluation`, `/dashboard/evaluation/upload`, `/dashboard/evaluation/results/[id]`, `/dashboard/schemes`, and `/settings`.
+- [x] Set `frontend/src/app/(app)/layout.tsx` to the shared shell: `max-w-5xl mx-auto px-4 md:px-6`. _(AppShell `main` now owns `mx-auto w-full max-w-5xl`.)_
+- [x] Remove page-level width overrides from `frontend/src/app/(app)/**` so dashboard, evaluation, results, schemes, and settings all inherit the same container. _(Dropped page-level `mx-auto`/`max-w-*` wrappers from the authed pages.)_
+- [x] Keep the visual rhythm consistent across `/dashboard`, `/dashboard/evaluation`, `/dashboard/evaluation/upload`, `/dashboard/evaluation/results/[id]`, `/dashboard/schemes`, and `/settings`. _(Dashboard, evaluation, schemes, and settings now inherit one shell width.)_
 
 **Exit criteria:** every authenticated route uses the same shell width and no page introduces its own competing max-width.
 
@@ -306,9 +306,9 @@ _All four exit-criteria items met: Aisyah total = **RM8,208/year** (STR RM450 + 
 
 **Implementation:**
 
-- [ ] Inline the How It Works pipeline visual into `frontend/src/app/page.tsx` and keep the section on the public landing.
-- [ ] Delete `frontend/src/app/(app)/dashboard/how-it-works/page.tsx` and any route wiring that still points at `/dashboard/how-it-works`.
-- [ ] Remove stale links or breadcrumbs in `frontend/src/components/layout/sidebar.tsx` and related nav code so `/` is the only How It Works destination.
+- [x] Inline the How It Works pipeline visual into `frontend/src/app/page.tsx` and keep the section on the public landing. _(Inline `#how-it-works` now renders on the landing page.)_
+- [x] Delete `frontend/src/app/(app)/dashboard/how-it-works/page.tsx` and any route wiring that still points at `/dashboard/how-it-works`. _(Deleted both dashboard How It Works page files and retired the route.)_
+- [x] Remove stale links or breadcrumbs in `frontend/src/components/layout/sidebar.tsx` and related nav code so `/` is the only How It Works destination. _(Sidebar entry removed; header/footer now point to `/#how-it-works`, breadcrumb label dropped.)_
 
 **Exit criteria:** the landing page shows the full How It Works content inline and `/dashboard/how-it-works` is gone.
 
@@ -320,9 +320,9 @@ _All four exit-criteria items met: Aisyah total = **RM8,208/year** (STR RM450 + 
 
 **Implementation:**
 
-- [ ] Remove the `"DRAFT packets only — you stay in control"` copy from `frontend/src/app/page.tsx`.
-- [ ] Check the landing CTA and nearby trust copy for any duplicate wording and trim it to the watermark invariant.
-- [ ] Leave the packet watermark text untouched; the landing page should stop restating it.
+- [x] Remove the `"DRAFT packets only — you stay in control"` copy from `frontend/src/app/page.tsx`. _(Removed the ShieldCheck badge and duplicate draft-control sentence from `landing-hero.tsx`.)_
+- [x] Check the landing CTA and nearby trust copy for any duplicate wording and trim it to the watermark invariant. _(Audited CTA/features; no duplicate draft-control copy remained.)_
+- [x] Leave the packet watermark text untouched; the landing page should stop restating it. _(Backend `DRAFT — NOT SUBMITTED` watermark stayed untouched.)_
 
 **Exit criteria:** the landing page no longer repeats the draft-control line and the invariant is implied by the packet watermark only.
 

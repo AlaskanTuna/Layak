@@ -147,7 +147,7 @@
 
 **Purpose/Issue:** Build every screen the Aisyah flow needs against mock data so the UI is visually complete before the 12:30 wiring block. When task 1 is ready, integration collapses to a one-line SSE endpoint swap, not a UI debug session. Covers FR-1 through FR-10 except live extraction.
 
-**Implementation — PO2 (Adam):**
+**Implementation:**
 
 - [x] Replace `frontend/src/app/page.tsx` stub with the real landing view (upload widget above the fold + trust copy "We store nothing. Draft only — you submit manually.").
 - [x] **Upload widget (FR-2)**: `frontend/src/components/upload/upload-widget.tsx` — three separately-labelled inputs (IC, payslip, utility) with `accept="image/*,application/pdf"` and `capture="environment"` for mobile camera. Reject files > 10 MB and non-image/non-PDF MIME types inline (not via toast).
@@ -241,7 +241,7 @@ _All four exit-criteria items met: Aisyah total = **RM8,208/year** (STR RM450 + 
 - [ ] Decide delivery: `GET /api/agent/packet/{id}` returns a ZIP of the three PDFs **OR** base64-embed the packet in the final `done` SSE event (keeps the service stateless — consistent with `docs/trd.md` §6.5).
 - [ ] Dockerfile / container config: install `libpango`, `libcairo`, `libgdk-pixbuf` (WeasyPrint system deps).
 
-**Implementation — PO2 (Adam):**
+**Implementation:**
 
 - [x] `frontend/src/components/results/packet-download.tsx` — renders one row per `PacketDraft` with a `Download PDF` button; base64-decode + `Blob` + `URL.createObjectURL` download when `blob_bytes_b64` is populated, else a disabled "Pending backend" button with explanatory copy. Surfaces `drafts.length` in the header and the DRAFT-watermark invariant in the description. Replaces the ZIP-vs-links decision with "whichever the backend delivers" — works for both delivery shapes.
 - [x] **Error surface**: `frontend/src/components/home/error-recovery-card.tsx` — `destructive`-tinted card rendered when `state.phase === 'error'`, showing the SSE error message plus two actions: `Try with sample documents` (triggers mock replay) and `Start over` (resets). Covers FR-3 AC.
@@ -286,15 +286,422 @@ _All four exit-criteria items met: Aisyah total = **RM8,208/year** (STR RM450 + 
 
 ---
 
-## Phase 2: App Workflow Refinement
+### 7. Refinement: Width-consistency pass
 
-...
+**Owner:** PO2 (Adam). **Depends on:** Phase 1 task 2 landing shell and the current dashboard routes.
+
+**Purpose/Issue:** Normalize authenticated screens under one width shell so the app reads as one product instead of a patchwork of per-page widths. The shared `(app)` layout should own the sizing contract; individual pages should stop fighting it.
+
+**Implementation:**
+
+- [ ] Set `frontend/src/app/(app)/layout.tsx` to the shared shell: `max-w-5xl mx-auto px-4 md:px-6`.
+- [ ] Remove page-level width overrides from `frontend/src/app/(app)/**` so dashboard, evaluation, results, schemes, and settings all inherit the same container.
+- [ ] Keep the visual rhythm consistent across `/dashboard`, `/dashboard/evaluation`, `/dashboard/evaluation/upload`, `/dashboard/evaluation/results/[id]`, `/dashboard/schemes`, and `/settings`.
+
+**Exit criteria:** every authenticated route uses the same shell width and no page introduces its own competing max-width.
+
+### 8. Refactor: Move How It Works content to landing page
+
+**Owner:** PO2 (Adam). **Depends on:** Phase 1 task 2 landing page and the dashboard nav/link set.
+
+**Purpose/Issue:** Make the marketing landing self-contained by bringing the explanatory pipeline visual onto `/` and retiring the old dashboard route. Users should understand the flow before they authenticate.
+
+**Implementation:**
+
+- [ ] Inline the How It Works pipeline visual into `frontend/src/app/page.tsx` and keep the section on the public landing.
+- [ ] Delete `frontend/src/app/(app)/dashboard/how-it-works/page.tsx` and any route wiring that still points at `/dashboard/how-it-works`.
+- [ ] Remove stale links or breadcrumbs in `frontend/src/components/layout/sidebar.tsx` and related nav code so `/` is the only How It Works destination.
+
+**Exit criteria:** the landing page shows the full How It Works content inline and `/dashboard/how-it-works` is gone.
+
+### 9. Refinement: Strip Gemini Code Execution mentions
+
+**Owner:** PO2 (Adam). **Depends on:** Phase 1 task 2 results copy and the landing/dashboard content tree.
+
+**Purpose/Issue:** Remove implementation jargon from user-facing copy. The product can still render the code-output panel, but the UI should not advertise Gemini Code Execution by name.
+
+**Implementation:**
+
+- [ ] Delete `Gemini Code Execution` copy from `frontend/src/app/page.tsx`.
+- [ ] Remove the same phrasing from dashboard result screens and any `how-it-works` component text.
+- [ ] Keep the code-output UI itself intact; only the labels, descriptions, and helper copy change.
+
+**Exit criteria:** no visible UI copy mentions Gemini Code Execution anywhere in the landing or dashboard flows.
+
+### 10. Refinement: Remove draft-control copy from landing
+
+**Owner:** PO2 (Adam). **Depends on:** Phase 1 task 2 landing copy.
+
+**Purpose/Issue:** Delete the redundant trust line that says the packets are drafts and the user stays in control. The packet watermark already carries that invariant.
+
+**Implementation:**
+
+- [ ] Remove the `"DRAFT packets only — you stay in control"` copy from `frontend/src/app/page.tsx`.
+- [ ] Check the landing CTA and nearby trust copy for any duplicate wording and trim it to the watermark invariant.
+- [ ] Leave the packet watermark text untouched; the landing page should stop restating it.
+
+**Exit criteria:** the landing page no longer repeats the draft-control line and the invariant is implied by the packet watermark only.
+
+---
+
+## Phase 2: SaaS Foundation (Auth + Firestore wiring)
+
+> Goal: signed-in user reaches `/dashboard` with a verified Firebase token; `users/{userId}` exists.
+
+### 1. Feature: Firebase project + Firestore setup
+
+**Owner:** PO1 (Hao). **Depends on:** Firebase project access, Firestore enabled in `asia-southeast1`, and a writable Secret Manager target for backend credentials.
+
+**Purpose/Issue:** Lock the Firebase-backed data model before any feature work starts. The app needs a single auth provider, a known Firestore schema, and the history/rate-limit index in place so later tasks can read and write with confidence.
+
+**Implementation — PO1 (Hao):**
+
+- [ ] Wire the Firestore contract in `firestore.rules` and `firestore.indexes.json` for `users/{userId}`, `evaluations/{evalId}`, and `waitlist/{autoId}`.
+- [ ] Define the `evaluations(userId ASC, createdAt DESC)` composite index explicitly so history queries and rate-limit counts use the same shape.
+- [ ] Record the rollout command in the runbook: `gcloud firestore indexes composite create ...` for the `evaluations` history window, then deploy rules and indexes with the repo's Firebase deploy path.
+
+**Exit criteria:** the repo has checked-in Firestore rules and index definitions for the `users`, `evaluations`, and `waitlist` collections, including the `userId + createdAt` composite index.
+
+### 2. Feature: Backend auth middleware + Admin SDK init + security rules deploy
+
+**Owner:** PO1 (Hao). **Depends on:** Phase 2 task 1 Firestore contract and a Firebase service account key in Secret Manager.
+
+**Purpose/Issue:** Make every backend request prove identity. The backend should verify Firebase ID tokens, lazy-create user docs, and keep client-side writes blocked by rules while the Admin SDK handles server-side persistence.
+
+**Implementation — PO1 (Hao):**
+
+- [ ] Add `backend/app/auth.py` with Firebase Admin initialization, `verify_id_token`, and a `current_user` dependency that injects `uid` as `request.user_id`.
+- [ ] Update `backend/app/main.py` and the dashboard route modules to require `Depends(current_user)` on authed endpoints.
+- [ ] Lazy-create `users/{userId}` on first authenticated request with `tier="free"`, `createdAt`, `lastLoginAt`, and Google profile fields.
+- [ ] Deploy the backend with `--set-secrets=FIREBASE_ADMIN_KEY=firebase-admin-key:latest` and keep `firestore.rules` client-only access locked to the owner.
+
+**Exit criteria:** a valid Firebase ID token reaches the backend, the user doc is created on first touch, and unauthenticated client writes remain blocked by Firestore rules.
+
+### 3. Feature: Frontend Firebase SDK + `<AuthGuard>` + sign-in/up pages + ID-token fetch wrapper
+
+**Owner:** PO2 (Adam). **Depends on:** Phase 2 task 1 Firestore contract and Phase 2 task 2 backend auth boundary.
+
+**Purpose/Issue:** Give the browser a real auth client and route guard so authenticated screens can rely on a stable session. The frontend should sign in with Google, persist the ID token, and attach it to every backend call.
+
+**Implementation — PO2 (Adam):**
+
+- [ ] Create `frontend/src/lib/firebase.ts` for `initializeApp`, `getAuth`, Google provider setup, and the fetch wrapper that injects `Authorization: Bearer <id-token>`.
+- [ ] Add `frontend/src/components/auth/auth-guard.tsx` and wrap `frontend/src/app/(app)/layout.tsx` so dashboard routes redirect to `/sign-in` when no Firebase session exists.
+- [ ] Implement `frontend/src/app/sign-in/page.tsx` and `frontend/src/app/sign-up/page.tsx` with the shared "Continue with Google" flow and the PDPA consent checkbox on sign-up.
+- [ ] Add `NEXT_PUBLIC_FIREBASE_*` env plumbing in `frontend/.env.example` and the local `frontend/.env.local` flow so the client SDK boots cleanly in dev and prod.
+
+**Exit criteria:** a signed-in browser reaches `/dashboard`, the ID token is attached to backend requests, and the frontend redirects anonymous users to the auth page.
+
+### 4. Feature: Integration smoke test
+
+**Owner:** Both (Adam + Hao). **Depends on:** Phase 2 tasks 1-3 landing locally and on the deployed preview.
+
+**Purpose/Issue:** Prove the auth path works end to end before any persisted-evaluation work lands. This is the first check that the browser, backend, and Firestore are all talking to each other as one system.
+
+**Implementation — Both:**
+
+- [ ] Sign in from a fresh browser profile, then confirm `/dashboard` renders without a manual refresh.
+- [ ] Confirm `users/{userId}` exists in Firestore after the first authed request.
+- [ ] Hit one backend endpoint with the injected bearer token and verify the response is 200, not a redirect or anonymous fallback.
+
+**Exit criteria:** fresh browser → Google sign-in → `/dashboard` renders → user doc exists → authed fetch succeeds.
+
+---
+
+## Phase 3: Persisted Evaluations + Rate Limiting
+
+> Goal: signed-in user runs an evaluation, it persists to Firestore, the results page lives at `/results/[id]`, free-tier caps at 5/24 h.
+
+### 1. Feature: Backend eval persistence + list/get-by-id + packet regeneration
+
+**Owner:** PO1 (Hao). **Depends on:** Phase 2 auth middleware and Firestore contract.
+
+**Purpose/Issue:** Persist every evaluation in Firestore so history, deep links, and packet regeneration all work off the same source of truth. The backend should write the lifecycle once and let the UI read it back later.
+
+**Implementation — PO1 (Hao):**
+
+- [ ] Extend `backend/app/agents/root_agent.py` so each step write lands in `evaluations/{evalId}` alongside the SSE event stream.
+- [ ] Add `backend/app/routes/evaluations.py` for list, get-by-id, and `GET /api/evaluations/{id}/packet`.
+- [ ] Mirror the Firestore shape in `backend/app/schema/` models for `UserDoc`, `EvaluationDoc`, and embedded step-state data.
+- [ ] Regenerate packets from stored profile + matches in `backend/app/agents/tools/generate_packet.py`; do not persist PDFs in Firestore or GCS.
+
+**Exit criteria:** one evaluation creates a Firestore doc, list/get-by-id endpoints read it back, and packet download is regenerated on demand from stored data.
+
+### 2. Feature: Rate-limit check before SSE opens
+
+**Owner:** PO1 (Hao). **Depends on:** Phase 2 auth middleware, Phase 3 task 1 Firestore writes, and the `evaluations(userId ASC, createdAt DESC)` index.
+
+**Purpose/Issue:** Enforce the free-tier cap before the backend starts streaming. The quota check has to happen up front so a blocked request never consumes model time or opens an SSE connection.
+
+**Implementation — PO1 (Hao):**
+
+- [ ] Add the preflight quota check in `backend/app/main.py` or a dedicated service layer before `/api/agent/intake` starts streaming.
+- [ ] Query `evaluations` with `userId == uid` over the rolling 24-hour window and return HTTP 429 with `X-RateLimit-Reset` when the cap is hit.
+- [ ] Keep the rate-limit response shaped for the frontend waitlist modal and `QuotaMeter` reset timer.
+
+**Exit criteria:** the 6th evaluation inside 24 hours returns 429 before SSE opens and includes a reset time.
+
+### 3. Feature: Frontend 3-route split
+
+**Owner:** PO2 (Adam). **Depends on:** Phase 2 auth guard, Phase 2 Firebase client, and Phase 3 task 1 evaluation read endpoints.
+
+**Purpose/Issue:** Break the single dashboard flow into stable routes so summary/history, intake, and results each have their own URL and loading state. That makes deep links, refreshes, and redirects predictable.
+
+**Implementation — PO2 (Adam):**
+
+- [ ] Split the dashboard workflow into `frontend/src/app/(app)/dashboard/evaluation/page.tsx`, `frontend/src/app/(app)/dashboard/evaluation/upload/page.tsx`, and `frontend/src/app/(app)/dashboard/evaluation/results/[id]/page.tsx`.
+- [ ] Update navigation and breadcrumbs in `frontend/src/components/layout/topbar.tsx` and related route helpers so `Results` resolves cleanly.
+- [ ] Hydrate the results route from Firestore first, then fall back to live updates while `status === "running"`.
+
+**Exit criteria:** summary, upload, and results each have their own route and refresh/deep-link behavior is stable.
+
+### 4. Feature: `QuotaMeter` + 429 handling with waitlist modal
+
+**Owner:** PO2 (Adam). **Depends on:** Phase 3 task 2 rate-limit responses and Phase 2 auth client.
+
+**Purpose/Issue:** Show quota before the user hits the wall and give them a recovery path when the backend rejects a request. The UI should explain the cap, expose the reset time, and route blocked users into the waitlist flow.
+
+**Implementation — PO2 (Adam):**
+
+- [ ] Add `frontend/src/components/dashboard/quota-meter.tsx` to read the rolling 24-hour count and render the free/pro badge state.
+- [ ] Wire 429 handling in the upload flow so the waitlist modal opens with the backend reset timestamp.
+- [ ] Connect the quota state to the dashboard CTA and the `UpgradeWaitlistModal` trigger path.
+
+**Exit criteria:** free users see live quota state, a blocked request shows the reset time, and the waitlist modal opens from the 429 path.
+
+### 5. Feature: Real uploads with bundled Aisyah fixtures
+
+**Owner:** PO2 (Adam). **Depends on:** Phase 3 task 3 route split and the backend intake endpoint.
+
+**Purpose/Issue:** Stop treating the sample path as a mock-only demo. The bundled PDFs should travel through the real upload stack so Firestore history and results are populated from the same path as a normal run.
+
+**Implementation — PO2 (Adam):**
+
+- [ ] Move the sample PDFs into `frontend/public/fixtures/` and point the "Use Aisyah sample documents" button at the real intake flow.
+- [ ] Keep `NEXT_PUBLIC_USE_MOCK_SSE` as a dev-only replay toggle in `frontend/src/fixtures/aisyah-response.ts`.
+- [ ] Ensure `frontend/src/components/upload/upload-widget.tsx` posts the real files through `frontend/src/lib/firebase.ts` and the backend intake endpoint.
+
+**Exit criteria:** the sample-documents button uses the real upload path and still works when mock SSE is disabled.
+
+---
+
+## Phase 4: Dashboard UX (History, Stats, Settings)
+
+> Goal: paid-feeling dashboard.
+
+### 1. Feature: EvaluationHistoryTable + pagination + empty state
+
+**Owner:** PO2 (Adam). **Depends on:** Phase 3 task 1 list endpoint and the Firestore history index.
+
+**Purpose/Issue:** Give users a readable history view that scales past a single evaluation. The history list should be paginated, predictable, and useful when empty.
+
+**Implementation — PO2 (Adam):**
+
+- [ ] Add `frontend/src/components/history/evaluation-history-table.tsx` with 20-per-page pagination and row links to `/dashboard/evaluation/results/[id]`.
+- [ ] Wire the summary page in `frontend/src/app/(app)/dashboard/evaluation/page.tsx` to the table and its empty state.
+- [ ] Keep the empty state explicit: no history yet, with a CTA back to the upload route.
+
+**Exit criteria:** the history page paginates, deep-links to results, and shows a clear empty state.
+
+### 2. Feature: AggregateStatsCards
+
+**Owner:** PO2 (Adam). **Depends on:** Phase 3 task 1 stored evaluations and the history query.
+
+**Purpose/Issue:** Surface the dashboard metrics that make the product feel alive: total evaluations, total RM identified, and unique schemes qualified.
+
+**Implementation — PO2 (Adam):**
+
+- [ ] Add `frontend/src/components/history/aggregate-stats-cards.tsx` above the history table.
+- [ ] Derive the metrics from the Firestore-backed evaluation data already returned by the history query.
+- [ ] Keep the cards responsive and consistent with the dashboard shell.
+
+**Exit criteria:** the dashboard summary shows the three aggregate stats from persisted data.
+
+### 3. Feature: Settings page (profile, tier card, danger zone)
+
+**Owner:** PO2 (Adam). **Depends on:** Phase 2 auth profile fields and Phase 4 task 4 PDPA endpoints.
+
+**Purpose/Issue:** Provide a place for account metadata, tier visibility, and destructive actions. The settings screen should expose the user’s identity, tier state, and PDPA controls without mixing them into the dashboard.
+
+**Implementation — PO2 (Adam):**
+
+- [ ] Build `frontend/src/app/(app)/settings/page.tsx` with profile, tier, and danger-zone sections.
+- [ ] Reuse `frontend/src/components/layout/user-menu.tsx` and `TierBadge` so the tier reads the same everywhere.
+- [ ] Wire the export/delete actions to the backend endpoints once Phase 4 task 4 lands.
+
+**Exit criteria:** settings shows the signed-in Google profile, tier state, and the export/delete actions.
+
+### 4. Feature: Backend PDPA endpoints
+
+**Owner:** PO1 (Hao). **Depends on:** Phase 2 auth boundary and Firestore persistence from Phase 3.
+
+**Purpose/Issue:** Give users the access and deletion rights required by the PDPA posture. Export must bundle the user record and evaluation history; delete must cascade cleanly through Firestore and Firebase Auth.
+
+**Implementation — PO1 (Hao):**
+
+- [ ] Add `backend/app/routes/user.py` with `GET /api/user/export` and `DELETE /api/user`.
+- [ ] Read `users/{userId}` plus all matching `evaluations` records and return them as a downloadable JSON attachment for export.
+- [ ] Cascade-delete `evaluations`, delete `users/{userId}`, and call `firebase_admin.auth.delete_user(uid)` on account removal.
+
+**Exit criteria:** export downloads the user bundle and delete removes the Firestore records plus the Firebase Auth account.
+
+### 5. Feature: Waitlist Firestore collection + `UpgradeWaitlistModal`
+
+**Owner:** PO2 (Adam). **Depends on:** Phase 2 Firestore contract and Phase 3 429 handling.
+
+**Purpose/Issue:** Capture Pro interest without billing or checkout. The modal should write a waitlist entry and the Firestore collection should make the manual tier-flip flow easy to manage.
+
+**Implementation — PO2 (Adam):**
+
+- [ ] Write `waitlist/{autoId}` entries from `frontend/src/components/settings/upgrade-waitlist-modal.tsx`.
+- [ ] Include `email`, `userId`, and `createdAt` in the waitlist write so the manual approval flow has enough context.
+- [ ] Keep the modal reusable from quota exhaustion, settings, and any other Pro gate.
+
+**Exit criteria:** waitlist submissions persist to Firestore and the modal can be launched from every Pro gate.
+
+---
+
+## Phase 5: Marketing Landing + Legal
+
+> Goal: an anonymous visitor at `/` reads the pitch, pricing, and How It Works; signs up with PDPA consent.
+
+### 1. Feature: Landing page rewrite
+
+**Owner:** PO2 (Adam). **Depends on:** Phase 1 landing work and Phase 1 appendages 8-10.
+
+**Purpose/Issue:** Turn `/` into the public pitch page for the SaaS pivot. The landing page should carry the hero, inline How It Works, pricing, and the primary Google CTA.
+
+**Implementation — PO2 (Adam):**
+
+- [ ] Rewrite `frontend/src/app/page.tsx` to hold the hero, inline How It Works pipeline visual, pricing cards, and footer links.
+- [ ] Keep the CTA pointed at `/sign-in` and make the Free/Pro cards match the v2 launch story.
+- [ ] Ensure the landing page stays the public entry point for the product story, not a dashboard teaser.
+
+**Exit criteria:** anonymous visitors land on a complete marketing page with hero, How It Works, pricing, and Google sign-in CTA.
+
+### 2. Feature: `/privacy` + `/terms` static pages
+
+**Owner:** PO2 (Adam). **Depends on:** the PDPA posture defined in the spec.
+
+**Purpose/Issue:** Publish the legal pages needed for the sign-up flow and footer links. These pages should be static, simple, and easy to maintain.
+
+**Implementation — PO2 (Adam):**
+
+- [ ] Add `frontend/src/app/privacy/page.tsx` with the PDPA-compliant privacy notice.
+- [ ] Add `frontend/src/app/terms/page.tsx` with the terms of use content.
+- [ ] Link both pages from the landing footer and the sign-up consent copy.
+
+**Exit criteria:** `/privacy` and `/terms` render as static pages and are reachable from the public UI.
+
+### 3. Feature: Sign-up PDPA consent gate wiring
+
+**Owner:** PO2 (Adam). **Depends on:** Phase 2 auth pages and the privacy notice content.
+
+**Purpose/Issue:** Make consent explicit before the Google OAuth popup opens. The sign-up flow needs a real checkbox gate and a stored timestamp so the PDPA posture is enforced, not implied.
+
+**Implementation — PO2 (Adam):**
+
+- [ ] Update `frontend/src/app/sign-up/page.tsx` so the checkbox must be ticked before the Google button opens OAuth.
+- [ ] Persist `pdpaConsentAt` on the user doc through the auth flow in `backend/app/auth.py`.
+- [ ] Keep the sign-up copy aligned with the `/privacy` notice and the footer links.
+
+**Exit criteria:** sign-up refuses OAuth until consent is checked and the consent timestamp is stored.
+
+### 4. Feature: Auth page polish
+
+**Owner:** PO2 (Adam). **Depends on:** Phase 2 auth pages.
+
+**Purpose/Issue:** Make sign-in and sign-up look like intentional product surfaces instead of dev scaffolding. The auth screens should be clean, single-purpose, and forgiving on failure.
+
+**Implementation — PO2 (Adam):**
+
+- [ ] Share the full-viewport card layout between `frontend/src/app/sign-in/page.tsx` and `frontend/src/app/sign-up/page.tsx`.
+- [ ] Keep the loading spinner and error toast behavior consistent across both auth pages.
+- [ ] Route successful auth back to `/dashboard` without a detour.
+
+**Exit criteria:** the auth pages look polished, handle failure cleanly, and return the user to the dashboard on success.
+
+---
+
+## Phase 6: Production Cutover
+
+> Goal: live at `https://layak.tech` with nightly prune; submission package refreshed.
+
+### 1. Feature: Cloud Scheduler + nightly prune Cloud Run Job
+
+**Owner:** PO1 (Hao). **Depends on:** Phase 2 Firestore schema and Phase 3 persisted evaluations.
+
+**Purpose/Issue:** Enforce the free-tier retention policy automatically. The prune job must remove stale free-tier evaluations every night without touching Pro history.
+
+**Implementation — PO1 (Hao):**
+
+- [ ] Implement `backend/scripts/prune_free_tier.py` against the `users` and `evaluations` collections.
+- [ ] Deploy the job as `layak-prune-free-tier` and schedule it for 02:00 MYT via Cloud Scheduler.
+- [ ] Keep the job logging the deleted-doc count to Cloud Logging so retention runs are visible.
+
+**Exit criteria:** the nightly prune job runs on schedule and deletes only free-tier evaluations older than 30 days.
+
+### 2. Feature: `.tech` domain claim via Student Copilot + Cloud Run custom-domain mapping + DNS
+
+**Owner:** PO2 (Adam). **Depends on:** the frontend Cloud Run service and the domain approval path.
+
+**Purpose/Issue:** Put the product on the real domain the team will demo and share. DNS and custom-domain mapping need to be in place before the submission package is refreshed.
+
+**Implementation — PO2 (Adam):**
+
+- [ ] Claim `layak.tech` through Student Copilot and map it to the frontend Cloud Run service.
+- [ ] Update DNS records for the custom domain and verify the mapping resolves from a fresh browser.
+- [ ] Keep the public URL in the README, video script, and submission copy aligned with the new domain.
+
+**Exit criteria:** `layak.tech` resolves to the frontend and is usable from a fresh device.
+
+### 3. Feature: Firebase service account in Secret Manager; prod deploy with `--min-instances=1 --cpu-boost` on both services
+
+**Owner:** PO1 (Hao). **Depends on:** Phase 2 auth boundary and Phase 6 task 2 domain mapping.
+
+**Purpose/Issue:** Finish the production deployment with the right secrets and warm instances. The backend needs the Firebase service account, and both services should stay warm through the demo window.
+
+**Implementation — PO1 (Hao):**
+
+- [ ] Store `firebase-admin-key` in Secret Manager and mount it as `FIREBASE_ADMIN_KEY` for the backend.
+- [ ] Deploy the backend with `adk deploy cloud_run --with_ui --region asia-southeast1 --min-instances 1 --cpu-boost --set-secrets GEMINI_API_KEY=gemini-api-key:latest --set-secrets FIREBASE_ADMIN_KEY=firebase-admin-key:latest`.
+- [ ] Deploy the frontend with `gcloud run deploy layak-frontend --source . --region asia-southeast1 --min-instances 1 --cpu-boost --allow-unauthenticated --set-env-vars NEXT_PUBLIC_API_URL=<backend-url>`.
+
+**Exit criteria:** both Cloud Run services are deployed with warm-instance settings and the backend can read the Firebase admin key from Secret Manager.
+
+### 4. Feature: Prod smoke from a fresh device
+
+**Owner:** Both (Adam + Hao). **Depends on:** Phase 6 tasks 1-3 deployed live.
+
+**Purpose/Issue:** Prove the live stack works from the outside world before handing off the submission package. This is the final end-to-end check on the real domain and the real auth flow.
+
+**Implementation — Both:**
+
+- [ ] Open `layak.tech` in incognito from another network and confirm the Google sign-in flow still works.
+- [ ] Run one full evaluation end to end and confirm the history view reflects it afterward.
+- [ ] Capture any prod-only flake before the submission package is frozen.
+
+**Exit criteria:** `layak.tech` works end-to-end from a fresh device and the history view updates after a live evaluation.
+
+### 5. Feature: Submission package refresh
+
+**Owner:** Both (Adam + Hao). **Depends on:** the live domain, the final demo flow, and the finished landing/legal pages.
+
+**Purpose/Issue:** Refresh the submission artifacts so they match the SaaS pivot instead of the hackathon demo. The README, video, deck, and form submission all need to reflect the new product shape and the new deadline.
+
+**Implementation — Both:**
+
+- [ ] Update `README.md` for the v2 SaaS flow, the Firebase-backed architecture, and the new live URL.
+- [ ] Re-record the demo video so it matches the signed-in workflow and the persisted history screens.
+- [ ] Update the deck, export `pitch.pdf`, and resubmit the Google Form before 24 Apr 23:59 MYT.
+
+**Exit criteria:** the repo contains refreshed submission artifacts and the final form is resubmitted against the updated deadline.
 
 ---
 
 ## Phase X: Submission Package
 
-> Maps to `docs/roadmap.md` Phase X — ship clean, complete artifacts. Tasks below are picked up on demo-day evening, post feature-freeze.
+> Maps to `docs/roadmap.md` Phase X — ship clean, complete artifacts. Tasks below are picked up on demo-day evening, post feature-freeze; hard submit is 24 Apr 23:59 MYT and the buffer window shifts to 25 Apr 00:00–00:59 MYT.
 
 ### 1. Feature: UI polish and README final pass
 
@@ -332,6 +739,6 @@ _All four exit-criteria items met: Aisyah total = **RM8,208/year** (STR RM450 + 
 
 - [ ] Fill and submit the Google Form against every required field (repo URL, Cloud Run URL, video URL, deck PDF, GitHub profile links, track + category).
 - [ ] Verify each link in the confirmation email.
-- [ ] Resubmit if anything breaks during the 23:00–23:59 buffer.
+- [ ] Resubmit if anything breaks during the 00:00–00:59 buffer.
 
 ---

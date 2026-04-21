@@ -1,12 +1,12 @@
 # Project Requirements Document
 
 **Project**: Layak
-**Module**: Layak MVP (v1 — hackathon demo build)
+**Module**: Layak v1 (hackathon demo build) + v2 (production SaaS pivot)
 **Industry**: Malaysian GovTech / social-assistance delivery (Track 2 — Citizens First)
 **Team Size**: 2
 **Target Grade**: Project 2030 — MyAI Future Hackathon, National Open Champion
-**Document Version**: 0.1.0
-**Date**: 20 April 2026
+**Document Version**: 0.2.0
+**Date**: 21 April 2026
 
 ---
 
@@ -18,6 +18,7 @@
    1. [Primary persona — Aisyah, 34, Grab driver, Kuantan (locked)](#31-primary-persona--aisyah-34-grab-driver-kuantan-locked)
    2. [Secondary personas (OUT OF SCOPE for v1)](#32-secondary-personas-out-of-scope-for-v1)
    3. [User assumptions](#33-user-assumptions)
+   4. [Secondary personas active in v2](#34-secondary-personas-active-in-v2)
 4. [Functional Requirements](#4-functional-requirements)
    1. [FR-1 — Single-page web app on Cloud Run](#fr-1--single-page-web-app-on-cloud-run)
    2. [FR-2 — Document upload widget (three files)](#fr-2--document-upload-widget-three-files)
@@ -29,6 +30,16 @@
    8. [FR-8 — Draft packet PDF generator](#fr-8--draft-packet-pdf-generator)
    9. [FR-9 — "Why I qualify" explanation per scheme](#fr-9--why-i-qualify-explanation-per-scheme)
    10. [FR-10 — Aisyah seed-data demo-mode fallback](#fr-10--aisyah-seed-data-demo-mode-fallback)
+   11. [FR-11 — Google OAuth sign-in](#fr-11--google-oauth-sign-in)
+   12. [FR-12 — PDPA-consent sign-up gate](#fr-12--pdpa-consent-sign-up-gate)
+   13. [FR-13 — Persisted per-user evaluation history](#fr-13--persisted-per-user-evaluation-history)
+   14. [FR-14 — Free-tier quota (5/24h with 429 + X-RateLimit-Reset)](#fr-14--free-tier-quota-524h-with-429--x-ratelimit-reset)
+   15. [FR-15 — Shareable owner-gated results URL at /dashboard/evaluation/results/[id]](#fr-15--shareable-owner-gated-results-url-at-dashboardevaluationresultsid)
+   16. [FR-16 — Settings profile + tier card + waitlist modal](#fr-16--settings-profile--tier-card--waitlist-modal)
+   17. [FR-17 — Data-export (GET /api/user/export) + account-deletion (DELETE /api/user)](#fr-17--data-export-get-apiuserexport--account-deletion-delete-apiuser)
+   18. [FR-18 — Nightly 30-day free-tier prune (Cloud Scheduler + Cloud Run Job)](#fr-18--nightly-30-day-free-tier-prune-cloud-scheduler--cloud-run-job)
+   19. [FR-19 — Marketing landing page at /](#fr-19--marketing-landing-page-at-)
+   20. [FR-20 — Privacy notice + terms pages (/privacy, /terms)](#fr-20--privacy-notice--terms-pages-privacy-terms)
 5. [Non-Functional Requirements](#5-non-functional-requirements)
    1. [NFR-1 — Performance](#nfr-1--performance)
    2. [NFR-2 — Grounding & transparency](#nfr-2--grounding--transparency)
@@ -36,6 +47,9 @@
    4. [NFR-4 — Accessibility & responsiveness](#nfr-4--accessibility--responsiveness)
    5. [NFR-5 — Reliability](#nfr-5--reliability)
    6. [NFR-6 — Security](#nfr-6--security)
+   7. [NFR-7 — Session security](#nfr-7--session-security)
+   8. [NFR-8 — PDPA compliance](#nfr-8--pdpa-compliance)
+   9. [NFR-9 — Tier-aware rate limits](#nfr-9--tier-aware-rate-limits)
 6. [Scope Boundaries](#6-scope-boundaries)
    1. [In scope (v1 — demo-night deliverables)](#61-in-scope-v1--demo-night-deliverables)
    2. [Out of scope (v1 — explicit)](#62-out-of-scope-v1--explicit)
@@ -97,9 +111,13 @@ Listed for positioning only. Not implemented, not in the demo, not in the rule e
 - Reads English UI copy if it is plain-language.
 - Trust-posture is skeptical after the MyGov chatbot incident and broader scam landscape — therefore Layak must display "we store nothing" and "draft only — you submit manually" prominently.
 
+### 3.4 Secondary personas active in v2
+
+v2 opens the product to any Malaysian citizen who self-selects through sign-up, but Aisyah remains the reference free-tier persona for product decisions, examples, and testing.
+
 ## 4. Functional Requirements
 
-Each requirement below ties to one of the ten in-scope v1 deliverables. Acceptance criteria are falsifiable — each one should be answerable with a yes/no test.
+Each requirement below ties to one of the in-scope v1 and v2 deliverables. Acceptance criteria are falsifiable — each one should be answerable with a yes/no test.
 
 ### FR-1 — Single-page web app on Cloud Run
 
@@ -221,6 +239,116 @@ Each requirement below ties to one of the ten in-scope v1 deliverables. Acceptan
 - [ ] The UI surface labels seed-mode runs with a "DEMO MODE" banner.
 - [ ] Demo mode is idempotent — repeat clicks produce the same result.
 
+### FR-11 — Google OAuth sign-in
+
+**Description.** Users sign in with Google OAuth through a "Continue with Google" button, and the resulting ID token is stored client-side for authenticated requests.
+
+**Acceptance criteria:**
+
+- [ ] The sign-in page shows a single Google OAuth button labeled "Continue with Google".
+- [ ] A successful sign-in stores a Firebase ID token client-side and redirects to `/dashboard`.
+- [ ] A failed OAuth flow shows a retryable error state instead of a blank page.
+- [ ] Anonymous visitors cannot access authenticated dashboard routes without signing in.
+
+### FR-12 — PDPA-consent sign-up gate
+
+**Description.** The sign-up flow requires an explicit PDPA consent checkbox before Google OAuth opens, and the consent timestamp is persisted with the user record.
+
+**Acceptance criteria:**
+
+- [ ] `/sign-up` renders a required PDPA consent checkbox before the Google button.
+- [ ] The OAuth popup does not open until the consent box is checked.
+- [ ] Successful sign-up persists `pdpaConsentAt` on the user document.
+- [ ] Reopening sign-up after a successful consent flow does not bypass the checkbox requirement.
+
+### FR-13 — Persisted per-user evaluation history
+
+**Description.** Each authenticated user can view only their own evaluation history, ordered by most recent first, from persisted Firestore records.
+
+**Acceptance criteria:**
+
+- [ ] `/dashboard/evaluation` lists only evaluations owned by the signed-in user.
+- [ ] The newest evaluation appears first in the history table.
+- [ ] A user cannot retrieve another user's evaluation through the history view.
+- [ ] Refreshing the page preserves the previously completed evaluation records.
+
+### FR-14 — Free-tier quota (5/24h with 429 + X-RateLimit-Reset)
+
+**Description.** Free-tier users can start at most five evaluations in a rolling 24-hour window; the sixth request is rejected before the pipeline begins.
+
+**Acceptance criteria:**
+
+- [ ] The sixth evaluation started within 24 hours returns HTTP 429.
+- [ ] The 429 response includes an `X-RateLimit-Reset` header.
+- [ ] Free-tier quota is evaluated before SSE streaming starts.
+- [ ] The UI routes a quota-exhausted free user to the waitlist modal.
+
+### FR-15 — Shareable owner-gated results URL at /dashboard/evaluation/results/[id]
+
+**Description.** Each completed evaluation gets a persistent results URL that renders for its owner and is inaccessible to other users.
+
+**Acceptance criteria:**
+
+- [ ] Completing an evaluation routes the user to `/dashboard/evaluation/results/[id]`.
+- [ ] The results page renders for the evaluation owner.
+- [ ] A different authenticated user receives a non-owner access failure for the same ID.
+- [ ] The route can be refreshed or revisited later without losing the stored results.
+
+### FR-16 — Settings profile + tier card + waitlist modal
+
+**Description.** The settings page shows read-only Google profile data, a tier card, and a waitlist modal for Pro access.
+
+**Acceptance criteria:**
+
+- [ ] `/settings` displays the user's Google email, display name, and photo URL as read-only fields.
+- [ ] The tier card reflects the current Firestore `tier` value.
+- [ ] Clicking "Upgrade to Pro" opens the waitlist modal.
+- [ ] Submitting the modal creates a waitlist record for the signed-in user.
+
+### FR-17 — Data-export (GET /api/user/export) + account-deletion (DELETE /api/user)
+
+**Description.** The account settings danger zone exposes a JSON export endpoint and a hard-delete endpoint for the signed-in user.
+
+**Acceptance criteria:**
+
+- [ ] `GET /api/user/export` returns a JSON bundle for the authenticated user.
+- [ ] The export bundle includes the user record and that user's evaluations.
+- [ ] `DELETE /api/user` removes the Firestore user document and the user's evaluations.
+- [ ] After account deletion succeeds, the user is signed out client-side.
+
+### FR-18 — Nightly 30-day free-tier prune (Cloud Scheduler + Cloud Run Job)
+
+**Description.** A nightly Cloud Scheduler trigger runs a Cloud Run Job that deletes free-tier evaluations older than 30 days.
+
+**Acceptance criteria:**
+
+- [ ] A Cloud Scheduler job triggers the prune workflow once per night.
+- [ ] The prune task runs as a Cloud Run Job.
+- [ ] Evaluations older than 30 days are deleted for free-tier users.
+- [ ] Pro-tier evaluations are not deleted by the prune job.
+
+### FR-19 — Marketing landing page at /
+
+**Description.** The root route serves a public marketing landing page with the product pitch, pricing, and a sign-in CTA.
+
+**Acceptance criteria:**
+
+- [ ] Anonymous visitors can load `/` without signing in.
+- [ ] The page includes a hero section, How It Works content, and pricing cards.
+- [ ] The primary CTA routes to `/sign-in`.
+- [ ] The landing footer links to `/privacy` and `/terms`.
+
+### FR-20 — Privacy notice + terms pages (/privacy, /terms)
+
+**Description.** Static privacy and terms pages are available at `/privacy` and `/terms`, and are linked from the public entry points.
+
+**Acceptance criteria:**
+
+- [ ] `/privacy` renders a static privacy notice.
+- [ ] `/terms` renders a static terms page.
+- [ ] Both pages are reachable from the landing footer.
+- [ ] The sign-up consent copy references the privacy notice.
+
 ## 5. Non-Functional Requirements
 
 ### NFR-1 — Performance
@@ -264,6 +392,24 @@ Each requirement below ties to one of the ten in-scope v1 deliverables. Acceptan
 - No credentials, tokens, or IC values appear in any commit, log line, or UI string.
 - AI disclosure section in README names Claude Code explicitly (hackathon Rules §4.2).
 
+### NFR-7 — Session security
+
+- ID tokens are verified on every authenticated call.
+- CORS is pinned to the frontend origin.
+- No PII is written to logs.
+
+### NFR-8 — PDPA compliance
+
+- Consent is captured before sign-up completes.
+- Export and delete endpoints are functional for the signed-in user.
+- Free-tier data retention is limited to 30 days.
+
+### NFR-9 — Tier-aware rate limits
+
+- Free tier is limited to 5 evaluations per rolling 24 hours.
+- Pro tier is unlimited.
+- The accepted race-condition behavior is documented.
+
 ## 6. Scope Boundaries
 
 ### 6.1 In scope (v1 — demo-night deliverables)
@@ -281,6 +427,14 @@ Mirrored verbatim from `docs/project-idea.md` §5. Ten items:
 9. "Why I qualify" explanation per scheme.
 10. Hardcoded Aisyah seed-data button for demo fallback.
 
+### 6.1.1 Additional v2 deliverables
+
+- User accounts via Firebase Auth / Google OAuth.
+- Persistent storage in Firestore.
+- Per-user evaluation history.
+- Tiered quotas: Free 5/24h, Pro unlimited.
+- PDPA export and deletion endpoints.
+
 ### 6.2 Out of scope (v1 — explicit)
 
 Mirrored verbatim from `docs/project-idea.md` §5. Any item below renders as a greyed-out "Checking… (v2)" card in the UI, never as a working feature.
@@ -290,7 +444,6 @@ Mirrored verbatim from `docs/project-idea.md` §5. Any item below renders as a g
 - Schemes beyond the three locked: i-Saraan, PERKESO, MyKasih, eKasih, PADU sync, state-level aid (Kita Selangor, Penang elderly), SARA claim flow.
 - Appeal workflow (BK-02 / BK-05 / JKM20).
 - Mobile native app.
-- User accounts and persistent storage.
 - MyDigital ID / MyKad NFC reading.
 - Multi-document versioning.
 - Email / WhatsApp delivery of packet.
@@ -304,6 +457,9 @@ Mirrored verbatim from `docs/project-idea.md` §5. Any item below renders as a g
 - eKasih booster tier toggle.
 - Warga Emas discretionary-override path.
 - Form B vs Form BE auto-routing (Aisyah is locked as Form B filer).
+- Stripe billing (deferred to v2.1).
+- Email/password auth (deferred indefinitely).
+- Admin panel (deferred — tier flips via gcloud/script).
 
 ### 6.3 Emergency de-scope plan
 
@@ -324,4 +480,5 @@ The demo still wins on the "Chat → Action" rubric provided steps 1–5 of the 
 - **Demo documents are synthetic.** MyKad, payslip, and utility-bill specimens used in the demo are fully fictional. Every synthetic MyKad carries a prominent "SYNTHETIC — FOR DEMO ONLY" watermark, uses a fictional IC number, and does not replicate holographic or chip elements (which would cross into forgery under the Penal Code and PDPA 2010 / National Registration Regulations 1990).
 - **Eligibility results are estimates.** Computations use Budget-2026-gazetted rates as of 20 April 2026. The final legal determination rests with the relevant agency on application. Layak is not an official government service and is not affiliated with any Malaysian ministry.
 - **Rule-engine scope is narrow.** Only the three locked schemes and five locked LHDN reliefs are encoded in v1. The UI greys out the long tail of schemes explicitly as "Checking… (v2)" rather than hiding them.
+- **v2 persists evaluation results (profile summary, scheme matches, total RM upside) to Firestore; original uploaded documents remain discarded after extraction; the packet watermark posture is unchanged.**
 - **AI disclosure.** The README declares that this project was built with Claude Code (Anthropic) as the primary agentic coding assistant, per hackathon Rules §4.2. All AI-generated code is reviewed by human developers before commit.

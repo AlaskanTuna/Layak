@@ -1,15 +1,30 @@
-"""Shared Gemini API client setup.
+"""Shared Gemini client setup — Vertex AI mode.
 
-Loads `GEMINI_API_KEY` from the repo-root `.env` on first client construction
-(the backend cwd is `backend/`, so the key lives at `../.env`). The client is
-cached so every tool shares one HTTPS connection pool.
+Phase 6 Task 6 cutover: the AI Studio API key keeps silently demoting the
+project from Tier 1 to Free tier even with billing active. Vertex AI uses the
+GCP project's IAM + billing directly, bypasses the AI Studio key tier-management
+bug, and properly draws on the project's $25 Google Cloud Credit.
+
+Auth flow:
+    Local dev: `gcloud auth application-default login` once. The SDK picks up
+        Application Default Credentials automatically.
+    Cloud Run: the service account attached to `layak-backend` is the
+        runtime identity. It needs `roles/aiplatform.user` (or anything that
+        grants `aiplatform.endpoints.predict`); the project default Compute SA
+        already inherits this via `roles/editor`.
+
+Configuration:
+    `GOOGLE_CLOUD_PROJECT`  — required. The GCP project ID for billing/quota.
+    `GOOGLE_CLOUD_LOCATION` — optional. The Vertex AI region. Defaults to
+                              `asia-southeast1` so requests stay co-located
+                              with the Cloud Run service.
 
 Model routing (see docs/trd.md §5.1):
     FAST_MODEL      — Gemini 2.5 Flash — multimodal extract, structured classify, code execution.
-    ORCHESTRATOR    — Gemini 2.5 Pro   — ADK RootAgent in Task 3 Path 2+. In practice the
-                      hackathon free-tier quota on `gemini-2.5-pro` is tight (429
-                      RESOURCE_EXHAUSTED), so Path 2 falls back to Flash for `compute_upside`
-                      until we switch to a paid Vertex AI project.
+    ORCHESTRATOR    — Gemini 2.5 Pro   — ADK RootAgent in Task 3 Path 2+. Vertex AI's
+                      project-scoped quotas mean we can call Pro directly without
+                      the 429 RESOURCE_EXHAUSTED churn the AI Studio Free tier
+                      forced on us pre-Phase 6 Task 6.
 """
 
 from __future__ import annotations
@@ -24,6 +39,8 @@ from google import genai
 FAST_MODEL = "gemini-2.5-flash"
 ORCHESTRATOR_MODEL = "gemini-2.5-pro"
 
+_DEFAULT_LOCATION = "asia-southeast1"
+
 _DOTENV_CANDIDATES = (
     Path(__file__).resolve().parent.parent.parent.parent / ".env",
     Path.cwd() / ".env",
@@ -31,34 +48,62 @@ _DOTENV_CANDIDATES = (
 )
 
 
-def _load_key_from_dotenv() -> str | None:
+def _load_var_from_dotenv(key: str) -> str | None:
+    """Read `key=value` for the given key from the first dotenv we find.
+
+    Used as a fallback for local dev — uvicorn started outside `pnpm dev`
+    won't have the parent shell's env. Production never hits this path because
+    Cloud Run injects env vars at deploy time.
+    """
+    prefix = f"{key}="
     for candidate in _DOTENV_CANDIDATES:
         if not candidate.is_file():
             continue
         try:
             for line in candidate.read_text(encoding="utf-8").splitlines():
-                if line.startswith("GEMINI_API_KEY=") and len(line) > len("GEMINI_API_KEY="):
+                if line.startswith(prefix) and len(line) > len(prefix):
                     return line.split("=", 1)[1].strip()
         except OSError:
             continue
     return None
 
 
+def _resolve_project() -> str:
+    project = os.environ.get("GOOGLE_CLOUD_PROJECT") or _load_var_from_dotenv("GOOGLE_CLOUD_PROJECT")
+    if not project:
+        raise RuntimeError(
+            "GOOGLE_CLOUD_PROJECT not set. Populate the repo-root .env "
+            "(see .env.example) or `gcloud config set project <id>` and "
+            "export GOOGLE_CLOUD_PROJECT before starting uvicorn."
+        )
+    return project
+
+
+def _resolve_location() -> str:
+    return (
+        os.environ.get("GOOGLE_CLOUD_LOCATION")
+        or _load_var_from_dotenv("GOOGLE_CLOUD_LOCATION")
+        or _DEFAULT_LOCATION
+    )
+
+
 @lru_cache(maxsize=1)
 def get_client() -> genai.Client:
-    """Return a cached `google.genai.Client` authenticated via `GEMINI_API_KEY`.
+    """Return a cached `google.genai.Client` bound to the project's Vertex AI.
+
+    Credentials resolve through Application Default Credentials — locally via
+    `gcloud auth application-default login`, on Cloud Run via the attached
+    service account.
 
     Raises:
-        RuntimeError: if the key is missing from both the environment and the
-            committed dotenv candidates.
+        RuntimeError: if `GOOGLE_CLOUD_PROJECT` isn't reachable from env or
+            the dotenv fallback.
     """
-    api_key = os.environ.get("GEMINI_API_KEY") or _load_key_from_dotenv()
-    if not api_key:
-        raise RuntimeError(
-            "GEMINI_API_KEY not set. Populate repo-root .env from Secret Manager "
-            "(see docs/trd.md §7) or export the env var before starting uvicorn."
-        )
-    return genai.Client(api_key=api_key)
+    return genai.Client(
+        vertexai=True,
+        project=_resolve_project(),
+        location=_resolve_location(),
+    )
 
 
 _FENCE_RE = re.compile(r"^\s*```(?:json)?\s*\n(.*?)\n```\s*$", re.DOTALL | re.IGNORECASE)

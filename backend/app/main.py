@@ -26,7 +26,8 @@ from fastapi.middleware.cors import CORSMiddleware
 from pydantic import ValidationError
 from starlette.responses import StreamingResponse
 
-# Load repo-root .env into os.environ before any agent module reads GEMINI_API_KEY.
+# Load repo-root .env into os.environ before any agent module reads
+# GOOGLE_CLOUD_PROJECT / GOOGLE_CLOUD_LOCATION (Phase 6 Task 6 — Vertex AI cutover).
 # Path: backend/app/main.py -> project root is three levels up.
 _DOTENV = Path(__file__).resolve().parent.parent.parent / ".env"
 if _DOTENV.is_file():

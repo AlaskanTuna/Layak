@@ -10,7 +10,6 @@ const LABELS: Record<string, string> = {
   upload: 'Upload',
   results: 'Results',
   schemes: 'Schemes',
-  'how-it-works': 'How it Works',
   settings: 'Settings',
   'sign-in': 'Sign in',
   'sign-up': 'Sign up'

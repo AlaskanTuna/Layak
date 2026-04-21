@@ -50,8 +50,8 @@ const PIPELINE: PipelineStep[] = [
     step: '04',
     title: 'Compute',
     icon: Calculator,
-    body: 'Gemini Code Execution runs a Python snippet on-stage that sums your annual upside across every qualifying scheme. The stdout streams live to the UI so you see the math, not just the answer.',
-    tools: ['Gemini Code Execution']
+    body: 'The agent runs live arithmetic on-stage, summing your annual upside across every qualifying scheme. Results stream to the UI so you see the full working, not just a final number.',
+    tools: ['On-stage arithmetic', 'Python']
   },
   {
     step: '05',
@@ -80,8 +80,8 @@ const STACK: StackTool[] = [
     icon: BookOpen
   },
   {
-    name: 'Gemini Code Execution',
-    role: 'Python-on-stage arithmetic. Transparent upside math the user can verify, not a black-box total.',
+    name: 'On-stage arithmetic',
+    role: 'Live Python computation that streams totals and working to the UI — transparent upside math you can verify, not a black-box number.',
     icon: Calculator
   },
   {

@@ -3,7 +3,7 @@
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useEffect, useState } from 'react'
-import { BookOpen, LayoutDashboard, Library, Menu, Sparkles, type LucideIcon } from 'lucide-react'
+import { LayoutDashboard, Library, Menu, Sparkles, type LucideIcon } from 'lucide-react'
 
 import { BrandMark } from '@/components/layout/brand-mark'
 import { Button } from '@/components/ui/button'
@@ -18,8 +18,7 @@ type NavItem = {
 const NAV_ITEMS: NavItem[] = [
   { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
   { href: '/dashboard/evaluation', label: 'Evaluation', icon: Sparkles },
-  { href: '/dashboard/schemes', label: 'Schemes', icon: Library },
-  { href: '/dashboard/how-it-works', label: 'How it Works', icon: BookOpen }
+  { href: '/dashboard/schemes', label: 'Schemes', icon: Library }
 ]
 
 type SidebarProps = {

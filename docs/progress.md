@@ -4,6 +4,20 @@
 
 ---
 
+## [21/04/26] - Phase 2 Task 2 follow-up: Firebase Admin secret live, backend + frontend redeployed via CI/CD
+
+PO2 completed the last deferred checkbox of Phase 2 Task 2 on PO1's behalf. Firebase Admin SDK is now fully configured in production, the backend deployment carries the Admin key via Secret Manager, and both services were redeployed together through the freshly-minted GitHub Actions workflow so the auth-enforcing backend and the Firebase-signed-in frontend cut over as one release.
+
+- **`layak-firebase-admin` service account created** (`layak-firebase-admin@layak-myaifuturehackathon.iam.gserviceaccount.com`). Roles: `roles/firebaseauth.admin` (supports the `check_revoked=True` path in `verify_firebase_id_token` so revoked/disabled users surface as 401 rather than silently passing) + `roles/datastore.user` (Admin SDK writes to the `users/{uid}` and `evaluations/{evalId}` collections). Narrow pair — no project Owner or blanket Editor.
+- **Key minted + vaulted**. `gcloud iam service-accounts keys create` run under `umask 077` against `/tmp/fb-admin-key-<pid>.json`. Immediately uploaded as the first version of Secret Manager secret `firebase-admin-key` (`replication-policy=automatic`), then `shred -u` on the local file. The secret is the only place the private key material lives — not on disk, not in git, not in the workflow file.
+- **Secret accessor bound to the runtime SA**. `roles/secretmanager.secretAccessor` granted on `firebase-admin-key` to the default Compute SA `297019726346-compute@developer.gserviceaccount.com` — the same SA that reads `gemini-api-key`. Scoped to the secret, not project-level.
+- **`.github/workflows/cloud-run-deploy.yml` updated**. Backend `--set-secrets` changed from `GEMINI_API_KEY=gemini-api-key:latest` to `GEMINI_API_KEY=gemini-api-key:latest,FIREBASE_ADMIN_KEY=firebase-admin-key:latest`. Cloud Run injects both as env vars on every revision; the Admin SDK's lazy-init in `backend/app/auth.py` parses `FIREBASE_ADMIN_KEY` on the first authed request and caches the `Certificate` in a module-level singleton guarded by a `threading.Lock`.
+- **Coordinated cutover via `workflow_dispatch`**. Ran `gh workflow run cloud-run-deploy.yml --ref main -f services=both` after pushing the workflow update, so backend (new auth-enforcing revision) and frontend (Firebase-SDK revision from the Phase 2 Task 3 code) flip to live together. Brief overlap window (~3-8 min per Cloud Build) tolerated — Cloud Run keeps the old revision serving until the new one reports ready, then 100% traffic shifts atomically.
+- **Firestore rules already live**. Deployed during Phase 2 Task 3 infra bring-up via `firebase deploy --only firestore:rules,firestore:indexes`; client writes on `users/{userId}` and `evaluations/{evalId}` remain server-only, owner-gated reads per `request.auth.uid == resource.data.userId`. No rule change this turn.
+- **Unblocks Phase 2 Task 4** (integration smoke). Fresh-browser sign-in → `/dashboard` → one authed backend call → `users/{uid}` doc creation — all three checks now have a functioning path end-to-end. Task 4 proper still needs a live browser; the auth boundary is verifiable via curl (`POST /api/agent/intake` without bearer → 401; with malformed bearer → 401).
+
+---
+
 ## [21/04/26] - Phase 3 Task 6 PO1: Manual Entry Mode — privacy-first intake alternative (FR-21)
 
 Shipped the "Enter manually" toggle alongside the existing three-document upload. Privacy-cautious users can now type name / DOB / IC last-4 / income / employment type / optional address / dependants list instead of uploading MyKad, payslip, and TNB bill. The Gemini OCR `extract` step is bypassed; classify → match → compute_upside → generate run unchanged. Full IC never crosses the wire — only `ic_last4` + `date_of_birth` are accepted as identity inputs.

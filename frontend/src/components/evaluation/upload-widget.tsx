@@ -3,7 +3,10 @@
 import { useId, useRef, useState } from 'react'
 import { ArrowRight, FileText, Sparkles, UploadCloud, X } from 'lucide-react'
 
+import { DependantsFieldset, type DependantInputRow } from '@/components/evaluation/dependants-fieldset'
+import { SectionBadge } from '@/components/evaluation/section-badge'
 import { Button } from '@/components/ui/button'
+import type { DependantInput } from '@/lib/agent-types'
 import { cn } from '@/lib/utils'
 
 const MAX_FILE_BYTES = 10 * 1024 * 1024
@@ -13,6 +16,14 @@ const ACCEPT_ATTR = 'image/*,application/pdf'
 export type UploadSlot = 'ic' | 'payslip' | 'utility'
 
 export type UploadFiles = Record<UploadSlot, File>
+
+/** Shape the upload widget yields on submit. Dependants are optional — an
+ * empty list is submitted as an empty array and the backend treats it as
+ * "no override," letting the OCR path's default (empty household) stand. */
+export type UploadSubmission = {
+  files: UploadFiles
+  dependants: DependantInput[]
+}
 
 type SlotSpec = {
   slot: UploadSlot
@@ -65,21 +76,9 @@ type FileSlotState = {
 }
 
 type Props = {
-  onSubmit: (files: UploadFiles) => void
+  onSubmit: (submission: UploadSubmission) => void
   onUseSamples: () => void
   disabled?: boolean
-}
-
-function SlotPill({ required }: { required: boolean }) {
-  return required ? (
-    <span className="inline-flex items-center rounded-full border border-amber-500/30 bg-amber-500/10 px-2 py-0.5 text-[10px] font-medium uppercase tracking-[0.14em] text-amber-700 dark:text-amber-400">
-      Required
-    </span>
-  ) : (
-    <span className="inline-flex items-center rounded-full border border-border bg-muted px-2 py-0.5 text-[10px] font-medium uppercase tracking-[0.14em] text-muted-foreground">
-      Optional
-    </span>
-  )
 }
 
 type SlotProps = {
@@ -101,7 +100,7 @@ function UploadSlotCard({ spec, state, inputId, disabled, inputRef, onChange, on
       <div className="flex flex-col gap-1.5">
         <div className="flex items-center gap-2">
           <p className="font-heading text-base font-semibold tracking-tight">{spec.label}</p>
-          <SlotPill required={spec.required} />
+          <SectionBadge required={spec.required} />
         </div>
         <p className="text-xs leading-relaxed text-muted-foreground">{spec.hint}</p>
       </div>
@@ -181,6 +180,7 @@ export function UploadWidget({ onSubmit, onUseSamples, disabled = false }: Props
     payslip: { file: null, error: null },
     utility: { file: null, error: null }
   })
+  const [dependants, setDependants] = useState<DependantInputRow[]>([])
   const inputRefs = useRef<Record<UploadSlot, HTMLInputElement | null>>({
     ic: null,
     payslip: null,
@@ -209,9 +209,16 @@ export function UploadWidget({ onSubmit, onUseSamples, disabled = false }: Props
   function handleSubmit() {
     if (!canSubmit) return
     onSubmit({
-      ic: state.ic.file!,
-      payslip: state.payslip.file!,
-      utility: state.utility.file!
+      files: {
+        ic: state.ic.file!,
+        payslip: state.payslip.file!,
+        utility: state.utility.file!
+      },
+      dependants: dependants.map(d => ({
+        relationship: d.relationship,
+        age: d.age,
+        ic_last4: d.ic_last4 === '' ? null : d.ic_last4
+      }))
     })
   }
 
@@ -235,6 +242,19 @@ export function UploadWidget({ onSubmit, onUseSamples, disabled = false }: Props
             />
           )
         })}
+        <div className="flex flex-col gap-3 rounded-xl border border-border bg-card p-5 shadow-sm">
+          <div className="flex flex-col gap-1.5">
+            <div className="flex items-center gap-2">
+              <p className="font-heading text-base font-semibold tracking-tight">Household</p>
+              <SectionBadge required={false} />
+            </div>
+            <p className="text-xs leading-relaxed text-muted-foreground">
+              Documents don&apos;t list your dependants. Add children / parents / other household
+              members here so schemes that gate on them (JKM Warga Emas, LHDN child relief) surface.
+            </p>
+          </div>
+          <DependantsFieldset value={dependants} onChange={setDependants} disabled={disabled} />
+        </div>
       </div>
 
       <div className="flex flex-col items-start gap-4 border-t border-border pt-5 sm:flex-row sm:items-center sm:justify-between">

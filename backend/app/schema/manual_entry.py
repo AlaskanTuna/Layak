@@ -48,4 +48,7 @@ class ManualEntryPayload(BaseModel):
     monthly_income_rm: float = Field(ge=0, le=1_000_000)
     employment_type: str = Field(pattern=r"^(gig|salaried)$")
     address: str | None = Field(default=None, max_length=500)
+    # Monthly electricity consumption in kWh from the utility bill. Optional —
+    # reserved for a future electricity-subsidy rule; no current rule gates on it.
+    monthly_kwh: int | None = Field(default=None, ge=0, le=10_000)
     dependants: list[DependantInput] = Field(default_factory=list, max_length=15)

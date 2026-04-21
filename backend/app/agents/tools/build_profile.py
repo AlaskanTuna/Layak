@@ -88,4 +88,5 @@ def build_profile_from_manual_entry(
         household_flags=derive_household_flags(payload.monthly_income_rm, dependants),
         form_type="form_b" if payload.employment_type == "gig" else "form_be",
         address=payload.address,
+        monthly_kwh=payload.monthly_kwh,
     )

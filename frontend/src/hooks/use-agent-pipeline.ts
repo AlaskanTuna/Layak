@@ -7,6 +7,7 @@ import { AISYAH_MOCK_EVENTS } from '@/fixtures/aisyah-response'
 import type {
   AgentEvent,
   ComputeUpsideResult,
+  DependantInput,
   HouseholdClassification,
   ManualEntryPayload,
   Packet,
@@ -33,7 +34,7 @@ export type PipelineState = {
 
 export type StartOptions =
   | { mode: 'mock' }
-  | { mode: 'real'; files: UploadFiles }
+  | { mode: 'real'; files: UploadFiles; dependants?: DependantInput[] }
   | { mode: 'manual'; payload: ManualEntryPayload }
 
 const INITIAL_STEP_STATES: Record<Step, StepStatus> = {
@@ -183,7 +184,7 @@ export function useAgentPipeline(): {
   )
 
   const startReal = useCallback(
-    (files: UploadFiles) => {
+    (files: UploadFiles, dependants: DependantInput[] | undefined) => {
       cleanup()
       setState({ ...INITIAL_STATE, phase: 'streaming' })
 
@@ -194,6 +195,12 @@ export function useAgentPipeline(): {
       form.append('ic', files.ic)
       form.append('payslip', files.payslip)
       form.append('utility', files.utility)
+      // The backend treats a non-empty `dependants` form field as an override —
+      // the OCR path otherwise returns an empty household because MyKad /
+      // payslip / utility bills don't disclose dependants.
+      if (dependants && dependants.length > 0) {
+        form.append('dependants', JSON.stringify(dependants))
+      }
 
       streamFromResponse(controller, () =>
         fetch(`${getBackendUrl()}/api/agent/intake`, {
@@ -233,7 +240,7 @@ export function useAgentPipeline(): {
       } else if (opts.mode === 'manual') {
         startManual(opts.payload)
       } else {
-        startReal(opts.files)
+        startReal(opts.files, opts.dependants)
       }
     },
     [startMock, startReal, startManual]

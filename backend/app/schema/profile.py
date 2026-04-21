@@ -55,6 +55,12 @@ class Profile(BaseModel):
     # some uploads don't carry it legibly; the rule engine doesn't gate on
     # address, but the WeasyPrint packet renders it in the draft forms when set.
     address: str | None = None
+    # Monthly electricity consumption in kWh from the utility bill (TNB). Not
+    # currently consumed by any rule — reserved for a future electricity-
+    # subsidy match (Bantuan Elektrik Rumah / TNB subsidy tier). Kept on
+    # `Profile` so the OCR path and manual path can both populate it without
+    # another schema migration when the rule lands.
+    monthly_kwh: int | None = Field(default=None, ge=0, le=10_000)
 
 
 class HouseholdClassification(BaseModel):

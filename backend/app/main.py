@@ -15,13 +15,15 @@ Run locally:
 
 from __future__ import annotations
 
+import json
 import os
 from collections.abc import AsyncIterator
 from pathlib import Path
 from typing import Annotated
 
-from fastapi import FastAPI, File, UploadFile
+from fastapi import FastAPI, File, Form, HTTPException, UploadFile, status
 from fastapi.middleware.cors import CORSMiddleware
+from pydantic import ValidationError
 from starlette.responses import StreamingResponse
 
 # Load repo-root .env into os.environ before any agent module reads GEMINI_API_KEY.
@@ -38,7 +40,7 @@ if _DOTENV.is_file():
 
 from app.agents.root_agent import stream_agent_events  # noqa: E402 — after dotenv load
 from app.agents.tools.build_profile import build_profile_from_manual_entry  # noqa: E402
-from app.schema.manual_entry import ManualEntryPayload  # noqa: E402
+from app.schema.manual_entry import DependantInput, ManualEntryPayload  # noqa: E402
 
 # ============================================================================
 # PHASE-2-TASK-3-BRIDGE: auth is wired end-to-end (backend/app/auth.py holds
@@ -81,16 +83,36 @@ async def intake(
     ic: Annotated[UploadFile, File()],
     payslip: Annotated[UploadFile, File()],
     utility: Annotated[UploadFile, File()],
+    dependants: Annotated[str | None, Form()] = None,
 ) -> StreamingResponse:
-    """Stream the five-step agent pipeline as Server-Sent Events."""
+    """Stream the five-step agent pipeline as Server-Sent Events.
+
+    `dependants` is an optional JSON-encoded list of `DependantInput` rows
+    supplied from the UploadWidget's Household section. When present, the
+    backend overlays them onto the Gemini-extracted Profile before classify
+    runs — MyKad / payslip / utility bills don't disclose dependants, so the
+    OCR path otherwise returns an empty household and silently under-matches
+    schemes that depend on children / elderly parents.
+    """
     uploads: dict[str, tuple[str, bytes]] = {
         "ic": (ic.filename or "ic.bin", await ic.read()),
         "payslip": (payslip.filename or "payslip.bin", await payslip.read()),
         "utility": (utility.filename or "utility.bin", await utility.read()),
     }
 
+    dependants_override: list[DependantInput] | None = None
+    if dependants:
+        try:
+            raw = json.loads(dependants)
+            dependants_override = [DependantInput.model_validate(d) for d in raw]
+        except (json.JSONDecodeError, ValidationError, TypeError) as exc:
+            raise HTTPException(
+                status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+                detail=f"Invalid dependants JSON: {exc}",
+            ) from exc
+
     async def event_stream() -> AsyncIterator[bytes]:
-        async for event in stream_agent_events(uploads):
+        async for event in stream_agent_events(uploads, dependants_override=dependants_override):
             yield f"data: {event.model_dump_json()}\n\n".encode()
 
     return StreamingResponse(

@@ -42,6 +42,7 @@ export type Profile = {
   household_flags: HouseholdFlags
   form_type: FormType
   address?: string | null
+  monthly_kwh?: number | null
 }
 
 export type EmploymentType = 'gig' | 'salaried'
@@ -61,6 +62,8 @@ export type ManualEntryPayload = {
   monthly_income_rm: number
   employment_type: EmploymentType
   address: string | null
+  /** Monthly electricity consumption in kWh from the utility bill. Optional. */
+  monthly_kwh: number | null
   dependants: DependantInput[]
 }
 

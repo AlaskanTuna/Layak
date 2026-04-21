@@ -28,6 +28,7 @@ from google.adk.agents import LlmAgent, SequentialAgent
 from google.adk.tools import FunctionTool
 
 from app.agents.gemini import sanitize_error_message
+from app.agents.tools.build_profile import derive_household_flags
 from app.agents.tools.classify import classify_household
 from app.agents.tools.compute_upside import compute_upside
 from app.agents.tools.extract import extract_profile
@@ -44,7 +45,8 @@ from app.schema.events import (
     StepResultEvent,
     StepStartedEvent,
 )
-from app.schema.profile import Profile
+from app.schema.manual_entry import DependantInput
+from app.schema.profile import Dependant, Profile
 
 # Tool registry — Task 3 Path 2 binds these to Gemini-backed LlmAgents.
 extract_tool = FunctionTool(extract_profile)
@@ -105,6 +107,7 @@ async def stream_agent_events(
     uploads: dict[str, tuple[str, bytes]] | None = None,
     *,
     prebuilt_profile: Profile | None = None,
+    dependants_override: list[DependantInput] | None = None,
 ) -> AsyncIterator[StepStartedEvent | StepResultEvent | DoneEvent | ErrorEvent]:
     """Stream the five-step pipeline as ordered SSE events.
 
@@ -145,6 +148,22 @@ async def stream_agent_events(
                 uploads["payslip"][1],
                 uploads["utility"][1],
             )
+            # FR-21 hybrid path: MyKad / payslip / utility bill don't disclose
+            # household composition, so the frontend may supply a dependants
+            # list alongside the uploads. Overlay it on the extracted profile
+            # before classify runs; household_flags are re-derived so the
+            # income_band reflects the new `has_children_under_18` value.
+            if dependants_override is not None:
+                overlay_dependants = [Dependant(**d.model_dump()) for d in dependants_override]
+                profile = profile.model_copy(
+                    update={
+                        "dependants": overlay_dependants,
+                        "household_size": 1 + len(overlay_dependants),
+                        "household_flags": derive_household_flags(
+                            profile.monthly_income_rm, overlay_dependants
+                        ),
+                    }
+                )
         yield StepResultEvent(step=current_step, data=ExtractResult(profile=profile))
 
         current_step = "classify"

@@ -1,11 +1,13 @@
 'use client'
 
 import { zodResolver } from '@hookform/resolvers/zod'
-import { Plus, Sparkles, Trash2 } from 'lucide-react'
+import { CalendarIcon, Eraser, Sparkles } from 'lucide-react'
 import { useEffect } from 'react'
-import { type SubmitHandler, useFieldArray, useForm, useWatch } from 'react-hook-form'
+import { Controller, type SubmitHandler, useForm, useWatch } from 'react-hook-form'
 import { z } from 'zod'
 
+import { DependantsFieldset, type DependantInputRow } from '@/components/evaluation/dependants-fieldset'
+import { SectionBadge } from '@/components/evaluation/section-badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
@@ -18,7 +20,7 @@ const RELATIONSHIPS = ['child', 'parent', 'spouse', 'sibling', 'other'] as const
 
 const dependantSchema = z.object({
   relationship: z.enum(RELATIONSHIPS),
-  age: z.number().int().min(0).max(130),
+  age: z.number().int().min(0).max(120),
   ic_last4: z
     .string()
     .refine(v => v === '' || /^\d{4}$/.test(v), { message: '4 digits or blank' })
@@ -28,20 +30,61 @@ const manualEntrySchema = z.object({
   name: z.string().trim().min(1, 'Required').max(200),
   date_of_birth: z
     .string()
-    .regex(/^\d{4}-\d{2}-\d{2}$/, 'Required')
-    .refine(
-      v => {
-        const d = new Date(v)
-        return !Number.isNaN(d.getTime()) && d.getFullYear() >= 1900 && d <= new Date()
-      },
-      { message: 'Must be a past date' }
-    ),
+    .regex(/^\d{4}-\d{2}-\d{2}$/, 'Use YYYY-MM-DD')
+    // `superRefine` lets us dispatch distinct messages: "2026-22-22" is an
+    // impossible date, not a future date — the old single refine masked the
+    // real reason with "Must be a past date".
+    .superRefine((v, ctx) => {
+      const [y, m, d] = v.split('-').map(Number)
+      if (m < 1 || m > 12 || d < 1 || d > 31) {
+        ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'Not a real date' })
+        return
+      }
+      const parsed = new Date(v)
+      if (Number.isNaN(parsed.getTime())) {
+        ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'Not a real date' })
+        return
+      }
+      // Catches overflow cases like 2026-02-30 that `new Date` silently
+      // normalises (→ 2026-03-02). UTC getters match the ISO parser.
+      if (
+        parsed.getUTCFullYear() !== y ||
+        parsed.getUTCMonth() + 1 !== m ||
+        parsed.getUTCDate() !== d
+      ) {
+        ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'Not a real date' })
+        return
+      }
+      if (y < 1900) {
+        ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'Year must be 1900 or later' })
+        return
+      }
+      if (parsed > new Date()) {
+        ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'Must be a past date' })
+      }
+    }),
   ic_last4: z.string().regex(/^\d{4}$/, '4 digits'),
   monthly_income_rm: z.number().min(0).max(1_000_000),
   employment_type: z.enum(['gig', 'salaried']),
   address: z.string().max(500),
+  // kWh lives as a plain string in the form so an empty input doesn't fight
+  // RHF's `valueAsNumber: true` (which emits NaN). Submit handler coerces.
+  monthly_kwh: z
+    .string()
+    .refine(v => v === '' || (/^\d+$/.test(v) && Number(v) <= 10000), { message: 'Whole number up to 10,000' }),
   dependants: z.array(dependantSchema).max(15)
 })
+
+/** Insert dashes into a typed DOB so older users can type `20260421` and see
+ * `2026-04-21` appear without hunting for the hyphen key. Also accepts a
+ * pre-dashed input (strips and re-inserts) so the date-picker callback path
+ * is idempotent. */
+function formatDateMask(raw: string): string {
+  const digits = raw.replace(/\D/g, '').slice(0, 8)
+  if (digits.length <= 4) return digits
+  if (digits.length <= 6) return `${digits.slice(0, 4)}-${digits.slice(4)}`
+  return `${digits.slice(0, 4)}-${digits.slice(4, 6)}-${digits.slice(6)}`
+}
 
 type FormValues = z.infer<typeof manualEntrySchema>
 
@@ -56,6 +99,7 @@ const AISYAH_DEFAULTS: FormValues = {
   monthly_income_rm: 2800,
   employment_type: 'gig',
   address: 'No. 42, Jalan IM 7/10, Bandar Indera Mahkota, 25200 Kuantan, Pahang',
+  monthly_kwh: '220',
   dependants: [
     { relationship: 'child', age: 10, ic_last4: '' },
     { relationship: 'child', age: 7, ic_last4: '' },
@@ -70,36 +114,41 @@ const EMPTY_DEFAULTS: FormValues = {
   monthly_income_rm: 0,
   employment_type: 'gig',
   address: '',
+  monthly_kwh: '',
   dependants: []
 }
 
 type Props = {
   onSubmit: (payload: ManualEntryPayload) => void
   onUseSamples: () => void
+  /** Fires after the form is reset to its empty defaults via the Clear button. */
+  onClear?: () => void
   disabled?: boolean
   /** When true, form pre-fills with Aisyah values on mount. Toggles demo banner upstream. */
   prefillAisyah?: boolean
 }
 
-export function ManualEntryForm({ onSubmit, onUseSamples, disabled = false, prefillAisyah = false }: Props) {
+export function ManualEntryForm({
+  onSubmit,
+  onUseSamples,
+  onClear,
+  disabled = false,
+  prefillAisyah = false
+}: Props) {
   const form = useForm<FormValues>({
     resolver: zodResolver(manualEntrySchema),
     defaultValues: prefillAisyah ? AISYAH_DEFAULTS : EMPTY_DEFAULTS,
     mode: 'onBlur'
   })
   const { register, handleSubmit, control, formState, reset } = form
-  const { fields, append, remove } = useFieldArray({ control, name: 'dependants' })
   // `useWatch` is the memo-safe alternative to `form.watch()` — the React Compiler
   // plugin flags `watch()` because it can't reliably cache its result.
-  const watchedDependants = useWatch({ control, name: 'dependants' }) ?? []
+  const watchedDependants = (useWatch({ control, name: 'dependants' }) ?? []) as DependantInputRow[]
 
   // Re-apply Aisyah defaults when the toggle arrives after mount (e.g. URL ?mode=manual+demo).
   useEffect(() => {
     if (prefillAisyah) reset(AISYAH_DEFAULTS)
   }, [prefillAisyah, reset])
-
-  const dependantsLen = watchedDependants.length
-  const householdSize = 1 + dependantsLen
 
   const submit: SubmitHandler<FormValues> = values => {
     const payload: ManualEntryPayload = {
@@ -109,6 +158,7 @@ export function ManualEntryForm({ onSubmit, onUseSamples, disabled = false, pref
       monthly_income_rm: values.monthly_income_rm,
       employment_type: values.employment_type,
       address: values.address.trim().length > 0 ? values.address.trim() : null,
+      monthly_kwh: values.monthly_kwh === '' ? null : Number(values.monthly_kwh),
       dependants: values.dependants.map(d => ({
         relationship: d.relationship,
         age: d.age,
@@ -123,19 +173,70 @@ export function ManualEntryForm({ onSubmit, onUseSamples, disabled = false, pref
     onUseSamples()
   }
 
+  const handleClearInline = () => {
+    reset(EMPTY_DEFAULTS)
+    onClear?.()
+  }
+
   return (
     <form onSubmit={handleSubmit(submit)} className="flex flex-col gap-4" noValidate>
       <Card>
         <CardHeader>
-          <CardTitle>Identity</CardTitle>
+          <SectionTitle title="Identity" required />
         </CardHeader>
         <CardContent className="flex flex-col gap-3">
           <Field label="Full name" error={formState.errors.name?.message} htmlFor="mef-name">
             <Input id="mef-name" autoComplete="name" disabled={disabled} {...register('name')} />
           </Field>
           <div className="grid gap-3 sm:grid-cols-2">
-            <Field label="Date of birth" error={formState.errors.date_of_birth?.message} htmlFor="mef-dob">
-              <Input id="mef-dob" type="date" disabled={disabled} {...register('date_of_birth')} />
+            <Field
+              label="Date of birth"
+              help="Just type the numbers — we fill in the dashes. Or use the calendar icon."
+              error={formState.errors.date_of_birth?.message}
+              htmlFor="mef-dob"
+            >
+              <Controller
+                control={control}
+                name="date_of_birth"
+                render={({ field }) => (
+                  <div className="flex gap-2">
+                    <Input
+                      id="mef-dob"
+                      type="text"
+                      inputMode="numeric"
+                      placeholder="YYYY-MM-DD"
+                      autoComplete="bday"
+                      maxLength={10}
+                      disabled={disabled}
+                      value={field.value}
+                      onChange={e => field.onChange(formatDateMask(e.target.value))}
+                      onBlur={field.onBlur}
+                      className="flex-1"
+                    />
+                    <div className="relative">
+                      <input
+                        type="date"
+                        aria-label="Pick date of birth from calendar"
+                        disabled={disabled}
+                        value={/^\d{4}-\d{2}-\d{2}$/.test(field.value) ? field.value : ''}
+                        onChange={e => field.onChange(formatDateMask(e.target.value))}
+                        className="peer absolute inset-0 cursor-pointer opacity-0"
+                      />
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="icon"
+                        disabled={disabled}
+                        aria-hidden
+                        tabIndex={-1}
+                        className="peer-focus-visible:ring-1 peer-focus-visible:ring-ring"
+                      >
+                        <CalendarIcon className="size-4" aria-hidden />
+                      </Button>
+                    </div>
+                  </div>
+                )}
+              />
             </Field>
             <Field
               label="IC last 4 digits"
@@ -158,7 +259,7 @@ export function ManualEntryForm({ onSubmit, onUseSamples, disabled = false, pref
 
       <Card>
         <CardHeader>
-          <CardTitle>Income</CardTitle>
+          <SectionTitle title="Income" required />
         </CardHeader>
         <CardContent className="flex flex-col gap-3">
           <div className="grid gap-3 sm:grid-cols-2">
@@ -203,10 +304,10 @@ export function ManualEntryForm({ onSubmit, onUseSamples, disabled = false, pref
 
       <Card>
         <CardHeader>
-          <CardTitle>Address</CardTitle>
+          <SectionTitle title="Utility bill" required />
         </CardHeader>
-        <CardContent>
-          <Field label="Home address" help="Optional." error={formState.errors.address?.message} htmlFor="mef-address">
+        <CardContent className="flex flex-col gap-3">
+          <Field label="Home address" error={formState.errors.address?.message} htmlFor="mef-address">
             <Textarea
               id="mef-address"
               rows={3}
@@ -215,121 +316,86 @@ export function ManualEntryForm({ onSubmit, onUseSamples, disabled = false, pref
               {...register('address')}
             />
           </Field>
+          <Field
+            label="Monthly electricity (kWh)"
+            help="From your TNB bill — reserved for a future electricity-subsidy match."
+            error={formState.errors.monthly_kwh?.message}
+            htmlFor="mef-kwh"
+          >
+            <Input
+              id="mef-kwh"
+              type="number"
+              inputMode="numeric"
+              min={0}
+              max={10000}
+              placeholder="e.g. 220"
+              disabled={disabled}
+              {...register('monthly_kwh')}
+            />
+          </Field>
         </CardContent>
       </Card>
 
       <Card>
         <CardHeader>
-          <CardTitle>Household</CardTitle>
+          <SectionTitle title="Household" required={false} />
         </CardHeader>
-        <CardContent className="flex flex-col gap-3">
-          <p className="text-xs text-muted-foreground">
-            Add everyone else who shares your household. Children under 18 and parents aged 60+ unlock
-            specific schemes — add them here. Household size: {householdSize} (you + {dependantsLen} dependant
-            {dependantsLen === 1 ? '' : 's'}).
-          </p>
-          {fields.length === 0 && (
-            <p className="rounded-md border border-dashed px-3 py-2 text-sm text-muted-foreground">
-              No dependants yet. Click &ldquo;Add dependant&rdquo; to list each household member.
-            </p>
-          )}
-          <ul className="flex flex-col gap-3">
-            {fields.map((field, index) => (
-              <li key={field.id} className="grid gap-2 rounded-md border border-border px-3 py-3 sm:grid-cols-[1fr_1fr_1fr_auto]">
-                <Field
-                  label="Relationship"
-                  error={formState.errors.dependants?.[index]?.relationship?.message}
-                  htmlFor={`mef-dep-rel-${index}`}
-                >
-                  <select
-                    id={`mef-dep-rel-${index}`}
-                    disabled={disabled}
-                    className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
-                    {...register(`dependants.${index}.relationship` as const)}
-                  >
-                    {RELATIONSHIPS.map(r => (
-                      <option key={r} value={r}>
-                        {r}
-                      </option>
-                    ))}
-                  </select>
-                </Field>
-                <Field
-                  label="Age"
-                  error={formState.errors.dependants?.[index]?.age?.message}
-                  htmlFor={`mef-dep-age-${index}`}
-                >
-                  <Input
-                    id={`mef-dep-age-${index}`}
-                    type="number"
-                    inputMode="numeric"
-                    min={0}
-                    max={130}
-                    disabled={disabled}
-                    {...register(`dependants.${index}.age` as const, { valueAsNumber: true })}
-                  />
-                </Field>
-                <Field
-                  label="IC last 4 (optional)"
-                  error={formState.errors.dependants?.[index]?.ic_last4?.message}
-                  htmlFor={`mef-dep-ic-${index}`}
-                >
-                  <Input
-                    id={`mef-dep-ic-${index}`}
-                    inputMode="numeric"
-                    maxLength={4}
-                    disabled={disabled}
-                    {...register(`dependants.${index}.ic_last4` as const)}
-                  />
-                </Field>
-                <div className="flex items-end">
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="icon"
-                    aria-label={`Remove dependant ${index + 1}`}
-                    disabled={disabled}
-                    onClick={() => remove(index)}
-                  >
-                    <Trash2 className="size-4" aria-hidden />
-                  </Button>
-                </div>
-              </li>
-            ))}
-          </ul>
-          <Button
-            type="button"
-            variant="outline"
-            size="sm"
-            disabled={disabled || fields.length >= 15}
-            onClick={() => append({ relationship: 'child', age: 0, ic_last4: '' })}
-            className="w-fit gap-1.5"
-          >
-            <Plus className="size-4" aria-hidden />
-            Add dependant
-          </Button>
+        <CardContent>
+          <Controller
+            control={control}
+            name="dependants"
+            render={({ field }) => (
+              <DependantsFieldset
+                value={watchedDependants}
+                onChange={next => field.onChange(next)}
+                disabled={disabled}
+              />
+            )}
+          />
         </CardContent>
       </Card>
 
       <Separator />
 
       <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-        <Button
-          type="button"
-          variant="secondary"
-          size="sm"
-          disabled={disabled}
-          onClick={handleUseAisyahInline}
-          className="gap-1.5"
-        >
-          <Sparkles className="size-4" aria-hidden />
-          Use Aisyah sample data
-        </Button>
+        <div className="flex flex-wrap gap-2">
+          <Button
+            type="button"
+            variant="secondary"
+            size="sm"
+            disabled={disabled}
+            onClick={handleUseAisyahInline}
+            className="gap-1.5"
+          >
+            <Sparkles className="size-4" aria-hidden />
+            Use Aisyah sample data
+          </Button>
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            disabled={disabled}
+            onClick={handleClearInline}
+            className="gap-1.5 text-muted-foreground hover:text-foreground"
+          >
+            <Eraser className="size-4" aria-hidden />
+            Clear
+          </Button>
+        </div>
         <Button type="submit" disabled={disabled || formState.isSubmitting}>
           Generate packet
         </Button>
       </div>
     </form>
+  )
+}
+
+function SectionTitle({ title, required }: { title: string; required: boolean }) {
+  return (
+    <div className="flex items-center gap-2">
+      <CardTitle>{title}</CardTitle>
+      <SectionBadge required={required} />
+    </div>
   )
 }
 

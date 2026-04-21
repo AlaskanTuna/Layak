@@ -113,6 +113,41 @@ Path 1 per the CLAUDE.md "no Gemini or Vertex AI call until sprint start" guardr
 - **Verification**: ruff `check` clean across 26 files, ruff `format --check` clean, **pytest 39 passed in 2.75 s** (Task 4 suite intact — no regressions from the tool additions). Dry-run `seed_vertex_ai_search.py` succeeds and lists all 6 PDFs + 3 canaries.
 - **Not done in Path 1 (intentional, handled in Path 2 at sprint start)**: real Gemini 2.5 Flash/Pro calls, live Vertex AI Search indexing, Discovery Engine API enablement on GCP project, `VERTEX_AI_SEARCH_DATA_STORE` populated in `.env`, the hour-12 Plan B collapse decision (not triggered yet since real VAIS hasn't been attempted).
 
+## [21/04/26] - Demo-docs audit fixes: watermark opacity, README Chrome guide, provenance-drift disclosure
+
+Three parallel subagent audits (legal compliance, fixture-data fidelity, print-to-PDF fidelity) on commit `d6b1664` returned actionable findings. Fixed here.
+
+- **A4 watermark opacity** — bumped `rgba(196, 30, 58, 0.14)` → `rgba(196, 30, 58, 0.22)` on both `grab-earnings.html` and `tnb-bill.html`. The 0.14 alpha would have reduced to ~11% grey luminance on a B/W printer (invisible); 0.22 survives grayscale. Also shifted the `.wm.top` / `.wm.mid` rows from `22%`/`52%` to `28%`/`55%` so the rotated watermarks clip symmetrically rather than the top band being half-hidden by page overflow.
+- **README Chrome print guide** — dropped the A7 fallback line (A7 = 74 × 105 mm, not a "close substitute" for the 85.6 × 54 mm MyKad; misleading advice). Replaced with explicit Chrome print-dialog settings (uncheck `Headers and footers`, set `Margins: None`, leave `Background graphics: on`) and a copy-pasteable `google-chrome --headless --print-to-pdf` command as the deterministic fallback. Also noted that `file://` works if Next's dev server isn't running.
+- **Intentional provenance drift** — added a "Known synthetic-provenance drift (intentional, disclosed)" section to `docs/demo/README.md` documenting two issues an observant viewer would spot:
+  1. MyKad shows `PEREMPUAN / FEMALE` but IC last digit `1` is odd (male-coded under real MyKad convention). The `4321` last-four is fixture-locked (`backend/app/fixtures/aisyah.py`); flipping would ripple through 20+ test + doc references. Disclosed rather than flipped.
+  2. MyKad DOB `24 MAR 1990` derived from IC prefix makes Aisyah 36 at the demo's "now" (21 Apr 2026), but the fixture + `docs/prd.md` / `docs/roadmap.md` / `docs/project-idea.md` all say age 34. The IC and the age each come from separately-locked sources; the drift is synthetic-only and never enters the rule engine (rules use dependant ages and income, not `profile.age`). Disclosed rather than reconciled.
+- **Not addressed** (audit flagged but cosmetic): minor A4 overflow headroom on `grab-earnings.html` and `tnb-bill.html` — each leaves 15–40 mm of page-2 safety margin, fine for current content; `address plausibility` (real-street + arbitrary house number pattern) — standard synthetic-persona practice and borderline under PDPA, documented in `docs/trd.md` §9.6 already.
+- **Verification:** `pnpm -C frontend build` still passes (static `public/` assets don't hit the compile graph); `pytest -q` in `backend/` passes all 39 tests.
+
+## [21/04/26] - Added three synthetic Aisyah demo documents (MyKad, Grab earnings, TNB bill) closing TRD §9.6
+
+Independent PO1 task from `docs/mockgen.md`. Three self-contained HTML files at `docs/demo/` styled to look like the documents Aisyah uploads during the demo, plus a render guide.
+
+- `docs/demo/mykad.html` — 85.6 × 54 mm (ISO/IEC 7810 ID-1) via `@page`. Off-white `#f5f3ed` with Pahang-green `#006c35` top border; photo placeholder + signature strip + IC (monospace), name, citizenship, gender (PEREMPUAN / FEMALE), DOB 24 MAR 1990, and the shared address. Stylized "MyKad · KAD PENGENALAN MALAYSIA" text header — **no coat of arms, holographic foil, or chip contacts** (Critical Do-Nots compliance). Three diagonal `SYNTHETIC — FOR DEMO ONLY` watermarks at 22 / 50 / 78% card-height so any reasonable crop still shows one.
+- `docs/demo/grab-earnings.html` — A4 portrait, emerald `#00b14f` Grab-ish accent, stylised `g` monogram in place of the real logo. Partner block (AISYAH BINTI AHMAD, Partner ID `KTN-GRAB-38271`, GrabCar Saver, Maybank ••••8276, Kuantan zone, Gold tier), 6-row earnings table totalling **Net payout RM2,800.00** = `monthly_income_rm` in the fixture. Statement period 1–31 March 2026, issued 31 March 2026, next statement 30 April 2026. Tax-note callout points the user at LHDN Form B filing by 30 June 2026 (YA 2025). Three watermarks at 22 / 52 / 82% page-height.
+- `docs/demo/tnb-bill.html` — A4 portrait, TNB green `#00793f` + yellow `#fcd116`, stylised `T` monogram. Customer block pins the identical address to the MyKad (the residence cross-check the classify step uses), account `082-0012-3456`, tariff Domestic (A) single-phase. Billing period 01-03-2026 → 31-03-2026, issue 05 April 2026, due **30 April 2026**. Consumption block: prev 4,218 → curr 4,501 kWh = 283 kWh, first 200 @ RM0.218 (RM43.60), next 83 @ RM0.334 (RM27.72), subtotal RM71.32, KWTBB 1.6% RM1.14, **Amount due RM72.46**. JomPAY panel with real public biller code `9191`, synthetic references, QR placeholder. Three watermarks at the same 22 / 52 / 82% heights.
+- `docs/demo/README.md` — one-paragraph render guide (open in Chrome → Cmd+P → Save as PDF; custom paper size for the MyKad; A4 for the rest), plus the data-fidelity table and the legal-safety reasoning that each file stays PDPA 2010 / NRR 1990 compliant.
+- **No React-tree churn, no deps installed, no configs touched.** Static assets under `public/` are served as-is by Next.
+- Sanity-check: `pnpm -C frontend build` still passes (static `public/` files don't enter the compile graph).
+- Closed `docs/trd.md` §9.6 open question with a RESOLVED marker pointing at `docs/demo/`. Note inside: the original plan said "payslip (EA Form/CP8A)" but Aisyah is a Form B gig worker — an EA Form would misrepresent her filer category, so `grab-earnings.html` replaces it. The net payout still ties to `monthly_income_rm`.
+- IC number quirk flagged by the brief (last digit even = female, `4321` ends in 1 → male-coded): preserved intentionally because the `ic_last4 = "4321"` value is fixture-locked across backend tests and the rule engine. Rippling a change across both sides of the codebase would cost more than the synthetic mismatch risks.
+
+## [21/04/26] - Synced frontend Aisyah fixture to Phase 1 Task 4 rule-engine output
+
+- Merged `origin/main` (commits `5b072b8` Task 4 rule engine + `2f7155d` §6.19 fix) into the `frontend` branch. Conflicts were additive in `docs/progress.md` + `docs/plan.md` only — resolved by concatenating entries in chronological order.
+- The rule engine produced different Aisyah figures than the initial Task 2 commit-2 fixture mirror. New live totals: **JKM Warga Emas RM7,200 + LHDN Form B RM558 + STR 2026 RM450 = RM8,208/year** (was RM9,408). Both clear the plan.md ≥RM7,000 headline.
+  - STR dropped from an assumed RM1,200 (higher tier) to the correct RM450 — Aisyah lands in the 1–2 children bucket × RM2,501–5,000 band of the risalah p.2 tier table.
+  - LHDN dropped from an assumed flat RM1,008 to RM558 — real YA2025 bracket math: RM33,600 annual chargeable income minus RM30,500 stacked reliefs → RM3,100 taxable → RM0 tax after reliefs, saving the full RM558 that was otherwise owed.
+- Rewrote `frontend/src/fixtures/aisyah-response.ts` to mirror the rule-engine output verbatim: `AISYAH_SCHEME_MATCHES` now sorted by `annual_rm` desc, `scheme_name` / `summary` / `why_qualify` strings regenerated per the engine's final copy, LHDN citations expanded to 6 entries (added §6.19.3 split between §49(1)(a)/§49(1)(b) and §6.11.3 lifestyle). `AISYAH_UPSIDE` Python snippet + stdout + `total_annual_rm` + `per_scheme_rm` all updated. `AISYAH_PACKET.drafts[]` reordered to match.
+- `AISYAH_CLASSIFICATION.per_capita_monthly_rm` already RM700 — no change. Added a Form B filer note.
+- `pnpm run lint` clean. `pnpm run build` clean.
+
 ---
 
 ## [20/04/26] - Phase 1 Task 2 commit 3: results view — ranked list, scheme cards, provenance panel, code execution trace
@@ -150,45 +185,6 @@ Path 1 per the CLAUDE.md "no Gemini or Vertex AI call until sprint start" guardr
 - Deferred to commit 2: `frontend/src/fixtures/aisyah-response.ts`, SSE consumer hook (`sse-client.ts`), pipeline stepper. Deferred to commit 3: ranked-list + scheme-card + provenance panel.
 
 ---
-
-## [21/04/26] - Demo-docs audit fixes: watermark opacity, README Chrome guide, provenance-drift disclosure
-
-Three parallel subagent audits (legal compliance, fixture-data fidelity, print-to-PDF fidelity) on commit `d6b1664` returned actionable findings. Fixed here.
-
-- **A4 watermark opacity** — bumped `rgba(196, 30, 58, 0.14)` → `rgba(196, 30, 58, 0.22)` on both `grab-earnings.html` and `tnb-bill.html`. The 0.14 alpha would have reduced to ~11% grey luminance on a B/W printer (invisible); 0.22 survives grayscale. Also shifted the `.wm.top` / `.wm.mid` rows from `22%`/`52%` to `28%`/`55%` so the rotated watermarks clip symmetrically rather than the top band being half-hidden by page overflow.
-- **README Chrome print guide** — dropped the A7 fallback line (A7 = 74 × 105 mm, not a "close substitute" for the 85.6 × 54 mm MyKad; misleading advice). Replaced with explicit Chrome print-dialog settings (uncheck `Headers and footers`, set `Margins: None`, leave `Background graphics: on`) and a copy-pasteable `google-chrome --headless --print-to-pdf` command as the deterministic fallback. Also noted that `file://` works if Next's dev server isn't running.
-- **Intentional provenance drift** — added a "Known synthetic-provenance drift (intentional, disclosed)" section to `docs/demo/README.md` documenting two issues an observant viewer would spot:
-  1. MyKad shows `PEREMPUAN / FEMALE` but IC last digit `1` is odd (male-coded under real MyKad convention). The `4321` last-four is fixture-locked (`backend/app/fixtures/aisyah.py`); flipping would ripple through 20+ test + doc references. Disclosed rather than flipped.
-  2. MyKad DOB `24 MAR 1990` derived from IC prefix makes Aisyah 36 at the demo's "now" (21 Apr 2026), but the fixture + `docs/prd.md` / `docs/roadmap.md` / `docs/project-idea.md` all say age 34. The IC and the age each come from separately-locked sources; the drift is synthetic-only and never enters the rule engine (rules use dependant ages and income, not `profile.age`). Disclosed rather than reconciled.
-- **Not addressed** (audit flagged but cosmetic): minor A4 overflow headroom on `grab-earnings.html` and `tnb-bill.html` — each leaves 15–40 mm of page-2 safety margin, fine for current content; `address plausibility` (real-street + arbitrary house number pattern) — standard synthetic-persona practice and borderline under PDPA, documented in `docs/trd.md` §9.6 already.
-- **Verification:** `pnpm -C frontend build` still passes (static `public/` assets don't hit the compile graph); `pytest -q` in `backend/` passes all 39 tests.
-
----
-
-## [21/04/26] - Added three synthetic Aisyah demo documents (MyKad, Grab earnings, TNB bill) closing TRD §9.6
-
-Independent PO1 task from `docs/mockgen.md`. Three self-contained HTML files at `docs/demo/` styled to look like the documents Aisyah uploads during the demo, plus a render guide.
-
-- `docs/demo/mykad.html` — 85.6 × 54 mm (ISO/IEC 7810 ID-1) via `@page`. Off-white `#f5f3ed` with Pahang-green `#006c35` top border; photo placeholder + signature strip + IC (monospace), name, citizenship, gender (PEREMPUAN / FEMALE), DOB 24 MAR 1990, and the shared address. Stylized "MyKad · KAD PENGENALAN MALAYSIA" text header — **no coat of arms, holographic foil, or chip contacts** (Critical Do-Nots compliance). Three diagonal `SYNTHETIC — FOR DEMO ONLY` watermarks at 22 / 50 / 78% card-height so any reasonable crop still shows one.
-- `docs/demo/grab-earnings.html` — A4 portrait, emerald `#00b14f` Grab-ish accent, stylised `g` monogram in place of the real logo. Partner block (AISYAH BINTI AHMAD, Partner ID `KTN-GRAB-38271`, GrabCar Saver, Maybank ••••8276, Kuantan zone, Gold tier), 6-row earnings table totalling **Net payout RM2,800.00** = `monthly_income_rm` in the fixture. Statement period 1–31 March 2026, issued 31 March 2026, next statement 30 April 2026. Tax-note callout points the user at LHDN Form B filing by 30 June 2026 (YA 2025). Three watermarks at 22 / 52 / 82% page-height.
-- `docs/demo/tnb-bill.html` — A4 portrait, TNB green `#00793f` + yellow `#fcd116`, stylised `T` monogram. Customer block pins the identical address to the MyKad (the residence cross-check the classify step uses), account `082-0012-3456`, tariff Domestic (A) single-phase. Billing period 01-03-2026 → 31-03-2026, issue 05 April 2026, due **30 April 2026**. Consumption block: prev 4,218 → curr 4,501 kWh = 283 kWh, first 200 @ RM0.218 (RM43.60), next 83 @ RM0.334 (RM27.72), subtotal RM71.32, KWTBB 1.6% RM1.14, **Amount due RM72.46**. JomPAY panel with real public biller code `9191`, synthetic references, QR placeholder. Three watermarks at the same 22 / 52 / 82% heights.
-- `docs/demo/README.md` — one-paragraph render guide (open in Chrome → Cmd+P → Save as PDF; custom paper size for the MyKad; A4 for the rest), plus the data-fidelity table and the legal-safety reasoning that each file stays PDPA 2010 / NRR 1990 compliant.
-- **No React-tree churn, no deps installed, no configs touched.** Static assets under `public/` are served as-is by Next.
-- Sanity-check: `pnpm -C frontend build` still passes (static `public/` files don't enter the compile graph).
-- Closed `docs/trd.md` §9.6 open question with a RESOLVED marker pointing at `docs/demo/`. Note inside: the original plan said "payslip (EA Form/CP8A)" but Aisyah is a Form B gig worker — an EA Form would misrepresent her filer category, so `grab-earnings.html` replaces it. The net payout still ties to `monthly_income_rm`.
-- IC number quirk flagged by the brief (last digit even = female, `4321` ends in 1 → male-coded): preserved intentionally because the `ic_last4 = "4321"` value is fixture-locked across backend tests and the rule engine. Rippling a change across both sides of the codebase would cost more than the synthetic mismatch risks.
-
----
-
-## [21/04/26] - Synced frontend Aisyah fixture to Phase 1 Task 4 rule-engine output
-
-- Merged `origin/main` (commits `5b072b8` Task 4 rule engine + `2f7155d` §6.19 fix) into the `frontend` branch. Conflicts were additive in `docs/progress.md` + `docs/plan.md` only — resolved by concatenating entries in chronological order.
-- The rule engine produced different Aisyah figures than the initial Task 2 commit-2 fixture mirror. New live totals: **JKM Warga Emas RM7,200 + LHDN Form B RM558 + STR 2026 RM450 = RM8,208/year** (was RM9,408). Both clear the plan.md ≥RM7,000 headline.
-  - STR dropped from an assumed RM1,200 (higher tier) to the correct RM450 — Aisyah lands in the 1–2 children bucket × RM2,501–5,000 band of the risalah p.2 tier table.
-  - LHDN dropped from an assumed flat RM1,008 to RM558 — real YA2025 bracket math: RM33,600 annual chargeable income minus RM30,500 stacked reliefs → RM3,100 taxable → RM0 tax after reliefs, saving the full RM558 that was otherwise owed.
-- Rewrote `frontend/src/fixtures/aisyah-response.ts` to mirror the rule-engine output verbatim: `AISYAH_SCHEME_MATCHES` now sorted by `annual_rm` desc, `scheme_name` / `summary` / `why_qualify` strings regenerated per the engine's final copy, LHDN citations expanded to 6 entries (added §6.19.3 split between §49(1)(a)/§49(1)(b) and §6.11.3 lifestyle). `AISYAH_UPSIDE` Python snippet + stdout + `total_annual_rm` + `per_scheme_rm` all updated. `AISYAH_PACKET.drafts[]` reordered to match.
-- `AISYAH_CLASSIFICATION.per_capita_monthly_rm` already RM700 — no change. Added a Form B filer note.
-- `pnpm run lint` clean. `pnpm run build` clean.
 
 ---
 

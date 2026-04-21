@@ -16,7 +16,7 @@ export function LandingHero() {
       </p>
       <div className="flex flex-col gap-3 sm:flex-row">
         <Button render={<Link href="/sign-in" />} size="lg">
-          Get started
+          Get Started
           <ArrowRight className="ml-1.5 size-4" aria-hidden />
         </Button>
         <Button render={<Link href="/dashboard/how-it-works" />} size="lg" variant="outline">

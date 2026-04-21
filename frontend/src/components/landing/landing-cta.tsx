@@ -15,7 +15,7 @@ export function LandingCta() {
           Takes under a minute.
         </p>
         <Button render={<Link href="/sign-in" />} size="lg">
-          Continue to sign in
+          Get Started
           <ArrowRight className="ml-1.5 size-4" aria-hidden />
         </Button>
       </div>

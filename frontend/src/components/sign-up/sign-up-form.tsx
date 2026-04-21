@@ -50,13 +50,13 @@ export function SignUpForm() {
           <input
             type="checkbox"
             checked={consent}
-            onChange={event => setConsent(event.target.checked)}
+            onChange={(event) => setConsent(event.target.checked)}
             className="mt-0.5 size-4 shrink-0 cursor-pointer rounded border border-input accent-primary"
             aria-describedby="pdpa-consent-description"
           />
           <span id="pdpa-consent-description" className="text-muted-foreground">
-            I consent to Layak processing my uploaded documents (IC, payslip, utility bill) to match government
-            schemes, per the{' '}
+            I consent to Layak processing my uploaded documents (IC, payslip, utility bill) to match government schemes,
+            per the{' '}
             <Link href="/privacy" className="text-primary underline underline-offset-2">
               Privacy Policy
             </Link>{' '}
@@ -90,7 +90,7 @@ export function SignUpForm() {
         <p className="text-center text-xs text-muted-foreground">
           Already have an account?{' '}
           <Link href="/sign-in" className="text-primary underline underline-offset-2">
-            Sign in
+            Sign In
           </Link>
         </p>
       </CardContent>

@@ -17,7 +17,7 @@ export function MarketingHeader() {
           How it works
         </Button>
         <Button render={<Link href="/sign-in" />} size="sm">
-          Sign in
+          Sign In
         </Button>
       </nav>
     </header>

@@ -22,7 +22,7 @@ OUT_DIR = REPO_ROOT / "frontend" / "public" / "fixtures"
 
 FIXTURE_SOURCES = (
     ("aisyah-mykad.pdf", HTML_DIR / "mykad.html"),
-    ("aisyah-payslip.pdf", HTML_DIR / "grab-earnings.html"),
+    ("aisyah-payslip.pdf", HTML_DIR / "payslip.html"),
     ("aisyah-utility.pdf", HTML_DIR / "tnb-bill.html"),
 )
 

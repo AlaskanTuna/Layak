@@ -42,7 +42,8 @@ RUN pip install --no-cache-dir --upgrade pip wheel \
        "google-adk>=1.31,<1.32" \
        "google-genai>=1.0" \
        "jinja2>=3.1" \
-       "weasyprint>=62"
+       "weasyprint>=62" \
+       "firebase-admin>=6.5,<7"
 
 # App code (templates + schemas + tools + rules + agents + fixtures + main).
 COPY app ./app

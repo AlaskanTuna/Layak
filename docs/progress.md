@@ -4,6 +4,27 @@
 
 ---
 
+## [21/04/26] - Phase 2 Task 2 PO1: Firebase Admin SDK boundary + authed /api/agent/intake
+
+PO1's slice of Phase 2 Task 2 — the backend now verifies Firebase ID tokens on `/api/agent/intake` and lazy-creates `users/{uid}` on first touch. Code-only this turn; redeploy deferred until the Firebase service-account secret is populated and Phase 2 Task 3 can mint real ID tokens for an end-to-end smoke.
+
+- **`backend/app/auth.py`** — single-file boundary for everything Firebase. `_init_firebase_admin` lazy-parses `FIREBASE_ADMIN_KEY` (JSON from Secret Manager) into a `Certificate`; re-entrant via a `threading.Lock` + sentinel so concurrent first requests don't double-init. `verify_firebase_id_token` wraps `firebase_admin.auth.verify_id_token` so every route imports through this module rather than `firebase_admin` directly. `current_user(request, authorization)` parses `Authorization: Bearer <id-token>`, surfaces 401 for missing/empty/invalid/expired/revoked tokens, and surfaces **503** (not 500) when the key env var is absent or malformed so the frontend can distinguish "service misconfigured" from "bad token." `UserInfo` is a frozen dataclass — `uid` / `email` / `display_name` / `photo_url`. `CurrentUser = Annotated[UserInfo, Depends(current_user)]` is the single import route modules need.
+- **`_upsert_user_doc`** — Firestore shape matches spec §3.3 character-for-character: `email`, `displayName`, `photoURL`, `tier="free"`, `createdAt=SERVER_TIMESTAMP`, `lastLoginAt=SERVER_TIMESTAMP`, `pdpaConsentAt=None`. Returning users only get `lastLoginAt` updated (one `.update()` call, no payload drift). Race between concurrent first-touches is explicitly acceptable per spec §3.5 — both writers converge on identical creation data.
+- **`backend/app/main.py`** — `/api/agent/intake` now takes `user: CurrentUser` as its first parameter. Starlette parses the multipart body before dep resolution, so a bad token still pays the upload cost — acceptable for v1 demo volume; revisit with middleware-level gating if abuse surfaces. `/health` stays unauthed. `user.uid` is threaded through as a placeholder (`_ = user`) — Phase 3 swaps that for the `evaluations/{evalId}` write path.
+- **Deps** — `firebase-admin>=6.5,<7` added to `backend/pyproject.toml` + `backend/Dockerfile`. Installed locally into `.venv` (pulls `google-cloud-firestore` transitively, so no extra dep line).
+- **Tests** — `backend/tests/test_auth.py`, 16 cases. Stubs `_init_firebase_admin` + `_get_firestore` + `verify_firebase_id_token` via monkeypatch so CI never needs real Firebase creds. Coverage: missing header, non-Bearer scheme, empty bearer, invalid/expired/revoked/disabled tokens (all → 401), `CertificateFetchError` (→ 503, transient outage), token missing uid, valid-token happy path (asserts exact `set` payload), returning-user path (asserts only `lastLoginAt` is touched), `request.state.user_id` mutation, padded-whitespace bearer token, 503 on missing env, 503 on non-JSON env, 503 on JSON-valid-but-shape-invalid service-account. Full suite: **55/55 passing** (39 prior + 16 new). Ruff: clean.
+- **Post-audit fixes applied before commit** (correctness subagent flagged three Criticals):
+  - `credentials.Certificate()` is now inside the try/except in `_init_firebase_admin` so a JSON-valid but shape-invalid key (e.g. missing `private_key`) returns 503, not 500.
+  - `UserDisabledError` added to the 401 branch; `CertificateFetchError` added as 503 ("verifier temporarily unavailable") so a transient Google cert outage doesn't force the client to re-auth.
+  - Dropped the `claims.get("sub")` fallback — Firebase-minted ID tokens always set `uid`, so the fallback was dead code that could accept non-Firebase JWTs in pathological cases. `current_user` now requires `uid` directly.
+  - Runbook §2.1 IAM role corrected from `roles/firebase.sdkAdminServiceAgent` (Google-managed, wrong for customer SAs) to `roles/firebaseauth.admin` + `roles/datastore.user`.
+  - Runbook §2.3.1 added to document that secret rotation requires a new Cloud Run revision — the Admin SDK and Firestore clients are process-cached.
+- **Import-smoke of `app.main`** without `FIREBASE_ADMIN_KEY` in env — loads cleanly (lazy init defers the env-var read until the first authed request). `GET /health` → 200; `POST /api/agent/intake` with no header → 401 `{"detail":"Missing bearer token"}`; with a header but no key env → 503 `{"detail":"Firebase Admin not configured"}`.
+- **Runbook** — new `docs/runbook.md` §2 captures the three-step rollout: (1) create `layak-firebase-admin` service account with `firebase.sdkAdminServiceAgent` + `datastore.user`, (2) mint + push a key to Secret Manager as `firebase-admin-key`, grant `secretAccessor` to the default Compute SA, (3) redeploy with `--set-secrets "GEMINI_API_KEY=...,FIREBASE_ADMIN_KEY=firebase-admin-key:latest"`. Verification curls included.
+- **Not shipped to prod this turn.** The currently-live `layak-backend-00003-j75` revision is still the unauthed v1 stack — the demo path is unaffected. The authed revision lands the moment Phase 2 Task 3 (PO2) can sign in and attach a real Bearer.
+
+---
+
 ## [21/04/26] - Phase 2 Task 1 PO1: Firestore contract checked in (rules + composite index + rollout runbook)
 
 PO1's slice of Phase 2 Task 1 — the Firestore contract that later Phase 2/3 work will depend on. No deploy yet; this task ends at the repo having the rules, indexes, and Firebase project config committed, plus a repeatable rollout command recorded in the new runbook.

@@ -37,6 +37,7 @@ if _DOTENV.is_file():
             os.environ[_k] = _v
 
 from app.agents.root_agent import stream_agent_events  # noqa: E402 — after dotenv load
+from app.auth import CurrentUser  # noqa: E402 — after dotenv load
 
 app = FastAPI(title="Layak Backend", version="0.1.0")
 
@@ -65,16 +66,18 @@ async def health() -> dict[str, str]:
 
 @app.post("/api/agent/intake")
 async def intake(
+    user: CurrentUser,
     ic: Annotated[UploadFile, File()],
     payslip: Annotated[UploadFile, File()],
     utility: Annotated[UploadFile, File()],
 ) -> StreamingResponse:
     """Stream the five-step agent pipeline as Server-Sent Events.
 
-    Task 1 scaffold emits: step_started(extract) → step_result(extract) →
-    step_started(match) → step_result(match) → done(empty packet). The full
-    five-step pipeline plus Gemini wiring lands in Phase 1 Task 3.
+    Authed: caller must supply `Authorization: Bearer <firebase-id-token>`.
+    `current_user` verifies the token and lazy-creates `users/{uid}` on first
+    touch, so the SSE stream that follows already runs in the user's context.
     """
+    _ = user  # Phase 3 uses user.uid to scope `evaluations/{evalId}` writes.
     uploads: dict[str, tuple[str, bytes]] = {
         "ic": (ic.filename or "ic.bin", await ic.read()),
         "payslip": (payslip.filename or "payslip.bin", await payslip.read()),

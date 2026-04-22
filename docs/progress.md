@@ -4,6 +4,12 @@
 
 ---
 
+## [23/04/26] - Phase 8 Tasks 1-4: Vertex AI Search + Gemini 3 Flash Preview + Flash-Lite hybrid
+
+Closed the two handbook gaps surfaced in the agentic-pipeline review. Task 1: probed the Vertex AI Model Garden directly via `genai.Client` (gcloud's `ai models list` only shows user-uploaded models, not Google publishers); finding is that `asia-southeast1` only publishes `gemini-2.5-flash`, `us-central1` adds 2.5-pro + 2.5-flash-lite but not gemini-3-flash-preview, and only the `global` smart-routing endpoint resolves all four models. Pivoted `_DEFAULT_LOCATION` from `asia-southeast1` to `global`; Cloud Run service stays in `asia-southeast1`. `backend/scripts/probe_gemini_3_flash.py` confirms gemini-3-flash-preview supports both `code_execution` (returns `executable_code` + `code_execution_result.output`) and `response_mime_type=application/json` (returns clean JSON without fences). Task 2: provisioned the Discovery Engine `layak-schemes-v1` data store. Inline raw_bytes import silently failed with `Field "document.data" is a required field` (a known DE quirk for binary PDFs even when the SDK accepts the shape), so pivoted to the documented Google pattern: created `gs://layak-schemes-pdfs/` (multi-region `us`), uploaded all 9 scheme PDFs via `gsutil`, rewrote `_import_pdfs` to use `GcsSource(input_uris=..., data_schema="content")`, granted the Discovery Engine project SA `roles/storage.objectViewer` on the bucket. All 9 PDFs are now indexed and queryable. Task 3: added `backend/app/services/vertex_ai_search.py` with `RetrievedPassage`, `search_passage()`, `passage_to_citation()`, and a high-level `get_primary_rag_citation()` convenience that turns the per-rule wiring into a 7-line block. Discovery Engine standard-edition rejects `extractive_content_spec` (Enterprise-only), so the helper uses `snippet_spec` only and strips `<b>` highlights from snippet payloads; standard edition also assigns hash document IDs instead of file stems, so the helper filters by URI substring instead of doc_id. Wired the helper into all 6 rule modules (str_2026 manually as the template; jkm_warga_emas, jkm_bkk, lhdn_form_b, i_saraan, perkeso_sksps via `/codex-delegate gpt-5.4-mini`). `lhdn_form_b._citations(form_type)` keeps its parameter; the rag rule_id is form-type-aware. Added `backend/tests/test_vertex_ai_search.py` with 6 mocked tests covering empty-query short-circuit, SDK-error fail-open, URI filtering, citation construction, and the None-when-no-hits path. Task 4: added `WORKER_MODEL = "gemini-2.5-flash-lite"` and `HEAVY_MODEL = "gemini-3-flash-preview"` (with `HEAVY_MODEL_FALLBACK = "gemini-2.5-pro"` documented) to `gemini.py`; swapped `classify.py` to WORKER_MODEL and `compute_upside.py` to HEAVY_MODEL; rewrote the LlmAgent placeholder docstrings in `root_agent.py` to reflect the new per-step matrix. Inline smoke against an Aisyah-shape match list returned a clean Python snippet + correctly formatted stdout table from gemini-3-flash-preview. Backend test suite: 304/304 green (was 298 before Phase 8). Tasks 5 (re-snapshot fixtures) and 6 (docs/trd.md + CLAUDE.md update) remain.
+
+---
+
 ## [22/04/26] - Dashboard card-title follow-up: Geist Sans headings + English title-case cleanup
 
 PO2 tightened dashboard card-title consistency without touching the shared `CardTitle` primitive, so landing cards and other exception surfaces stay as-is. Dashboard/evaluation card titles now explicitly use Geist Sans in `code-execution-panel.tsx`, `results-action-rail.tsx`, `manual-entry-form.tsx`, `evaluation-upload-client.tsx`, `error-recovery-card.tsx`, and `settings-page.tsx`. The English dashboard-facing heading copy was also normalised to title case where those card titles were still sentence case, including quick-start cards, results action cards, required-contributions heading, error-card titles, and the Settings danger card labels. Frontend `pnpm -C frontend lint` clean aside from the pre-existing settings warning; `pnpm -C frontend build` clean.
@@ -893,6 +899,11 @@ Findings the audit flagged that were **not** acted on (cosmetic or external to P
 
 - Fixed the `/dashboard/evaluation/upload` manual-tab tooltip layering bug by letting the manual form cards render with visible overflow and promoting the tooltip wrapper/panel to a higher stacking level.
 - This keeps the household and field-label tooltips above their cards instead of slipping underneath the surrounding content.
+
+## [23/04/26] - Root dev script now boots frontend and backend together
+
+- Updated the root `package.json` so `pnpm run dev` starts both the Next.js frontend and the FastAPI backend in parallel.
+- Added explicit `dev:frontend` and `dev:backend` scripts as separate entry points, with the backend path using the repo-local `backend/.venv/bin/uvicorn app.main:app --reload --port 8080`.
 
 ## [22/04/26] - Phase 7 Task 3: upload validator tightening + JPG/PNG crop preview
 

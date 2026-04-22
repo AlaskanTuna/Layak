@@ -8,36 +8,43 @@ Layak is an agentic AI concierge that helps Malaysians discover social-assistanc
 
 ## Functional Diagram
 
-If a NotebookLM-generated banner is added later, place it here, for example:
-
-```md
-![Layak functional diagram](docs/assets/readme-functional-diagram.png)
-```
-
-Mermaid fallback:
-
 ```mermaid
-flowchart LR
-    Citizen[Citizen]
-    Frontend[Next.js frontend]
-    Backend[FastAPI backend]
-    Agent[RootAgent]
-    Extract[Extract]
-    Classify[Classify]
-    Match[Match]
-    Upside[Compute upside]
-    Generate[Generate packet]
-    Results[Ranked results + provenance + draft packet]
+flowchart TD
+    User((User))
+    Upload[Upload documents]
+    Manual[Enter details manually]
+    RootAgent{RootAgent<br/>Gemini 2.5 Pro}
 
-    Citizen --> Frontend --> Backend --> Agent
-    Agent --> Extract --> Classify --> Match --> Upside --> Generate --> Results
+    User --> Upload
+    User --> Manual
+    Upload --> RootAgent
+    Manual --> RootAgent
+
+    subgraph Pipeline[Agentic Five-Step Pipeline]
+        direction TB
+        Extract[1. Extract<br/>Gemini 2.5 Flash]
+        Classify[2. Classify<br/>Gemini 2.5 Flash]
+        Match[3. Match<br/>Rule engine + Vertex AI Search]
+        Rank[4. Rank<br/>Gemini Code Execution]
+        Generate[5. Generate<br/>WeasyPrint draft PDFs]
+    end
+
+    RootAgent --> Extract
+    Extract --> Classify --> Match --> Rank --> Generate
+
+    Match -.-> Grounding[(Grounded scheme PDFs)]
+    Rank -.-> Compute[(Python arithmetic)]
+
+    Generate --> Results[Ranked results]
+    Results --> Provenance[Provenance panel]
+    Results --> Packets[Draft packet download]
 ```
 
 ## Hackathon Submission Context
 
 Layak is a public web application built for the Project 2030: MyAI Future Hackathon under Track 2, `Citizens First`. The project targets the `Open Category` and is designed to satisfy the handbook's emphasis on practical AI, grounded workflows, and deployment on Google Cloud Run.
 
-The repository includes source code, setup instructions, architecture diagrams, and deployment references so judges and contributors can review the system end to end.
+The repository includes source code, setup instructions, architecture diagrams, deployment references, and AI disclosure details so judges and contributors can review the system end to end.
 
 ## What Layak Does
 
@@ -56,7 +63,7 @@ The app is intentionally draft-only. It does not submit to government systems on
 
 Layak is built around a simple product stance: citizens should not have to portal-hop just to discover what they are already entitled to. The system focuses on a safer AI pattern than a generic chatbot by grounding eligibility logic in committed source materials, surfacing citations in the UI, and stopping at draft generation instead of live submission.
 
-That combination matters for public trust. The goal is not to replace agency decision-making, but to make discovery, preparation, and confidence dramatically better for the user.
+That combination matters for public trust and hackathon relevance. The goal is not to replace agency decision-making, but to make discovery, preparation, and confidence dramatically better for the user while demonstrating a practical, visible "AI to action" workflow.
 
 ## Solution Overview
 

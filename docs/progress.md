@@ -4,6 +4,12 @@
 
 ---
 
+## [22/04/26] - Phase 7 Task 12 PO2 follow-up: help launcher placement + glass treatment + modal layout fix
+
+PO2 tightened the new quick-help surface after live QA. The floating `?` launcher is now dashboard-only (removed from the marketing landing page), the button uses the shared global glassmorphism surface styling from `globals.css`, and the dialog shell was reworked to behave like a proper bounded modal instead of letting the footer collapse into the body. `frontend/src/components/layout/floating-help-launcher.tsx` now opens through the same `handleOpenChange()` path used by the dialog, uses a grid tab list that wraps cleanly on smaller widths, constrains the popup to `85svh`, and keeps the content area scrollable with an inline footer row plus a single `Done` action. Frontend `pnpm -C frontend lint` clean; `pnpm -C frontend build` clean.
+
+---
+
 ## [22/04/26] - Phase 7 Task 9 PO1: PERKESO SKSPS rule + `SchemeKind` schema split + `<RequiredContributionsCard>`
 
 PO1's Phase 7 Task 9 — the rule engine now surfaces PERKESO SKSPS (Akta 789 mandatory social-security contribution for gig drivers) as a first-class scheme match, but tagged `kind="required_contribution"` so its RM amount lands in a dedicated "Required contributions" block instead of inflating the upside total. This required a small but load-bearing schema change: `SchemeKind = Literal["upside", "required_contribution"]` + `annual_contribution_rm: float | None` on `SchemeMatch`, defaulting to back-compat values so pre-Task-9 Firestore docs still validate. Five rules are now registered; Aisyah's qualifying list goes from 4 → 5 matches.

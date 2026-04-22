@@ -10,7 +10,6 @@ import {
   Dialog,
   DialogContent,
   DialogDescription,
-  DialogFooter,
   DialogHeader,
   DialogTitle
 } from '@/components/ui/dialog'
@@ -56,27 +55,27 @@ export function FloatingHelpLauncher() {
       <Button
         type="button"
         size="icon-lg"
-        className="fixed right-4 bottom-4 z-40 rounded-full shadow-lg md:right-6 md:bottom-6"
+        className="glass-surface fixed right-4 bottom-4 z-40 rounded-full shadow-lg md:right-6 md:bottom-6"
         aria-label={t('common.help.open')}
-        onClick={() => setOpen(true)}
+        onClick={() => handleOpenChange(true)}
       >
         <CircleHelp className="size-5" aria-hidden />
       </Button>
       <Dialog open={open} onOpenChange={handleOpenChange}>
-        <DialogContent className="max-w-xl p-0 sm:max-w-2xl">
+        <DialogContent className="max-h-[85svh] max-w-xl overflow-hidden p-0 sm:max-w-2xl">
           <DialogHeader className="px-5 pt-5">
             <DialogTitle>{t('common.help.title')}</DialogTitle>
             <DialogDescription>{t('common.help.description')}</DialogDescription>
           </DialogHeader>
-          <div className="px-5 pb-5">
+          <div className="flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto px-5 pb-5">
             <Tabs value={section} onValueChange={handleSectionChange} className="gap-4">
-              <TabsList className="h-auto w-full flex-wrap justify-start">
+              <TabsList className="grid h-auto w-full grid-cols-2 gap-2 rounded-xl bg-muted/70 p-1 md:grid-cols-4">
                 <TabsTrigger value="overview">{t('common.help.tabs.overview')}</TabsTrigger>
                 <TabsTrigger value="documents">{t('common.help.tabs.documents')}</TabsTrigger>
                 <TabsTrigger value="samples">{t('common.help.tabs.samples')}</TabsTrigger>
                 <TabsTrigger value="results">{t('common.help.tabs.results')}</TabsTrigger>
               </TabsList>
-              <TabsContent value="overview">
+              <TabsContent value="overview" className="mt-0">
                 <HelpCard
                   icon={<Waypoints className="size-4" aria-hidden />}
                   title={t('common.help.overview.title')}
@@ -88,7 +87,7 @@ export function FloatingHelpLauncher() {
                   ]}
                 />
               </TabsContent>
-              <TabsContent value="documents">
+              <TabsContent value="documents" className="mt-0">
                 <HelpCard
                   icon={<FileText className="size-4" aria-hidden />}
                   title={t('common.help.documents.title')}
@@ -100,7 +99,7 @@ export function FloatingHelpLauncher() {
                   ]}
                 />
               </TabsContent>
-              <TabsContent value="samples">
+              <TabsContent value="samples" className="mt-0">
                 <HelpCard
                   icon={<Sparkles className="size-4" aria-hidden />}
                   title={t('common.help.samples.title')}
@@ -112,7 +111,7 @@ export function FloatingHelpLauncher() {
                   ]}
                 />
               </TabsContent>
-              <TabsContent value="results">
+              <TabsContent value="results" className="mt-0">
                 <HelpCard
                   icon={<PlayCircle className="size-4" aria-hidden />}
                   title={t('common.help.results.title')}
@@ -125,10 +124,13 @@ export function FloatingHelpLauncher() {
                 />
               </TabsContent>
             </Tabs>
+            <div className="flex items-center justify-between rounded-xl border border-border/80 bg-muted/40 px-4 py-3">
+              <p className="pr-3 text-xs text-muted-foreground">{t('common.help.footer')}</p>
+              <Button type="button" variant="outline" onClick={() => setOpen(false)}>
+                {t('common.button.done')}
+              </Button>
+            </div>
           </div>
-          <DialogFooter showCloseButton className="rounded-b-xl">
-            <p className="mr-auto text-xs text-muted-foreground">{t('common.help.footer')}</p>
-          </DialogFooter>
         </DialogContent>
       </Dialog>
     </>

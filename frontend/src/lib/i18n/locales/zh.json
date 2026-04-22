@@ -394,7 +394,39 @@
       "recoveryIntro": "流程中途出错。您可以使用合成的 Aisyah 文件运行完整流程 —— 有助于确认界面其余部分正常 —— 或使用新文件重新开始。",
       "switchToManual": "切换到手动输入",
       "trySamples": "使用示例文件尝试",
-      "startOver": "重新开始"
+      "startOver": "重新开始",
+      "ctas": {
+        "retry": "重试",
+        "manual": "切换到手动输入",
+        "samples": "使用示例文件尝试",
+        "settings": "打开设置"
+      },
+      "categories": {
+        "quotaExhausted": {
+          "title": "每日配额已用完",
+          "body": "今日 Gemini OCR 配额已用完。请切换到「手动输入」—— 流程其余部分运作方式完全相同，仅省略文件扫描步骤。"
+        },
+        "serviceUnavailable": {
+          "title": "Gemini 暂时不可用",
+          "body": "通常一分钟内即可恢复。请重试同一评估，或在上游恢复期间使用随附的 Aisyah 示例回退。"
+        },
+        "deadlineExceeded": {
+          "title": "上游请求超时",
+          "body": "Gemini 调用超过了我们允许的时长。请使用相同文件重试，或切换到「手动输入」以完全跳过 OCR 步骤。"
+        },
+        "permissionDenied": {
+          "title": "未获授权访问 Gemini",
+          "body": "服务器无法针对此请求通过 Gemini 身份验证。请打开「设置」确认您以正确的层级登录；值班团队已收到通知。"
+        },
+        "extractValidation": {
+          "title": "未能清晰地读取文件",
+          "body": "我们提取了文本，但结果不符合我们的档案结构。请尝试「手动输入」（由您自行填写字段），或通过示例包上传更清晰的扫描件。"
+        },
+        "generic": {
+          "title": "流程错误",
+          "body": "流程中途发生意外。请使用合成的 Aisyah 文件运行完整流程以检查界面其余部分，或使用新文件重新开始。"
+        }
+      }
     },
     "upside": {
       "label": "潜在减免总额",

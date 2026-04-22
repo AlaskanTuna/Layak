@@ -90,12 +90,26 @@ class DoneEvent(BaseModel):
     eval_id: str | None = None
 
 
+ErrorCategory = Literal[
+    "quota_exhausted",
+    "service_unavailable",
+    "deadline_exceeded",
+    "permission_denied",
+    "extract_validation",
+]
+
+
 class ErrorEvent(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
     type: Literal["error"] = "error"
     step: Step | None = None
     message: str = Field(min_length=1)
+    # Phase 7 Task 6: stamped by `gemini.humanize_error()` so the frontend can
+    # render category-tailored CTAs (retry / switch-to-manual / settings link)
+    # instead of substring-matching the humanised message. `None` surfaces the
+    # generic "something broke" recovery card.
+    category: ErrorCategory | None = None
     # Phase 3 Task 1: populated when the evaluation doc was already created
     # before the error — lets the frontend link the user to the failed eval.
     eval_id: str | None = None

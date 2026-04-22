@@ -1,7 +1,7 @@
 'use client'
 
 import { useRouter, useSearchParams } from 'next/navigation'
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import { ErrorRecoveryCard } from '@/components/evaluation/error-recovery-card'
@@ -71,13 +71,29 @@ export function EvaluationUploadClient() {
     setDemoMode(demoByTab[next] ?? false)
   }
 
+  // Phase 7 Task 6 — retain the last submission so the recovery card's
+  // Retry CTA can replay the same pipeline on a transient failure
+  // (service_unavailable / deadline_exceeded). `null` means there's
+  // nothing to retry (e.g. just after `reset()` or before any submit).
+  const lastSubmissionRef = useRef<
+    | { kind: 'real'; files: UploadFiles; dependants: DependantInput[] }
+    | { kind: 'manual'; payload: ManualEntryPayload }
+    | null
+  >(null)
+
   function handleSubmitUpload(submission: UploadSubmission) {
     setDemoByTab(prev => ({ ...prev, upload: null }))
     setDemoMode(false)
+    lastSubmissionRef.current = {
+      kind: 'real',
+      files: submission.files,
+      dependants: submission.dependants
+    }
     start({ mode: 'real', files: submission.files, dependants: submission.dependants })
   }
 
   function handleSubmitManual(payload: ManualEntryPayload) {
+    lastSubmissionRef.current = { kind: 'manual', payload }
     start({ mode: 'manual', payload })
   }
 
@@ -104,6 +120,7 @@ export function EvaluationUploadClient() {
     setLoadingPersona(persona)
     try {
       const files = await load()
+      lastSubmissionRef.current = { kind: 'real', files, dependants }
       start({ mode: 'real', files, dependants })
     } catch (err) {
       setSampleLoadError(err instanceof Error ? err.message : String(err))
@@ -133,7 +150,21 @@ export function EvaluationUploadClient() {
     setDemoByTab({ upload: null, manual: null })
     setDemoMode(false)
     setMode(initialMode)
+    lastSubmissionRef.current = null
     reset()
+  }
+
+  function handleRetry() {
+    // Transient-error replay. No submission retained means there's nothing
+    // to retry — the button wouldn't render in that case (the recovery card
+    // only wires Retry when `onRetry` is defined), but we guard here too.
+    const last = lastSubmissionRef.current
+    if (!last) return
+    if (last.kind === 'real') {
+      start({ mode: 'real', files: last.files, dependants: last.dependants })
+    } else {
+      start({ mode: 'manual', payload: last.payload })
+    }
   }
 
   function handleSwitchToManual() {
@@ -188,6 +219,7 @@ export function EvaluationUploadClient() {
           {showError && (
             <ErrorRecoveryCard
               message={state.error ?? t('evaluation.unknownError')}
+              category={state.errorCategory}
               // "Use samples" falls back to the upload path with the default
               // Aisyah persona; on a quota-exhausted error the card prefers
               // the Manual Entry CTA instead because the upload path would
@@ -195,6 +227,10 @@ export function EvaluationUploadClient() {
               // intake screen to keep the recovery card single-action.
               onUseSamples={() => handleUseSamplesUpload('aisyah')}
               onReset={handleReset}
+              // Retry is always wired — an error event implies a prior
+              // submit, which always populated `lastSubmissionRef`. The
+              // handler no-ops defensively if the ref was cleared mid-stream.
+              onRetry={handleRetry}
               onSwitchToManual={handleSwitchToManual}
             />
           )}

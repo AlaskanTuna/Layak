@@ -16,6 +16,7 @@ import pytest
 from app.agents.gemini import (
     ERROR_CATEGORY_MESSAGES,
     categorize_error_message,
+    humanize_error,
     humanize_error_message,
     sanitize_error_message,
 )
@@ -89,3 +90,72 @@ def test_humanize_truncation_still_applied_on_unknown_error() -> None:
     out = humanize_error_message(raw, max_len=240)
     assert len(out) == 240
     assert out.endswith("…")
+
+
+# ----------------------------------------------------------------------------
+# Phase 7 Task 6 — `humanize_error` tuple helper feeding the SSE ErrorEvent
+# ----------------------------------------------------------------------------
+
+
+@pytest.mark.parametrize(
+    "raw, expected_category",
+    [
+        ("ClientError: 429 RESOURCE_EXHAUSTED.", "quota_exhausted"),
+        ("503 SERVICE_UNAVAILABLE", "service_unavailable"),
+        ("DEADLINE_EXCEEDED: timed out", "deadline_exceeded"),
+        ("PermissionDenied: 403", "permission_denied"),
+        ("ValidationError: 1 validation error for Profile", "extract_validation"),
+    ],
+)
+def test_humanize_error_returns_message_and_category_for_known_categories(
+    raw: str, expected_category: str
+) -> None:
+    """Each known category → `(static_copy, slug)`; slug mirrors the Literal in events.py."""
+    message, category = humanize_error(raw)
+    assert category == expected_category
+    assert message == ERROR_CATEGORY_MESSAGES[expected_category]
+
+
+def test_humanize_error_returns_none_category_for_unknown_error() -> None:
+    """Unknown error → `(sanitized_raw, None)` so the frontend falls through
+    to the generic recovery card. `None` is the sentinel the SSE ErrorEvent
+    sends across the wire."""
+    raw = "RuntimeError: unexpected internal state, IC 900324064321 leaked"
+    message, category = humanize_error(raw)
+    assert category is None
+    # Unknown path still runs through sanitisation — the IC digits are redacted.
+    assert message == sanitize_error_message(raw)
+    assert "[redacted]" in message
+
+
+def test_humanize_error_tuple_agrees_with_humanize_error_message() -> None:
+    """Regression guard — the tuple form and the string form must return the
+    same user-facing message for every known category plus the unknown path.
+    If they drift, the SSE error card would show one copy on first render and
+    a different copy on Firestore-rehydrate."""
+    cases = [
+        "ClientError: 429 RESOURCE_EXHAUSTED",
+        "503 SERVICE_UNAVAILABLE",
+        "DEADLINE_EXCEEDED",
+        "PermissionDenied: 403",
+        "ValidationError: Profile extract broken",
+        "asyncio.CancelledError — no idea",
+    ]
+    for raw in cases:
+        tuple_msg, _category = humanize_error(raw)
+        assert tuple_msg == humanize_error_message(raw), f"drift on: {raw!r}"
+
+
+def test_humanize_error_category_slugs_match_events_literal() -> None:
+    """The backend's `ErrorCategory` Literal in `app/schema/events.py` must
+    enumerate exactly the same slugs `ERROR_CATEGORY_MESSAGES` exposes.
+    Adding a category on one side and forgetting the other would let the
+    ErrorEvent pass validation locally but reject on the frontend typed
+    mirror in `frontend/src/lib/agent-types.ts`."""
+    from typing import get_args
+
+    from app.schema.events import ErrorCategory
+
+    schema_slugs = set(get_args(ErrorCategory))
+    impl_slugs = set(ERROR_CATEGORY_MESSAGES.keys())
+    assert schema_slugs == impl_slugs, f"slug drift: schema={schema_slugs} impl={impl_slugs}"

@@ -239,6 +239,35 @@ async def test_persist_error_event_without_step_skips_step_state_update(doc_ref:
 
 
 @pytest.mark.asyncio
+async def test_persist_error_event_stores_category_slug(doc_ref: MagicMock) -> None:
+    """Phase 7 Task 6 — the category slug from the SSE ErrorEvent must round-
+    trip into Firestore so the persisted results route can render the same
+    category-tailored recovery CTAs on a page refresh as the live SSE did."""
+    events = _events(
+        ErrorEvent(
+            step="classify",
+            message="Gemini's daily free-tier quota is exhausted.",
+            category="quota_exhausted",
+        )
+    )
+    await _collect(persist_event_stream(events, eval_id="eval-xyz", doc_ref=doc_ref))
+    payload = doc_ref.update.call_args.args[0]
+    assert payload["error"]["category"] == "quota_exhausted"
+
+
+@pytest.mark.asyncio
+async def test_persist_error_event_without_category_stores_null(doc_ref: MagicMock) -> None:
+    """Unknown-category errors still write the field — as `None` — so
+    reads on the frontend don't have to guard the optional key. Firestore
+    `None` serialises to JSON `null` which matches the frontend type."""
+    events = _events(ErrorEvent(step="extract", message="RuntimeError: mystery"))
+    await _collect(persist_event_stream(events, eval_id="eval-xyz", doc_ref=doc_ref))
+    payload = doc_ref.update.call_args.args[0]
+    assert "category" in payload["error"]
+    assert payload["error"]["category"] is None
+
+
+@pytest.mark.asyncio
 async def test_persist_swallows_firestore_failure_to_keep_stream_open(doc_ref: MagicMock) -> None:
     """A Firestore write failure must not break the client's SSE stream."""
     doc_ref.update.side_effect = RuntimeError("transient firestore blip")

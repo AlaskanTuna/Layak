@@ -9,6 +9,7 @@ import type {
   AgentEvent,
   ComputeUpsideResult,
   DependantInput,
+  ErrorCategory,
   HouseholdClassification,
   ManualEntryPayload,
   Packet,
@@ -37,6 +38,10 @@ export type PipelineState = {
   /** Populated when the backend returns 429 — drives the waitlist modal. */
   quotaExceeded: RateLimitErrorBody | null
   error: string | null
+  /** Phase 7 Task 6 — category slug from the SSE `ErrorEvent`. `null` when
+   * the pipeline has not errored OR the error didn't match a known category.
+   * Drives the category-tailored CTAs in `<ErrorRecoveryCard>`. */
+  errorCategory: ErrorCategory | null
 }
 
 export type StartOptions =
@@ -62,7 +67,8 @@ const INITIAL_STATE: PipelineState = {
   packet: null,
   evalId: null,
   quotaExceeded: null,
-  error: null
+  error: null,
+  errorCategory: null
 }
 
 function shouldForceMock(): boolean {
@@ -111,6 +117,7 @@ export function applyEvent(prev: PipelineState, event: AgentEvent): PipelineStat
         ...prev,
         phase: 'error',
         error: event.message,
+        errorCategory: event.category ?? null,
         stepStates,
         evalId: event.eval_id ?? prev.evalId
       }
@@ -216,6 +223,9 @@ export function useAgentPipeline(): {
             ...prev,
             phase: 'error',
             error: message,
+            // Network-layer failure — no backend category reached us, so the
+            // recovery card falls back to its generic "start over" branch.
+            errorCategory: null,
             stepStates: markFirstActiveStepErrored(prev.stepStates)
           }))
         }

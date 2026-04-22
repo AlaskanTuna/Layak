@@ -27,7 +27,7 @@ from collections.abc import AsyncIterator
 from google.adk.agents import LlmAgent, SequentialAgent
 from google.adk.tools import FunctionTool
 
-from app.agents.gemini import humanize_error_message
+from app.agents.gemini import humanize_error
 from app.agents.tools.build_profile import derive_household_flags
 from app.agents.tools.classify import classify_household
 from app.agents.tools.compute_upside import compute_upside
@@ -193,4 +193,5 @@ async def stream_agent_events(
         yield DoneEvent(packet=packet)
     except Exception as exc:  # noqa: BLE001 — surface every failure to the UI.
         raw = f"{type(exc).__name__}: {exc}"
-        yield ErrorEvent(step=current_step, message=humanize_error_message(raw))
+        message, category = humanize_error(raw)
+        yield ErrorEvent(step=current_step, message=message, category=category)

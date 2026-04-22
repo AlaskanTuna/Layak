@@ -181,6 +181,10 @@ def _mirror_to_firestore(  # noqa: PLR0912 — per-event-type dispatch is natura
                 "error": {
                     "step": event.step,
                     "message": sanitize_error_message(event.message),
+                    # Phase 7 Task 6 — persist the category slug so the
+                    # results route can render the same category-tailored
+                    # recovery CTAs on a refresh as the live SSE did.
+                    "category": event.category,
                 },
                 **({f"stepStates.{event.step}": "error"} if event.step else {}),
             }

@@ -33,8 +33,20 @@ import os
 import re
 from functools import lru_cache
 from pathlib import Path
+from typing import Literal
 
 from google import genai
+
+# Error-recovery category slugs surfaced on the SSE `ErrorEvent.category` so
+# the frontend can render category-aware CTAs without substring-matching the
+# humanised message. `None` (unknown) triggers the generic "start over" card.
+ErrorCategory = Literal[
+    "quota_exhausted",
+    "service_unavailable",
+    "deadline_exceeded",
+    "permission_denied",
+    "extract_validation",
+]
 
 FAST_MODEL = "gemini-2.5-flash"
 ORCHESTRATOR_MODEL = "gemini-2.5-pro"
@@ -149,7 +161,7 @@ def sanitize_error_message(message: str, max_len: int = 240) -> str:
 # `category` slug to the user-facing message — the slug also flows to the
 # frontend on the SSE error event so the UI can surface category-aware CTAs
 # (e.g. "Try Manual Entry" only when OCR is rate-limited).
-ERROR_CATEGORY_MESSAGES: dict[str, str] = {
+ERROR_CATEGORY_MESSAGES: dict[ErrorCategory, str] = {
     "quota_exhausted": (
         "Gemini's daily free-tier quota is exhausted. Try again later, or "
         "switch to Manual Entry mode — it skips the OCR step and runs the rest "
@@ -172,7 +184,7 @@ ERROR_CATEGORY_MESSAGES: dict[str, str] = {
 }
 
 
-def categorize_error_message(raw: str) -> str | None:
+def categorize_error_message(raw: str) -> ErrorCategory | None:
     """Return a `ERROR_CATEGORY_MESSAGES` slug for known upstream errors, or `None`.
 
     Pure string matching — the google-genai SDK doesn't expose a stable error
@@ -228,6 +240,21 @@ def humanize_error_message(raw: str, max_len: int = 240) -> str:
     if category is not None:
         return ERROR_CATEGORY_MESSAGES[category]
     return sanitize_error_message(raw, max_len)
+
+
+def humanize_error(raw: str, max_len: int = 240) -> tuple[str, ErrorCategory | None]:
+    """Pair of `(user-facing message, category slug)` for an upstream error.
+
+    Convenience for callers that need both halves at once — the orchestrator
+    emits the pair onto the SSE `ErrorEvent` so the frontend renders
+    category-tailored CTAs. Categories that don't match a known pattern return
+    `(sanitized_raw, None)`; the frontend treats `None` as the generic "start
+    over" branch.
+    """
+    category = categorize_error_message(raw)
+    if category is not None:
+        return ERROR_CATEGORY_MESSAGES[category], category
+    return sanitize_error_message(raw, max_len), None
 
 
 def detect_mime(filename: str, data: bytes) -> str:

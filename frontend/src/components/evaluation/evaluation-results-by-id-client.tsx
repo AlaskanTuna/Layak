@@ -7,6 +7,7 @@ import { AlertTriangle, ArrowLeft, ArrowRight, Loader2 } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 
 import { CodeExecutionPanel } from '@/components/evaluation/code-execution-panel'
+import { ErrorRecoveryCard } from '@/components/evaluation/error-recovery-card'
 import { EvaluationUpsideHero } from '@/components/evaluation/evaluation-upside-hero'
 import { PersistedPacketDownload } from '@/components/evaluation/persisted-packet-download'
 import { PipelineStepper } from '@/components/evaluation/pipeline-stepper'
@@ -75,7 +76,8 @@ function docToPipelineState(doc: EvaluationDoc): PipelineState {
     packet: null,
     evalId: null,
     quotaExceeded: null,
-    error: doc.error?.message ?? null
+    error: doc.error?.message ?? null,
+    errorCategory: doc.error?.category ?? null
   }
 }
 
@@ -217,19 +219,20 @@ export function EvaluationResultsByIdClient({ evalId }: { evalId: string }) {
       )}
 
       {isError && (
-        <Alert variant="destructive">
-          <AlertTriangle className="size-4" />
-          <AlertTitle>{t('evaluation.results.failedTitle')}</AlertTitle>
-          <AlertDescription>
-            {doc.error?.message ?? t('evaluation.unknownError')}
-            <div className="mt-3 flex">
-              <Button size="sm" onClick={handleStartAnother}>
-                {t('evaluation.results.startAnother')}
-                <ArrowRight className="ml-1.5 size-3.5" aria-hidden />
-              </Button>
-            </div>
-          </AlertDescription>
-        </Alert>
+        // Phase 7 Task 6 — category-tailored recovery on persisted errors.
+        // The original files + dependants aren't retained server-side, so
+        // Retry isn't meaningful here; omitted `onRetry` tells the card to
+        // drop the Retry CTA entirely. The remaining CTAs (manual, samples,
+        // settings, reset) all route back to the upload page where the user
+        // picks a fresh submission — category still drives which of those
+        // CTAs renders.
+        <ErrorRecoveryCard
+          message={doc.error?.message ?? t('evaluation.unknownError')}
+          category={doc.error?.category ?? null}
+          onUseSamples={handleStartAnother}
+          onReset={handleStartAnother}
+          onSwitchToManual={() => router.push('/dashboard/evaluation/upload?mode=manual')}
+        />
       )}
 
       {(isComplete || (isRunning && doc.matches.length > 0)) && (

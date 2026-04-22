@@ -425,7 +425,39 @@
       "recoveryIntro": "Something broke mid-pipeline. You can run the full flow against synthetic Aisyah documents — useful for confirming the rest of the UI is healthy — or start over with fresh uploads.",
       "switchToManual": "Switch to Manual Entry",
       "trySamples": "Try with sample documents",
-      "startOver": "Start over"
+      "startOver": "Start over",
+      "ctas": {
+        "retry": "Retry",
+        "manual": "Switch to Manual Entry",
+        "samples": "Try with sample documents",
+        "settings": "Open settings"
+      },
+      "categories": {
+        "quotaExhausted": {
+          "title": "Daily quota exhausted",
+          "body": "We've run the day's Gemini OCR quota. Switch to Manual Entry — the rest of the pipeline runs exactly the same way, just without document scanning."
+        },
+        "serviceUnavailable": {
+          "title": "Gemini is temporarily unavailable",
+          "body": "This usually clears in under a minute. Retry the same evaluation, or fall back to the bundled Aisyah sample while the upstream recovers."
+        },
+        "deadlineExceeded": {
+          "title": "Upstream request timed out",
+          "body": "The Gemini call took longer than we allow. Retry with the same documents, or switch to Manual Entry to skip the OCR step entirely."
+        },
+        "permissionDenied": {
+          "title": "Gemini access not authorised",
+          "body": "The server couldn't authenticate against Gemini for this request. Open Settings to confirm you're signed in on the right tier; the on-call team has been notified."
+        },
+        "extractValidation": {
+          "title": "Couldn't read the documents cleanly",
+          "body": "We extracted text but the result didn't fit our profile schema. Try Manual Entry (you'll type the fields yourself) or drop in clearer scans via the sample pack."
+        },
+        "generic": {
+          "title": "Pipeline error",
+          "body": "Something unexpected happened mid-pipeline. Run the full flow against synthetic Aisyah documents to check the rest of the UI, or start over with fresh uploads."
+        }
+      }
     },
     "upside": {
       "label": "Total Potential Relief",

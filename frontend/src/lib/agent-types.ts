@@ -128,7 +128,25 @@ export type StepResultEvent =
   | { type: 'step_result'; step: 'compute_upside'; data: ComputeUpsideResult }
   | { type: 'step_result'; step: 'generate'; data: GenerateResult }
 export type DoneEvent = { type: 'done'; packet: Packet; eval_id?: string | null }
-export type ErrorEvent = { type: 'error'; step: Step | null; message: string; eval_id?: string | null }
+
+// Phase 7 Task 6 — SSE ErrorEvent.category mirrors backend
+// `app/schema/events.py:ErrorCategory`. Keep the two sides in lockstep:
+// adding a category here must land a matching entry in the Python Literal
+// AND category-tailored copy in `frontend/src/lib/i18n/locales/*.json`.
+export type ErrorCategory =
+  | 'quota_exhausted'
+  | 'service_unavailable'
+  | 'deadline_exceeded'
+  | 'permission_denied'
+  | 'extract_validation'
+
+export type ErrorEvent = {
+  type: 'error'
+  step: Step | null
+  message: string
+  category?: ErrorCategory | null
+  eval_id?: string | null
+}
 
 export type AgentEvent = StepStartedEvent | StepResultEvent | DoneEvent | ErrorEvent
 
@@ -157,6 +175,7 @@ export type EvaluationStepStates = Record<Step, EvaluationStepState>
 export type EvaluationErrorDoc = {
   step: Step | null
   message: string
+  category?: ErrorCategory | null
 }
 
 /** Persisted trace of the `compute_upside` step's Gemini Code Execution call. */

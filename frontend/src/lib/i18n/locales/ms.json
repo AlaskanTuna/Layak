@@ -394,7 +394,39 @@
       "recoveryIntro": "Sesuatu rosak pada pertengahan saluran. Anda boleh jalankan aliran penuh terhadap dokumen sintetik Aisyah — berguna untuk mengesahkan bahagian UI lain sihat — atau mula semula dengan muat naik baharu.",
       "switchToManual": "Tukar ke Masukan Manual",
       "trySamples": "Cuba dengan dokumen sampel",
-      "startOver": "Mula semula"
+      "startOver": "Mula semula",
+      "ctas": {
+        "retry": "Cuba semula",
+        "manual": "Tukar ke Masukan Manual",
+        "samples": "Cuba dengan dokumen sampel",
+        "settings": "Buka tetapan"
+      },
+      "categories": {
+        "quotaExhausted": {
+          "title": "Kuota harian telah habis",
+          "body": "Kuota Gemini OCR hari ini telah digunakan sepenuhnya. Tukar ke Masukan Manual — bahagian saluran yang lain berjalan dengan cara yang sama, cuma tanpa imbasan dokumen."
+        },
+        "serviceUnavailable": {
+          "title": "Gemini tidak tersedia buat sementara",
+          "body": "Ini biasanya pulih dalam kurang seminit. Cuba jalankan penilaian yang sama, atau guna sampel Aisyah yang disediakan sementara sumber hulu pulih."
+        },
+        "deadlineExceeded": {
+          "title": "Permintaan hulu melebihi masa",
+          "body": "Panggilan Gemini mengambil masa lebih lama daripada yang dibenarkan. Cuba semula dengan dokumen yang sama, atau tukar ke Masukan Manual untuk melangkau langkah OCR."
+        },
+        "permissionDenied": {
+          "title": "Akses Gemini tidak dibenarkan",
+          "body": "Pelayan gagal mengesahkan Gemini untuk permintaan ini. Buka Tetapan untuk mengesahkan anda log masuk pada peringkat yang betul; pasukan on-call telah dimaklumkan."
+        },
+        "extractValidation": {
+          "title": "Tidak dapat membaca dokumen dengan tepat",
+          "body": "Kami mengekstrak teks tetapi hasilnya tidak menepati skema profil. Cuba Masukan Manual (anda taip medan sendiri) atau muat naik imbasan yang lebih jelas melalui pek sampel."
+        },
+        "generic": {
+          "title": "Ralat saluran",
+          "body": "Sesuatu yang tidak dijangka berlaku pada pertengahan saluran. Jalankan aliran penuh terhadap dokumen sintetik Aisyah untuk memeriksa bahagian UI lain, atau mula semula dengan muat naik baharu."
+        }
+      }
     },
     "upside": {
       "label": "Jumlah Potensi Pelepasan",

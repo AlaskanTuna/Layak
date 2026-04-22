@@ -6,6 +6,7 @@ import { useTranslation } from 'react-i18next'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import type { Packet, PacketDraft } from '@/lib/agent-types'
+import { notificationStore } from '@/lib/notification-store'
 import { base64ToBlob, triggerDownload } from '@/lib/packet-download-utils'
 
 type Props = {
@@ -20,6 +21,10 @@ function DraftRow({ draft }: { draft: PacketDraft }) {
     if (!draft.blob_bytes_b64) return
     const blob = base64ToBlob(draft.blob_bytes_b64)
     triggerDownload(blob, draft.filename)
+    notificationStore.push(
+      t('evaluation.packet.notificationTitle'),
+      t('evaluation.packet.notificationBody')
+    )
   }
 
   return (
@@ -56,7 +61,7 @@ export function PacketDownload({ packet }: Props) {
   return (
     <Card>
       <CardHeader>
-        <CardTitle className="flex items-center gap-2 text-sm">
+        <CardTitle className="flex items-center gap-2 font-sans text-sm">
           <ShieldCheck className="size-4 text-primary" aria-hidden />
           {count === 1
             ? t('evaluation.packet.titleSingular', { count })

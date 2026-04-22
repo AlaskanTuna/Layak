@@ -58,21 +58,16 @@ export function EvaluationUpsideHero({ totalAnnualRm, schemeCount, packet, empty
                 schemeCount === 1 ? t('evaluation.upside.schemeSingular') : t('evaluation.upside.schemePlural')
             })}
           </p>
-          <div className="flex">
-            <Button
-              type="button"
-              size="lg"
-              onClick={() => downloadAllDrafts(packet)}
-              disabled={!canDownloadAll}
-            >
-              <Download className="mr-1.5 size-4" aria-hidden />
-              {canDownloadAll
-                ? draftCount > 0
+          {canDownloadAll && (
+            <div className="flex">
+              <Button type="button" size="lg" onClick={() => downloadAllDrafts(packet)}>
+                <Download className="mr-1.5 size-4" aria-hidden />
+                {draftCount > 0
                   ? t('evaluation.upside.downloadWithCount', { count: draftCount })
-                  : t('evaluation.upside.download')
-                : t('evaluation.upside.downloadPending')}
-            </Button>
-          </div>
+                  : t('evaluation.upside.download')}
+              </Button>
+            </div>
+          )}
         </>
       )}
     </section>

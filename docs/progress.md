@@ -4,6 +4,12 @@
 
 ---
 
+## [22/04/26] - Phase 7 Task 13 PO2 follow-up: quieter results page + packet download notification
+
+PO2 refined the persisted results route for non-technical users. `frontend/src/components/evaluation/evaluation-upside-hero.tsx` no longer shows the dead-end "Drafts pending" CTA when no packet is attached there, `scheme-card-grid.tsx` now uses a simpler `Apply` label for agency links, and `code-execution-panel.tsx` is collapsed by default behind an explicit show/hide toggle with a shorter `Gemini Code Execution` heading. Packet download surfaces now use a `font-sans` title treatment, and both packet download paths (`packet-download.tsx` and `persisted-packet-download.tsx`) push a success entry into the notification panel after a file/ZIP is saved locally. Mirrored the revised labels across `en/ms/zh`. Frontend `pnpm -C frontend lint` clean; `pnpm -C frontend build` clean.
+
+---
+
 ## [22/04/26] - Phase 7 Task 11 PO2 follow-up: lighter upload cards + tooltip-based document guidance
 
 PO2 simplified the upload widget further after review: the separate "Before you continue" checklist block is gone, and the document-specific guidance now sits in compact hover/focus tooltips beside each upload-card heading instead of taking up space inside the cards. `frontend/src/components/evaluation/upload-widget.tsx` now uses a small shared `InfoTooltip` helper for `MyKad`, `Payslip`, `Utility bill`, and `Household`, keeping the cards visually lighter while preserving the same explanatory copy. The household card still shows the live dependant-summary line, but its longer guidance is now tooltip-only. Frontend `pnpm -C frontend lint` clean; `pnpm -C frontend build` clean.

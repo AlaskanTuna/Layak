@@ -527,7 +527,7 @@
       "whyQualify": "Mengapa anda layak",
       "whyIQualify": "Mengapa saya layak",
       "estValue": "Anggaran Nilai",
-      "startApp": "Mula permohonan",
+      "startApp": "Mohon",
       "categoryAssistance": "Bantuan",
       "perYearEst": "setahun (anggaran)",
       "openAgencyPortal": "Buka portal {{agency}}",
@@ -551,11 +551,15 @@
       "scheme": "skim: {{id}}",
       "downloadZip": "Muat turun semua draf sebagai ZIP",
       "generatingZip": "Menjana ZIP…",
-      "placeholderNotice": "Penjana pakej WeasyPrint akan hadir dalam Fasa 1 Tugas 5 (blok penyambungan berpasangan). Sehingga itu, bentuk pakej dipaparkan supaya anda dapat melihat di mana butang muat turun akan berada."
+      "placeholderNotice": "Penjana pakej WeasyPrint akan hadir dalam Fasa 1 Tugas 5 (blok penyambungan berpasangan). Sehingga itu, bentuk pakej dipaparkan supaya anda dapat melihat di mana butang muat turun akan berada.",
+      "notificationTitle": "Pakej draf telah dimuat turun",
+      "notificationBody": "Fail draf anda sudah tersedia pada peranti ini. Semak dengan teliti sebelum penghantaran manual."
     },
     "codeExecution": {
-      "title": "Gemini Code Execution — pengiraan faedah",
-      "description": "Ejen menjalankan Python untuk mengira faedah setiap skim dan jumlah tahunan. Potongan kod dan stdout dipaparkan secara verbatim.",
+      "title": "Gemini Code Execution",
+      "description": "Jejak teknikal pilihan untuk pengiraan faedah tahunan. Kembangkan jika anda mahu menyemak Python dan stdout yang dijana.",
+      "show": "Tunjuk butiran",
+      "hide": "Sembunyi butiran",
       "python": "Python",
       "stdout": "stdout"
     }

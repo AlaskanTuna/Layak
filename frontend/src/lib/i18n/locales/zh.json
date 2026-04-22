@@ -527,7 +527,7 @@
       "whyQualify": "为何您符合资格",
       "whyIQualify": "我为何符合资格",
       "estValue": "预估价值",
-      "startApp": "开始申请",
+      "startApp": "申请",
       "categoryAssistance": "援助",
       "perYearEst": "每年（预估）",
       "openAgencyPortal": "打开 {{agency}} 门户",
@@ -551,11 +551,15 @@
       "scheme": "计划：{{id}}",
       "downloadZip": "以 ZIP 下载所有草稿",
       "generatingZip": "正在生成 ZIP…",
-      "placeholderNotice": "WeasyPrint 申请包生成器将在第 1 阶段任务 5（配对布线块）上线。在此之前将渲染申请包外壳，以便您看到下载按钮将位于何处。"
+      "placeholderNotice": "WeasyPrint 申请包生成器将在第 1 阶段任务 5（配对布线块）上线。在此之前将渲染申请包外壳，以便您看到下载按钮将位于何处。",
+      "notificationTitle": "草拟申请包已下载",
+      "notificationBody": "您的草拟文件已保存到这台设备。手动提交前请先仔细检查。"
     },
     "codeExecution": {
-      "title": "Gemini Code Execution —— 收益计算",
-      "description": "代理运行 Python 以计算每项计划及年度总收益。代码片段和 stdout 按原样显示。",
+      "title": "Gemini Code Execution",
+      "description": "这是年度收益计算的可选技术轨迹。若您想查看生成的 Python 与 stdout，可展开查看。",
+      "show": "显示详情",
+      "hide": "隐藏详情",
       "python": "Python",
       "stdout": "stdout"
     }

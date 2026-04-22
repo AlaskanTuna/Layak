@@ -23,6 +23,14 @@ permissions:
 env:
   GCP_PROJECT: layak-myaifuturehackathon
   GCP_REGION: asia-southeast1
+  # Vertex AI Gemini location is independent of Cloud Run region. Phase 8 Task 1
+  # probe found asia-southeast1 only publishes gemini-2.5-flash, while `global`
+  # resolves all four needed models (extract Flash, classify Flash-Lite,
+  # compute Gemini 3 Flash Preview, fallback Pro). The same applies to the
+  # Vertex AI Search data store (provisioned in `global`).
+  VERTEX_AI_LOCATION: global
+  VERTEX_AI_SEARCH_DATA_STORE: layak-schemes-v1
+  VERTEX_AI_SEARCH_LOCATION: global
   WIF_PROVIDER: projects/297019726346/locations/global/workloadIdentityPools/github-actions/providers/github
   DEPLOY_SA: github-actions-deployer@layak-myaifuturehackathon.iam.gserviceaccount.com
   FRONTEND_URL: https://layak-frontend-297019726346.asia-southeast1.run.app
@@ -83,7 +91,7 @@ jobs:
             --min-instances 1 \
             --cpu-boost \
             --allow-unauthenticated \
-            --set-env-vars "GOOGLE_CLOUD_PROJECT=$GCP_PROJECT,GOOGLE_CLOUD_LOCATION=$GCP_REGION" \
+            --set-env-vars "GOOGLE_CLOUD_PROJECT=$GCP_PROJECT,GOOGLE_CLOUD_LOCATION=$VERTEX_AI_LOCATION,VERTEX_AI_SEARCH_DATA_STORE=$VERTEX_AI_SEARCH_DATA_STORE,VERTEX_AI_SEARCH_LOCATION=$VERTEX_AI_SEARCH_LOCATION" \
             --set-secrets FIREBASE_ADMIN_KEY=firebase-admin-key:latest \
             --memory 1Gi \
             --timeout 300 \

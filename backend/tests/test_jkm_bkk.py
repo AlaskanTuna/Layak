@@ -1,19 +1,16 @@
-"""JKM Bantuan Kanak-Kanak (BKK) rule tests — Phase 7 Task 8.
+"""JKM Bantuan Kanak-Kanak (BKK) rule tests — Phase 7 Task 8 + Budget-2021 rates.
 
 Asserts:
-  1. Constants match the BKK schedule (RM100/child, RM450/mo household cap,
-     RM1,000/capita means-test threshold).
-  2. Aisyah-shape profile (2 children under 18, low income) qualifies with
-     `annual_rm == 2400.0`.
+  1. Constants match the current Budget-2021 BKK schedule (RM 200/child for
+     ages ≤ 6, RM 150/child for ages 7–17, RM 1,000/mo household cap,
+     RM 1,000/capita means-test threshold).
+  2. Aisyah-shape profile (2 children ages 10 + 7, both in the older band,
+     low income) qualifies with `annual_rm == 3600.0`.
   3. High-income profile does not qualify.
   4. Profile without qualifying child dependants does not qualify.
-  5. Profile with 7 children caps at the monthly household ceiling
-     (RM5,400/yr, NOT 7 × RM100 × 12 = RM8,400/yr).
+  5. Mixed-age and large-household scenarios respect the per-tier rate
+     and the RM 12,000/yr household ceiling.
   6. `generate_packet` renders a valid PDF for the JKM BKK match.
-
-Does NOT assert against `pdf_text["jkm-bkk-brochure.pdf"]` — the source
-brochure isn't committed under `backend/data/schemes/` yet. Swap in a PDF
-page assertion when the asset lands, same shape as `test_jkm_warga_emas.py`.
 """
 
 from __future__ import annotations
@@ -31,18 +28,28 @@ from app.schema.profile import Dependant, HouseholdFlags, Profile
 # ---------------------------------------------------------------------------
 
 
-def test_per_child_rate_is_100() -> None:
-    assert jkm_bkk.PER_CHILD_MONTHLY_RM == 100.0
+def test_per_child_rate_younger_band_is_200() -> None:
+    """Budget 2021 schedule — RM 200/month for children aged 6 and under."""
+    assert jkm_bkk.PER_CHILD_MONTHLY_RM_YOUNGER == 200.0
 
 
-def test_household_monthly_cap_is_450() -> None:
-    assert jkm_bkk.HOUSEHOLD_MONTHLY_CAP_RM == 450.0
+def test_per_child_rate_older_band_is_150() -> None:
+    """Budget 2021 schedule — RM 150/month for children aged 7–17."""
+    assert jkm_bkk.PER_CHILD_MONTHLY_RM_OLDER == 150.0
 
 
-def test_household_annual_cap_is_5400() -> None:
+def test_younger_band_age_boundary_is_6() -> None:
+    assert jkm_bkk.YOUNGER_BAND_AGE == 6
+
+
+def test_household_monthly_cap_is_1000() -> None:
+    assert jkm_bkk.HOUSEHOLD_MONTHLY_CAP_RM == 1000.0
+
+
+def test_household_annual_cap_is_12000() -> None:
     """Derived cap — asserted explicitly so a change to the monthly cap
     can't silently drift the annual arithmetic."""
-    assert jkm_bkk.HOUSEHOLD_ANNUAL_CAP_RM == 5400.0
+    assert jkm_bkk.HOUSEHOLD_ANNUAL_CAP_RM == 12000.0
 
 
 def test_per_capita_threshold_is_1000() -> None:
@@ -79,13 +86,14 @@ def _profile(*, income: float, household_size: int, children: list[int], parents
     )
 
 
-def test_aisyah_shape_qualifies_two_children_annual_rm_2400(aisyah: Profile) -> None:
-    """Aisyah: RM2,800 / 4 = RM700/cap (≤ RM1,000), two children ages 10 & 7 (<18)."""
+def test_aisyah_shape_qualifies_two_children_annual_rm_3600(aisyah: Profile) -> None:
+    """Aisyah: RM 2,800 / 4 = RM 700/cap (≤ RM 1,000); two children ages 10 & 7
+    both fall in the older 7–17 band → 2 × RM 150 × 12 = RM 3,600/yr (well
+    under the RM 12,000 household cap)."""
     result = jkm_bkk.match(aisyah)
     assert result.qualifies is True
     assert result.scheme_id == "jkm_bkk"
-    # 2 × RM100 × 12 = RM2,400/yr; well under the RM5,400 household cap.
-    assert result.annual_rm == 2400.0
+    assert result.annual_rm == 3600.0
     assert "Bantuan Kanak-Kanak" in result.scheme_name
 
 
@@ -120,37 +128,72 @@ def test_adult_children_do_not_count() -> None:
 
 
 def test_seven_children_caps_at_household_monthly_ceiling() -> None:
-    """7 children × RM100 = RM700/month uncapped; household cap clamps to RM450/mo."""
-    ages = [2, 4, 6, 8, 10, 12, 14]  # all <18, seven of them.
+    """Mixed-age large household: ages [2,4,6,8,10,12,14] = 3 younger × RM 200
+    + 4 older × RM 150 = RM 600 + RM 600 = RM 1,200/month uncapped; household
+    cap clamps to RM 1,000/month → RM 12,000/yr."""
+    ages = [2, 4, 6, 8, 10, 12, 14]
     result = jkm_bkk.match(_profile(income=3000, household_size=8, children=ages))
     assert result.qualifies is True
-    # RM450 × 12 = RM5,400/yr, NOT 7 × RM100 × 12 = RM8,400.
-    assert result.annual_rm == 5400.0
-    assert "capped" in result.summary.lower() or "RM450" in result.summary
+    assert result.annual_rm == 12000.0
+    assert "capped" in result.summary.lower() or "RM1,000" in result.summary
 
 
-def test_five_children_also_caps_at_monthly_ceiling() -> None:
-    """Cap engages from 5 children onwards (5 × RM100 = RM500 > RM450)."""
+def test_five_children_under_cap() -> None:
+    """ages [2,5,8,11,14] = 2 younger × RM 200 + 3 older × RM 150 = RM 850/mo,
+    below the RM 1,000 household cap → RM 10,200/yr."""
     ages = [2, 5, 8, 11, 14]
     result = jkm_bkk.match(_profile(income=3000, household_size=6, children=ages))
     assert result.qualifies is True
-    assert result.annual_rm == 5400.0
+    assert result.annual_rm == 10200.0
 
 
-def test_four_children_below_cap() -> None:
-    """4 children × RM100 = RM400/month, below the RM450 household cap."""
+def test_four_children_under_cap() -> None:
+    """ages [2,5,8,11] = 2 younger × RM 200 + 2 older × RM 150 = RM 700/mo,
+    below the RM 1,000 cap → RM 8,400/yr."""
     ages = [2, 5, 8, 11]
     result = jkm_bkk.match(_profile(income=3000, household_size=5, children=ages))
     assert result.qualifies is True
-    assert result.annual_rm == 4800.0  # 4 × 100 × 12
+    assert result.annual_rm == 8400.0
+
+
+def test_five_younger_children_engage_cap() -> None:
+    """All 5 children aged ≤ 6: 5 × RM 200 = RM 1,000/mo — exactly at cap →
+    RM 12,000/yr (cap saturates without exceeding, no cap_note expected)."""
+    ages = [1, 2, 3, 4, 5]
+    result = jkm_bkk.match(_profile(income=3000, household_size=6, children=ages))
+    assert result.qualifies is True
+    assert result.annual_rm == 12000.0
+
+
+def test_six_younger_children_exceeds_cap() -> None:
+    """6 × RM 200 = RM 1,200/mo uncapped; capped to RM 1,000/mo → RM 12,000/yr."""
+    ages = [1, 2, 3, 4, 5, 6]
+    result = jkm_bkk.match(_profile(income=3000, household_size=7, children=ages))
+    assert result.qualifies is True
+    assert result.annual_rm == 12000.0
 
 
 def test_boundary_per_capita_exactly_at_threshold_qualifies() -> None:
-    """Per-capita equal to RM1,000 qualifies — threshold is inclusive (≤)."""
-    # RM3,000 / 3 members = RM1,000 per capita exactly.
+    """Per-capita equal to RM 1,000 qualifies — threshold is inclusive (≤).
+    1 child age 10 → older band → RM 150 × 12 = RM 1,800/yr."""
+    # RM 3,000 / 3 members = RM 1,000 per capita exactly.
     result = jkm_bkk.match(_profile(income=3000, household_size=3, children=[10]))
     assert result.qualifies is True
-    assert result.annual_rm == 1200.0
+    assert result.annual_rm == 1800.0
+
+
+def test_age_boundary_six_pays_younger_rate() -> None:
+    """Age 6 inclusive falls into the younger band (RM 200/mo)."""
+    result = jkm_bkk.match(_profile(income=2000, household_size=3, children=[6]))
+    assert result.qualifies is True
+    assert result.annual_rm == 2400.0  # 1 × 200 × 12
+
+
+def test_age_boundary_seven_pays_older_rate() -> None:
+    """Age 7 falls into the older band (RM 150/mo)."""
+    result = jkm_bkk.match(_profile(income=2000, household_size=3, children=[7]))
+    assert result.qualifies is True
+    assert result.annual_rm == 1800.0  # 1 × 150 × 12
 
 
 # ---------------------------------------------------------------------------

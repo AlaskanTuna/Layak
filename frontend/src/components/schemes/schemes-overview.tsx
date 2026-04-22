@@ -65,7 +65,7 @@ const IN_SCOPE: InScopeScheme[] = [
     agency: 'JKM',
     name: 'JKM · Bantuan Kanak-Kanak',
     summaryKey: 'schemes.jkmBkk.summary',
-    upsideRm: '5,400.00',
+    upsideRm: '12,000.00',
     formLabel: 'Form JKM10',
     portalUrl: 'https://www.jkm.gov.my'
   },

@@ -914,3 +914,16 @@ Findings the audit flagged that were **not** acted on (cosmetic or external to P
 - `backend/data/schemes/perkeso-sksps-rates.pdf` (491.2 KB) — official PERKESO LINDUNG KENDIRI BM booklet `https://www.perkeso.gov.my/images/lindung/booklet/270825-poster-LINDUNG_KENDIRI-BM.pdf` covering the SKSPS plan structure + contribution schedule.
 - Magic header verified `%PDF` on each. Backend test suite still 291/291 green — no regression. Phase 7 Tasks 7/8/9 box-1 each ticked with annotations describing the source URL and any fallback used.
 - Net effect: the agent pipeline now has a complete offline-readable provenance chain for all 6 in-scope schemes plus the Form B/BE LHDN reliefs.
+
+## [22/04/26] - Phase 7 BKK rate correction Budget 2021 plus brochure asset replacement
+
+- Replaced the unusable JKM BKK brochure HTML-render snippet with the JKM SPK ISO 9001 procedure document at `https://www.jkm.gov.my/uploads/content-downloads/file_20241025152555.pdf` 3.1 MB text-bearing. Surfaced via a research subagent — the SPK explicitly documents the Budget 2021 BKK rate schedule verbatim.
+- OCR-d the PERKESO SKSPS booklet PDF in place via ocrmypdf plus RapidOCR Tesseract Malay/English language packs unavailable in this WSL env. The booklet is now searchable; word-level recall is good but rate-number OCR quality is weak. Acceptable since the rule has the rate schedule hardcoded — the asset is for citation provenance only.
+- Rate correction: the rule was encoding the pre-2021 BKK schedule RM 100/child flat, RM 450/household cap = RM 5,400/yr ceiling. Current Budget 2021 schedule is RM 200/month per child aged 6 and under, RM 150/month for ages 7–17, capped at RM 1,000/month per household = RM 12,000/yr ceiling. Rule engine was undercounting by RM 1,200/yr for Aisyah 2,400 to 3,600.
+- Updated `backend/app/rules/jkm_bkk.py` with age-tiered constants PER_CHILD_MONTHLY_RM_YOUNGER 200.0 / PER_CHILD_MONTHLY_RM_OLDER 150.0, YOUNGER_BAND_AGE 6, HOUSEHOLD_MONTHLY_CAP_RM 1000.0. Both rule citations rewritten with the SPK verbatim rate passage.
+- Updated `backend/tests/test_jkm_bkk.py` — split the per-child constant test, added age-6/age-7 boundary tests, added five-younger-engage-cap + six-younger-exceeds-cap tests. Aisyah annual_rm assertion 2400 to 3600. Backend suite 297/297 green +6 tests.
+- Updated `backend/app/templates/jkm_bkk.html.jinja` Bahagian III table to render a per-tier breakdown younger vs older and updated the Nota kadar callout to the Bajet 2021 wording.
+- Updated `frontend/src/fixtures/aisyah-response.ts` — Aisyah BKK match annual_rm 2400 to 3600, summary plus why_qualify text rewritten, both citations updated, AISYAH_UPSIDE.total_annual_rm 11,108 to 12,308, python snippet + stdout regenerated, file docstring updated.
+- Updated `frontend/src/lib/i18n/locales/{en,ms,zh}.json` — `schemes.jkmBkk.summary` now describes the age-tiered rates plus new household cap.
+- Updated `frontend/src/components/schemes/schemes-overview.tsx` — JKM BKK card upsideRm 5,400.00 to 12,000.00.
+- Verified: pnpm lint clean, pnpm build clean across all 13 routes.

@@ -54,8 +54,9 @@ export function FloatingHelpLauncher() {
     <>
       <Button
         type="button"
+        variant="ghost"
         size="icon-lg"
-        className="glass-surface fixed right-4 bottom-4 z-40 rounded-full shadow-lg md:right-6 md:bottom-6"
+        className="glass-surface fixed right-4 bottom-4 z-40 rounded-full text-foreground shadow-lg hover:bg-accent/25 hover:text-foreground md:right-6 md:bottom-6 dark:hover:bg-accent/35"
         aria-label={t('common.help.open')}
         onClick={() => handleOpenChange(true)}
       >

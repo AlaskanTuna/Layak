@@ -182,6 +182,69 @@ async def get_evaluation_packet(user: CurrentUser, eval_id: str) -> Response:
     )
 
 
+@router.get("/{eval_id}/packet/{scheme_id}")
+async def get_evaluation_packet_draft(
+    user: CurrentUser,
+    eval_id: str,
+    scheme_id: str,
+) -> Response:
+    """Regenerate ONE draft PDF from stored profile + the matching SchemeMatch.
+
+    Phase 7 Task 4 — powers the inline PDF preview on the persisted results
+    page. Returns a single `application/pdf` stream with `inline` disposition
+    so `<iframe>` / browser PDF viewers can render it. Auth is the usual
+    Bearer-token path; the frontend fetches the bytes via `authedFetch`, wraps
+    them in a blob URL, and hands the URL to the iframe.
+
+    404 semantics match `get_evaluation`: missing eval, wrong-owner, OR
+    `scheme_id` absent from the stored match list all return 404 — never
+    differentiating lest we leak which scheme_ids a stored evaluation has.
+    """
+    data, _ref = _load_owned_evaluation(eval_id, user.uid)
+
+    raw_profile = data.get("profile")
+    raw_matches = data.get("matches")
+    if raw_profile is None:
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail="Evaluation has no extracted profile yet",
+        )
+    try:
+        profile = Profile.model_validate(raw_profile)
+        matches = [SchemeMatch.model_validate(m) for m in (raw_matches or [])]
+    except ValidationError as exc:
+        _logger.exception("evaluations/%s profile/matches malformed", eval_id)
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Stored evaluation is malformed; cannot regenerate packet",
+        ) from exc
+
+    target = next((m for m in matches if m.scheme_id == scheme_id and m.qualifies), None)
+    if target is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Draft not found")
+
+    packet = await generate_packet(profile, [target])
+    if not packet.drafts:
+        # generate_packet silently skips scheme_ids not in _TEMPLATE_MAP; guard that.
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Draft not found")
+
+    draft = packet.drafts[0]
+    if not draft.blob_bytes_b64:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Draft regeneration produced no bytes",
+        )
+    pdf_bytes = base64.b64decode(draft.blob_bytes_b64)
+    return Response(
+        content=pdf_bytes,
+        media_type="application/pdf",
+        headers={
+            "Content-Disposition": f'inline; filename="{draft.filename}"',
+            "Cache-Control": "no-store",
+        },
+    )
+
+
 def _load_owned_evaluation(eval_id: str, user_uid: str) -> tuple[dict[str, Any], Any]:
     """Fetch an evaluation + enforce owner-gate. Raises 404 on missing or wrong-owner.
 

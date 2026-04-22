@@ -542,6 +542,14 @@
       "annualLabel": "年度缴款",
       "footnote": "请直接通过机构门户注册并缴款。未缴款可能影响日后您申请工伤福利时的权益。"
     },
+    "preview": {
+      "title": "在线预览（{{count}} 份草稿）",
+      "description": "先在浏览器中查看每份草稿 PDF 再下载；每次预览都会根据你已存储的个人资料和匹配项在服务器端重新运行 WeasyPrint，字节不会持久保存。",
+      "loading": "正在加载预览…",
+      "error": "预览失败：{{message}}",
+      "iframeTitle": "{{name}} 的在线预览",
+      "downloadOne": "下载此 PDF"
+    },
     "packet": {
       "titleSingular": "草拟申请包（{{count}} 份文件）",
       "titlePlural": "草拟申请包（{{count}} 份文件）",

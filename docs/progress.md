@@ -876,3 +876,9 @@ Findings the audit flagged that were **not** acted on (cosmetic or external to P
 - Polished Dark Mode layout variables within `.dark` selector (slate shades, `oklch`).
 - Integrated PDPA Consent routing (`X-PDPA-Consent` header triggering on first app auth via `/api/quota`) within `backend/app/auth.py`.
   \n## 2026-04-26\n\n### Phase 5: Auth + Gateway + Marketing (P5T1)\n- Added simple, transparent pricing structure to `en.json` with Free and Pro tiers.\n- Scaffolded `frontend/src/components/landing/landing-pricing.tsx` implementing the Free/Pro split as seen in the SaaS pivot spec.\n- Integrated `LandingPricing` component into `frontend/src/app/pages/marketing/landing-page.tsx`.\n- Marked Phase 5 Task 1 (Landing Page rewrite) as complete in `docs/plan.md`.
+
+## [22/04/26] - Landing and dashboard contrast polish
+
+- Fixed the landing-page language dropdown so its menu and items use explicit card-foreground text even before the transparent marketing header transitions on scroll.
+- Softened the landing hero's fade overlays in both themes so the banner art stays visible without sacrificing headline legibility.
+- Corrected the dashboard floating help launcher to use theme-safe foreground colors on its glass surface, keeping the `?` icon readable in light and dark mode.

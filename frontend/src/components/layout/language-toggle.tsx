@@ -60,7 +60,7 @@ export function LanguageToggle() {
         role="menu"
         aria-hidden={!isOpen}
         className={cn(
-          'absolute right-0 top-full z-50 mt-2 w-48 overflow-hidden rounded-xl border border-border bg-card shadow-xl',
+          'absolute right-0 top-full z-50 mt-2 w-48 overflow-hidden rounded-xl border border-border bg-card text-card-foreground shadow-xl',
           'origin-top-right transition-all duration-200',
           isOpen ? 'scale-100 opacity-100' : 'pointer-events-none scale-95 opacity-0'
         )}
@@ -76,7 +76,7 @@ export function LanguageToggle() {
                 aria-checked={isActive}
                 onClick={() => handleSelect(code)}
                 className={cn(
-                  'flex w-full items-center justify-between gap-2 rounded-lg px-3 py-2 text-sm transition-colors hover:bg-accent/60',
+                  'flex w-full items-center justify-between gap-2 rounded-lg px-3 py-2 text-left text-sm text-card-foreground transition-colors hover:bg-accent/60',
                   isActive && 'font-medium'
                 )}
               >

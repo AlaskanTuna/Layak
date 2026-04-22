@@ -20,9 +20,9 @@ export function LandingHero() {
           className="object-cover object-center"
           priority
         />
-        {/* Gradient overlays to ensure text readability and blend into the next section */}
-        <div className="absolute inset-0 bg-black/40" />
-        <div className="absolute inset-0 bg-gradient-to-t from-background via-background/20 to-transparent" />
+        {/* Tuned overlays keep the hero readable without washing out the banner art. */}
+        <div className="absolute inset-0 bg-black/18 dark:bg-black/28" />
+        <div className="absolute inset-0 bg-gradient-to-t from-background/62 via-background/10 to-transparent dark:from-background/72 dark:via-background/14" />
       </div>
 
       {/* Hero Content */}

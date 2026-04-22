@@ -573,6 +573,14 @@
       "annualLabel": "Annual contribution",
       "footnote": "Register and pay directly via the agency portal. Non-payment may affect access to employment-injury benefits if you claim later."
     },
+    "preview": {
+      "title": "Inline preview ({{count}} drafts)",
+      "description": "Inspect each draft PDF in the browser before downloading. Each preview re-runs WeasyPrint server-side from your stored profile + matches; the bytes never persist.",
+      "loading": "Loading preview…",
+      "error": "Preview failed: {{message}}",
+      "iframeTitle": "Inline preview of {{name}}",
+      "downloadOne": "Download this PDF"
+    },
     "packet": {
       "titleSingular": "Draft Application Packet ({{count}} File)",
       "titlePlural": "Draft Application Packet ({{count}} Files)",

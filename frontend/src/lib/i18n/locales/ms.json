@@ -542,6 +542,14 @@
       "annualLabel": "Caruman tahunan",
       "footnote": "Daftar dan bayar terus melalui portal agensi. Kegagalan membayar boleh menjejaskan akses kepada faedah kecederaan pekerjaan jika anda membuat tuntutan kemudian."
     },
+    "preview": {
+      "title": "Pratonton dalam talian ({{count}} draf)",
+      "description": "Semak setiap PDF draf dalam pelayar sebelum memuat turun; setiap pratonton menjalankan semula WeasyPrint di sisi pelayan daripada profil dan padanan anda yang disimpan, dan baitnya tidak kekal.",
+      "loading": "Memuatkan pratonton…",
+      "error": "Pratonton gagal: {{message}}",
+      "iframeTitle": "Pratonton dalam talian {{name}}",
+      "downloadOne": "Muat turun PDF ini"
+    },
     "packet": {
       "titleSingular": "Pakej permohonan draf ({{count}} fail)",
       "titlePlural": "Pakej permohonan draf ({{count}} fail)",

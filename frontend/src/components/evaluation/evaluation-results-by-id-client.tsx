@@ -7,6 +7,7 @@ import { AlertTriangle, ArrowLeft, ArrowRight, Loader2 } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 
 import { CodeExecutionPanel } from '@/components/evaluation/code-execution-panel'
+import { DraftPacketPreview } from '@/components/evaluation/draft-packet-preview'
 import { ErrorRecoveryCard } from '@/components/evaluation/error-recovery-card'
 import { EvaluationUpsideHero } from '@/components/evaluation/evaluation-upside-hero'
 import { PersistedPacketDownload } from '@/components/evaluation/persisted-packet-download'
@@ -272,7 +273,8 @@ export function EvaluationResultsByIdClient({ evalId }: { evalId: string }) {
       )}
 
       {isComplete && (
-        <div id="draft-packet">
+        <div id="draft-packet" className="flex flex-col gap-3">
+          <DraftPacketPreview evalId={evalId} matches={doc.matches} />
           <PersistedPacketDownload evalId={evalId} matches={doc.matches} />
         </div>
       )}

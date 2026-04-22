@@ -43,7 +43,7 @@ layak/
 └── pnpm-workspace.yaml
 ```
 
-Plan B (at sprint hour 12 if Vertex AI Search setup stalls): collapse to Gemini 2.5 Pro inline-PDF grounding in its 1M-token context. Keep ADK-Python and the five-step pipeline intact. See `docs/trd.md` §8.
+Plan B: documented inline-PDF fallback if Discovery Engine is unreachable on demo day. Keep ADK-Python and the five-step pipeline intact. See `docs/trd.md` §8.
 
 ---
 
@@ -61,8 +61,8 @@ Plan B (at sprint hour 12 if Vertex AI Search setup stalls): collapse to Gemini 
 
 - **Framework:** FastAPI 0.115+, Python 3.12, async.
 - **Agent layer:** ADK-Python **v1.31 (GA)** — `FunctionTool`, `LlmAgent`, `SequentialAgent`, `ParallelAgent`. **Do not use Firebase Genkit-Python** (Alpha, warm-instance bug on Cloud Run).
-- **Models:** Gemini 2.5 Pro (RootAgent orchestrator); Gemini 2.5 Flash (extractor + classifier workers); Gemini Code Execution (`tools: [{codeExecution: {}}]`) for on-stage arithmetic.
-- **RAG:** Vertex AI Search (primary) over three scheme PDFs; Plan B collapses to Gemini 2.5 Pro inline-PDF grounding.
+- **Models:** `FAST_MODEL = gemini-2.5-flash` (extract); `WORKER_MODEL = gemini-2.5-flash-lite` (classify); `HEAVY_MODEL = gemini-3-flash-preview` (compute_upside); `HEAVY_MODEL_FALLBACK = gemini-2.5-pro`; `ORCHESTRATOR_MODEL = gemini-2.5-pro` reserved for an optional ADK runner cutover.
+- **RAG:** Vertex AI Search is the LIVE RAG layer over the 9 scheme PDFs in `backend/data/schemes/` (ingested into the `layak-schemes-v1` Discovery Engine data store via `gs://layak-schemes-pdfs/`). Wired into every rule module's `_citations()` via `backend/app/services/vertex_ai_search.py::get_primary_rag_citation()` with a fail-open posture — Discovery Engine errors fall through to hardcoded citations. Plan B is the documented inline-PDF fallback if Discovery Engine itself is unreachable on demo day.
 - **Schema:** Pydantic v2 models for `Profile`, `SchemeMatch`, `Packet`, and rule-engine thresholds.
 - **PDF generator:** WeasyPrint (Cloud Run container needs `libpango`, `libcairo`, `libgdk-pixbuf`).
 

@@ -806,21 +806,22 @@ _Frontend:_
 
 **Exit criteria:** clicking "Use Farhan sample data" runs the live pipeline against the salaried persona end-to-end and produces a Form BE draft packet.
 
-### 3. Feature: Profile edit step between extract and classify
+### 3. Feature: Upload validation + JPG/PNG crop preview before ingest
 
-**Owner:** PO2 (Adam). **Depends on:** Phase 1 task 5 (frontend SSE wiring), Phase 3 task 1 (persistence layer).
+**Owner:** PO2 (Adam). **Depends on:** Phase 1 task 2 upload widget, Phase 1 task 5 frontend SSE wiring.
 
-**Purpose/Issue:** Gemini Vision OCR is good but not perfect — names, IC fragments, RM amounts, addresses can drift. Today the user can't correct mistakes; the wrong extract flows straight into classify. A brief edit-and-confirm step between extract and classify catches OCR errors before they cascade through the pipeline. Biggest single usability win for non-Aisyah documents.
+**Purpose/Issue:** The upload step is still too fuzzy for normal users. It is not obvious whether invalid file types are blocked, JPG/PNG image uploads behave differently from PDF uploads, and blurry photos can go straight into the pipeline without one last human check. For hackathon polish, the upload flow should explain what is accepted, validate it clearly, and let the user crop image uploads before the agentic pipeline ingests them. PDF uploads skip the crop step and ingest directly.
 
 **Implementation — PO2 (Adam):**
 
-- [ ] After the `step_result: extract` SSE event lands, pause the streaming pipeline and render an editable profile form pre-populated with the extracted fields in `frontend/src/components/evaluation/profile-edit-step.tsx`.
-- [ ] On Save, POST the corrected profile back via a new backend endpoint `POST /api/agent/intake/{eval_id}/profile` that updates the in-flight Firestore doc and resumes the pipeline at classify.
-- [ ] On Cancel, abandon the run (existing reset path).
-- [ ] Wire a Skip toggle defaulted off — power users + the demo can bypass the gate.
-- [ ] Add `backend/tests/test_intake_profile_edit.py` covering the edit endpoint contract (auth-gated, owner-checked, schema-validated).
+- [ ] Tighten `frontend/src/components/evaluation/upload-widget.tsx` validation so each slot clearly rejects unsupported file types with inline copy the user can understand. Keep accepted types explicit in the UI (`JPG`, `PNG`, `PDF`) and fail fast before submit.
+- [ ] Add visible helper copy near the upload widget explaining the ingestion difference: `JPG/PNG` → image OCR path, `PDF` → direct PDF/text extraction path. This should remove the "why did these behave differently?" confusion.
+- [ ] For `JPG` / `PNG` uploads, show a preview modal before ingestion so the user can visually confirm the document and crop the image if it is blurry, tilted, or padded with background. The confirmed cropped image is what gets passed into the pipeline.
+- [ ] For `PDF` uploads, skip the preview/crop modal and ingest immediately once validation passes.
+- [ ] Keep the per-slot UX simple: upload → validate → preview/crop if image → continue. No extra step for PDFs.
+- [ ] Add lightweight frontend coverage for the validator and the image-vs-PDF branch so the crop modal only appears for image uploads.
 
-**Exit criteria:** the user sees their extracted profile, can edit any field, and the corrected values flow through classify → match → compute_upside → generate.
+**Exit criteria:** unsupported uploads are blocked clearly, image uploads can be previewed/cropped before ingestion, PDF uploads bypass the crop step, and the user understands the difference between the two paths.
 
 ### 4. Feature: Inline PDF preview on the results page
 
@@ -896,7 +897,7 @@ _Frontend:_
 **Implementation — PO1 (Hao):**
 
 - [ ] Source the BKK rules — drop the public JKM BKK / Bantuan Kanak-Kanak brochure or borang into backend/data/schemes/ (filename like jkm-bkk-brochure.pdf). TODO: confirm primary source for the per-capita threshold (commonly cited as RM1,000/capita), the per-child rate (RM100/mo), and the household cap (RM450/mo or 6 children) before encoding.
-- [ ] Add backend/app/rules/jkm_bkk.py exposing match(profile) -> SchemeMatch. Qualifies when at least one dependant has relationship == 'child' AND age < 18, AND per_capita_income (= monthly_income_rm / max(household_size, 1)) <= 1000.0. annual_rm = min(qualifying_child_count, 6) _ 100.0 _ 12, capped at 450.0 \* 12 = 5400.0/yr. Include \_citations() pointing at the BKK PDF.
+- [ ] Add backend/app/rules/jkm*bkk.py exposing match(profile) -> SchemeMatch. Qualifies when at least one dependant has relationship == 'child' AND age < 18, AND per_capita_income (= monthly_income_rm / max(household_size, 1)) <= 1000.0. annual_rm = min(qualifying_child_count, 6) * 100.0 \_ 12, capped at 450.0 \* 12 = 5400.0/yr. Include \_citations() pointing at the BKK PDF.
 - [ ] Register the new module in backend/app/agents/tools/match.py — append jkm_bkk to the \_RULES tuple and the import line.
 - [ ] Register the new module in backend/app/rules/**init**.py.
 - [ ] Add the new SchemeId literal value "jkm_bkk" to backend/app/schema/scheme.py.
@@ -991,21 +992,6 @@ _Frontend:_
 - [ ] If Phase 7 task 4 lands, mount the inline PDF preview directly under this action rail so review and download become one continuous flow.
 
 **Exit criteria:** a first-time user landing on the results page can tell what to do next within a few seconds, without needing demo narration.
-
-### 14. Feature: Accessibility + reduced-motion polish pass
-
-**Owner:** PO2 (Adam). **Depends on:** the final Phase 7 UI surfaces, including the help launcher if task 12 lands.
-
-**Purpose/Issue:** Hackathon polish is not just visual. The app should feel calm, readable, tappable, and trustworthy across keyboard, touch, and lower-motion preferences — especially for older users.
-
-**Implementation — PO2 (Adam):**
-
-- [ ] Audit key controls for target size, focus visibility, contrast, and plain-language labels across the landing page, evaluation flow, results page, settings, and the new help launcher.
-- [ ] Respect `prefers-reduced-motion` in animated surfaces such as the pipeline stepper, loading states, and any help-modal transitions.
-- [ ] Review dialog, dropdown, and mobile-drawer flows for keyboard escape / focus-trap correctness.
-- [ ] Fix obvious wording friction discovered during the pass, especially jargon-heavy labels that would confuse non-technical users.
-
-**Exit criteria:** the demo flow feels calm and usable on keyboard and touch, and no major UI element depends on animation or insider terminology to be understood.
 
 ---
 

@@ -32,8 +32,12 @@ Rules (enforce strictly):
   separators; `"RM2,800"` or `"2,800.00"` will fail validation.
 - `household_size` includes the applicant. If the documents don't disclose
   household size, default to `1` and leave `dependants` empty.
-- `dependants` lists each child / parent / spouse / sibling / other with
-  their age. `ic_last4` on a dependant is optional.
+- `dependants` lists each child / parent / spouse / sibling / other in the
+  household. Each entry contains EXACTLY these keys: `relationship` (one of
+  child, parent, spouse, sibling, other), `age` (integer). `ic_last4` is
+  optional (4-digit string). Do NOT include `name`, `gender`, `occupation`,
+  or any other field on a dependant — extra fields are silently dropped
+  and just waste output tokens.
 - `household_flags`:
   - `has_children_under_18`: true if any dependant has relationship `child`
     and age < 18.

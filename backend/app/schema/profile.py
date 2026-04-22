@@ -25,7 +25,14 @@ Relationship = Literal["child", "parent", "spouse", "sibling", "other"]
 
 
 class Dependant(BaseModel):
-    model_config = ConfigDict(extra="forbid")
+    # Gemini OCR (extract.py) "helpfully" tags each dependant with their given
+    # name when the source document lists one (Farhan's payslip surfaces
+    # "Nurul Hidayah / Adam Hakim / Aleesya Sofea"). The rule engine only
+    # reads `relationship` + `age` + `ic_last4`, so we silently drop anything
+    # else rather than fail the whole extract on an unused field. The prompt
+    # still asks Gemini to emit only the listed fields — this is defense in
+    # depth against model drift.
+    model_config = ConfigDict(extra="ignore")
 
     relationship: Relationship
     age: int = Field(ge=0, le=130)

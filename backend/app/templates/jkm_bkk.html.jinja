@@ -1,0 +1,147 @@
+{#
+  JKM Bantuan Kanak-Kanak (BKK) draft application packet.
+
+  Mirrors the structure of `jkm18.html.jinja` (Warga Emas) so the visual
+  language is consistent across the two JKM cash-transfer drafts. The
+  template relies on Jinja context already supplied by `_scheme_context` in
+  `generate_packet.py`: `profile`, `match`, `dependants`, `children_under_18`,
+  `per_capita`. Any additional fields get computed inline from these below.
+#}
+{% extends "_base.html.jinja" %}
+
+{% block title %}JKM · Permohonan Bantuan Kanak-Kanak (Draft){% endblock %}
+{% block agency %}Jabatan Kebajikan Masyarakat (JKM) · Bantuan Kanak-Kanak (BKK) · <a href="{{ match.portal_url }}">{{ match.portal_url }}</a>{% endblock %}
+
+{% block body %}
+<section>
+  <h2>Bahagian I — Pemohon (Penjaga Kanak-Kanak)</h2>
+  <div class="field-grid">
+    <div class="label">Nama Pemohon</div>
+    <div class="value">{{ profile.name }}</div>
+
+    <div class="label">Kad Pengenalan (4 akhir)</div>
+    <div class="value">••••-••-{{ profile.ic_last4 }}</div>
+
+    <div class="label">Hubungan dengan Penerima</div>
+    <div class="value">Ibu/Bapa atau Penjaga sah kepada kanak-kanak</div>
+
+    <div class="label">Pendapatan Bulanan Pemohon</div>
+    <div class="value">RM {{ '{:,.2f}'.format(profile.monthly_income_rm) }}</div>
+
+    {% if profile.address %}
+    <div class="label">Alamat Isi Rumah</div>
+    <div class="value">{{ profile.address }}</div>
+    {% endif %}
+  </div>
+</section>
+
+<section>
+  <h2>Bahagian II — Maklumat Kanak-Kanak (Penerima)</h2>
+  {% set qualifying_children = [] %}
+  {% for d in dependants if d.relationship == 'child' and d.age < 18 %}
+    {% set _ = qualifying_children.append(d) %}
+  {% endfor %}
+  {% if qualifying_children %}
+  <table class="amounts">
+    <thead>
+      <tr>
+        <th>Bil.</th>
+        <th>Hubungan</th>
+        <th class="num">Umur</th>
+        <th>IC (4 akhir)</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for child in qualifying_children %}
+      <tr>
+        <td class="num">{{ loop.index }}</td>
+        <td>{{ child.relationship | title }}</td>
+        <td class="num">{{ child.age }} tahun</td>
+        <td>{% if child.ic_last4 %}••••-••-{{ child.ic_last4 }}{% else %}—{% endif %}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+  <p>Tiada tanggungan kanak-kanak di bawah 18 tahun disyor dalam profil pemohon.</p>
+  {% endif %}
+</section>
+
+<section>
+  <h2>Bahagian III — Ujian Pendapatan Per Kapita</h2>
+  {% set child_count = qualifying_children | length %}
+  {% set per_child_rm = 100.0 %}
+  {% set monthly_cap_rm = 450.0 %}
+  {% set uncapped_monthly = child_count * per_child_rm %}
+  {% set capped_monthly = [uncapped_monthly, monthly_cap_rm] | min %}
+  <table class="amounts">
+    <thead>
+      <tr>
+        <th>Butiran</th>
+        <th class="num">Nilai</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Pendapatan isi rumah bulanan</td>
+        <td class="num">RM {{ '{:,.2f}'.format(profile.monthly_income_rm) }}</td>
+      </tr>
+      <tr>
+        <td>Saiz isi rumah</td>
+        <td class="num">{{ profile.household_size }}</td>
+      </tr>
+      <tr>
+        <td>Pendapatan per kapita</td>
+        <td class="num">RM {{ '{:,.2f}'.format(per_capita) }}</td>
+      </tr>
+      <tr>
+        <td>Had BKK (pendapatan per kapita)</td>
+        <td class="num">RM 1,000.00</td>
+      </tr>
+      <tr>
+        <td>Kanak-kanak layak ({{ child_count }} × RM{{ '{:,.2f}'.format(per_child_rm) }})</td>
+        <td class="num">RM {{ '{:,.2f}'.format(uncapped_monthly) }}</td>
+      </tr>
+      {% if uncapped_monthly > monthly_cap_rm %}
+      <tr>
+        <td>Had maksimum bulanan (isi rumah)</td>
+        <td class="num">RM {{ '{:,.2f}'.format(monthly_cap_rm) }}</td>
+      </tr>
+      {% endif %}
+      <tr class="total">
+        <td>Anggaran Bayaran Setahun ({{ '{:,.2f}'.format(capped_monthly) }} × 12)</td>
+        <td class="num">RM {{ '{:,.2f}'.format(match.annual_rm) }}</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="callout">
+    <strong>Nota kadar:</strong> Bantuan Kanak-Kanak dibayar RM100 sebulan bagi setiap
+    kanak-kanak yang layak, tertakluk kepada had maksimum RM450 sebulan bagi setiap
+    isi rumah. Kadar boleh dikemas kini menerusi jadual JKM semasa; sila sahkan
+    amaun dengan Pejabat Kebajikan Masyarakat Daerah (PKMD) semasa permohonan.
+  </div>
+</section>
+
+<section>
+  <h2>Bahagian IV — Justifikasi Kelayakan</h2>
+  <p>{{ match.why_qualify }}</p>
+</section>
+
+<section>
+  <h2>Bahagian V — Rujukan Sumber (Provenance)</h2>
+  <ul class="citations">
+    {% for c in match.rule_citations %}
+    <li>
+      <span class="rule-id">{{ c.rule_id }}</span> — {{ c.passage }}
+      <span class="src">Sumber: {{ c.source_pdf }} · {{ c.page_ref }}{% if c.source_url %} · <a href="{{ c.source_url }}">{{ c.source_url }}</a>{% endif %}</span>
+    </li>
+    {% endfor %}
+  </ul>
+</section>
+
+<section class="signature-block">
+  <div class="slot">Tandatangan Pemohon / Tarikh</div>
+  <div class="slot">Saksi / Pegawai JKM</div>
+</section>
+{% endblock %}

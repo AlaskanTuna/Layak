@@ -15,7 +15,7 @@ docs/plan.md Task 4 headline sanity target.
 
 from __future__ import annotations
 
-from app.rules import jkm_warga_emas, lhdn_form_b, str_2026
+from app.rules import jkm_bkk, jkm_warga_emas, lhdn_form_b, str_2026
 from app.schema.profile import Dependant, HouseholdFlags, Profile
 from app.schema.scheme import SchemeMatch
 
@@ -44,6 +44,7 @@ def _compute_aisyah_matches() -> list[SchemeMatch]:
     results = [
         str_2026.match(AISYAH_PROFILE),
         jkm_warga_emas.match(AISYAH_PROFILE),
+        jkm_bkk.match(AISYAH_PROFILE),
         lhdn_form_b.match(AISYAH_PROFILE),
     ]
     qualifying = [m for m in results if m.qualifies]

@@ -2,12 +2,13 @@
  * Aisyah canned SSE replay for demo mode (FR-10) and the dev-only `NEXT_PUBLIC_USE_MOCK_SSE=1` escape hatch.
  *
  * Mirrors the live rule-engine output from `backend/app/fixtures/aisyah.py` (which
- * is computed against `backend/app/rules/{str_2026,jkm_warga_emas,lhdn_form_b}.py`).
+ * is computed against `backend/app/rules/{str_2026,jkm_warga_emas,jkm_bkk,lhdn_form_b}.py`).
  * Numbers must stay in lockstep with the backend — after any rule-engine change,
  * re-run the backend fixture and copy the resulting matches over verbatim.
  *
- * Totals (post Phase 1 Task 4 rule engine): JKM RM7,200 + LHDN RM558 + STR RM450
- * = RM8,208/year. Sorted descending by `annual_rm` per `match_schemes` contract.
+ * Totals (post Phase 7 Task 8 rule engine): JKM Warga Emas RM7,200 + JKM BKK
+ * RM2,400 + LHDN RM558 + STR RM450 = RM10,608/year. Sorted descending by
+ * `annual_rm` per `match_schemes` contract.
  */
 
 import type {
@@ -87,6 +88,36 @@ export const AISYAH_SCHEME_MATCHES: SchemeMatch[] = [
         page_ref: 'Budget 2026 speech (external reference)',
         passage:
           'Monthly payment rate: RM600 (Budget 2026); fallback RM500 where the uplift is pending JKM18 re-gazette.',
+        source_url: 'https://www.jkm.gov.my'
+      }
+    ]
+  },
+  {
+    scheme_id: 'jkm_bkk',
+    scheme_name: 'JKM Bantuan Kanak-Kanak — per-child monthly payment',
+    qualifies: true,
+    annual_rm: 2400,
+    summary:
+      'Per-capita income RM700/month is at/under BKK threshold RM1,000; 2 qualifying child(ren) × RM100/month = RM200/month.',
+    why_qualify:
+      'Your household earns RM2,800/month across 4 members — per-capita income RM700 is at/under the BKK threshold of RM1,000. With 2 child(ren) under 18 at RM100/month per child, the annual payment works out to RM2,400. Apply via the JKM BKK form (Borang Permohonan Bantuan Kanak-Kanak) at your nearest Pejabat Kebajikan Masyarakat Daerah.',
+    agency: 'JKM (Jabatan Kebajikan Masyarakat)',
+    portal_url: 'https://www.jkm.gov.my',
+    rule_citations: [
+      {
+        rule_id: 'jkm.bkk.eligibility_means_test',
+        source_pdf: 'jkm-bkk-brochure.pdf',
+        page_ref: 'JKM BKK brochure, Bahagian I — Kriteria Kelayakan (external reference)',
+        passage:
+          'Bantuan Kanak-Kanak dibayar kepada isi rumah berpendapatan rendah dengan kanak-kanak berumur di bawah 18 tahun. Had pendapatan per kapita isi rumah tidak melebihi RM1,000 sebulan.',
+        source_url: 'https://www.jkm.gov.my'
+      },
+      {
+        rule_id: 'jkm.bkk.rate_per_child',
+        source_pdf: 'jkm-bkk-brochure.pdf',
+        page_ref: 'JKM BKK brochure, Bahagian II — Kadar Bayaran (external reference)',
+        passage:
+          'Kadar bulanan Bantuan Kanak-Kanak: RM100 bagi setiap kanak-kanak yang layak, tertakluk kepada had maksimum RM450 sebulan bagi setiap isi rumah.',
         source_url: 'https://www.jkm.gov.my'
       }
     ]
@@ -197,28 +228,32 @@ export const AISYAH_UPSIDE: ComputeUpsideResult = {
 # Gemini Code Execution would run this in a sandbox under Gemini 2.5 Pro.
 
 jkm_warga_emas = 7200  # JKM Warga Emas — dependent elderly payment
+jkm_bkk = 2400  # JKM Bantuan Kanak-Kanak — per-child monthly payment
 lhdn_form_b = 558  # LHDN Form B — five YA2025 reliefs
 str_2026 = 450  # STR 2026 — Household with children tier
 
-total = jkm_warga_emas + lhdn_form_b + str_2026
+total = jkm_warga_emas + jkm_bkk + lhdn_form_b + str_2026
 
-print("{:<42s}{:>12s}".format("Scheme", "Annual (RM)"))
-print("-" * 55)
-print("{:<42s}{:>12,}".format('JKM Warga Emas — dependent elderly payment', jkm_warga_emas))
-print("{:<42s}{:>12,}".format('LHDN Form B — five YA2025 reliefs', lhdn_form_b))
-print("{:<42s}{:>12,}".format('STR 2026 — Household with children tier', str_2026))
-print("-" * 55)
-print("{:<42s}{:>12,}".format("Total upside (annual)", total))`,
-  stdout: `Scheme                                     Annual (RM)
--------------------------------------------------------
-JKM Warga Emas — dependent elderly payment       7,200
-LHDN Form B — five YA2025 reliefs                  558
-STR 2026 — Household with children tier            450
--------------------------------------------------------
-Total upside (annual)                            8,208`,
-  total_annual_rm: 8208,
+print("{:<44s}{:>12s}".format("Scheme", "Annual (RM)"))
+print("-" * 57)
+print("{:<44s}{:>12,}".format('JKM Warga Emas — dependent elderly payment', jkm_warga_emas))
+print("{:<44s}{:>12,}".format('JKM Bantuan Kanak-Kanak — per-child payment', jkm_bkk))
+print("{:<44s}{:>12,}".format('LHDN Form B — five YA2025 reliefs', lhdn_form_b))
+print("{:<44s}{:>12,}".format('STR 2026 — Household with children tier', str_2026))
+print("-" * 57)
+print("{:<44s}{:>12,}".format("Total upside (annual)", total))`,
+  stdout: `Scheme                                        Annual (RM)
+---------------------------------------------------------
+JKM Warga Emas — dependent elderly payment          7,200
+JKM Bantuan Kanak-Kanak — per-child payment         2,400
+LHDN Form B — five YA2025 reliefs                     558
+STR 2026 — Household with children tier               450
+---------------------------------------------------------
+Total upside (annual)                              10,608`,
+  total_annual_rm: 10608,
   per_scheme_rm: {
     jkm_warga_emas: 7200,
+    jkm_bkk: 2400,
     lhdn_form_b: 558,
     str_2026: 450
   }
@@ -227,6 +262,7 @@ Total upside (annual)                            8,208`,
 export const AISYAH_PACKET: Packet = {
   drafts: [
     { scheme_id: 'jkm_warga_emas', filename: 'JKM18-warga-emas-draft-4321.pdf', blob_bytes_b64: null },
+    { scheme_id: 'jkm_bkk', filename: 'JKM-bkk-draft-4321.pdf', blob_bytes_b64: null },
     { scheme_id: 'lhdn_form_b', filename: 'LHDN-form-b-relief-summary-4321.pdf', blob_bytes_b64: null },
     { scheme_id: 'str_2026', filename: 'BK-01-STR2026-draft-4321.pdf', blob_bytes_b64: null }
   ],

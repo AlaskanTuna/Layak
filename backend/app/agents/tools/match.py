@@ -9,11 +9,11 @@ ranked list only surfaces the schemes the profile actually qualifies for.
 
 from __future__ import annotations
 
-from app.rules import jkm_warga_emas, lhdn_form_b, str_2026
+from app.rules import jkm_bkk, jkm_warga_emas, lhdn_form_b, str_2026
 from app.schema.profile import Profile
 from app.schema.scheme import SchemeMatch
 
-_RULES = (str_2026, jkm_warga_emas, lhdn_form_b)
+_RULES = (str_2026, jkm_warga_emas, jkm_bkk, lhdn_form_b)
 
 
 async def match_schemes(profile: Profile) -> list[SchemeMatch]:

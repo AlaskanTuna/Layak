@@ -227,7 +227,11 @@
       "description": "使用您的 Google 账户继续进入仪表板。",
       "noAccountPrefix": "还没有账户？",
       "noAccountCta": "注册",
-      "errorFailed": "登录失败。请重试。"
+      "errorFailed": "登录失败。请重试。",
+      "orDivider": "或",
+      "continueAsGuest": "以访客身份继续",
+      "guestNotice": "共享演示账户 —— 请勿输入真实的个人信息。",
+      "errorGuestFailed": "访客登录失败。请重试。"
     },
     "signUp": {
       "title": "创建您的账户",
@@ -635,7 +639,9 @@
       "deleteTitle": "删除账户",
       "deleteDescription": "依据 PDPA §34，删除所有评估及您的账户记录，并撤销 Firebase Auth。此操作无法撤销。",
       "deleteCta": "删除账户",
-      "deleteConfirm": "这将永久删除您的账户、所有评估和登录记录。是否继续？"
+      "deleteConfirm": "这将永久删除您的账户、所有评估和登录记录。是否继续？",
+      "guestLockedTitle": "访客演示已禁用账户删除",
+      "guestLockedDescription": "您正以共享演示账户登录。账户级删除已锁定，以便其他评审保留各自的会话。请改为登出 —— 您的个人评估记录仍可在历史记录表中删除。"
     },
     "upgrade": {
       "title": "已达免费上限",

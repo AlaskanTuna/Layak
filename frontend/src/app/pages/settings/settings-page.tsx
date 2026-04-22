@@ -12,7 +12,7 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { useAuth } from '@/lib/auth-context'
 import type { QuotaResponse } from '@/lib/agent-types'
-import { authedFetch, signOutCurrentUser } from '@/lib/firebase'
+import { GUEST_UID, authedFetch, signOutCurrentUser } from '@/lib/firebase'
 
 function getBackendUrl(): string {
   return process.env.NEXT_PUBLIC_BACKEND_URL ?? 'http://localhost:8080'
@@ -184,26 +184,33 @@ export function SettingsPage() {
             </Button>
           </div>
 
-          <div className="flex flex-wrap items-start justify-between gap-3 rounded-md border border-destructive/30 bg-destructive/5 px-3 py-2.5">
-            <div className="flex flex-col">
-              <p className="text-sm font-medium text-destructive">{t('settings.danger.deleteTitle')}</p>
-              <p className="text-xs text-destructive/80">{t('settings.danger.deleteDescription')}</p>
+          {user?.uid === GUEST_UID ? (
+            <div className="flex flex-col gap-1 rounded-md border border-border bg-muted/40 px-3 py-2.5">
+              <p className="text-sm font-medium">{t('settings.danger.guestLockedTitle')}</p>
+              <p className="text-xs text-muted-foreground">{t('settings.danger.guestLockedDescription')}</p>
             </div>
-            <Button
-              type="button"
-              size="sm"
-              variant="destructive"
-              onClick={handleDelete}
-              disabled={exporting || deleting}
-            >
-              {deleting ? (
-                <Loader2 className="size-3.5 animate-spin" aria-hidden />
-              ) : (
-                <Trash2 className="size-3.5" aria-hidden />
-              )}
-              {t('settings.danger.deleteCta')}
-            </Button>
-          </div>
+          ) : (
+            <div className="flex flex-wrap items-start justify-between gap-3 rounded-md border border-destructive/30 bg-destructive/5 px-3 py-2.5">
+              <div className="flex flex-col">
+                <p className="text-sm font-medium text-destructive">{t('settings.danger.deleteTitle')}</p>
+                <p className="text-xs text-destructive/80">{t('settings.danger.deleteDescription')}</p>
+              </div>
+              <Button
+                type="button"
+                size="sm"
+                variant="destructive"
+                onClick={handleDelete}
+                disabled={exporting || deleting}
+              >
+                {deleting ? (
+                  <Loader2 className="size-3.5 animate-spin" aria-hidden />
+                ) : (
+                  <Trash2 className="size-3.5" aria-hidden />
+                )}
+                {t('settings.danger.deleteCta')}
+              </Button>
+            </div>
+          )}
 
           <div className="flex">
             <Button

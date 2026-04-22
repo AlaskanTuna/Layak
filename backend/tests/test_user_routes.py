@@ -239,6 +239,38 @@ def test_delete_requires_auth(client: tuple[TestClient, MagicMock, MagicMock]) -
     assert resp.status_code == 401
 
 
+def test_delete_blocks_guest_uid(
+    client: tuple[TestClient, MagicMock, MagicMock],
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Guest demo account is shared — DELETE /api/user must 403 so a single
+    judge can't wipe the public-access demo for everyone else.
+    """
+    tc, db, _users_doc = client
+    monkeypatch.setattr(
+        auth_module,
+        "verify_firebase_id_token",
+        MagicMock(return_value={"uid": auth_module.GUEST_UID, "email": auth_module.GUEST_EMAIL}),
+    )
+    # Pre-set the existing guest doc so _upsert_user_doc doesn't try to create one.
+    snap = MagicMock()
+    snap.exists = True
+    snap.to_dict.return_value = {"tier": "pro"}
+    users_doc = MagicMock()
+    users_doc.get.return_value = snap
+    users_col = MagicMock()
+    users_col.document.return_value = users_doc
+    db.collection.side_effect = lambda name: users_col if name == "users" else MagicMock()
+
+    with patch.object(fb_auth, "delete_user") as mock_delete_user:
+        resp = tc.delete("/api/user", headers={"Authorization": "Bearer valid"})
+
+    assert resp.status_code == 403
+    # Critical: the guard fired before any Firestore or Auth side effects.
+    mock_delete_user.assert_not_called()
+    db.batch.assert_not_called()
+
+
 def test_delete_cascades_firestore_and_deletes_auth_user(
     client: tuple[TestClient, MagicMock, MagicMock],
 ) -> None:

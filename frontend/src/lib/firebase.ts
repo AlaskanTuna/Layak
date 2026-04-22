@@ -6,9 +6,19 @@ import {
   GoogleAuthProvider,
   getAuth,
   signOut as firebaseSignOut,
+  signInWithCustomToken,
   signInWithPopup,
   type User
 } from 'firebase/auth'
+
+// Mirrors backend/app/auth.py:GUEST_UID. Used by the public-access guest
+// sign-in flow and as a settings-page guard so the shared demo account
+// can't be self-destructed by any single judge.
+export const GUEST_UID = 'guest-demo'
+
+function getGuestApiBase(): string {
+  return process.env.NEXT_PUBLIC_BACKEND_URL ?? 'http://localhost:8080'
+}
 
 const firebaseConfig = {
   apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
@@ -50,6 +60,22 @@ export async function signInWithGoogle(): Promise<User> {
   const provider = new GoogleAuthProvider()
   provider.setCustomParameters({ prompt: 'select_account' })
   const result = await signInWithPopup(getFirebaseAuth(), provider)
+  return result.user
+}
+
+export async function signInAsGuest(): Promise<User> {
+  const res = await fetch(`${getGuestApiBase()}/api/auth/guest-token`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' }
+  })
+  if (!res.ok) {
+    throw new Error(`Guest sign-in failed: ${res.status} ${res.statusText}`)
+  }
+  const { customToken } = (await res.json()) as { customToken: string }
+  if (!customToken) {
+    throw new Error('Guest sign-in returned an empty token')
+  }
+  const result = await signInWithCustomToken(getFirebaseAuth(), customToken)
   return result.user
 }
 

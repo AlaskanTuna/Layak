@@ -42,6 +42,7 @@ if _DOTENV.is_file():
 from app.agents.root_agent import stream_agent_events  # noqa: E402 — after dotenv load
 from app.agents.tools.build_profile import build_profile_from_manual_entry  # noqa: E402
 from app.auth import CurrentUser, get_firestore  # noqa: E402 — after dotenv load
+from app.routes.auth import router as auth_router  # noqa: E402
 from app.routes.evaluations import router as evaluations_router  # noqa: E402
 from app.routes.quota import router as quota_router  # noqa: E402
 from app.routes.user import router as user_router  # noqa: E402
@@ -70,6 +71,7 @@ app.add_middleware(
 )
 
 
+app.include_router(auth_router)
 app.include_router(evaluations_router)
 app.include_router(quota_router)
 app.include_router(user_router)

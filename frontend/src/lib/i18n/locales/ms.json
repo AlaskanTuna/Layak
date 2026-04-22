@@ -227,7 +227,11 @@
       "description": "Teruskan dengan akaun Google anda untuk ke papan pemuka.",
       "noAccountPrefix": "Tiada akaun?",
       "noAccountCta": "Daftar",
-      "errorFailed": "Log masuk gagal. Sila cuba lagi."
+      "errorFailed": "Log masuk gagal. Sila cuba lagi.",
+      "orDivider": "atau",
+      "continueAsGuest": "Teruskan sebagai tetamu",
+      "guestNotice": "Akaun demo dikongsi — sila jangan masukkan maklumat peribadi sebenar.",
+      "errorGuestFailed": "Log masuk tetamu gagal. Sila cuba lagi."
     },
     "signUp": {
       "title": "Cipta akaun anda",
@@ -635,7 +639,9 @@
       "deleteTitle": "Padam akaun",
       "deleteDescription": "Memadam setiap penilaian dan rekod akaun anda, kemudian membatalkan Firebase Auth, mengikut PDPA §34. Tindakan ini tidak boleh dipulihkan.",
       "deleteCta": "Padam akaun",
-      "deleteConfirm": "Ini akan memadam akaun anda, setiap penilaian, dan rekod log masuk anda secara kekal. Teruskan?"
+      "deleteConfirm": "Ini akan memadam akaun anda, setiap penilaian, dan rekod log masuk anda secara kekal. Teruskan?",
+      "guestLockedTitle": "Pemadaman akaun dilumpuhkan untuk demo tetamu",
+      "guestLockedDescription": "Anda log masuk sebagai akaun demo dikongsi. Pemadaman seluruh akaun dikunci supaya sesi juri lain kekal aktif. Sila log keluar — penilaian individu anda masih boleh dipadam dari jadual sejarah."
     },
     "upgrade": {
       "title": "Had percuma dicapai",

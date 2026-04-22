@@ -258,7 +258,11 @@
       "description": "Continue with your Google account to reach your dashboard.",
       "noAccountPrefix": "No account?",
       "noAccountCta": "Sign up",
-      "errorFailed": "Sign-in failed. Please try again."
+      "errorFailed": "Sign-in failed. Please try again.",
+      "orDivider": "or",
+      "continueAsGuest": "Continue as guest",
+      "guestNotice": "Shared demo account — please don't enter real personal information.",
+      "errorGuestFailed": "Guest sign-in failed. Please try again."
     },
     "signUp": {
       "title": "Create your account",
@@ -572,21 +576,25 @@
       "footnote": "Register and pay directly via the agency portal. Non-payment may affect access to employment-injury benefits if you claim later."
     },
     "packet": {
-      "titleSingular": "Draft application packet ({{count}} file)",
-      "titlePlural": "Draft application packet ({{count}} files)",
-      "titleSchemeSingular": "Draft application packet ({{count}} scheme)",
-      "titleSchemePlural": "Draft application packet ({{count}} schemes)",
+      "titleSingular": "Draft Application Packet ({{count}} File)",
+      "titlePlural": "Draft Application Packet ({{count}} Files)",
+      "titleSchemeSingular": "Draft Application Packet ({{count}} Scheme)",
+      "titleSchemePlural": "Draft Application Packet ({{count}} Schemes)",
       "description": "Every page carries a \"DRAFT — NOT SUBMITTED\" watermark. Layak never submits on your behalf. Review each PDF, then lodge it yourself via the agency's official portal.",
       "download": "Download PDF",
       "pending": "Pending backend",
       "scheme": "scheme: {{id}}",
       "downloadZip": "Download all drafts as ZIP",
       "generatingZip": "Generating ZIP…",
-      "placeholderNotice": "WeasyPrint packet generator lands in Phase 1 Task 5 (paired wiring block). Until then the packet shell is rendered so you can see where the download CTAs will sit."
+      "placeholderNotice": "WeasyPrint packet generator lands in Phase 1 Task 5 (paired wiring block). Until then the packet shell is rendered so you can see where the download CTAs will sit.",
+      "notificationTitle": "Draft packet downloaded",
+      "notificationBody": "Your draft files are ready on this device. Review them carefully before manual submission."
     },
     "codeExecution": {
-      "title": "Gemini Code Execution — upside computation",
-      "description": "The agent ran Python to compute per-scheme and total annual upside. Snippet and stdout are rendered verbatim.",
+      "title": "Gemini Code Execution",
+      "description": "Optional technical trace for the annual upside math. Expand it if you want to inspect the generated Python and stdout.",
+      "show": "Show details",
+      "hide": "Hide details",
       "python": "Python",
       "stdout": "stdout"
     }
@@ -605,7 +613,7 @@
       "comingCount": "{{count}} schemes"
     },
     "howWePick": {
-      "title": "How we pick what to support",
+      "title": "How We Pick What to Support",
       "description": "Layak prioritises schemes with publicly-documented thresholds, open application portals, and high real-world upside for low-to-middle-income Malaysians. Each rule we support is backed by a citable source — either a government PR document, gazetted form, or scheme brochure — so every RM figure in your evaluation traces back to a specific page."
     },
     "notAffiliated": "Not affiliated with LHDN, JKM, Treasury, or any other Malaysian government body.",
@@ -662,7 +670,9 @@
       "deleteTitle": "Delete account",
       "deleteDescription": "Removes every evaluation and your account record, then revokes Firebase Auth, per PDPA §34. This cannot be undone.",
       "deleteCta": "Delete account",
-      "deleteConfirm": "This permanently deletes your account, every evaluation, and your sign-in record. Continue?"
+      "deleteConfirm": "This permanently deletes your account, every evaluation, and your sign-in record. Continue?",
+      "guestLockedTitle": "Account deletion disabled for guest demo",
+      "guestLockedDescription": "You're signed in as the shared demo account. Account-wide deletion is locked so other judges keep their session. Sign out instead — your individual evaluations stay deletable from the history table."
     },
     "upgrade": {
       "title": "Free tier reached",

@@ -39,6 +39,20 @@ _logger = logging.getLogger(__name__)
 _FIREBASE_ADMIN_KEY_ENV = "FIREBASE_ADMIN_KEY"
 _init_lock = Lock()
 
+# Shared demo account used by the public-access guest sign-in flow. Hackathon
+# submission requires the deployed URL to be reachable without Google sign-in,
+# so /api/auth/guest-token mints a Firebase custom token for this fixed UID
+# and the frontend signs in via signInWithCustomToken. Tier is "pro" so concurrent
+# judges aren't gated by the free-tier 24h rate limit.
+GUEST_UID = "guest-demo"
+GUEST_DISPLAY_NAME = "Guest Demo"
+GUEST_EMAIL = "guest@layak.demo"
+GUEST_TIER = "pro"
+
+
+def is_guest(uid: str) -> bool:
+    return uid == GUEST_UID
+
 
 @dataclass(slots=True)
 class _FirebaseState:
@@ -130,6 +144,43 @@ def get_firestore() -> Any:
     `app.auth.get_firestore` to return a mock.
     """
     return _get_firestore()
+
+
+def mint_guest_custom_token() -> str:
+    """Mint a Firebase custom token for the shared demo guest UID.
+
+    Pre-creates `users/guest-demo` with `tier="pro"` and a signed PDPA-consent
+    timestamp on first call so the lazy `_upsert_user_doc` path doesn't
+    downgrade the demo to free tier on the next authed request. On repeat
+    calls, refreshes `lastLoginAt` and re-asserts `tier="pro"` defensively
+    in case anything mutated it out-of-band. Returns the Firebase Admin SDK
+    token decoded to UTF-8 (the SDK returns bytes).
+    """
+    _init_firebase_admin()
+    db = _get_firestore()
+    ref = db.collection("users").document(GUEST_UID)
+    snapshot = ref.get()
+    if snapshot.exists:
+        ref.update({
+            "lastLoginAt": SERVER_TIMESTAMP,
+            "tier": GUEST_TIER,
+        })
+    else:
+        ref.set({
+            "email": GUEST_EMAIL,
+            "displayName": GUEST_DISPLAY_NAME,
+            "photoURL": None,
+            "tier": GUEST_TIER,
+            "createdAt": SERVER_TIMESTAMP,
+            "lastLoginAt": SERVER_TIMESTAMP,
+            "pdpaConsentAt": SERVER_TIMESTAMP,
+            "isGuest": True,
+        })
+
+    token = fb_auth.create_custom_token(GUEST_UID)
+    if isinstance(token, bytes):
+        return token.decode("utf-8")
+    return token
 
 
 def verify_firebase_id_token(id_token: str) -> dict[str, Any]:

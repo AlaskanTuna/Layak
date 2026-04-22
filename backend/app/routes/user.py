@@ -32,7 +32,7 @@ from fastapi import APIRouter, HTTPException, status
 from firebase_admin import auth as fb_auth
 from starlette.responses import Response
 
-from app.auth import CurrentUser, get_firestore
+from app.auth import CurrentUser, get_firestore, is_guest
 
 _logger = logging.getLogger(__name__)
 
@@ -111,7 +111,15 @@ async def delete_user_account(user: CurrentUser) -> Response:
     retry (the Firestore delete has already succeeded). Ordering is deliberate:
     wiping data first and revoking Auth second means a partial failure never
     leaves the user with a locked-out session AND live records.
+
+    The shared demo guest account is protected — deleting it would wipe the
+    public-access demo for every other judge. Guests get a 403.
     """
+    if is_guest(user.uid):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="The shared demo guest account cannot be deleted.",
+        )
     db = get_firestore()
     try:
         _cascade_delete_firestore(db, user.uid)

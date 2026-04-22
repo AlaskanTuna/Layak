@@ -19,6 +19,7 @@ so the UI can render either depending on live gazette confirmation.
 
 from __future__ import annotations
 
+from app.config import getenv
 from app.schema.profile import Profile
 from app.schema.scheme import RuleCitation, SchemeMatch
 from app.services.vertex_ai_search import get_primary_rag_citation
@@ -35,7 +36,7 @@ _SCHEME_NAME = "JKM Warga Emas — dependent elderly payment"
 # Phase 8 Task 3 — Vertex AI Search grounds the primary citation against the
 # live source PDF. URI filter constrains the snippet ranker to the expected
 # document so the rule cannot accidentally cite a different scheme's PDF.
-_RAG_QUERY = "JKM Warga Emas application elderly parent"
+_RAG_QUERY = getenv("LAYAK_RAG_QUERY_JKM_WARGA_EMAS", "JKM Warga Emas application elderly parent")
 _RAG_URI_SUBSTRING = "jkm18.pdf"
 
 

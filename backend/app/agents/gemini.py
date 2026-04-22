@@ -49,6 +49,8 @@ from typing import Literal
 
 from google import genai
 
+from app.config import getenv
+
 # Error-recovery category slugs surfaced on the SSE `ErrorEvent.category` so
 # the frontend can render category-aware CTAs without substring-matching the
 # humanised message. `None` (unknown) triggers the generic "start over" card.
@@ -60,11 +62,14 @@ ErrorCategory = Literal[
     "extract_validation",
 ]
 
-FAST_MODEL = "gemini-2.5-flash"
-WORKER_MODEL = "gemini-2.5-flash-lite"
-HEAVY_MODEL = "gemini-3-flash-preview"
-HEAVY_MODEL_FALLBACK = "gemini-2.5-pro"
-ORCHESTRATOR_MODEL = "gemini-2.5-pro"
+# Per-step model assignment — overridable via `LAYAK_*` env vars (see
+# `app.config.getenv` and `.env.example`). Resolved at module import; Cloud
+# Run env-var injection or `.env` overrides win over these literal defaults.
+FAST_MODEL = getenv("LAYAK_FAST_MODEL", "gemini-2.5-flash")
+WORKER_MODEL = getenv("LAYAK_WORKER_MODEL", "gemini-2.5-flash-lite")
+HEAVY_MODEL = getenv("LAYAK_HEAVY_MODEL", "gemini-3-flash-preview")
+HEAVY_MODEL_FALLBACK = getenv("LAYAK_HEAVY_MODEL_FALLBACK", "gemini-2.5-pro")
+ORCHESTRATOR_MODEL = getenv("LAYAK_ORCHESTRATOR_MODEL", "gemini-2.5-pro")
 
 _DEFAULT_LOCATION = "global"
 

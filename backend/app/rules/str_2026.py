@@ -18,6 +18,7 @@ page 2 of the source PDF.
 
 from __future__ import annotations
 
+from app.config import getenv
 from app.schema.profile import Profile
 from app.schema.scheme import RuleCitation, SchemeMatch
 from app.services.vertex_ai_search import get_primary_rag_citation
@@ -54,7 +55,7 @@ _SCHEME_NAME = "STR 2026 — Household with children tier"
 # URI filter guards against cross-scheme drift (e.g. the query text could
 # otherwise rank i-saraan-program.pdf above the STR risalah when both mention
 # "Sumbangan Tunai Rahmah" in their Budget extracts).
-_RAG_QUERY = "Sumbangan Tunai Rahmah household tier with children"
+_RAG_QUERY = getenv("LAYAK_RAG_QUERY_STR_2026", "Sumbangan Tunai Rahmah household tier with children")
 _RAG_URI_SUBSTRING = "risalah-str-2026.pdf"
 
 

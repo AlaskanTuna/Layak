@@ -41,11 +41,15 @@ from typing import Any
 from starlette.responses import JSONResponse
 
 from app.auth import UserInfo
+from app.config import getenv_int
 
 _logger = logging.getLogger(__name__)
 
-FREE_TIER_LIMIT = 5
-FREE_TIER_WINDOW = timedelta(hours=24)
+# Free-tier rate-limit knobs — overridable via `LAYAK_FREE_TIER_LIMIT` and
+# `LAYAK_FREE_TIER_WINDOW_HOURS`. Defaults match the original spec
+# (5 evaluations per rolling 24 h).
+FREE_TIER_LIMIT = getenv_int("LAYAK_FREE_TIER_LIMIT", 5)
+FREE_TIER_WINDOW = timedelta(hours=getenv_int("LAYAK_FREE_TIER_WINDOW_HOURS", 24))
 
 
 def get_used_count(db: Any, user: UserInfo, *, now: datetime | None = None) -> int:

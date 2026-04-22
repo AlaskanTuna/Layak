@@ -32,6 +32,7 @@ and Form BE because the reliefs + brackets are shared.
 
 from __future__ import annotations
 
+from app.config import getenv
 from app.schema.profile import Profile
 from app.schema.scheme import RuleCitation, SchemeMatch
 from app.services.vertex_ai_search import get_primary_rag_citation
@@ -68,7 +69,7 @@ _SCHEME_NAME_FORM_BE = "LHDN Form BE — five YA2025 reliefs"
 # Phase 8 Task 3 — Vertex AI Search grounds the primary citation against the
 # live source PDF. URI filter constrains the snippet ranker to the expected
 # document so the rule cannot accidentally cite a different scheme's PDF.
-_RAG_QUERY = "individual personal relief paragraph 46 RM9000"
+_RAG_QUERY = getenv("LAYAK_RAG_QUERY_LHDN_FORM_B", "individual personal relief paragraph 46 RM9000")
 _RAG_URI_SUBSTRING = "pr-no-4-2024.pdf"
 
 # YA2025 personal income tax brackets for resident individuals (Schedule 1, ITA).

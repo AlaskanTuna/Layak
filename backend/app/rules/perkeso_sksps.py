@@ -34,6 +34,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 
+from app.config import getenv
 from app.schema.profile import Profile
 from app.schema.scheme import RuleCitation, SchemeMatch
 from app.services.vertex_ai_search import get_primary_rag_citation
@@ -82,7 +83,7 @@ _SOURCE_PDF = "perkeso-sksps-rates.pdf"
 # Phase 8 Task 3 — Vertex AI Search grounds the primary citation against the
 # live source PDF. URI filter constrains the snippet ranker to the expected
 # document so the rule cannot accidentally cite a different scheme's PDF.
-_RAG_QUERY = "PERKESO SKSPS self-employed contribution plans"
+_RAG_QUERY = getenv("LAYAK_RAG_QUERY_PERKESO_SKSPS", "PERKESO SKSPS self-employed contribution plans")
 _RAG_URI_SUBSTRING = "perkeso-sksps-rates.pdf"
 
 

@@ -24,6 +24,7 @@ Qualifying criteria:
 
 from __future__ import annotations
 
+from app.config import getenv
 from app.schema.profile import Dependant, Profile
 from app.schema.scheme import RuleCitation, SchemeMatch
 from app.services.vertex_ai_search import get_primary_rag_citation
@@ -50,7 +51,7 @@ _SOURCE_PDF = "jkm-bkk-brochure.pdf"
 # Phase 8 Task 3 — Vertex AI Search grounds the primary citation against the
 # live source PDF. URI filter constrains the snippet ranker to the expected
 # document so the rule cannot accidentally cite a different scheme's PDF.
-_RAG_QUERY = "Bantuan Kanak-Kanak children household monthly"
+_RAG_QUERY = getenv("LAYAK_RAG_QUERY_JKM_BKK", "Bantuan Kanak-Kanak children household monthly")
 _RAG_URI_SUBSTRING = "jkm-bkk-brochure.pdf"
 
 

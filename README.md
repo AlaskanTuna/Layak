@@ -16,9 +16,9 @@
 
 <img src="assets/banner.png" alt="Layak functional diagram banner" />
 
-> Project 2030: MyAI Future Hackathon submission
-> Track 2: Citizens First (GovTech and Digital Services)
-> Category: Open
+> **Submission For:** Project 2030: MyAI Future Hackathon;
+> **Track 2:** Citizens First (GovTech and Digital Services);
+> **Category:** Open
 
 ---
 

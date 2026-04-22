@@ -27,11 +27,11 @@ export function LandingHero() {
 
       {/* Hero Content */}
       <div className="relative z-10 mx-auto flex w-full max-w-5xl flex-col items-center justify-center gap-6 px-4 py-24 text-center md:px-6">
-        <h1 className="font-heading text-4xl font-bold leading-tight tracking-tight sm:text-5xl md:text-6xl text-balance text-white drop-shadow-sm">
+        <h1 className="max-w-4xl font-sans text-4xl font-semibold leading-[0.95] tracking-[-0.045em] text-balance text-white drop-shadow-[0_10px_30px_rgba(0,0,0,0.35)] sm:text-6xl md:text-7xl">
           {t('marketing.hero.headlinePart1')} <br className="hidden sm:inline" />
           {t('marketing.hero.headlinePart2')}
         </h1>
-        <p className="max-w-2xl text-base leading-relaxed text-zinc-200 sm:text-lg drop-shadow-sm">
+        <p className="max-w-2xl text-base leading-relaxed text-zinc-100/92 sm:text-lg drop-shadow-sm">
           {t('marketing.hero.description')}
         </p>
         <div className="mt-4 flex flex-col gap-3 sm:flex-row w-full sm:w-auto">

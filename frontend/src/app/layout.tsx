@@ -1,5 +1,5 @@
 import type { Metadata } from 'next'
-import { Geist, Lora } from 'next/font/google'
+import { Geist, Literata } from 'next/font/google'
 
 import { AuthProvider } from '@/lib/auth-context'
 import { I18nProvider } from '@/providers/i18n-provider'
@@ -13,8 +13,8 @@ const geistSans = Geist({
   display: 'swap'
 })
 
-const lora = Lora({
-  variable: '--font-lora',
+const literata = Literata({
+  variable: '--font-literata',
   subsets: ['latin'],
   display: 'swap'
 })
@@ -34,7 +34,11 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="en" suppressHydrationWarning className={`${geistSans.variable} ${lora.variable} antialiased`}>
+    <html
+      lang="en"
+      suppressHydrationWarning
+      className={`${geistSans.variable} ${literata.variable} antialiased`}
+    >
       <body>
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
           <I18nProvider>

@@ -86,7 +86,7 @@ export function LandingHero() {
             <Button
               render={<Link href="/sign-in" />}
               size="lg"
-              className="w-full sm:w-auto px-8 bg-white text-black hover:bg-zinc-200"
+              className="w-full border border-black/6 bg-white px-8 text-black shadow-[0_12px_32px_rgba(0,0,0,0.14)] hover:bg-zinc-200 sm:w-auto dark:border-white/10 dark:bg-zinc-950/82 dark:text-white dark:hover:bg-zinc-900"
             >
               {t('marketing.hero.getStarted')}
               <ArrowRight className="ml-2 size-4" aria-hidden />

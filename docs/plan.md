@@ -1001,11 +1001,11 @@ _Frontend:_
 
 ### 1. Feature: Verify gemini-3-flash-preview tool support + asia-southeast1 availability (gate)
 
-**Owner:** PO1 (Hao). **Depends on:** nothing.
+**Owner:** Any. **Depends on:** nothing.
 
 **Purpose/Issue:** Before committing gemini-3-flash-preview anywhere in the pipeline, confirm it supports the code_execution Tool and response_mime_type="application/json" in the asia-southeast1 region (where the Cloud Run backend lives). Preview models historically lag their GA siblings on tool support, and a missing capability would silently break the compute_upside step at demo time.
 
-**Implementation — PO1 (Hao):**
+**Implementation — Any:**
 
 - [ ] Run `gcloud ai models describe gemini-3-flash-preview --region=asia-southeast1` and `gcloud ai models describe gemini-3-flash-preview --region=us-central1` to confirm regional availability and current model status.
 - [ ] Write `backend/scripts/probe_gemini_3_flash.py` (~50 lines) that hits gemini-3-flash-preview via the existing `get_client()` helper and exercises `tools=[Tool(code_execution=...)]` against a trivial "compute 2+2 and print" prompt. Pass condition: the response candidates include both an `executable_code` part and a `code_execution_result` part with non-empty output.
@@ -1019,11 +1019,11 @@ _Frontend:_
 
 ### 2. Feature: Run Vertex AI Search seed and verify indexing
 
-**Owner:** PO1 (Hao). **Depends on:** nothing.
+**Owner:** Any. **Depends on:** nothing.
 
 **Purpose/Issue:** The seed script `backend/scripts/seed_vertex_ai_search.py` already exists and is idempotent — it just has not been executed against the live project. Move 1 of the Google AI stack alignment requires the Discovery Engine data store created and the 6 scheme PDFs in `backend/data/schemes/` indexed and queryable before Task 3 can wire retrieval into the rule modules.
 
-**Implementation — PO1 (Hao):**
+**Implementation — Any:**
 
 - [ ] From the repo root run `python backend/scripts/seed_vertex_ai_search.py --project layak-myaifuturehackathon --execute` to create the data store and import the six PDFs.
 - [ ] Wait 3-5 minutes for Discovery Engine indexing to complete, then re-run the script's canary query block to confirm every PDF returns at least one passage hit.
@@ -1037,11 +1037,11 @@ _Frontend:_
 
 ### 3. Feature: Vertex AI Search retrieval helper wired into every rule module
 
-**Owner:** PO1 (Hao). **Depends on:** Phase 8 Task 2.
+**Owner:** Any. **Depends on:** Phase 8 Task 2.
 
 **Purpose/Issue:** With the data store live, every rule module's `_citations()` helper should attach a Vertex-AI-Search-derived passage and source URI as the primary citation, falling back to the existing hardcoded URL when Discovery Engine returns empty or errors. This is the single biggest handbook-alignment win — the deck's "Context: Vertex AI Search RAG" claim becomes literally true.
 
-**Implementation — PO1 (Hao):**
+**Implementation — Any:**
 
 - [ ] Add `backend/app/services/vertex_ai_search.py` exposing `search_passage(query: str, top_k: int = 1) -> list[RetrievedPassage]` where `RetrievedPassage` is a Pydantic model carrying `passage_text`, `source_uri`, `document_id`, and `relevance_score`. Wrap `google.cloud.discoveryengine_v1.SearchServiceClient.search()` and cache the client via `@lru_cache(maxsize=1)` per the existing `get_client()` pattern in `backend/app/agents/gemini.py`.
 - [ ] Adopt a fail-open posture: any Discovery Engine error or empty response returns an empty list, never raises. Log via the module logger so silent failures still leave a breadcrumb.
@@ -1056,11 +1056,11 @@ _Frontend:_
 
 ### 4. Feature: Per-step model reassignment — hybrid Gemini 3 Flash Preview + 2.5 Flash-Lite
 
-**Owner:** PO1 (Hao). **Depends on:** Phase 8 Task 1 (the probe outcome decides whether the heavy model is gemini-3-flash-preview or the gemini-2.5-pro fallback).
+**Owner:** Any. **Depends on:** Phase 8 Task 1 (the probe outcome decides whether the heavy model is gemini-3-flash-preview or the gemini-2.5-pro fallback).
 
 **Purpose/Issue:** Adopt a per-step model matrix instead of routing every LLM call through gemini-2.5-flash. Extract stays on Flash (multimodal OCR, GA-only territory). Classify drops to gemini-2.5-flash-lite (~5x cheaper for the small structured-output workload). Compute_upside moves to gemini-3-flash-preview (or gemini-2.5-pro if Task 1 ruled out the preview model). The deck's "Brain (Pro/Gemini 3) plus Flash workers" framing becomes literally true, and classify cost drops without any quality risk.
 
-**Implementation — PO1 (Hao):**
+**Implementation — Any:**
 
 - [ ] In `backend/app/agents/gemini.py` add `WORKER_MODEL = "gemini-2.5-flash-lite"` for the cheap structured-output worker and `HEAVY_MODEL = "gemini-3-flash-preview"` (or `"gemini-2.5-pro"` per the Task 1 probe outcome) for the reasoning-heavy step. Keep `FAST_MODEL = "gemini-2.5-flash"` for extract. Document the chosen `HEAVY_MODEL` value plus the Task 1 probe date in the module docstring so future readers know why the choice was made.
 - [ ] In `backend/app/agents/tools/classify.py` swap `model=FAST_MODEL` to `model=WORKER_MODEL`. Run the existing classify tests to confirm Flash-Lite handles the structured-output prompt without drift; tighten the prompt only if Flash-Lite returns something off-schema.
@@ -1076,11 +1076,11 @@ _Frontend:_
 
 ### 5. Feature: Re-snapshot Aisyah + Farhan demo-mode fixtures against the new pipeline
 
-**Owner:** PO2 (Adam). **Depends on:** Phase 8 Tasks 3 and 4 (citations and model swap must both be live before snapshotting, otherwise the fixture diverges again).
+**Owner:** Any. **Depends on:** Phase 8 Tasks 3 and 4 (citations and model swap must both be live before snapshotting, otherwise the fixture diverges again).
 
 **Purpose/Issue:** The Aisyah/Farhan mock-mode replay (`frontend/src/fixtures/aisyah-response.ts` and the Farhan equivalent if present) is hand-typed to match the current pipeline output — `SchemeMatch.citations` carry hardcoded URLs and `compute_upside.python_snippet` is Flash-shaped. After Tasks 3 and 4 land, real outputs will carry Vertex-AI-Search-derived citations and a different `python_snippet` shape from the new heavy model. Re-snapshot so the demo-mode storyboard stays a faithful preview of what real upload produces.
 
-**Implementation — PO2 (Adam):**
+**Implementation — Any:**
 
 - [ ] With the deployed Cloud Run backend running on the new Phase 8 configuration, run the live pipeline against `frontend/public/fixtures/aisyah-{mykad,payslip,utility}.pdf` via the standard `/api/agent/intake` endpoint and capture the SSE event stream to a local JSON file.
 - [ ] Replace the `AISYAH_MOCK_EVENTS` array in `frontend/src/fixtures/aisyah-response.ts` with the captured stream, preserving the existing `delayMs` cadence (or adjusting if the new pipeline is materially faster or slower than the snapshot it replaces).
@@ -1095,11 +1095,11 @@ _Frontend:_
 
 ### 6. Feature: Update docs/trd.md and CLAUDE.md to reflect the Phase 8 architecture
 
-**Owner:** PO2 (Adam). **Depends on:** Phase 8 Tasks 3 and 4.
+**Owner:** Any. **Depends on:** Phase 8 Tasks 3 and 4.
 
 **Purpose/Issue:** `docs/trd.md` §5.1 (model routing), §6.x (RAG architecture), and §8 (Plan B) currently describe the Flash-only / rule-engine-only state from before Phase 8. `CLAUDE.md`'s Tech Stack section frames Vertex AI Search as the "primary" RAG layer with inline-PDF as the Plan B collapse — neither is true after Phase 8. Bring both files into truth so the deck team can reference them safely.
 
-**Implementation — PO2 (Adam):**
+**Implementation — Any:**
 
 - [ ] Update `docs/trd.md` §5.1 model-routing section to document the per-step matrix from Task 4: extract on `gemini-2.5-flash`, classify on `gemini-2.5-flash-lite`, compute_upside on the chosen heavy model, generate as deterministic WeasyPrint.
 - [ ] Add a new `docs/trd.md` sub-section under the RAG topic documenting the Vertex AI Search retrieval helper (`backend/app/services/vertex_ai_search.py`), the `layak-schemes-v1` data store ID, the per-rule query strings, and the fail-open posture.

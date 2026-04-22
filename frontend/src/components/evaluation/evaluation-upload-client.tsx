@@ -364,7 +364,7 @@ function PathCard({
         >
           {icon}
         </div>
-        <CardTitle className="font-sans">{title}</CardTitle>
+        <CardTitle>{title}</CardTitle>
       </CardHeader>
       <CardContent className="flex flex-col gap-2">
         <p className="text-sm leading-relaxed text-muted-foreground">{description}</p>

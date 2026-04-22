@@ -442,7 +442,7 @@ export function ManualEntryForm({
 function SectionTitle({ title, required }: { title: string; required: boolean }) {
   return (
     <div className="flex items-center gap-2">
-      <CardTitle className="font-sans">{title}</CardTitle>
+      <CardTitle>{title}</CardTitle>
       <SectionBadge required={required} />
     </div>
   )

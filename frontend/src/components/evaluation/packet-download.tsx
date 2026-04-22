@@ -61,7 +61,7 @@ export function PacketDownload({ packet }: Props) {
   return (
     <Card>
       <CardHeader>
-        <CardTitle className="flex items-center gap-2 font-sans text-sm">
+        <CardTitle className="flex items-center gap-2 text-sm">
           <ShieldCheck className="size-4 text-primary" aria-hidden />
           {count === 1
             ? t('evaluation.packet.titleSingular', { count })

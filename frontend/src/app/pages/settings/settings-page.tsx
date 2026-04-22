@@ -102,7 +102,7 @@ export function SettingsPage() {
 
       <Card>
         <CardHeader>
-          <CardTitle className="font-sans">{t('settings.profile.title')}</CardTitle>
+          <CardTitle>{t('settings.profile.title')}</CardTitle>
           <CardDescription>{t('settings.profile.description')}</CardDescription>
         </CardHeader>
         <CardContent className="flex flex-col gap-2">
@@ -123,7 +123,7 @@ export function SettingsPage() {
 
       <Card>
         <CardHeader>
-          <CardTitle className="flex items-center gap-2 font-sans">
+          <CardTitle className="flex items-center gap-2">
             <Crown className="size-4 text-primary" aria-hidden />
             {t('settings.tier.title')}
           </CardTitle>
@@ -156,7 +156,7 @@ export function SettingsPage() {
 
       <Card className="ring-destructive/30">
         <CardHeader>
-          <CardTitle className="flex items-center gap-2 font-sans text-destructive">
+          <CardTitle className="flex items-center gap-2 text-destructive">
             <AlertTriangle className="size-4" aria-hidden />
             {t('settings.danger.title')}
           </CardTitle>

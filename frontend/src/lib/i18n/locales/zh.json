@@ -569,7 +569,7 @@
   "schemes": {
     "pageEyebrow": "计划库",
     "pageTitle": "Layak 推理的每一项马来西亚计划。",
-    "pageDescription": "本次构建中已上线三项联邦计划。另有五项将在 v2 推出，届时我们会将每项的规则、门槛和申请表接入引擎。",
+    "pageDescription": "本次构建中已上线五项联邦计划。另有四项将在 v2 推出，届时我们会将每项的规则、门槛和申请表接入引擎。",
     "stats": {
       "inScope": "已纳入",
       "coming": "v2 即将推出"
@@ -588,8 +588,11 @@
       "cashTransfer": "现金转账",
       "welfare": "福利",
       "taxRelief": "税务减免",
+      "socialSecurity": "社会保障",
       "typicalUpside": "典型收益",
+      "annualContribution": "年度缴款",
       "upTo": "最高 RM",
+      "rm": "RM",
       "perYear": "/ 年",
       "agencyPortal": "机构门户"
     },
@@ -599,12 +602,17 @@
     "jkm": {
       "summary": "每月 RM 600 补助金，适用于低收入家庭中符合资格的年长受扶养人（60 岁以上）。"
     },
+    "jkmBkk": {
+      "summary": "每名子女每月 RM 100（每户上限 RM 450/月），面向有学龄子女的低收入家庭。"
+    },
     "lhdn": {
-      "summary": "五项自雇减免：个人、配偶豁免、每名子女、医疗和生活方式。"
+      "summary": "涵盖 Form B（自雇）和 Form BE（受薪）申报者的五项税务减免：个人、子女、父母医疗、EPF + 寿险、生活方式。"
+    },
+    "perkesoSksps": {
+      "summary": "自雇社会保障缴款（Akta 789）。零工与客运工作者强制参与 —— 提供医疗、伤残与遗属保障。"
     },
     "coming": {
-      "iSaraanDesc": "自雇 EPF 对应缴款。",
-      "perkesoDesc": "自雇社会保障计划。",
+      "iSaraanDesc": "自雇 EPF 对应缴款 —— 政府按自愿缴款金额加发 15%，每年上限 RM 500。",
       "myKasihDesc": "无现金食品援助计划。",
       "eKasihDesc": "国家贫困家庭登记册。",
       "saraDesc": "替代税务减免途径。"

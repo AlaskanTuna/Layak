@@ -569,7 +569,7 @@
   "schemes": {
     "pageEyebrow": "Perpustakaan skim",
     "pageTitle": "Setiap skim Malaysia yang Layak pertimbangkan.",
-    "pageDescription": "Tiga skim persekutuan tersedia dalam binaan ini. Lima lagi akan hadir dalam v2 apabila kami menyambungkan peraturan, ambang, dan borang permohonan setiap satu ke dalam enjin.",
+    "pageDescription": "Lima skim persekutuan tersedia dalam binaan ini. Empat lagi akan hadir dalam v2 apabila kami menyambungkan peraturan, ambang, dan borang permohonan setiap satu ke dalam enjin.",
     "stats": {
       "inScope": "dalam skop",
       "coming": "akan datang dalam v2"
@@ -588,8 +588,11 @@
       "cashTransfer": "Pindahan Tunai",
       "welfare": "Kebajikan",
       "taxRelief": "Pelepasan Cukai",
+      "socialSecurity": "Keselamatan Sosial",
       "typicalUpside": "Faedah biasa",
+      "annualContribution": "Caruman tahunan",
       "upTo": "Sehingga RM",
+      "rm": "RM",
       "perYear": "/ tahun",
       "agencyPortal": "Portal agensi"
     },
@@ -599,12 +602,17 @@
     "jkm": {
       "summary": "Bayaran bulanan RM 600 untuk tanggungan warga emas yang layak (berumur 60+) dalam isi rumah berpendapatan rendah."
     },
+    "jkmBkk": {
+      "summary": "RM 100/bulan setiap kanak-kanak (had RM 450/bulan setiap isi rumah) untuk keluarga berpendapatan rendah dengan anak usia sekolah."
+    },
     "lhdn": {
-      "summary": "Lima pelepasan bekerja sendiri: individu, pengecualian pasangan, setiap anak, perubatan, dan gaya hidup."
+      "summary": "Lima pelepasan cukai meliputi pemfail Borang B (bekerja sendiri) dan Borang BE (bergaji): individu, anak, perubatan ibu bapa, KWSP + insurans hayat, dan gaya hidup."
+    },
+    "perkesoSksps": {
+      "summary": "Caruman keselamatan sosial bekerja sendiri (Akta 789). Wajib untuk pekerja gig dan pengangkutan penumpang — meliputi perubatan, hilang upaya, dan tanggungan kematian."
     },
     "coming": {
-      "iSaraanDesc": "Caruman padanan KWSP bekerja sendiri.",
-      "perkesoDesc": "Skim keselamatan sosial bekerja sendiri.",
+      "iSaraanDesc": "Caruman padanan KWSP bekerja sendiri — kerajaan menambah 15% caruman sukarela, had RM 500/tahun.",
       "myKasihDesc": "Program bantuan makanan tanpa tunai.",
       "eKasihDesc": "Daftar isi rumah miskin kebangsaan.",
       "saraDesc": "Laluan pelepasan cukai alternatif."

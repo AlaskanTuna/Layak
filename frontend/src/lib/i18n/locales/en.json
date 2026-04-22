@@ -600,7 +600,7 @@
   "schemes": {
     "pageEyebrow": "Scheme library",
     "pageTitle": "Every Malaysian scheme Layak reasons over.",
-    "pageDescription": "Three federal schemes are live in this build. Five more land in v2 as we wire each one's rules, thresholds, and application form into the engine.",
+    "pageDescription": "Five federal schemes are live in this build. Four more land in v2 as we wire each one's rules, thresholds, and application form into the engine.",
     "stats": {
       "inScope": "in scope",
       "coming": "coming in v2"
@@ -619,8 +619,11 @@
       "cashTransfer": "Cash Transfer",
       "welfare": "Welfare",
       "taxRelief": "Tax Relief",
+      "socialSecurity": "Social Security",
       "typicalUpside": "Typical upside",
+      "annualContribution": "Annual contribution",
       "upTo": "Up to RM",
+      "rm": "RM",
       "perYear": "/ year",
       "agencyPortal": "Agency portal"
     },
@@ -630,12 +633,17 @@
     "jkm": {
       "summary": "Monthly RM 600 payment for a qualifying elderly dependant (aged 60+) in low-income households."
     },
+    "jkmBkk": {
+      "summary": "RM 100/month per child (capped RM 450/month per household) for low-income families with school-age children."
+    },
     "lhdn": {
-      "summary": "Five self-employed reliefs: individual, spouse exemption, per-child, medical, and lifestyle."
+      "summary": "Five tax reliefs covering both Form B (self-employed) and Form BE (salaried) filers: individual, child, parent medical, EPF + life insurance, and lifestyle."
+    },
+    "perkesoSksps": {
+      "summary": "Self-employed social-security contribution (Akta 789). Mandatory for gig and passenger-transport workers — buys medical, disability, and survivor cover."
     },
     "coming": {
-      "iSaraanDesc": "Self-employed EPF matching contribution.",
-      "perkesoDesc": "Self-employed social security scheme.",
+      "iSaraanDesc": "Self-employed EPF matching contribution — government tops up 15% of voluntary contribution, capped RM 500/yr.",
       "myKasihDesc": "Cashless food aid programme.",
       "eKasihDesc": "National poor-household registry.",
       "saraDesc": "Alternate tax-relief pathway."

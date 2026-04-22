@@ -1,7 +1,19 @@
 'use client'
 
-import { ArrowUpRight, Coins, Compass, HeartHandshake, Landmark, Scale, type LucideIcon } from 'lucide-react'
+import {
+  ArrowUpRight,
+  Baby,
+  Coins,
+  Compass,
+  HeartHandshake,
+  Landmark,
+  Scale,
+  ShieldCheck,
+  type LucideIcon
+} from 'lucide-react'
 import { useTranslation } from 'react-i18next'
+
+type SchemeKind = 'upside' | 'required_contribution'
 
 type InScopeScheme = {
   id: string
@@ -10,9 +22,14 @@ type InScopeScheme = {
   agency: string
   name: string
   summaryKey: string
+  // For `upside` schemes this reads as `Up to RM <upsideRm> / year`. For
+  // `required_contribution` schemes (PERKESO SKSPS) it reads as
+  // `Annual contribution: RM <upsideRm> / year` so the catalogue card never
+  // misleads viewers into thinking they receive the contribution amount.
   upsideRm: string
   formLabel: string
   portalUrl: string
+  kind?: SchemeKind
 }
 
 // Scheme names, agency names, form IDs, and portal URLs are proper nouns and
@@ -41,15 +58,38 @@ const IN_SCOPE: InScopeScheme[] = [
     portalUrl: 'https://www.jkm.gov.my'
   },
   {
-    id: 'lhdn-form-b',
+    id: 'jkm-bkk',
+    categoryKey: 'schemes.labels.welfare',
+    icon: Baby,
+    agency: 'JKM',
+    name: 'JKM · Bantuan Kanak-Kanak',
+    summaryKey: 'schemes.jkmBkk.summary',
+    upsideRm: '5,400.00',
+    formLabel: 'Form JKM10',
+    portalUrl: 'https://www.jkm.gov.my'
+  },
+  {
+    id: 'lhdn-form-b-be',
     categoryKey: 'schemes.labels.taxRelief',
     icon: Scale,
     agency: 'LHDN',
-    name: 'LHDN Form B · YA2025 reliefs',
+    name: 'LHDN Form B / BE · YA2025 reliefs',
     summaryKey: 'schemes.lhdn.summary',
     upsideRm: '4,500.00',
-    formLabel: 'Form B',
+    formLabel: 'Form B / BE',
     portalUrl: 'https://mytax.hasil.gov.my'
+  },
+  {
+    id: 'perkeso-sksps',
+    categoryKey: 'schemes.labels.socialSecurity',
+    icon: ShieldCheck,
+    agency: 'PERKESO',
+    name: 'PERKESO SKSPS',
+    summaryKey: 'schemes.perkesoSksps.summary',
+    upsideRm: '232.80–596.40',
+    formLabel: 'Form SKSPS-1',
+    portalUrl: 'https://www.perkeso.gov.my',
+    kind: 'required_contribution'
   }
 ]
 
@@ -59,9 +99,11 @@ type ComingScheme = {
   summaryKey: string
 }
 
+// i-Saraan is still here because Phase 7 Task 7 (rule + template + tests)
+// hasn't shipped yet — the schemes-overview catalogue must not claim a scheme
+// the rule engine can't actually score.
 const COMING_V2: ComingScheme[] = [
   { name: 'i-Saraan', agency: 'EPF', summaryKey: 'schemes.coming.iSaraanDesc' },
-  { name: 'PERKESO SKSPS', agency: 'PERKESO', summaryKey: 'schemes.coming.perkesoDesc' },
   { name: 'MyKasih', agency: 'MyKasih Foundation', summaryKey: 'schemes.coming.myKasihDesc' },
   { name: 'eKasih', agency: 'ICU JPM', summaryKey: 'schemes.coming.eKasihDesc' },
   { name: 'SARA claim', agency: 'LHDN', summaryKey: 'schemes.coming.saraDesc' }
@@ -91,6 +133,7 @@ function StatsRow({ inScope, coming }: { inScope: number; coming: number }) {
 function InScopeCard({ scheme }: { scheme: InScopeScheme }) {
   const { t } = useTranslation()
   const Icon = scheme.icon
+  const isContribution = scheme.kind === 'required_contribution'
   return (
     <article className="group flex flex-col gap-4 rounded-xl border border-border bg-card p-6 shadow-sm transition-colors hover:border-primary/35">
       <div className="flex items-center justify-between gap-3">
@@ -106,13 +149,24 @@ function InScopeCard({ scheme }: { scheme: InScopeScheme }) {
         <h3 className="font-heading text-xl font-semibold tracking-tight">{scheme.name}</h3>
       </div>
       <p className="text-sm leading-relaxed text-muted-foreground">{t(scheme.summaryKey)}</p>
-      <div className="flex flex-col gap-0.5 rounded-lg border border-dashed border-primary/25 bg-primary/5 px-4 py-3">
+      <div
+        className={`flex flex-col gap-0.5 rounded-lg border border-dashed px-4 py-3 ${
+          isContribution ? 'border-amber-500/30 bg-amber-500/5' : 'border-primary/25 bg-primary/5'
+        }`}
+      >
         <p className="text-[10px] font-medium uppercase tracking-[0.14em] text-muted-foreground">
-          {t('schemes.labels.typicalUpside')}
+          {isContribution ? t('schemes.labels.annualContribution') : t('schemes.labels.typicalUpside')}
         </p>
         <p className="font-heading tabular-nums">
-          <span className="text-sm font-normal text-muted-foreground">{t('schemes.labels.upTo')}</span>{' '}
-          <span className="text-xl font-semibold text-primary">{scheme.upsideRm}</span>
+          {!isContribution && (
+            <span className="text-sm font-normal text-muted-foreground">{t('schemes.labels.upTo')} </span>
+          )}
+          {isContribution && (
+            <span className="text-sm font-normal text-muted-foreground">{t('schemes.labels.rm')} </span>
+          )}
+          <span className={`text-xl font-semibold ${isContribution ? 'text-amber-700 dark:text-amber-500' : 'text-primary'}`}>
+            {scheme.upsideRm}
+          </span>
           <span className="ml-1 text-xs font-normal text-muted-foreground">{t('schemes.labels.perYear')}</span>
         </p>
       </div>

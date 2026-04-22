@@ -97,7 +97,9 @@ function InScopeCard({ scheme }: { scheme: InScopeScheme }) {
         <div className="flex size-10 items-center justify-center rounded-md bg-primary/10 text-primary">
           <Icon className="size-5" aria-hidden />
         </div>
-        <span className="text-[10px] font-medium uppercase tracking-[0.14em] text-primary">{t(scheme.categoryKey)}</span>
+        <span className="text-[10px] font-medium uppercase tracking-[0.14em] text-primary">
+          {t(scheme.categoryKey)}
+        </span>
       </div>
       <div className="flex flex-col gap-1">
         <p className="text-[11px] font-medium uppercase tracking-[0.14em] text-muted-foreground">{scheme.agency}</p>
@@ -138,7 +140,9 @@ function ComingCard({ scheme }: { scheme: ComingScheme }) {
     <div className="flex flex-col gap-1 rounded-lg border border-dashed border-border bg-card/40 px-4 py-3">
       <div className="flex items-center justify-between gap-3">
         <p className="font-heading text-sm font-semibold">{scheme.name}</p>
-        <span className="text-[9px] font-medium uppercase tracking-[0.16em] text-muted-foreground">{scheme.agency}</span>
+        <span className="text-[9px] font-medium uppercase tracking-[0.16em] text-muted-foreground">
+          {scheme.agency}
+        </span>
       </div>
       <p className="text-xs leading-relaxed text-muted-foreground">{t(scheme.summaryKey)}</p>
     </div>
@@ -156,7 +160,7 @@ export function SchemesOverview() {
           {t('schemes.sections.inScopeTitle')}
         </p>
         <ul className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
-          {IN_SCOPE.map(scheme => (
+          {IN_SCOPE.map((scheme) => (
             <li key={scheme.id} className="h-full">
               <InScopeCard scheme={scheme} />
             </li>
@@ -174,7 +178,7 @@ export function SchemesOverview() {
           </span>
         </div>
         <ul className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-          {COMING_V2.map(scheme => (
+          {COMING_V2.map((scheme) => (
             <li key={scheme.name}>
               <ComingCard scheme={scheme} />
             </li>
@@ -185,7 +189,7 @@ export function SchemesOverview() {
       <aside className="flex flex-col gap-3 rounded-xl border border-border bg-muted/40 p-6">
         <div className="flex items-center gap-2">
           <Compass className="size-4 text-primary" aria-hidden />
-          <h3 className="font-heading text-sm font-semibold tracking-tight">{t('schemes.howWePick.title')}</h3>
+          <h3 className="font-sans text-sm font-semibold tracking-tight">{t('schemes.howWePick.title')}</h3>
         </div>
         <p className="text-sm leading-relaxed text-muted-foreground">{t('schemes.howWePick.description')}</p>
         <div className="flex items-center gap-2 text-[11px] uppercase tracking-[0.14em] text-muted-foreground">

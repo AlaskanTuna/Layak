@@ -24,11 +24,11 @@ export function MarketingHeader() {
   }, [])
 
   return (
-    <header 
+    <header
       className={cn(
         'fixed inset-x-0 top-0 z-50 flex h-[var(--topbar-height)] items-center px-4 transition-all duration-500 md:px-6 border-b',
-        isScrolled 
-          ? 'bg-background/80 backdrop-blur-md border-border/40 text-foreground' 
+        isScrolled
+          ? 'bg-background/80 backdrop-blur-md border-border/40 text-foreground'
           : 'bg-transparent border-transparent text-white dark:text-foreground'
       )}
     >

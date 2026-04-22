@@ -54,17 +54,12 @@ export function Sidebar({ mobileOpen, onMobileClose }: SidebarProps) {
         </div>
 
         <nav className="flex flex-1 flex-col gap-0.5 overflow-y-auto p-2">
-          {NAV_ITEMS.map(item => {
+          {NAV_ITEMS.map((item) => {
             const Icon = item.icon
             const active = pathname === item.href
             const label = t(item.labelKey)
             return (
-              <Link
-                key={item.labelKey}
-                href={item.href}
-                aria-label={label}
-                aria-current={active ? 'page' : undefined}
-              >
+              <Link key={item.labelKey} href={item.href} aria-label={label} aria-current={active ? 'page' : undefined}>
                 <span
                   className={cn(
                     'flex h-9 w-full items-center rounded-md pl-4 text-sm transition-[background-color,color] duration-200 ease-in-out',

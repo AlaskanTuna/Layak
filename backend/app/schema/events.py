@@ -110,8 +110,8 @@ class ErrorEvent(BaseModel):
     # instead of substring-matching the humanised message. `None` surfaces the
     # generic "something broke" recovery card.
     category: ErrorCategory | None = None
-    # Phase 3 Task 1: populated when the evaluation doc was already created
-    # before the error — lets the frontend link the user to the failed eval.
+    # Optional legacy field. Failed evaluations are now discarded from
+    # Firestore, so current callers leave this unset.
     eval_id: str | None = None
 
 

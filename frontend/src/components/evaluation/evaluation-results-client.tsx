@@ -17,6 +17,14 @@ export function EvaluationResultsClient() {
   const { t } = useTranslation()
   const { state, reset, setDemoMode } = useEvaluation()
 
+  useEffect(
+    () => () => {
+      setDemoMode(false)
+      reset()
+    },
+    [reset, setDemoMode]
+  )
+
   useEffect(() => {
     if (state.phase === 'idle') {
       router.replace('/dashboard/evaluation/upload')

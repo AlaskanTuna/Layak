@@ -36,21 +36,24 @@ export function Breadcrumbs() {
 
   if (segments.length === 0) return null
 
-  const crumbs = segments.map((segment, index) => {
-    const href = '/' + segments.slice(0, index + 1).join('/')
-    return {
+  const crumbs = segments.reduce<Array<{ label: string; href: string }>>((acc, segment, index) => {
+    // `/dashboard/evaluation/results/[id]` should keep the stable
+    // "Results" breadcrumb label and never expose the Firestore id.
+    if (segments[index - 1] === 'results') return acc
+
+    acc.push({
       label: toLabel(segment, index),
-      href,
-      isLast: index === segments.length - 1
-    }
-  })
+      href: '/' + segments.slice(0, index + 1).join('/')
+    })
+    return acc
+  }, [])
 
   return (
     <nav aria-label="Breadcrumb" className="hidden min-w-0 items-center gap-1.5 md:flex">
       {crumbs.map((crumb, i) => (
         <div key={crumb.href} className="flex min-w-0 items-center gap-1.5">
           {i > 0 && <ChevronRight className="size-3 shrink-0 text-muted-foreground/50" aria-hidden />}
-          {crumb.isLast ? (
+          {i === crumbs.length - 1 ? (
             <span className="truncate text-sm font-medium text-foreground" aria-current="page">
               {crumb.label}
             </span>

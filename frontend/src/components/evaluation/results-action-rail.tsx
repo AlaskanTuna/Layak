@@ -1,6 +1,5 @@
 'use client'
 
-import Link from 'next/link'
 import { ArrowRight, FileText, ListChecks, ShieldCheck } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 
@@ -11,9 +10,10 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 type Props = {
   canReviewMatches: boolean
   canReviewPacket: boolean
+  onStartAnother: () => void
 }
 
-export function ResultsActionRail({ canReviewMatches, canReviewPacket }: Props) {
+export function ResultsActionRail({ canReviewMatches, canReviewPacket, onStartAnother }: Props) {
   const { t } = useTranslation()
 
   return (
@@ -65,7 +65,7 @@ export function ResultsActionRail({ canReviewMatches, canReviewPacket }: Props) 
           title={t('evaluation.results.actions.startAnotherTitle')}
           description={t('evaluation.results.actions.startAnotherBody')}
           action={
-            <Button render={<Link href="/dashboard/evaluation/upload" />} variant="outline">
+            <Button type="button" variant="outline" onClick={onStartAnother}>
               {t('evaluation.results.actions.startAnotherCta')}
             </Button>
           }

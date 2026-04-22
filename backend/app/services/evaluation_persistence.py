@@ -12,9 +12,10 @@ The intake route now does three things per request:
    flips the step's state to `running`; `step_result` flips it to `complete`
    and persists the step payload (profile / classification / matches /
    compute_upside / packet). `done` stamps `status="complete"`, `completedAt`,
-   `totalAnnualRM`. `error` stamps `status="error"` with the sanitized message.
-3. **eval_id injection** — DoneEvent and ErrorEvent get the persisted eval_id
-   attached so the frontend can route to `/dashboard/evaluation/results/[id]`.
+   `totalAnnualRM`. `error` discards the running Firestore doc entirely so
+   failed evaluations never land in history.
+3. **eval_id injection** — DoneEvent gets the persisted eval_id attached so the
+   frontend can route to `/dashboard/evaluation/results/[id]`.
 
 Firestore write failures mid-stream are caught and converted into an SSE
 `error` event — the stream never silently swallows a persistence failure.
@@ -31,7 +32,6 @@ from typing import Any
 from fastapi import HTTPException, status
 from google.cloud.firestore_v1 import SERVER_TIMESTAMP
 
-from app.agents.gemini import sanitize_error_message
 from app.schema.events import (
     DoneEvent,
     ErrorEvent,
@@ -103,8 +103,8 @@ async def persist_event_stream(
     client's UI must never hang because persistence hiccupped. A Firestore
     failure is logged and swallowed; the client still gets its stream.
 
-    Stamps `eval_id` onto `DoneEvent` and `ErrorEvent` before yielding so the
-    frontend can route to the results page / link to the failed eval.
+    Stamps `eval_id` onto `DoneEvent` before yielding so the frontend can route
+    to the results page.
     """
     async for event in events:
         try:
@@ -116,7 +116,7 @@ async def persist_event_stream(
                 event.type,
             )
 
-        if isinstance(event, DoneEvent | ErrorEvent):
+        if isinstance(event, DoneEvent):
             # Pydantic models are frozen via ConfigDict(extra="forbid") but
             # not immutable — `model_copy(update=...)` returns a new instance.
             yield event.model_copy(update={"eval_id": eval_id})
@@ -174,19 +174,7 @@ def _mirror_to_firestore(  # noqa: PLR0912 — per-event-type dispatch is natura
         return
 
     if isinstance(event, ErrorEvent):
-        doc_ref.update(
-            {
-                "status": "error",
-                "completedAt": SERVER_TIMESTAMP,
-                "error": {
-                    "step": event.step,
-                    "message": sanitize_error_message(event.message),
-                    # Phase 7 Task 6 — persist the category slug so the
-                    # results route can render the same category-tailored
-                    # recovery CTAs on a refresh as the live SSE did.
-                    "category": event.category,
-                },
-                **({f"stepStates.{event.step}": "error"} if event.step else {}),
-            }
-        )
+        # Failed evaluations should not pollute history. The live SSE already
+        # surfaced the failure to the user; discard the pre-created doc.
+        doc_ref.delete()
         return

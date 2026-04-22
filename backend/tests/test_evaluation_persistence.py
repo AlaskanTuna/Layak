@@ -210,39 +210,30 @@ async def test_persist_done_event_stamps_completed(doc_ref: MagicMock) -> None:
 
 @pytest.mark.asyncio
 async def test_persist_error_event_stamps_error_and_sanitizes(doc_ref: MagicMock) -> None:
-    # Message contains a full-IC digit run that must be sanitized before
-    # reaching Firestore (privacy invariant NFR-3).
+    # Failed evaluations are intentionally discarded instead of persisted.
     events = _events(
         ErrorEvent(step="extract", message="ValidationError: bad IC 900324064321 in payload")
     )
     out = await _collect(persist_event_stream(events, eval_id="eval-xyz", doc_ref=doc_ref))
     err = out[0]
     assert isinstance(err, ErrorEvent)
-    assert err.eval_id == "eval-xyz"
-    payload = doc_ref.update.call_args.args[0]
-    assert payload["status"] == "error"
-    assert payload["error"]["step"] == "extract"
-    # sanitize_error_message redacts the IC digits.
-    assert "900324064321" not in payload["error"]["message"]
-    assert "[redacted]" in payload["error"]["message"]
-    assert payload["stepStates.extract"] == "error"
+    assert err.eval_id is None
+    doc_ref.delete.assert_called_once_with()
+    doc_ref.update.assert_not_called()
 
 
 @pytest.mark.asyncio
 async def test_persist_error_event_without_step_skips_step_state_update(doc_ref: MagicMock) -> None:
     events = _events(ErrorEvent(step=None, message="generic failure"))
     await _collect(persist_event_stream(events, eval_id="eval-xyz", doc_ref=doc_ref))
-    payload = doc_ref.update.call_args.args[0]
-    assert payload["status"] == "error"
-    # No dynamic `stepStates.{step}` key since the step was unknown.
-    assert not any(k.startswith("stepStates.") for k in payload)
+    doc_ref.delete.assert_called_once_with()
+    doc_ref.update.assert_not_called()
 
 
 @pytest.mark.asyncio
 async def test_persist_error_event_stores_category_slug(doc_ref: MagicMock) -> None:
-    """Phase 7 Task 6 — the category slug from the SSE ErrorEvent must round-
-    trip into Firestore so the persisted results route can render the same
-    category-tailored recovery CTAs on a page refresh as the live SSE did."""
+    """Category metadata still flows to the live SSE event even though the
+    Firestore doc itself is discarded."""
     events = _events(
         ErrorEvent(
             step="classify",
@@ -250,21 +241,22 @@ async def test_persist_error_event_stores_category_slug(doc_ref: MagicMock) -> N
             category="quota_exhausted",
         )
     )
-    await _collect(persist_event_stream(events, eval_id="eval-xyz", doc_ref=doc_ref))
-    payload = doc_ref.update.call_args.args[0]
-    assert payload["error"]["category"] == "quota_exhausted"
+    out = await _collect(persist_event_stream(events, eval_id="eval-xyz", doc_ref=doc_ref))
+    err = out[0]
+    assert isinstance(err, ErrorEvent)
+    assert err.category == "quota_exhausted"
+    doc_ref.delete.assert_called_once_with()
 
 
 @pytest.mark.asyncio
 async def test_persist_error_event_without_category_stores_null(doc_ref: MagicMock) -> None:
-    """Unknown-category errors still write the field — as `None` — so
-    reads on the frontend don't have to guard the optional key. Firestore
-    `None` serialises to JSON `null` which matches the frontend type."""
+    """Unknown-category errors should still flow through the SSE event."""
     events = _events(ErrorEvent(step="extract", message="RuntimeError: mystery"))
-    await _collect(persist_event_stream(events, eval_id="eval-xyz", doc_ref=doc_ref))
-    payload = doc_ref.update.call_args.args[0]
-    assert "category" in payload["error"]
-    assert payload["error"]["category"] is None
+    out = await _collect(persist_event_stream(events, eval_id="eval-xyz", doc_ref=doc_ref))
+    err = out[0]
+    assert isinstance(err, ErrorEvent)
+    assert err.category is None
+    doc_ref.delete.assert_called_once_with()
 
 
 @pytest.mark.asyncio

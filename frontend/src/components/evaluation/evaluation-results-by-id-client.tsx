@@ -19,6 +19,7 @@ import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
 import type { PipelineState, StepStatus } from '@/hooks/use-agent-pipeline'
 import { useAuth } from '@/lib/auth-context'
+import { useEvaluation } from '@/components/evaluation/evaluation-provider'
 import {
   type ComputeUpsideResult,
   type EvaluationDoc,
@@ -90,6 +91,7 @@ export function EvaluationResultsByIdClient({ evalId }: { evalId: string }) {
   const router = useRouter()
   const { t } = useTranslation()
   const { user, loading: authLoading } = useAuth()
+  const { reset, setDemoMode } = useEvaluation()
   const [doc, setDoc] = useState<EvaluationDoc | null>(null)
   const [phase, setPhase] = useState<FetchPhase>('loading')
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
@@ -143,6 +145,17 @@ export function EvaluationResultsByIdClient({ evalId }: { evalId: string }) {
       }
     }
   }, [phase, doc, fetchDoc])
+
+  useEffect(
+    () => () => {
+      // The evaluation provider is shared across the whole
+      // `/dashboard/evaluation/*` subtree. Clear any completed/demo state when
+      // the user leaves results so upload/history pages don't inherit it.
+      setDemoMode(false)
+      reset()
+    },
+    [reset, setDemoMode]
+  )
 
   const pipelineState = useMemo(() => (doc ? docToPipelineState(doc) : null), [doc])
 
@@ -215,6 +228,8 @@ export function EvaluationResultsByIdClient({ evalId }: { evalId: string }) {
   const totalAnnualRm = doc.totalAnnualRM ?? 0
 
   function handleStartAnother() {
+    setDemoMode(false)
+    reset()
     router.push('/dashboard/evaluation/upload')
   }
 
@@ -228,6 +243,7 @@ export function EvaluationResultsByIdClient({ evalId }: { evalId: string }) {
         <ResultsActionRail
           canReviewMatches={matchedCount > 0}
           canReviewPacket={matchedCount > 0}
+          onStartAnother={handleStartAnother}
         />
       )}
 

@@ -9,7 +9,7 @@ from __future__ import annotations
 
 from google.genai import types
 
-from app.agents.gemini import FAST_MODEL, get_client, strip_json_fences
+from app.agents.gemini import WORKER_MODEL, get_client, strip_json_fences
 from app.schema.profile import HouseholdClassification, Profile
 
 _INSTRUCTION = """
@@ -49,7 +49,7 @@ async def classify_household(profile: Profile) -> HouseholdClassification:
     client = get_client()
     prompt = _INSTRUCTION.format(profile_json=profile.model_dump_json(indent=2))
     response = client.models.generate_content(
-        model=FAST_MODEL,
+        model=WORKER_MODEL,
         contents=prompt,
         config=types.GenerateContentConfig(
             response_mime_type="application/json",

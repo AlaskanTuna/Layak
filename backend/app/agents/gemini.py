@@ -19,12 +19,24 @@ Configuration:
                               `asia-southeast1` so requests stay co-located
                               with the Cloud Run service.
 
-Model routing (see docs/trd.md §5.1):
-    FAST_MODEL      — Gemini 2.5 Flash — multimodal extract, structured classify, code execution.
-    ORCHESTRATOR    — Gemini 2.5 Pro   — ADK RootAgent in Task 3 Path 2+. Vertex AI's
-                      project-scoped quotas mean we can call Pro directly without
-                      the 429 RESOURCE_EXHAUSTED churn the AI Studio Free tier
-                      forced on us pre-Phase 6 Task 6.
+Model routing (Phase 8 Task 4 — per-step assignment, see docs/trd.md §5.1):
+    FAST_MODEL      — Gemini 2.5 Flash — multimodal extract (OCR-critical, GA-only).
+    WORKER_MODEL    — Gemini 2.5 Flash-Lite — structured classify (~5x cheaper than Flash).
+    HEAVY_MODEL     — Gemini 3 Flash Preview — compute_upside (code_execution tool).
+                      Cleared by Phase 8 Task 1 probe (2026-04-23):
+                      `backend/scripts/probe_gemini_3_flash.py` confirmed both
+                      `code_execution` and `response_mime_type=application/json`
+                      work against this model in the `global` location. Fallback
+                      to `gemini-2.5-pro` if the preview model is ever yanked.
+    ORCHESTRATOR    — Gemini 2.5 Pro   — kept for the documented ADK orchestrator
+                      role; not currently invoked by the manual `stream_agent_events`
+                      loop. Reserved for the optional Move 2b ADK runner cutover.
+
+Region pinning: Phase 8 Task 1 probe found `asia-southeast1` only publishes
+`gemini-2.5-flash`, while `global` resolves all four models above. The
+`_DEFAULT_LOCATION` flips to `global` so a single Vertex AI endpoint serves
+the entire pipeline. Cloud Run service stays in `asia-southeast1` for
+co-location with the user-facing frontend.
 """
 
 from __future__ import annotations
@@ -49,9 +61,12 @@ ErrorCategory = Literal[
 ]
 
 FAST_MODEL = "gemini-2.5-flash"
+WORKER_MODEL = "gemini-2.5-flash-lite"
+HEAVY_MODEL = "gemini-3-flash-preview"
+HEAVY_MODEL_FALLBACK = "gemini-2.5-pro"
 ORCHESTRATOR_MODEL = "gemini-2.5-pro"
 
-_DEFAULT_LOCATION = "asia-southeast1"
+_DEFAULT_LOCATION = "global"
 
 _DOTENV_CANDIDATES = (
     Path(__file__).resolve().parent.parent.parent.parent / ".env",

@@ -62,36 +62,43 @@ root_agent = SequentialAgent(
         LlmAgent(
             name="extractor_stub",
             description=(
-                "Stub extractor. Task 3 Path 2: Gemini 2.5 Flash multimodal reading "
-                "IC + payslip + utility-bill uploads into a Profile with structured output."
+                "Extractor. Gemini 2.5 Flash (FAST_MODEL) multimodal reading "
+                "IC + payslip + utility-bill uploads into a Profile with structured output. "
+                "Quality-critical OCR step; stays on GA Flash."
             ),
         ),
         LlmAgent(
             name="classifier_stub",
             description=(
-                "Stub classifier. Task 3 Path 2: Gemini 2.5 Flash structured output "
-                "emitting household-flags + per-capita income + income band."
+                "Classifier. Phase 8 Task 4: Gemini 2.5 Flash-Lite (WORKER_MODEL) structured "
+                "output emitting household-flags + per-capita income + income band. ~5x cheaper "
+                "than Flash for the small structured-output workload."
             ),
         ),
         LlmAgent(
             name="matcher_stub",
             description=(
-                "Stub matcher. Task 3 Path 2: Vertex AI Search retrieves passage + URL "
-                "per rule, then the rule engine in app/rules/ validates thresholds."
+                "Matcher. Pure-Python rule engine in app/rules/ validates thresholds; "
+                "Phase 8 Task 3: app/services/vertex_ai_search.py augments each rule's "
+                "_citations() with a Discovery Engine retrieved passage as the primary "
+                "citation, hardcoded URL as fail-open fallback."
             ),
         ),
         LlmAgent(
             name="upside_computer_stub",
             description=(
-                "Stub compute_upside. Task 3 Path 2: Gemini 2.5 Pro with code_execution "
-                "runs Python in a sandbox; stdout streamed to the UI verbatim."
+                "compute_upside. Phase 8 Task 4: Gemini 3 Flash Preview (HEAVY_MODEL) with "
+                "code_execution runs Python in a sandbox; stdout streamed to the UI verbatim. "
+                "Probe (backend/scripts/probe_gemini_3_flash.py, 2026-04-23) confirmed "
+                "code_execution + structured-output support in `global` location. "
+                "Fallback: HEAVY_MODEL_FALLBACK = gemini-2.5-pro."
             ),
         ),
         LlmAgent(
             name="packet_generator_stub",
             description=(
-                "Stub packet generator. Task 5: WeasyPrint renders three Jinja HTML "
-                "templates into PDFs watermarked 'DRAFT — NOT SUBMITTED'."
+                "Packet generator. WeasyPrint renders Jinja HTML templates into PDFs "
+                "watermarked 'DRAFT — NOT SUBMITTED'. No LLM call."
             ),
         ),
     ],

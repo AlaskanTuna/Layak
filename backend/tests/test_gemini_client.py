@@ -59,7 +59,10 @@ def test_get_client_defaults_location_when_unset(
     _args, kwargs = ctor.call_args
     assert kwargs["vertexai"] is True
     assert kwargs["project"] == "some-project"
-    assert kwargs["location"] == "asia-southeast1"
+    # Phase 8 Task 4: default location flipped from asia-southeast1 to global
+    # so a single Vertex AI endpoint serves all four pipeline models (probe
+    # found asia-southeast1 only publishes gemini-2.5-flash).
+    assert kwargs["location"] == "global"
 
 
 def test_get_client_raises_runtime_error_when_project_unset(

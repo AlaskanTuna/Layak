@@ -1,4 +1,4 @@
-"""`compute_upside` — Gemini 2.5 Flash + code_execution tool (Task 3 Path 2).
+"""`compute_upside` — Gemini 3 Flash Preview + code_execution tool (Phase 8 Task 4).
 
 Sends the rule-engine matches to Gemini with the Code Execution tool enabled.
 Gemini writes a short Python script, runs it in a sandbox, and returns the
@@ -6,9 +6,15 @@ executable source + stdout. We parse both out of the response parts and
 populate `ComputeUpsideResult` — the frontend pipeline step renders the
 `<pre>`-block exactly as Gemini produced it.
 
-Why Flash and not Pro: `gemini-2.5-pro` returns 429 RESOURCE_EXHAUSTED on the
-free-tier API key we're demoing against. Flash supports the Code Execution
-tool with identical payload shape and is safely under quota.
+Phase 8 Task 4 cutover: this step now uses `HEAVY_MODEL` (gemini-3-flash-preview).
+The previous `FAST_MODEL` (gemini-2.5-flash) workaround was driven by the
+AI Studio Free-tier 429 cliff that the Phase 6 Vertex AI cutover already
+solved; with Vertex billing flowing to the project's GCC, we can safely run
+the more capable model here. The Phase 8 Task 1 probe
+(`backend/scripts/probe_gemini_3_flash.py`, 2026-04-23) confirmed
+`code_execution` works against gemini-3-flash-preview in the `global`
+location. Fallback: switch the import to `HEAVY_MODEL_FALLBACK` (gemini-2.5-pro)
+if the preview model is ever yanked.
 """
 
 from __future__ import annotations
@@ -17,7 +23,7 @@ import json
 
 from google.genai import types
 
-from app.agents.gemini import FAST_MODEL, get_client
+from app.agents.gemini import HEAVY_MODEL, get_client
 from app.schema.events import ComputeUpsideResult
 from app.schema.scheme import SchemeMatch
 
@@ -95,7 +101,7 @@ async def compute_upside(matches: list[SchemeMatch]) -> ComputeUpsideResult:
         matches_json=json.dumps([m.model_dump() for m in upside_matches], default=str, indent=2)
     )
     response = client.models.generate_content(
-        model=FAST_MODEL,
+        model=HEAVY_MODEL,
         contents=prompt,
         config=types.GenerateContentConfig(
             tools=[types.Tool(code_execution=types.ToolCodeExecution())],

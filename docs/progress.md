@@ -4,6 +4,12 @@
 
 ---
 
+## [22/04/26] - Phase 7 Task 11 PO2 follow-up: lighter upload cards + tooltip-based document guidance
+
+PO2 simplified the upload widget further after review: the separate "Before you continue" checklist block is gone, and the document-specific guidance now sits in compact hover/focus tooltips beside each upload-card heading instead of taking up space inside the cards. `frontend/src/components/evaluation/upload-widget.tsx` now uses a small shared `InfoTooltip` helper for `MyKad`, `Payslip`, `Utility bill`, and `Household`, keeping the cards visually lighter while preserving the same explanatory copy. The household card still shows the live dependant-summary line, but its longer guidance is now tooltip-only. Frontend `pnpm -C frontend lint` clean; `pnpm -C frontend build` clean.
+
+---
+
 ## [22/04/26] - Phase 7 Task 12 PO2 follow-up: help launcher placement + glass treatment + modal layout fix
 
 PO2 tightened the new quick-help surface after live QA. The floating `?` launcher is now dashboard-only (removed from the marketing landing page), the button uses the shared global glassmorphism surface styling from `globals.css`, and the dialog shell was reworked to behave like a proper bounded modal instead of letting the footer collapse into the body. `frontend/src/components/layout/floating-help-launcher.tsx` now opens through the same `handleOpenChange()` path used by the dialog, uses a grid tab list that wraps cleanly on smaller widths, constrains the popup to `85svh`, and keeps the content area scrollable with an inline footer row plus a single `Done` action. Frontend `pnpm -C frontend lint` clean; `pnpm -C frontend build` clean.

@@ -8,6 +8,7 @@ import type { TFunction } from 'i18next'
 import { DependantsFieldset, type DependantInputRow } from '@/components/evaluation/dependants-fieldset'
 import { SectionBadge } from '@/components/evaluation/section-badge'
 import { Button } from '@/components/ui/button'
+import { InfoTooltip } from '@/components/ui/info-tooltip'
 import type { DependantInput } from '@/lib/agent-types'
 import { cn } from '@/lib/utils'
 
@@ -98,9 +99,9 @@ function UploadSlotCard({ spec, state, inputId, disabled, inputRef, onChange, on
       <div className="flex flex-col gap-1.5">
         <div className="flex items-center gap-2">
           <p className="font-heading text-base font-semibold tracking-tight">{label}</p>
+          <InfoTooltip content={hint} label={hint} />
           <SectionBadge required={spec.required} />
         </div>
-        <p className="text-xs leading-relaxed text-muted-foreground">{hint}</p>
       </div>
 
       {file ? (
@@ -225,14 +226,6 @@ export function UploadWidget({ onSubmit, onUseSamples, disabled = false, samples
   return (
     <div className="flex flex-col gap-5">
       <div className="flex flex-col gap-4">
-        <div className="rounded-xl border border-primary/15 bg-primary/5 p-4">
-          <p className="font-heading text-sm font-semibold tracking-tight">{t('evaluation.upload.readyTitle')}</p>
-          <ul className="mt-3 space-y-2 text-sm text-muted-foreground">
-            <li>{t('evaluation.upload.readyIc')}</li>
-            <li>{t('evaluation.upload.readyPayslip')}</li>
-            <li>{t('evaluation.upload.readyUtility')}</li>
-          </ul>
-        </div>
         {SLOT_SPECS.map(spec => {
           const inputId = `${reactId}-${spec.slot}`
           return (
@@ -262,6 +255,10 @@ export function UploadWidget({ onSubmit, onUseSamples, disabled = false, samples
                 <p className="font-heading text-base font-semibold tracking-tight">
                   {t('evaluation.upload.householdTitle')}
                 </p>
+                <InfoTooltip
+                  content={t('evaluation.upload.householdHint')}
+                  label={t('evaluation.upload.householdHint')}
+                />
                 <SectionBadge required={false} />
               </div>
               <p className="text-xs leading-relaxed text-muted-foreground">
@@ -276,12 +273,7 @@ export function UploadWidget({ onSubmit, onUseSamples, disabled = false, samples
             />
           </button>
           {showHousehold && (
-            <>
-              <p className="text-xs leading-relaxed text-muted-foreground">
-                {t('evaluation.upload.householdHint')}
-              </p>
-              <DependantsFieldset value={dependants} onChange={setDependants} disabled={disabled} />
-            </>
+            <DependantsFieldset value={dependants} onChange={setDependants} disabled={disabled} />
           )}
         </div>
       </div>

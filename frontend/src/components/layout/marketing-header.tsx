@@ -34,11 +34,17 @@ export function MarketingHeader() {
     >
       <Link href="/" className="flex items-center gap-2" aria-label={t('common.aria.layakHome')}>
         <BrandMark />
-        <span className="font-sans text-base font-semibold tracking-tight">{t('common.brand')}</span>
+        <span className="font-sans text-base font-semibold tracking-tight text-black dark:text-foreground">
+          {t('common.brand')}
+        </span>
       </Link>
       <nav className="ml-auto flex items-center gap-1">
-        <LanguageToggle />
-        <ThemeToggle />
+        <div className="text-black dark:text-foreground">
+          <LanguageToggle />
+        </div>
+        <div className="text-black dark:text-foreground">
+          <ThemeToggle />
+        </div>
         <Button render={<Link href="/sign-in" />} size="sm" className="ml-2">
           {t('common.button.signIn')}
         </Button>

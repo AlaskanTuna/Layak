@@ -79,7 +79,7 @@ export function LandingHero() {
             {t('marketing.hero.headlinePart1')} <br className="hidden sm:inline" />
             {t('marketing.hero.headlinePart2')}
           </h1>
-          <p className="max-w-2xl text-base leading-relaxed text-zinc-100/92 sm:text-lg drop-shadow-sm">
+          <p className="hero-description max-w-2xl rounded-2xl px-4 py-3 text-base leading-relaxed sm:text-lg">
             {t('marketing.hero.description')}
           </p>
           <div className="mt-4 flex w-full flex-col gap-3 sm:w-auto sm:flex-row">

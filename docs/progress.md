@@ -905,3 +905,12 @@ Findings the audit flagged that were **not** acted on (cosmetic or external to P
 - `ActiveApplications` cards: added `min-w-0 flex-1` to the inner flex column, `truncate` on both text rows, and `shrink-0` on the Open button — fixes the case where a long timestamp + RM amount would push the CTA off-screen on a narrow phone.
 - Verified: `pnpm lint` clean, `pnpm build` clean across all 13 routes.
 - Other surfaces audited and left as-is: `SchemeCardGrid` (already 1-col → 2-col → 3-col), `DraftPacketPreview` (already truncates name + uses min-w-0), `ResultsActionRail` (already 1-col → 3-col), `schemes-overview` (already 1-col → 2-col → 3-col).
+
+## [22/04/26] - Phase 7 brochure provenance: source + commit i-Saraan, JKM BKK, PERKESO SKSPS PDFs
+
+- All three Phase 7 scheme rules now have on-disk provenance assets matching the filenames they cite. The KWSP / JKM / PERKESO portals do not all publish downloadable brochure PDFs (Cloudflare blocks on KWSP; HTML-only article on JKM), so each asset was sourced from the closest official `.gov.my` substitute and stored under the planned filename so the rule docstrings + citation references resolve to a real file.
+- `backend/data/schemes/i-saraan-program.pdf` (898.5 KB) — MOF Bajet 2024 touchpoint document `https://belanjawan.mof.gov.my/pdf/belanjawan2024/ucapan/touchpoint-budget-bm.pdf`, which covers the i-Saraan 15% government match capped at RM 500/yr.
+- `backend/data/schemes/jkm-bkk-brochure.pdf` (156.8 KB) — official JKM BKK article page `https://www.jkm.gov.my/main/article/bantuan-bulanan` rendered to PDF; preserves the canonical JKM copy on per-child rate + per-household cap.
+- `backend/data/schemes/perkeso-sksps-rates.pdf` (491.2 KB) — official PERKESO LINDUNG KENDIRI BM booklet `https://www.perkeso.gov.my/images/lindung/booklet/270825-poster-LINDUNG_KENDIRI-BM.pdf` covering the SKSPS plan structure + contribution schedule.
+- Magic header verified `%PDF` on each. Backend test suite still 291/291 green — no regression. Phase 7 Tasks 7/8/9 box-1 each ticked with annotations describing the source URL and any fallback used.
+- Net effect: the agent pipeline now has a complete offline-readable provenance chain for all 6 in-scope schemes plus the Form B/BE LHDN reliefs.

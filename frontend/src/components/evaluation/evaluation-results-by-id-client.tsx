@@ -11,6 +11,7 @@ import { ErrorRecoveryCard } from '@/components/evaluation/error-recovery-card'
 import { EvaluationUpsideHero } from '@/components/evaluation/evaluation-upside-hero'
 import { PersistedPacketDownload } from '@/components/evaluation/persisted-packet-download'
 import { PipelineStepper } from '@/components/evaluation/pipeline-stepper'
+import { RequiredContributionsCard } from '@/components/evaluation/required-contributions-card'
 import { SchemeCardGrid } from '@/components/evaluation/scheme-card-grid'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
@@ -205,7 +206,13 @@ export function EvaluationResultsByIdClient({ evalId }: { evalId: string }) {
   const isComplete = doc.status === 'complete'
   const isError = doc.status === 'error'
 
-  const qualifyingCount = doc.matches.filter(m => m.qualifies).length
+  // Phase 7 Task 9 — hero "across N schemes" copy should reflect only the
+  // upside schemes (exclude required_contribution). `totalAnnualRM` already
+  // excludes them because backend `compute_upside` does the same filter
+  // before summing; this keeps the hero count and hero total math-consistent.
+  const qualifyingCount = doc.matches.filter(
+    m => m.qualifies && (m.kind ?? 'upside') === 'upside'
+  ).length
   const totalAnnualRm = doc.totalAnnualRM ?? 0
 
   function handleStartAnother() {
@@ -244,6 +251,7 @@ export function EvaluationResultsByIdClient({ evalId }: { evalId: string }) {
             empty={!isComplete}
           />
           <SchemeCardGrid matches={doc.matches} />
+          <RequiredContributionsCard matches={doc.matches} />
           {pipelineState.upside &&
             pipelineState.upside.total_annual_rm > 0 &&
             // Only render the panel when we actually have a trace to show —

@@ -18,7 +18,19 @@ export type Relationship = 'child' | 'parent' | 'spouse' | 'sibling' | 'other'
 
 export type Step = 'extract' | 'classify' | 'match' | 'compute_upside' | 'generate'
 
-export type SchemeId = 'str_2026' | 'jkm_warga_emas' | 'jkm_bkk' | 'lhdn_form_b' | 'lhdn_form_be'
+export type SchemeId =
+  | 'str_2026'
+  | 'jkm_warga_emas'
+  | 'jkm_bkk'
+  | 'lhdn_form_b'
+  | 'lhdn_form_be'
+  | 'perkeso_sksps'
+
+// Phase 7 Task 9 — upside schemes stack into the headline annual-relief
+// total; required_contribution schemes (e.g. PERKESO SKSPS) surface a
+// separate "Required contributions" block and are excluded from the
+// upside total. Keep in lockstep with backend `app/schema/scheme.py`.
+export type SchemeKind = 'upside' | 'required_contribution'
 
 export type Dependant = {
   relationship: Relationship
@@ -90,12 +102,22 @@ export type SchemeMatch = {
   scheme_id: SchemeId
   scheme_name: string
   qualifies: boolean
+  /** Annual benefit paid to the user. Always `0` for
+   * `kind === 'required_contribution'` — the mandatory amount lives on
+   * `annual_contribution_rm` instead so upside math stays correct. */
   annual_rm: number
   summary: string
   why_qualify: string
   agency: string
   portal_url: string
   rule_citations: RuleCitation[]
+  /** Phase 7 Task 9 — defaults to `'upside'` on backend matches that pre-date
+   * Task 9. Optional on the type so older persisted Firestore docs still
+   * deserialise in TypeScript. */
+  kind?: SchemeKind
+  /** Annual mandatory contribution the user PAYS under this scheme. Only set
+   * when `kind === 'required_contribution'`. */
+  annual_contribution_rm?: number | null
 }
 
 export type PacketDraft = {

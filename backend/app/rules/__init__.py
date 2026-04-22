@@ -6,6 +6,6 @@ pinned by a matching assertion in `backend/tests/` — except where the source
 document is pending commit (noted in the rule module docstring).
 """
 
-from app.rules import jkm_bkk, jkm_warga_emas, lhdn_form_b, str_2026
+from app.rules import jkm_bkk, jkm_warga_emas, lhdn_form_b, perkeso_sksps, str_2026
 
-__all__ = ["jkm_bkk", "jkm_warga_emas", "lhdn_form_b", "str_2026"]
+__all__ = ["jkm_bkk", "jkm_warga_emas", "lhdn_form_b", "perkeso_sksps", "str_2026"]

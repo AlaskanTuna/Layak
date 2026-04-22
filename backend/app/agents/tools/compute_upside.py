@@ -69,11 +69,20 @@ def _extract_exec_parts(response: object) -> tuple[str, str]:
 
 
 async def compute_upside(matches: list[SchemeMatch]) -> ComputeUpsideResult:
-    """Compute annual RM upside via Gemini-run Python (code_execution tool)."""
-    per_scheme = {m.scheme_id: float(m.annual_rm) for m in matches}
+    """Compute annual RM upside via Gemini-run Python (code_execution tool).
+
+    Phase 7 Task 9: `kind="required_contribution"` matches are skipped here —
+    they represent money the user PAYS (e.g. PERKESO SKSPS mandatory
+    contributions), not upside. Filtering before prompt construction keeps
+    them out of the generated Python table; their `annual_rm` is already
+    `0.0` so the final sum is unaffected either way, but omitting them from
+    the stdout table avoids a misleading "PERKESO SKSPS ... 0" row.
+    """
+    upside_matches = [m for m in matches if m.kind == "upside"]
+    per_scheme = {m.scheme_id: float(m.annual_rm) for m in upside_matches}
     total = sum(per_scheme.values())
 
-    if not matches:
+    if not upside_matches:
         return ComputeUpsideResult(
             python_snippet="# No qualifying schemes — skipping computation.\n",
             stdout="No qualifying schemes.",
@@ -82,7 +91,9 @@ async def compute_upside(matches: list[SchemeMatch]) -> ComputeUpsideResult:
         )
 
     client = get_client()
-    prompt = _INSTRUCTION.format(matches_json=json.dumps([m.model_dump() for m in matches], default=str, indent=2))
+    prompt = _INSTRUCTION.format(
+        matches_json=json.dumps([m.model_dump() for m in upside_matches], default=str, indent=2)
+    )
     response = client.models.generate_content(
         model=FAST_MODEL,
         contents=prompt,

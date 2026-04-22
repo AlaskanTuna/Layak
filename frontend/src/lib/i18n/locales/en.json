@@ -486,6 +486,12 @@
       "emptyList": "Scheme matches will appear here after your first evaluation completes.",
       "eligibleSchemesCount": "Eligible schemes ({{count}})"
     },
+    "requiredContributions": {
+      "heading": "Required contributions",
+      "intro": "Mandatory contributions you owe under these schemes. These are NOT included in your annual relief total above — they're money you pay.",
+      "annualLabel": "Annual contribution",
+      "footnote": "Register and pay directly via the agency portal. Non-payment may affect access to employment-injury benefits if you claim later."
+    },
     "packet": {
       "titleSingular": "Draft application packet ({{count}} file)",
       "titlePlural": "Draft application packet ({{count}} files)",

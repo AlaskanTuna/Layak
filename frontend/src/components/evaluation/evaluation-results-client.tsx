@@ -8,6 +8,7 @@ import { CodeExecutionPanel } from '@/components/evaluation/code-execution-panel
 import { useEvaluation } from '@/components/evaluation/evaluation-provider'
 import { EvaluationUpsideHero } from '@/components/evaluation/evaluation-upside-hero'
 import { PacketDownload } from '@/components/evaluation/packet-download'
+import { RequiredContributionsCard } from '@/components/evaluation/required-contributions-card'
 import { SchemeCardGrid } from '@/components/evaluation/scheme-card-grid'
 import { Button } from '@/components/ui/button'
 
@@ -39,7 +40,12 @@ export function EvaluationResultsClient() {
     return null
   }
 
-  const qualifyingCount = state.matches.filter(m => m.qualifies).length
+  // Phase 7 Task 9 — upside schemeCount excludes required-contribution
+  // entries so the hero's "across N schemes" copy tallies only the
+  // schemes that stack into the annual-relief total.
+  const qualifyingCount = state.matches.filter(
+    m => m.qualifies && (m.kind ?? 'upside') === 'upside'
+  ).length
   const totalAnnualRm = state.upside?.total_annual_rm ?? 0
 
   return (
@@ -50,6 +56,7 @@ export function EvaluationResultsClient() {
         packet={state.packet}
       />
       <SchemeCardGrid matches={state.matches} />
+      <RequiredContributionsCard matches={state.matches} />
       {state.upside && <CodeExecutionPanel upside={state.upside} />}
       <PacketDownload packet={state.packet} />
       <div className="flex">

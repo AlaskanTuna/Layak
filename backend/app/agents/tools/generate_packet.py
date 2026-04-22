@@ -31,18 +31,21 @@ from app.schema.scheme import SchemeMatch
 # backend/app/agents/tools/generate_packet.py → backend/app/templates/
 _TEMPLATES_DIR = Path(__file__).resolve().parent.parent.parent / "templates"
 
-# scheme_id → (template filename, output filename pattern). LHDN has two
-# entries (one per filer form); Phase 7 Task 1 added `lhdn_form_be` so
-# salaried filers receive a matching Form BE draft rather than silently
-# falling back to the Form B layout. Phase 7 Task 8 added `jkm_bkk`
-# (Bantuan Kanak-Kanak) — complements `jkm_warga_emas` for households
-# with children under 18.
+# scheme_id → (template filename, output filename pattern). Phase-7 additions:
+# - `lhdn_form_be` (Task 1) — Form BE salaried filer layout.
+# - `jkm_bkk` (Task 8) — Bantuan Kanak-Kanak per-child payment.
+# - `perkeso_sksps` (Task 9) — SKSPS self-employed social-security
+#   contribution. Unlike the other four, SKSPS is a required-contribution
+#   scheme (`kind="required_contribution"`); the draft still renders so the
+#   user has a filing artefact, but the match's `annual_rm` is zero and the
+#   upside pipeline filters it out.
 _TEMPLATE_MAP: dict[str, tuple[str, str]] = {
     "str_2026": ("bk01.html.jinja", "BK-01-STR2026-draft-{ic_last4}.pdf"),
     "jkm_warga_emas": ("jkm18.html.jinja", "JKM18-warga-emas-draft-{ic_last4}.pdf"),
     "jkm_bkk": ("jkm_bkk.html.jinja", "JKM-bkk-draft-{ic_last4}.pdf"),
     "lhdn_form_b": ("lhdn.html.jinja", "LHDN-form-b-relief-summary-{ic_last4}.pdf"),
     "lhdn_form_be": ("lhdn_be.html.jinja", "LHDN-form-be-relief-summary-{ic_last4}.pdf"),
+    "perkeso_sksps": ("perkeso_sksps.html.jinja", "PERKESO-sksps-draft-{ic_last4}.pdf"),
 }
 
 

@@ -10,7 +10,16 @@ from typing import Literal
 
 from pydantic import BaseModel, ConfigDict, Field
 
-SchemeId = Literal["str_2026", "jkm_warga_emas", "jkm_bkk", "lhdn_form_b", "lhdn_form_be"]
+SchemeId = Literal["str_2026", "jkm_warga_emas", "jkm_bkk", "lhdn_form_b", "lhdn_form_be", "perkeso_sksps"]
+
+# Phase 7 Task 9 — `SchemeKind` splits upside schemes (user RECEIVES money,
+# annual_rm sums into the headline upside total) from required-contribution
+# schemes (user PAYS money — e.g. PERKESO SKSPS mandatory social-security
+# contributions). Required contributions render in a separate UI block so
+# they don't misleadingly stack into the "annual relief" total. Defaults to
+# `"upside"` so every pre-Task-9 rule keeps its existing semantics without
+# touching each match() call site.
+SchemeKind = Literal["upside", "required_contribution"]
 
 
 class RuleCitation(BaseModel):
@@ -35,3 +44,10 @@ class SchemeMatch(BaseModel):
     agency: str = Field(min_length=1)
     portal_url: str = Field(min_length=1)
     rule_citations: list[RuleCitation] = Field(default_factory=list)
+    # Phase 7 Task 9 additions. Defaults preserve the pre-task shape so every
+    # prior rule + persisted Firestore doc validates without migration.
+    kind: SchemeKind = "upside"
+    # The annualised RM amount the user would PAY under this scheme; set only
+    # when `kind == "required_contribution"`. The frontend renders this in the
+    # "Required contributions" block instead of stacking it into the upside.
+    annual_contribution_rm: float | None = Field(default=None, ge=0)

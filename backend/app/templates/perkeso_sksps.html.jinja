@@ -1,0 +1,145 @@
+{#
+  PERKESO SKSPS (Self-Employed Social Security) draft registration packet.
+
+  This is a REQUIRED CONTRIBUTION, not an upside — the packet documents the
+  monthly contribution the user owes under Akta 789 (Plan 1–4 depending on
+  declared monthly income). `match.annual_contribution_rm` carries the
+  yearly amount; `match.annual_rm` is always `0.0` and is intentionally
+  omitted from the rendered totals.
+
+  Structurally mirrors `bk01.html.jinja` (STR 2026) so the visual language
+  stays consistent with the other draft packets. The diagonal
+  "DRAFT — NOT SUBMITTED" watermark + legal footer come from `_base`.
+#}
+{% extends "_base.html.jinja" %}
+
+{% block title %}PERKESO SKSPS · Borang Pendaftaran (Draft){% endblock %}
+{% block agency %}PERKESO (SOCSO) · Skim Keselamatan Sosial Pekerjaan Sendiri (Akta 789) · <a href="{{ match.portal_url }}">{{ match.portal_url }}</a>{% endblock %}
+
+{% block body %}
+<section>
+  <h2>Bahagian I — Maklumat Pemohon</h2>
+  <div class="field-grid">
+    <div class="label">Nama Pemohon</div>
+    <div class="value">{{ profile.name }}</div>
+
+    <div class="label">Kad Pengenalan (4 akhir)</div>
+    <div class="value">••••-••-{{ profile.ic_last4 }}</div>
+
+    <div class="label">Umur</div>
+    <div class="value">{{ profile.age }} tahun</div>
+
+    <div class="label">Kategori Pekerjaan</div>
+    <div class="value">Pekerja Sendiri / Gig (Form B)</div>
+
+    <div class="label">Pendapatan Bulanan Diisytihar</div>
+    <div class="value">RM {{ '{:,.2f}'.format(profile.monthly_income_rm) }}</div>
+
+    {% if profile.address %}
+    <div class="label">Alamat Surat-menyurat</div>
+    <div class="value">{{ profile.address }}</div>
+    {% endif %}
+  </div>
+</section>
+
+<section>
+  <h2>Bahagian II — Plan Caruman (Jadual SKSPS)</h2>
+  <table class="amounts">
+    <thead>
+      <tr>
+        <th>Plan</th>
+        <th>Had Pendapatan Bulanan</th>
+        <th class="num">Caruman Bulanan (RM)</th>
+        <th class="num">Caruman Tahunan (RM)</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% set selected_plan = None %}
+      {% if profile.monthly_income_rm <= 1050 %}{% set selected_plan = 1 %}
+      {% elif profile.monthly_income_rm <= 1550 %}{% set selected_plan = 2 %}
+      {% elif profile.monthly_income_rm <= 2950 %}{% set selected_plan = 3 %}
+      {% else %}{% set selected_plan = 4 %}{% endif %}
+      <tr {% if selected_plan == 1 %}class="total"{% endif %}>
+        <td>Plan 1{% if selected_plan == 1 %} ←{% endif %}</td>
+        <td>≤ RM1,050</td>
+        <td class="num">19.40</td>
+        <td class="num">232.80</td>
+      </tr>
+      <tr {% if selected_plan == 2 %}class="total"{% endif %}>
+        <td>Plan 2{% if selected_plan == 2 %} ←{% endif %}</td>
+        <td>≤ RM1,550</td>
+        <td class="num">24.90</td>
+        <td class="num">298.80</td>
+      </tr>
+      <tr {% if selected_plan == 3 %}class="total"{% endif %}>
+        <td>Plan 3{% if selected_plan == 3 %} ←{% endif %}</td>
+        <td>≤ RM2,950</td>
+        <td class="num">36.90</td>
+        <td class="num">442.80</td>
+      </tr>
+      <tr {% if selected_plan == 4 %}class="total"{% endif %}>
+        <td>Plan 4{% if selected_plan == 4 %} ←{% endif %}</td>
+        <td>&gt; RM2,950</td>
+        <td class="num">49.70</td>
+        <td class="num">596.40</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="callout">
+    <strong>Plan anda:</strong> Plan {{ selected_plan }} — RM{{ '{:,.2f}'.format(match.annual_contribution_rm or 0) }}
+    setahun ({{ '{:,.2f}'.format((match.annual_contribution_rm or 0) / 12) }} sebulan). Ini adalah
+    <em>caruman wajib</em> di bawah Akta 789, bukan bantuan yang diterima. Amaun ini
+    TIDAK ditambah ke dalam jumlah bantuan tahunan anda.
+  </div>
+</section>
+
+<section>
+  <h2>Bahagian III — Kelayakan dan Justifikasi</h2>
+  <p>{{ match.why_qualify }}</p>
+
+  <table class="amounts">
+    <thead>
+      <tr>
+        <th>Butiran</th>
+        <th class="num">Nilai</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Skim</td>
+        <td class="num">{{ match.scheme_name }}</td>
+      </tr>
+      <tr>
+        <td>Jenis Skim</td>
+        <td class="num">Caruman Wajib (bukan bantuan)</td>
+      </tr>
+      <tr>
+        <td>Ringkasan Plan</td>
+        <td class="num">{{ match.summary }}</td>
+      </tr>
+      <tr class="total">
+        <td>Jumlah Caruman Setahun</td>
+        <td class="num">RM {{ '{:,.2f}'.format(match.annual_contribution_rm or 0) }}</td>
+      </tr>
+    </tbody>
+  </table>
+</section>
+
+<section>
+  <h2>Bahagian IV — Rujukan Sumber (Provenance)</h2>
+  <ul class="citations">
+    {% for c in match.rule_citations %}
+    <li>
+      <span class="rule-id">{{ c.rule_id }}</span> — {{ c.passage }}
+      <span class="src">Sumber: {{ c.source_pdf }} · {{ c.page_ref }}{% if c.source_url %} · <a href="{{ c.source_url }}">{{ c.source_url }}</a>{% endif %}</span>
+    </li>
+    {% endfor %}
+  </ul>
+</section>
+
+<section class="signature-block">
+  <div class="slot">Tandatangan Pemohon / Tarikh</div>
+  <div class="slot">Cop Rasmi (Pegawai PERKESO)</div>
+</section>
+{% endblock %}

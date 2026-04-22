@@ -2,13 +2,15 @@
  * Aisyah canned SSE replay for demo mode (FR-10) and the dev-only `NEXT_PUBLIC_USE_MOCK_SSE=1` escape hatch.
  *
  * Mirrors the live rule-engine output from `backend/app/fixtures/aisyah.py` (which
- * is computed against `backend/app/rules/{str_2026,jkm_warga_emas,jkm_bkk,lhdn_form_b}.py`).
+ * is computed against `backend/app/rules/{str_2026,jkm_warga_emas,jkm_bkk,lhdn_form_b,perkeso_sksps}.py`).
  * Numbers must stay in lockstep with the backend — after any rule-engine change,
  * re-run the backend fixture and copy the resulting matches over verbatim.
  *
- * Totals (post Phase 7 Task 8 rule engine): JKM Warga Emas RM7,200 + JKM BKK
- * RM2,400 + LHDN RM558 + STR RM450 = RM10,608/year. Sorted descending by
- * `annual_rm` per `match_schemes` contract.
+ * Upside totals (post Phase 7 Task 9): JKM Warga Emas RM7,200 + JKM BKK RM2,400 +
+ * LHDN RM558 + STR RM450 = RM10,608/year. Sorted descending by `annual_rm`,
+ * then required-contribution schemes (SKSPS) tacked onto the end — Aisyah's
+ * SKSPS Plan 3 contribution (RM442.80/yr) renders separately in the
+ * "Required contributions" block and does NOT stack into the RM10,608 total.
  */
 
 import type {
@@ -220,6 +222,40 @@ export const AISYAH_SCHEME_MATCHES: SchemeMatch[] = [
           'https://bantuantunai.hasil.gov.my/Borang/BK-01%20(Borang%20Permohonan%20&%20Kemaskini%20STR%202026).pdf'
       }
     ]
+  },
+  {
+    scheme_id: 'perkeso_sksps',
+    scheme_name: 'PERKESO SKSPS — Self-Employed Social Security',
+    qualifies: true,
+    // Upside is zero — SKSPS is a REQUIRED CONTRIBUTION, not a benefit.
+    // The actual annual RM Aisyah would PAY lives on `annual_contribution_rm`.
+    annual_rm: 0,
+    summary:
+      'Plan 3: RM36.90/month → RM442.80/year mandatory contribution under Akta 789 (income ≤ RM2,950).',
+    why_qualify:
+      'As a self-employed / gig filer aged 34 with monthly income of RM2,800.00, you fall under the Akta 789 mandate for PERKESO SKSPS registration. Your income bracket places you on Plan 3 of the SKSPS Jadual Caruman: RM36.90/month (RM442.80/year). Register via SKSPS-1 at https://www.perkeso.gov.my. This is a MANDATORY contribution — Layak surfaces it alongside your qualifying schemes so you can budget for it; it does NOT stack into your annual relief total.',
+    agency: 'PERKESO (SOCSO)',
+    portal_url: 'https://www.perkeso.gov.my',
+    kind: 'required_contribution',
+    annual_contribution_rm: 442.8,
+    rule_citations: [
+      {
+        rule_id: 'perkeso.sksps.akta_789_eligibility',
+        source_pdf: 'perkeso-sksps-rates.pdf',
+        page_ref: 'Akta 789 · Skim Keselamatan Sosial Pekerjaan Sendiri (external reference)',
+        passage:
+          'Semua pekerja sendiri yang berumur antara 18 hingga 60 tahun dan bekerja dalam sektor pengangkutan penumpang (termasuk e-hailing seperti Grab) wajib mendaftar dan membuat caruman bulanan di bawah Akta 789 (Akta Keselamatan Sosial Pekerjaan Sendiri 2017).',
+        source_url: 'https://www.perkeso.gov.my'
+      },
+      {
+        rule_id: 'perkeso.sksps.plan_schedule',
+        source_pdf: 'perkeso-sksps-rates.pdf',
+        page_ref: 'Jadual Caruman SKSPS — 4-tier income bracket (external reference)',
+        passage:
+          'Jadual Caruman SKSPS: Plan 1 (pendapatan bulanan ≤ RM1,050, caruman RM19.40/bulan); Plan 2 (≤ RM1,550, RM24.90/bulan); Plan 3 (≤ RM2,950, RM36.90/bulan); Plan 4 (> RM2,950, RM49.70/bulan).',
+        source_url: 'https://www.perkeso.gov.my'
+      }
+    ]
   }
 ]
 
@@ -264,7 +300,8 @@ export const AISYAH_PACKET: Packet = {
     { scheme_id: 'jkm_warga_emas', filename: 'JKM18-warga-emas-draft-4321.pdf', blob_bytes_b64: null },
     { scheme_id: 'jkm_bkk', filename: 'JKM-bkk-draft-4321.pdf', blob_bytes_b64: null },
     { scheme_id: 'lhdn_form_b', filename: 'LHDN-form-b-relief-summary-4321.pdf', blob_bytes_b64: null },
-    { scheme_id: 'str_2026', filename: 'BK-01-STR2026-draft-4321.pdf', blob_bytes_b64: null }
+    { scheme_id: 'str_2026', filename: 'BK-01-STR2026-draft-4321.pdf', blob_bytes_b64: null },
+    { scheme_id: 'perkeso_sksps', filename: 'PERKESO-sksps-draft-4321.pdf', blob_bytes_b64: null }
   ],
   generated_at: '2026-04-21T03:30:00Z'
 }

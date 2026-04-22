@@ -80,7 +80,11 @@ function SchemeRow({ match }: { match: SchemeMatch }) {
 
 export function SchemeListStacked({ matches, empty = false }: Props) {
   const { t } = useTranslation()
-  const qualifying = matches.filter(m => m.qualifies).sort((a, b) => b.annual_rm - a.annual_rm)
+  // Phase 7 Task 9 — filter out `required_contribution` kinds (SKSPS etc.);
+  // they render in the separate `<RequiredContributionsCard>` block.
+  const qualifying = matches
+    .filter(m => m.qualifies && (m.kind ?? 'upside') === 'upside')
+    .sort((a, b) => b.annual_rm - a.annual_rm)
   const count = empty ? 0 : qualifying.length
 
   return (

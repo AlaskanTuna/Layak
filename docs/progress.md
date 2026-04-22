@@ -927,3 +927,10 @@ Findings the audit flagged that were **not** acted on (cosmetic or external to P
 - Updated `frontend/src/lib/i18n/locales/{en,ms,zh}.json` — `schemes.jkmBkk.summary` now describes the age-tiered rates plus new household cap.
 - Updated `frontend/src/components/schemes/schemes-overview.tsx` — JKM BKK card upsideRm 5,400.00 to 12,000.00.
 - Verified: pnpm lint clean, pnpm build clean across all 13 routes.
+
+## [22/04/26] - PERKESO SKSPS PDF re-OCR with Tesseract msa+eng
+
+- After installing system Tesseract 5.3 + the msa + eng language packs in the Ubuntu env, re-OCR-d `backend/data/schemes/perkeso-sksps-rates.pdf` in place via ocrmypdf --force-ocr -l msa+eng --optimize 0.
+- Text quality jumped from 49 lines RapidOCR Latin model to 169 lines Tesseract msa+eng. Words now extract cleanly KEMENTERIAN SUMBER MANUSIA, PERKESO, Skim Keselamatan Sosial Pekerjaan Sendiri, etc., and the eligibility-band numbers come through RM 30/day to RM 118.50/day. The 4-tier contribution table 232.80/298.80/442.80/596.40 still does not OCR cleanly because it is rendered as a complex multi-column infographic; those rates live in the gazetted Akta 789 schedule referenced separately by the rule.
+- File grew from 3.3 MB to 6.4 MB optimize disabled to bypass jbig2 binary permission error in WSL; well within the size budget for a committed asset.
+- Backend test suite still 297/297 green — no rule changes, just a stronger citation asset.

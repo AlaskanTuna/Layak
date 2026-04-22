@@ -10,7 +10,7 @@ import { downloadAllDrafts, hasDownloadableDrafts } from '@/lib/packet-download-
 
 type Props = {
   totalAnnualRm: number
-  schemeCount: number
+  matchedCount: number
   packet: Packet | null
   empty?: boolean
 }
@@ -19,7 +19,7 @@ function formatRm(value: number): string {
   return value.toLocaleString('en-MY', { minimumFractionDigits: 0, maximumFractionDigits: 0 })
 }
 
-export function EvaluationUpsideHero({ totalAnnualRm, schemeCount, packet, empty = false }: Props) {
+export function EvaluationUpsideHero({ totalAnnualRm, matchedCount, packet, empty = false }: Props) {
   const { t } = useTranslation()
   const canDownloadAll = hasDownloadableDrafts(packet)
   const draftCount = packet?.drafts.length ?? 0
@@ -52,11 +52,7 @@ export function EvaluationUpsideHero({ totalAnnualRm, schemeCount, packet, empty
       ) : (
         <>
           <p className="max-w-md text-sm leading-relaxed text-muted-foreground">
-            {t('evaluation.upside.description', {
-              count: schemeCount,
-              schemeLabel:
-                schemeCount === 1 ? t('evaluation.upside.schemeSingular') : t('evaluation.upside.schemePlural')
-            })}
+            {t('evaluation.upside.description', { count: matchedCount })}
           </p>
           {canDownloadAll && (
             <div className="flex">

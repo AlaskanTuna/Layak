@@ -42,7 +42,7 @@ class EvaluationListItem(BaseModel):
     """Slim row used by the history list (`/dashboard/evaluation`).
 
     Full doc is too heavy for a list view — we only need what the table
-    renders (date, status, RM). The detail view calls `GET /{id}`.
+    renders (date, status, RM, draft count). The detail view calls `GET /{id}`.
     """
 
     model_config = ConfigDict(extra="forbid")
@@ -52,6 +52,7 @@ class EvaluationListItem(BaseModel):
     totalAnnualRM: float = Field(ge=0)  # noqa: N815 — mirror Firestore field casing
     createdAt: str | None = None  # noqa: N815 — ISO 8601 string
     completedAt: str | None = None  # noqa: N815
+    draftCount: int = Field(default=0, ge=0)  # noqa: N815
 
 
 class EvaluationListResponse(BaseModel):
@@ -92,6 +93,7 @@ async def list_evaluations(
                 totalAnnualRM=float(data.get("totalAnnualRM") or 0.0),
                 createdAt=_ts_to_iso(data.get("createdAt")),
                 completedAt=_ts_to_iso(data.get("completedAt")),
+                draftCount=len(data.get("matches") or []),
             )
         )
     return EvaluationListResponse(items=items)

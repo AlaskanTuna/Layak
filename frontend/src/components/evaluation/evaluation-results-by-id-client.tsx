@@ -207,13 +207,10 @@ export function EvaluationResultsByIdClient({ evalId }: { evalId: string }) {
   const isComplete = doc.status === 'complete'
   const isError = doc.status === 'error'
 
-  // Phase 7 Task 9 — hero "across N schemes" copy should reflect only the
-  // upside schemes (exclude required_contribution). `totalAnnualRM` already
-  // excludes them because backend `compute_upside` does the same filter
-  // before summing; this keeps the hero count and hero total math-consistent.
-  const qualifyingCount = doc.matches.filter(
-    m => m.qualifies && (m.kind ?? 'upside') === 'upside'
-  ).length
+  // `totalAnnualRM` remains upside-only, but the hero copy should reflect the
+  // full matched set the user sees on the page, including required-
+  // contribution items surfaced in the separate card below.
+  const matchedCount = doc.matches.filter(m => m.qualifies).length
   const totalAnnualRm = doc.totalAnnualRM ?? 0
 
   function handleStartAnother() {
@@ -228,8 +225,8 @@ export function EvaluationResultsByIdClient({ evalId }: { evalId: string }) {
 
       {isComplete && (
         <ResultsActionRail
-          canReviewMatches={qualifyingCount > 0}
-          canReviewPacket={qualifyingCount > 0}
+          canReviewMatches={matchedCount > 0}
+          canReviewPacket={matchedCount > 0}
         />
       )}
 
@@ -254,7 +251,7 @@ export function EvaluationResultsByIdClient({ evalId }: { evalId: string }) {
         <>
           <EvaluationUpsideHero
             totalAnnualRm={totalAnnualRm}
-            schemeCount={qualifyingCount}
+            matchedCount={matchedCount}
             packet={null}
             empty={!isComplete}
           />

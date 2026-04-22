@@ -259,7 +259,7 @@
     "activeApplications": {
       "title": "Draf permohonan sedia",
       "empty": "Belum ada",
-      "emptyDescription": "Apabila penilaian selesai, tiga pakej draf permohonan akan muncul di sini supaya anda boleh menghantarnya kepada agensi.",
+      "emptyDescription": "Apabila penilaian selesai, pakej-pakej draf permohonan akan muncul di sini supaya anda boleh menghantarnya kepada agensi.",
       "startCta": "Mulakan penilaian",
       "draftsReady": "{{count}} draf sedia untuk dihantar",
       "totalRm": "Jumlah RM {{amount}}",
@@ -516,9 +516,7 @@
       "currency": "RM",
       "empty": "Jalankan penilaian pertama anda untuk melihat jumlah potensi pelepasan tahunan merentasi skim persekutuan dan negeri.",
       "start": "Mula penilaian",
-      "description": "Merentasi {{count}} {{schemeLabel}} dan pelepasan. Berdasarkan profil pendapatan dan status isi rumah anda.",
-      "schemeSingular": "skim",
-      "schemePlural": "skim",
+      "description": "Dipadankan merentasi {{count}} skim. Jumlah di sini hanya merangkumi skim faedah, berdasarkan profil pendapatan dan status isi rumah anda.",
       "download": "Muat turun semua draf",
       "downloadWithCount": "Muat turun semua draf ({{count}})",
       "downloadPending": "Draf belum sedia"

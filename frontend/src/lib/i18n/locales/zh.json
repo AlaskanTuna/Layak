@@ -259,7 +259,7 @@
     "activeApplications": {
       "title": "申请草稿已就绪",
       "empty": "尚无内容",
-      "emptyDescription": "评估完成后，三份申请草稿包将出现在此处，您可以提交给相关机构。",
+      "emptyDescription": "评估完成后，相应的申请草稿包会显示在这里，供您提交给相关机构。",
       "startCta": "开始评估",
       "draftsReady": "{{count}} 份草稿可提交",
       "totalRm": "RM {{amount}} 总额",
@@ -516,9 +516,7 @@
       "currency": "RM",
       "empty": "运行您的第一次评估，查看您在联邦和州级计划中的年度潜在减免总额。",
       "start": "开始评估",
-      "description": "涵盖 {{count}} 项{{schemeLabel}}及减免。基于您的收入档案和家庭状况。",
-      "schemeSingular": "计划",
-      "schemePlural": "计划",
+      "description": "已按您的收入档案和家庭状况匹配 {{count}} 项计划。这里显示的总额只计算正向收益计划。",
       "download": "下载所有草稿",
       "downloadWithCount": "下载所有草稿（{{count}}）",
       "downloadPending": "草稿待处理"

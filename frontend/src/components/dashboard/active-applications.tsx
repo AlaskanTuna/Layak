@@ -29,7 +29,7 @@ function formatTimestamp(value: string | null, locale: string): string {
 
 /**
  * "Active draft packets" — top N most recent completed evaluations whose
- * three draft application PDFs are ready to lodge with the agencies. Each
+ * generated draft application PDFs are ready to lodge with the agencies. Each
  * card deep-links to the persisted results page where the user can re-
  * download the packet. Empty state when no completed evaluations exist.
  */
@@ -73,7 +73,7 @@ export function ActiveApplications({ items }: Props) {
                   </div>
                   <div className="flex flex-col">
                     <p className="text-sm font-medium">
-                      {t('dashboard.activeApplications.draftsReady', { count: 3 })}
+                      {t('dashboard.activeApplications.draftsReady', { count: item.draftCount })}
                     </p>
                     <p className="text-xs text-muted-foreground">
                       {t('dashboard.activeApplications.totalRm', {

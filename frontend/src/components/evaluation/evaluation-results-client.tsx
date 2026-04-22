@@ -40,19 +40,17 @@ export function EvaluationResultsClient() {
     return null
   }
 
-  // Phase 7 Task 9 — upside schemeCount excludes required-contribution
-  // entries so the hero's "across N schemes" copy tallies only the
-  // schemes that stack into the annual-relief total.
-  const qualifyingCount = state.matches.filter(
-    m => m.qualifies && (m.kind ?? 'upside') === 'upside'
-  ).length
+  // The RM total still comes from upside-only math (`state.upside`), but the
+  // supporting copy should reflect every matched scheme the user can review on
+  // the results page, including required-contribution entries like SKSPS.
+  const matchedCount = state.matches.filter(m => m.qualifies).length
   const totalAnnualRm = state.upside?.total_annual_rm ?? 0
 
   return (
     <div className="flex flex-col gap-6">
       <EvaluationUpsideHero
         totalAnnualRm={totalAnnualRm}
-        schemeCount={qualifyingCount}
+        matchedCount={matchedCount}
         packet={state.packet}
       />
       <SchemeCardGrid matches={state.matches} />

@@ -228,6 +228,7 @@ export type EvaluationListItem = {
   totalAnnualRM: number
   createdAt: string | null
   completedAt: string | null
+  draftCount: number
 }
 
 export type EvaluationListResponse = {

@@ -290,7 +290,7 @@
     "activeApplications": {
       "title": "Application drafts ready",
       "empty": "None yet",
-      "emptyDescription": "When an evaluation completes, the three draft application packets land here so you can lodge them with the agencies.",
+      "emptyDescription": "When an evaluation completes, its draft application packets land here so you can lodge them with the agencies.",
       "startCta": "Start an evaluation",
       "draftsReady": "{{count}} drafts ready to submit",
       "totalRm": "RM {{amount}} total",
@@ -547,9 +547,7 @@
       "currency": "RM",
       "empty": "Run your first evaluation to see your total potential annual relief across federal and state schemes.",
       "start": "Start evaluation",
-      "description": "Across {{count}} {{schemeLabel}} and reliefs. Based on your income profile and household status.",
-      "schemeSingular": "scheme",
-      "schemePlural": "schemes",
+      "description": "Matched across {{count}} scheme(s). Total shown here includes upside schemes only, based on your income profile and household status.",
       "download": "Download all drafts",
       "downloadWithCount": "Download all drafts ({{count}})",
       "downloadPending": "Drafts pending"

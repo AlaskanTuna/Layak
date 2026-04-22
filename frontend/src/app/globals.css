@@ -197,8 +197,8 @@
   color: color-mix(in oklch, white 96%, transparent);
   background: linear-gradient(
     135deg,
-    color-mix(in oklch, black 38%, transparent),
-    color-mix(in oklch, black 22%, transparent)
+    color-mix(in oklch, black 28%, transparent),
+    color-mix(in oklch, black 14%, transparent)
   );
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);

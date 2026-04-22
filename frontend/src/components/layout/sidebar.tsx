@@ -44,7 +44,7 @@ export function Sidebar({ mobileOpen, onMobileClose }: SidebarProps) {
             <BrandMark />
             <span
               className={cn(
-                'whitespace-nowrap font-heading text-base font-semibold tracking-tight transition-[max-width,margin-left,opacity] duration-200 ease-in-out',
+                'whitespace-nowrap font-sans text-base font-semibold tracking-tight transition-[max-width,margin-left,opacity] duration-200 ease-in-out',
                 isCollapsed ? 'pointer-events-none ml-0 max-w-0 opacity-0' : 'ml-2.5 max-w-xs opacity-100'
               )}
             >

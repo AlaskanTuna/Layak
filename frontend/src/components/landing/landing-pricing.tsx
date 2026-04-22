@@ -5,7 +5,7 @@ import { useTranslation } from 'react-i18next'
 import Link from 'next/link'
 
 import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 
 export function LandingPricing() {
   const { t } = useTranslation()
@@ -13,7 +13,7 @@ export function LandingPricing() {
   return (
     <section id="pricing" className="mx-auto w-full max-w-5xl px-4 py-16 md:px-6">
       <div className="mb-10 flex flex-col items-center text-center">
-        <h2 className="font-heading mb-4 text-3xl font-semibold tracking-tight sm:text-4xl">
+        <h2 className="font-heading mb-4 text-3xl font-semibold tracking-tight sm:text-4xl capitalize">
           {t('marketing.pricing.title', 'Simple, transparent pricing')}
         </h2>
         <p className="max-w-2xl text-muted-foreground sm:text-lg">

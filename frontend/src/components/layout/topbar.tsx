@@ -22,7 +22,7 @@ export function Topbar({ onMenuClick }: TopbarProps) {
       <MobileMenuButton onClick={onMenuClick} />
       <Link href="/dashboard" className="flex items-center gap-2 md:hidden" aria-label={t('common.aria.layakHome')}>
         <BrandMark size="sm" />
-        <span className="font-heading text-base font-semibold tracking-tight">{t('common.brand')}</span>
+        <span className="font-sans text-base font-semibold tracking-tight">{t('common.brand')}</span>
       </Link>
       <Breadcrumbs />
       <div className="ml-auto flex items-center gap-1">

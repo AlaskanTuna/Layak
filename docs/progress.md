@@ -4,6 +4,16 @@
 
 ---
 
+## [22/04/26] - Phase 7 planning pass: status review + appended PO2 polish backlog
+
+Reviewed `docs/plan.md` against the latest `main` commits to produce a Phase 7 status check before the next PO2 sprint. Current `main` confirms Phase 7 Task 1 (Form BE support) and Task 2 (Farhan salaried demo persona) are landed. Repo health checked from the local workspace: backend `.venv` test suite passed **216/216**; frontend `pnpm lint` and `pnpm build` both pass when WSL uses the repo's pinned Node runtime (`nvm use 24.14.0`), with one non-blocking lint warning still present in `frontend/src/components/landing/landing-pricing.tsx` for an unused `CardFooter` import.
+
+- **Recent status anchor.** Latest `main` commits are `eef5ecb` (Farhan persona fixtures + two-button sample CTA) and `ec69735` (Form BE filer support). `gh` is not installed in this workspace, so the reliable change trail for this review was the local `git log` on `main`.
+- **Phase 7 open work remains sizable.** Original polish backlog Tasks 3-5 are still the main PO2-facing usability items: profile edit between extract and classify, inline PDF preview, and the mobile responsiveness pass. Task 6 stays with PO1 for structured error categories + CTA recovery. Older appended Tasks 7-10 in `docs/plan.md` are scheme-expansion work (`i-Saraan`, `JKM BKK`, `PERKESO SKSPS`, and `/dashboard/schemes` sync).
+- **Appended new PO2 polish tasks under Phase 7.** Added four architecture-light usability tasks at the end of Phase 7: (11) streamline evaluation entry flow for first-time users, (12) floating `?` help launcher with on-demand tour guide modal, (13) results-page action rail + deadline-first guidance, and (14) accessibility + reduced-motion polish. These are aimed directly at improving judging usability without introducing new backend architecture.
+
+---
+
 ## [22/04/26] - Phase 7 Task 2 PO1: Cikgu Farhan salaried persona fixtures + two-button sample-data CTA
 
 PO1's Phase 7 Task 2 — the upload widget now ships with two side-by-side "Use sample data" buttons (Aisyah the gig driver + Cikgu Farhan the salaried teacher), and the demo banner reflects which persona is loaded. End-to-end: clicking the Farhan button fetches three synthetic PDFs from `/fixtures/`, streams them through the live intake pipeline, and produces a Form BE draft packet downstream (via Phase 7 Task 1's rule + template work).

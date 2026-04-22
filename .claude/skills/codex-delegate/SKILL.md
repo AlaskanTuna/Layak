@@ -26,13 +26,14 @@ Do **not** use it for:
 
 Use `codex exec` in headless mode. Prefer feeding the prompt through stdin so long prompts stay readable and self-contained.
 
+**`--cd` MUST be the absolute path to the repo root**, not `.` and not a sub-directory path. The Codex sandbox is rooted at `--cd`; if you set it to `backend/` (or inherit a non-root shell cwd via `.`), Codex will silently reject writes anywhere else in the repo (e.g. `frontend/`, `docs/`, `.claude/`) with a `patch rejected: writing outside of the project` error and stop without applying anything. Burned us on Phase 8 Tasks 5 and 6 — both failed first try until re-dispatched with the absolute path.
+
 ### Hard task: GPT-5.4 (High)
 
 ```bash
 cat <<'EOF' | codex exec \
-  --cd . \
-  --sandbox workspace-write \
-  --ask-for-approval never \
+  --cd /absolute/path/to/repo \
+  --full-auto \
   --model gpt-5.4 \
   -c model_reasoning_effort=high \
   -
@@ -44,9 +45,8 @@ EOF
 
 ```bash
 cat <<'EOF' | codex exec \
-  --cd . \
-  --sandbox workspace-write \
-  --ask-for-approval never \
+  --cd /absolute/path/to/repo \
+  --full-auto \
   --model gpt-5.4-mini \
   -c model_reasoning_effort=high \
   -
@@ -58,17 +58,14 @@ Run in background (`run_in_background: true`) when the job is long. `codex exec`
 
 ## Flags (locked for this project)
 
-| Flag                             | Why                                                                                                            |
-| -------------------------------- | -------------------------------------------------------------------------------------------------------------- |
-| `exec`                           | Stable non-interactive Codex mode for scripted subagent runs.                                                  |
-| `--cd .`                         | Starts the delegated run from the repo root so paths resolve consistently.                                     |
-| `--sandbox workspace-write`      | Lets the subagent read and edit the workspace without granting full machine access.                            |
-| `--ask-for-approval never`       | Keeps the run headless. Delegated jobs should not block waiting for approval.                                  |
-| `--model <name>`                 | Explicitly selects the intended model for the delegated task.                                                  |
-| `-c model_reasoning_effort=high` | Forces high reasoning on supported models.                                                                     |
-| `-`                              | Reads the prompt from stdin, which is safer and cleaner for long prompts than shell-escaping one giant string. |
-
-Prefer the explicit `--sandbox workspace-write --ask-for-approval never` pair over `--full-auto`. Per the Codex docs, `--full-auto` sets `workspace-write` plus `on-request` approvals; for delegated subagent runs, we want "never pause" behavior.
+| Flag                             | Why                                                                                                                                                                                                                 |
+| -------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `exec`                           | Stable non-interactive Codex mode for scripted subagent runs.                                                                                                                                                       |
+| `--cd <abs-path>`                | Sandbox root + working directory. MUST be the absolute repo root, never `.` or a sub-directory.                                                                                                                     |
+| `--full-auto`                    | Sets `--sandbox workspace-write` + never-pause approvals in one flag. The current Codex CLI rejects the older `--ask-for-approval never` flag; `--full-auto` is the working equivalent for headless delegated runs. |
+| `--model <name>`                 | Explicitly selects the intended model for the delegated task.                                                                                                                                                       |
+| `-c model_reasoning_effort=high` | Forces high reasoning on supported models.                                                                                                                                                                          |
+| `-`                              | Reads the prompt from stdin, which is safer and cleaner for long prompts than shell-escaping one giant string.                                                                                                      |
 
 ## Model selection
 
@@ -116,9 +113,8 @@ Each job should own a different output target or a clearly separate file set. Do
 
 ```bash
 cat <<'EOF' | codex exec \
-  --cd . \
-  --sandbox workspace-write \
-  --ask-for-approval never \
+  --cd /home/adam/CS/Layak \
+  --full-auto \
   --model gpt-5.4 \
   -c model_reasoning_effort=high \
   -
@@ -143,9 +139,8 @@ EOF
 
 ```bash
 cat <<'EOF' | codex exec \
-  --cd . \
-  --sandbox workspace-write \
-  --ask-for-approval never \
+  --cd /home/adam/CS/Layak \
+  --full-auto \
   --model gpt-5.4-mini \
   -c model_reasoning_effort=high \
   -
@@ -163,7 +158,9 @@ EOF
 ## Caveats
 
 - **Git repo check:** `codex exec` expects to run inside a Git repository. Use `--skip-git-repo-check` only for clearly safe one-off directories.
-- **Working directory:** run from the repo root or set `--cd` explicitly so relative paths stay stable.
-- **Permissions:** this skill assumes `workspace-write` is enough. If the task needs network, secrets, or broader filesystem access, do not silently widen permissions.
+- **Sandbox root = `--cd`:** the absolute path passed to `--cd` is the writable boundary. Setting `--cd .` while the shell cwd is a sub-directory (e.g. `backend/`) silently confines Codex to that sub-tree and rejects every cross-tree edit. Always pass the absolute repo root, especially when the delegated task spans multiple top-level directories (`frontend/`, `docs/`, `.claude/`).
+- **Stale flags surface as `unexpected argument` errors:** the Codex CLI evolves; `--ask-for-approval never` was the old way and now errors out. If the CLI ever rejects `--full-auto` or any other flag here, run `codex exec --help` to find the current equivalent before retrying.
+- **Permissions:** this skill assumes `--full-auto`'s `workspace-write` is enough. If the task needs network, secrets, or broader filesystem access, do not silently widen permissions.
 - **Secrets:** avoid prompts that tell the delegated run to inspect `.env`, credentials, or unrelated private state.
 - **Git actions:** do not delegate commit, push, branching, or PR creation. The main agent remains responsible for all Git operations after review.
+- **Out-of-scope churn:** Codex sometimes touches unrelated files (whitespace / line-ending normalisation, IDE-style cleanups). Always `git diff -w` after the run and `git checkout` files where the only delta is whitespace before staging.

@@ -1,0 +1,149 @@
+{#
+  LHDN Form BE (salaried individuals) YA2025 relief summary.
+
+  Mirrors `lhdn.html.jinja` byte-for-byte on the relief table, tax-delta
+  arithmetic, and citations — the five reliefs apply identically under
+  Form B and Form BE. Only the filer-category label, the Form BE filing
+  deadline (30 April 2026 vs Form B's 30 June 2026), and the title + agency
+  line differ. Keep the two templates in sync when one edits; grep for
+  `lhdn.html.jinja` before touching either.
+#}
+{% extends "_base.html.jinja" %}
+
+{% block title %}LHDN Form BE · Relief Summary · YA2025 (Draft){% endblock %}
+{% block agency %}Lembaga Hasil Dalam Negeri Malaysia (HASiL) · Form BE (Salaried Individual) YA2025 · <a href="{{ match.portal_url }}">{{ match.portal_url }}</a>{% endblock %}
+
+{% block body %}
+<section>
+  <h2>Part I — Taxpayer</h2>
+  <div class="field-grid">
+    <div class="label">Name</div>
+    <div class="value">{{ profile.name }}</div>
+
+    <div class="label">IC (last 4)</div>
+    <div class="value">••••-••-{{ profile.ic_last4 }}</div>
+
+    <div class="label">Filer Category</div>
+    <div class="value">Form BE — resident individual, employment income only</div>
+
+    <div class="label">Year of Assessment</div>
+    <div class="value">YA 2025</div>
+
+    <div class="label">Filing Deadline</div>
+    <div class="value">30 April 2026 (grace period to 15 May 2026 for e-Filing)</div>
+
+    <div class="label">Annual Gross Income</div>
+    <div class="value">RM {{ '{:,.2f}'.format(annual_income) }}</div>
+
+    {% if profile.address %}
+    <div class="label">Correspondence Address</div>
+    <div class="value">{{ profile.address }}</div>
+    {% endif %}
+  </div>
+</section>
+
+<section>
+  <h2>Part II — Applicable YA2025 Reliefs (PR 4/2024)</h2>
+  <table class="amounts">
+    <thead>
+      <tr>
+        <th>Relief</th>
+        <th>Source</th>
+        <th class="num">Cap (RM)</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Individual &amp; dependant relatives</td>
+        <td>PR 4/2024 §6.1, ITA §46(1)(a)</td>
+        <td class="num">9,000.00</td>
+      </tr>
+      {% if has_parent %}
+      <tr>
+        <td>Parent medical, dental, carer</td>
+        <td>PR 4/2024 §6.2.1, ITA §46(1)(c)</td>
+        <td class="num">8,000.00</td>
+      </tr>
+      {% endif %}
+      {% if children_under_18 %}
+      <tr>
+        <td>Child relief #16a × {{ children_under_18 }} (under 18)</td>
+        <td>PR 4/2024 §6.18.2(a), ITA §§48(1)(a), 48(2)(a)</td>
+        <td class="num">{{ '{:,.2f}'.format(2000.0 * children_under_18) }}</td>
+      </tr>
+      {% endif %}
+      <tr>
+        <td>EPF &amp; life insurance (combined)</td>
+        <td>PR 4/2024 §6.19.3, ITA §§49(1)(a), 49(1)(b)</td>
+        <td class="num">7,000.00</td>
+      </tr>
+      <tr>
+        <td>Lifestyle #9</td>
+        <td>PR 4/2024 §6.11.3</td>
+        <td class="num">2,500.00</td>
+      </tr>
+      <tr class="total">
+        <td colspan="2">Total stackable relief (at cap)</td>
+        <td class="num">RM {{ '{:,.2f}'.format(total_relief) }}</td>
+      </tr>
+    </tbody>
+  </table>
+</section>
+
+<section>
+  <h2>Part III — Estimated Tax Delta</h2>
+  <p>{{ match.why_qualify }}</p>
+
+  <table class="amounts">
+    <thead>
+      <tr>
+        <th>Calculation</th>
+        <th class="num">Amount (RM)</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Annual gross income</td>
+        <td class="num">{{ '{:,.2f}'.format(annual_income) }}</td>
+      </tr>
+      <tr>
+        <td>Less: total reliefs</td>
+        <td class="num">−{{ '{:,.2f}'.format(total_relief) }}</td>
+      </tr>
+      <tr>
+        <td>Chargeable income (after reliefs)</td>
+        <td class="num">{{ '{:,.2f}'.format(chargeable_after) }}</td>
+      </tr>
+      <tr class="total">
+        <td>Estimated annual tax saving (vs no reliefs)</td>
+        <td class="num">RM {{ '{:,.2f}'.format(match.annual_rm) }}</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="callout">
+    This estimate uses the YA2025 Schedule 1 marginal-rate brackets. MTD/PCB
+    already deducted from your monthly salary is reconciled on submission —
+    any excess paid vs this final liability is refunded. Keep receipts for
+    lifestyle, parent medical, and insurance reliefs for at least 7 years
+    per LHDN record-keeping requirements.
+  </div>
+</section>
+
+<section>
+  <h2>Part IV — Provenance (cached cites)</h2>
+  <ul class="citations">
+    {% for c in match.rule_citations %}
+    <li>
+      <span class="rule-id">{{ c.rule_id }}</span> — {{ c.passage }}
+      <span class="src">Source: {{ c.source_pdf }} · {{ c.page_ref }}{% if c.source_url %} · <a href="{{ c.source_url }}">{{ c.source_url }}</a>{% endif %}</span>
+    </li>
+    {% endfor %}
+  </ul>
+</section>
+
+<section class="signature-block">
+  <div class="slot">Taxpayer signature / Date</div>
+  <div class="slot">Tax agent (if applicable)</div>
+</section>
+{% endblock %}

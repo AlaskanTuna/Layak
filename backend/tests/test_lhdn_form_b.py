@@ -149,8 +149,14 @@ def test_aisyah_match_has_all_six_citations(aisyah: Profile) -> None:
     assert expected.issubset(rule_ids)
 
 
-def test_form_be_filer_does_not_qualify() -> None:
-    """Form BE (salaried) filer is out of scope for the Form B rule."""
+def test_form_be_filer_now_qualifies_with_form_be_scheme_id() -> None:
+    """Phase 7 Task 1 widened the rule to cover Form BE (salaried) filers.
+
+    Prior behavior: Form BE was short-circuited to `qualifies=False`. The five
+    reliefs apply identically under both forms; the gate has been removed and
+    the scheme_id now diverges so the frontend + generate_packet can route to
+    the Form BE draft template + deadline.
+    """
     p = Profile(
         name="Form BE filer",
         ic_last4="0003",
@@ -166,8 +172,10 @@ def test_form_be_filer_does_not_qualify() -> None:
         form_type="form_be",
     )
     result = lhdn_form_b.match(p)
-    assert result.qualifies is False
-    assert result.annual_rm == 0.0
+    assert result.qualifies is True
+    assert result.scheme_id == "lhdn_form_be"
+    assert "Form BE" in result.scheme_name
+    assert result.annual_rm > 0
 
 
 def test_tax_bracket_ya2025_spot_checks() -> None:

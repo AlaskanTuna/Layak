@@ -1,4 +1,15 @@
-"""LHDN Form B — five personal reliefs for YA 2025.
+"""LHDN Form B / Form BE — five personal reliefs for YA 2025.
+
+Historical note: this module was originally Form-B-only; Phase 7 Task 1
+widened it to cover Form BE (salaried individuals) because every relief we
+cite — PR 4/2024 §6.1 (individual), §6.2.1 (parent medical), §6.18.2(a)
+(child #16a), §6.19.3 (EPF + life insurance), §6.11.3 (lifestyle #9) —
+applies identically to resident individuals under both filing categories.
+The only differences that matter operationally are the filing deadline
+(30 June 2026 for Form B, 30 April 2026 for Form BE) and the agency
+portal copy; those are surfaced conditionally below. Module filename kept
+as `lhdn_form_b.py` to preserve git-blame continuity; the rule emits
+`scheme_id="lhdn_form_b"` or `"lhdn_form_be"` based on `profile.form_type`.
 
 Source of truth: `backend/data/schemes/pr-no-4-2024.pdf` (Public Ruling No.
 4/2024, `Taxation of a Resident Individual — Part I: Gifts or Contributions
@@ -7,13 +18,16 @@ paragraph references transcribed from the PR; the test module asserts every
 RM value appears verbatim on the cited page.
 
 Filing window reference: `backend/data/schemes/rf-filing-programme-for-2026.pdf`
-(LHDN Return-Form Filing Programme 2026). Example 2 on doc p.2 sets the Form B
-submission deadline to 30 June 2026 with a 15-day e-Filing grace period.
+(LHDN Return-Form Filing Programme 2026):
+- Example 2 on doc p.2 sets the Form B submission deadline to 30 June 2026.
+- Example 1 on doc p.2 sets the Form BE submission deadline to 30 April 2026.
+Both carry a 15-day e-Filing grace period.
 
 Tax-saving estimate uses the YA2025 chargeable-income bracket schedule (see
 `_malaysia_tax_ya2025` below) applied twice: once against the unreduced annual
 income and once after subtracting the sum of applicable reliefs. The delta is
-the realistic annual upside the user sees.
+the realistic annual upside the user sees — identical arithmetic for Form B
+and Form BE because the reliefs + brackets are shared.
 """
 
 from __future__ import annotations
@@ -44,9 +58,11 @@ EPF_LIFE_17_COMBINED_CAP_RM = LIFE_INSURANCE_CAP_RM + EPF_CAP_RM
 LIFESTYLE_9_CAP_RM = 2500.0
 
 _FORM_B_DEADLINE = "30 June 2026"
+_FORM_BE_DEADLINE = "30 April 2026"
 _AGENCY = "LHDN (HASiL)"
 _PORTAL_URL = "https://mytax.hasil.gov.my"
-_SCHEME_NAME = "LHDN Form B — five YA2025 reliefs"
+_SCHEME_NAME_FORM_B = "LHDN Form B — five YA2025 reliefs"
+_SCHEME_NAME_FORM_BE = "LHDN Form BE — five YA2025 reliefs"
 
 # YA2025 personal income tax brackets for resident individuals (Schedule 1, ITA).
 # Stored as (upper bound of chargeable income, marginal rate).
@@ -83,10 +99,17 @@ def _malaysia_tax_ya2025(chargeable_rm: float) -> float:
     return round(tax, 2)
 
 
-def _citations() -> list[RuleCitation]:
-    return [
+def _citations(form_type: str) -> list[RuleCitation]:
+    """Common relief citations plus the form-specific filing-deadline citation.
+
+    The five reliefs apply identically under Form B and Form BE. Only the
+    filing-deadline citation diverges — Example 1 vs Example 2 on doc p.2
+    of the RF Filing Programme 2026.
+    """
+    citation_prefix = "lhdn.form_b" if form_type == "form_b" else "lhdn.form_be"
+    reliefs = [
         RuleCitation(
-            rule_id="lhdn.form_b.individual_relief",
+            rule_id=f"{citation_prefix}.individual_relief",
             source_pdf="pr-no-4-2024.pdf",
             page_ref="PR 4/2024 §6.1 (doc p.9) — ITA paragraph 46(1)(a)",
             passage=(
@@ -96,7 +119,7 @@ def _citations() -> list[RuleCitation]:
             source_url="https://www.hasil.gov.my/media/d2wh4ykj/pr-no-4-2024.pdf",
         ),
         RuleCitation(
-            rule_id="lhdn.form_b.parent_medical",
+            rule_id=f"{citation_prefix}.parent_medical",
             source_pdf="pr-no-4-2024.pdf",
             page_ref="PR 4/2024 §6.2.1 (doc p.9) — ITA paragraph 46(1)(c)",
             passage=(
@@ -107,7 +130,7 @@ def _citations() -> list[RuleCitation]:
             source_url="https://www.hasil.gov.my/media/d2wh4ykj/pr-no-4-2024.pdf",
         ),
         RuleCitation(
-            rule_id="lhdn.form_b.child_16a",
+            rule_id=f"{citation_prefix}.child_16a",
             source_pdf="pr-no-4-2024.pdf",
             page_ref="PR 4/2024 §6.18.2(a) (doc p.41) — ITA paragraphs 48(1)(a), 48(2)(a)",
             passage=(
@@ -117,7 +140,7 @@ def _citations() -> list[RuleCitation]:
             source_url="https://www.hasil.gov.my/media/d2wh4ykj/pr-no-4-2024.pdf",
         ),
         RuleCitation(
-            rule_id="lhdn.form_b.epf_life_17",
+            rule_id=f"{citation_prefix}.epf_life_17",
             source_pdf="pr-no-4-2024.pdf",
             page_ref="PR 4/2024 §6.19 / §6.19.3 (doc p.46–48) — ITA paragraphs 49(1)(a), 49(1)(b)",
             passage=(
@@ -129,7 +152,7 @@ def _citations() -> list[RuleCitation]:
             source_url="https://www.hasil.gov.my/media/d2wh4ykj/pr-no-4-2024.pdf",
         ),
         RuleCitation(
-            rule_id="lhdn.form_b.lifestyle_9",
+            rule_id=f"{citation_prefix}.lifestyle_9",
             source_pdf="pr-no-4-2024.pdf",
             page_ref="PR 4/2024 §6.11.3 (doc p.29)",
             passage=(
@@ -138,17 +161,34 @@ def _citations() -> list[RuleCitation]:
             ),
             source_url="https://www.hasil.gov.my/media/d2wh4ykj/pr-no-4-2024.pdf",
         ),
-        RuleCitation(
-            rule_id="lhdn.form_b.filing_deadline",
-            source_pdf="rf-filing-programme-for-2026.pdf",
-            page_ref="RF Filing Programme 2026, doc p.2, Example 2",
-            passage=(
-                "The due date for submission of Form B for Year of Assessment 2025 is "
-                "30 June 2026. Grace period is given until 15 July 2026 for the e-Filing."
-            ),
-            source_url="https://www.hasil.gov.my/media/fqog1423/rf-filing-programme-for-2026.pdf",
-        ),
     ]
+    if form_type == "form_b":
+        reliefs.append(
+            RuleCitation(
+                rule_id="lhdn.form_b.filing_deadline",
+                source_pdf="rf-filing-programme-for-2026.pdf",
+                page_ref="RF Filing Programme 2026, doc p.2, Example 2",
+                passage=(
+                    "The due date for submission of Form B for Year of Assessment 2025 is "
+                    "30 June 2026. Grace period is given until 15 July 2026 for the e-Filing."
+                ),
+                source_url="https://www.hasil.gov.my/media/fqog1423/rf-filing-programme-for-2026.pdf",
+            )
+        )
+    else:
+        reliefs.append(
+            RuleCitation(
+                rule_id="lhdn.form_be.filing_deadline",
+                source_pdf="rf-filing-programme-for-2026.pdf",
+                page_ref="RF Filing Programme 2026, doc p.2, Example 1",
+                passage=(
+                    "The due date for submission of Form BE for Year of Assessment 2025 is "
+                    "30 April 2026. Grace period is given until 15 May 2026 for the e-Filing."
+                ),
+                source_url="https://www.hasil.gov.my/media/fqog1423/rf-filing-programme-for-2026.pdf",
+            )
+        )
+    return reliefs
 
 
 def _applicable_reliefs(profile: Profile) -> dict[str, float]:
@@ -169,25 +209,25 @@ def _applicable_reliefs(profile: Profile) -> dict[str, float]:
 
 
 def match(profile: Profile) -> SchemeMatch:
-    """Match a profile against the five Form B YA2025 reliefs.
+    """Match a profile against the five YA2025 personal reliefs.
 
-    Qualifies when `profile.form_type == "form_b"`. The tax saving is the delta
-    between YA2025 bracketed tax on unreduced vs reduced chargeable income.
+    Qualifies for BOTH Form B (self-employed) and Form BE (salaried) filers —
+    the five reliefs (individual, parent medical, child #16a, EPF + life,
+    lifestyle) apply identically to any resident individual. The tax saving
+    is the delta between YA2025 bracketed tax on unreduced vs reduced
+    chargeable income; identical arithmetic across forms.
+
+    The emitted `scheme_id` and `scheme_name` vary with `profile.form_type` so
+    the frontend + template router can surface the right filing deadline and
+    agency-form layout. See module docstring for the Form B vs BE divergences.
     """
-    cites = _citations()
-
-    if profile.form_type != "form_b":
-        return SchemeMatch(
-            scheme_id="lhdn_form_b",
-            scheme_name=_SCHEME_NAME,
-            qualifies=False,
-            annual_rm=0.0,
-            summary="Form B rule does not apply — profile filed under Form BE.",
-            why_qualify="Out of scope: only Form B (self-employed) filers qualify for this rule.",
-            agency=_AGENCY,
-            portal_url=_PORTAL_URL,
-            rule_citations=cites,
-        )
+    is_form_b = profile.form_type == "form_b"
+    scheme_id = "lhdn_form_b" if is_form_b else "lhdn_form_be"
+    scheme_name = _SCHEME_NAME_FORM_B if is_form_b else _SCHEME_NAME_FORM_BE
+    deadline = _FORM_B_DEADLINE if is_form_b else _FORM_BE_DEADLINE
+    filer_category = "self-employed" if is_form_b else "salaried"
+    form_label = "Form B" if is_form_b else "Form BE"
+    cites = _citations(profile.form_type)
 
     reliefs = _applicable_reliefs(profile)
     total_relief = sum(reliefs.values())
@@ -199,8 +239,8 @@ def match(profile: Profile) -> SchemeMatch:
 
     if saving <= 0:
         return SchemeMatch(
-            scheme_id="lhdn_form_b",
-            scheme_name=_SCHEME_NAME,
+            scheme_id=scheme_id,
+            scheme_name=scheme_name,
             qualifies=False,
             annual_rm=0.0,
             summary=(f"Total relief RM{total_relief:,.0f} already exceeds chargeable income — no further tax saving."),
@@ -215,8 +255,8 @@ def match(profile: Profile) -> SchemeMatch:
 
     applied = ", ".join(f"{k} (RM{v:,.0f})" for k, v in reliefs.items())
     return SchemeMatch(
-        scheme_id="lhdn_form_b",
-        scheme_name=_SCHEME_NAME,
+        scheme_id=scheme_id,
+        scheme_name=scheme_name,
         qualifies=True,
         annual_rm=saving,
         summary=(
@@ -224,10 +264,10 @@ def match(profile: Profile) -> SchemeMatch:
             f"income RM{annual_income:,.0f}; estimated tax saving RM{saving:,.0f}."
         ),
         why_qualify=(
-            f"As a Form B (self-employed) filer with an annual income of RM{annual_income:,.0f}, "
+            f"As a {form_label} ({filer_category}) filer with an annual income of RM{annual_income:,.0f}, "
             f"the following YA2025 reliefs stack: {applied}. Applying them reduces your "
             f"chargeable income by RM{total_relief:,.0f} and your tax bill by "
-            f"RM{saving:,.0f}/year. The Form B filing deadline is {_FORM_B_DEADLINE}."
+            f"RM{saving:,.0f}/year. The {form_label} filing deadline is {deadline}."
         ),
         agency=_AGENCY,
         portal_url=_PORTAL_URL,

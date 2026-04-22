@@ -10,7 +10,7 @@ from typing import Literal
 
 from pydantic import BaseModel, ConfigDict, Field
 
-SchemeId = Literal["str_2026", "jkm_warga_emas", "lhdn_form_b"]
+SchemeId = Literal["str_2026", "jkm_warga_emas", "lhdn_form_b", "lhdn_form_be"]
 
 
 class RuleCitation(BaseModel):

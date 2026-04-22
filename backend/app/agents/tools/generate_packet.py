@@ -31,11 +31,15 @@ from app.schema.scheme import SchemeMatch
 # backend/app/agents/tools/generate_packet.py → backend/app/templates/
 _TEMPLATES_DIR = Path(__file__).resolve().parent.parent.parent / "templates"
 
-# scheme_id → (template filename, output filename pattern)
+# scheme_id → (template filename, output filename pattern). LHDN has two
+# entries (one per filer form); Phase 7 Task 1 added `lhdn_form_be` so
+# salaried filers receive a matching Form BE draft rather than silently
+# falling back to the Form B layout.
 _TEMPLATE_MAP: dict[str, tuple[str, str]] = {
     "str_2026": ("bk01.html.jinja", "BK-01-STR2026-draft-{ic_last4}.pdf"),
     "jkm_warga_emas": ("jkm18.html.jinja", "JKM18-warga-emas-draft-{ic_last4}.pdf"),
     "lhdn_form_b": ("lhdn.html.jinja", "LHDN-form-b-relief-summary-{ic_last4}.pdf"),
+    "lhdn_form_be": ("lhdn_be.html.jinja", "LHDN-form-be-relief-summary-{ic_last4}.pdf"),
 }
 
 

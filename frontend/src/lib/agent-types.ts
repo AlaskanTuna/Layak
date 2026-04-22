@@ -18,7 +18,7 @@ export type Relationship = 'child' | 'parent' | 'spouse' | 'sibling' | 'other'
 
 export type Step = 'extract' | 'classify' | 'match' | 'compute_upside' | 'generate'
 
-export type SchemeId = 'str_2026' | 'jkm_warga_emas' | 'lhdn_form_b'
+export type SchemeId = 'str_2026' | 'jkm_warga_emas' | 'lhdn_form_b' | 'lhdn_form_be'
 
 export type Dependant = {
   relationship: Relationship

@@ -258,7 +258,7 @@
     }
   },
   "evaluation": {
-    "sampleLoadError": "无法加载 Aisyah 示例：{{error}}",
+    "sampleLoadError": "无法加载示例数据：{{error}}",
     "unknownError": "未知错误。",
     "overview": {
       "eyebrow": "我的评估",
@@ -288,8 +288,20 @@
     },
     "intake": {
       "aria": "录入方式",
-      "upload": "上传文件",
-      "manual": "手动输入"
+      "upload": "上传我的文件",
+      "manual": "手动填写资料",
+      "quickStartEyebrow": "从这里开始",
+      "quickStartTitle": "选择最容易开始的方式。",
+      "quickStartDescription": "想最快看懂流程就先试示例数据；如果真实文件已经准备好，就直接上传；如果手边没有文件，也可以自己输入资料。",
+      "sampleTitle": "先试示例数据",
+      "sampleDescription": "最适合演示、评审和第一次使用的访客，先看完整流程，再决定是否使用真实文件。",
+      "sampleFooter": "Aisyah = 零工 / Form B · Farhan = 受薪 / Form BE",
+      "uploadTitle": "上传我的文件",
+      "uploadDescription": "最适合已经准备好清晰身份证、最新工资单和最新水电费账单的时候。",
+      "uploadFooter": "上传三份文件，得到一次引导式评估",
+      "manualTitle": "手动填写资料",
+      "manualDescription": "最适合文件不在身边，或你想走一条更简单、无需上传的路径。",
+      "manualFooter": "当上传不方便时，这是很好的备用方案"
     },
     "stepper": {
       "aria": "流程进度",
@@ -322,9 +334,18 @@
       "samplesDivider": "或",
       "loadingSamples": "正在加载示例…",
       "continue": "继续评估",
+      "readyTitle": "继续前请先确认",
+      "readyIc": "使用身份证正面，并确保文字清晰可读。",
+      "readyPayslip": "使用您最新的工资单或收入证明。",
+      "readyUtility": "使用您最新的电费、水费或宽带账单。",
       "eyebrow": "步骤 · 上传",
       "pageTitle": "上传文件。",
-      "pageDescription": "请提供以下文件以验证您在计划组合中的资格。请确保所有文字清晰可读 —— 代理将会提取、分类、匹配、排名并生成草拟申请包。"
+      "pageDescription": "选择最容易开始的方式：先试示例数据、上传您的文件，或手动填写资料。Layak 会把这些转成草拟指引，但仍需由您亲自审核并提交。",
+      "householdCollapsed": "除非您想加入子女、父母或其他家庭成员，否则可先跳过这里。",
+      "householdAdded": "已加入 {{count}} 位家庭成员。打开即可查看或编辑。",
+      "samplesTitle": "想先走一遍低风险流程？",
+      "samplesHint": "Aisyah 展示零工路径，Farhan 展示受薪路径。两者都是合成示例。",
+      "trustCopy": "Layak 只提供草拟指引。您需要自行审核结果，并通过官方机构门户手动提交。"
     },
     "manual": {
       "identityTitle": "身份",

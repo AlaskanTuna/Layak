@@ -258,7 +258,7 @@
     }
   },
   "evaluation": {
-    "sampleLoadError": "Tidak dapat memuat sampel Aisyah: {{error}}",
+    "sampleLoadError": "Tidak dapat memuat data sampel: {{error}}",
     "unknownError": "Ralat tidak diketahui.",
     "overview": {
       "eyebrow": "Penilaian saya",
@@ -288,8 +288,20 @@
     },
     "intake": {
       "aria": "Kaedah pengambilan",
-      "upload": "Muat naik dokumen",
-      "manual": "Masuk secara manual"
+      "upload": "Muat naik dokumen saya",
+      "manual": "Isi butiran secara manual",
+      "quickStartEyebrow": "Mula di sini",
+      "quickStartTitle": "Pilih cara yang paling mudah untuk bermula.",
+      "quickStartDescription": "Cuba data sampel untuk panduan terpantas, muat naik dokumen sebenar jika sudah sedia, atau taip sendiri butiran jika itu terasa lebih mudah.",
+      "sampleTitle": "Cuba data sampel",
+      "sampleDescription": "Paling sesuai untuk demo, juri, dan pengguna kali pertama yang mahu melihat keseluruhan aliran sebelum menggunakan dokumen sebenar.",
+      "sampleFooter": "Aisyah = gig / Borang B · Farhan = bergaji / Borang BE",
+      "uploadTitle": "Muat naik dokumen saya",
+      "uploadDescription": "Paling sesuai apabila anda sudah mempunyai IC yang jelas, slip gaji terkini, dan bil utiliti terkini.",
+      "uploadFooter": "Tiga fail masuk, satu penilaian berpandu keluar",
+      "manualTitle": "Isi butiran secara manual",
+      "manualDescription": "Paling sesuai apabila fail tidak berada berhampiran atau anda mahu laluan tanpa muat naik yang lebih mudah.",
+      "manualFooter": "Pilihan sandaran yang baik apabila muat naik terasa menyusahkan"
     },
     "stepper": {
       "aria": "Kemajuan saluran",
@@ -322,9 +334,18 @@
       "samplesDivider": "atau",
       "loadingSamples": "Memuatkan sampel…",
       "continue": "Teruskan penilaian",
+      "readyTitle": "Sebelum anda teruskan",
+      "readyIc": "Gunakan bahagian hadapan IC anda dan pastikan teks mudah dibaca.",
+      "readyPayslip": "Gunakan slip gaji atau penyata pendapatan terkini anda.",
+      "readyUtility": "Gunakan bil elektrik, air, atau internet anda yang terkini.",
       "eyebrow": "Langkah · Muat naik",
       "pageTitle": "Muat naik dokumen.",
-      "pageDescription": "Sediakan dokumen di bawah untuk mengesahkan kelayakan anda terhadap korpus skim. Pastikan semua teks jelas dan boleh dibaca — ejen akan mengekstrak, mengelaskan, memadankan, menilai, dan menjana pakej permohonan draf."
+      "pageDescription": "Pilih cara yang paling mudah untuk bermula: cuba data sampel, muat naik dokumen anda, atau taip butiran secara manual. Layak menukarkannya kepada panduan draf yang anda masih semak dan hantar sendiri.",
+      "householdCollapsed": "Langkau bahagian ini melainkan anda mahu menambah anak, ibu bapa, atau ahli keluarga lain.",
+      "householdAdded": "{{count}} ahli isi rumah telah ditambah. Buka untuk semak atau edit.",
+      "samplesTitle": "Mahukan panduan tanpa risiko dahulu?",
+      "samplesHint": "Gunakan Aisyah untuk laluan pekerja gig atau Farhan untuk laluan pekerja bergaji. Kedua-duanya ialah demo sintetik.",
+      "trustCopy": "Layak hanya menyediakan panduan draf. Anda menyemak hasilnya dan menghantar secara manual melalui portal rasmi agensi."
     },
     "manual": {
       "identityTitle": "Identiti",

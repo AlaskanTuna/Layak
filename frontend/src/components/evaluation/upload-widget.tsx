@@ -1,7 +1,7 @@
 'use client'
 
 import { useId, useRef, useState } from 'react'
-import { ArrowRight, FileText, Loader2, Sparkles, UploadCloud, X } from 'lucide-react'
+import { ArrowRight, ChevronDown, FileText, Loader2, ShieldCheck, Sparkles, UploadCloud, X } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import type { TFunction } from 'i18next'
 
@@ -174,6 +174,7 @@ function UploadSlotCard({ spec, state, inputId, disabled, inputRef, onChange, on
 export function UploadWidget({ onSubmit, onUseSamples, disabled = false, samplesLoading = null }: Props) {
   const { t } = useTranslation()
   const reactId = useId()
+  const [showHousehold, setShowHousehold] = useState(false)
   const [state, setState] = useState<Record<UploadSlot, FileSlotState>>({
     ic: { file: null, error: null },
     payslip: { file: null, error: null },
@@ -224,6 +225,14 @@ export function UploadWidget({ onSubmit, onUseSamples, disabled = false, samples
   return (
     <div className="flex flex-col gap-5">
       <div className="flex flex-col gap-4">
+        <div className="rounded-xl border border-primary/15 bg-primary/5 p-4">
+          <p className="font-heading text-sm font-semibold tracking-tight">{t('evaluation.upload.readyTitle')}</p>
+          <ul className="mt-3 space-y-2 text-sm text-muted-foreground">
+            <li>{t('evaluation.upload.readyIc')}</li>
+            <li>{t('evaluation.upload.readyPayslip')}</li>
+            <li>{t('evaluation.upload.readyUtility')}</li>
+          </ul>
+        </div>
         {SLOT_SPECS.map(spec => {
           const inputId = `${reactId}-${spec.slot}`
           return (
@@ -242,45 +251,76 @@ export function UploadWidget({ onSubmit, onUseSamples, disabled = false, samples
           )
         })}
         <div className="flex flex-col gap-3 rounded-xl border border-border bg-card p-5 shadow-sm">
-          <div className="flex flex-col gap-1.5">
-            <div className="flex items-center gap-2">
-              <p className="font-heading text-base font-semibold tracking-tight">
-                {t('evaluation.upload.householdTitle')}
+          <button
+            type="button"
+            className="flex w-full items-start justify-between gap-3 text-left"
+            onClick={() => setShowHousehold(prev => !prev)}
+            aria-expanded={showHousehold}
+          >
+            <div className="flex flex-col gap-1.5">
+              <div className="flex items-center gap-2">
+                <p className="font-heading text-base font-semibold tracking-tight">
+                  {t('evaluation.upload.householdTitle')}
+                </p>
+                <SectionBadge required={false} />
+              </div>
+              <p className="text-xs leading-relaxed text-muted-foreground">
+                {dependants.length > 0
+                  ? t('evaluation.upload.householdAdded', { count: dependants.length })
+                  : t('evaluation.upload.householdCollapsed')}
               </p>
-              <SectionBadge required={false} />
             </div>
-            <p className="text-xs leading-relaxed text-muted-foreground">
-              {t('evaluation.upload.householdHint')}
-            </p>
-          </div>
-          <DependantsFieldset value={dependants} onChange={setDependants} disabled={disabled} />
+            <ChevronDown
+              className={cn('mt-0.5 size-4 shrink-0 text-muted-foreground transition-transform', showHousehold && 'rotate-180')}
+              aria-hidden
+            />
+          </button>
+          {showHousehold && (
+            <>
+              <p className="text-xs leading-relaxed text-muted-foreground">
+                {t('evaluation.upload.householdHint')}
+              </p>
+              <DependantsFieldset value={dependants} onChange={setDependants} disabled={disabled} />
+            </>
+          )}
         </div>
       </div>
 
       <div className="flex flex-col items-start gap-4 border-t border-border pt-5 sm:flex-row sm:items-center sm:justify-between">
-        <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
-          <SamplePersonaButton
-            persona="aisyah"
-            label={t('evaluation.upload.useSamplesAisyah')}
-            loading={samplesLoading === 'aisyah'}
-            disabled={disabled || samplesLoading !== null}
-            onClick={() => onUseSamples('aisyah')}
-          />
-          <span aria-hidden className="text-xs text-muted-foreground/60">
-            {t('evaluation.upload.samplesDivider')}
-          </span>
-          <SamplePersonaButton
-            persona="farhan"
-            label={t('evaluation.upload.useSamplesFarhan')}
-            loading={samplesLoading === 'farhan'}
-            disabled={disabled || samplesLoading !== null}
-            onClick={() => onUseSamples('farhan')}
-          />
+        <div className="flex flex-col gap-2">
+          <div className="flex flex-col gap-1">
+            <p className="text-sm font-medium">{t('evaluation.upload.samplesTitle')}</p>
+            <p className="text-xs leading-relaxed text-muted-foreground">{t('evaluation.upload.samplesHint')}</p>
+          </div>
+          <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
+            <SamplePersonaButton
+              persona="aisyah"
+              label={t('evaluation.upload.useSamplesAisyah')}
+              loading={samplesLoading === 'aisyah'}
+              disabled={disabled || samplesLoading !== null}
+              onClick={() => onUseSamples('aisyah')}
+            />
+            <span aria-hidden className="text-xs text-muted-foreground/60">
+              {t('evaluation.upload.samplesDivider')}
+            </span>
+            <SamplePersonaButton
+              persona="farhan"
+              label={t('evaluation.upload.useSamplesFarhan')}
+              loading={samplesLoading === 'farhan'}
+              disabled={disabled || samplesLoading !== null}
+              onClick={() => onUseSamples('farhan')}
+            />
+          </div>
         </div>
         <Button type="button" onClick={handleSubmit} disabled={disabled || !canSubmit} size="lg">
           {t('evaluation.upload.continue')}
           <ArrowRight className="ml-1.5 size-4" aria-hidden />
         </Button>
+      </div>
+
+      <div className="flex items-start gap-2 rounded-xl border border-primary/15 bg-primary/5 p-4 text-sm text-muted-foreground">
+        <ShieldCheck className="mt-0.5 size-4 shrink-0 text-primary" aria-hidden />
+        <p>{t('evaluation.upload.trustCopy')}</p>
       </div>
     </div>
   )

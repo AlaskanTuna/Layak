@@ -954,11 +954,11 @@ _Frontend:_
 
 **Implementation — PO2 (Adam):**
 
-- [ ] Reframe `frontend/src/components/evaluation/evaluation-upload-client.tsx` so the first screen explains the three paths in plain language: `Try sample data`, `Upload my documents`, and `Type details manually`. Keep any internal wording like "intake mode" out of the visible UI.
-- [ ] Simplify `frontend/src/components/evaluation/upload-widget.tsx`: keep one obvious primary CTA, keep the required three documents clear, and collapse optional household / dependant overrides behind an expandable "Add family members (optional)" affordance instead of rendering the whole fieldset by default.
-- [ ] Add short readiness hints beside each slot using plain examples (`front of IC`, `latest payslip`, `latest electricity bill`) plus a lightweight document-quality checklist before submit.
-- [ ] Make the two sample personas self-explanatory in visible copy: Aisyah = gig / Form B, Farhan = salaried / Form BE. Judges should understand why there are two demos without narration.
-- [ ] Keep one sentence of trust copy on the evaluation surface clarifying that Layak creates draft guidance only and the user still submits manually.
+- [x] Reframe `frontend/src/components/evaluation/evaluation-upload-client.tsx` so the first screen explains the three paths in plain language: `Try sample data`, `Upload my documents`, and `Type details manually`. Keep any internal wording like "intake mode" out of the visible UI.
+- [x] Simplify `frontend/src/components/evaluation/upload-widget.tsx`: keep one obvious primary CTA, keep the required three documents clear, and collapse optional household / dependant overrides behind an expandable "Add family members (optional)" affordance instead of rendering the whole fieldset by default.
+- [x] Add short readiness hints beside each slot using plain examples (`front of IC`, `latest payslip`, `latest electricity bill`) plus a lightweight document-quality checklist before submit.
+- [x] Make the two sample personas self-explanatory in visible copy: Aisyah = gig / Form B, Farhan = salaried / Form BE. Judges should understand why there are two demos without narration.
+- [x] Keep one sentence of trust copy on the evaluation surface clarifying that Layak creates draft guidance only and the user still submits manually.
 
 **Exit criteria:** a first-time user can understand how to start an evaluation without external explanation, and the upload screen presents one obvious primary action plus one obvious low-risk demo path.
 

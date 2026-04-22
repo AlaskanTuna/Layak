@@ -2,6 +2,7 @@
 
 import { useRouter, useSearchParams } from 'next/navigation'
 import { useEffect, useRef, useState } from 'react'
+import { FileText, KeyboardIcon, Sparkles } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 
 import { ErrorRecoveryCard } from '@/components/evaluation/error-recovery-card'
@@ -16,6 +17,7 @@ import {
 } from '@/components/evaluation/upload-widget'
 import { UpgradeWaitlistModal } from '@/components/settings/upgrade-waitlist-modal'
 import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { AISYAH_DEPENDANT_OVERRIDES, loadAisyahFixtureFiles } from '@/lib/aisyah-fixtures'
 import { FARHAN_DEPENDANT_OVERRIDES, loadFarhanFixtureFiles } from '@/lib/farhan-fixtures'
 import type { DependantInput, ManualEntryPayload, Step } from '@/lib/agent-types'
@@ -190,6 +192,7 @@ export function EvaluationUploadClient() {
     <div className="flex flex-col gap-4">
       {showIntake && (
         <>
+          <QuickStartGuide mode={mode} onModeChange={handleModeChange} />
           <IntakeModeToggle value={mode} onChange={handleModeChange} />
           {/* Both widgets stay mounted so partial form state survives a tab switch. */}
           <div className={cn(mode !== 'upload' && 'hidden')} aria-hidden={mode !== 'upload'}>
@@ -258,5 +261,115 @@ export function EvaluationUploadClient() {
         }
       />
     </div>
+  )
+}
+
+function QuickStartGuide({
+  mode,
+  onModeChange
+}: {
+  mode: IntakeMode
+  onModeChange: (mode: IntakeMode) => void
+}) {
+  const { t } = useTranslation()
+
+  return (
+    <section className="flex flex-col gap-3">
+      <div className="flex flex-col gap-1">
+        <p className="text-[11px] font-medium uppercase tracking-[0.18em] text-primary">
+          {t('evaluation.intake.quickStartEyebrow')}
+        </p>
+        <h2 className="font-heading text-xl font-semibold tracking-tight">
+          {t('evaluation.intake.quickStartTitle')}
+        </h2>
+        <p className="text-sm leading-relaxed text-muted-foreground">
+          {t('evaluation.intake.quickStartDescription')}
+        </p>
+      </div>
+      <div className="grid gap-3 lg:grid-cols-3">
+        <PathCard
+          icon={<Sparkles className="size-4" aria-hidden />}
+          title={t('evaluation.intake.sampleTitle')}
+          description={t('evaluation.intake.sampleDescription')}
+          footer={t('evaluation.intake.sampleFooter')}
+          tone="amber"
+        />
+        <PathCard
+          icon={<FileText className="size-4" aria-hidden />}
+          title={t('evaluation.intake.uploadTitle')}
+          description={t('evaluation.intake.uploadDescription')}
+          footer={t('evaluation.intake.uploadFooter')}
+          active={mode === 'upload'}
+          onClick={() => onModeChange('upload')}
+        />
+        <PathCard
+          icon={<KeyboardIcon className="size-4" aria-hidden />}
+          title={t('evaluation.intake.manualTitle')}
+          description={t('evaluation.intake.manualDescription')}
+          footer={t('evaluation.intake.manualFooter')}
+          active={mode === 'manual'}
+          onClick={() => onModeChange('manual')}
+        />
+      </div>
+    </section>
+  )
+}
+
+function PathCard({
+  icon,
+  title,
+  description,
+  footer,
+  active = false,
+  tone = 'default',
+  onClick
+}: {
+  icon: React.ReactNode
+  title: string
+  description: string
+  footer: string
+  active?: boolean
+  tone?: 'default' | 'amber'
+  onClick?: () => void
+}) {
+  const clickable = onClick != null
+  return (
+    <Card
+      className={cn(
+        'border transition-colors',
+        tone === 'amber' && 'border-amber-300/70 bg-amber-50/70 dark:border-amber-700/70 dark:bg-amber-950/20',
+        clickable && 'cursor-pointer hover:border-primary/40 hover:bg-primary/5',
+        active && 'border-primary bg-primary/5 ring-1 ring-primary/20'
+      )}
+      role={clickable ? 'button' : undefined}
+      tabIndex={clickable ? 0 : undefined}
+      onClick={onClick}
+      onKeyDown={
+        clickable
+          ? event => {
+              if (event.key === 'Enter' || event.key === ' ') {
+                event.preventDefault()
+                onClick()
+              }
+            }
+          : undefined
+      }
+    >
+      <CardHeader className="gap-2">
+        <div
+          className={cn(
+            'flex size-9 items-center justify-center rounded-md bg-primary/10 text-primary',
+            tone === 'amber' && 'bg-amber-500/10 text-amber-700 dark:text-amber-300'
+          )}
+        >
+          {icon}
+        </div>
+        <CardTitle>{title}</CardTitle>
+      </CardHeader>
+      <CardContent className="flex flex-col gap-2">
+        <p className="text-sm leading-relaxed text-muted-foreground">{description}</p>
+        <p className="text-xs font-medium text-foreground/80">{footer}</p>
+      </CardContent>
+    </Card>
   )
 }

@@ -107,7 +107,7 @@ Registration is free. By registering, all participants agree to the rules below.
 2. All deliverables must be submitted through the official portal.
 3. Required submission package:
    - Public GitHub repository with source code, README, and setup instructions.
-   - Video demo up to 3 minutes, hosted on YouTube or Google Drive.
+   - Video demo up to 5 minutes, hosted on YouTube or Google Drive.
    - Google Slides deck, exported as PDF, up to 15 slides.
    - Google Cloud Run deployment link that works without login, or test credentials if login is unavoidable.
 4. Submissions must be in English.

@@ -317,6 +317,9 @@
       "householdTitle": "Isi rumah",
       "householdHint": "Dokumen tidak menyenaraikan tanggungan anda. Tambah anak / ibu bapa / ahli isi rumah lain di sini supaya skim yang bergantung padanya (JKM Warga Emas, pelepasan anak LHDN) muncul.",
       "useSamples": "Gunakan dokumen sampel Aisyah",
+      "useSamplesAisyah": "Gunakan Aisyah (pemandu gig)",
+      "useSamplesFarhan": "Gunakan Farhan (guru bergaji)",
+      "samplesDivider": "atau",
       "loadingSamples": "Memuatkan sampel…",
       "continue": "Teruskan penilaian",
       "eyebrow": "Langkah · Muat naik",
@@ -382,7 +385,9 @@
     },
     "demo": {
       "title": "MOD DEMO",
-      "description": "Menjalankan terhadap Aisyah — pemandu Grab sintetik di Kuantan, dua anak berusia sekolah dan seorang tanggungan warga emas. Tiada MyKad sebenar terlibat."
+      "description": "Menjalankan terhadap Aisyah — pemandu Grab sintetik di Kuantan, dua anak berusia sekolah dan seorang tanggungan warga emas. Tiada MyKad sebenar terlibat.",
+      "description_aisyah": "Menjalankan terhadap Aisyah — pemandu Grab sintetik di Kuantan, dua anak berusia sekolah dan seorang tanggungan warga emas. Tiada MyKad sebenar terlibat.",
+      "description_farhan": "Menjalankan terhadap Cikgu Farhan — guru bergaji sintetik di Subang Jaya, pasangan dan dua anak berusia sekolah. Memfailkan Borang BE. Tiada MyKad sebenar terlibat."
     },
     "error": {
       "title": "Ralat saluran",

@@ -317,6 +317,9 @@
       "householdTitle": "家庭",
       "householdHint": "文件不会列出您的受扶养人。请在此添加子女／父母／其他家庭成员，以便相关计划（JKM Warga Emas、LHDN 子女减免）能够出现。",
       "useSamples": "使用 Aisyah 示例文件",
+      "useSamplesAisyah": "使用 Aisyah（Grab 司机）",
+      "useSamplesFarhan": "使用 Farhan（受薪教师）",
+      "samplesDivider": "或",
       "loadingSamples": "正在加载示例…",
       "continue": "继续评估",
       "eyebrow": "步骤 · 上传",
@@ -382,7 +385,9 @@
     },
     "demo": {
       "title": "演示模式",
-      "description": "使用 Aisyah 运行 —— 一位合成的关丹 Grab 司机，有两名学龄子女和一位年长受扶养人。不涉及任何真实 MyKad。"
+      "description": "使用 Aisyah 运行 —— 一位合成的关丹 Grab 司机，有两名学龄子女和一位年长受扶养人。不涉及任何真实 MyKad。",
+      "description_aisyah": "使用 Aisyah 运行 —— 一位合成的关丹 Grab 司机，有两名学龄子女和一位年长受扶养人。不涉及任何真实 MyKad。",
+      "description_farhan": "使用 Cikgu Farhan 运行 —— 一位合成的梳邦再也受薪教师，有配偶和两名学龄子女。申报 Form BE。不涉及任何真实 MyKad。"
     },
     "error": {
       "title": "流程错误",

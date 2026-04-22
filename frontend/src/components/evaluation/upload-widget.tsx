@@ -62,12 +62,18 @@ type FileSlotState = {
   error: string | null
 }
 
+// Phase 7 Task 2 — sample data now has two personas (Aisyah gig, Farhan
+// salaried) so the demo can side-by-side both form types in one flow.
+export type SamplePersona = 'aisyah' | 'farhan'
+
 type Props = {
   onSubmit: (submission: UploadSubmission) => void
-  onUseSamples: () => void
+  onUseSamples: (persona: SamplePersona) => void
   disabled?: boolean
-  /** Reflects in-flight fetch of bundled Aisyah PDFs from /public/fixtures/. */
-  samplesLoading?: boolean
+  /** Which persona's fixtures are currently being fetched from /public/fixtures/,
+   * or `null` when idle. Drives the per-button spinner + disable state so only
+   * the clicked button spins, not both. */
+  samplesLoading?: SamplePersona | null
 }
 
 type SlotProps = {
@@ -165,7 +171,7 @@ function UploadSlotCard({ spec, state, inputId, disabled, inputRef, onChange, on
   )
 }
 
-export function UploadWidget({ onSubmit, onUseSamples, disabled = false, samplesLoading = false }: Props) {
+export function UploadWidget({ onSubmit, onUseSamples, disabled = false, samplesLoading = null }: Props) {
   const { t } = useTranslation()
   const reactId = useId()
   const [state, setState] = useState<Record<UploadSlot, FileSlotState>>({
@@ -252,31 +258,69 @@ export function UploadWidget({ onSubmit, onUseSamples, disabled = false, samples
       </div>
 
       <div className="flex flex-col items-start gap-4 border-t border-border pt-5 sm:flex-row sm:items-center sm:justify-between">
-        <Button
-          type="button"
-          variant="ghost"
-          size="sm"
-          onClick={onUseSamples}
-          disabled={disabled || samplesLoading}
-          className="px-0 text-muted-foreground hover:bg-transparent hover:text-foreground"
-        >
-          {samplesLoading ? (
-            <>
-              <Loader2 className="mr-1.5 size-4 animate-spin" aria-hidden />
-              {t('evaluation.upload.loadingSamples')}
-            </>
-          ) : (
-            <>
-              <Sparkles className="mr-1.5 size-4" aria-hidden />
-              {t('evaluation.upload.useSamples')}
-            </>
-          )}
-        </Button>
+        <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
+          <SamplePersonaButton
+            persona="aisyah"
+            label={t('evaluation.upload.useSamplesAisyah')}
+            loading={samplesLoading === 'aisyah'}
+            disabled={disabled || samplesLoading !== null}
+            onClick={() => onUseSamples('aisyah')}
+          />
+          <span aria-hidden className="text-xs text-muted-foreground/60">
+            {t('evaluation.upload.samplesDivider')}
+          </span>
+          <SamplePersonaButton
+            persona="farhan"
+            label={t('evaluation.upload.useSamplesFarhan')}
+            loading={samplesLoading === 'farhan'}
+            disabled={disabled || samplesLoading !== null}
+            onClick={() => onUseSamples('farhan')}
+          />
+        </div>
         <Button type="button" onClick={handleSubmit} disabled={disabled || !canSubmit} size="lg">
           {t('evaluation.upload.continue')}
           <ArrowRight className="ml-1.5 size-4" aria-hidden />
         </Button>
       </div>
     </div>
+  )
+}
+
+function SamplePersonaButton({
+  persona,
+  label,
+  loading,
+  disabled,
+  onClick
+}: {
+  persona: SamplePersona
+  label: string
+  loading: boolean
+  disabled: boolean
+  onClick: () => void
+}) {
+  const { t } = useTranslation()
+  return (
+    <Button
+      type="button"
+      variant="ghost"
+      size="sm"
+      onClick={onClick}
+      disabled={disabled}
+      data-persona={persona}
+      className="px-0 text-muted-foreground hover:bg-transparent hover:text-foreground"
+    >
+      {loading ? (
+        <>
+          <Loader2 className="mr-1.5 size-4 animate-spin" aria-hidden />
+          {t('evaluation.upload.loadingSamples')}
+        </>
+      ) : (
+        <>
+          <Sparkles className="mr-1.5 size-4" aria-hidden />
+          {label}
+        </>
+      )}
+    </Button>
   )
 }

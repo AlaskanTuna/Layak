@@ -348,6 +348,9 @@
       "householdTitle": "Household",
       "householdHint": "Documents don't list your dependants. Add children / parents / other household members here so schemes that gate on them (JKM Warga Emas, LHDN child relief) surface.",
       "useSamples": "Use Aisyah sample documents",
+      "useSamplesAisyah": "Use Aisyah (gig driver)",
+      "useSamplesFarhan": "Use Farhan (salaried teacher)",
+      "samplesDivider": "or",
       "loadingSamples": "Loading samples…",
       "continue": "Continue evaluation",
       "eyebrow": "Step · Upload",
@@ -413,7 +416,9 @@
     },
     "demo": {
       "title": "DEMO MODE",
-      "description": "Running against Aisyah — a synthetic Grab driver in Kuantan, two school-age children and one elderly dependant. No real MyKad is involved."
+      "description": "Running against Aisyah — a synthetic Grab driver in Kuantan, two school-age children and one elderly dependant. No real MyKad is involved.",
+      "description_aisyah": "Running against Aisyah — a synthetic Grab driver in Kuantan, two school-age children and one elderly dependant. No real MyKad is involved.",
+      "description_farhan": "Running against Cikgu Farhan — a synthetic salaried teacher in Subang Jaya, spouse and two school-age children. Files Form BE. No real MyKad is involved."
     },
     "error": {
       "title": "Pipeline error",

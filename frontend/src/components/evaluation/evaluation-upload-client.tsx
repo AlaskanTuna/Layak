@@ -5,16 +5,32 @@ import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import { ErrorRecoveryCard } from '@/components/evaluation/error-recovery-card'
-import { useEvaluation } from '@/components/evaluation/evaluation-provider'
+import { type DemoPersona, useEvaluation } from '@/components/evaluation/evaluation-provider'
 import { type IntakeMode, IntakeModeToggle } from '@/components/evaluation/intake-mode-toggle'
 import { ManualEntryForm } from '@/components/evaluation/manual-entry-form'
 import { PipelineStepper } from '@/components/evaluation/pipeline-stepper'
-import { UploadWidget, type UploadSubmission } from '@/components/evaluation/upload-widget'
+import {
+  type SamplePersona,
+  UploadWidget,
+  type UploadSubmission
+} from '@/components/evaluation/upload-widget'
 import { UpgradeWaitlistModal } from '@/components/settings/upgrade-waitlist-modal'
 import { Button } from '@/components/ui/button'
 import { AISYAH_DEPENDANT_OVERRIDES, loadAisyahFixtureFiles } from '@/lib/aisyah-fixtures'
-import type { ManualEntryPayload, Step } from '@/lib/agent-types'
+import { FARHAN_DEPENDANT_OVERRIDES, loadFarhanFixtureFiles } from '@/lib/farhan-fixtures'
+import type { DependantInput, ManualEntryPayload, Step } from '@/lib/agent-types'
+import type { UploadFiles } from '@/components/evaluation/upload-widget'
 import { cn } from '@/lib/utils'
+
+// Per-persona fixture loader table. Keeps the dispatch branchless in the
+// upload handler — add another persona by adding another entry here.
+const PERSONA_LOADERS: Record<
+  SamplePersona,
+  { load: () => Promise<UploadFiles>; dependants: DependantInput[] }
+> = {
+  aisyah: { load: loadAisyahFixtureFiles, dependants: AISYAH_DEPENDANT_OVERRIDES },
+  farhan: { load: loadFarhanFixtureFiles, dependants: FARHAN_DEPENDANT_OVERRIDES }
+}
 
 export function EvaluationUploadClient() {
   const { t } = useTranslation()
@@ -28,13 +44,14 @@ export function EvaluationUploadClient() {
   const waitlistOpen = state.quotaExceeded != null
   const initialMode: IntakeMode = searchParams?.get('mode') === 'manual' ? 'manual' : 'upload'
   const [mode, setMode] = useState<IntakeMode>(initialMode)
-  // Per-tab demo flag — when the user clicks "Use Aisyah sample data" on a
-  // tab, we remember that choice on that tab so switching tabs doesn't show
-  // a stale demo banner for a tab with no demo state. The active tab's flag
-  // is mirrored to the global `isDemoMode` that drives the banner.
-  const [demoByTab, setDemoByTab] = useState<Record<IntakeMode, boolean>>({
-    upload: false,
-    manual: false
+  // Per-tab demo persona — when the user clicks a "Use <persona> sample data"
+  // button on a tab, we remember that choice on that tab so switching tabs
+  // doesn't show a stale demo banner for a tab with no demo state. The active
+  // tab's persona is mirrored to the global `demoPersona` that drives the
+  // banner. Manual Entry only has an Aisyah sample, so its slot is narrower.
+  const [demoByTab, setDemoByTab] = useState<Record<IntakeMode, DemoPersona | null>>({
+    upload: null,
+    manual: null
   })
 
   useEffect(() => {
@@ -51,11 +68,11 @@ export function EvaluationUploadClient() {
 
   function handleModeChange(next: IntakeMode) {
     setMode(next)
-    setDemoMode(demoByTab[next])
+    setDemoMode(demoByTab[next] ?? false)
   }
 
   function handleSubmitUpload(submission: UploadSubmission) {
-    setDemoByTab(prev => ({ ...prev, upload: false }))
+    setDemoByTab(prev => ({ ...prev, upload: null }))
     setDemoMode(false)
     start({ mode: 'real', files: submission.files, dependants: submission.dependants })
   }
@@ -64,50 +81,56 @@ export function EvaluationUploadClient() {
     start({ mode: 'manual', payload })
   }
 
-  const [loadingSamples, setLoadingSamples] = useState(false)
+  const [loadingPersona, setLoadingPersona] = useState<SamplePersona | null>(null)
   const [sampleLoadError, setSampleLoadError] = useState<string | null>(null)
 
-  async function handleUseSamplesUpload() {
-    setDemoByTab(prev => ({ ...prev, upload: true }))
-    setDemoMode(true)
+  async function handleUseSamplesUpload(persona: SamplePersona) {
+    setDemoByTab(prev => ({ ...prev, upload: persona }))
+    setDemoMode(persona)
     setSampleLoadError(null)
     // Dev escape hatch — when NEXT_PUBLIC_USE_MOCK_SSE=1 the pipeline replays
-    // canned events; skip the fetch entirely.
+    // canned events (Aisyah-shaped) regardless of persona; skip the fetch
+    // entirely. The mock pipeline doesn't know about Farhan and would
+    // desync, so only honour mock mode for Aisyah.
     const useMock =
-      process.env.NODE_ENV !== 'production' && process.env.NEXT_PUBLIC_USE_MOCK_SSE === '1'
+      persona === 'aisyah' &&
+      process.env.NODE_ENV !== 'production' &&
+      process.env.NEXT_PUBLIC_USE_MOCK_SSE === '1'
     if (useMock) {
       start({ mode: 'mock' })
       return
     }
-    setLoadingSamples(true)
+    const { load, dependants } = PERSONA_LOADERS[persona]
+    setLoadingPersona(persona)
     try {
-      const files = await loadAisyahFixtureFiles()
-      start({ mode: 'real', files, dependants: AISYAH_DEPENDANT_OVERRIDES })
+      const files = await load()
+      start({ mode: 'real', files, dependants })
     } catch (err) {
       setSampleLoadError(err instanceof Error ? err.message : String(err))
       setDemoMode(false)
-      setDemoByTab(prev => ({ ...prev, upload: false }))
+      setDemoByTab(prev => ({ ...prev, upload: null }))
     } finally {
-      setLoadingSamples(false)
+      setLoadingPersona(null)
     }
   }
 
   function handleUseSamplesManual() {
     // Inside the manual form — the form itself has already reset to Aisyah
     // values. Mark the manual tab as demo so switching to upload clears the
-    // banner and switching back restores it.
-    setDemoByTab(prev => ({ ...prev, manual: true }))
-    setDemoMode(true)
+    // banner and switching back restores it. Manual mode is Aisyah-only;
+    // Farhan lives on the upload tab.
+    setDemoByTab(prev => ({ ...prev, manual: 'aisyah' }))
+    setDemoMode('aisyah')
   }
 
   function handleClearManual() {
     // User wiped the manual form — demo banner should drop if it was up.
-    setDemoByTab(prev => ({ ...prev, manual: false }))
+    setDemoByTab(prev => ({ ...prev, manual: null }))
     if (mode === 'manual') setDemoMode(false)
   }
 
   function handleReset() {
-    setDemoByTab({ upload: false, manual: false })
+    setDemoByTab({ upload: null, manual: null })
     setDemoMode(false)
     setMode(initialMode)
     reset()
@@ -116,7 +139,7 @@ export function EvaluationUploadClient() {
   function handleSwitchToManual() {
     // Quota-exhausted recovery — drop the failed pipeline state and flip
     // the user into Manual Entry mode where the OCR step is synthetic.
-    setDemoByTab(prev => ({ ...prev, upload: false }))
+    setDemoByTab(prev => ({ ...prev, upload: null }))
     setDemoMode(false)
     setMode('manual')
     reset()
@@ -142,7 +165,7 @@ export function EvaluationUploadClient() {
             <UploadWidget
               onSubmit={handleSubmitUpload}
               onUseSamples={handleUseSamplesUpload}
-              samplesLoading={loadingSamples}
+              samplesLoading={loadingPersona}
             />
             {sampleLoadError && (
               <p className="mt-2 text-xs text-destructive" role="alert">
@@ -165,10 +188,12 @@ export function EvaluationUploadClient() {
           {showError && (
             <ErrorRecoveryCard
               message={state.error ?? t('evaluation.unknownError')}
-              // "Use samples" falls back to the same upload path; on a
-              // quota-exhausted error the card prefers the Manual Entry CTA
-              // instead because the upload path would 429 the same way.
-              onUseSamples={handleUseSamplesUpload}
+              // "Use samples" falls back to the upload path with the default
+              // Aisyah persona; on a quota-exhausted error the card prefers
+              // the Manual Entry CTA instead because the upload path would
+              // 429 the same way. Farhan is only reachable from the idle
+              // intake screen to keep the recovery card single-action.
+              onUseSamples={() => handleUseSamplesUpload('aisyah')}
               onReset={handleReset}
               onSwitchToManual={handleSwitchToManual}
             />

@@ -889,6 +889,11 @@ Findings the audit flagged that were **not** acted on (cosmetic or external to P
 - Added right-side tooltips to manual-entry field labels and employment-type choices, plus a tooltip-backed household header on the manual tab to mirror the upload tab.
 - Normalized the visible English upload/manual labels and button copy to title case so both tabs read as one consistent flow.
 
+## [23/04/26] - Manual-entry tooltip stacking fix
+
+- Fixed the `/dashboard/evaluation/upload` manual-tab tooltip layering bug by letting the manual form cards render with visible overflow and promoting the tooltip wrapper/panel to a higher stacking level.
+- This keeps the household and field-label tooltips above their cards instead of slipping underneath the surrounding content.
+
 ## [22/04/26] - Phase 7 Task 3: upload validator tightening + JPG/PNG crop preview
 
 - Tightened `frontend/src/components/evaluation/upload-widget.tsx` validation from the looser `image/*` MIME prefix to a strict allowlist of `image/jpeg | image/png | application/pdf`. The earlier prefix had let BMP / TIFF / HEIC reach the OCR step where they fail.

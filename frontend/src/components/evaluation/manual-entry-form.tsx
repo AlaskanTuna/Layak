@@ -100,6 +100,8 @@ const EMPTY_DEFAULTS: FormValues = {
   dependants: []
 }
 
+const TOOLTIP_CARD_CLASS = 'overflow-visible'
+
 type Props = {
   onSubmit: (payload: ManualEntryPayload) => void
   onUseSamples: (persona: ManualSamplePersona) => void
@@ -226,7 +228,7 @@ export function ManualEntryForm({
 
   return (
     <form onSubmit={handleSubmit(submit)} className="flex flex-col gap-4" noValidate>
-      <Card>
+      <Card className={TOOLTIP_CARD_CLASS}>
         <CardHeader>
           <SectionTitle title={t('evaluation.manual.identityTitle')} required />
         </CardHeader>
@@ -306,7 +308,7 @@ export function ManualEntryForm({
         </CardContent>
       </Card>
 
-      <Card>
+      <Card className={TOOLTIP_CARD_CLASS}>
         <CardHeader>
           <SectionTitle title={t('evaluation.manual.incomeTitle')} required />
         </CardHeader>
@@ -351,7 +353,7 @@ export function ManualEntryForm({
         </CardContent>
       </Card>
 
-      <Card>
+      <Card className={TOOLTIP_CARD_CLASS}>
         <CardHeader>
           <SectionTitle title={t('evaluation.manual.utilityTitle')} required={false} />
         </CardHeader>
@@ -403,7 +405,7 @@ export function ManualEntryForm({
         </CardContent>
       </Card>
 
-      <Card>
+      <Card className={TOOLTIP_CARD_CLASS}>
         <CardHeader>
           <SectionTitle
             title={t('evaluation.manual.householdTitle')}

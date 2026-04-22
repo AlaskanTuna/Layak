@@ -12,7 +12,7 @@ type Props = {
 
 export function InfoTooltip({ content, label, className }: Props) {
   return (
-    <span className={cn('group/tooltip relative inline-flex', className)}>
+    <span className={cn('group/tooltip relative inline-flex z-10 group-hover/tooltip:z-50 group-focus-within/tooltip:z-50', className)}>
       <button
         type="button"
         aria-label={label}
@@ -22,7 +22,7 @@ export function InfoTooltip({ content, label, className }: Props) {
       </button>
       <span
         role="tooltip"
-        className="pointer-events-none absolute top-1/2 left-full z-20 ml-2 hidden w-56 -translate-y-1/2 rounded-lg border border-border bg-popover px-3 py-2 text-xs leading-relaxed text-popover-foreground shadow-lg group-hover/tooltip:block group-focus-within/tooltip:block"
+        className="pointer-events-none absolute top-1/2 left-full z-[60] ml-2 hidden w-56 -translate-y-1/2 rounded-lg border border-border bg-popover px-3 py-2 text-xs leading-relaxed text-popover-foreground shadow-lg group-hover/tooltip:block group-focus-within/tooltip:block"
       >
         {content}
       </span>

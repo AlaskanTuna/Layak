@@ -26,19 +26,25 @@ export function LandingHero() {
       </div>
 
       {/* Hero Content */}
-      <div className="relative z-10 mx-auto flex w-full max-w-5xl flex-col items-center justify-center gap-6 px-4 py-24 text-center md:px-6">
-        <h1 className="max-w-4xl font-sans text-4xl font-semibold leading-[0.95] tracking-[-0.045em] text-balance text-white drop-shadow-[0_10px_30px_rgba(0,0,0,0.35)] sm:text-6xl md:text-7xl">
+      <div className="relative z-10 mx-auto flex w-full max-w-6xl px-4 py-24 md:px-6">
+        <div className="flex w-full flex-col items-center gap-6 text-center lg:max-w-3xl lg:items-start lg:text-left">
+          <h1 className="max-w-4xl font-display text-5xl leading-[0.92] tracking-[-0.03em] text-balance text-white drop-shadow-[0_12px_36px_rgba(0,0,0,0.38)] sm:text-6xl md:text-7xl lg:text-[5.5rem]">
           {t('marketing.hero.headlinePart1')} <br className="hidden sm:inline" />
           {t('marketing.hero.headlinePart2')}
-        </h1>
-        <p className="max-w-2xl text-base leading-relaxed text-zinc-100/92 sm:text-lg drop-shadow-sm">
-          {t('marketing.hero.description')}
-        </p>
-        <div className="mt-4 flex flex-col gap-3 sm:flex-row w-full sm:w-auto">
-          <Button render={<Link href="/sign-in" />} size="lg" className="w-full sm:w-auto px-8 bg-white text-black hover:bg-zinc-200">
+          </h1>
+          <p className="max-w-2xl text-base leading-relaxed text-zinc-100/92 sm:text-lg drop-shadow-sm">
+            {t('marketing.hero.description')}
+          </p>
+          <div className="mt-4 flex w-full flex-col gap-3 sm:w-auto sm:flex-row">
+            <Button
+              render={<Link href="/sign-in" />}
+              size="lg"
+              className="w-full sm:w-auto px-8 bg-white text-black hover:bg-zinc-200"
+            >
             {t('marketing.hero.getStarted')}
             <ArrowRight className="ml-2 size-4" aria-hidden />
-          </Button>
+            </Button>
+          </div>
         </div>
       </div>
     </section>

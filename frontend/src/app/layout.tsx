@@ -1,5 +1,5 @@
 import type { Metadata } from 'next'
-import { Geist, Literata } from 'next/font/google'
+import { Abril_Fatface, Geist, Literata } from 'next/font/google'
 
 import { AuthProvider } from '@/lib/auth-context'
 import { I18nProvider } from '@/providers/i18n-provider'
@@ -16,6 +16,13 @@ const geistSans = Geist({
 const literata = Literata({
   variable: '--font-literata',
   subsets: ['latin'],
+  display: 'swap'
+})
+
+const abrilFatface = Abril_Fatface({
+  variable: '--font-abril-fatface',
+  subsets: ['latin'],
+  weight: '400',
   display: 'swap'
 })
 
@@ -37,7 +44,7 @@ export default function RootLayout({
     <html
       lang="en"
       suppressHydrationWarning
-      className={`${geistSans.variable} ${literata.variable} antialiased`}
+      className={`${geistSans.variable} ${literata.variable} ${abrilFatface.variable} antialiased`}
     >
       <body>
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>

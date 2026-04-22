@@ -288,32 +288,32 @@
     "errorTitle": "Could not load dashboard",
     "errorUnexpected": "An unexpected error occurred.",
     "activeApplications": {
-      "title": "Application drafts ready",
+      "title": "Application Drafts Ready",
       "empty": "None yet",
       "emptyDescription": "When an evaluation completes, its draft application packets land here so you can lodge them with the agencies.",
       "startCta": "Start an evaluation",
       "draftsReady": "{{count}} drafts ready to submit",
       "totalRm": "RM {{amount}} total",
-      "openCta": "Open packet"
+      "openCta": "Open Packet"
     },
     "recentActivity": {
       "title": "Recent Activity",
       "empty": "None",
       "emptyDescription": "Evaluations stream here as they happen.",
-      "viewAll": "View all evaluations",
+      "viewAll": "View All Evaluations",
       "justNow": "Just now",
       "minutesAgo": "{{count}} min ago",
       "hoursAgo": "{{count}} h ago",
       "daysAgo": "{{count}} d ago",
       "label": {
-        "complete": "Evaluation complete",
-        "running": "Evaluation running",
-        "error": "Evaluation failed"
+        "complete": "Evaluation Complete",
+        "running": "Evaluation Running",
+        "error": "Evaluation Failed"
       }
     },
     "quota": {
-      "tierFree": "Free tier · 24 h",
-      "tierPro": "Pro · unlimited",
+      "tierFree": "Free Tier · 24H",
+      "tierPro": "Pro · Unlimited",
       "usage": "{{used}} / {{limit}}",
       "remaining": "{{remaining}} left · resets in {{time}}",
       "exhausted": "Quota resets in {{time}}",
@@ -328,8 +328,8 @@
       "results": "Results",
       "schemes": "Schemes",
       "settings": "Settings",
-      "signIn": "Sign in",
-      "signUp": "Sign up"
+      "signIn": "Sign In",
+      "signUp": "Sign Up"
     }
   },
   "evaluation": {

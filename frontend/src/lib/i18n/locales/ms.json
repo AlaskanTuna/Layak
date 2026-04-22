@@ -589,16 +589,7 @@
   "schemes": {
     "pageEyebrow": "Perpustakaan skim",
     "pageTitle": "Setiap skim Malaysia yang Layak pertimbangkan.",
-    "pageDescription": "Enam skim persekutuan tersedia dalam binaan ini. Tiga lagi akan hadir dalam v2 apabila kami menyambungkan peraturan, ambang, dan borang permohonan setiap satu ke dalam enjin.",
-    "stats": {
-      "inScope": "dalam skop",
-      "coming": "akan datang dalam v2"
-    },
-    "sections": {
-      "inScopeTitle": "Dalam skop · binaan ini",
-      "comingTitle": "Akan datang dalam v2",
-      "comingCount": "{{count}} skim"
-    },
+    "pageDescription": "Enam skim persekutuan tersedia dalam binaan ini. Setiap peraturan menarik ambang, kadar caruman, dan borang permohonan daripada sumber rasmi agensi — setiap angka RM dalam penilaian anda boleh dikesan kembali ke halaman tertentu.",
     "howWePick": {
       "title": "Cara kami memilih skim untuk disokong",
       "description": "Layak mengutamakan skim dengan ambang yang didokumentasikan secara terbuka, portal permohonan terbuka, dan faedah sebenar yang tinggi untuk rakyat Malaysia berpendapatan rendah hingga sederhana. Setiap peraturan yang kami sokong disokong oleh sumber yang boleh dirujuk — sama ada dokumen PR kerajaan, borang diwartakan, atau risalah skim — supaya setiap angka RM dalam penilaian anda boleh dikesan ke halaman tertentu."
@@ -634,11 +625,6 @@
     },
     "iSaraan": {
       "summary": "Kerajaan menambah 15% caruman KWSP sukarela bagi pekerja sendiri, had RM 500/tahun. Sasaran pemfail Borang B berumur 18-60 tahun tanpa caruman KWSP majikan."
-    },
-    "coming": {
-      "myKasihDesc": "Program bantuan makanan tanpa tunai.",
-      "eKasihDesc": "Daftar isi rumah miskin kebangsaan.",
-      "saraDesc": "Laluan pelepasan cukai alternatif."
     }
   },
   "settings": {

@@ -589,16 +589,7 @@
   "schemes": {
     "pageEyebrow": "计划库",
     "pageTitle": "Layak 推理的每一项马来西亚计划。",
-    "pageDescription": "本次构建中已上线六项联邦计划。另有三项将在 v2 推出，届时我们会将每项的规则、门槛和申请表接入引擎。",
-    "stats": {
-      "inScope": "已纳入",
-      "coming": "v2 即将推出"
-    },
-    "sections": {
-      "inScopeTitle": "已纳入 · 本次构建",
-      "comingTitle": "v2 即将推出",
-      "comingCount": "{{count}} 项计划"
-    },
+    "pageDescription": "本次构建中已上线六项联邦计划。每条规则的门槛、缴费率和申请表都源自机构官方资料——评估中的每一个 RM 数字都可追溯到具体页面。",
     "howWePick": {
       "title": "我们如何选择支持的计划",
       "description": "Layak 优先支持具有公开文档门槛、开放申请门户和高实际收益的计划，面向中低收入马来西亚人。我们支持的每条规则都有可引用的来源 —— 可能是政府 PR 文件、宪报登记表格或计划小册子 —— 因此您评估中的每个 RM 数字都可追溯到特定页面。"
@@ -634,11 +625,6 @@
     },
     "iSaraan": {
       "summary": "政府按自雇人士的自愿 EPF 缴款额加发 15%，每年上限 RM 500。面向 18-60 岁、无雇主 EPF 缴款路径的 Form B 申报者。"
-    },
-    "coming": {
-      "myKasihDesc": "无现金食品援助计划。",
-      "eKasihDesc": "国家贫困家庭登记册。",
-      "saraDesc": "替代税务减免途径。"
     }
   },
   "settings": {

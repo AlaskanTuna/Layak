@@ -105,39 +105,6 @@ const IN_SCOPE: InScopeScheme[] = [
   }
 ]
 
-type ComingScheme = {
-  name: string
-  agency: string
-  summaryKey: string
-}
-
-const COMING_V2: ComingScheme[] = [
-  { name: 'MyKasih', agency: 'MyKasih Foundation', summaryKey: 'schemes.coming.myKasihDesc' },
-  { name: 'eKasih', agency: 'ICU JPM', summaryKey: 'schemes.coming.eKasihDesc' },
-  { name: 'SARA claim', agency: 'LHDN', summaryKey: 'schemes.coming.saraDesc' }
-]
-
-function StatsRow({ inScope, coming }: { inScope: number; coming: number }) {
-  const { t } = useTranslation()
-  return (
-    <div className="flex flex-wrap items-center gap-3 text-[11px] uppercase tracking-[0.14em] text-muted-foreground">
-      <span className="inline-flex items-center gap-1.5">
-        <span aria-hidden className="size-1.5 rounded-full bg-primary" />
-        <span className="font-semibold text-foreground tabular-nums">{inScope}</span>
-        <span>{t('schemes.stats.inScope')}</span>
-      </span>
-      <span aria-hidden className="opacity-40">
-        ·
-      </span>
-      <span className="inline-flex items-center gap-1.5">
-        <span aria-hidden className="size-1.5 rounded-full bg-muted-foreground/40" />
-        <span className="font-semibold text-foreground tabular-nums">{coming}</span>
-        <span>{t('schemes.stats.coming')}</span>
-      </span>
-    </div>
-  )
-}
-
 function InScopeCard({ scheme }: { scheme: InScopeScheme }) {
   const { t } = useTranslation()
   const Icon = scheme.icon
@@ -196,53 +163,15 @@ function InScopeCard({ scheme }: { scheme: InScopeScheme }) {
   )
 }
 
-function ComingCard({ scheme }: { scheme: ComingScheme }) {
-  const { t } = useTranslation()
-  return (
-    <div className="flex flex-col gap-1 rounded-lg border border-dashed border-border bg-card/40 px-4 py-3">
-      <div className="flex items-center justify-between gap-3">
-        <p className="font-heading text-sm font-semibold">{scheme.name}</p>
-        <span className="text-[9px] font-medium uppercase tracking-[0.16em] text-muted-foreground">
-          {scheme.agency}
-        </span>
-      </div>
-      <p className="text-xs leading-relaxed text-muted-foreground">{t(scheme.summaryKey)}</p>
-    </div>
-  )
-}
-
 export function SchemesOverview() {
   const { t } = useTranslation()
   return (
     <div className="flex flex-col gap-8">
-      <StatsRow inScope={IN_SCOPE.length} coming={COMING_V2.length} />
-
       <section className="flex flex-col gap-4">
-        <p className="text-[11px] font-medium uppercase tracking-[0.18em] text-primary">
-          {t('schemes.sections.inScopeTitle')}
-        </p>
         <ul className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
           {IN_SCOPE.map((scheme) => (
             <li key={scheme.id} className="h-full">
               <InScopeCard scheme={scheme} />
-            </li>
-          ))}
-        </ul>
-      </section>
-
-      <section className="flex flex-col gap-4">
-        <div className="flex items-baseline justify-between">
-          <p className="text-[11px] font-medium uppercase tracking-[0.18em] text-muted-foreground">
-            {t('schemes.sections.comingTitle')}
-          </p>
-          <span className="text-[11px] uppercase tracking-[0.14em] text-muted-foreground/70">
-            {t('schemes.sections.comingCount', { count: COMING_V2.length })}
-          </span>
-        </div>
-        <ul className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-          {COMING_V2.map((scheme) => (
-            <li key={scheme.name}>
-              <ComingCard scheme={scheme} />
             </li>
           ))}
         </ul>

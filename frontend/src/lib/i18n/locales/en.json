@@ -620,16 +620,7 @@
   "schemes": {
     "pageEyebrow": "Scheme library",
     "pageTitle": "Every Malaysian scheme Layak reasons over.",
-    "pageDescription": "Six federal schemes are live in this build. Three more land in v2 as we wire each one's rules, thresholds, and application form into the engine.",
-    "stats": {
-      "inScope": "in scope",
-      "coming": "coming in v2"
-    },
-    "sections": {
-      "inScopeTitle": "In scope · this build",
-      "comingTitle": "Coming in v2",
-      "comingCount": "{{count}} schemes"
-    },
+    "pageDescription": "Six federal schemes are live in this build. Each rule pulls thresholds, contribution rates, and application forms from the agency's published source — every RM figure on your evaluation traces back to a specific page.",
     "howWePick": {
       "title": "How We Pick What to Support",
       "description": "Layak prioritises schemes with publicly-documented thresholds, open application portals, and high real-world upside for low-to-middle-income Malaysians. Each rule we support is backed by a citable source — either a government PR document, gazetted form, or scheme brochure — so every RM figure in your evaluation traces back to a specific page."
@@ -665,11 +656,6 @@
     },
     "iSaraan": {
       "summary": "Government tops up 15% of self-employed voluntary EPF contribution, capped RM 500/yr. Targets Form B filers aged 18-60 without employer EPF."
-    },
-    "coming": {
-      "myKasihDesc": "Cashless food aid programme.",
-      "eKasihDesc": "National poor-household registry.",
-      "saraDesc": "Alternate tax-relief pathway."
     }
   },
   "settings": {

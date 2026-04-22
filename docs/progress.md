@@ -934,3 +934,10 @@ Findings the audit flagged that were **not** acted on (cosmetic or external to P
 - Text quality jumped from 49 lines RapidOCR Latin model to 169 lines Tesseract msa+eng. Words now extract cleanly KEMENTERIAN SUMBER MANUSIA, PERKESO, Skim Keselamatan Sosial Pekerjaan Sendiri, etc., and the eligibility-band numbers come through RM 30/day to RM 118.50/day. The 4-tier contribution table 232.80/298.80/442.80/596.40 still does not OCR cleanly because it is rendered as a complex multi-column infographic; those rates live in the gazetted Akta 789 schedule referenced separately by the rule.
 - File grew from 3.3 MB to 6.4 MB optimize disabled to bypass jbig2 binary permission error in WSL; well within the size budget for a committed asset.
 - Backend test suite still 297/297 green — no rule changes, just a stronger citation asset.
+
+## [22/04/26] - Drop in-scope vs v2 distinction from /dashboard/schemes
+
+- Removed the COMING_V2 array, ComingCard component, StatsRow component, ComingScheme type, and the in-scope-section eyebrow from `frontend/src/components/schemes/schemes-overview.tsx`. The page now renders just the live cards plus the How We Pick aside.
+- Pruned deprecated i18n keys from en/ms/zh: `schemes.stats.{inScope,coming}`, `schemes.sections.{inScopeTitle,comingTitle,comingCount}`, `schemes.coming.{myKasihDesc,eKasihDesc,saraDesc}`.
+- Rewrote `schemes.pageDescription` to drop the "Three more land in v2..." sentence; new copy emphasises citation provenance instead of forward-looking scope.
+- Verified pnpm lint clean, pnpm build clean across all 13 routes.

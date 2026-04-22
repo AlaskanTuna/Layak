@@ -360,7 +360,7 @@
       "byIdEyebrow": "Evaluation",
       "byIdTitle": "Your eligibility results.",
       "byIdDescription": "Hydrated from your saved evaluation. Numbers cite the rule and source page; every packet is a DRAFT you submit yourself.",
-      "deadlineTitle": "Draft only — check deadlines before you submit",
+      "deadlineTitle": "Draft Only — Check Deadlines Before You Submit",
       "deadlineBody": "Layak never files for you. Review the matched schemes, confirm the latest official deadline on the agency side, then submit manually through the correct portal.",
       "actions": {
         "eyebrow": "What to do next",
@@ -576,20 +576,20 @@
       "perYearEst": "per year (est.)",
       "openAgencyPortal": "Open {{agency}} portal",
       "emptyList": "Scheme matches will appear here after your first evaluation completes.",
-      "eligibleSchemesCount": "Eligible schemes ({{count}})"
+      "eligibleSchemesCount": "Eligible Schemes ({{count}})"
     },
     "requiredContributions": {
       "heading": "Required Contributions",
       "intro": "Mandatory contributions you owe under these schemes. These are NOT included in your annual relief total above — they're money you pay.",
-      "annualLabel": "Annual contribution",
+      "annualLabel": "Annual Contribution",
       "footnote": "Register and pay directly via the agency portal. Non-payment may affect access to employment-injury benefits if you claim later."
     },
     "preview": {
-      "title": "Inline preview ({{count}} drafts)",
+      "title": "Inline Preview ({{count}} drafts)",
       "description": "Inspect each draft PDF in the browser before downloading. Each preview re-runs WeasyPrint server-side from your stored profile + matches; the bytes never persist.",
       "loading": "Loading preview…",
-      "error": "Preview failed: {{message}}",
-      "iframeTitle": "Inline preview of {{name}}",
+      "error": "Preview Failed: {{message}}",
+      "iframeTitle": "Inline Preview of {{name}}",
       "downloadOne": "Download this PDF"
     },
     "packet": {

@@ -324,7 +324,25 @@
       "backendReturned": "后端返回 {{status}} {{statusText}}",
       "byIdEyebrow": "评估",
       "byIdTitle": "您的资格评估结果。",
-      "byIdDescription": "从您保存的评估中加载。数字引用规则和来源页面；每个申请包都是 DRAFT，由您亲自提交。"
+      "byIdDescription": "从您保存的评估中加载。数字引用规则和来源页面；每个申请包都是 DRAFT，由您亲自提交。",
+      "deadlineTitle": "仅为草稿 — 提交前请先确认截止日期",
+      "deadlineBody": "Layak 不会代您提交。请先查看匹配到的计划，在相关机构一侧确认最新官方截止日期，然后通过正确的门户手动提交。",
+      "actions": {
+        "eyebrow": "接下来做什么",
+        "title": "清楚地完成下一步。",
+        "description": "先做最重要的动作，再按顺序完成其余步骤。",
+        "reviewMatchesTitle": "查看匹配到的计划",
+        "reviewMatchesBody": "在采取任何行动前，先确认每个计划为什么会匹配成功。",
+        "reviewMatchesCta": "查看计划",
+        "reviewMatchesEmpty": "这次评估没有找到符合资格的计划。",
+        "reviewPacketTitle": "查看或下载草拟申请包",
+        "reviewPacketBody": "下一步请打开申请包区域，以便检查或下载草拟文件。",
+        "reviewPacketCta": "前往草拟申请包",
+        "reviewPacketEmpty": "只有出现符合资格的计划时，这里才会显示草拟申请包。",
+        "startAnotherTitle": "开始新的评估",
+        "startAnotherBody": "如果您想比较另一份档案或另一组文件，可以重新开始一次评估。",
+        "startAnotherCta": "开始新的评估"
+      }
     },
     "intake": {
       "aria": "录入方式",

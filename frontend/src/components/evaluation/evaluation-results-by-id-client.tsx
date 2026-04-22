@@ -12,6 +12,7 @@ import { EvaluationUpsideHero } from '@/components/evaluation/evaluation-upside-
 import { PersistedPacketDownload } from '@/components/evaluation/persisted-packet-download'
 import { PipelineStepper } from '@/components/evaluation/pipeline-stepper'
 import { RequiredContributionsCard } from '@/components/evaluation/required-contributions-card'
+import { ResultsActionRail } from '@/components/evaluation/results-action-rail'
 import { SchemeCardGrid } from '@/components/evaluation/scheme-card-grid'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
@@ -225,6 +226,13 @@ export function EvaluationResultsByIdClient({ evalId }: { evalId: string }) {
         <PipelineStepper state={pipelineState} />
       )}
 
+      {isComplete && (
+        <ResultsActionRail
+          canReviewMatches={qualifyingCount > 0}
+          canReviewPacket={qualifyingCount > 0}
+        />
+      )}
+
       {isError && (
         // Phase 7 Task 6 — category-tailored recovery on persisted errors.
         // The original files + dependants aren't retained server-side, so
@@ -250,7 +258,9 @@ export function EvaluationResultsByIdClient({ evalId }: { evalId: string }) {
             packet={null}
             empty={!isComplete}
           />
-          <SchemeCardGrid matches={doc.matches} />
+          <div id="matched-schemes">
+            <SchemeCardGrid matches={doc.matches} />
+          </div>
           <RequiredContributionsCard matches={doc.matches} />
           {pipelineState.upside &&
             pipelineState.upside.total_annual_rm > 0 &&
@@ -264,7 +274,11 @@ export function EvaluationResultsByIdClient({ evalId }: { evalId: string }) {
         </>
       )}
 
-      {isComplete && <PersistedPacketDownload evalId={evalId} matches={doc.matches} />}
+      {isComplete && (
+        <div id="draft-packet">
+          <PersistedPacketDownload evalId={evalId} matches={doc.matches} />
+        </div>
+      )}
 
       {isComplete && (
         <div className="flex">

@@ -324,7 +324,25 @@
       "backendReturned": "Backend memulangkan {{status}} {{statusText}}",
       "byIdEyebrow": "Penilaian",
       "byIdTitle": "Keputusan kelayakan anda.",
-      "byIdDescription": "Dimuatkan daripada penilaian anda yang disimpan. Angka merujuk peraturan dan halaman sumber; setiap pakej adalah DRAF yang anda hantar sendiri."
+      "byIdDescription": "Dimuatkan daripada penilaian anda yang disimpan. Angka merujuk peraturan dan halaman sumber; setiap pakej adalah DRAF yang anda hantar sendiri.",
+      "deadlineTitle": "Draf sahaja — semak tarikh akhir sebelum menghantar",
+      "deadlineBody": "Layak tidak pernah memfailkan bagi pihak anda. Semak skim yang dipadankan, sahkan tarikh akhir rasmi terkini di pihak agensi, kemudian hantar secara manual melalui portal yang betul.",
+      "actions": {
+        "eyebrow": "Apa yang perlu dibuat seterusnya",
+        "title": "Ambil langkah seterusnya dengan yakin.",
+        "description": "Mulakan dengan tindakan yang paling penting, kemudian teruskan mengikut turutan.",
+        "reviewMatchesTitle": "Semak skim yang dipadankan",
+        "reviewMatchesBody": "Lihat sebab setiap skim dipadankan sebelum anda bertindak atas apa-apa.",
+        "reviewMatchesCta": "Semak skim",
+        "reviewMatchesEmpty": "Tiada skim layak ditemui dalam larian ini.",
+        "reviewPacketTitle": "Semak atau muat turun pakej draf anda",
+        "reviewPacketBody": "Buka bahagian pakej seterusnya supaya anda boleh memeriksa atau memuat turun dokumen draf.",
+        "reviewPacketCta": "Pergi ke pakej draf",
+        "reviewPacketEmpty": "Pakej draf hanya muncul di sini apabila ada skim yang layak.",
+        "startAnotherTitle": "Mulakan penilaian lain",
+        "startAnotherBody": "Jalankan penilaian baharu jika anda mahu membandingkan profil atau set dokumen yang lain.",
+        "startAnotherCta": "Mulakan penilaian lain"
+      }
     },
     "intake": {
       "aria": "Kaedah pengambilan",

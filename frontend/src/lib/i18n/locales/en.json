@@ -355,7 +355,25 @@
       "backendReturned": "Backend returned {{status}} {{statusText}}",
       "byIdEyebrow": "Evaluation",
       "byIdTitle": "Your eligibility results.",
-      "byIdDescription": "Hydrated from your saved evaluation. Numbers cite the rule and source page; every packet is a DRAFT you submit yourself."
+      "byIdDescription": "Hydrated from your saved evaluation. Numbers cite the rule and source page; every packet is a DRAFT you submit yourself.",
+      "deadlineTitle": "Draft only — check deadlines before you submit",
+      "deadlineBody": "Layak never files for you. Review the matched schemes, confirm the latest official deadline on the agency side, then submit manually through the correct portal.",
+      "actions": {
+        "eyebrow": "What to do next",
+        "title": "Take the next step with confidence.",
+        "description": "Start with the most important action, then work through the rest in order.",
+        "reviewMatchesTitle": "Review matched schemes",
+        "reviewMatchesBody": "See why each scheme matched before you act on anything.",
+        "reviewMatchesCta": "Review schemes",
+        "reviewMatchesEmpty": "No qualifying schemes surfaced in this run.",
+        "reviewPacketTitle": "Review or download your draft packet",
+        "reviewPacketBody": "Open the packet section next so you can inspect or download the draft documents.",
+        "reviewPacketCta": "Go to draft packet",
+        "reviewPacketEmpty": "A draft packet appears here only when a scheme qualifies.",
+        "startAnotherTitle": "Start another evaluation",
+        "startAnotherBody": "Run a fresh evaluation if you want to compare another profile or document set.",
+        "startAnotherCta": "Start another evaluation"
+      }
     },
     "intake": {
       "aria": "Intake method",

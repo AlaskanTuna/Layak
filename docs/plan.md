@@ -986,10 +986,10 @@ _Frontend:_
 
 **Implementation — PO2 (Adam):**
 
-- [ ] Add a `What to do next` rail near the top of `frontend/src/components/evaluation/evaluation-results-by-id-client.tsx` with the clearest actions: review matched schemes, preview/download the draft packet, and start another evaluation.
-- [ ] Surface deadline / manual-submission reminder copy above the fold so users immediately understand the result is guidance, not an auto-submission.
-- [ ] Distinguish primary vs secondary actions visually so the user does not have to scan the full page to find the next step.
-- [ ] If Phase 7 task 4 lands, mount the inline PDF preview directly under this action rail so review and download become one continuous flow.
+- [x] Add a `What to do next` rail near the top of `frontend/src/components/evaluation/evaluation-results-by-id-client.tsx` with the clearest actions: review matched schemes, preview/download the draft packet, and start another evaluation.
+- [x] Surface deadline / manual-submission reminder copy above the fold so users immediately understand the result is guidance, not an auto-submission.
+- [x] Distinguish primary vs secondary actions visually so the user does not have to scan the full page to find the next step.
+- [x] If Phase 7 task 4 lands, mount the inline PDF preview directly under this action rail so review and download become one continuous flow. _(The new action rail leaves the packet section directly below the fold-ready actions, so the inline preview can slot in there later without another layout rethink.)_
 
 **Exit criteria:** a first-time user landing on the results page can tell what to do next within a few seconds, without needing demo narration.
 

@@ -867,6 +867,146 @@ _Frontend:_
 
 **Exit criteria:** every documented Gemini failure mode shows a category-tailored card with at least one actionable button; no raw error text leaks to the user.
 
+### 7. Feature: i-Saraan (EPF) rule + KWSP 6A-i template
+
+**Owner:** PO1 (Hao). **Depends on:** Phase 1 Task 4 (rule engine), Phase 1 Task 5 (generate_packet template registration).
+
+**Purpose/Issue:** Aisyah is self-employed (gig driver). Under EPF i-Saraan, the government matches 15% of voluntary EPF contribution, capped at RM500/yr, for self-employed Malaysian citizens or PRs aged 18-60. This is the strongest "you are leaving money on the table" demo card for Aisyah's persona. Form is KWSP 6A-i. Threshold is broad (employment_type=gig + age range + citizenship), making it a layup add to the rule engine that materially enriches every gig-worker evaluation.
+
+**Implementation — PO1 (Hao):**
+
+- [ ] Source the i-Saraan rules — drop a copy of the public KWSP i-Saraan brochure or program PDF into backend/data/schemes/ (filename like i-saraan-program.pdf). TODO: confirm primary source URL before encoding the RM500/yr cap and the 15% match rate against the gazetted figure.
+- [ ] Add backend/app/rules/i_saraan.py exposing match(profile) -> SchemeMatch. Qualifies when employment_type == 'gig' (or however the Profile schema represents self-employed) AND 18 <= age <= 60. annual_rm = 500.0 (the maximum government match). Include \_citations() returning RuleCitation entries pointing at the i-Saraan PDF page references and the public KWSP portal URL.
+- [ ] Register the new module in backend/app/agents/tools/match.py — append i_saraan to the \_RULES tuple and the import line.
+- [ ] Register the new module in backend/app/rules/**init**.py.
+- [ ] Add the new SchemeId literal value "i_saraan" to backend/app/schema/scheme.py SchemeId Literal.
+- [ ] Add backend/app/templates/i_saraan.html.jinja using lhdn.html.jinja as the structural reference. Fields: filer name, IC last 4, monthly income, voluntary contribution worked example, agency portal link, "DRAFT — NOT SUBMITTED" watermark. Filename pattern: KWSP-i-saraan-{ic_last4}.pdf.
+- [ ] Register the template in \_TEMPLATE_MAP within backend/app/agents/tools/generate_packet.py.
+- [ ] Add backend/tests/test_i_saraan.py covering: gig profile age 34 qualifies with annual_rm == 500.0; salaried profile does not qualify; under-18 profile does not qualify; over-60 profile does not qualify; rendered packet bytes start with %PDF.
+- [ ] Sync the frontend SchemeId Literal in frontend/src/lib/agent-types.ts to add "i_saraan".
+
+**Exit criteria:** running the pipeline against a self-employed profile produces an i-Saraan KWSP 6A-i draft packet alongside the existing scheme outputs, and the rule's annual_rm contributes to the total upside computation.
+
+### 8. Feature: JKM Bantuan Kanak-Kanak (BKK) rule + JKM10 template
+
+**Owner:** PO1 (Hao). **Depends on:** Phase 1 Task 4 (rule engine), Phase 1 Task 5 (generate_packet template registration). Naturally complements JKM Warga Emas, which already uses parent-relationship dependant data.
+
+**Purpose/Issue:** JKM Bantuan Kanak-Kanak pays RM100/month per child (up to 6 children, capped RM450/month per household per current JKM schedule) to low-income households with children under 18. Both Aisyah (2 school-age kids) and Cikgu Farhan (2 children ages 10 + 7 per Phase 7 Task 2 Farhan fixture overrides) qualify. This task uses dependants[] data the pipeline already extracts — zero new manual-entry surface required.
+
+**Implementation — PO1 (Hao):**
+
+- [ ] Source the BKK rules — drop the public JKM BKK / Bantuan Kanak-Kanak brochure or borang into backend/data/schemes/ (filename like jkm-bkk-brochure.pdf). TODO: confirm primary source for the per-capita threshold (commonly cited as RM1,000/capita), the per-child rate (RM100/mo), and the household cap (RM450/mo or 6 children) before encoding.
+- [ ] Add backend/app/rules/jkm_bkk.py exposing match(profile) -> SchemeMatch. Qualifies when at least one dependant has relationship == 'child' AND age < 18, AND per_capita_income (= monthly_income_rm / max(household_size, 1)) <= 1000.0. annual_rm = min(qualifying_child_count, 6) _ 100.0 _ 12, capped at 450.0 \* 12 = 5400.0/yr. Include \_citations() pointing at the BKK PDF.
+- [ ] Register the new module in backend/app/agents/tools/match.py — append jkm_bkk to the \_RULES tuple and the import line.
+- [ ] Register the new module in backend/app/rules/**init**.py.
+- [ ] Add the new SchemeId literal value "jkm_bkk" to backend/app/schema/scheme.py.
+- [ ] Add backend/app/templates/jkm_bkk.html.jinja using jkm18.html.jinja as the structural reference. Fields: applicant name (parent), IC last 4, household income, household_size, per-capita income computation, per-child enumeration, annual upside, agency portal link, "DRAFT — NOT SUBMITTED" watermark. Filename pattern: JKM-bkk-{ic_last4}.pdf.
+- [ ] Register the template in \_TEMPLATE_MAP within backend/app/agents/tools/generate_packet.py.
+- [ ] Add backend/tests/test_jkm_bkk.py covering: Aisyah-shape profile (2 children under 18, low income) qualifies with annual_rm == 2400.0; high-income profile does not qualify; profile with no child dependants does not qualify; profile with 7 children caps at RM5400/yr; rendered packet bytes start with %PDF.
+- [ ] Sync the frontend SchemeId Literal in frontend/src/lib/agent-types.ts to add "jkm_bkk".
+
+**Exit criteria:** a profile with school-age children under the per-capita threshold produces a JKM BKK draft packet, with annual_rm correctly reflecting the per-child × month math.
+
+### 9. Feature: PERKESO SKSPS (Self-Employed Social Security) rule + template
+
+**Owner:** PO1 (Hao). **Depends on:** Phase 1 Task 4 (rule engine), Phase 1 Task 5 (generate_packet template registration), and the frontend ranked-list component.
+
+**Purpose/Issue:** PERKESO SKSPS is mandatory social security for self-employed Malaysians (Grab/passenger transport drivers were brought under the Akta 789 in 2024). Annual contribution ranges RM232.80–RM596.40 across 4 plans depending on declared monthly earnings. This is a COMPLIANCE/PROTECTION scheme, not an upside scheme — surfacing it correctly means rendering it in a separate "Required contributions" UI block, NOT in the annual_rm ranked list (which would mislead users into thinking they receive the contribution amount).
+
+**Implementation — PO1 (Hao):**
+
+- [ ] Source the SKSPS rules — drop the public PERKESO SKSPS brochure or contribution-rate table into backend/data/schemes/ (filename like perkeso-sksps-rates.pdf). TODO: confirm Plan 1 (RM232.80) through Plan 4 (RM596.40) annual contribution amounts and the income brackets that map to each plan against the gazetted Self-Employed Employment Injury Scheme (Akta 789) schedule.
+- [ ] Decide on the annual_rm semantics. RECOMMENDED: introduce a new SchemeKind enum field on SchemeMatch ("upside" vs "required_contribution") and let SKSPS emit kind="required_contribution" with annual_rm equal to zero plus a separate annual_contribution_rm field. The ranked-list component must filter kind=="required_contribution" entries out of the upside total. Document this decision in the task narrative — call out that this is a small schema change rippling through frontend/src/lib/agent-types.ts and the ranked-list component.
+- [ ] Add backend/app/rules/perkeso_sksps.py exposing match(profile) -> SchemeMatch. Qualifies when employment_type == 'gig' AND 18 <= age <= 60. Compute the contribution plan from monthly_income_rm: Plan 1 if income ≤ RM1,050, Plan 2 if ≤ RM1,550, Plan 3 if ≤ RM2,950, Plan 4 above (TODO: confirm against gazetted brackets). Set kind="required_contribution" and annual_contribution_rm to the selected plan's amount. Include \_citations() pointing at the SKSPS PDF.
+- [ ] Register the new module in backend/app/agents/tools/match.py and backend/app/rules/**init**.py.
+- [ ] Add the new SchemeId literal value "perkeso_sksps" to backend/app/schema/scheme.py.
+- [ ] Add backend/app/templates/perkeso_sksps.html.jinja using bk01.html.jinja as the structural reference. Fields: filer name, IC last 4, monthly income declaration, selected Plan tier, annual contribution amount, benefits summary, agency portal link, "DRAFT — NOT SUBMITTED" watermark. Filename pattern: PERKESO-sksps-{ic_last4}.pdf.
+- [ ] Register the template in \_TEMPLATE_MAP within backend/app/agents/tools/generate_packet.py.
+- [ ] Update frontend/src/components/results/ranked-list.tsx to render a separate "Required contributions" subsection below the upside ranked list, displaying SchemeMatch entries where kind=="required_contribution". Total annual upside math must EXCLUDE these entries.
+- [ ] Add backend/tests/test_perkeso_sksps.py covering: gig profile at low income emits Plan 1 contribution; gig profile at higher income emits the appropriate Plan tier; salaried profile does not qualify; rendered packet bytes start with %PDF; SchemeMatch.kind is "required_contribution" so the ranked-list excludes it from the upside sum.
+- [ ] Sync the frontend SchemeId Literal in frontend/src/lib/agent-types.ts to add "perkeso_sksps", and add the kind field to the typed mirror.
+
+**Exit criteria:** a self-employed profile shows a PERKESO SKSPS card under "Required contributions" with the correct Plan tier and annual contribution, and the upside total above remains math-correct (excludes the contribution).
+
+### 10. Feature: /dashboard/schemes overview update + i18n sync
+
+**Owner:** PO2 (Adam). **Depends on:** Phase 7 Tasks 7, 8, 9 (the three new scheme rules must be live).
+
+**Purpose/Issue:** With i-Saraan, JKM BKK, and PERKESO SKSPS now live in the rule engine, the public-facing scheme catalogue at /dashboard/schemes (rendered by frontend/src/components/schemes/schemes-overview.tsx) must reflect the new active set. Currently the page shows 3 IN_SCOPE entries and 5 COMING_V2 entries. After this task: 6 IN_SCOPE entries (3 original + 3 new) and 2 COMING_V2 entries (MyKasih, eKasih — SARA claim is being folded into the existing LHDN logic per the strategy discussion). The "Coming in v2" subtitle copy and stats row counts must also update.
+
+**Implementation — PO2 (Adam):**
+
+- [ ] In schemes-overview.tsx, append three new entries to the IN_SCOPE array. i-Saraan: categoryKey 'schemes.labels.retirement', icon PiggyBank (or similar Lucide icon), agency 'KWSP', name 'EPF i-Saraan', summaryKey 'schemes.iSaraan.summary', upsideRm '500.00', formLabel 'Form KWSP 6A-i', portalUrl 'https://www.kwsp.gov.my/en/member/contribution/i-saraan'. JKM BKK: categoryKey 'schemes.labels.welfare', icon Baby, agency 'JKM', name 'JKM · Bantuan Kanak-Kanak', summaryKey 'schemes.jkmBkk.summary', upsideRm '5,400.00', formLabel 'Form JKM10', portalUrl 'https://www.jkm.gov.my'. PERKESO SKSPS: categoryKey 'schemes.labels.socialSecurity', icon ShieldCheck, agency 'PERKESO', name 'PERKESO SKSPS · Self-Employed Social Security', summaryKey 'schemes.perkesoSksps.summary', upsideRm 'RM232.80–596.40 / yr (contribution)', formLabel 'Form SKSPS-1', portalUrl 'https://www.perkeso.gov.my'.
+- [ ] Remove i-Saraan, PERKESO SKSPS, and SARA claim from the COMING_V2 array. Remaining entries: MyKasih, eKasih.
+- [ ] Add new label keys to the i18n locales under schemes.labels: retirement, socialSecurity. Plus new summary keys: schemes.iSaraan.summary, schemes.jkmBkk.summary, schemes.perkesoSksps.summary. Mirror across en/ms/zh in frontend/src/lib/i18n/locales/{en,ms,zh}.json.
+- [ ] Update the page-level description copy at en.json line 480 ("Three federal schemes are live in this build. Five more land in v2…") to reflect the new active count (6) and remaining-coming count (2). Mirror the change across ms.json and zh.json.
+- [ ] Audit the StatsRow render — inScope={IN_SCOPE.length} and coming={COMING_V2.length} auto-update from array lengths, no manual change. Verify the layout still looks balanced when the IN_SCOPE grid has 6 entries (3 cols × 2 rows on lg breakpoint).
+- [ ] Run `pnpm -C frontend lint && pnpm -C frontend build` to confirm no TypeScript regressions from the new SchemeId values.
+
+**Exit criteria:** /dashboard/schemes shows 6 in-scope cards (3 original + 3 new) above 2 coming cards; all copy is mirrored across en/ms/zh; build is green.
+
+### 11. Feature: Streamline evaluation entry flow for first-time users
+
+**Owner:** PO2 (Adam). **Depends on:** the existing upload + manual entry surfaces, Phase 7 task 2 demo personas.
+
+**Purpose/Issue:** The intake flow is working, but it still feels like a tool for builders instead of ordinary citizens. First-time users currently have to parse mode switches, three document slots, optional dependant overrides, and two sample personas before they feel safe to click. For the judges, aunties, and uncles, the first screen should explain itself in under 10 seconds.
+
+**Implementation — PO2 (Adam):**
+
+- [ ] Reframe `frontend/src/components/evaluation/evaluation-upload-client.tsx` so the first screen explains the three paths in plain language: `Try sample data`, `Upload my documents`, and `Type details manually`. Keep any internal wording like "intake mode" out of the visible UI.
+- [ ] Simplify `frontend/src/components/evaluation/upload-widget.tsx`: keep one obvious primary CTA, keep the required three documents clear, and collapse optional household / dependant overrides behind an expandable "Add family members (optional)" affordance instead of rendering the whole fieldset by default.
+- [ ] Add short readiness hints beside each slot using plain examples (`front of IC`, `latest payslip`, `latest electricity bill`) plus a lightweight document-quality checklist before submit.
+- [ ] Make the two sample personas self-explanatory in visible copy: Aisyah = gig / Form B, Farhan = salaried / Form BE. Judges should understand why there are two demos without narration.
+- [ ] Keep one sentence of trust copy on the evaluation surface clarifying that Layak creates draft guidance only and the user still submits manually.
+
+**Exit criteria:** a first-time user can understand how to start an evaluation without external explanation, and the upload screen presents one obvious primary action plus one obvious low-risk demo path.
+
+### 12. Feature: On-demand tour guide modal with floating help launcher
+
+**Owner:** PO2 (Adam). **Depends on:** the public landing shell and authenticated app shell.
+
+**Purpose/Issue:** The app needs a self-serve explanation layer without cluttering the main UI. A floating bottom-right `?` button gives judges and first-time users a reliable, forgiving place to get help without leaving the page or breaking the flow.
+
+**Implementation — PO2 (Adam):**
+
+- [ ] Add a persistent bottom-right help launcher (Lucide `CircleHelp` or equivalent) on the public landing and authenticated app shell. Keep it above mobile safe areas and clear of existing CTAs.
+- [ ] Clicking the launcher opens a shadcn `Dialog` or `Sheet` with a compact tour guide. Minimum sections: `How Layak works`, `What documents to prepare`, `Try sample data first`, and `What happens after results`.
+- [ ] Make the guide contextual where cheap: when opened from the upload screen, start on document prep; when opened from the results page, start on the next-actions section.
+- [ ] Keep the guide on-demand only — no forced auto-popup. If helpful, persist the last-opened section in localStorage so repeat visitors return to the most relevant help tab.
+- [ ] Translate the guide across `en`, `ms`, and `zh`, and ensure the launcher + modal are keyboard / screen-reader safe.
+
+**Exit criteria:** every major screen has a one-tap help affordance, and a first-time user can understand the flow without leaving the page or asking a teammate.
+
+### 13. Feature: Results-page action rail + deadline-first guidance
+
+**Owner:** PO2 (Adam). **Depends on:** the persisted results route and packet download CTA. Integrates cleanly with Phase 7 task 4 if inline PDF preview lands.
+
+**Purpose/Issue:** After the pipeline finishes, the app still needs a stronger "what do I do now?" moment. The current results page has useful information, but the next action is not framed boldly enough for non-technical users.
+
+**Implementation — PO2 (Adam):**
+
+- [ ] Add a `What to do next` rail near the top of `frontend/src/components/evaluation/evaluation-results-by-id-client.tsx` with the clearest actions: review matched schemes, preview/download the draft packet, and start another evaluation.
+- [ ] Surface deadline / manual-submission reminder copy above the fold so users immediately understand the result is guidance, not an auto-submission.
+- [ ] Distinguish primary vs secondary actions visually so the user does not have to scan the full page to find the next step.
+- [ ] If Phase 7 task 4 lands, mount the inline PDF preview directly under this action rail so review and download become one continuous flow.
+
+**Exit criteria:** a first-time user landing on the results page can tell what to do next within a few seconds, without needing demo narration.
+
+### 14. Feature: Accessibility + reduced-motion polish pass
+
+**Owner:** PO2 (Adam). **Depends on:** the final Phase 7 UI surfaces, including the help launcher if task 12 lands.
+
+**Purpose/Issue:** Hackathon polish is not just visual. The app should feel calm, readable, tappable, and trustworthy across keyboard, touch, and lower-motion preferences — especially for older users.
+
+**Implementation — PO2 (Adam):**
+
+- [ ] Audit key controls for target size, focus visibility, contrast, and plain-language labels across the landing page, evaluation flow, results page, settings, and the new help launcher.
+- [ ] Respect `prefers-reduced-motion` in animated surfaces such as the pipeline stepper, loading states, and any help-modal transitions.
+- [ ] Review dialog, dropdown, and mobile-drawer flows for keyboard escape / focus-trap correctness.
+- [ ] Fix obvious wording friction discovered during the pass, especially jargon-heavy labels that would confuse non-technical users.
+
+**Exit criteria:** the demo flow feels calm and usable on keyboard and touch, and no major UI element depends on animation or insider terminology to be understood.
+
 ---
 
 ## Phase X: Submission Package

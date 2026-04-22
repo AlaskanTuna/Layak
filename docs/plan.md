@@ -970,11 +970,11 @@ _Frontend:_
 
 **Implementation — PO2 (Adam):**
 
-- [ ] Add a persistent bottom-right help launcher (Lucide `CircleHelp` or equivalent) on the public landing and authenticated app shell. Keep it above mobile safe areas and clear of existing CTAs.
-- [ ] Clicking the launcher opens a shadcn `Dialog` or `Sheet` with a compact tour guide. Minimum sections: `How Layak works`, `What documents to prepare`, `Try sample data first`, and `What happens after results`.
-- [ ] Make the guide contextual where cheap: when opened from the upload screen, start on document prep; when opened from the results page, start on the next-actions section.
-- [ ] Keep the guide on-demand only — no forced auto-popup. If helpful, persist the last-opened section in localStorage so repeat visitors return to the most relevant help tab.
-- [ ] Translate the guide across `en`, `ms`, and `zh`, and ensure the launcher + modal are keyboard / screen-reader safe.
+- [x] Add a persistent bottom-right help launcher (Lucide `CircleHelp` or equivalent) on the public landing and authenticated app shell. Keep it above mobile safe areas and clear of existing CTAs.
+- [x] Clicking the launcher opens a shadcn `Dialog` or `Sheet` with a compact tour guide. Minimum sections: `How Layak works`, `What documents to prepare`, `Try sample data first`, and `What happens after results`.
+- [x] Make the guide contextual where cheap: when opened from the upload screen, start on document prep; when opened from the results page, start on the next-actions section.
+- [x] Keep the guide on-demand only — no forced auto-popup. If helpful, persist the last-opened section in localStorage so repeat visitors return to the most relevant help tab.
+- [x] Translate the guide across `en`, `ms`, and `zh`, and ensure the launcher + modal are keyboard / screen-reader safe.
 
 **Exit criteria:** every major screen has a one-tap help affordance, and a first-time user can understand the flow without leaving the page or asking a teammate.
 

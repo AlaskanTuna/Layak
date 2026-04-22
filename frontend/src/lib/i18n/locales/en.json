@@ -51,6 +51,46 @@
       "ms": "Bahasa Malaysia",
       "zh": "简体中文"
     },
+    "help": {
+      "open": "Open quick help",
+      "title": "Quick help",
+      "description": "A fast guide for first-time users. Pick the section that matches where you are in the flow.",
+      "footer": "Layak gives draft guidance only. You still review and submit manually.",
+      "tabs": {
+        "overview": "How Layak works",
+        "documents": "What to prepare",
+        "samples": "Try sample data",
+        "results": "After results"
+      },
+      "overview": {
+        "title": "How Layak works",
+        "body": "Layak turns one evaluation into a guided flow: understand your profile, match schemes, estimate upside, then prepare draft packets for you to review.",
+        "point1": "Start with sample data if you want a no-risk walkthrough first.",
+        "point2": "Upload or type your details, then wait for the pipeline to finish.",
+        "point3": "Use the results page to review schemes and download your draft packet."
+      },
+      "documents": {
+        "title": "What documents to prepare",
+        "body": "The upload path works best when your files are recent, readable, and cropped to the important details.",
+        "point1": "Use the front of your IC, your latest payslip, and your latest utility bill.",
+        "point2": "Make sure names, dates, addresses, and RM amounts are easy to read.",
+        "point3": "If uploads feel troublesome, switch to the manual path instead."
+      },
+      "samples": {
+        "title": "Try sample data first",
+        "body": "The sample personas are the safest way to understand the demo before touching real documents.",
+        "point1": "Aisyah shows the gig-worker / Form B path.",
+        "point2": "Farhan shows the salaried / Form BE path.",
+        "point3": "Both demos are synthetic and safe to explore."
+      },
+      "results": {
+        "title": "What happens after results",
+        "body": "The results page is where you decide what to do next: review matched schemes, inspect the draft packet, or start another evaluation.",
+        "point1": "Check why each scheme matched before you act on it.",
+        "point2": "Download the draft packet and review it carefully.",
+        "point3": "Layak never submits for you — final submission is always manual."
+      }
+    },
     "sectionBadge": {
       "required": "Required",
       "optional": "Optional"

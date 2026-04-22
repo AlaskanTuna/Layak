@@ -51,6 +51,46 @@
       "ms": "Bahasa Malaysia",
       "zh": "简体中文"
     },
+    "help": {
+      "open": "Buka bantuan ringkas",
+      "title": "Bantuan ringkas",
+      "description": "Panduan pantas untuk pengguna kali pertama. Pilih bahagian yang sepadan dengan tempat anda berada dalam aliran.",
+      "footer": "Layak hanya memberi panduan draf. Anda masih perlu menyemak dan menghantar secara manual.",
+      "tabs": {
+        "overview": "Cara Layak berfungsi",
+        "documents": "Apa yang perlu disediakan",
+        "samples": "Cuba data sampel",
+        "results": "Selepas keputusan"
+      },
+      "overview": {
+        "title": "Cara Layak berfungsi",
+        "body": "Layak menukarkan satu penilaian menjadi aliran berpandu: fahami profil anda, padankan skim, anggarkan faedah, kemudian sediakan pakej draf untuk anda semak.",
+        "point1": "Mulakan dengan data sampel jika anda mahu panduan tanpa risiko terlebih dahulu.",
+        "point2": "Muat naik atau taip butiran anda, kemudian tunggu saluran selesai.",
+        "point3": "Gunakan halaman keputusan untuk menyemak skim dan memuat turun pakej draf anda."
+      },
+      "documents": {
+        "title": "Apa yang perlu disediakan",
+        "body": "Laluan muat naik berfungsi paling baik apabila fail anda terkini, boleh dibaca, dan dipotong pada bahagian penting.",
+        "point1": "Gunakan bahagian hadapan IC, slip gaji terkini, dan bil utiliti terkini anda.",
+        "point2": "Pastikan nama, tarikh, alamat, dan jumlah RM mudah dibaca.",
+        "point3": "Jika muat naik terasa menyusahkan, tukar ke laluan manual."
+      },
+      "samples": {
+        "title": "Cuba data sampel dahulu",
+        "body": "Persona sampel ialah cara paling selamat untuk memahami demo sebelum menyentuh dokumen sebenar.",
+        "point1": "Aisyah menunjukkan laluan pekerja gig / Borang B.",
+        "point2": "Farhan menunjukkan laluan pekerja bergaji / Borang BE.",
+        "point3": "Kedua-dua demo ialah sintetik dan selamat untuk diterokai."
+      },
+      "results": {
+        "title": "Apa berlaku selepas keputusan",
+        "body": "Halaman keputusan ialah tempat anda memilih langkah seterusnya: semak skim yang dipadankan, periksa pakej draf, atau mulakan penilaian baharu.",
+        "point1": "Semak sebab setiap skim dipadankan sebelum anda bertindak.",
+        "point2": "Muat turun pakej draf dan semaknya dengan teliti.",
+        "point3": "Layak tidak pernah menghantar bagi pihak anda — penghantaran akhir sentiasa manual."
+      }
+    },
     "sectionBadge": {
       "required": "Wajib",
       "optional": "Pilihan"

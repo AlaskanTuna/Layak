@@ -26,6 +26,7 @@ from __future__ import annotations
 
 from app.schema.profile import Dependant, Profile
 from app.schema.scheme import RuleCitation, SchemeMatch
+from app.services.vertex_ai_search import get_primary_rag_citation
 
 CHILD_AGE_THRESHOLD = 18
 # Age boundary for the two per-child rate tiers. Children aged ≤ YOUNGER_BAND_AGE
@@ -46,9 +47,24 @@ _SCHEME_NAME = "JKM Bantuan Kanak-Kanak — per-child monthly payment"
 # backend/data/schemes/. Documents the current BKK rates verbatim.
 _SOURCE_PDF = "jkm-bkk-brochure.pdf"
 
+# Phase 8 Task 3 — Vertex AI Search grounds the primary citation against the
+# live source PDF. URI filter constrains the snippet ranker to the expected
+# document so the rule cannot accidentally cite a different scheme's PDF.
+_RAG_QUERY = "Bantuan Kanak-Kanak children household monthly"
+_RAG_URI_SUBSTRING = "jkm-bkk-brochure.pdf"
+
 
 def _citations() -> list[RuleCitation]:
-    return [
+    cites: list[RuleCitation] = []
+    rag = get_primary_rag_citation(
+        query=_RAG_QUERY,
+        uri_substring=_RAG_URI_SUBSTRING,
+        rule_id="rag.jkm_bkk.primary",
+        fallback_pdf="jkm-bkk-brochure.pdf",
+    )
+    if rag is not None:
+        cites.append(rag)
+    cites.extend([
         RuleCitation(
             rule_id="jkm.bkk.eligibility_means_test",
             source_pdf=_SOURCE_PDF,
@@ -72,7 +88,8 @@ def _citations() -> list[RuleCitation]:
             ),
             source_url="https://www.jkm.gov.my/uploads/content-downloads/file_20241025152555.pdf",
         ),
-    ]
+    ])
+    return cites
 
 
 def _qualifying_children(profile: Profile) -> list[Dependant]:

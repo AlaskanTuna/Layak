@@ -38,6 +38,7 @@ from __future__ import annotations
 
 from app.schema.profile import Profile
 from app.schema.scheme import RuleCitation, SchemeMatch
+from app.services.vertex_ai_search import get_primary_rag_citation
 
 MIN_AGE = 18
 MAX_AGE = 60
@@ -53,9 +54,24 @@ _PORTAL_URL = "https://www.kwsp.gov.my/en/member/contribution/i-saraan"
 _SCHEME_NAME = "EPF i-Saraan — voluntary contribution government match"
 _SOURCE_PDF = "i-saraan-program.pdf"
 
+# Phase 8 Task 3 — Vertex AI Search grounds the primary citation against the
+# live source PDF. URI filter constrains the snippet ranker to the expected
+# document so the rule cannot accidentally cite a different scheme's PDF.
+_RAG_QUERY = "i-Saraan RM500 government match"
+_RAG_URI_SUBSTRING = "i-saraan-program.pdf"
+
 
 def _citations() -> list[RuleCitation]:
-    return [
+    cites: list[RuleCitation] = []
+    rag = get_primary_rag_citation(
+        query=_RAG_QUERY,
+        uri_substring=_RAG_URI_SUBSTRING,
+        rule_id="rag.i_saraan.primary",
+        fallback_pdf="i-saraan-program.pdf",
+    )
+    if rag is not None:
+        cites.append(rag)
+    cites.extend([
         RuleCitation(
             rule_id="epf.i_saraan.eligibility",
             source_pdf=_SOURCE_PDF,
@@ -78,7 +94,8 @@ def _citations() -> list[RuleCitation]:
             ),
             source_url="https://www.kwsp.gov.my/en/member/contribution/i-saraan",
         ),
-    ]
+    ])
+    return cites
 
 
 def match(profile: Profile) -> SchemeMatch:

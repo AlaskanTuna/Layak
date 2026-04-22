@@ -20,6 +20,7 @@ from __future__ import annotations
 
 from app.schema.profile import Profile
 from app.schema.scheme import RuleCitation, SchemeMatch
+from app.services.vertex_ai_search import get_primary_rag_citation
 
 # Income band ceilings (monthly household income, RM) — risalah p.2.
 BAND_1_CEILING_RM = 2500.0
@@ -48,6 +49,14 @@ _AGENCY = "LHDN (HASiL) / Ministry of Finance"
 _PORTAL_URL = "https://bantuantunai.hasil.gov.my"
 _SCHEME_NAME = "STR 2026 — Household with children tier"
 
+# Phase 8 Task 3 — Vertex AI Search grounds the tier-table citation against the
+# live risalah PDF. Query tuned against the standard-edition snippet ranker; the
+# URI filter guards against cross-scheme drift (e.g. the query text could
+# otherwise rank i-saraan-program.pdf above the STR risalah when both mention
+# "Sumbangan Tunai Rahmah" in their Budget extracts).
+_RAG_QUERY = "Sumbangan Tunai Rahmah household tier with children"
+_RAG_URI_SUBSTRING = "risalah-str-2026.pdf"
+
 
 def _child_bucket(children_under_18: int) -> str | None:
     """Return the tier-table bucket key for a given child count, or None if off-scope."""
@@ -70,7 +79,16 @@ def _income_band(monthly_income_rm: float) -> str | None:
 
 
 def _citations() -> list[RuleCitation]:
-    return [
+    cites: list[RuleCitation] = []
+    rag = get_primary_rag_citation(
+        query=_RAG_QUERY,
+        uri_substring=_RAG_URI_SUBSTRING,
+        rule_id="rag.str_2026.primary",
+        fallback_pdf="risalah-str-2026.pdf",
+    )
+    if rag is not None:
+        cites.append(rag)
+    cites.extend([
         RuleCitation(
             rule_id="str_2026.household_with_children.tier_table",
             source_pdf="risalah-str-2026.pdf",
@@ -98,7 +116,8 @@ def _citations() -> list[RuleCitation]:
                 "BK-01%20(Borang%20Permohonan%20&%20Kemaskini%20STR%202026).pdf"
             ),
         ),
-    ]
+    ])
+    return cites
 
 
 def _why_qualify(band: str, bucket: str, annual_rm: float, children: int, income: float) -> str:

@@ -36,6 +36,7 @@ from dataclasses import dataclass
 
 from app.schema.profile import Profile
 from app.schema.scheme import RuleCitation, SchemeMatch
+from app.services.vertex_ai_search import get_primary_rag_citation
 
 # Eligibility window
 GIG_AGE_MIN = 18
@@ -78,9 +79,24 @@ _PORTAL_URL = "https://www.perkeso.gov.my"
 _SCHEME_NAME = "PERKESO SKSPS — Self-Employed Social Security"
 _SOURCE_PDF = "perkeso-sksps-rates.pdf"
 
+# Phase 8 Task 3 — Vertex AI Search grounds the primary citation against the
+# live source PDF. URI filter constrains the snippet ranker to the expected
+# document so the rule cannot accidentally cite a different scheme's PDF.
+_RAG_QUERY = "PERKESO SKSPS self-employed contribution plans"
+_RAG_URI_SUBSTRING = "perkeso-sksps-rates.pdf"
+
 
 def _citations() -> list[RuleCitation]:
-    return [
+    cites: list[RuleCitation] = []
+    rag = get_primary_rag_citation(
+        query=_RAG_QUERY,
+        uri_substring=_RAG_URI_SUBSTRING,
+        rule_id="rag.perkeso_sksps.primary",
+        fallback_pdf="perkeso-sksps-rates.pdf",
+    )
+    if rag is not None:
+        cites.append(rag)
+    cites.extend([
         RuleCitation(
             rule_id="perkeso.sksps.akta_789_eligibility",
             source_pdf=_SOURCE_PDF,
@@ -104,7 +120,8 @@ def _citations() -> list[RuleCitation]:
             ),
             source_url="https://www.perkeso.gov.my",
         ),
-    ]
+    ])
+    return cites
 
 
 def match(profile: Profile) -> SchemeMatch:

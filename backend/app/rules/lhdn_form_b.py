@@ -34,6 +34,7 @@ from __future__ import annotations
 
 from app.schema.profile import Profile
 from app.schema.scheme import RuleCitation, SchemeMatch
+from app.services.vertex_ai_search import get_primary_rag_citation
 
 SUPPORTED_YA = "ya_2025"
 if SUPPORTED_YA != "ya_2025":
@@ -63,6 +64,12 @@ _AGENCY = "LHDN (HASiL)"
 _PORTAL_URL = "https://mytax.hasil.gov.my"
 _SCHEME_NAME_FORM_B = "LHDN Form B — five YA2025 reliefs"
 _SCHEME_NAME_FORM_BE = "LHDN Form BE — five YA2025 reliefs"
+
+# Phase 8 Task 3 — Vertex AI Search grounds the primary citation against the
+# live source PDF. URI filter constrains the snippet ranker to the expected
+# document so the rule cannot accidentally cite a different scheme's PDF.
+_RAG_QUERY = "individual personal relief paragraph 46 RM9000"
+_RAG_URI_SUBSTRING = "pr-no-4-2024.pdf"
 
 # YA2025 personal income tax brackets for resident individuals (Schedule 1, ITA).
 # Stored as (upper bound of chargeable income, marginal rate).
@@ -106,6 +113,15 @@ def _citations(form_type: str) -> list[RuleCitation]:
     filing-deadline citation diverges — Example 1 vs Example 2 on doc p.2
     of the RF Filing Programme 2026.
     """
+    cites: list[RuleCitation] = []
+    rag = get_primary_rag_citation(
+        query=_RAG_QUERY,
+        uri_substring=_RAG_URI_SUBSTRING,
+        rule_id=f"rag.lhdn.{ 'form_b' if form_type == 'form_b' else 'form_be' }.primary",
+        fallback_pdf="pr-no-4-2024.pdf",
+    )
+    if rag is not None:
+        cites.append(rag)
     citation_prefix = "lhdn.form_b" if form_type == "form_b" else "lhdn.form_be"
     reliefs = [
         RuleCitation(
@@ -188,7 +204,8 @@ def _citations(form_type: str) -> list[RuleCitation]:
                 source_url="https://www.hasil.gov.my/media/fqog1423/rf-filing-programme-for-2026.pdf",
             )
         )
-    return reliefs
+    cites.extend(reliefs)
+    return cites
 
 
 def _applicable_reliefs(profile: Profile) -> dict[str, float]:

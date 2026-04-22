@@ -12,6 +12,7 @@
  * tacked onto the end — Aisyah's SKSPS Plan 3 contribution (RM 442.80/yr)
  * renders separately in the "Required contributions" block and does NOT stack
  * into the RM 12,308 total.
+ * Phase 8 re-snapshot (2026-04-23): rule_citations now lead with a Vertex-AI-Search-derived primary citation grounded in `gs://layak-schemes-pdfs/<scheme>.pdf`; AISYAH_UPSIDE.python_snippet + .stdout are captured from gemini-3-flash-preview output (HEAVY_MODEL).
  */
 
 import type {
@@ -69,6 +70,14 @@ export const AISYAH_SCHEME_MATCHES: SchemeMatch[] = [
     portal_url: 'https://www.jkm.gov.my',
     rule_citations: [
       {
+        rule_id: 'rag.jkm_warga_emas.primary',
+        source_pdf: 'jkm18.pdf',
+        page_ref: 'Vertex AI Search retrieval',
+        passage:
+          'ahli keluarga tidak mencukupi. UNTUK KEGUNAAN PEJABAT No. Siri / / / Kod Negeri / Kod Daerah / No. Daftar Klien Tarikh Pendaftaran Ruj. Fail PERCUMA JKM 18.',
+        source_url: 'gs://layak-schemes-pdfs/jkm18.pdf'
+      },
+      {
         rule_id: 'jkm.warga_emas.means_test_per_capita',
         source_pdf: 'jkm18.pdf',
         page_ref: 'p. 2, Section VII — Maklumat Pendapatan dan Perbelanjaan Bulanan',
@@ -108,6 +117,14 @@ export const AISYAH_SCHEME_MATCHES: SchemeMatch[] = [
     portal_url: 'https://www.jkm.gov.my',
     rule_citations: [
       {
+        rule_id: 'rag.jkm_bkk.primary',
+        source_pdf: 'jkm-bkk-brochure.pdf',
+        page_ref: 'Vertex AI Search retrieval',
+        passage:
+          'KATEGORI DAN KADAR BANTUAN BULANAN BANTUAN KANAK-KANAK (BKK) — pecahan kadar mengikut umur kanak-kanak dengan had maksimum RM1,000 sebulan setiap keluarga.',
+        source_url: 'gs://layak-schemes-pdfs/jkm-bkk-brochure.pdf'
+      },
+      {
         rule_id: 'jkm.bkk.eligibility_means_test',
         source_pdf: 'jkm-bkk-brochure.pdf',
         page_ref: 'JKM SPK ISO 9001 — Bantuan Kewangan Bulanan, Kategori Bantuan',
@@ -137,6 +154,14 @@ export const AISYAH_SCHEME_MATCHES: SchemeMatch[] = [
     agency: 'LHDN (HASiL)',
     portal_url: 'https://mytax.hasil.gov.my',
     rule_citations: [
+      {
+        rule_id: 'rag.lhdn.form_b.primary',
+        source_pdf: 'pr-no-4-2024.pdf',
+        page_ref: 'Vertex AI Search retrieval',
+        passage:
+          'INLAND REVENUE BOARD OF MALAYSIA TAXATION OF A RESIDENT INDIVIDUAL PART I — GIFTS OR CONTRIBUTIONS AND ALLOWABLE DEDUCTIONS, Public Ruling No. 4/2024 §6.1 individual relief paragraph 46(1)(a).',
+        source_url: 'gs://layak-schemes-pdfs/pr-no-4-2024.pdf'
+      },
       {
         rule_id: 'lhdn.form_b.individual_relief',
         source_pdf: 'pr-no-4-2024.pdf',
@@ -199,6 +224,14 @@ export const AISYAH_SCHEME_MATCHES: SchemeMatch[] = [
     portal_url: 'https://www.kwsp.gov.my/en/member/contribution/i-saraan',
     rule_citations: [
       {
+        rule_id: 'rag.i_saraan.primary',
+        source_pdf: 'i-saraan-program.pdf',
+        page_ref: 'Vertex AI Search retrieval',
+        passage:
+          'Had caruman padanan 15% Kerajaan di bawah program i-Saraan KWSP ditingkatkan kepada RM500 setahun terhad kepada RM5,000 seumur hidup.',
+        source_url: 'gs://layak-schemes-pdfs/i-saraan-program.pdf'
+      },
+      {
         rule_id: 'epf.i_saraan.eligibility',
         source_pdf: 'i-saraan-program.pdf',
         page_ref: 'KWSP i-Saraan program brochure, §Kelayakan (external reference)',
@@ -228,6 +261,14 @@ export const AISYAH_SCHEME_MATCHES: SchemeMatch[] = [
     agency: 'LHDN (HASiL) / Ministry of Finance',
     portal_url: 'https://bantuantunai.hasil.gov.my',
     rule_citations: [
+      {
+        rule_id: 'rag.str_2026.primary',
+        source_pdf: 'risalah-str-2026.pdf',
+        page_ref: 'Vertex AI Search retrieval',
+        passage:
+          'Sumbangan Asas Rahmah (SARA) adalah secara automatik berdasarkan data lulus STR 2026 melibatkan kumpulan Miskin dan Miskin Tegar dalam rekod data eKasih.',
+        source_url: 'gs://layak-schemes-pdfs/risalah-str-2026.pdf'
+      },
       {
         rule_id: 'str_2026.household_with_children.tier_table',
         source_pdf: 'risalah-str-2026.pdf',
@@ -270,6 +311,14 @@ export const AISYAH_SCHEME_MATCHES: SchemeMatch[] = [
     annual_contribution_rm: 442.8,
     rule_citations: [
       {
+        rule_id: 'rag.perkeso_sksps.primary',
+        source_pdf: 'perkeso-sksps-rates.pdf',
+        page_ref: 'Vertex AI Search retrieval',
+        passage:
+          'KEMENTERIAN SUMBER MANUSIA PERKESO Skim Keselamatan Sosial Pekerjaan Sendiri (LINDUNG Kendiri) memberi perlindungan keselamatan sosial kepada pekerja sendiri.',
+        source_url: 'gs://layak-schemes-pdfs/perkeso-sksps-rates.pdf'
+      },
+      {
         rule_id: 'perkeso.sksps.akta_789_eligibility',
         source_pdf: 'perkeso-sksps-rates.pdf',
         page_ref: 'Akta 789 · Skim Keselamatan Sosial Pekerjaan Sendiri (external reference)',
@@ -290,35 +339,32 @@ export const AISYAH_SCHEME_MATCHES: SchemeMatch[] = [
 ]
 
 export const AISYAH_UPSIDE: ComputeUpsideResult = {
-  python_snippet: `# Layak — annual RM upside computation
-# Gemini Code Execution would run this in a sandbox under Gemini 2.5 Pro.
-
-jkm_warga_emas = 7200  # JKM Warga Emas — dependent elderly payment
-jkm_bkk = 3600  # JKM Bantuan Kanak-Kanak — per-child monthly payment
-lhdn_form_b = 558  # LHDN Form B — five YA2025 reliefs
-i_saraan = 500  # EPF i-Saraan — voluntary contribution government match
-str_2026 = 450  # STR 2026 — Household with children tier
+  python_snippet: `jkm_warga_emas = 7200.0
+jkm_bkk = 3600.0
+lhdn_form_b = 558.0
+i_saraan = 500.0
+str_2026 = 450.0
 
 total = jkm_warga_emas + jkm_bkk + lhdn_form_b + i_saraan + str_2026
 
-print("{:<44s}{:>12s}".format("Scheme", "Annual (RM)"))
-print("-" * 57)
-print("{:<44s}{:>12,}".format('JKM Warga Emas — dependent elderly payment', jkm_warga_emas))
-print("{:<44s}{:>12,}".format('JKM Bantuan Kanak-Kanak — per-child payment', jkm_bkk))
-print("{:<44s}{:>12,}".format('LHDN Form B — five YA2025 reliefs', lhdn_form_b))
-print("{:<44s}{:>12,}".format('EPF i-Saraan — 15% government match', i_saraan))
-print("{:<44s}{:>12,}".format('STR 2026 — Household with children tier', str_2026))
-print("-" * 57)
-print("{:<44s}{:>12,}".format("Total upside (annual)", total))`,
-  stdout: `Scheme                                        Annual (RM)
----------------------------------------------------------
-JKM Warga Emas — dependent elderly payment          7,200
-JKM Bantuan Kanak-Kanak — per-child payment         3,600
-LHDN Form B — five YA2025 reliefs                     558
-EPF i-Saraan — 15% government match                   500
-STR 2026 — Household with children tier               450
----------------------------------------------------------
-Total upside (annual)                              12,308`,
+print("{:<54s}{:>12s}".format("Scheme", "Annual (RM)"))
+print("-" * 66)
+print("{:<54s}{:>12,.2f}".format("JKM Warga Emas — dependent elderly payment", jkm_warga_emas))
+print("{:<54s}{:>12,.2f}".format("JKM Bantuan Kanak-Kanak — per-child monthly payment", jkm_bkk))
+print("{:<54s}{:>12,.2f}".format("LHDN Form B — five YA2025 reliefs", lhdn_form_b))
+print("{:<54s}{:>12,.2f}".format("EPF i-Saraan — voluntary contribution government match", i_saraan))
+print("{:<54s}{:>12,.2f}".format("STR 2026 — Household with children tier", str_2026))
+print("-" * 66)
+print("{:<54s}{:>12,.2f}".format("Total upside (annual)", total))`,
+  stdout: `Scheme                                                 Annual (RM)
+------------------------------------------------------------------
+JKM Warga Emas — dependent elderly payment                7,200.00
+JKM Bantuan Kanak-Kanak — per-child monthly payment       3,600.00
+LHDN Form B — five YA2025 reliefs                           558.00
+EPF i-Saraan — voluntary contribution government match      500.00
+STR 2026 — Household with children tier                     450.00
+------------------------------------------------------------------
+Total upside (annual)                                    12,308.00`,
   total_annual_rm: 12308,
   per_scheme_rm: {
     jkm_warga_emas: 7200,

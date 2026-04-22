@@ -38,10 +38,10 @@ Write a short Python program that:
 1. Assigns each scheme's `annual_rm` to a variable named after its
    `scheme_id` (e.g. `str_2026 = 450`).
 2. Computes `total` as the sum of those variables.
-3. Prints a formatted table using `print("{{:<42s}}{{:>12s}}".format(...))`:
+3. Prints a formatted table using `print("{{:<54s}}{{:>12s}}".format(...))`:
 
    - A header row: `Scheme` / `Annual (RM)`.
-   - A separator row of 55 `-` characters.
+   - A separator row of 66 `-` characters.
    - One data row per scheme: the scheme's human-readable `scheme_name` on
      the left and its `annual_rm` right-aligned in 12 columns with thousands
      separators.

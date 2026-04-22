@@ -127,7 +127,7 @@ export function ErrorRecoveryCard({
   return (
     <Card className="border-destructive/40 bg-destructive/5">
       <CardHeader>
-        <CardTitle className="flex items-center gap-2 text-sm text-destructive">
+        <CardTitle className="flex items-center gap-2 font-sans text-sm text-destructive">
           <Icon className="size-4" aria-hidden />
           {t(`${keyPrefix}.title`)}
         </CardTitle>

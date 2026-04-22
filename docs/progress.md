@@ -4,6 +4,12 @@
 
 ---
 
+## [22/04/26] - Dashboard card-title follow-up: Geist Sans headings + English title-case cleanup
+
+PO2 tightened dashboard card-title consistency without touching the shared `CardTitle` primitive, so landing cards and other exception surfaces stay as-is. Dashboard/evaluation card titles now explicitly use Geist Sans in `code-execution-panel.tsx`, `results-action-rail.tsx`, `manual-entry-form.tsx`, `evaluation-upload-client.tsx`, `error-recovery-card.tsx`, and `settings-page.tsx`. The English dashboard-facing heading copy was also normalised to title case where those card titles were still sentence case, including quick-start cards, results action cards, required-contributions heading, error-card titles, and the Settings danger card labels. Frontend `pnpm -C frontend lint` clean aside from the pre-existing settings warning; `pnpm -C frontend build` clean.
+
+---
+
 ## [22/04/26] - Phase 7 follow-up: align dashboard draft counts and results hero with live match data
 
 PO2 fixed two stale-count bugs that showed up clearly in Aisyah demo mode. `backend/app/routes/evaluations.py` now includes a `draftCount` field in each slim history/dashboard list item, derived from the stored `matches` array, and the frontend `EvaluationListItem` mirror now reads it so `frontend/src/components/dashboard/active-applications.tsx` no longer hardcodes `3 drafts ready to submit`. On the results side, `evaluation-results-client.tsx` and `evaluation-results-by-id-client.tsx` now pass the full matched-schemes count into `evaluation-upside-hero.tsx` instead of the older upside-only subset, while the hero copy in `en/ms/zh` now explicitly says the RM total only includes upside schemes. This makes Aisyah's current flow read as 5 matched drafts / schemes, which matches the actual generated packet set (STR, JKM Warga Emas, JKM BKK, LHDN Form B, PERKESO SKSPS). Frontend `pnpm -C frontend lint` clean aside from one pre-existing settings warning; `pnpm -C frontend build` clean.

@@ -98,7 +98,7 @@ function ActionCard({
     <Card className={emphasized ? 'border-primary/25 bg-primary/5' : undefined}>
       <CardHeader className="gap-2">
         <div className="flex size-8 items-center justify-center rounded-md bg-primary/10 text-primary">{icon}</div>
-        <CardTitle>{title}</CardTitle>
+        <CardTitle className="font-sans">{title}</CardTitle>
       </CardHeader>
       <CardContent className="flex flex-col gap-4">
         <p className="text-sm leading-relaxed text-muted-foreground">{description}</p>

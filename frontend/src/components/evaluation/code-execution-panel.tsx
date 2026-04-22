@@ -19,7 +19,7 @@ export function CodeExecutionPanel({ upside }: Props) {
   return (
     <Card>
       <CardHeader className="grid-cols-[1fr_auto] gap-2">
-        <CardTitle className="flex items-center gap-2 text-sm">
+        <CardTitle className="flex items-center gap-2 font-sans text-sm">
           <Code2 className="size-4 text-primary" aria-hidden />
           {t('evaluation.codeExecution.title')}
         </CardTitle>

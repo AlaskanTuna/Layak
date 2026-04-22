@@ -882,3 +882,9 @@ Findings the audit flagged that were **not** acted on (cosmetic or external to P
 - Fixed the landing-page language dropdown so its menu and items use explicit card-foreground text even before the transparent marketing header transitions on scroll.
 - Softened the landing hero's fade overlays in both themes so the banner art stays visible without sacrificing headline legibility.
 - Corrected the dashboard floating help launcher to use theme-safe foreground colors on its glass surface, keeping the `?` icon readable in light and dark mode.
+
+## [22/04/26] - Upload and manual entry label consistency pass
+
+- Aligned the upload and manual-entry card headers to the same Geist Sans treatment on `/dashboard/evaluation/upload`, and removed inline helper copy from the manual form in favor of the existing tooltip pattern.
+- Added right-side tooltips to manual-entry field labels and employment-type choices, plus a tooltip-backed household header on the manual tab to mirror the upload tab.
+- Normalized the visible English upload/manual labels and button copy to title case so both tabs read as one consistent flow.

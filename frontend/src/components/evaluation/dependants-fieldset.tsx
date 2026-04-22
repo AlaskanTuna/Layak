@@ -26,6 +26,7 @@ type Props = {
   disabled?: boolean
   /** Defaults to 15 — matches the backend `ManualEntryPayload.dependants` cap. */
   max?: number
+  showSummary?: boolean
 }
 
 export function newEmptyDependant(): DependantInputRow {
@@ -47,7 +48,13 @@ function clampAge(raw: string): number {
 /** Shared controlled component — used by UploadWidget (hybrid path) and
  * ManualEntryForm (full manual path). Stays dumb on purpose so each parent
  * manages its own validation/coercion. */
-export function DependantsFieldset({ value, onChange, disabled = false, max = 15 }: Props) {
+export function DependantsFieldset({
+  value,
+  onChange,
+  disabled = false,
+  max = 15,
+  showSummary = true
+}: Props) {
   const { t } = useTranslation()
   const update = (i: number, patch: Partial<DependantInputRow>) =>
     onChange(value.map((row, j) => (j === i ? { ...row, ...patch } : row)))
@@ -60,9 +67,11 @@ export function DependantsFieldset({ value, onChange, disabled = false, max = 15
 
   return (
     <div className="flex flex-col gap-3">
-      <p className="text-xs text-muted-foreground">
-        {t('evaluation.dependants.description', { size: householdSize, count, plural: pluralLabel })}
-      </p>
+      {showSummary && (
+        <p className="text-xs text-muted-foreground">
+          {t('evaluation.dependants.description', { size: householdSize, count, plural: pluralLabel })}
+        </p>
+      )}
       {count === 0 && (
         <p className="rounded-md border border-dashed px-3 py-2 text-sm text-muted-foreground">
           {t('evaluation.dependants.empty')}

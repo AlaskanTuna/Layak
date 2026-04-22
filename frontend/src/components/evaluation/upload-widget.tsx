@@ -98,7 +98,7 @@ function UploadSlotCard({ spec, state, inputId, disabled, inputRef, onChange, on
     <div className="flex flex-col gap-3 rounded-xl border border-border bg-card p-5 shadow-sm">
       <div className="flex flex-col gap-1.5">
         <div className="flex items-center gap-2">
-          <p className="font-heading text-base font-semibold tracking-tight">{label}</p>
+          <p className="font-sans text-base font-medium tracking-tight">{label}</p>
           <InfoTooltip content={hint} label={hint} />
           <SectionBadge required={spec.required} />
         </div>
@@ -252,7 +252,7 @@ export function UploadWidget({ onSubmit, onUseSamples, disabled = false, samples
           >
             <div className="flex flex-col gap-1.5">
               <div className="flex items-center gap-2">
-                <p className="font-heading text-base font-semibold tracking-tight">
+                <p className="font-sans text-base font-medium tracking-tight">
                   {t('evaluation.upload.householdTitle')}
                 </p>
                 <InfoTooltip
@@ -273,7 +273,7 @@ export function UploadWidget({ onSubmit, onUseSamples, disabled = false, samples
             />
           </button>
           {showHousehold && (
-            <DependantsFieldset value={dependants} onChange={setDependants} disabled={disabled} />
+            <DependantsFieldset value={dependants} onChange={setDependants} disabled={disabled} showSummary={false} />
           )}
         </div>
       </div>

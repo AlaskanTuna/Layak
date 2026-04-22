@@ -2,15 +2,15 @@
  * Aisyah canned SSE replay for demo mode (FR-10) and the dev-only `NEXT_PUBLIC_USE_MOCK_SSE=1` escape hatch.
  *
  * Mirrors the live rule-engine output from `backend/app/fixtures/aisyah.py` (which
- * is computed against `backend/app/rules/{str_2026,jkm_warga_emas,jkm_bkk,lhdn_form_b,perkeso_sksps}.py`).
+ * is computed against `backend/app/rules/{str_2026,jkm_warga_emas,jkm_bkk,lhdn_form_b,i_saraan,perkeso_sksps}.py`).
  * Numbers must stay in lockstep with the backend — after any rule-engine change,
  * re-run the backend fixture and copy the resulting matches over verbatim.
  *
- * Upside totals (post Phase 7 Task 9): JKM Warga Emas RM7,200 + JKM BKK RM2,400 +
- * LHDN RM558 + STR RM450 = RM10,608/year. Sorted descending by `annual_rm`,
- * then required-contribution schemes (SKSPS) tacked onto the end — Aisyah's
- * SKSPS Plan 3 contribution (RM442.80/yr) renders separately in the
- * "Required contributions" block and does NOT stack into the RM10,608 total.
+ * Upside totals (post Phase 7 Task 7): JKM Warga Emas RM7,200 + JKM BKK RM2,400 +
+ * LHDN RM558 + i-Saraan RM500 + STR RM450 = RM11,108/year. Sorted descending by
+ * `annual_rm`, then required-contribution schemes (SKSPS) tacked onto the end —
+ * Aisyah's SKSPS Plan 3 contribution (RM442.80/yr) renders separately in the
+ * "Required contributions" block and does NOT stack into the RM11,108 total.
  */
 
 import type {
@@ -187,6 +187,35 @@ export const AISYAH_SCHEME_MATCHES: SchemeMatch[] = [
     ]
   },
   {
+    scheme_id: 'i_saraan',
+    scheme_name: 'EPF i-Saraan — voluntary contribution government match',
+    qualifies: true,
+    annual_rm: 500,
+    summary: 'Self-employed Form B filer aged 34 qualifies for the i-Saraan 15% government match up to RM500/year.',
+    why_qualify:
+      "You're a self-employed filer (Form B) aged 34, within the i-Saraan 18-60 age window. Contribute at least RM3,333.33/year voluntarily into your EPF Account and the government will add the full RM500 — the maximum annual match. Smaller contributions earn a proportional 15% match (e.g. RM1,000 contributed → RM150 government match). Register via the KWSP i-Saraan portal or at any KWSP branch.",
+    agency: 'KWSP (Kumpulan Wang Simpanan Pekerja / Employees Provident Fund)',
+    portal_url: 'https://www.kwsp.gov.my/en/member/contribution/i-saraan',
+    rule_citations: [
+      {
+        rule_id: 'epf.i_saraan.eligibility',
+        source_pdf: 'i-saraan-program.pdf',
+        page_ref: 'KWSP i-Saraan program brochure, §Kelayakan (external reference)',
+        passage:
+          'i-Saraan terbuka kepada warga Malaysia atau Penduduk Tetap yang bekerja sendiri, berumur 18 hingga 60 tahun, tanpa majikan tetap yang mencarum kepada KWSP bagi pihak mereka.',
+        source_url: 'https://www.kwsp.gov.my/en/member/contribution/i-saraan'
+      },
+      {
+        rule_id: 'epf.i_saraan.match_rate_and_cap',
+        source_pdf: 'i-saraan-program.pdf',
+        page_ref: 'KWSP i-Saraan program brochure, §Kadar Padanan Kerajaan (external reference)',
+        passage:
+          'Kerajaan memadankan 15% daripada caruman sukarela yang dibuat oleh ahli i-Saraan ke dalam Akaun Persaraan KWSP, sehingga had maksimum RM500 setahun setiap ahli.',
+        source_url: 'https://www.kwsp.gov.my/en/member/contribution/i-saraan'
+      }
+    ]
+  },
+  {
     scheme_id: 'str_2026',
     scheme_name: 'STR 2026 — Household with children tier',
     qualifies: true,
@@ -266,15 +295,17 @@ export const AISYAH_UPSIDE: ComputeUpsideResult = {
 jkm_warga_emas = 7200  # JKM Warga Emas — dependent elderly payment
 jkm_bkk = 2400  # JKM Bantuan Kanak-Kanak — per-child monthly payment
 lhdn_form_b = 558  # LHDN Form B — five YA2025 reliefs
+i_saraan = 500  # EPF i-Saraan — voluntary contribution government match
 str_2026 = 450  # STR 2026 — Household with children tier
 
-total = jkm_warga_emas + jkm_bkk + lhdn_form_b + str_2026
+total = jkm_warga_emas + jkm_bkk + lhdn_form_b + i_saraan + str_2026
 
 print("{:<44s}{:>12s}".format("Scheme", "Annual (RM)"))
 print("-" * 57)
 print("{:<44s}{:>12,}".format('JKM Warga Emas — dependent elderly payment', jkm_warga_emas))
 print("{:<44s}{:>12,}".format('JKM Bantuan Kanak-Kanak — per-child payment', jkm_bkk))
 print("{:<44s}{:>12,}".format('LHDN Form B — five YA2025 reliefs', lhdn_form_b))
+print("{:<44s}{:>12,}".format('EPF i-Saraan — 15% government match', i_saraan))
 print("{:<44s}{:>12,}".format('STR 2026 — Household with children tier', str_2026))
 print("-" * 57)
 print("{:<44s}{:>12,}".format("Total upside (annual)", total))`,
@@ -283,14 +314,16 @@ print("{:<44s}{:>12,}".format("Total upside (annual)", total))`,
 JKM Warga Emas — dependent elderly payment          7,200
 JKM Bantuan Kanak-Kanak — per-child payment         2,400
 LHDN Form B — five YA2025 reliefs                     558
+EPF i-Saraan — 15% government match                   500
 STR 2026 — Household with children tier               450
 ---------------------------------------------------------
-Total upside (annual)                              10,608`,
-  total_annual_rm: 10608,
+Total upside (annual)                              11,108`,
+  total_annual_rm: 11108,
   per_scheme_rm: {
     jkm_warga_emas: 7200,
     jkm_bkk: 2400,
     lhdn_form_b: 558,
+    i_saraan: 500,
     str_2026: 450
   }
 }
@@ -300,6 +333,7 @@ export const AISYAH_PACKET: Packet = {
     { scheme_id: 'jkm_warga_emas', filename: 'JKM18-warga-emas-draft-4321.pdf', blob_bytes_b64: null },
     { scheme_id: 'jkm_bkk', filename: 'JKM-bkk-draft-4321.pdf', blob_bytes_b64: null },
     { scheme_id: 'lhdn_form_b', filename: 'LHDN-form-b-relief-summary-4321.pdf', blob_bytes_b64: null },
+    { scheme_id: 'i_saraan', filename: 'KWSP-i-saraan-draft-4321.pdf', blob_bytes_b64: null },
     { scheme_id: 'str_2026', filename: 'BK-01-STR2026-draft-4321.pdf', blob_bytes_b64: null },
     { scheme_id: 'perkeso_sksps', filename: 'PERKESO-sksps-draft-4321.pdf', blob_bytes_b64: null }
   ],

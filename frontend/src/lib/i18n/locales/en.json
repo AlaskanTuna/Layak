@@ -600,7 +600,7 @@
   "schemes": {
     "pageEyebrow": "Scheme library",
     "pageTitle": "Every Malaysian scheme Layak reasons over.",
-    "pageDescription": "Five federal schemes are live in this build. Four more land in v2 as we wire each one's rules, thresholds, and application form into the engine.",
+    "pageDescription": "Six federal schemes are live in this build. Three more land in v2 as we wire each one's rules, thresholds, and application form into the engine.",
     "stats": {
       "inScope": "in scope",
       "coming": "coming in v2"
@@ -620,6 +620,7 @@
       "welfare": "Welfare",
       "taxRelief": "Tax Relief",
       "socialSecurity": "Social Security",
+      "retirement": "Retirement",
       "typicalUpside": "Typical upside",
       "annualContribution": "Annual contribution",
       "upTo": "Up to RM",
@@ -642,8 +643,10 @@
     "perkesoSksps": {
       "summary": "Self-employed social-security contribution (Akta 789). Mandatory for gig and passenger-transport workers — buys medical, disability, and survivor cover."
     },
+    "iSaraan": {
+      "summary": "Government tops up 15% of self-employed voluntary EPF contribution, capped RM 500/yr. Targets Form B filers aged 18-60 without employer EPF."
+    },
     "coming": {
-      "iSaraanDesc": "Self-employed EPF matching contribution — government tops up 15% of voluntary contribution, capped RM 500/yr.",
       "myKasihDesc": "Cashless food aid programme.",
       "eKasihDesc": "National poor-household registry.",
       "saraDesc": "Alternate tax-relief pathway."

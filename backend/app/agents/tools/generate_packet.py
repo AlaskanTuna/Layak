@@ -46,6 +46,7 @@ _TEMPLATE_MAP: dict[str, tuple[str, str]] = {
     "lhdn_form_b": ("lhdn.html.jinja", "LHDN-form-b-relief-summary-{ic_last4}.pdf"),
     "lhdn_form_be": ("lhdn_be.html.jinja", "LHDN-form-be-relief-summary-{ic_last4}.pdf"),
     "perkeso_sksps": ("perkeso_sksps.html.jinja", "PERKESO-sksps-draft-{ic_last4}.pdf"),
+    "i_saraan": ("i_saraan.html.jinja", "KWSP-i-saraan-draft-{ic_last4}.pdf"),
 }
 
 

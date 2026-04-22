@@ -25,6 +25,7 @@ export type SchemeId =
   | 'lhdn_form_b'
   | 'lhdn_form_be'
   | 'perkeso_sksps'
+  | 'i_saraan'
 
 // Phase 7 Task 9 — upside schemes stack into the headline annual-relief
 // total; required_contribution schemes (e.g. PERKESO SKSPS) surface a

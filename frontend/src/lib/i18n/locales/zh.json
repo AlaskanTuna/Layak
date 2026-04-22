@@ -569,7 +569,7 @@
   "schemes": {
     "pageEyebrow": "计划库",
     "pageTitle": "Layak 推理的每一项马来西亚计划。",
-    "pageDescription": "本次构建中已上线五项联邦计划。另有四项将在 v2 推出，届时我们会将每项的规则、门槛和申请表接入引擎。",
+    "pageDescription": "本次构建中已上线六项联邦计划。另有三项将在 v2 推出，届时我们会将每项的规则、门槛和申请表接入引擎。",
     "stats": {
       "inScope": "已纳入",
       "coming": "v2 即将推出"
@@ -589,6 +589,7 @@
       "welfare": "福利",
       "taxRelief": "税务减免",
       "socialSecurity": "社会保障",
+      "retirement": "退休金",
       "typicalUpside": "典型收益",
       "annualContribution": "年度缴款",
       "upTo": "最高 RM",
@@ -611,8 +612,10 @@
     "perkesoSksps": {
       "summary": "自雇社会保障缴款（Akta 789）。零工与客运工作者强制参与 —— 提供医疗、伤残与遗属保障。"
     },
+    "iSaraan": {
+      "summary": "政府按自雇人士的自愿 EPF 缴款额加发 15%，每年上限 RM 500。面向 18-60 岁、无雇主 EPF 缴款路径的 Form B 申报者。"
+    },
     "coming": {
-      "iSaraanDesc": "自雇 EPF 对应缴款 —— 政府按自愿缴款金额加发 15%，每年上限 RM 500。",
       "myKasihDesc": "无现金食品援助计划。",
       "eKasihDesc": "国家贫困家庭登记册。",
       "saraDesc": "替代税务减免途径。"

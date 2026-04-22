@@ -24,7 +24,7 @@ from app.agents.tools.build_profile import (
     derive_household_flags,
 )
 from app.fixtures.aisyah import AISYAH_PROFILE, AISYAH_SCHEME_MATCHES
-from app.rules import jkm_bkk, jkm_warga_emas, lhdn_form_b, perkeso_sksps, str_2026
+from app.rules import i_saraan, jkm_bkk, jkm_warga_emas, lhdn_form_b, perkeso_sksps, str_2026
 from app.schema.manual_entry import DependantInput, ManualEntryPayload
 from app.schema.profile import Dependant
 
@@ -135,6 +135,7 @@ def test_built_profile_drives_same_scheme_matches_as_fixture() -> None:
         jkm_warga_emas.match(built),
         jkm_bkk.match(built),
         lhdn_form_b.match(built),
+        i_saraan.match(built),
         perkeso_sksps.match(built),
     ]
     qualifying = [m for m in results if m.qualifies]

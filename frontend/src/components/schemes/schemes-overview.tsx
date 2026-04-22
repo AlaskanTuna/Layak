@@ -7,6 +7,7 @@ import {
   Compass,
   HeartHandshake,
   Landmark,
+  PiggyBank,
   Scale,
   ShieldCheck,
   type LucideIcon
@@ -80,6 +81,17 @@ const IN_SCOPE: InScopeScheme[] = [
     portalUrl: 'https://mytax.hasil.gov.my'
   },
   {
+    id: 'i-saraan',
+    categoryKey: 'schemes.labels.retirement',
+    icon: PiggyBank,
+    agency: 'KWSP',
+    name: 'EPF i-Saraan',
+    summaryKey: 'schemes.iSaraan.summary',
+    upsideRm: '500.00',
+    formLabel: 'KWSP i-Saraan registration',
+    portalUrl: 'https://www.kwsp.gov.my/en/member/contribution/i-saraan'
+  },
+  {
     id: 'perkeso-sksps',
     categoryKey: 'schemes.labels.socialSecurity',
     icon: ShieldCheck,
@@ -99,11 +111,7 @@ type ComingScheme = {
   summaryKey: string
 }
 
-// i-Saraan is still here because Phase 7 Task 7 (rule + template + tests)
-// hasn't shipped yet — the schemes-overview catalogue must not claim a scheme
-// the rule engine can't actually score.
 const COMING_V2: ComingScheme[] = [
-  { name: 'i-Saraan', agency: 'EPF', summaryKey: 'schemes.coming.iSaraanDesc' },
   { name: 'MyKasih', agency: 'MyKasih Foundation', summaryKey: 'schemes.coming.myKasihDesc' },
   { name: 'eKasih', agency: 'ICU JPM', summaryKey: 'schemes.coming.eKasihDesc' },
   { name: 'SARA claim', agency: 'LHDN', summaryKey: 'schemes.coming.saraDesc' }

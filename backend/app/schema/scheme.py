@@ -10,7 +10,15 @@ from typing import Literal
 
 from pydantic import BaseModel, ConfigDict, Field
 
-SchemeId = Literal["str_2026", "jkm_warga_emas", "jkm_bkk", "lhdn_form_b", "lhdn_form_be", "perkeso_sksps"]
+SchemeId = Literal[
+    "str_2026",
+    "jkm_warga_emas",
+    "jkm_bkk",
+    "lhdn_form_b",
+    "lhdn_form_be",
+    "perkeso_sksps",
+    "i_saraan",
+]
 
 # Phase 7 Task 9 — `SchemeKind` splits upside schemes (user RECEIVES money,
 # annual_rm sums into the headline upside total) from required-contribution

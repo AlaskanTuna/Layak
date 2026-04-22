@@ -569,7 +569,7 @@
   "schemes": {
     "pageEyebrow": "Perpustakaan skim",
     "pageTitle": "Setiap skim Malaysia yang Layak pertimbangkan.",
-    "pageDescription": "Lima skim persekutuan tersedia dalam binaan ini. Empat lagi akan hadir dalam v2 apabila kami menyambungkan peraturan, ambang, dan borang permohonan setiap satu ke dalam enjin.",
+    "pageDescription": "Enam skim persekutuan tersedia dalam binaan ini. Tiga lagi akan hadir dalam v2 apabila kami menyambungkan peraturan, ambang, dan borang permohonan setiap satu ke dalam enjin.",
     "stats": {
       "inScope": "dalam skop",
       "coming": "akan datang dalam v2"
@@ -589,6 +589,7 @@
       "welfare": "Kebajikan",
       "taxRelief": "Pelepasan Cukai",
       "socialSecurity": "Keselamatan Sosial",
+      "retirement": "Persaraan",
       "typicalUpside": "Faedah biasa",
       "annualContribution": "Caruman tahunan",
       "upTo": "Sehingga RM",
@@ -611,8 +612,10 @@
     "perkesoSksps": {
       "summary": "Caruman keselamatan sosial bekerja sendiri (Akta 789). Wajib untuk pekerja gig dan pengangkutan penumpang — meliputi perubatan, hilang upaya, dan tanggungan kematian."
     },
+    "iSaraan": {
+      "summary": "Kerajaan menambah 15% caruman KWSP sukarela bagi pekerja sendiri, had RM 500/tahun. Sasaran pemfail Borang B berumur 18-60 tahun tanpa caruman KWSP majikan."
+    },
     "coming": {
-      "iSaraanDesc": "Caruman padanan KWSP bekerja sendiri — kerajaan menambah 15% caruman sukarela, had RM 500/tahun.",
       "myKasihDesc": "Program bantuan makanan tanpa tunai.",
       "eKasihDesc": "Daftar isi rumah miskin kebangsaan.",
       "saraDesc": "Laluan pelepasan cukai alternatif."

@@ -213,8 +213,8 @@ async def test_match_schemes_sorts_required_contribution_after_upside(aisyah: Pr
     # First `upside_count` entries are kind="upside"; the rest are contributions.
     assert kinds[:upside_count] == ["upside"] * upside_count
     assert kinds[upside_count:] == ["required_contribution"] * contribution_count
-    # Aisyah: STR + Warga Emas + BKK + LHDN Form B (4 upside) + SKSPS (1 contribution).
-    assert upside_count == 4
+    # Aisyah: STR + Warga Emas + BKK + LHDN Form B + i-Saraan (5 upside) + SKSPS (1 contribution).
+    assert upside_count == 5
     assert contribution_count == 1
     assert matches[-1].scheme_id == "perkeso_sksps"
 

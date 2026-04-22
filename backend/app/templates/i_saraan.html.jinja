@@ -1,0 +1,125 @@
+{% extends "_base.html.jinja" %}
+
+{% block title %}KWSP i-Saraan · Voluntary Contribution Government Match (Draft){% endblock %}
+{% block agency %}Kumpulan Wang Simpanan Pekerja (KWSP / EPF) · i-Saraan Program · <a href="{{ match.portal_url }}">{{ match.portal_url }}</a>{% endblock %}
+
+{% block body %}
+<section>
+  <h2>Part I — Member</h2>
+  <div class="field-grid">
+    <div class="label">Name</div>
+    <div class="value">{{ profile.name }}</div>
+
+    <div class="label">IC (last 4)</div>
+    <div class="value">••••-••-{{ profile.ic_last4 }}</div>
+
+    <div class="label">Age</div>
+    <div class="value">{{ profile.age }}</div>
+
+    <div class="label">Filer Category</div>
+    <div class="value">Form B — self-employed (no employer EPF contribution path)</div>
+
+    <div class="label">Annual Self-Employed Income</div>
+    <div class="value">RM {{ '{:,.2f}'.format(annual_income) }}</div>
+
+    {% if profile.address %}
+    <div class="label">Correspondence Address</div>
+    <div class="value">{{ profile.address }}</div>
+    {% endif %}
+  </div>
+</section>
+
+<section>
+  <h2>Part II — i-Saraan Government Match Schedule</h2>
+  <table class="amounts">
+    <thead>
+      <tr>
+        <th>Mechanism</th>
+        <th>Source</th>
+        <th class="num">Value</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Government match rate</td>
+        <td>KWSP i-Saraan brochure §Kadar Padanan Kerajaan</td>
+        <td class="num">15.00%</td>
+      </tr>
+      <tr>
+        <td>Annual government match cap</td>
+        <td>KWSP i-Saraan brochure §Had Maksimum</td>
+        <td class="num">RM 500.00</td>
+      </tr>
+      <tr>
+        <td>Voluntary contribution to max the match</td>
+        <td>Derived: 500 ÷ 15%</td>
+        <td class="num">RM 3,333.33</td>
+      </tr>
+      <tr class="total">
+        <td colspan="2">Maximum annual government match (this year)</td>
+        <td class="num">RM {{ '{:,.2f}'.format(match.annual_rm) }}</td>
+      </tr>
+    </tbody>
+  </table>
+</section>
+
+<section>
+  <h2>Part III — Worked Example</h2>
+  <p>{{ match.why_qualify }}</p>
+
+  <table class="amounts">
+    <thead>
+      <tr>
+        <th>Your voluntary contribution (annual)</th>
+        <th class="num">Government 15% match</th>
+        <th class="num">Total credited to EPF Account</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>RM 1,000.00</td>
+        <td class="num">RM 150.00</td>
+        <td class="num">RM 1,150.00</td>
+      </tr>
+      <tr>
+        <td>RM 2,000.00</td>
+        <td class="num">RM 300.00</td>
+        <td class="num">RM 2,300.00</td>
+      </tr>
+      <tr>
+        <td>RM 3,333.33 (matches the cap)</td>
+        <td class="num">RM 500.00</td>
+        <td class="num">RM 3,833.33</td>
+      </tr>
+      <tr>
+        <td>RM 5,000.00 (exceeds cap)</td>
+        <td class="num">RM 500.00 (capped)</td>
+        <td class="num">RM 5,500.00</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="callout">
+    The government match is credited to your EPF Akaun Persaraan after your
+    voluntary contribution clears. Match payments are processed annually in
+    arrears, typically within Q1 of the following year.
+  </div>
+</section>
+
+<section>
+  <h2>Part IV — Provenance (cached cites)</h2>
+  <ul class="citations">
+    {% for c in match.rule_citations %}
+    <li>
+      <span class="rule-id">{{ c.rule_id }}</span> — {{ c.passage }}
+      <span class="src">Source: {{ c.source_pdf }} · {{ c.page_ref }}{% if c.source_url %} · <a href="{{ c.source_url }}">{{ c.source_url }}</a>{% endif %}</span>
+    </li>
+    {% endfor %}
+  </ul>
+</section>
+
+<section class="signature-block">
+  <div class="slot">Member signature / Date</div>
+  <div class="slot">KWSP branch officer (if applicable)</div>
+</section>
+{% endblock %}

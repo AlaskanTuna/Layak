@@ -10,6 +10,7 @@
   --font-sans: var(--font-geist-sans);
   --font-serif: var(--font-literata);
   --font-heading: var(--font-literata);
+  --font-display: var(--font-abril-fatface);
   --color-sidebar-ring: var(--sidebar-ring);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
@@ -141,6 +142,8 @@
   }
   html {
     @apply font-sans;
+    scroll-behavior: smooth;
+    scrollbar-gutter: stable;
   }
 }
 
@@ -169,21 +172,76 @@
   border: 1px solid var(--glass-border);
 }
 
-* {
-  scrollbar-width: thin;
-  scrollbar-color: color-mix(in oklch, var(--muted-foreground) 50%, transparent) transparent;
+.hero-glass-panel {
+  background: linear-gradient(
+    135deg,
+    color-mix(in oklch, white 18%, transparent),
+    color-mix(in oklch, white 5%, transparent)
+  );
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  border: 1px solid color-mix(in oklch, white 18%, transparent);
+  box-shadow: 0 24px 80px color-mix(in oklch, black 22%, transparent);
 }
 
-*::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
+.dark .hero-glass-panel {
+  background: linear-gradient(
+    135deg,
+    color-mix(in oklch, white 10%, transparent),
+    color-mix(in oklch, white 3%, transparent)
+  );
+  border-color: color-mix(in oklch, white 12%, transparent);
 }
 
-*::-webkit-scrollbar-thumb {
-  background-color: color-mix(in oklch, var(--muted-foreground) 50%, transparent);
-  border-radius: 9999px;
+@supports selector(::-webkit-scrollbar) {
+  html::-webkit-scrollbar,
+  body::-webkit-scrollbar,
+  *::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+
+  html::-webkit-scrollbar-thumb,
+  body::-webkit-scrollbar-thumb,
+  *::-webkit-scrollbar-thumb {
+    background-color: color-mix(in oklch, var(--muted-foreground) 18%, transparent);
+    border: 3px solid transparent;
+    background-clip: padding-box;
+    border-radius: 9999px;
+    transition: background-color 180ms ease;
+  }
+
+  html:hover::-webkit-scrollbar-thumb,
+  body:hover::-webkit-scrollbar-thumb,
+  *:hover::-webkit-scrollbar-thumb {
+    background-color: color-mix(in oklch, var(--muted-foreground) 32%, transparent);
+  }
+
+  html::-webkit-scrollbar-track,
+  body::-webkit-scrollbar-track,
+  *::-webkit-scrollbar-track {
+    background: transparent;
+  }
 }
 
-*::-webkit-scrollbar-track {
-  background: transparent;
+@supports not selector(::-webkit-scrollbar) {
+  html,
+  body,
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: color-mix(in oklch, var(--muted-foreground) 22%, transparent) transparent;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  .hero-glass-panel,
+  html::-webkit-scrollbar-thumb,
+  body::-webkit-scrollbar-thumb,
+  *::-webkit-scrollbar-thumb {
+    transition: none;
+  }
 }

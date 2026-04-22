@@ -67,15 +67,15 @@ export function ActiveApplications({ items }: Props) {
           {completed.map(item => (
             <Card key={item.id} className="px-4 py-3">
               <div className="flex items-center justify-between gap-3">
-                <div className="flex items-start gap-3">
+                <div className="flex min-w-0 flex-1 items-start gap-3">
                   <div className="flex size-9 shrink-0 items-center justify-center rounded-md bg-primary/10 text-primary">
                     <FileText className="size-4" aria-hidden />
                   </div>
-                  <div className="flex flex-col">
-                    <p className="text-sm font-medium">
+                  <div className="flex min-w-0 flex-col">
+                    <p className="truncate text-sm font-medium">
                       {t('dashboard.activeApplications.draftsReady', { count: item.draftCount })}
                     </p>
-                    <p className="text-xs text-muted-foreground">
+                    <p className="truncate text-xs text-muted-foreground">
                       {t('dashboard.activeApplications.totalRm', {
                         amount: RM.format(item.totalAnnualRM)
                       })}{' '}
@@ -86,6 +86,7 @@ export function ActiveApplications({ items }: Props) {
                 <Button
                   size="sm"
                   variant="ghost"
+                  className="shrink-0"
                   render={<Link href={`/dashboard/evaluation/results/${item.id}`} />}
                 >
                   {t('dashboard.activeApplications.openCta')}

@@ -7,6 +7,7 @@ import { AlertTriangle, ArrowLeft, ArrowRight, Loader2 } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 
 import { CodeExecutionPanel } from '@/components/evaluation/code-execution-panel'
+import { DraftPacketPreview } from '@/components/evaluation/draft-packet-preview'
 import { ErrorRecoveryCard } from '@/components/evaluation/error-recovery-card'
 import { EvaluationUpsideHero } from '@/components/evaluation/evaluation-upside-hero'
 import { PersistedPacketDownload } from '@/components/evaluation/persisted-packet-download'
@@ -18,6 +19,7 @@ import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
 import type { PipelineState, StepStatus } from '@/hooks/use-agent-pipeline'
 import { useAuth } from '@/lib/auth-context'
+import { useEvaluation } from '@/components/evaluation/evaluation-provider'
 import {
   type ComputeUpsideResult,
   type EvaluationDoc,
@@ -89,6 +91,7 @@ export function EvaluationResultsByIdClient({ evalId }: { evalId: string }) {
   const router = useRouter()
   const { t } = useTranslation()
   const { user, loading: authLoading } = useAuth()
+  const { reset, setDemoMode } = useEvaluation()
   const [doc, setDoc] = useState<EvaluationDoc | null>(null)
   const [phase, setPhase] = useState<FetchPhase>('loading')
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
@@ -142,6 +145,17 @@ export function EvaluationResultsByIdClient({ evalId }: { evalId: string }) {
       }
     }
   }, [phase, doc, fetchDoc])
+
+  useEffect(
+    () => () => {
+      // The evaluation provider is shared across the whole
+      // `/dashboard/evaluation/*` subtree. Clear any completed/demo state when
+      // the user leaves results so upload/history pages don't inherit it.
+      setDemoMode(false)
+      reset()
+    },
+    [reset, setDemoMode]
+  )
 
   const pipelineState = useMemo(() => (doc ? docToPipelineState(doc) : null), [doc])
 
@@ -214,6 +228,8 @@ export function EvaluationResultsByIdClient({ evalId }: { evalId: string }) {
   const totalAnnualRm = doc.totalAnnualRM ?? 0
 
   function handleStartAnother() {
+    setDemoMode(false)
+    reset()
     router.push('/dashboard/evaluation/upload')
   }
 
@@ -227,6 +243,7 @@ export function EvaluationResultsByIdClient({ evalId }: { evalId: string }) {
         <ResultsActionRail
           canReviewMatches={matchedCount > 0}
           canReviewPacket={matchedCount > 0}
+          onStartAnother={handleStartAnother}
         />
       )}
 
@@ -272,7 +289,8 @@ export function EvaluationResultsByIdClient({ evalId }: { evalId: string }) {
       )}
 
       {isComplete && (
-        <div id="draft-packet">
+        <div id="draft-packet" className="flex flex-col gap-3">
+          <DraftPacketPreview evalId={evalId} matches={doc.matches} />
           <PersistedPacketDownload evalId={evalId} matches={doc.matches} />
         </div>
       )}

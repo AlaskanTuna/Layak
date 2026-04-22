@@ -876,3 +876,32 @@ Findings the audit flagged that were **not** acted on (cosmetic or external to P
 - Polished Dark Mode layout variables within `.dark` selector (slate shades, `oklch`).
 - Integrated PDPA Consent routing (`X-PDPA-Consent` header triggering on first app auth via `/api/quota`) within `backend/app/auth.py`.
   \n## 2026-04-26\n\n### Phase 5: Auth + Gateway + Marketing (P5T1)\n- Added simple, transparent pricing structure to `en.json` with Free and Pro tiers.\n- Scaffolded `frontend/src/components/landing/landing-pricing.tsx` implementing the Free/Pro split as seen in the SaaS pivot spec.\n- Integrated `LandingPricing` component into `frontend/src/app/pages/marketing/landing-page.tsx`.\n- Marked Phase 5 Task 1 (Landing Page rewrite) as complete in `docs/plan.md`.
+
+## [22/04/26] - Landing and dashboard contrast polish
+
+- Fixed the landing-page language dropdown so its menu and items use explicit card-foreground text even before the transparent marketing header transitions on scroll.
+- Softened the landing hero's fade overlays in both themes so the banner art stays visible without sacrificing headline legibility.
+- Corrected the dashboard floating help launcher to use theme-safe foreground colors on its glass surface, keeping the `?` icon readable in light and dark mode.
+
+## [22/04/26] - Upload and manual entry label consistency pass
+
+- Aligned the upload and manual-entry card headers to the same Geist Sans treatment on `/dashboard/evaluation/upload`, and removed inline helper copy from the manual form in favor of the existing tooltip pattern.
+- Added right-side tooltips to manual-entry field labels and employment-type choices, plus a tooltip-backed household header on the manual tab to mirror the upload tab.
+- Normalized the visible English upload/manual labels and button copy to title case so both tabs read as one consistent flow.
+
+## [22/04/26] - Phase 7 Task 3: upload validator tightening + JPG/PNG crop preview
+
+- Tightened `frontend/src/components/evaluation/upload-widget.tsx` validation from the looser `image/*` MIME prefix to a strict allowlist of `image/jpeg | image/png | application/pdf`. The earlier prefix had let BMP / TIFF / HEIC reach the OCR step where they fail.
+- New `errorFileTypeStrict` i18n triplet (en/ms/zh) replaces the old generic `errorFileType` for the strict path; `ingestionPathHelper` triplet powers a new banner above the slot grid explaining JPG/PNG → image OCR vs PDF → direct text extraction.
+- Built `frontend/src/components/evaluation/crop-preview-modal.tsx` wrapping `react-image-crop@11` inside the Base UI Dialog. Default 95% centered crop with rule-of-thirds guides; Reset / Cancel / Confirm CTAs. Confirm draws the crop into a canvas at the source image natural resolution and emits a new `File` preserving filename + MIME, which then enters the slot state.
+- Branched `handleFileChange` on `IMAGE_MIME_TYPES.has(file.type)` — PDFs commit straight to the slot, images set `pendingCrop` and the slot stays blank until the user confirms (preventing premature Continue). Cancelling resets the hidden file input so re-picking the same filename re-fires `onChange`.
+- Frontend test coverage for the validator + image-vs-PDF branch is deferred — same constraint as Phase 7 Task 6 (no test harness in this repo). Verified via `pnpm lint` clean and `pnpm build` clean.
+- Added `react-image-crop@11.0.10` to `frontend/package.json`; bundle impact ~6KB gzipped.
+
+## [22/04/26] - Phase 7 Task 5: mobile responsiveness fixes for demo-flow surfaces
+
+- Static-analysis pass through every dashboard route at 375px effective width — sidebar drawer + topbar menu confirmed already mobile-correct, code execution `<pre>` blocks already overflow-x-auto, RequiredContributions already does `flex-col → sm:flex-row` with `min-w-0`. No browser walkthrough this turn (out of scope for a static sweep).
+- `EvaluationUpsideHero`: stepped the currency typography down to `text-4xl sm:text-5xl md:text-6xl` (was 5xl/6xl flat), wrapped the row in `flex-wrap` with `gap-y-1`, and added `break-all` on the RM number so very long totals wrap onto a second line instead of pushing past the viewport edge.
+- `ActiveApplications` cards: added `min-w-0 flex-1` to the inner flex column, `truncate` on both text rows, and `shrink-0` on the Open button — fixes the case where a long timestamp + RM amount would push the CTA off-screen on a narrow phone.
+- Verified: `pnpm lint` clean, `pnpm build` clean across all 13 routes.
+- Other surfaces audited and left as-is: `SchemeCardGrid` (already 1-col → 2-col → 3-col), `DraftPacketPreview` (already truncates name + uses min-w-0), `ResultsActionRail` (already 1-col → 3-col), `schemes-overview` (already 1-col → 2-col → 3-col).

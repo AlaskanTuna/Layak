@@ -385,6 +385,18 @@
       "hintUtility": "水、电或宽带账单，用于地址验证 —— 最近三个月内。",
       "errorFileSize": "文件为 {{size}} MB —— 上限为 10 MB。",
       "errorFileType": "不支持的文件类型（{{type}}）。请上传图片或 PDF。",
+      "errorFileTypeStrict": "不支持的文件（{{type}}）。Layak 只接受 JPG, PNG, 或 PDF。",
+      "ingestionPathHelper": "JPG 和 PNG 会先走图片 OCR——你会先看到一个快速预览，可以把模糊或留白过多的照片裁好再提取。PDF 会直接进入文字提取，不会先预览。",
+      "crop": {
+        "title": "预览并裁切",
+        "description": "先把背景去掉或校正倾斜，再让 Layak 导入这张图片。确认后会发送裁切后的版本，或取消改选其他文件。",
+        "imageAlt": "上传文件预览",
+        "loading": "正在加载预览…",
+        "processingError": "无法裁切该图片：{{message}}",
+        "reset": "重置裁切",
+        "cancel": "取消",
+        "confirm": "使用这次裁切"
+      },
       "dropzonePrimary": "点击上传",
       "dropzoneSecondary": "或拖放文件",
       "dropzoneFormats": "JPG、PNG 或 PDF，最大 10MB",
@@ -541,6 +553,14 @@
       "intro": "您在这些计划下需要缴纳的强制性费用。这些款项不计入上方的年度减免总额 —— 这是您需要支付的金额。",
       "annualLabel": "年度缴款",
       "footnote": "请直接通过机构门户注册并缴款。未缴款可能影响日后您申请工伤福利时的权益。"
+    },
+    "preview": {
+      "title": "在线预览（{{count}} 份草稿）",
+      "description": "先在浏览器中查看每份草稿 PDF 再下载；每次预览都会根据你已存储的个人资料和匹配项在服务器端重新运行 WeasyPrint，字节不会持久保存。",
+      "loading": "正在加载预览…",
+      "error": "预览失败：{{message}}",
+      "iframeTitle": "{{name}} 的在线预览",
+      "downloadOne": "下载此 PDF"
     },
     "packet": {
       "titleSingular": "草拟申请包（{{count}} 份文件）",

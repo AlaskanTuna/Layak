@@ -11,6 +11,7 @@ import { DependantsFieldset, type DependantInputRow } from '@/components/evaluat
 import { SectionBadge } from '@/components/evaluation/section-badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { InfoTooltip } from '@/components/ui/info-tooltip'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Separator } from '@/components/ui/separator'
@@ -315,17 +316,17 @@ export function ManualEntryForm({
                 <legend className="sr-only">{t('evaluation.manual.employmentLabel')}</legend>
                 <label className="flex items-start gap-2 text-sm">
                   <input type="radio" value="gig" {...register('employment_type')} className="mt-1" />
-                  <span>
-                    <span className="font-medium">{t('evaluation.manual.employmentGig')}</span>
-                    <span className="block text-xs text-muted-foreground">{t('evaluation.manual.employmentGigHelp')}</span>
-                  </span>
+                  <TooltipLabel
+                    label={t('evaluation.manual.employmentGig')}
+                    tooltip={t('evaluation.manual.employmentGigHelp')}
+                  />
                 </label>
                 <label className="flex items-start gap-2 text-sm">
                   <input type="radio" value="salaried" {...register('employment_type')} className="mt-1" />
-                  <span>
-                    <span className="font-medium">{t('evaluation.manual.employmentSalaried')}</span>
-                    <span className="block text-xs text-muted-foreground">{t('evaluation.manual.employmentSalariedHelp')}</span>
-                  </span>
+                  <TooltipLabel
+                    label={t('evaluation.manual.employmentSalaried')}
+                    tooltip={t('evaluation.manual.employmentSalariedHelp')}
+                  />
                 </label>
               </fieldset>
             </Field>
@@ -387,7 +388,11 @@ export function ManualEntryForm({
 
       <Card>
         <CardHeader>
-          <SectionTitle title={t('evaluation.manual.householdTitle')} required={false} />
+          <SectionTitle
+            title={t('evaluation.manual.householdTitle')}
+            tooltip={t('evaluation.upload.householdHint')}
+            required={false}
+          />
         </CardHeader>
         <CardContent>
           <Controller
@@ -398,6 +403,7 @@ export function ManualEntryForm({
                 value={watchedDependants}
                 onChange={next => field.onChange(next)}
                 disabled={disabled}
+                showSummary={false}
               />
             )}
           />
@@ -439,10 +445,11 @@ export function ManualEntryForm({
   )
 }
 
-function SectionTitle({ title, required }: { title: string; required: boolean }) {
+function SectionTitle({ title, tooltip, required }: { title: string; tooltip?: string; required: boolean }) {
   return (
     <div className="flex items-center gap-2">
       <CardTitle>{title}</CardTitle>
+      {tooltip && <InfoTooltip content={tooltip} label={tooltip} />}
       <SectionBadge required={required} />
     </div>
   )
@@ -463,14 +470,31 @@ function Field({
 }) {
   return (
     <div className="flex flex-col gap-1.5">
-      <Label htmlFor={htmlFor}>{label}</Label>
+      <LabelRow htmlFor={htmlFor} label={label} tooltip={help} />
       {children}
-      {help && <p className="text-xs text-muted-foreground">{help}</p>}
       {error && (
         <p className="text-xs text-destructive" role="alert">
           {error}
         </p>
       )}
     </div>
+  )
+}
+
+function LabelRow({ htmlFor, label, tooltip }: { htmlFor?: string; label: string; tooltip?: string }) {
+  return (
+    <div className="flex items-center gap-2">
+      <Label htmlFor={htmlFor}>{label}</Label>
+      {tooltip && <InfoTooltip content={tooltip} label={tooltip} />}
+    </div>
+  )
+}
+
+function TooltipLabel({ label, tooltip }: { label: string; tooltip: string }) {
+  return (
+    <span className="inline-flex items-center gap-2">
+      <span className="font-medium">{label}</span>
+      <InfoTooltip content={tooltip} label={tooltip} />
+    </span>
   )
 }

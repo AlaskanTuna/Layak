@@ -303,6 +303,100 @@ def test_get_packet_regenerates_zip(client: tuple[TestClient, MagicMock], monkey
     assert names == {"str.pdf", "jkm.pdf", "lhdn.pdf"}
 
 
+# --- /api/evaluations/{id}/packet/{scheme_id} (single PDF) --------------
+
+
+def test_get_packet_draft_requires_auth(client: tuple[TestClient, MagicMock]) -> None:
+    tc, _ = client
+    resp = tc.get("/api/evaluations/abc/packet/str_2026")
+    assert resp.status_code == 401
+
+
+def test_get_packet_draft_404_when_not_owned(client: tuple[TestClient, MagicMock]) -> None:
+    tc, db = client
+    _wire_get_by_id(db, _make_eval_snapshot(user_id="someone-else"))
+    resp = tc.get(
+        "/api/evaluations/eval-xyz/packet/str_2026",
+        headers={"Authorization": "Bearer valid"},
+    )
+    assert resp.status_code == 404
+
+
+def test_get_packet_draft_404_when_scheme_id_not_in_matches(
+    client: tuple[TestClient, MagicMock],
+) -> None:
+    """Asking for a scheme_id the eval never matched should 404 — same shape
+    as the wrong-owner case so a guesser can't probe which schemes someone
+    qualified for."""
+    tc, db = client
+    _wire_get_by_id(db, _make_eval_snapshot())
+    resp = tc.get(
+        "/api/evaluations/eval-xyz/packet/lhdn_form_be",
+        headers={"Authorization": "Bearer valid"},
+    )
+    assert resp.status_code == 404
+
+
+def test_get_packet_draft_409_when_profile_missing(client: tuple[TestClient, MagicMock]) -> None:
+    tc, db = client
+    _wire_get_by_id(db, _make_eval_snapshot(profile=False))
+    resp = tc.get(
+        "/api/evaluations/eval-xyz/packet/str_2026",
+        headers={"Authorization": "Bearer valid"},
+    )
+    assert resp.status_code == 409
+
+
+def test_get_packet_draft_returns_single_pdf(
+    client: tuple[TestClient, MagicMock],
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Happy path: profile + matching scheme present → generate_packet called
+    with a single-element matches list → single PDF returned with inline
+    Content-Disposition so iframes render it."""
+    tc, db = client
+    _wire_get_by_id(db, _make_eval_snapshot())
+
+    import base64
+
+    from app.routes import evaluations as evaluations_module
+    from app.schema.packet import Packet, PacketDraft
+
+    fake_pdf_bytes = b"%PDF-1.4 single-draft fake\n"
+    fake_b64 = base64.b64encode(fake_pdf_bytes).decode()
+    captured_match_ids: list[list[str]] = []
+
+    async def _fake_generate(_profile: Any, matches: list[Any]) -> Packet:
+        # The single-draft endpoint must hand `generate_packet` exactly one
+        # match — the one matching scheme_id — not the full list.
+        captured_match_ids.append([m.scheme_id for m in matches])
+        return Packet(
+            drafts=[
+                PacketDraft(
+                    scheme_id=matches[0].scheme_id,
+                    filename=f"{matches[0].scheme_id}.pdf",
+                    blob_bytes_b64=fake_b64,
+                ),
+            ],
+            generated_at=datetime(2026, 4, 21, 12, 0, 0, tzinfo=UTC),
+        )
+
+    monkeypatch.setattr(evaluations_module, "generate_packet", _fake_generate)
+
+    resp = tc.get(
+        "/api/evaluations/eval-xyz/packet/str_2026",
+        headers={"Authorization": "Bearer valid"},
+    )
+    assert resp.status_code == 200
+    assert resp.headers["content-type"] == "application/pdf"
+    assert resp.headers.get("content-disposition", "").startswith("inline")
+    assert "str_2026.pdf" in resp.headers.get("content-disposition", "")
+    assert resp.content == fake_pdf_bytes
+    # Critical: only the one match was passed to generate_packet — no wasted
+    # WeasyPrint runs on the other qualifying matches.
+    assert captured_match_ids == [["str_2026"]]
+
+
 # --- /api/evaluations/{id} (delete) --------------------------------------
 
 

@@ -385,6 +385,18 @@
       "hintUtility": "Bil air, elektrik, atau jalur lebar untuk pengesahan alamat — dalam tempoh tiga bulan lepas.",
       "errorFileSize": "Fail adalah {{size}} MB — maksimum 10 MB.",
       "errorFileType": "Jenis fail tidak disokong ({{type}}). Muat naik imej atau PDF.",
+      "errorFileTypeStrict": "Fail tidak disokong ({{type}}). Layak hanya menerima JPG, PNG, atau PDF.",
+      "ingestionPathHelper": "JPG dan PNG diproses melalui OCR imej — anda akan menerima pratonton pantas untuk memangkas foto yang kabur atau mempunyai ruang tambahan sebelum kami mengekstrak. PDF terus ke pengekstrakan teks tanpa langkah pratonton.",
+      "crop": {
+        "title": "Pratonton dan potong",
+        "description": "Potong latar belakang atau betulkan kecondongan sebelum Layak memproses imej ini. Sahkan untuk menghantar versi yang dipotong, atau batalkan untuk memilih fail lain.",
+        "imageAlt": "Pratonton dokumen dimuat naik",
+        "loading": "Memuatkan pratonton…",
+        "processingError": "Tidak dapat memotong imej ini: {{message}}",
+        "reset": "Tetapkan semula potongan",
+        "cancel": "Batal",
+        "confirm": "Gunakan potongan ini"
+      },
       "dropzonePrimary": "Klik untuk muat naik",
       "dropzoneSecondary": "atau seret dan lepas",
       "dropzoneFormats": "JPG, PNG, atau PDF sehingga 10MB",
@@ -541,6 +553,14 @@
       "intro": "Caruman wajib yang perlu anda bayar di bawah skim-skim ini. Ini TIDAK termasuk dalam jumlah pelepasan tahunan di atas — ini adalah wang yang anda bayar.",
       "annualLabel": "Caruman tahunan",
       "footnote": "Daftar dan bayar terus melalui portal agensi. Kegagalan membayar boleh menjejaskan akses kepada faedah kecederaan pekerjaan jika anda membuat tuntutan kemudian."
+    },
+    "preview": {
+      "title": "Pratonton dalam talian ({{count}} draf)",
+      "description": "Semak setiap PDF draf dalam pelayar sebelum memuat turun; setiap pratonton menjalankan semula WeasyPrint di sisi pelayan daripada profil dan padanan anda yang disimpan, dan baitnya tidak kekal.",
+      "loading": "Memuatkan pratonton…",
+      "error": "Pratonton gagal: {{message}}",
+      "iframeTitle": "Pratonton dalam talian {{name}}",
+      "downloadOne": "Muat turun PDF ini"
     },
     "packet": {
       "titleSingular": "Pakej permohonan draf ({{count}} fail)",

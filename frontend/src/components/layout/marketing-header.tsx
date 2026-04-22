@@ -39,9 +39,6 @@ export function MarketingHeader() {
       <nav className="ml-auto flex items-center gap-1">
         <LanguageToggle />
         <ThemeToggle />
-        <Button render={<Link href="/#how-it-works" />} size="sm" variant="ghost">
-          {t('common.button.howItWorks')}
-        </Button>
         <Button render={<Link href="/sign-in" />} size="sm" className="ml-2">
           {t('common.button.signIn')}
         </Button>

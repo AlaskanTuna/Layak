@@ -188,3 +188,7 @@ temp/
 design-system/
 *.tsbuildinfo
 settings.local.json
+
+# CLI agent artifacts
+.codex
+.claude/scheduled_tasks.lock

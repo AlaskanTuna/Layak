@@ -178,40 +178,55 @@ def _ensure_data_store(
     return store_path
 
 
+_GCS_PDF_BUCKET = "layak-schemes-pdfs"
+
+
 def _import_pdfs(
     client: DocumentServiceClient,
     store_path: str,
     pdfs: list[Path],
     verbose: bool,
 ) -> None:
-    """Upsert every PDF via inline raw_bytes into the default branch."""
-    from google.cloud.discoveryengine_v1.types import Document, ImportDocumentsRequest
+    """Upsert every PDF into the default branch via Discovery Engine GCS source.
+
+    Inline raw_bytes ingestion (the previous approach) silently fails with
+    "Field 'document.data' is a required field" — this is a long-standing
+    Discovery Engine quirk for PDF binaries even though the SDK accepts the
+    shape. The documented Google pattern is to upload PDFs to GCS first and
+    use `gcs_source` with `data_schema='content'` so Discovery Engine pulls
+    each PDF, parses it, and indexes the extracted text.
+
+    Bucket: gs://layak-schemes-pdfs/ (created in `us` multi-region; ~14 MB
+    total — well inside the GCS Always Free tier's 5 GB ceiling). Upload the
+    PDFs once via:
+
+        gsutil -m cp backend/data/schemes/*.pdf gs://layak-schemes-pdfs/
+
+    Re-running the seed script after that is idempotent (INCREMENTAL
+    reconciliation upserts in-place per object name).
+    """
+    from google.cloud.discoveryengine_v1.types import GcsSource, ImportDocumentsRequest
 
     branch = f"{store_path}/branches/default_branch"
-    documents = [
-        Document(
-            id=_sanitize_doc_id(p.stem),
-            content=Document.Content(mime_type="application/pdf", raw_bytes=p.read_bytes()),
-        )
-        for p in pdfs
-    ]
-    if verbose:
-        for d, p in zip(documents, pdfs, strict=True):
-            print(f"    queued {d.id!r}  ({p.stat().st_size:,} bytes)")
+    input_uris = [f"gs://{_GCS_PDF_BUCKET}/{p.name}" for p in pdfs]
 
-    print(f"Importing {len(documents)} PDFs into {branch} ...")
+    print(f"Importing {len(pdfs)} PDFs into {branch} via gs://{_GCS_PDF_BUCKET}/ ...")
+    if verbose:
+        for uri in input_uris:
+            print(f"  source uri: {uri}")
+
     op = client.import_documents(
         request=ImportDocumentsRequest(
             parent=branch,
-            inline_source=ImportDocumentsRequest.InlineSource(documents=documents),
+            gcs_source=GcsSource(input_uris=input_uris, data_schema="content"),
             reconciliation_mode=ImportDocumentsRequest.ReconciliationMode.INCREMENTAL,
         )
     )
     result = op.result(timeout=900)
-    # Different response shapes across SDK versions; report what we can see.
+    print(f"  result: {result}")
     for field in ("success_count", "failure_count"):
         if hasattr(result, field):
-            print(f"  {field}: {getattr(result, field)}")
+            print(f"    {field}: {getattr(result, field)}")
 
 
 def _run_canaries(client: SearchServiceClient, store_path: str) -> bool:
@@ -274,8 +289,8 @@ def _execute(args: argparse.Namespace) -> int:
     if not pdfs:
         print(f"error: no PDFs found in {SCHEMES_DIR}", file=sys.stderr)
         return 1
-    if len(pdfs) != 6:
-        print(f"warning: expected 6 PDFs, found {len(pdfs)}", file=sys.stderr)
+    if len(pdfs) < 6:
+        print(f"warning: fewer than 6 PDFs found ({len(pdfs)}); seed will still proceed", file=sys.stderr)
 
     client_data = de.DataStoreServiceClient()
     client_doc = de.DocumentServiceClient()

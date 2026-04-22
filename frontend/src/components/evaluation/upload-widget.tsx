@@ -1,10 +1,11 @@
 'use client'
 
 import { useId, useRef, useState } from 'react'
-import { ArrowRight, ChevronDown, FileText, Loader2, ShieldCheck, Sparkles, UploadCloud, X } from 'lucide-react'
+import { ArrowRight, ChevronDown, FileImage, FileText, Loader2, ShieldCheck, Sparkles, UploadCloud, X } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import type { TFunction } from 'i18next'
 
+import { CropPreviewModal } from '@/components/evaluation/crop-preview-modal'
 import { DependantsFieldset, type DependantInputRow } from '@/components/evaluation/dependants-fieldset'
 import { SectionBadge } from '@/components/evaluation/section-badge'
 import { Button } from '@/components/ui/button'
@@ -13,8 +14,12 @@ import type { DependantInput } from '@/lib/agent-types'
 import { cn } from '@/lib/utils'
 
 const MAX_FILE_BYTES = 10 * 1024 * 1024
-const ACCEPTED_MIME_PREFIXES = ['image/', 'application/pdf']
-const ACCEPT_ATTR = 'image/*,application/pdf'
+// Strict allowlist — Phase 7 Task 3 tightened from the looser `image/*` prefix
+// because BMP / TIFF / HEIC sneak past the previous check but fail the OCR
+// path. JPG, PNG, PDF only — same set the dropzone label advertises.
+const ACCEPTED_MIME_TYPES = new Set(['image/jpeg', 'image/png', 'application/pdf'])
+const IMAGE_MIME_TYPES = new Set(['image/jpeg', 'image/png'])
+const ACCEPT_ATTR = 'image/jpeg,image/png,application/pdf'
 
 export type UploadSlot = 'ic' | 'payslip' | 'utility'
 
@@ -46,10 +51,14 @@ function validate(file: File, t: TFunction): string | null {
     const mb = (file.size / (1024 * 1024)).toFixed(1)
     return t('evaluation.upload.errorFileSize', { size: mb })
   }
-  if (!ACCEPTED_MIME_PREFIXES.some(prefix => file.type.startsWith(prefix))) {
-    return t('evaluation.upload.errorFileType', { type: file.type || 'unknown' })
+  if (!ACCEPTED_MIME_TYPES.has(file.type)) {
+    return t('evaluation.upload.errorFileTypeStrict', { type: file.type || 'unknown' })
   }
   return null
+}
+
+function isImageFile(file: File): boolean {
+  return IMAGE_MIME_TYPES.has(file.type)
 }
 
 function formatSize(bytes: number): string {
@@ -187,10 +196,19 @@ export function UploadWidget({ onSubmit, onUseSamples, disabled = false, samples
     payslip: null,
     utility: null
   })
+  // Phase 7 Task 3 — crop preview is per-slot. We hold the in-flight image
+  // (the one the user just selected, validated as JPG/PNG) on a separate
+  // pending-slot pair so the slot's `state.file` is only populated AFTER the
+  // user confirms (or is bypassed for PDFs entirely).
+  const [pendingCrop, setPendingCrop] = useState<{ slot: UploadSlot; file: File } | null>(null)
 
   const canSubmit = (['ic', 'payslip', 'utility'] as const).every(
     s => state[s].file !== null && state[s].error === null
   )
+
+  function commitFile(slot: UploadSlot, file: File) {
+    setState(prev => ({ ...prev, [slot]: { file, error: null } }))
+  }
 
   function handleFileChange(slot: UploadSlot, file: File | null) {
     if (!file) {
@@ -198,7 +216,35 @@ export function UploadWidget({ onSubmit, onUseSamples, disabled = false, samples
       return
     }
     const error = validate(file, t)
-    setState(prev => ({ ...prev, [slot]: { file: error ? null : file, error } }))
+    if (error) {
+      setState(prev => ({ ...prev, [slot]: { file: null, error } }))
+      return
+    }
+    if (isImageFile(file)) {
+      // Hold the slot blank until the user confirms the crop. Surfacing the
+      // file in the slot prematurely would let them hit Continue while the
+      // crop modal is still open.
+      setState(prev => ({ ...prev, [slot]: { file: null, error: null } }))
+      setPendingCrop({ slot, file })
+      return
+    }
+    // PDFs skip the preview/crop step entirely — direct extraction path.
+    commitFile(slot, file)
+  }
+
+  function handleCropConfirm(cropped: File) {
+    if (!pendingCrop) return
+    commitFile(pendingCrop.slot, cropped)
+    setPendingCrop(null)
+  }
+
+  function handleCropCancel() {
+    if (!pendingCrop) return
+    // Reset the hidden input so re-picking the same filename re-triggers
+    // onChange. Without this, browsers swallow the second pick as a no-op.
+    const el = inputRefs.current[pendingCrop.slot]
+    if (el) el.value = ''
+    setPendingCrop(null)
   }
 
   function handleClear(slot: UploadSlot) {
@@ -225,6 +271,11 @@ export function UploadWidget({ onSubmit, onUseSamples, disabled = false, samples
 
   return (
     <div className="flex flex-col gap-5">
+      <div className="flex items-start gap-2 rounded-xl border border-border bg-muted/30 p-3 text-xs leading-relaxed text-muted-foreground sm:text-sm">
+        <FileImage className="mt-0.5 size-4 shrink-0 text-primary/70" aria-hidden />
+        <p>{t('evaluation.upload.ingestionPathHelper')}</p>
+      </div>
+
       <div className="flex flex-col gap-4">
         {SLOT_SPECS.map(spec => {
           const inputId = `${reactId}-${spec.slot}`
@@ -314,6 +365,13 @@ export function UploadWidget({ onSubmit, onUseSamples, disabled = false, samples
         <ShieldCheck className="mt-0.5 size-4 shrink-0 text-primary" aria-hidden />
         <p>{t('evaluation.upload.trustCopy')}</p>
       </div>
+
+      <CropPreviewModal
+        open={pendingCrop !== null}
+        file={pendingCrop?.file ?? null}
+        onConfirm={handleCropConfirm}
+        onCancel={handleCropCancel}
+      />
     </div>
   )
 }

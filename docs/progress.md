@@ -888,3 +888,12 @@ Findings the audit flagged that were **not** acted on (cosmetic or external to P
 - Aligned the upload and manual-entry card headers to the same Geist Sans treatment on `/dashboard/evaluation/upload`, and removed inline helper copy from the manual form in favor of the existing tooltip pattern.
 - Added right-side tooltips to manual-entry field labels and employment-type choices, plus a tooltip-backed household header on the manual tab to mirror the upload tab.
 - Normalized the visible English upload/manual labels and button copy to title case so both tabs read as one consistent flow.
+
+## [22/04/26] - Phase 7 Task 3: upload validator tightening + JPG/PNG crop preview
+
+- Tightened `frontend/src/components/evaluation/upload-widget.tsx` validation from the looser `image/*` MIME prefix to a strict allowlist of `image/jpeg | image/png | application/pdf`. The earlier prefix had let BMP / TIFF / HEIC reach the OCR step where they fail.
+- New `errorFileTypeStrict` i18n triplet (en/ms/zh) replaces the old generic `errorFileType` for the strict path; `ingestionPathHelper` triplet powers a new banner above the slot grid explaining JPG/PNG → image OCR vs PDF → direct text extraction.
+- Built `frontend/src/components/evaluation/crop-preview-modal.tsx` wrapping `react-image-crop@11` inside the Base UI Dialog. Default 95% centered crop with rule-of-thirds guides; Reset / Cancel / Confirm CTAs. Confirm draws the crop into a canvas at the source image natural resolution and emits a new `File` preserving filename + MIME, which then enters the slot state.
+- Branched `handleFileChange` on `IMAGE_MIME_TYPES.has(file.type)` — PDFs commit straight to the slot, images set `pendingCrop` and the slot stays blank until the user confirms (preventing premature Continue). Cancelling resets the hidden file input so re-picking the same filename re-fires `onChange`.
+- Frontend test coverage for the validator + image-vs-PDF branch is deferred — same constraint as Phase 7 Task 6 (no test harness in this repo). Verified via `pnpm lint` clean and `pnpm build` clean.
+- Added `react-image-crop@11.0.10` to `frontend/package.json`; bundle impact ~6KB gzipped.

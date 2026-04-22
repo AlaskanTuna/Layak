@@ -416,6 +416,18 @@
       "hintUtility": "Water, electricity, or broadband bill for address verification — within the last three months.",
       "errorFileSize": "File is {{size}} MB — max is 10 MB.",
       "errorFileType": "Unsupported file type ({{type}}). Upload an image or PDF.",
+      "errorFileTypeStrict": "Unsupported file ({{type}}). Layak accepts JPG, PNG, or PDF only.",
+      "ingestionPathHelper": "JPG and PNG run through image OCR — you'll get a quick preview to crop blurry or padded photos before we extract. PDFs go straight into text extraction with no preview step.",
+      "crop": {
+        "title": "Preview and crop",
+        "description": "Trim away background or fix tilt before Layak ingests this image. Confirm to send the cropped version, or cancel to pick a different file.",
+        "imageAlt": "Uploaded document preview",
+        "loading": "Loading preview…",
+        "processingError": "Couldn't crop that image: {{message}}",
+        "reset": "Reset crop",
+        "cancel": "Cancel",
+        "confirm": "Use this crop"
+      },
       "dropzonePrimary": "Click to upload",
       "dropzoneSecondary": "or drag and drop",
       "dropzoneFormats": "JPG, PNG, or PDF up to 10MB",

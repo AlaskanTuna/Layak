@@ -385,6 +385,18 @@
       "hintUtility": "Bil air, elektrik, atau jalur lebar untuk pengesahan alamat — dalam tempoh tiga bulan lepas.",
       "errorFileSize": "Fail adalah {{size}} MB — maksimum 10 MB.",
       "errorFileType": "Jenis fail tidak disokong ({{type}}). Muat naik imej atau PDF.",
+      "errorFileTypeStrict": "Fail tidak disokong ({{type}}). Layak hanya menerima JPG, PNG, atau PDF.",
+      "ingestionPathHelper": "JPG dan PNG diproses melalui OCR imej — anda akan menerima pratonton pantas untuk memangkas foto yang kabur atau mempunyai ruang tambahan sebelum kami mengekstrak. PDF terus ke pengekstrakan teks tanpa langkah pratonton.",
+      "crop": {
+        "title": "Pratonton dan potong",
+        "description": "Potong latar belakang atau betulkan kecondongan sebelum Layak memproses imej ini. Sahkan untuk menghantar versi yang dipotong, atau batalkan untuk memilih fail lain.",
+        "imageAlt": "Pratonton dokumen dimuat naik",
+        "loading": "Memuatkan pratonton…",
+        "processingError": "Tidak dapat memotong imej ini: {{message}}",
+        "reset": "Tetapkan semula potongan",
+        "cancel": "Batal",
+        "confirm": "Gunakan potongan ini"
+      },
       "dropzonePrimary": "Klik untuk muat naik",
       "dropzoneSecondary": "atau seret dan lepas",
       "dropzoneFormats": "JPG, PNG, atau PDF sehingga 10MB",

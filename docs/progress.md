@@ -897,3 +897,11 @@ Findings the audit flagged that were **not** acted on (cosmetic or external to P
 - Branched `handleFileChange` on `IMAGE_MIME_TYPES.has(file.type)` — PDFs commit straight to the slot, images set `pendingCrop` and the slot stays blank until the user confirms (preventing premature Continue). Cancelling resets the hidden file input so re-picking the same filename re-fires `onChange`.
 - Frontend test coverage for the validator + image-vs-PDF branch is deferred — same constraint as Phase 7 Task 6 (no test harness in this repo). Verified via `pnpm lint` clean and `pnpm build` clean.
 - Added `react-image-crop@11.0.10` to `frontend/package.json`; bundle impact ~6KB gzipped.
+
+## [22/04/26] - Phase 7 Task 5: mobile responsiveness fixes for demo-flow surfaces
+
+- Static-analysis pass through every dashboard route at 375px effective width — sidebar drawer + topbar menu confirmed already mobile-correct, code execution `<pre>` blocks already overflow-x-auto, RequiredContributions already does `flex-col → sm:flex-row` with `min-w-0`. No browser walkthrough this turn (out of scope for a static sweep).
+- `EvaluationUpsideHero`: stepped the currency typography down to `text-4xl sm:text-5xl md:text-6xl` (was 5xl/6xl flat), wrapped the row in `flex-wrap` with `gap-y-1`, and added `break-all` on the RM number so very long totals wrap onto a second line instead of pushing past the viewport edge.
+- `ActiveApplications` cards: added `min-w-0 flex-1` to the inner flex column, `truncate` on both text rows, and `shrink-0` on the Open button — fixes the case where a long timestamp + RM amount would push the CTA off-screen on a narrow phone.
+- Verified: `pnpm lint` clean, `pnpm build` clean across all 13 routes.
+- Other surfaces audited and left as-is: `SchemeCardGrid` (already 1-col → 2-col → 3-col), `DraftPacketPreview` (already truncates name + uses min-w-0), `ResultsActionRail` (already 1-col → 3-col), `schemes-overview` (already 1-col → 2-col → 3-col).

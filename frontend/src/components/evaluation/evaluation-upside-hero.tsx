@@ -30,9 +30,9 @@ export function EvaluationUpsideHero({ totalAnnualRm, matchedCount, packet, empt
         {t('evaluation.upside.label')}
       </p>
 
-      <div className="flex items-baseline gap-2 tabular-nums">
-        <span className="font-heading text-3xl font-normal text-muted-foreground sm:text-4xl">{t('evaluation.upside.currency')}</span>
-        <span className="font-heading text-5xl font-semibold tracking-tight text-foreground sm:text-6xl">
+      <div className="flex flex-wrap items-baseline gap-x-2 gap-y-1 tabular-nums">
+        <span className="font-heading text-2xl font-normal text-muted-foreground sm:text-3xl md:text-4xl">{t('evaluation.upside.currency')}</span>
+        <span className="font-heading text-4xl font-semibold tracking-tight text-foreground break-all sm:text-5xl md:text-6xl">
           {empty ? '—' : formatRm(totalAnnualRm)}
         </span>
       </div>

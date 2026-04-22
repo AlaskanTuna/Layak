@@ -2,7 +2,7 @@
 
 import { zodResolver } from '@hookform/resolvers/zod'
 import { CalendarIcon, Eraser, Sparkles } from 'lucide-react'
-import { useEffect, useMemo, useRef } from 'react'
+import { useMemo, useRef } from 'react'
 import { Controller, type SubmitHandler, useForm, useWatch } from 'react-hook-form'
 import { useTranslation } from 'react-i18next'
 import { z } from 'zod'
@@ -63,6 +63,31 @@ const AISYAH_DEFAULTS: FormValues = {
   ]
 }
 
+/**
+ * Farhan defaults for one-click pre-fill — salaried-teacher counterpart to
+ * Aisyah. Mirrors `frontend/src/lib/farhan-fixtures.ts` dependants so the
+ * manual and upload paths produce equivalent profiles. DOB 1988-03-22 (from
+ * the synthetic MyKad) derives age 38 against any 2026 reference date after
+ * 22 Mar; gross monthly income is RM 4,180.50 (basic + allowances).
+ */
+const FARHAN_DEFAULTS: FormValues = {
+  name: 'Cikgu Farhan bin Mohd Yusof',
+  date_of_birth: '1988-03-22',
+  ic_last4: '5837',
+  monthly_income_rm: 4180.5,
+  employment_type: 'salaried',
+  address: 'No. 24, Jalan Putera 3/2, Taman Putera Subang, 47600 Subang Jaya, Selangor',
+  monthly_cost_rm: '152.40',
+  monthly_kwh: '380',
+  dependants: [
+    { relationship: 'spouse', age: 36, ic_last4: '' },
+    { relationship: 'child', age: 10, ic_last4: '' },
+    { relationship: 'child', age: 7, ic_last4: '' }
+  ]
+}
+
+export type ManualSamplePersona = 'aisyah' | 'farhan'
+
 const EMPTY_DEFAULTS: FormValues = {
   name: '',
   date_of_birth: '',
@@ -77,20 +102,17 @@ const EMPTY_DEFAULTS: FormValues = {
 
 type Props = {
   onSubmit: (payload: ManualEntryPayload) => void
-  onUseSamples: () => void
+  onUseSamples: (persona: ManualSamplePersona) => void
   /** Fires after the form is reset to its empty defaults via the Clear button. */
   onClear?: () => void
   disabled?: boolean
-  /** When true, form pre-fills with Aisyah values on mount. Toggles demo banner upstream. */
-  prefillAisyah?: boolean
 }
 
 export function ManualEntryForm({
   onSubmit,
   onUseSamples,
   onClear,
-  disabled = false,
-  prefillAisyah = false
+  disabled = false
 }: Props) {
   const { t } = useTranslation()
 
@@ -159,7 +181,7 @@ export function ManualEntryForm({
 
   const form = useForm<FormValues>({
     resolver: zodResolver(manualEntrySchema),
-    defaultValues: prefillAisyah ? AISYAH_DEFAULTS : EMPTY_DEFAULTS,
+    defaultValues: EMPTY_DEFAULTS,
     mode: 'onBlur'
   })
   const { register, handleSubmit, control, formState, reset } = form
@@ -172,11 +194,6 @@ export function ManualEntryForm({
   // `useWatch` is the memo-safe alternative to `form.watch()` — the React Compiler
   // plugin flags `watch()` because it can't reliably cache its result.
   const watchedDependants = (useWatch({ control, name: 'dependants' }) ?? []) as DependantInputRow[]
-
-  // Re-apply Aisyah defaults when the toggle arrives after mount (e.g. URL ?mode=manual+demo).
-  useEffect(() => {
-    if (prefillAisyah) reset(AISYAH_DEFAULTS)
-  }, [prefillAisyah, reset])
 
   const submit: SubmitHandler<FormValues> = values => {
     const payload: ManualEntryPayload = {
@@ -197,9 +214,9 @@ export function ManualEntryForm({
     onSubmit(payload)
   }
 
-  const handleUseAisyahInline = () => {
-    reset(AISYAH_DEFAULTS)
-    onUseSamples()
+  const handleUseSample = (persona: ManualSamplePersona) => {
+    reset(persona === 'aisyah' ? AISYAH_DEFAULTS : FARHAN_DEFAULTS)
+    onUseSamples(persona)
   }
 
   const handleClearInline = () => {
@@ -412,22 +429,36 @@ export function ManualEntryForm({
 
       <Separator />
 
-      <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-        <div className="flex flex-wrap gap-2">
-          <Button
-            type="button"
-            variant="secondary"
-            size="sm"
-            disabled={disabled}
-            onClick={handleUseAisyahInline}
-            className="gap-1.5"
-          >
-            <Sparkles className="size-4" aria-hidden />
-            {t('evaluation.manual.useAisyah')}
-          </Button>
+      <div className="flex flex-col items-start gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex flex-wrap items-center gap-x-3 gap-y-2">
           <Button
             type="button"
             variant="outline"
+            size="sm"
+            disabled={disabled}
+            onClick={() => handleUseSample('aisyah')}
+            className="gap-1.5"
+          >
+            <Sparkles className="size-4" aria-hidden />
+            {t('evaluation.upload.useSamplesAisyah')}
+          </Button>
+          <span aria-hidden className="text-xs text-muted-foreground/60">
+            {t('evaluation.upload.samplesDivider')}
+          </span>
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            disabled={disabled}
+            onClick={() => handleUseSample('farhan')}
+            className="gap-1.5"
+          >
+            <Sparkles className="size-4" aria-hidden />
+            {t('evaluation.upload.useSamplesFarhan')}
+          </Button>
+          <Button
+            type="button"
+            variant="ghost"
             size="sm"
             disabled={disabled}
             onClick={handleClearInline}

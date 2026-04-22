@@ -478,7 +478,6 @@
       "kwhHelp": "Optional — only if your bill lists \"Jumlah Penggunaan\".",
       "kwhPlaceholder": "e.g. 220",
       "householdTitle": "Household",
-      "useAisyah": "Use Aisyah Sample Data",
       "clear": "Clear",
       "submit": "Generate Packet",
       "zodRequired": "Required",

@@ -133,13 +133,13 @@ export function EvaluationUploadClient() {
     }
   }
 
-  function handleUseSamplesManual() {
-    // Inside the manual form — the form itself has already reset to Aisyah
-    // values. Mark the manual tab as demo so switching to upload clears the
-    // banner and switching back restores it. Manual mode is Aisyah-only;
-    // Farhan lives on the upload tab.
-    setDemoByTab(prev => ({ ...prev, manual: 'aisyah' }))
-    setDemoMode('aisyah')
+  function handleUseSamplesManual(persona: DemoPersona) {
+    // Inside the manual form — the form itself has already reset to the
+    // chosen persona's values. Mark the manual tab with the matching persona
+    // so switching to upload clears the banner and switching back restores
+    // the right copy ("gig driver Aisyah" vs "salaried teacher Farhan").
+    setDemoByTab(prev => ({ ...prev, manual: persona }))
+    setDemoMode(persona)
   }
 
   function handleClearManual() {

@@ -393,21 +393,21 @@ function SamplePersonaButton({
   return (
     <Button
       type="button"
-      variant="ghost"
+      variant="outline"
       size="sm"
       onClick={onClick}
       disabled={disabled}
       data-persona={persona}
-      className="px-0 text-muted-foreground hover:bg-transparent hover:text-foreground"
+      className="gap-1.5"
     >
       {loading ? (
         <>
-          <Loader2 className="mr-1.5 size-4 animate-spin" aria-hidden />
+          <Loader2 className="size-4 animate-spin" aria-hidden />
           {t('evaluation.upload.loadingSamples')}
         </>
       ) : (
         <>
-          <Sparkles className="mr-1.5 size-4" aria-hidden />
+          <Sparkles className="size-4" aria-hidden />
           {label}
         </>
       )}

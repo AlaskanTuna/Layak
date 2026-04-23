@@ -34,7 +34,9 @@ MAX_DIGEST_CHARS = 6000
 
 # Per-language register directive. Reuses the same Dewan / 普通话 conventions
 # as `LANGUAGE_INSTRUCTION_BLOCK` in `app/agents/gemini.py` so the chatbot
-# voice matches the rest of the pipeline output.
+# voice matches the rest of the pipeline output. Used as the (lower-priority)
+# style footer; the strict per-language Rule 0 below is what actually anchors
+# the response language.
 _LANGUAGE_DIRECTIVES: dict[SupportedLanguage, str] = {
     "en": "Respond in plain English.",
     "ms": (
@@ -48,6 +50,50 @@ _LANGUAGE_DIRECTIVES: dict[SupportedLanguage, str] = {
 }
 
 
+# Rule 0: hard language lock. Model otherwise drifts to the language of the
+# topic / retrieved PDFs (e.g. responds in BM when the user asks in English
+# about STR / JKM / risalah PDFs). The instruction must be:
+#   (a) explicit about the failure mode it's preventing
+#   (b) absolute ("MUST be entirely in X, regardless of …")
+#   (c) placed BEFORE the scope/refusal/citation rules so the model treats
+#       it as a top-priority constraint, not a style suggestion.
+_LANGUAGE_LOCK: dict[SupportedLanguage, str] = {
+    "en": (
+        "**Rule 0 — Language lock (MOST IMPORTANT).** Your entire response "
+        "MUST be written in English. The user's question is in English and "
+        "the app is set to English. Even when the user asks about "
+        "Malay-named schemes (STR, JKM, BKK, i-Saraan) or you retrieve "
+        "passages from Malay-language risalah PDFs, you MUST translate or "
+        "paraphrase those concepts into English in your reply. Do NOT "
+        "switch to Bahasa Malaysia or Chinese under any circumstance. "
+        "Scheme names (STR 2026, JKM Warga Emas, etc.) and `[scheme:xxx]` "
+        "citation markers stay verbatim — everything else is English."
+    ),
+    "ms": (
+        "**Peraturan 0 — Kunci bahasa (PALING PENTING).** Seluruh jawapan "
+        "anda MESTI ditulis dalam Bahasa Malaysia (register Dewan). Soalan "
+        "pengguna dalam Bahasa Malaysia dan aplikasi ditetapkan kepada "
+        "Bahasa Malaysia. Walaupun pengguna menyentuh tajuk berbahasa "
+        "Inggeris atau anda mengambil petikan daripada PDF berbahasa "
+        "Inggeris (LHDN explanatory notes, dsb.), anda MESTI menterjemah "
+        "atau merumuskannya semula ke dalam Bahasa Malaysia. Jangan "
+        "tukar kepada bahasa Inggeris atau Cina dalam apa keadaan pun. "
+        "Nama skim (STR 2026, JKM Warga Emas, dll.) dan penanda petikan "
+        "`[scheme:xxx]` kekal verbatim — selebihnya Bahasa Malaysia."
+    ),
+    "zh": (
+        "**规则 0 —— 语言锁定（最重要）。** 您的整段回答必须使用简体中文（普通话语体）。"
+        "用户的提问是中文，应用界面也设置为中文。"
+        "即便用户提到马来文名称的计划（STR、JKM、BKK、i-Saraan），"
+        "或您从马来文 / 英文的 risalah PDF 中检索到段落，"
+        "您都必须将这些内容翻译或意译成简体中文。"
+        "在任何情况下都不得切换为马来文或英文。"
+        "计划名称（STR 2026、JKM Warga Emas 等）以及 `[scheme:xxx]` "
+        "引用标记保持原样 —— 其余内容必须是简体中文。"
+    ),
+}
+
+
 # Per-language system instruction block. Format strings interpolate the
 # eval-context digest from `_render_eval_digest()`. The hard constraints are
 # repeated in each language because Gemini's instruction-following degrades
@@ -57,6 +103,8 @@ _SYSTEM_TEMPLATES: dict[SupportedLanguage, str] = {
 You are Layak, an AI helper for one specific Malaysian social-assistance \
 evaluation. You help citizens (often older relatives with low tech literacy) \
 understand the results of THEIR evaluation in plain language.
+
+{language_lock}
 
 # This evaluation
 {digest}
@@ -95,6 +143,8 @@ spesifik. Anda membantu rakyat (selalunya saudara mara warga emas yang \
 kurang celik teknologi) memahami keputusan penilaian MEREKA dalam bahasa \
 yang mudah.
 
+{language_lock}
+
 # Penilaian ini
 {digest}
 
@@ -131,6 +181,8 @@ dipetik.
     "zh": """\
 您是 Layak，一位 AI 助手，专门协助说明马来西亚社会援助评估的结果。\
 您帮助公民（通常是科技素养较低的年长亲属）以简明语言理解他们这一份评估的结果。
+
+{language_lock}
 
 # 本次评估
 {digest}
@@ -356,8 +408,13 @@ def build_system_instruction(
     """
     template = _SYSTEM_TEMPLATES.get(language) or _SYSTEM_TEMPLATES["en"]
     directive = _LANGUAGE_DIRECTIVES.get(language) or _LANGUAGE_DIRECTIVES["en"]
+    language_lock = _LANGUAGE_LOCK.get(language) or _LANGUAGE_LOCK["en"]
     digest = render_eval_digest(eval_doc, language)
-    return template.format(digest=digest, language_directive=directive)
+    return template.format(
+        digest=digest,
+        language_directive=directive,
+        language_lock=language_lock,
+    )
 
 
 def qualifying_scheme_ids(eval_doc: dict[str, Any]) -> set[str]:

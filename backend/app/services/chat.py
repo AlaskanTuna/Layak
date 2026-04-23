@@ -25,7 +25,6 @@ from google.genai import types
 from app.agents.chat_prompt import build_system_instruction, qualifying_scheme_ids
 from app.agents.gemini import (
     FAST_MODEL,
-    LANGUAGE_INSTRUCTION_BLOCK,
     get_client,
     humanize_error,
 )
@@ -333,12 +332,19 @@ async def stream_chat_response(
         temperature=0.2,
     )
 
-    # Append the language directive as a final user-side hint so even if the
-    # model drops the system-prompt language register, the per-turn nudge
-    # keeps the response in the chosen language. Mirrors the same trick the
-    # pipeline tools use via `LANGUAGE_INSTRUCTION_BLOCK`.
+    # Append a strict per-turn language reinforcement. Even with the system
+    # prompt's Rule 0 hard-lock, the model occasionally drifts to BM when the
+    # question references Malay-named schemes (STR, JKM) AND the retrieval
+    # tool surfaces Malay-language risalah PDFs — so we restate the language
+    # constraint on the user's last turn as the most-recent-attention hint.
+    _per_turn = {
+        "en": "Reply in English. Translate any Malay text from retrieved PDFs into English.",
+        "ms": "Balas dalam Bahasa Malaysia. Terjemahkan mana-mana teks Inggeris dari PDF yang diambil ke Bahasa Malaysia.",
+        "zh": "请用简体中文回复。检索到的 PDF 中的任何马来文或英文段落，请翻译成中文。",
+    }
+    reinforcement = _per_turn.get(language, _per_turn["en"])
     contents[-1].parts.append(
-        types.Part.from_text(text=f"\n\n[{LANGUAGE_INSTRUCTION_BLOCK[language]}]")
+        types.Part.from_text(text=f"\n\n[{reinforcement}]")
     )
 
     client = get_client()

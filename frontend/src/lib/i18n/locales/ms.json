@@ -57,10 +57,10 @@
       "description": "Panduan pantas untuk pengguna kali pertama. Pilih bahagian yang sepadan dengan tempat anda berada dalam aliran.",
       "footer": "Layak hanya memberi panduan draf. Anda masih perlu menyemak dan menghantar secara manual.",
       "tabs": {
-        "overview": "Cara Layak berfungsi",
-        "documents": "Apa yang perlu disediakan",
-        "samples": "Cuba data sampel",
-        "results": "Selepas keputusan"
+        "overview": "Cara Layak",
+        "documents": "Dokumen",
+        "samples": "Data sampel",
+        "results": "Keputusan"
       },
       "overview": {
         "title": "Cara Layak berfungsi",

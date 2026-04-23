@@ -70,34 +70,46 @@ export function FloatingHelpLauncher() {
           </DialogHeader>
           <div className="flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto px-5 pb-5">
             <Tabs value={section} onValueChange={handleSectionChange} className="gap-4">
-              {/* `md:grid-cols-2` instead of `-4` so longer non-EN labels
-                  ("Apa yang perlu disediakan", "After results") get enough
-                  horizontal room; `whitespace-normal text-center leading-tight`
-                  overrides the primitive's `whitespace-nowrap` so anything
-                  that still doesn't fit wraps in-cell instead of visually
-                  bleeding into the next tab. */}
-              <TabsList className="grid h-auto w-full grid-cols-2 gap-2 rounded-xl bg-muted/70 p-1">
+              {/* shadcn's `TabsList` pins `h-8` under
+                  `group-data-horizontal/tabs:h-8` + uses `inline-flex` — a
+                  Tailwind `h-auto` / `grid` override via cn() doesn't reliably
+                  win through tailwind-merge + base-ui's render layer, so the
+                  list only allocates height for one row and any wrapped row
+                  overflows on top of the content below. Inline `style` wins
+                  deterministically against both. `flex-wrap` is the natural
+                  pairing — lets the height grow with content for free. Each
+                  trigger claims ~half the row via basis so two fit per row,
+                  with `whitespace-normal` so longer non-EN labels wrap in-cell
+                  instead of bleeding into their neighbour. */}
+              <TabsList
+                className="flex w-full flex-wrap gap-2 rounded-xl bg-muted/70 p-1"
+                style={{ height: 'auto' }}
+              >
                 <TabsTrigger
                   value="overview"
-                  className="h-auto min-h-9 whitespace-normal px-3 py-2 text-center text-xs leading-tight sm:text-sm"
+                  className="min-h-9 flex-1 basis-[calc(50%-0.25rem)] whitespace-normal px-3 py-2 text-center text-xs leading-tight sm:text-sm"
+                  style={{ height: 'auto' }}
                 >
                   {t('common.help.tabs.overview')}
                 </TabsTrigger>
                 <TabsTrigger
                   value="documents"
-                  className="h-auto min-h-9 whitespace-normal px-3 py-2 text-center text-xs leading-tight sm:text-sm"
+                  className="min-h-9 flex-1 basis-[calc(50%-0.25rem)] whitespace-normal px-3 py-2 text-center text-xs leading-tight sm:text-sm"
+                  style={{ height: 'auto' }}
                 >
                   {t('common.help.tabs.documents')}
                 </TabsTrigger>
                 <TabsTrigger
                   value="samples"
-                  className="h-auto min-h-9 whitespace-normal px-3 py-2 text-center text-xs leading-tight sm:text-sm"
+                  className="min-h-9 flex-1 basis-[calc(50%-0.25rem)] whitespace-normal px-3 py-2 text-center text-xs leading-tight sm:text-sm"
+                  style={{ height: 'auto' }}
                 >
                   {t('common.help.tabs.samples')}
                 </TabsTrigger>
                 <TabsTrigger
                   value="results"
-                  className="h-auto min-h-9 whitespace-normal px-3 py-2 text-center text-xs leading-tight sm:text-sm"
+                  className="min-h-9 flex-1 basis-[calc(50%-0.25rem)] whitespace-normal px-3 py-2 text-center text-xs leading-tight sm:text-sm"
+                  style={{ height: 'auto' }}
                 >
                   {t('common.help.tabs.results')}
                 </TabsTrigger>

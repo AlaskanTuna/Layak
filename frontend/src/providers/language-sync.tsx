@@ -19,14 +19,46 @@ function isSupported(lng: string): lng is SupportedLanguage {
   return (SUPPORTED_LANGUAGES as readonly string[]).includes(lng)
 }
 
+// `detection.lookupLocalStorage` key from i18n/index.ts. The presence of this
+// key is the signal that the user explicitly picked a language in this
+// browser — it's only written by i18next-browser-languagedetector's
+// `caches: ['localStorage']` after a `changeLanguage` call.
+const LANG_LS_KEY = 'layak.lng'
+
+function readLocalStorageLang(): string | null {
+  if (typeof window === 'undefined') return null
+  try {
+    return window.localStorage.getItem(LANG_LS_KEY)
+  } catch {
+    return null
+  }
+}
+
+async function patchPreferences(lng: SupportedLanguage): Promise<void> {
+  try {
+    await authedFetch(`${backendUrl()}/api/user/preferences`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ language: lng })
+    })
+  } catch {
+    // Best-effort — UI already flipped; a Firestore outage shouldn't
+    // surface an error toast for what's essentially a preference tweak.
+  }
+}
+
 /**
  * Phase 9 — bridges i18next and `users/{uid}.language`:
  *
  * 1. **Hydrate on auth-ready.** First time `useAuth()` resolves to a signed-in
- *    user, GET `/api/user/me` and flip i18next if the server-stored language
- *    differs from whatever localStorage / the browser preference produced.
- *    Server outranks localStorage so a language picked on device A shows up
- *    on device B immediately.
+ *    user, GET `/api/user/me`. Resolution rule:
+ *    - If the browser has a cached language choice (`localStorage.layak.lng`
+ *      is set), treat that as the user's explicit intent. If it differs from
+ *      the server value, PATCH the server UP rather than flipping the UI
+ *      DOWN — otherwise a user who picked Bahasa Malaysia before Phase 9
+ *      landed (server still `"en"` default) gets silently reset on refresh.
+ *    - If the browser has no cached choice (fresh device), adopt the
+ *      server language so device-B picks up the device-A preference.
  * 2. **Persist on change.** Listen for i18next `languageChanged` and PATCH
  *    `/api/user/preferences` (debounced so rapid toggles coalesce).
  *
@@ -52,7 +84,25 @@ export function LanguageSync({ children }: { children: React.ReactNode }) {
         if (!res.ok) return
         const body = (await res.json()) as { language?: string }
         const serverLang = body.language
-        if (serverLang && isSupported(serverLang) && serverLang !== i18n.language) {
+        if (!serverLang || !isSupported(serverLang)) return
+
+        const cachedLang = readLocalStorageLang()
+        const hasExplicitBrowserChoice = cachedLang !== null && isSupported(cachedLang)
+
+        if (hasExplicitBrowserChoice && cachedLang !== serverLang) {
+          // Browser disagrees with server. Treat localStorage as the user's
+          // explicit intent (they toggled the dropdown here) and push UP to
+          // the server instead of silently flipping the UI DOWN.
+          if (cachedLang !== i18n.language) {
+            await i18n.changeLanguage(cachedLang)
+          }
+          await patchPreferences(cachedLang as SupportedLanguage)
+          return
+        }
+
+        // No explicit browser choice (or it already agrees with server) —
+        // adopt the server value so cross-device sync works.
+        if (serverLang !== i18n.language) {
           await i18n.changeLanguage(serverLang)
         }
       } catch {
@@ -73,14 +123,7 @@ export function LanguageSync({ children }: { children: React.ReactNode }) {
         // Only attempt the PATCH when the user is signed in — pre-auth
         // toggles on the landing page stay in localStorage until sign-in.
         if (!user) return
-        void authedFetch(`${backendUrl()}/api/user/preferences`, {
-          method: 'PATCH',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ language: lng })
-        }).catch(() => {
-          // Best-effort — UI already flipped; a Firestore outage shouldn't
-          // surface an error toast for what's essentially a preference tweak.
-        })
+        void patchPreferences(lng)
       }, PATCH_DEBOUNCE_MS)
     }
 

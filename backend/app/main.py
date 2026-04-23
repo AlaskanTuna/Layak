@@ -81,7 +81,10 @@ app.add_middleware(
         "https://layak-frontend-i2t7hf6seq-as.a.run.app",
     ],
     allow_origin_regex=r"http://localhost:\d+",
-    allow_methods=["GET", "POST", "DELETE", "OPTIONS"],
+    # PATCH added Phase 9 — `/api/user/preferences` uses it to persist the
+    # language choice. Without it the CORS preflight blocks the call and the
+    # language toggle can never round-trip to Firestore.
+    allow_methods=["GET", "POST", "PATCH", "DELETE", "OPTIONS"],
     allow_headers=["*"],
 )
 

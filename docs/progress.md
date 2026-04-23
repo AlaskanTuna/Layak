@@ -925,6 +925,7 @@ Findings the audit flagged that were **not** acted on (cosmetic or external to P
 - Replaced the modal shell with the same `topbar-glass` foundation used by the dashboard header, then layered explicit utility background opacity, border, and shadow classes on top so the frosted-card look is preserved in production.
 - Re-verified with `pnpm -C frontend lint` and `pnpm -C frontend build`.
 - Follow-up pass: increased the chatbot shell to a denser `bg-card`-based frosted panel with stronger blur and saturation, because the header-style alpha still read too transparent once the modal covered text-heavy results content.
+- Extended that denser frosted-panel treatment to the quick help dialog, notification popover, and user menu so all dashboard overlays now share the same heavier glass feel instead of mixing lighter card/popover surfaces.
 
 ## [22/04/26] - Landing and dashboard contrast polish
 

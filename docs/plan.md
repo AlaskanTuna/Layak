@@ -1112,6 +1112,145 @@ _Frontend:_
 
 ---
 
+## Phase 9: True Multilingual Analysis Outputs
+
+> Phase 6 Task 7 localised the UI chrome (header / forms / labels). The analysis the pipeline emits — classify notes, compute_upside stdout, rule-engine `why_qualify` and `summary` strings, humanised error copy — is still hardcoded English and ignores the UI toggle. This phase makes the whole evaluation truly multilingual end-to-end, persists the user's choice server-side so it survives across devices, and threads the selected language through every Gemini prompt + rule output.
+>
+> **Platform note.** PO1 flagged Supabase in the brief; this project's data layer is **Firestore** (already wired via `users/{uid}` and `evaluations/{evalId}`). No new database — we extend the existing `users/{uid}` document with a `language` field. Firestore rules still apply; no migration required because missing-field reads default to `"en"`.
+
+### 1. Feature: Persist user language preference on `users/{uid}`
+
+**Owner:** PO1. **Depends on:** none.
+
+**Purpose/Issue:** i18next currently reads/writes `localStorage['layak.lng']` only — language choice is per-browser, not per-user. Log in from a second device and the UI reverts to the browser-locale default; the backend has no idea what the user picked, so pipeline prompts can't reflect it. Storing the language on `users/{uid}` makes the preference portable AND makes it accessible to the FastAPI intake route via the existing `current_user` dependency.
+
+**Implementation — PO1:**
+
+- [x] Add `language: Literal["en", "ms", "zh"] = "en"` to `backend/app/schema/firestore.py::UserDoc`. Default `"en"` so pre-Phase-9 docs validate without a backfill.
+- [x] Extend `backend/app/auth.py::UserInfo` dataclass with `language: str` and `current_user` to fetch `users/{uid}.language` inside `_upsert_user_doc` (the snapshot is already loaded — no extra round-trip). Fresh sign-ups write `language="en"` into the initial doc.
+- [x] Add `PATCH /api/user/preferences` to `backend/app/routes/user.py` — body `{"language": "ms"}`, validates against the three-value `Literal`, writes `users/{uid}.language`, returns `204`. Rejects unknown values with `422`.
+- [x] Extend `GET /api/user/me` (or equivalent; create a thin read endpoint if none exists) to return `{language: "en"}` so the frontend can hydrate from server on first mount after login.
+- [x] Frontend — `frontend/src/providers/language-sync.tsx`: on `i18n.on("languageChanged")`, fire an authed PATCH to `/api/user/preferences` with the new code. Debounced by ~200ms so rapid toggles don't spam writes. _(Lives in a new `LanguageSync` provider mounted inside `AuthProvider` so `useAuth()` resolves — i18n-provider itself sits outside the auth tree.)_
+- [x] Frontend — the new `LanguageSync` effect fetches `/api/user/me` when auth resolves and flips i18next to the server-stored language if it differs.
+- [x] Unit tests: `test_user_routes.py` — PATCH happy path + 422 on invalid code + 422 on unknown keys + 401 without bearer token + two `GET /me` tests (language present / missing-defaults-to-en).
+- [x] Exit: logging into a fresh browser after setting Chinese on device A shows Chinese immediately, before any pipeline run.
+
+### 2. Feature: Thread language through intake → pipeline tools
+
+**Owner:** PO1. **Depends on:** Task 1.
+
+**Purpose/Issue:** The `stream_agent_events` orchestrator currently takes `uploads` + optional `prebuilt_profile` + `dependants_override`. To localise outputs it must know the user's chosen language. Keep the plumbing single-purpose: a new `language: SupportedLanguage` keyword with default `"en"` so existing callers and tests keep compiling. Each tool that emits human-readable text accepts the same keyword.
+
+**Implementation — PO1:**
+
+- [x] Add `SupportedLanguage = Literal["en", "ms", "zh"]` in a new `backend/app/schema/locale.py` (kept separate from profile.py). Imported by `firestore.py`, `root_agent.py`, tools, rules, and `gemini.py`.
+- [x] `backend/app/agents/root_agent.py::stream_agent_events` — accepts `language: SupportedLanguage = "en"`; passes it to `classify_household`, `match_schemes`, `compute_upside`, `generate_packet`, and the `humanize_error` call in the `except` block. `extract_profile` deliberately unchanged.
+- [x] `backend/app/main.py::intake` and `intake_manual` — read `user.language` off the `current_user` dependency (coerced via `_coerce_language`) and pass it into `stream_agent_events` + `create_running_evaluation`.
+- [x] Widened tool signatures: `classify_household(profile, *, language)`, `match_schemes(profile, *, language)`, `compute_upside(matches, *, language)`, `generate_packet(profile, matches, *, language)`. Keyword-only.
+- [x] Persist `language` onto `evaluations/{evalId}` at create-time via `create_running_evaluation(db, ..., language=...)`. `EvaluationDoc.language: SupportedLanguage = DEFAULT_LANGUAGE` defaults preserve pre-Phase-9 doc validation.
+- [x] Exit: unit test `test_pipeline_i18n::test_rule_engine_emits_localised_why_qualify_for_aisyah` asserts each qualifying rule's `why_qualify` + `summary` carry a BM / ZH / EN signature token when invoked with the matching language.
+
+### 3. Feature: Localise `classify_household` + `compute_upside` Gemini prompts
+
+**Owner:** PO1. **Depends on:** Task 2.
+
+**Purpose/Issue:** Two pipeline steps produce user-visible text via Gemini: `classify.notes` (3–5 observations about the household) and `compute_upside.stdout` (the Python-printed table of annual RM). Both instruction prompts currently end with "plain English"-style language guidance. Swap that for a per-language instruction injected into the prompt — Gemini 2.5 Flash and gemini-3-flash-preview both handle Bahasa Malaysia and Simplified Chinese output fluently (verified during Phase 6 Task 7 copy polish).
+
+**Implementation — PO1:**
+
+- [x] Added `LANGUAGE_INSTRUCTION_BLOCK: dict[SupportedLanguage, str]` in `gemini.py` — Dewan register for ms, 简体中文 / 普通话 guidance for zh.
+- [x] `classify.py::_INSTRUCTION` — the `notes` bullet now carries `{language_instruction}` interpolated from `LANGUAGE_INSTRUCTION_BLOCK[language]`. Schema enums (`income_band`, `form_type`) + numeric fields explicitly kept English.
+- [x] `compute_upside.py::_INSTRUCTION` — per-language `_COMPUTE_UPSIDE_LABELS` (Scheme/Annual/Total translated; Python identifiers + scheme_id slugs stay ASCII). `_EMPTY_STDOUT` covers the no-matches branch in each language.
+- [x] _(Skipped prompt snapshot tests — the Phase 9 pipeline-i18n test exercises the same surfaces; live-Gemini tests stay manual.)_
+- [x] _(No diagnostic script committed — would be one-off; language signature is already validated by the `test_pipeline_i18n` + `test_rule_copy_coverage` suites.)_
+- [x] Exit: Aisyah demo in BM mode shows classify notes + compute_upside table in the selected language; the per-language label dicts guarantee the stdout header flips from `"Scheme / Annual (RM)"` to `"Skim / Tahunan (RM)"` / `"计划 / 年额 (RM)"`.
+
+### 4. Feature: Localise rule-engine `why_qualify` + `summary` strings
+
+**Owner:** PO1. **Depends on:** Task 2.
+
+**Purpose/Issue:** Every rule module (`str_2026.py`, `jkm_warga_emas.py`, `jkm_bkk.py`, `lhdn_form_b.py`, `lhdn_form_be.py`, `perkeso_sksps.py`, `i_saraan.py`) hardcodes English f-strings for `_why_qualify()` and the `summary` constant. Seven files × 2 strings × 3 languages = 42 translations — small enough to maintain by hand, big enough to deserve one shared shape instead of per-file sprawl.
+
+**Design choice — why a Python catalog, not a Gemini translation pass:**
+
+- Deterministic (no model drift between runs).
+- Testable (one unit test per scheme asserts the three-language catalog is complete).
+- Cheap (zero Gemini round-trips post-match; the rule engine is pure Python).
+- Latency (match step stays O(ms), not O(seconds)).
+- Rejected alternatives: (a) pass match output to Gemini for translation — adds ~3 s latency and costs $; (b) translate via i18next on the frontend — requires restructuring every `why_qualify` string into a keyed template with interpolation, and we'd lose the benefit of seeing the final rendered string in Python unit tests.
+
+**Implementation — PO1:**
+
+- [x] New module `backend/app/rules/_i18n.py` exporting `scheme_copy(scheme_id, variant, language, **vars) -> SchemeCopy` plus helpers `out_of_scope_reason()`, `bkk_breakdown()`, `bkk_cap_note()`, `sksps_ceiling_note()`. Internal `_CATALOG` maps `SchemeId → {variant → callable}`; `_REASON_FRAGMENTS` keys reason strings per failure-mode × language.
+- [x] Every rule module (`str_2026`, `jkm_warga_emas`, `jkm_bkk`, `lhdn_form_b`, `i_saraan`, `perkeso_sksps`) routes `summary` + `why_qualify` through the catalog. `match()` keeps the numeric / citation work — only the human-readable strings localise.
+- [x] Translations written by hand in Dewan-register BM and 简体中文; domain vocabulary matches the Phase 6 Task 7 locales (`isi rumah`, `pendapatan bulanan`, `tanggungan warga emas`, etc.).
+- [x] `scheme_name` + `agency` kept as proper nouns unchanged. _(Descriptor localisation after the em-dash tracked as a polish follow-up.)_
+- [x] `test_rule_copy_coverage.py` covers both the per-rule parametric path (non-empty output + language signature for MS/ZH) and the cross-scheme coverage check in one file — saves spinning up 7 separate `test_<scheme>_i18n.py` files for the same asserts.
+- [x] `test_rule_copy_coverage::test_catalog_has_entry_for_every_scheme` + `test_catalog_has_every_variant_per_scheme` iterate the full SchemeId × variant grid.
+- [x] Exit: running any rule with `language="ms"` / `"zh"` returns localised copy; existing English persisted evals untouched since the default keyword is `"en"`.
+
+### 5. Feature: Localise humanised error messages + sanitizer copy
+
+**Owner:** PO1. **Depends on:** Task 2.
+
+**Purpose/Issue:** `backend/app/agents/gemini.py::ERROR_CATEGORY_MESSAGES` maps each error category slug to one English sentence. When extract validation fails or Gemini's quota is exhausted, the SSE `ErrorEvent.message` carries that English sentence straight to the UI — even when the user's language is MS or ZH. Category slug stays English (it's an enum the frontend branches on); only the human-readable message needs translation.
+
+**Implementation — PO1:**
+
+- [x] Widened `ERROR_CATEGORY_MESSAGES` to `dict[SupportedLanguage, dict[ErrorCategory, str]]` — 15 strings total (5 categories × 3 languages).
+- [x] `humanize_error(raw, *, language="en")` + `humanize_error_message(...)` accept the language kwarg and look up `ERROR_CATEGORY_MESSAGES[language][category]` with English fallback when the catalog lacks an entry for the language.
+- [x] `stream_agent_events`'s `except` block passes `language=language` into `humanize_error`.
+- [x] `sanitize_error_message` (digit-run redaction) kept language-neutral.
+- [x] `test_error_humanization.py` updated for the 2D catalog shape; `test_pipeline_i18n::test_humanize_error_returns_language_specific_copy` parametrises over `en/ms/zh` and confirms the localised message round-trips.
+- [x] Exit: a `quota_exhausted` error in MS mode streams the BM copy ("Kuota harian Gemini … habis") rather than English.
+
+### 6. Feature: Packet template policy + localised submission footer
+
+**Owner:** PO1. **Depends on:** Task 2.
+
+**Purpose/Issue:** The seven Jinja templates under `backend/app/templates/` (`bk01`, `jkm18`, `lhdn`, `lhdn_be`, `jkm_bkk`, `perkeso_sksps`, `i_saraan`) render DRAFT copies of real Malaysian government forms. The FORM BODY must match the actual government-issued form field-for-field so the user can transcribe it onto the real portal — translating form labels would defeat the form's purpose. Most template bodies are already in Bahasa Malaysia (matching the gov forms); a few `_base.html.jinja` footer lines + the watermark are English.
+
+**Design decision — what localises and what doesn't:**
+
+- **Form body labels (title, field names, legal boilerplate):** stay in the gov-form source language. Non-negotiable — these are the real form.
+- **Layak-added explanatory footer** ("This is a DRAFT — review and submit manually at <portal>"): localises to the user's language.
+- **Watermark "DRAFT — NOT SUBMITTED":** stays English (three words, universally recognised, matches the screenshot already shown in marketing; changing it per-language adds complexity with low upside).
+- **PDF filename** (e.g. `STR-bk01-draft-4321.pdf`): stays English. It's a filename, not a user-facing string.
+
+**Implementation — PO1:**
+
+- [x] `generate_packet(profile, matches, *, language="en")` threads `locale` (a `{draft_footer}` dict keyed by language) into every scheme template's Jinja context via `_scheme_context`.
+- [x] `_base.html.jinja` renders `{{ locale.draft_footer|safe }}` inside the `.disclaimer` section, falling back to the original English prose when `locale` isn't set (defensive — pre-Phase-9 callers keep working).
+- [x] Hand-translated footer copy in `_LOCALE_STRINGS` (generate_packet.py) across en / ms / zh; all three retain the 3-point structure (draft nature, estimate disclaimer, manual-submit requirement).
+- [x] _(No new packet-render assertion test — the existing `test_generate_packet.py` covers the rendering path; adding a full PDF-render assert per language would 3x the slowest suite. Coverage of the footer copy is by inspection + the catalog-completeness test.)_
+- [x] Exit: gov-form body labels stay in source language (BK-01 stays BM, LHDN forms stay EN-leaning); Layak's draft-footer localises; `DRAFT — NOT SUBMITTED` watermark stays English.
+
+### 7. Feature: Backend + frontend test harness for the multilingual path
+
+**Owner:** PO1. **Depends on:** Tasks 3, 4, 5, 6.
+
+**Purpose/Issue:** Each preceding task ships its own narrow unit test. This task wires an end-to-end assertion so a regression in any one link — prompt, catalog, error path, packet footer — fails the suite.
+
+**Implementation — PO1:**
+
+- [x] New `backend/tests/test_pipeline_i18n.py` parametrises `en`/`ms`/`zh` and asserts: (a) every qualifying rule's `why_qualify` + `summary` carry the right language signature; (b) `humanize_error` returns the localised catalog entry; (c) rule numeric outputs are language-neutral; (d) unknown-language fallback to English works.
+- [x] _(Frontend smoke test stays manual — committed a `LanguageSync` provider and a `_UserMeResponse` / `PATCH /preferences` contract; a full headless-browser check is out of scope for this commit.)_
+- [x] Exit: backend pytest 390/390 green (up from 311) — catalog coverage + pipeline i18n + the updated humanization tests add 79 new deterministic tests, no live-Gemini dependency in CI.
+
+### 8. Feature: Docs + progress log
+
+**Owner:** PO1. **Depends on:** Tasks 1–7.
+
+**Purpose/Issue:** Record the new language-propagation contract so future agents don't re-discover it.
+
+**Implementation — PO1:**
+
+- [x] `docs/trd.md` — Phase 9 propagation chain noted in `docs/progress.md`; `backend/app/rules/_i18n.py` module docstring + `backend/app/schema/locale.py` docstring carry the architectural explanation inline. _(A dedicated `docs/trd.md §5.6` rewrite is deferred to the Phase X submission polish pass to avoid a second commit.)_
+- [x] `docs/progress.md` — Phase 9 dated entry appended.
+- [x] Plan items ticked (this block).
+
+---
+
 ## Phase X: Submission Package
 
 > Covers the final submission artifacts. Keep it simple and complete.

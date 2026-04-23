@@ -33,6 +33,8 @@ and Form BE because the reliefs + brackets are shared.
 from __future__ import annotations
 
 from app.config import getenv
+from app.rules._i18n import scheme_copy
+from app.schema.locale import DEFAULT_LANGUAGE, SupportedLanguage
 from app.schema.profile import Profile
 from app.schema.scheme import RuleCitation, SchemeMatch
 from app.services.vertex_ai_search import get_primary_rag_citation
@@ -226,7 +228,11 @@ def _applicable_reliefs(profile: Profile) -> dict[str, float]:
     return reliefs
 
 
-def match(profile: Profile) -> SchemeMatch:
+def match(
+    profile: Profile,
+    *,
+    language: SupportedLanguage = DEFAULT_LANGUAGE,
+) -> SchemeMatch:
     """Match a profile against the five YA2025 personal reliefs.
 
     Qualifies for BOTH Form B (self-employed) and Form BE (salaried) filers —
@@ -256,37 +262,45 @@ def match(profile: Profile) -> SchemeMatch:
     saving = round(tax_before - tax_after, 2)
 
     if saving <= 0:
+        copy = scheme_copy(
+            scheme_id,
+            "out_of_scope",
+            language,
+            total_relief=total_relief,
+            annual_income=annual_income,
+        )
         return SchemeMatch(
             scheme_id=scheme_id,
             scheme_name=scheme_name,
             qualifies=False,
             annual_rm=0.0,
-            summary=(f"Total relief RM{total_relief:,.0f} already exceeds chargeable income — no further tax saving."),
-            why_qualify=(
-                f"Out of scope: annual chargeable income RM{annual_income:,.0f} produces "
-                f"zero tax under YA2025 brackets even before reliefs — nothing to save."
-            ),
+            summary=copy["summary"],
+            why_qualify=copy["why_qualify"],
             agency=_AGENCY,
             portal_url=_PORTAL_URL,
             rule_citations=cites,
         )
 
     applied = ", ".join(f"{k} (RM{v:,.0f})" for k, v in reliefs.items())
+    copy = scheme_copy(
+        scheme_id,
+        "qualify",
+        language,
+        form_label=form_label,
+        filer_category=filer_category,
+        annual_income=annual_income,
+        total_relief=total_relief,
+        saving=saving,
+        applied=applied,
+        deadline=deadline,
+    )
     return SchemeMatch(
         scheme_id=scheme_id,
         scheme_name=scheme_name,
         qualifies=True,
         annual_rm=saving,
-        summary=(
-            f"Applied YA2025 reliefs totalling RM{total_relief:,.0f} against annual "
-            f"income RM{annual_income:,.0f}; estimated tax saving RM{saving:,.0f}."
-        ),
-        why_qualify=(
-            f"As a {form_label} ({filer_category}) filer with an annual income of RM{annual_income:,.0f}, "
-            f"the following YA2025 reliefs stack: {applied}. Applying them reduces your "
-            f"chargeable income by RM{total_relief:,.0f} and your tax bill by "
-            f"RM{saving:,.0f}/year. The {form_label} filing deadline is {deadline}."
-        ),
+        summary=copy["summary"],
+        why_qualify=copy["why_qualify"],
         agency=_AGENCY,
         portal_url=_PORTAL_URL,
         rule_citations=cites,

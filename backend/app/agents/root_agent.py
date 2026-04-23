@@ -45,6 +45,7 @@ from app.schema.events import (
     StepResultEvent,
     StepStartedEvent,
 )
+from app.schema.locale import DEFAULT_LANGUAGE, SupportedLanguage
 from app.schema.manual_entry import DependantInput
 from app.schema.profile import Dependant, Profile
 
@@ -115,6 +116,7 @@ async def stream_agent_events(
     *,
     prebuilt_profile: Profile | None = None,
     dependants_override: list[DependantInput] | None = None,
+    language: SupportedLanguage = DEFAULT_LANGUAGE,
 ) -> AsyncIterator[StepStartedEvent | StepResultEvent | DoneEvent | ErrorEvent]:
     """Stream the five-step pipeline as ordered SSE events.
 
@@ -176,29 +178,29 @@ async def stream_agent_events(
         current_step = "classify"
         yield StepStartedEvent(step=current_step)
         await asyncio.sleep(_INTER_STEP_DELAY_S)
-        classification = await classify_household(profile)
+        classification = await classify_household(profile, language=language)
         yield StepResultEvent(step=current_step, data=ClassifyResult(classification=classification))
 
         current_step = "match"
         yield StepStartedEvent(step=current_step)
         await asyncio.sleep(_INTER_STEP_DELAY_S)
-        matches = await match_schemes(profile)
+        matches = await match_schemes(profile, language=language)
         yield StepResultEvent(step=current_step, data=MatchResult(matches=matches))
 
         current_step = "compute_upside"
         yield StepStartedEvent(step=current_step)
         await asyncio.sleep(_INTER_STEP_DELAY_S)
-        trace = await compute_upside(matches)
+        trace = await compute_upside(matches, language=language)
         yield StepResultEvent(step=current_step, data=trace)
 
         current_step = "generate"
         yield StepStartedEvent(step=current_step)
         await asyncio.sleep(_INTER_STEP_DELAY_S)
-        packet = await generate_packet(profile, matches)
+        packet = await generate_packet(profile, matches, language=language)
         yield StepResultEvent(step=current_step, data=GenerateResult(packet=packet))
 
         yield DoneEvent(packet=packet)
     except Exception as exc:  # noqa: BLE001 — surface every failure to the UI.
         raw = f"{type(exc).__name__}: {exc}"
-        message, category = humanize_error(raw)
+        message, category = humanize_error(raw, language=language)
         yield ErrorEvent(step=current_step, message=message, category=category)

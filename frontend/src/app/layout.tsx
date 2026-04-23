@@ -3,6 +3,7 @@ import { Abril_Fatface, Geist, Literata } from 'next/font/google'
 
 import { AuthProvider } from '@/lib/auth-context'
 import { I18nProvider } from '@/providers/i18n-provider'
+import { LanguageSync } from '@/providers/language-sync'
 import { ThemeProvider } from '@/providers/theme-provider'
 
 import './globals.css'
@@ -49,7 +50,9 @@ export default function RootLayout({
       <body>
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
           <I18nProvider>
-            <AuthProvider>{children}</AuthProvider>
+            <AuthProvider>
+              <LanguageSync>{children}</LanguageSync>
+            </AuthProvider>
           </I18nProvider>
         </ThemeProvider>
       </body>

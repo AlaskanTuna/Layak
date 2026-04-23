@@ -19,6 +19,8 @@ page 2 of the source PDF.
 from __future__ import annotations
 
 from app.config import getenv
+from app.rules._i18n import out_of_scope_reason, scheme_copy
+from app.schema.locale import DEFAULT_LANGUAGE, SupportedLanguage
 from app.schema.profile import Profile
 from app.schema.scheme import RuleCitation, SchemeMatch
 from app.services.vertex_ai_search import get_primary_rag_citation
@@ -121,25 +123,20 @@ def _citations() -> list[RuleCitation]:
     return cites
 
 
-def _why_qualify(band: str, bucket: str, annual_rm: float, children: int, income: float) -> str:
-    band_label = "≤RM2,500" if band == "le_2500" else "RM2,501–RM5,000"
-    return (
-        f"Your household earns RM{income:,.0f}/month, inside the {band_label} band. "
-        f"You have {children} child(ren) under 18, placing you in the '{bucket.replace('_', '-')}' "
-        f"children bucket. STR 2026 pays RM{annual_rm:,.0f}/year in two tranches under the "
-        f"household-with-children tier. You still apply via BK-01 at "
-        f"bantuantunai.hasil.gov.my — Layak drafts the form for you; the final "
-        f"determination is LHDN's on application."
-    )
-
-
-def match(profile: Profile) -> SchemeMatch:
+def match(
+    profile: Profile,
+    *,
+    language: SupportedLanguage = DEFAULT_LANGUAGE,
+) -> SchemeMatch:
     """Match a profile against the STR 2026 household-with-children tier.
 
     Returns a SchemeMatch with `qualifies=True` if the profile has ≥1 child under
     18 and monthly income ≤RM5,000. All other cases return `qualifies=False` and
     `annual_rm=0` with the same citations, so the provenance panel can still
     explain the non-match.
+
+    Phase 9: `language` picks the localised `summary` + `why_qualify` via the
+    `app.rules._i18n` catalog.
     """
     children_under_18 = sum(1 for d in profile.dependants if d.relationship == "child" and d.age < 18)
     bucket = _child_bucket(children_under_18)
@@ -150,30 +147,46 @@ def match(profile: Profile) -> SchemeMatch:
     if bucket is None or band is None:
         reasons: list[str] = []
         if bucket is None:
-            reasons.append("no child under 18 in household")
+            reasons.append(out_of_scope_reason("str_no_child_under_18", language))
         if band is None:
-            reasons.append(f"income RM{profile.monthly_income_rm:,.0f} exceeds RM5,000 ceiling")
+            reasons.append(
+                out_of_scope_reason(
+                    "str_income_above_ceiling",
+                    language,
+                    income=profile.monthly_income_rm,
+                )
+            )
+        copy = scheme_copy("str_2026", "out_of_scope", language, reasons=reasons)
         return SchemeMatch(
             scheme_id="str_2026",
             scheme_name=_SCHEME_NAME,
             qualifies=False,
             annual_rm=0.0,
-            summary="Does not qualify under STR 2026 household-with-children tier.",
-            why_qualify="Out of scope: " + "; ".join(reasons) + ".",
+            summary=copy["summary"],
+            why_qualify=copy["why_qualify"],
             agency=_AGENCY,
             portal_url=_PORTAL_URL,
             rule_citations=cites,
         )
 
     annual_rm = STR_HOUSEHOLD_ANNUAL_RM[band][bucket]
-    band_label = "≤RM2,500" if band == "le_2500" else "RM2,501–RM5,000"
+    copy = scheme_copy(
+        "str_2026",
+        "qualify",
+        language,
+        band=band,
+        bucket=bucket,
+        annual_rm=annual_rm,
+        children=children_under_18,
+        income=profile.monthly_income_rm,
+    )
     return SchemeMatch(
         scheme_id="str_2026",
         scheme_name=_SCHEME_NAME,
         qualifies=True,
         annual_rm=annual_rm,
-        summary=f"Household-with-children tier, income band {band_label}, {bucket.replace('_', '-')} children bucket.",
-        why_qualify=_why_qualify(band, bucket, annual_rm, children_under_18, profile.monthly_income_rm),
+        summary=copy["summary"],
+        why_qualify=copy["why_qualify"],
         agency=_AGENCY,
         portal_url=_PORTAL_URL,
         rule_citations=cites,

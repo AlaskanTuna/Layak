@@ -25,6 +25,8 @@ Qualifying criteria:
 from __future__ import annotations
 
 from app.config import getenv
+from app.rules._i18n import bkk_breakdown, bkk_cap_note, out_of_scope_reason, scheme_copy
+from app.schema.locale import DEFAULT_LANGUAGE, SupportedLanguage
 from app.schema.profile import Dependant, Profile
 from app.schema.scheme import RuleCitation, SchemeMatch
 from app.services.vertex_ai_search import get_primary_rag_citation
@@ -107,7 +109,11 @@ def _per_child_monthly_rm(age: int) -> float:
     return PER_CHILD_MONTHLY_RM_YOUNGER if age <= YOUNGER_BAND_AGE else PER_CHILD_MONTHLY_RM_OLDER
 
 
-def match(profile: Profile) -> SchemeMatch:
+def match(
+    profile: Profile,
+    *,
+    language: SupportedLanguage = DEFAULT_LANGUAGE,
+) -> SchemeMatch:
     """Match a profile against JKM BKK.
 
     Qualifies when at least one qualifying child is present AND per-capita
@@ -124,18 +130,30 @@ def match(profile: Profile) -> SchemeMatch:
     if not qualifies:
         reasons: list[str] = []
         if not qualifying_children:
-            reasons.append(f"no child dependant aged <{CHILD_AGE_THRESHOLD} in household")
+            reasons.append(
+                out_of_scope_reason(
+                    "jkm_bkk_no_child",
+                    language,
+                    threshold=CHILD_AGE_THRESHOLD,
+                )
+            )
         if per_capita > PER_CAPITA_THRESHOLD_RM:
             reasons.append(
-                f"per-capita income RM{per_capita:,.0f} exceeds BKK threshold RM{PER_CAPITA_THRESHOLD_RM:,.0f}"
+                out_of_scope_reason(
+                    "jkm_bkk_income_above_threshold",
+                    language,
+                    per_capita=per_capita,
+                    threshold=PER_CAPITA_THRESHOLD_RM,
+                )
             )
+        copy = scheme_copy("jkm_bkk", "out_of_scope", language, reasons=reasons)
         return SchemeMatch(
             scheme_id="jkm_bkk",
             scheme_name=_SCHEME_NAME,
             qualifies=False,
             annual_rm=0.0,
-            summary="Does not qualify under JKM BKK means test.",
-            why_qualify="Out of scope: " + "; ".join(reasons) + ".",
+            summary=copy["summary"],
+            why_qualify=copy["why_qualify"],
             agency=_AGENCY,
             portal_url=_PORTAL_URL,
             rule_citations=cites,
@@ -150,41 +168,39 @@ def match(profile: Profile) -> SchemeMatch:
     annual_rm = capped_monthly * 12
 
     cap_note = (
-        f" (capped at RM{HOUSEHOLD_MONTHLY_CAP_RM:,.0f}/month household maximum)"
+        bkk_cap_note(HOUSEHOLD_MONTHLY_CAP_RM, language)
         if uncapped_monthly > HOUSEHOLD_MONTHLY_CAP_RM
         else ""
     )
+    breakdown = bkk_breakdown(
+        younger_count=younger_count,
+        younger_rate=PER_CHILD_MONTHLY_RM_YOUNGER,
+        younger_age_max=YOUNGER_BAND_AGE,
+        older_count=older_count,
+        older_rate=PER_CHILD_MONTHLY_RM_OLDER,
+        language=language,
+    )
 
-    breakdown_parts: list[str] = []
-    if younger_count:
-        breakdown_parts.append(
-            f"{younger_count} × RM{PER_CHILD_MONTHLY_RM_YOUNGER:,.0f} (age ≤{YOUNGER_BAND_AGE})"
-        )
-    if older_count:
-        breakdown_parts.append(
-            f"{older_count} × RM{PER_CHILD_MONTHLY_RM_OLDER:,.0f} (age {YOUNGER_BAND_AGE + 1}–17)"
-        )
-    breakdown = " + ".join(breakdown_parts)
-
+    copy = scheme_copy(
+        "jkm_bkk",
+        "qualify",
+        language,
+        per_capita=per_capita,
+        threshold_rm=PER_CAPITA_THRESHOLD_RM,
+        breakdown=breakdown,
+        cap_note=cap_note,
+        capped_monthly=capped_monthly,
+        annual_rm=annual_rm,
+        monthly_income_rm=profile.monthly_income_rm,
+        household_size=profile.household_size,
+    )
     return SchemeMatch(
         scheme_id="jkm_bkk",
         scheme_name=_SCHEME_NAME,
         qualifies=True,
         annual_rm=annual_rm,
-        summary=(
-            f"Per-capita income RM{per_capita:,.0f}/month is at/under BKK threshold "
-            f"RM{PER_CAPITA_THRESHOLD_RM:,.0f}; "
-            f"{breakdown} = RM{capped_monthly:,.0f}/month{cap_note}."
-        ),
-        why_qualify=(
-            f"Your household earns RM{profile.monthly_income_rm:,.0f}/month across "
-            f"{profile.household_size} members — per-capita income "
-            f"RM{per_capita:,.0f} is at/under the BKK threshold of "
-            f"RM{PER_CAPITA_THRESHOLD_RM:,.0f}. Per current Budget 2021 rates: "
-            f"{breakdown}{cap_note}, the annual payment works out to "
-            f"RM{annual_rm:,.0f}. Apply via Borang Permohonan Bantuan Kanak-Kanak "
-            f"at your nearest Pejabat Kebajikan Masyarakat Daerah."
-        ),
+        summary=copy["summary"],
+        why_qualify=copy["why_qualify"],
         agency=_AGENCY,
         portal_url=_PORTAL_URL,
         rule_citations=cites,

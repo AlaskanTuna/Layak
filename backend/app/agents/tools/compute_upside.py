@@ -23,8 +23,13 @@ import json
 
 from google.genai import types
 
-from app.agents.gemini import HEAVY_MODEL, get_client
+from app.agents.gemini import (
+    HEAVY_MODEL,
+    LANGUAGE_INSTRUCTION_BLOCK,
+    get_client,
+)
 from app.schema.events import ComputeUpsideResult
+from app.schema.locale import DEFAULT_LANGUAGE, SupportedLanguage
 from app.schema.scheme import SchemeMatch
 
 _INSTRUCTION = """
@@ -40,17 +45,46 @@ Write a short Python program that:
 2. Computes `total` as the sum of those variables.
 3. Prints a formatted table using `print("{{:<54s}}{{:>12s}}".format(...))`:
 
-   - A header row: `Scheme` / `Annual (RM)`.
+   - A header row: left column `{header_scheme}`, right column `{header_annual}`.
    - A separator row of 66 `-` characters.
    - One data row per scheme: the scheme's human-readable `scheme_name` on
      the left and its `annual_rm` right-aligned in 12 columns with thousands
      separators.
    - A separator row.
-   - A final row: `Total upside (annual)` / formatted total.
+   - A final row: left column `{total_label}`, right column the formatted total.
+
+Python identifiers, `scheme_id` values, format specifiers, and numeric
+output stay ASCII / English — they are code. Only the three printed
+labels above ({header_scheme}, {header_annual}, {total_label}) carry the
+user's language.
+
+{language_instruction}
 
 Run the code via the code_execution tool. Return nothing but the tool-call
 output — do not add commentary.
 """.strip()
+
+
+# Per-language labels substituted into the compute_upside prompt. The
+# values are UI copy ONLY; Python identifiers + `scheme_id` slugs + number
+# formatting stay language-neutral ASCII so the code remains executable.
+_COMPUTE_UPSIDE_LABELS: dict[str, dict[str, str]] = {
+    "en": {
+        "header_scheme": "Scheme",
+        "header_annual": "Annual (RM)",
+        "total_label": "Total upside (annual)",
+    },
+    "ms": {
+        "header_scheme": "Skim",
+        "header_annual": "Tahunan (RM)",
+        "total_label": "Jumlah manfaat (tahunan)",
+    },
+    "zh": {
+        "header_scheme": "计划",
+        "header_annual": "年额 (RM)",
+        "total_label": "年度总收益",
+    },
+}
 
 
 def _extract_exec_parts(response: object) -> tuple[str, str]:
@@ -74,7 +108,18 @@ def _extract_exec_parts(response: object) -> tuple[str, str]:
     return python_snippet, stdout
 
 
-async def compute_upside(matches: list[SchemeMatch]) -> ComputeUpsideResult:
+_EMPTY_STDOUT: dict[str, str] = {
+    "en": "No qualifying schemes.",
+    "ms": "Tiada skim yang layak.",
+    "zh": "没有符合条件的计划。",
+}
+
+
+async def compute_upside(
+    matches: list[SchemeMatch],
+    *,
+    language: SupportedLanguage = DEFAULT_LANGUAGE,
+) -> ComputeUpsideResult:
     """Compute annual RM upside via Gemini-run Python (code_execution tool).
 
     Phase 7 Task 9: `kind="required_contribution"` matches are skipped here —
@@ -83,6 +128,10 @@ async def compute_upside(matches: list[SchemeMatch]) -> ComputeUpsideResult:
     them out of the generated Python table; their `annual_rm` is already
     `0.0` so the final sum is unaffected either way, but omitting them from
     the stdout table avoids a misleading "PERKESO SKSPS ... 0" row.
+
+    Phase 9: `language` swaps the printed header / total labels so the
+    stdout table renders in the user's chosen language. Python identifiers
+    and scheme_id slugs stay English (they're code).
     """
     upside_matches = [m for m in matches if m.kind == "upside"]
     per_scheme = {m.scheme_id: float(m.annual_rm) for m in upside_matches}
@@ -91,14 +140,17 @@ async def compute_upside(matches: list[SchemeMatch]) -> ComputeUpsideResult:
     if not upside_matches:
         return ComputeUpsideResult(
             python_snippet="# No qualifying schemes — skipping computation.\n",
-            stdout="No qualifying schemes.",
+            stdout=_EMPTY_STDOUT[language],
             total_annual_rm=0.0,
             per_scheme_rm={},
         )
 
     client = get_client()
+    labels = _COMPUTE_UPSIDE_LABELS[language]
     prompt = _INSTRUCTION.format(
-        matches_json=json.dumps([m.model_dump() for m in upside_matches], default=str, indent=2)
+        matches_json=json.dumps([m.model_dump() for m in upside_matches], default=str, indent=2),
+        language_instruction=LANGUAGE_INSTRUCTION_BLOCK[language],
+        **labels,
     )
     response = client.models.generate_content(
         model=HEAVY_MODEL,

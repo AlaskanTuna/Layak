@@ -47,7 +47,7 @@ def client(monkeypatch: pytest.MonkeyPatch) -> tuple[TestClient, MagicMock, Magi
     verify_mock = MagicMock(return_value={"uid": _OWNER_UID, "email": "a@example.com"})
     monkeypatch.setattr(auth_module, "verify_firebase_id_token", verify_mock)
 
-    upsert_mock = MagicMock(return_value="free")
+    upsert_mock = MagicMock(return_value=("free", "en"))
     monkeypatch.setattr(auth_module, "_upsert_user_doc", upsert_mock)
 
     class _FrozenDateTime(datetime):
@@ -77,7 +77,7 @@ def test_get_quota_returns_pro_sentinel_without_firestore_touch(
     client: tuple[TestClient, MagicMock, MagicMock, MagicMock, datetime],
 ) -> None:
     tc, _, get_firestore_mock, upsert_mock, _ = client
-    upsert_mock.return_value = "pro"
+    upsert_mock.return_value = ("pro", "en")
 
     resp = tc.get("/api/quota", headers={"Authorization": "Bearer valid"})
     assert resp.status_code == 200
@@ -97,7 +97,7 @@ def test_get_quota_free_under_cap_returns_iso_reset(
     client: tuple[TestClient, MagicMock, MagicMock, MagicMock, datetime],
 ) -> None:
     tc, _db, get_firestore_mock, upsert_mock, _ = client
-    upsert_mock.return_value = "free"
+    upsert_mock.return_value = ("free", "en")
     db_mock = _wire_quota_db(3, oldest_at=_NOW - timedelta(hours=20))
     get_firestore_mock.return_value = db_mock
 
@@ -118,7 +118,7 @@ def test_get_quota_free_with_zero_usage_resets_in_24h(
     client: tuple[TestClient, MagicMock, MagicMock, MagicMock, datetime],
 ) -> None:
     tc, _db, get_firestore_mock, upsert_mock, fixed_now = client
-    upsert_mock.return_value = "free"
+    upsert_mock.return_value = ("free", "en")
     db_mock = _wire_quota_db(0)
     get_firestore_mock.return_value = db_mock
 
@@ -135,7 +135,7 @@ def test_get_quota_free_at_cap_uses_estimate_reset_at(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     tc, _db, get_firestore_mock, upsert_mock, fixed_now = client
-    upsert_mock.return_value = "free"
+    upsert_mock.return_value = ("free", "en")
     db_mock = _wire_quota_db(5)
     get_firestore_mock.return_value = db_mock
 

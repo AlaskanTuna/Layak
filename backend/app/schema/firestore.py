@@ -15,6 +15,7 @@ from typing import Literal
 
 from pydantic import BaseModel, ConfigDict, Field
 
+from app.schema.locale import DEFAULT_LANGUAGE, SupportedLanguage
 from app.schema.profile import HouseholdClassification, Profile
 from app.schema.scheme import SchemeMatch
 
@@ -40,6 +41,10 @@ class UserDoc(BaseModel):
     displayName: str | None = None  # noqa: N815 — Firestore field is camelCase
     photoURL: str | None = None  # noqa: N815
     tier: Tier = "free"
+    # Phase 9: persisted UI / pipeline language preference. Pre-Phase-9 docs
+    # have no `language` field; readers default to `"en"` so missing-field
+    # docs validate without a backfill.
+    language: SupportedLanguage = DEFAULT_LANGUAGE
     createdAt: datetime | None = None  # noqa: N815 — SERVER_TIMESTAMP resolves async
     lastLoginAt: datetime | None = None  # noqa: N815
     pdpaConsentAt: datetime | None = None  # noqa: N815
@@ -99,6 +104,11 @@ class EvaluationDoc(BaseModel):
 
     userId: str = Field(min_length=1)  # noqa: N815
     status: EvaluationStatus
+    # Phase 9: the language the eval ran under. Frozen at create-time so
+    # toggling the UI toggle mid-run doesn't silently repaint `why_qualify`
+    # strings in a language they weren't generated in. Pre-Phase-9 docs
+    # default to `"en"` via the field default below.
+    language: SupportedLanguage = DEFAULT_LANGUAGE
     createdAt: datetime | None = None  # noqa: N815 — SERVER_TIMESTAMP sentinel on write
     completedAt: datetime | None = None  # noqa: N815
     profile: Profile | None = None

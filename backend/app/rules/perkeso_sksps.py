@@ -35,6 +35,8 @@ from __future__ import annotations
 from dataclasses import dataclass
 
 from app.config import getenv
+from app.rules._i18n import out_of_scope_reason, scheme_copy, sksps_ceiling_note
+from app.schema.locale import DEFAULT_LANGUAGE, SupportedLanguage
 from app.schema.profile import Profile
 from app.schema.scheme import RuleCitation, SchemeMatch
 from app.services.vertex_ai_search import get_primary_rag_citation
@@ -125,7 +127,11 @@ def _citations() -> list[RuleCitation]:
     return cites
 
 
-def match(profile: Profile) -> SchemeMatch:
+def match(
+    profile: Profile,
+    *,
+    language: SupportedLanguage = DEFAULT_LANGUAGE,
+) -> SchemeMatch:
     """Match a self-employed profile against SKSPS + compute the contribution plan.
 
     Qualifies when `form_type == "form_b"` (self-employed / gig) AND the
@@ -141,19 +147,25 @@ def match(profile: Profile) -> SchemeMatch:
     if not qualifies:
         reasons: list[str] = []
         if not is_gig:
-            reasons.append("SKSPS only applies to self-employed / gig filers (Form B)")
+            reasons.append(out_of_scope_reason("perkeso_sksps_not_gig", language))
         if not age_in_window:
             reasons.append(
-                f"applicant age {profile.age} is outside the Akta 789 window "
-                f"({GIG_AGE_MIN}–{GIG_AGE_MAX})"
+                out_of_scope_reason(
+                    "perkeso_sksps_age_outside_window",
+                    language,
+                    age=profile.age,
+                    min_age=GIG_AGE_MIN,
+                    max_age=GIG_AGE_MAX,
+                )
             )
+        copy = scheme_copy("perkeso_sksps", "out_of_scope", language, reasons=reasons)
         return SchemeMatch(
             scheme_id="perkeso_sksps",
             scheme_name=_SCHEME_NAME,
             qualifies=False,
             annual_rm=0.0,
-            summary="Does not qualify under SKSPS eligibility.",
-            why_qualify="Out of scope: " + "; ".join(reasons) + ".",
+            summary=copy["summary"],
+            why_qualify=copy["why_qualify"],
             agency=_AGENCY,
             portal_url=_PORTAL_URL,
             rule_citations=cites,
@@ -162,12 +174,24 @@ def match(profile: Profile) -> SchemeMatch:
         )
 
     plan = _plan_for_income(profile.monthly_income_rm)
-    ceiling_note = (
-        f"(income > RM{_PLANS[-2].income_ceiling_rm:,.0f})"
-        if plan.income_ceiling_rm is None
-        else f"(income ≤ RM{plan.income_ceiling_rm:,.0f})"
+    ceiling_note = sksps_ceiling_note(
+        income_ceiling_rm=plan.income_ceiling_rm,
+        highest_finite_ceiling_rm=_PLANS[-2].income_ceiling_rm or 0.0,
+        language=language,
     )
 
+    copy = scheme_copy(
+        "perkeso_sksps",
+        "qualify",
+        language,
+        plan_label=plan.label,
+        monthly_rm=plan.monthly_rm,
+        annual_rm=plan.annual_rm,
+        ceiling_note=ceiling_note,
+        age=profile.age,
+        monthly_income_rm=profile.monthly_income_rm,
+        portal_url=_PORTAL_URL,
+    )
     return SchemeMatch(
         scheme_id="perkeso_sksps",
         scheme_name=_SCHEME_NAME,
@@ -176,20 +200,8 @@ def match(profile: Profile) -> SchemeMatch:
         # the user PAYS. Keeping it at 0.0 means `compute_upside.py`'s sum
         # over `annual_rm` stays correct without needing a filter there.
         annual_rm=0.0,
-        summary=(
-            f"{plan.label}: RM{plan.monthly_rm:.2f}/month → "
-            f"RM{plan.annual_rm:.2f}/year mandatory contribution under Akta 789 {ceiling_note}."
-        ),
-        why_qualify=(
-            f"As a self-employed / gig filer aged {profile.age} with monthly income of "
-            f"RM{profile.monthly_income_rm:,.2f}, you fall under the Akta 789 mandate for "
-            f"PERKESO SKSPS registration. Your income bracket places you on "
-            f"{plan.label} of the SKSPS Jadual Caruman: RM{plan.monthly_rm:.2f}/month "
-            f"(RM{plan.annual_rm:.2f}/year). Register via SKSPS-1 at {_PORTAL_URL}. "
-            "This is a MANDATORY contribution — Layak surfaces it alongside your "
-            "qualifying schemes so you can budget for it; it does NOT stack into your "
-            "annual relief total."
-        ),
+        summary=copy["summary"],
+        why_qualify=copy["why_qualify"],
         agency=_AGENCY,
         portal_url=_PORTAL_URL,
         rule_citations=cites,

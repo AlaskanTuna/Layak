@@ -58,8 +58,8 @@ def test_categorize_error_message_unknown_returns_none(raw: str) -> None:
 def test_humanize_returns_friendly_copy_for_known_category() -> None:
     raw = "ClientError: 429 RESOURCE_EXHAUSTED. caller exhausted free-tier quota"
     out = humanize_error_message(raw)
-    # Static remediation copy — verbatim from the table.
-    assert out == ERROR_CATEGORY_MESSAGES["quota_exhausted"]
+    # Static remediation copy — verbatim from the English table (default language).
+    assert out == ERROR_CATEGORY_MESSAGES["en"]["quota_exhausted"]
     # And in particular, it suggests Manual Entry as the recovery path.
     assert "Manual Entry" in out
 
@@ -79,10 +79,11 @@ def test_humanize_friendly_copy_carries_no_caller_data() -> None:
     digit-redaction pass to run on it too. This test guards against that
     silently regressing.
     """
-    for category, copy in ERROR_CATEGORY_MESSAGES.items():
-        assert sanitize_error_message(copy) == copy[: 240 - 1] + "…" if len(copy) > 240 else copy, (
-            f"category {category!r} contains digits the sanitiser would redact"
-        )
+    for language, by_category in ERROR_CATEGORY_MESSAGES.items():
+        for category, copy in by_category.items():
+            assert sanitize_error_message(copy) == copy[: 240 - 1] + "…" if len(copy) > 240 else copy, (
+                f"lang {language!r} category {category!r} contains digits the sanitiser would redact"
+            )
 
 
 def test_humanize_truncation_still_applied_on_unknown_error() -> None:
@@ -113,7 +114,7 @@ def test_humanize_error_returns_message_and_category_for_known_categories(
     """Each known category → `(static_copy, slug)`; slug mirrors the Literal in events.py."""
     message, category = humanize_error(raw)
     assert category == expected_category
-    assert message == ERROR_CATEGORY_MESSAGES[expected_category]
+    assert message == ERROR_CATEGORY_MESSAGES["en"][expected_category]
 
 
 def test_humanize_error_returns_none_category_for_unknown_error() -> None:
@@ -157,5 +158,11 @@ def test_humanize_error_category_slugs_match_events_literal() -> None:
     from app.schema.events import ErrorCategory
 
     schema_slugs = set(get_args(ErrorCategory))
-    impl_slugs = set(ERROR_CATEGORY_MESSAGES.keys())
-    assert schema_slugs == impl_slugs, f"slug drift: schema={schema_slugs} impl={impl_slugs}"
+    # Every language's catalog must enumerate the full set of categories
+    # (test_rule_copy_coverage covers the rule side; this covers the
+    # error-humanization side). Pick any language's inner dict to compare.
+    for language, by_category in ERROR_CATEGORY_MESSAGES.items():
+        impl_slugs = set(by_category.keys())
+        assert schema_slugs == impl_slugs, (
+            f"slug drift in language={language!r}: schema={schema_slugs} impl={impl_slugs}"
+        )

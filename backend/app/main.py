@@ -46,12 +46,27 @@ from app.routes.auth import router as auth_router  # noqa: E402
 from app.routes.evaluations import router as evaluations_router  # noqa: E402
 from app.routes.quota import router as quota_router  # noqa: E402
 from app.routes.user import router as user_router  # noqa: E402
+from app.schema.locale import SupportedLanguage  # noqa: E402
 from app.schema.manual_entry import DependantInput, ManualEntryPayload  # noqa: E402
 from app.services.evaluation_persistence import (  # noqa: E402
     create_running_evaluation,
     persist_event_stream,
 )
 from app.services.rate_limit import enforce_quota  # noqa: E402
+
+_SUPPORTED_LANGUAGES = ("en", "ms", "zh")
+
+
+def _coerce_language(raw: str | None) -> SupportedLanguage:
+    """Clamp a user-doc language value to a supported code.
+
+    `current_user` already normalises on read, but we re-coerce here so the
+    intake route has a narrow `SupportedLanguage` type to hand to
+    `stream_agent_events` / `create_running_evaluation`.
+    """
+    if raw in _SUPPORTED_LANGUAGES:
+        return raw  # type: ignore[return-value]
+    return "en"
 
 app = FastAPI(title="Layak Backend", version="0.1.0")
 
@@ -144,10 +159,17 @@ async def intake(
 
     # Pre-SSE Firestore write. On failure this raises HTTPException(503) and
     # the client never sees an SSE stream open — consistent with the frontend
-    # treating 5xx as retryable.
-    eval_id, doc_ref = create_running_evaluation(db, user_id=user.uid)
+    # treating 5xx as retryable. Phase 9: freeze the user's language onto the
+    # eval at create-time so `why_qualify` + classify notes stay in the
+    # language the eval was generated with, even if the user toggles later.
+    language = _coerce_language(user.language)
+    eval_id, doc_ref = create_running_evaluation(db, user_id=user.uid, language=language)
 
-    events = stream_agent_events(uploads, dependants_override=dependants_override)
+    events = stream_agent_events(
+        uploads,
+        dependants_override=dependants_override,
+        language=language,
+    )
 
     async def event_stream() -> AsyncIterator[bytes]:
         async for event in persist_event_stream(events, eval_id=eval_id, doc_ref=doc_ref):
@@ -184,13 +206,15 @@ async def intake_manual(
     if limited is not None:
         return limited
 
+    language = _coerce_language(user.language)
     eval_id, doc_ref = create_running_evaluation(
         db,
         user_id=user.uid,
         profile=profile,
+        language=language,
     )
 
-    events = stream_agent_events(prebuilt_profile=profile)
+    events = stream_agent_events(prebuilt_profile=profile, language=language)
 
     async def event_stream() -> AsyncIterator[bytes]:
         async for event in persist_event_stream(events, eval_id=eval_id, doc_ref=doc_ref):

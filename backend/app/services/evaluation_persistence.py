@@ -38,6 +38,7 @@ from app.schema.events import (
     StepResultEvent,
     StepStartedEvent,
 )
+from app.schema.locale import DEFAULT_LANGUAGE, SupportedLanguage
 from app.schema.profile import Profile
 
 _logger = logging.getLogger(__name__)
@@ -56,11 +57,17 @@ def create_running_evaluation(
     *,
     user_id: str,
     profile: Profile | None = None,
+    language: SupportedLanguage = DEFAULT_LANGUAGE,
 ) -> tuple[str, Any]:
     """Insert a new `evaluations/{evalId}` doc with status="running".
 
     Returns `(eval_id, doc_ref)`. The doc ref is used by `persist_event_stream`
     for subsequent updates — stashing it beats re-fetching on every event.
+
+    Phase 9: `language` is frozen onto the doc at create-time. A user
+    toggling languages mid-run does NOT re-run the pipeline — the eval's
+    `why_qualify` + classify notes stay in the language they were generated
+    with. Pre-Phase-9 docs without `language` default to `"en"` on read.
 
     Raises:
         HTTPException(503): if the Firestore write fails (network / permission).
@@ -71,6 +78,7 @@ def create_running_evaluation(
     payload: dict[str, Any] = {
         "userId": user_id,
         "status": "running",
+        "language": language,
         "createdAt": SERVER_TIMESTAMP,
         "completedAt": None,
         "profile": profile.model_dump(mode="json") if profile is not None else None,

@@ -37,6 +37,8 @@ brochure is committed.
 from __future__ import annotations
 
 from app.config import getenv
+from app.rules._i18n import out_of_scope_reason, scheme_copy
+from app.schema.locale import DEFAULT_LANGUAGE, SupportedLanguage
 from app.schema.profile import Profile
 from app.schema.scheme import RuleCitation, SchemeMatch
 from app.services.vertex_ai_search import get_primary_rag_citation
@@ -99,7 +101,11 @@ def _citations() -> list[RuleCitation]:
     return cites
 
 
-def match(profile: Profile) -> SchemeMatch:
+def match(
+    profile: Profile,
+    *,
+    language: SupportedLanguage = DEFAULT_LANGUAGE,
+) -> SchemeMatch:
     """Match a profile against EPF i-Saraan eligibility.
 
     Qualifies when the filer is self-employed (Form B) AND within the gazetted
@@ -117,41 +123,48 @@ def match(profile: Profile) -> SchemeMatch:
     if not qualifies:
         reasons: list[str] = []
         if not is_self_employed:
-            reasons.append(
-                "filer is not self-employed (Form B); i-Saraan targets gig / business filers without employer EPF"
-            )
+            reasons.append(out_of_scope_reason("i_saraan_not_self_employed", language))
         if not in_age_window:
-            reasons.append(f"age {profile.age} outside the i-Saraan window ({MIN_AGE}-{MAX_AGE})")
+            reasons.append(
+                out_of_scope_reason(
+                    "i_saraan_age_outside_window",
+                    language,
+                    age=profile.age,
+                    min_age=MIN_AGE,
+                    max_age=MAX_AGE,
+                )
+            )
+        copy = scheme_copy("i_saraan", "out_of_scope", language, reasons=reasons)
         return SchemeMatch(
             scheme_id="i_saraan",
             scheme_name=_SCHEME_NAME,
             qualifies=False,
             annual_rm=0.0,
-            summary="Does not qualify under EPF i-Saraan eligibility.",
-            why_qualify="Out of scope: " + "; ".join(reasons) + ".",
+            summary=copy["summary"],
+            why_qualify=copy["why_qualify"],
             agency=_AGENCY,
             portal_url=_PORTAL_URL,
             rule_citations=cites,
         )
 
+    copy = scheme_copy(
+        "i_saraan",
+        "qualify",
+        language,
+        age=profile.age,
+        match_rate_pct=MATCH_RATE_PCT,
+        annual_match_cap_rm=ANNUAL_MATCH_CAP_RM,
+        min_age=MIN_AGE,
+        max_age=MAX_AGE,
+        annual_contribution_to_max_match_rm=ANNUAL_CONTRIBUTION_TO_MAX_MATCH_RM,
+    )
     return SchemeMatch(
         scheme_id="i_saraan",
         scheme_name=_SCHEME_NAME,
         qualifies=True,
         annual_rm=ANNUAL_MATCH_CAP_RM,
-        summary=(
-            f"Self-employed Form B filer aged {profile.age} qualifies for the i-Saraan "
-            f"{MATCH_RATE_PCT:.0f}% government match up to RM{ANNUAL_MATCH_CAP_RM:,.0f}/year."
-        ),
-        why_qualify=(
-            f"You're a self-employed filer (Form B) aged {profile.age}, within the i-Saraan "
-            f"{MIN_AGE}-{MAX_AGE} age window. Contribute at least RM"
-            f"{ANNUAL_CONTRIBUTION_TO_MAX_MATCH_RM:,.2f}/year voluntarily into your EPF Account "
-            f"and the government will add the full RM{ANNUAL_MATCH_CAP_RM:,.0f} — the maximum "
-            f"annual match. Smaller contributions earn a proportional "
-            f"{MATCH_RATE_PCT:.0f}% match (e.g. RM1,000 contributed → RM150 government match). "
-            f"Register via the KWSP i-Saraan portal or at any KWSP branch."
-        ),
+        summary=copy["summary"],
+        why_qualify=copy["why_qualify"],
         agency=_AGENCY,
         portal_url=_PORTAL_URL,
         rule_citations=cites,

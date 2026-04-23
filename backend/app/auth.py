@@ -77,6 +77,11 @@ class UserInfo:
     must be fresh per request rather than cached at sign-in time. Phase 3
     Task 2 consumes it for rate-limit decisions; first-touch users default
     to "free".
+
+    `language` ("en" | "ms" | "zh") — Phase 9. Read from `users/{uid}.language`
+    on every auth cycle so the pipeline prompts and `humanize_error` pick up
+    the user's current preference. Pre-Phase-9 docs without the field default
+    to `"en"`.
     """
 
     uid: str
@@ -84,6 +89,7 @@ class UserInfo:
     display_name: str | None
     photo_url: str | None
     tier: str = "free"
+    language: str = "en"
 
 
 def _init_firebase_admin() -> firebase_admin.App:
@@ -171,6 +177,7 @@ def mint_guest_custom_token() -> str:
             "displayName": GUEST_DISPLAY_NAME,
             "photoURL": None,
             "tier": GUEST_TIER,
+            "language": "en",
             "createdAt": SERVER_TIMESTAMP,
             "lastLoginAt": SERVER_TIMESTAMP,
             "pdpaConsentAt": SERVER_TIMESTAMP,
@@ -193,17 +200,29 @@ def verify_firebase_id_token(id_token: str) -> dict[str, Any]:
     return fb_auth.verify_id_token(id_token)
 
 
-def _upsert_user_doc(uid: str, claims: dict[str, Any], has_consent: bool = False) -> str:
+_SUPPORTED_LANGUAGES = ("en", "ms", "zh")
+
+
+def _coerce_language(raw: Any) -> str:
+    """Clamp a Firestore `language` value to a supported code or `"en"`."""
+    if isinstance(raw, str) and raw in _SUPPORTED_LANGUAGES:
+        return raw
+    return "en"
+
+
+def _upsert_user_doc(uid: str, claims: dict[str, Any], has_consent: bool = False) -> tuple[str, str]:
     """Lazy-create `users/{uid}` on first touch; refresh `lastLoginAt` after.
 
-    Returns the user's current `tier` ("free" or "pro") — read from the
-    existing doc, or `"free"` on fresh creation. Phase 3 Task 2 consumes it
-    for rate-limit enforcement, so piggybacking on the snapshot we already
-    fetched beats a second round-trip per request.
+    Returns `(tier, language)` — both read from the existing doc, or
+    `("free", "en")` on fresh creation. Phase 3 Task 2 consumes `tier` for
+    rate-limit enforcement, Phase 9 consumes `language` for pipeline
+    localisation; piggybacking on the snapshot we already fetched beats two
+    extra round-trips per request.
 
-    Shape per spec §3.3:
+    Shape per spec §3.3 + Phase 9 addition:
         email, displayName, photoURL, tier ∈ {"free", "pro"},
-        createdAt, lastLoginAt, pdpaConsentAt (null until sign-up consent).
+        language ∈ {"en", "ms", "zh"}, createdAt, lastLoginAt,
+        pdpaConsentAt (null until sign-up consent).
 
     Two-request race is tolerated (spec §3.5 "acknowledged-and-accepted"):
     both writers would set the same claims on identical creation data, and
@@ -221,19 +240,22 @@ def _upsert_user_doc(uid: str, claims: dict[str, Any], has_consent: bool = False
         ref.update(update_data)
         data = snapshot.to_dict() or {}
         tier = data.get("tier", "free")
-        return tier if tier in ("free", "pro") else "free"
+        tier = tier if tier in ("free", "pro") else "free"
+        language = _coerce_language(data.get("language"))
+        return tier, language
 
     new_doc = {
         "email": claims.get("email"),
         "displayName": claims.get("name"),
         "photoURL": claims.get("picture"),
         "tier": "free",
+        "language": "en",
         "createdAt": SERVER_TIMESTAMP,
         "lastLoginAt": SERVER_TIMESTAMP,
         "pdpaConsentAt": SERVER_TIMESTAMP if has_consent else None,
     }
     ref.set(new_doc)
-    return "free"
+    return "free", "en"
 
 
 async def current_user(
@@ -294,7 +316,7 @@ async def current_user(
         )
 
     has_consent = x_pdpa_consent == "true"
-    tier = _upsert_user_doc(uid, claims, has_consent)
+    tier, language = _upsert_user_doc(uid, claims, has_consent)
 
     request.state.user_id = uid
     return UserInfo(
@@ -303,6 +325,7 @@ async def current_user(
         display_name=claims.get("name"),
         photo_url=claims.get("picture"),
         tier=tier,
+        language=language,
     )
 
 

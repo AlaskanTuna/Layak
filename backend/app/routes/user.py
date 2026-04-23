@@ -30,9 +30,11 @@ from typing import Any
 
 from fastapi import APIRouter, HTTPException, status
 from firebase_admin import auth as fb_auth
+from pydantic import BaseModel, ConfigDict
 from starlette.responses import Response
 
 from app.auth import CurrentUser, get_firestore, is_guest
+from app.schema.locale import SupportedLanguage
 
 _logger = logging.getLogger(__name__)
 
@@ -43,6 +45,64 @@ router = APIRouter(prefix="/api/user", tags=["user"])
 # batch loop below still chunks so a Pro user with months of history can be
 # removed without special casing.
 _BATCH_MAX_OPS = 450  # leave headroom for the final user-doc delete
+
+
+class _UserMeResponse(BaseModel):
+    """Shape returned by `GET /api/user/me`. Phase 9."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    uid: str
+    email: str | None
+    displayName: str | None  # noqa: N815 — matches Firestore field casing.
+    photoURL: str | None  # noqa: N815
+    tier: str
+    language: SupportedLanguage
+
+
+class _PreferencesPatch(BaseModel):
+    """Body for `PATCH /api/user/preferences`. Phase 9.
+
+    Only `language` is settable right now. Extra keys rejected so a client
+    typo (`"lang": "ms"`) 422s loudly instead of silently no-op'ing.
+    """
+
+    model_config = ConfigDict(extra="forbid")
+
+    language: SupportedLanguage
+
+
+@router.get("/me")
+async def get_user_me(user: CurrentUser) -> _UserMeResponse:
+    """Return the caller's persisted profile — lets the frontend hydrate its
+    UI language from the server-stored preference on every login, so a user
+    who picks Bahasa Malaysia on device A sees it immediately on device B.
+
+    `language` is always present (`current_user` coerces unknown / missing
+    values to `"en"`). The fields mirror `UserDoc` minus the timestamps.
+    """
+    return _UserMeResponse(
+        uid=user.uid,
+        email=user.email,
+        displayName=user.display_name,
+        photoURL=user.photo_url,
+        tier=user.tier,
+        language=user.language,  # type: ignore[arg-type]
+    )
+
+
+@router.patch("/preferences", status_code=status.HTTP_204_NO_CONTENT)
+async def patch_user_preferences(payload: _PreferencesPatch, user: CurrentUser) -> Response:
+    """Update a caller's persisted preferences. Phase 9.
+
+    Right now the only preference is `language`, but the shape leaves room
+    for future fields (e.g. notification toggles) without a second endpoint.
+    Returns 204 with an empty body — the client already has the value it
+    just wrote.
+    """
+    db = get_firestore()
+    db.collection("users").document(user.uid).update({"language": payload.language})
+    return Response(status_code=status.HTTP_204_NO_CONTENT)
 
 
 @router.get("/export")
@@ -186,4 +246,10 @@ def _serialise_value(value: Any) -> Any:
     return value
 
 
-__all__ = ["router", "export_user_data", "delete_user_account"]
+__all__ = [
+    "router",
+    "export_user_data",
+    "delete_user_account",
+    "get_user_me",
+    "patch_user_preferences",
+]

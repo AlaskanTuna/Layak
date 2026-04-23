@@ -20,6 +20,8 @@ so the UI can render either depending on live gazette confirmation.
 from __future__ import annotations
 
 from app.config import getenv
+from app.rules._i18n import out_of_scope_reason, scheme_copy
+from app.schema.locale import DEFAULT_LANGUAGE, SupportedLanguage
 from app.schema.profile import Profile
 from app.schema.scheme import RuleCitation, SchemeMatch
 from app.services.vertex_ai_search import get_primary_rag_citation
@@ -85,7 +87,11 @@ def _citations() -> list[RuleCitation]:
     return cites
 
 
-def match(profile: Profile) -> SchemeMatch:
+def match(
+    profile: Profile,
+    *,
+    language: SupportedLanguage = DEFAULT_LANGUAGE,
+) -> SchemeMatch:
     """Match a profile against JKM Warga Emas on behalf of an elderly dependent.
 
     Qualifies when:
@@ -105,16 +111,30 @@ def match(profile: Profile) -> SchemeMatch:
     if not qualifies:
         reasons: list[str] = []
         if not elderly_parents:
-            reasons.append(f"no parent dependant aged ≥{WARGA_EMAS_AGE_THRESHOLD} in household")
+            reasons.append(
+                out_of_scope_reason(
+                    "jkm_warga_emas_no_elderly_parent",
+                    language,
+                    threshold=WARGA_EMAS_AGE_THRESHOLD,
+                )
+            )
         if per_capita > FOOD_PLI_RM:
-            reasons.append(f"per-capita income RM{per_capita:,.0f} exceeds food-PLI RM{FOOD_PLI_RM:,.0f}")
+            reasons.append(
+                out_of_scope_reason(
+                    "jkm_warga_emas_income_above_pli",
+                    language,
+                    per_capita=per_capita,
+                    food_pli=FOOD_PLI_RM,
+                )
+            )
+        copy = scheme_copy("jkm_warga_emas", "out_of_scope", language, reasons=reasons)
         return SchemeMatch(
             scheme_id="jkm_warga_emas",
             scheme_name=_SCHEME_NAME,
             qualifies=False,
             annual_rm=0.0,
-            summary="Does not qualify under JKM Warga Emas means test.",
-            why_qualify="Out of scope: " + "; ".join(reasons) + ".",
+            summary=copy["summary"],
+            why_qualify=copy["why_qualify"],
             agency=_AGENCY,
             portal_url=_PORTAL_URL,
             rule_citations=cites,
@@ -123,23 +143,25 @@ def match(profile: Profile) -> SchemeMatch:
     annual_rm = WARGA_EMAS_MONTHLY_RM * 12
     eldest = max(elderly_parents, key=lambda d: d.age)
 
+    copy = scheme_copy(
+        "jkm_warga_emas",
+        "qualify",
+        language,
+        per_capita=per_capita,
+        food_pli_rm=FOOD_PLI_RM,
+        eldest_age=eldest.age,
+        monthly_rm=WARGA_EMAS_MONTHLY_RM,
+        fallback_monthly_rm=WARGA_EMAS_FALLBACK_MONTHLY_RM,
+        monthly_income_rm=profile.monthly_income_rm,
+        household_size=profile.household_size,
+    )
     return SchemeMatch(
         scheme_id="jkm_warga_emas",
         scheme_name=_SCHEME_NAME,
         qualifies=True,
         annual_rm=annual_rm,
-        summary=(
-            f"Per-capita income RM{per_capita:,.0f}/month is below food-PLI "
-            f"RM{FOOD_PLI_RM:,.0f} — elderly parent age {eldest.age} qualifies."
-        ),
-        why_qualify=(
-            f"Your household earns RM{profile.monthly_income_rm:,.0f}/month across "
-            f"{profile.household_size} members — per-capita income RM{per_capita:,.0f} is "
-            f"below the DOSM 2024 food-PLI threshold of RM{FOOD_PLI_RM:,.0f}. Under Budget "
-            f"2026 the monthly payment is RM{WARGA_EMAS_MONTHLY_RM:,.0f} (fallback "
-            f"RM{WARGA_EMAS_FALLBACK_MONTHLY_RM:,.0f} where the uplift is pending). You "
-            f"apply on behalf of the dependent elder using the JKM18 form."
-        ),
+        summary=copy["summary"],
+        why_qualify=copy["why_qualify"],
         agency=_AGENCY,
         portal_url=_PORTAL_URL,
         rule_citations=cites,

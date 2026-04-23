@@ -10,13 +10,18 @@ ranked list only surfaces the schemes the profile actually qualifies for.
 from __future__ import annotations
 
 from app.rules import i_saraan, jkm_bkk, jkm_warga_emas, lhdn_form_b, perkeso_sksps, str_2026
+from app.schema.locale import DEFAULT_LANGUAGE, SupportedLanguage
 from app.schema.profile import Profile
 from app.schema.scheme import SchemeMatch
 
 _RULES = (str_2026, jkm_warga_emas, jkm_bkk, lhdn_form_b, i_saraan, perkeso_sksps)
 
 
-async def match_schemes(profile: Profile) -> list[SchemeMatch]:
+async def match_schemes(
+    profile: Profile,
+    *,
+    language: SupportedLanguage = DEFAULT_LANGUAGE,
+) -> list[SchemeMatch]:
     """Match a profile to eligible schemes with rule citations.
 
     Returns only qualifying `SchemeMatch`es, sorted descending by `annual_rm` so
@@ -29,8 +34,11 @@ async def match_schemes(profile: Profile) -> list[SchemeMatch]:
     filters on `kind` to render them in a separate "Required contributions"
     block; `compute_upside` sums `annual_rm` so the zero keeps upside math
     correct without a second filter there.
+
+    Phase 9: `language` threads into each rule's `match()` so the human-
+    readable `summary` + `why_qualify` strings render in the user's language.
     """
-    results = [module.match(profile) for module in _RULES]
+    results = [module.match(profile, language=language) for module in _RULES]
     qualifying = [m for m in results if m.qualifies]
     # Primary sort: upside descending. Secondary sort: kind — pushes
     # required_contribution entries to the bottom when two matches tie on

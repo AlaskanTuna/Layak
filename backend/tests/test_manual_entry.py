@@ -287,7 +287,7 @@ def test_intake_manual_accepts_aisyah_and_streams_sse(
     from app.schema.packet import Packet
     from app.schema.profile import HouseholdClassification
 
-    async def _fake_classify(_profile: Any) -> Any:
+    async def _fake_classify(_profile: Any, **_kwargs: Any) -> Any:
         return HouseholdClassification(
             has_children_under_18=True,
             has_elderly_dependant=True,
@@ -296,7 +296,7 @@ def test_intake_manual_accepts_aisyah_and_streams_sse(
             notes=[],
         )
 
-    async def _fake_compute_upside(matches: Any) -> Any:
+    async def _fake_compute_upside(matches: Any, **_kwargs: Any) -> Any:
         return ComputeUpsideResult(
             python_snippet="",
             stdout="",
@@ -304,7 +304,7 @@ def test_intake_manual_accepts_aisyah_and_streams_sse(
             per_scheme_rm={m.scheme_id: m.annual_rm for m in matches},
         )
 
-    async def _fake_generate(_profile: Any, _matches: Any) -> Packet:
+    async def _fake_generate(_profile: Any, _matches: Any, **_kwargs: Any) -> Packet:
         from datetime import datetime
 
         return Packet(drafts=[], generated_at=datetime(2026, 4, 21, 15, 0, 0))

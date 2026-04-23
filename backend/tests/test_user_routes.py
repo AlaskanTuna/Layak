@@ -362,3 +362,100 @@ def test_delete_batches_large_eval_counts(
     assert db.batch.call_count >= 2
     # At least 950 deletes (the evals) plus 1 user-doc delete happened.
     assert batch.delete.call_count >= 951
+
+
+# ============================================================================
+# /api/user/me  +  /api/user/preferences  (Phase 9)
+# ============================================================================
+
+
+def test_get_user_me_requires_auth(client: tuple[TestClient, MagicMock, MagicMock]) -> None:
+    tc, _db, _users_doc = client
+    resp = tc.get("/api/user/me")
+    assert resp.status_code == 401
+
+
+def test_get_user_me_returns_language_from_user_doc(
+    client: tuple[TestClient, MagicMock, MagicMock],
+) -> None:
+    """`current_user` reads `users/{uid}.language` and surfaces it on the
+    response so the frontend can hydrate i18next from the server."""
+    tc, _db, users_doc = client
+    snap = MagicMock()
+    snap.exists = True
+    snap.to_dict.return_value = {"tier": "free", "language": "ms"}
+    users_doc.get.return_value = snap
+
+    resp = tc.get("/api/user/me", headers={"Authorization": "Bearer valid"})
+    assert resp.status_code == 200
+    body = resp.json()
+    assert body["language"] == "ms"
+    assert body["tier"] == "free"
+    assert body["uid"] == _UID
+
+
+def test_get_user_me_defaults_language_to_en_when_field_missing(
+    client: tuple[TestClient, MagicMock, MagicMock],
+) -> None:
+    """Pre-Phase-9 user docs have no `language` field — reading defaults to en."""
+    tc, _db, users_doc = client
+    snap = MagicMock()
+    snap.exists = True
+    snap.to_dict.return_value = {"tier": "free"}  # no language key
+    users_doc.get.return_value = snap
+
+    resp = tc.get("/api/user/me", headers={"Authorization": "Bearer valid"})
+    assert resp.status_code == 200
+    assert resp.json()["language"] == "en"
+
+
+def test_patch_preferences_requires_auth(client: tuple[TestClient, MagicMock, MagicMock]) -> None:
+    tc, _db, _users_doc = client
+    resp = tc.patch("/api/user/preferences", json={"language": "ms"})
+    assert resp.status_code == 401
+
+
+def test_patch_preferences_happy_path_writes_firestore(
+    client: tuple[TestClient, MagicMock, MagicMock],
+) -> None:
+    tc, _db, users_doc = client
+
+    resp = tc.patch(
+        "/api/user/preferences",
+        headers={"Authorization": "Bearer valid"},
+        json={"language": "zh"},
+    )
+    assert resp.status_code == 204
+    # `current_user` fires an earlier `users/{uid}.update({lastLoginAt: ...})`
+    # during auth; the route then fires the language update. Check the
+    # language write landed as one of the update calls rather than asserting
+    # single-call since the auth-side write is expected.
+    users_doc.update.assert_any_call({"language": "zh"})
+
+
+def test_patch_preferences_rejects_unknown_language(
+    client: tuple[TestClient, MagicMock, MagicMock],
+) -> None:
+    """Unknown codes 422 — keeps the schema tight so a client typo surfaces
+    loudly instead of silently writing garbage to Firestore."""
+    tc, _db, _users_doc = client
+    resp = tc.patch(
+        "/api/user/preferences",
+        headers={"Authorization": "Bearer valid"},
+        json={"language": "fr"},
+    )
+    assert resp.status_code == 422
+
+
+def test_patch_preferences_rejects_extra_keys(
+    client: tuple[TestClient, MagicMock, MagicMock],
+) -> None:
+    """`extra="forbid"` on the body model catches client typos like `lang`
+    instead of silently no-op'ing."""
+    tc, _db, _users_doc = client
+    resp = tc.patch(
+        "/api/user/preferences",
+        headers={"Authorization": "Bearer valid"},
+        json={"lang": "ms"},  # wrong key name
+    )
+    assert resp.status_code == 422

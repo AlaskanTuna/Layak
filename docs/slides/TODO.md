@@ -13,6 +13,7 @@ Please modify the deck-stage.js and Layak-Pitch-Deck.html and fix the following 
 9. In slide 14, change "Long-tail schemes" to "Coverage of most schemes" and "Sovereign deploy" to "Open Weights Model Support & Collaborations", and "Concept" to "Pending"
 
 Pending User Action:
+
 1. Add a photo of Aisyah on slide 3 (perhaps from our demo video)
-2. Actual screenshot of the generated form on slide 13 
-3. Ask user to check if the future 
+2. Actual screenshot of the generated form on slide 13
+3. Ask user to check if the future

@@ -1260,7 +1260,7 @@ _Frontend:_
 - [ ] Copy review, empty states, obvious-bug sweep.
 - [ ] README final pass: features, setup, AI disclosure (names Claude Code per Rules §4.2), architecture overview with ASCII diagrams from `docs/trd.md`.
 
-### 2. Feature: 3-minute demo video
+### 2. Feature: 5-minute demo video
 
 **Purpose/Issue:** _(to be filled at task start)_
 
@@ -1276,8 +1276,8 @@ _Frontend:_
 
 **Implementation:**
 
-- [ ] Canva deck: problem → user → solution → demo → architecture → tech → impact → business model → team.
-- [ ] Export PDF; commit to repo root as `pitch.pdf`.
+- [x] Canva deck: problem → user → solution → demo → architecture → tech → impact → business model → team.
+- [x] Export PDF; commit to repo root as `pitch.pdf`.
 
 ### 4. Feature: Final submission
 

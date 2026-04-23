@@ -33,6 +33,8 @@ Layak turns that into one guided flow. A user can upload supporting documents or
 - Source-linked provenance for rule-backed claims.
 - Downloadable draft application packets for manual submission.
 
+Matched schemes are ranked by estimated annual RM upside, while required contributions are surfaced separately so the headline benefit total stays honest.
+
 Layak is intentionally draft-only. It does not submit to government systems on the user's behalf.
 
 ---
@@ -83,7 +85,7 @@ flowchart LR
 ```mermaid
 flowchart LR
     Intake[Upload or manual entry] --> Extract[1. Extract<br/>Gemini 2.5 Flash]
-    Extract --> Classify[2. Classify<br/>Gemini 2.5 Flash]
+    Extract --> Classify[2. Classify<br/>Gemini 2.5 Flash-Lite]
     Classify --> Match[3. Match<br/>Pydantic rules + Vertex AI Search]
     Match --> Rank[4. Rank<br/>Gemini Code Execution]
     Rank --> Generate[5. Generate<br/>WeasyPrint draft PDFs]
@@ -112,6 +114,18 @@ flowchart LR
 ```
 
 </details>
+
+---
+
+## Google AI Ecosystem
+
+Layak is built around the Google AI stack the hackathon calls for:
+
+- `Gemini 2.5 Pro` for orchestration.
+- `Gemini 2.5 Flash` and `Gemini 2.5 Flash-Lite` for extraction and classification.
+- `Vertex AI Search` for grounded retrieval and provenance.
+- `Gemini Code Execution` for visible upside calculations.
+- `Cloud Run`, `Firebase Auth`, `Firestore`, and `Secret Manager` for deployment, auth, persistence, and secrets.
 
 ---
 
@@ -157,6 +171,7 @@ Important values include:
 - `GOOGLE_CLOUD_PROJECT`
 - `GOOGLE_CLOUD_LOCATION`
 - `VERTEX_AI_SEARCH_DATA_STORE`
+- `VERTEX_AI_SEARCH_LOCATION`
 - `NEXT_PUBLIC_BACKEND_URL`
 - `NEXT_PUBLIC_FIREBASE_*`
 - `FIREBASE_ADMIN_KEY`
@@ -204,7 +219,7 @@ Cloud Run deployment examples documented for this project:
 - Frontend:
   `gcloud run deploy layak-frontend --source frontend --region asia-southeast1 --min-instances 1 --cpu-boost --allow-unauthenticated --set-build-env-vars NEXT_PUBLIC_BACKEND_URL=https://layak-backend-297019726346.asia-southeast1.run.app --memory 512Mi --timeout 60`
 - Backend:
-  `gcloud run deploy layak-backend --source backend --region asia-southeast1 --min-instances 1 --cpu-boost --allow-unauthenticated --set-secrets GEMINI_API_KEY=gemini-api-key:latest --memory 1Gi --timeout 300`
+  `gcloud run deploy layak-backend --source backend --region asia-southeast1 --min-instances 1 --cpu-boost --allow-unauthenticated --set-env-vars GOOGLE_CLOUD_PROJECT=...,GOOGLE_CLOUD_LOCATION=global,VERTEX_AI_SEARCH_DATA_STORE=layak-schemes-v1,VERTEX_AI_SEARCH_LOCATION=global --set-secrets FIREBASE_ADMIN_KEY=firebase-admin-key:latest --memory 2Gi --timeout 300`
 
 If these URLs or commands drift, treat the runtime configuration and deployment scripts as the source of truth.
 

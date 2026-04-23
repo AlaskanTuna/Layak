@@ -1,0 +1,1414 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>Layak — Pitch Deck</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Lora:ital,wght@0,400..700;1,400..700&display=swap" rel="stylesheet">
+<script src="deck-stage.js"></script>
+<style>
+  :root {
+    --paper: #F5F1E8;
+    --paper-2: #EDE7D9;
+    --ink: #141E2E;
+    --ink-2: #2B3445;
+    --muted: #6B7080;
+    --rule: #D9D2C0;
+    --accent: #B91C1C;       /* deep Malaysian red */
+    --accent-ink: #7A1212;
+    --ok: #0F5132;
+    --warn: #8A5A00;
+  }
+
+  html, body { margin:0; padding:0; background:#0A0E17; font-family: 'Lora', Georgia, serif; color: var(--ink); }
+  deck-stage { background: #0A0E17; }
+
+  section.slide {
+    background: var(--paper);
+    color: var(--ink);
+    font-family: 'Lora', Georgia, serif;
+    overflow: hidden;
+    position: relative;
+    box-sizing: border-box;
+  }
+
+  /* ===== TYPE SCALE (1920x1080) ===== */
+  .t-eyebrow { font-family:'IBM Plex Mono', monospace; font-weight:500; font-size:24px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--accent); }
+  .t-eyebrow-muted { font-family:'IBM Plex Mono', monospace; font-weight:500; font-size:24px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--muted); }
+  .t-title { font-family:'Lora', Georgia, serif; font-weight:700; font-size:72px; line-height:1.02; letter-spacing:-0.02em; color: var(--ink); }
+  .t-title-sm { font-family:'Lora', Georgia, serif; font-weight:700; font-size:56px; line-height:1.04; letter-spacing:-0.02em; color: var(--ink); }
+  .t-subtitle { font-weight:500; font-size:36px; line-height:1.3; color: var(--ink-2); }
+  .t-body { font-weight:400; font-size:28px; line-height:1.4; color: var(--ink-2); }
+  .t-small { font-weight:400; font-size:24px; line-height:1.4; color: var(--muted); }
+  .t-mono-sm { font-family:'IBM Plex Mono', monospace; font-size:24px; color: var(--muted); letter-spacing:0.02em; }
+  .t-mono-md { font-family:'IBM Plex Mono', monospace; font-size:26px; color: var(--ink-2); }
+  .t-huge { font-family:'Lora', Georgia, serif; font-weight:700; font-size:220px; line-height:0.95; letter-spacing:-0.04em; color: var(--ink); }
+  .t-mega { font-family:'Lora', Georgia, serif; font-weight:700; font-size:300px; line-height:0.9; letter-spacing:-0.05em; color: var(--accent); }
+
+  .slide-pad { padding: 70px 110px 70px 110px; box-sizing: border-box; height:100%; display:flex; flex-direction:column; }
+
+  /* top chrome */
+  .top-chrome {
+    display:flex; justify-content:space-between; align-items:center;
+    font-family:'IBM Plex Mono', monospace; font-size:24px; color: var(--muted); letter-spacing:0.08em; text-transform: uppercase;
+  }
+  .top-chrome .brand { display:flex; align-items:center; gap:14px; color: var(--ink); font-weight:600; }
+  .brand-mark {
+    width:18px; height:18px; background: var(--accent); display:inline-block;
+  }
+
+  /* Cover right-side stack: logo slot + team card */
+  .cover-right-stack {
+    position:absolute; inset: 0;
+    padding: 100px 80px 100px 80px;
+    display:flex; flex-direction:column; justify-content:center; gap: 60px;
+    z-index: 2;
+  }
+  .cover-logo-slot {
+    background: var(--paper-2);
+    border: 2px dashed var(--rule);
+    aspect-ratio: 1 / 1;
+    max-width: 460px;
+    align-self:center;
+    display:grid; place-items:center;
+    padding: 40px; text-align:center;
+    box-shadow: -30px 30px 0 0 var(--ink);
+  }
+  .cover-logo-slot img { max-width: 100%; max-height: 100%; display:block; }
+  .cover-logo-placeholder {
+    font-family:'IBM Plex Mono', monospace; font-size:24px; letter-spacing:0.1em;
+    text-transform: uppercase; color: var(--muted); line-height:1.4;
+  }
+  .cover-logo-placeholder small {
+    display:block; margin-top: 14px; font-size:16px; letter-spacing:0.04em;
+    color: var(--accent); text-transform: none; font-family: 'IBM Plex Mono', monospace;
+  }
+  .cover-team {
+    max-width: 460px; align-self:center; width:100%;
+    display:flex; flex-direction:column; gap: 12px;
+    border-top: 1px solid var(--rule); padding-top: 22px;
+  }
+  .ct-row { display:grid; grid-template-columns: 130px 1fr; gap: 20px; align-items:baseline; }
+  .ct-label {
+    font-family:'IBM Plex Mono', monospace; font-size:18px; letter-spacing:0.14em;
+    text-transform: uppercase; color: var(--muted);
+  }
+  .ct-val {
+    font-family:'IBM Plex Mono', monospace; font-size:20px; color: var(--ink);
+    border-bottom: 1px dashed var(--rule); padding: 4px 2px; outline:none;
+    min-height: 28px;
+  }
+  .ct-val:focus { border-bottom-color: var(--accent); border-bottom-style: solid; }
+
+  .ct-row-member { grid-template-columns: 130px 1fr; align-items: start; }
+  .ct-member { display:flex; flex-direction:column; gap: 6px; }
+  .ct-gh { display:flex; align-items:center; gap:8px; color: var(--muted); }
+  .gh-icon { width: 18px; height: 18px; flex-shrink:0; display:block; }
+  .ct-val-gh {
+    font-family:'IBM Plex Mono', monospace; font-size:17px; color: var(--ink-2);
+    border-bottom: 1px dashed var(--rule); padding: 2px 2px;
+  }
+  .ct-val-gh::before { content: "@"; color: var(--muted); margin-right: 2px; }
+
+  /* Dividers */
+  .rule { height:1px; background: var(--rule); width:100%; }
+  .rule-thick { height:2px; background: var(--ink); width:64px; }
+
+  /* ========== SLIDE 1: COVER ========== */
+  .cover {
+    background:
+      radial-gradient(ellipse at 80% 0%, #EFE6D0 0%, transparent 55%),
+      var(--paper);
+    padding:0;
+  }
+  .cover-grid {
+    display:grid; grid-template-columns: 1.3fr 1fr; height:100%;
+  }
+  .cover-left { padding: 120px 100px; display:flex; flex-direction:column; justify-content:space-between; }
+  .cover-right { position:relative; border-left:1px solid var(--rule); }
+  .cover-right::before {
+    content:""; position:absolute; inset:0;
+    background-image:
+      linear-gradient(to right, rgba(20,30,46,0.05) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba(20,30,46,0.05) 1px, transparent 1px);
+    background-size: 80px 80px;
+  }
+  .cover-mark {
+    position:absolute; right: 100px; top: 120px;
+    width: 520px; height: 520px;
+    background: var(--accent);
+    display:grid; place-items:center;
+    box-shadow: -40px 40px 0 0 var(--ink);
+  }
+  .cover-mark-inner {
+    font-family:'Lora', Georgia, serif; font-weight:700; font-size:380px; color: var(--paper); line-height:1; letter-spacing:-0.05em;
+  }
+  .cover-hero-num {
+    font-family:'IBM Plex Mono', monospace; font-weight:600; font-size:200px; line-height:0.9;
+    color: var(--ink); letter-spacing:-0.04em;
+  }
+  .cover-footer {
+    display:flex; justify-content:space-between; align-items:flex-end; gap:40px;
+  }
+  .cover-meta-col { display:flex; flex-direction:column; gap:6px; }
+
+  /* ========== SLIDE FRAME (generic) ========== */
+  .frame-head {
+    display:flex; justify-content:space-between; align-items:baseline;
+    padding-bottom: 28px; border-bottom: 1px solid var(--rule); margin-bottom: 48px;
+  }
+  .frame-title-group { display:flex; flex-direction:column; gap:16px; max-width: 1300px; }
+  .page-num { font-family:'IBM Plex Mono', monospace; font-size:22px; color: var(--muted); letter-spacing:0.08em; }
+
+  /* ========== SLIDE 2: PROBLEM ========== */
+  .problem-grid {
+    display:grid; grid-template-columns: 1.1fr 1fr; gap: 80px; flex:1; min-height:0;
+  }
+  .big-stat { display:flex; flex-direction:column; gap:24px; }
+  .big-stat .num { font-family:'Lora', Georgia, serif; font-weight:700; font-size:220px; line-height:0.85; color: var(--accent); letter-spacing:-0.04em; }
+  .big-stat .num-label { font-weight:500; font-size:32px; color: var(--ink); max-width: 700px; line-height:1.25; }
+
+  .stat-card {
+    background: var(--paper-2);
+    border: 1px solid var(--rule);
+    padding: 32px 36px;
+    display:flex; flex-direction:column; gap:14px;
+    min-height:0;
+  }
+  .stat-card .sc-num { font-family:'Lora', Georgia, serif; font-weight:700; font-size:72px; color: var(--ink); line-height:1; }
+  .stat-card .sc-label { font-size:24px; color: var(--ink-2); line-height:1.3; }
+  .stat-stack { display:grid; grid-template-rows: 1fr 1fr; gap: 24px; min-height:0; }
+
+  /* ========== SLIDE 3: AISYAH ========== */
+  .persona-grid { display:grid; grid-template-columns: 480px 1fr; gap: 72px; flex:1; min-height:0; }
+  .persona-card {
+    background: var(--ink); color: var(--paper); padding: 36px 36px;
+    display:flex; flex-direction:column; justify-content:space-between; gap:28px;
+  }
+  .persona-portrait {
+    width: 100%; aspect-ratio: 1/1; background: var(--ink-2);
+    display:grid; place-items:center;
+    background-image:
+      repeating-linear-gradient(135deg, rgba(245,241,232,0.04) 0 12px, transparent 12px 24px);
+    border: 1px solid rgba(245,241,232,0.12);
+  }
+  .persona-portrait .initial {
+    font-family:'Lora', Georgia, serif; font-weight:700; font-size:160px; color: var(--paper); line-height:1;
+  }
+  .persona-name { font-family:'Lora', Georgia, serif; font-size:44px; font-weight:700; line-height:1.05; }
+  .persona-meta { font-family:'IBM Plex Mono', monospace; font-size:24px; color: rgba(245,241,232,0.7); letter-spacing:0.06em; text-transform:uppercase; }
+
+  .persona-facts { display:grid; grid-template-columns: 1fr 1fr; gap: 24px 48px; align-content:start; }
+  .pfact { display:flex; flex-direction:column; gap:10px; }
+  .pfact-label { font-family:'IBM Plex Mono', monospace; font-size:24px; letter-spacing:0.12em; text-transform:uppercase; color: var(--muted); }
+  .pfact-value { font-size:24px; color: var(--ink); line-height:1.3; font-weight:500; }
+
+  .quote-block {
+    margin-top: 8px;
+    border-left: 4px solid var(--accent); padding: 10px 0 10px 28px;
+    font-family:'Lora', Georgia, serif; font-style: italic; font-size:34px; line-height:1.3; color: var(--ink); max-width: 1000px;
+  }
+
+  /* Slides 02–04: tighter head so content doesn't crash the bottom edge */
+  .slide[data-label^="02"] .frame-head,
+  .slide[data-label^="03"] .frame-head,
+  .slide[data-label^="04"] .frame-head {
+    margin-top: 14px !important;
+    margin-bottom: 32px;
+    padding-bottom: 20px;
+  }
+  .slide[data-label^="02"] .t-title,
+  .slide[data-label^="03"] .t-title,
+  .slide[data-label^="04"] .t-title {
+    font-size: 62px;
+  }
+  .slide[data-label^="04"] .t-title {
+    font-size: 54px; white-space: nowrap;
+  }
+  .slide[data-label^="03"] .persona-facts { align-content:start; }
+  .slide[data-label^="03"] .quote-block { margin-top: 24px; }
+
+  /* ========== SLIDE 4: WHAT LAYAK DOES ========== */
+  .what-grid { display:grid; grid-template-columns: 1fr 1fr; gap: 72px; flex:1; min-height:0; }
+  .what-left { display:flex; flex-direction:column; gap: 28px; align-self:center; }
+  .what-lead { font-family:'Lora', Georgia, serif; font-size:48px; font-weight:700; line-height:1.08; letter-spacing:-0.015em; }
+  .what-lead em { color: var(--accent); font-style:normal; }
+  .what-sub { font-size:24px; color: var(--ink-2); line-height:1.5; max-width: 760px; }
+
+  .flow-diagram {
+    display:flex; flex-direction:column; gap: 16px; justify-content:center;
+    background: var(--paper-2); border:1px solid var(--rule); padding: 36px 36px;
+  }
+  .flow-row {
+    display:grid; grid-template-columns: 80px 1fr; gap: 24px; align-items:center;
+    padding: 14px 0; border-bottom: 1px dashed var(--rule);
+  }
+  .flow-row:last-child { border-bottom: none; }
+  .flow-ix { font-family:'IBM Plex Mono', monospace; font-size:24px; color: var(--accent); font-weight:600; }
+  .flow-label { font-size:24px; color: var(--ink); font-weight:500; line-height:1.3; }
+  .flow-label small { display:block; font-size:24px; color: var(--muted); font-family:'IBM Plex Mono', monospace; margin-top:4px; letter-spacing:0.04em; }
+
+  /* ========== SLIDE 5: 5-STEP PIPELINE ========== */
+  .pipe-rail { flex:1; display:grid; grid-template-columns: repeat(5, 1fr); gap: 16px; align-items:stretch; min-height:0; }
+  .pipe-step {
+    background: var(--paper); border:1px solid var(--rule);
+    padding: 28px 22px; display:flex; flex-direction:column; gap:14px; position:relative; min-height:0;
+  }
+  .pipe-step .num {
+    font-family:'IBM Plex Mono', monospace; font-weight:600; font-size:24px; color: var(--accent); letter-spacing:0.1em;
+  }
+  .pipe-step .label { font-family:'Lora', Georgia, serif; font-weight:700; font-size:30px; line-height:1.05; color: var(--ink); }
+  .pipe-step .body { font-size:24px; line-height:1.35; color: var(--ink-2); }
+  .pipe-step .tech { margin-top:auto; padding-top:14px; border-top:1px solid var(--rule);
+    font-family:'IBM Plex Mono', monospace; font-size:24px; color: var(--muted); letter-spacing:0.01em; line-height:1.35; }
+  .pipe-step.accent { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+  .pipe-step.accent .label { color: var(--paper); }
+  .pipe-step.accent .body { color: rgba(245,241,232,0.85); }
+  .pipe-step.accent .num { color: var(--paper); }
+  .pipe-step.accent .tech { color: rgba(245,241,232,0.6); border-color: rgba(245,241,232,0.18); }
+
+  /* ========== SLIDE 6: GROUNDED ========== */
+  .grounded-grid { display:grid; grid-template-columns: 1fr 1.1fr; gap: 80px; flex:1; align-items:center; min-height:0; }
+  .grounded-lead { font-family:'Lora', Georgia, serif; font-size:54px; font-weight:700; line-height:1.08; letter-spacing:-0.015em; }
+  .grounded-lead em { color: var(--accent); font-style:normal; }
+  .grounded-sub { margin-top: 24px; font-size:24px; line-height:1.5; color: var(--ink-2); max-width: 640px; }
+
+  .cite-mock {
+    background: #fff; border:1px solid var(--rule); padding: 40px 44px;
+    box-shadow: 0 24px 60px -30px rgba(20,30,46,0.25);
+  }
+  .cite-mock .cm-head { display:flex; justify-content:space-between; align-items:baseline; margin-bottom: 28px; border-bottom:1px solid var(--rule); padding-bottom:20px;}
+  .cite-mock .cm-title { font-family:'Lora', Georgia, serif; font-weight:700; font-size:38px; color: var(--ink); }
+  .cite-mock .cm-tag { font-family:'IBM Plex Mono', monospace; font-size:24px; letter-spacing:0.12em; color: var(--accent); text-transform:uppercase; }
+  .cite-row { display:flex; justify-content:space-between; align-items:center; padding: 20px 0; border-bottom: 1px dashed var(--rule); gap: 40px; }
+  .cite-row:last-child { border-bottom: none; }
+  .cite-key { font-size:24px; color: var(--ink-2); }
+  .cite-val { display:flex; align-items:center; gap:16px; }
+  .cite-val .val-num { font-family:'IBM Plex Mono', monospace; font-weight:600; font-size:28px; color: var(--ink); }
+  .cite-val .chip {
+    font-family:'IBM Plex Mono', monospace; font-size:18px; color: var(--accent); border:1px solid var(--accent);
+    padding:4px 10px; letter-spacing:0.06em;
+  }
+  .cite-foot { margin-top:24px; font-family:'IBM Plex Mono', monospace; font-size:20px; color: var(--muted); }
+
+  /* ========== SLIDE 7: DATA PRIVACY ========== */
+  .priv-grid { display:grid; grid-template-columns: 1fr 1fr 1fr; gap: 28px; flex:1; min-height:0; }
+  .priv-card {
+    background: var(--paper-2); border: 1px solid var(--rule);
+    padding: 36px 32px; display:flex; flex-direction:column; gap: 16px; min-height:0;
+  }
+  .priv-card.featured { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+  .priv-card .ix { font-family:'IBM Plex Mono', monospace; font-size:20px; letter-spacing:0.14em; color: var(--accent); }
+  .priv-card.featured .ix { color: var(--paper); }
+  .priv-card .h { font-family:'Lora', Georgia, serif; font-weight:700; font-size:32px; line-height:1.1; color: var(--ink); }
+  .priv-card.featured .h { color: var(--paper); }
+  .priv-card .p { font-size:20px; line-height:1.45; color: var(--ink-2); }
+  .priv-card.featured .p { color: rgba(245,241,232,0.85); }
+  .priv-card .foot {
+    margin-top:auto; padding-top:16px; border-top:1px solid var(--rule);
+    font-family:'IBM Plex Mono', monospace; font-size:18px; color: var(--muted); letter-spacing:0.04em;
+  }
+  .priv-card.featured .foot { border-color: rgba(245,241,232,0.15); color: rgba(245,241,232,0.6); }
+
+  /* ========== SLIDE 8: MANUAL ENTRY ========== */
+  .manual-grid { display:grid; grid-template-columns: 1fr 1fr; gap: 72px; flex:1; min-height:0; }
+  .toggle-mock {
+    border:1px solid var(--rule); background:#fff; padding: 44px 40px; display:flex; flex-direction:column; gap: 28px;
+    box-shadow: 0 24px 60px -30px rgba(20,30,46,0.2);
+  }
+  .seg {
+    display:grid; grid-template-columns: 1fr 1fr; background: var(--paper-2); padding: 6px; border:1px solid var(--rule);
+  }
+  .seg > div { text-align:center; padding: 20px 0; font-weight:500; font-size:24px; color: var(--muted); cursor:default; }
+  .seg > div.active { background: var(--ink); color: var(--paper); }
+  .manual-fields { display:grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+  .mf {
+    display:flex; flex-direction:column; gap:10px; border:1px solid var(--rule); padding: 20px 22px; background: var(--paper);
+  }
+  .mf .lbl { font-family:'IBM Plex Mono', monospace; font-size:16px; letter-spacing:0.1em; color: var(--muted); text-transform:uppercase; }
+  .mf .val { font-size:24px; color: var(--ink); font-weight:500; }
+  .mf.span2 { grid-column: span 2; }
+  .mf.locked .val { color: var(--muted); }
+  .mf.locked .val::after { content:" ●●●●"; letter-spacing:2px; color: var(--accent); }
+
+  .manual-copy { align-self:center; }
+  .manual-copy h3 { font-family:'Lora', Georgia, serif; font-size:44px; font-weight:700; line-height:1.1; margin:0 0 20px; }
+  .manual-copy p { font-size:24px; line-height:1.5; color: var(--ink-2); margin: 0 0 16px; max-width: 720px; }
+  .manual-copy .callout {
+    margin-top: 16px; border-left: 4px solid var(--accent); padding: 8px 0 8px 24px;
+    font-size:24px; color: var(--ink); font-family:'IBM Plex Mono', monospace; line-height:1.4;
+  }
+
+  /* ========== SLIDE 9: GEMMA SWAP ========== */
+  section.slide.sov {
+    background: var(--ink);
+    color: var(--paper);
+  }
+  .sov .top-chrome { color: rgba(245,241,232,0.6); }
+  .sov .top-chrome .brand { color: var(--paper); }
+  .sov .frame-head { border-color: rgba(245,241,232,0.15); }
+  .sov .t-title { color: var(--paper); }
+  .sov-grid { display:grid; grid-template-columns: 1fr 1fr; gap: 72px; flex:1; align-items:stretch; min-height:0; }
+  .swap-box {
+    border:1px solid rgba(245,241,232,0.2); padding: 40px 40px;
+    display:flex; flex-direction:column; gap: 20px; min-height:0;
+  }
+  .swap-box.current {
+    background: rgba(245,241,232,0.06);
+  }
+  .swap-box .tag {
+    display:inline-block; font-family:'IBM Plex Mono', monospace; font-size:18px; letter-spacing:0.14em; text-transform:uppercase;
+    padding:6px 12px; border:1px solid currentColor; color: var(--accent);
+    align-self:flex-start;
+  }
+  .swap-box.current .tag { color: rgba(245,241,232,0.7); }
+  .swap-box h3 {
+    font-family:'Lora', Georgia, serif; font-weight:700; font-size:40px; line-height:1.05; margin:0;
+    color: var(--paper);
+  }
+  .swap-box p { font-size:20px; line-height:1.5; color: rgba(245,241,232,0.82); margin:0; }
+  .swap-box ul {
+    list-style:none; padding:0; margin:0; display:flex; flex-direction:column; gap: 10px;
+  }
+  .swap-box li {
+    font-family:'IBM Plex Mono', monospace; font-size:18px; color: rgba(245,241,232,0.85);
+    padding-left: 24px; position:relative; line-height:1.4;
+  }
+  .swap-box li::before {
+    content:""; width: 10px; height:10px; background: var(--accent); position:absolute; left:0; top:9px;
+  }
+  .swap-box .foot {
+    margin-top:auto; padding-top: 20px; border-top:1px solid rgba(245,241,232,0.15);
+    font-family:'IBM Plex Mono', monospace; font-size:18px; color: rgba(245,241,232,0.55); letter-spacing:0.04em;
+  }
+
+  .sov .t-title, .sov .t-subtitle, .sov .page-num { color: var(--paper); }
+  .sov .t-subtitle { color: rgba(245,241,232,0.8); }
+  .sov .t-eyebrow { color: var(--accent); }
+  .sov .page-num { color: rgba(245,241,232,0.55); }
+
+  /* ========== SLIDE 10: ARCHITECTURE ========== */
+  .arch-diagram {
+    flex:1; display:flex; flex-direction:column; gap: 24px; justify-content:center;
+    font-family:'IBM Plex Mono', monospace; min-height:0;
+  }
+  .arch-row {
+    display:grid; grid-template-columns: 200px 1fr; gap: 32px; align-items:center;
+  }
+  .arch-row-label {
+    font-size: 18px; letter-spacing:0.14em; color: var(--muted); text-transform:uppercase;
+    text-align:right;
+  }
+  .arch-row-cells { display:flex; gap: 16px; align-items:stretch; }
+  .arch-cell {
+    flex:1; background: var(--paper-2); border:1px solid var(--rule); padding: 18px 22px;
+    display:flex; flex-direction:column; gap: 4px;
+  }
+  .arch-cell.accent { background: var(--accent); color: var(--paper); border-color: var(--accent); }
+  .arch-cell.dark { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+  .arch-cell .name { font-weight:600; font-size:20px; letter-spacing:0.04em; }
+  .arch-cell .sub { font-size:15px; letter-spacing:0.06em; opacity: 0.7; }
+  .arch-arrow {
+    text-align:center; font-size:18px; color: var(--muted); padding: 0 0 0 200px;
+    letter-spacing:0.2em;
+  }
+
+  /* ========== SLIDE 11: STACK ========== */
+  .stack-grid {
+    flex:1; display:grid; grid-template-columns: repeat(4, 1fr); grid-template-rows: 1fr 1fr; gap: 20px; min-height:0;
+  }
+  .stack-card {
+    background: var(--paper-2); border:1px solid var(--rule); padding: 28px 28px;
+    display:flex; flex-direction:column; gap: 12px; justify-content:space-between; min-height:0;
+  }
+  .stack-card .tier { font-family:'IBM Plex Mono', monospace; font-size:18px; letter-spacing:0.14em; text-transform:uppercase; color: var(--accent); }
+  .stack-card h4 { font-family:'Lora', Georgia, serif; font-size:28px; font-weight:700; line-height:1.1; margin:0; color: var(--ink); }
+  .stack-card p { font-size:18px; line-height:1.4; color: var(--ink-2); margin:0; }
+  .stack-card .code {
+    font-family:'IBM Plex Mono', monospace; font-size:15px; color: var(--muted); letter-spacing:0.02em; margin-top: auto;
+  }
+
+  /* ========== SLIDE 12: OUTCOME ========== */
+  .outcome {
+    background: var(--paper);
+    padding:0;
+  }
+  .outcome-grid {
+    display:grid; grid-template-columns: 1fr 620px; height:100%;
+  }
+  .outcome-left {
+    padding: 120px 100px; display:flex; flex-direction:column; justify-content:space-between;
+    background: var(--paper);
+  }
+  .outcome-right {
+    background: var(--ink); color: var(--paper);
+    padding: 120px 80px; display:flex; flex-direction:column; gap: 24px; justify-content:center;
+  }
+  .outcome-num {
+    font-family:'Lora', Georgia, serif; font-weight:700; font-size:240px; line-height:0.85; color: rgb(0, 83, 12);
+    letter-spacing:-0.04em; white-space: nowrap;
+  }
+  .outcome-sub { font-size:34px; color: var(--ink-2); line-height:1.25; max-width: 700px; margin-top: 20px; }
+  .breakdown-title { font-family:'IBM Plex Mono', monospace; font-size:20px; letter-spacing:0.14em; text-transform:uppercase; color: rgba(245,241,232,0.55); margin-bottom: 12px; }
+  .br-row {
+    display:grid; grid-template-columns: 1fr auto; gap: 24px; padding: 16px 0;
+    border-bottom: 1px solid rgba(245,241,232,0.15); align-items:baseline;
+  }
+  .br-row:last-of-type { border-bottom:none; }
+  .br-name { font-family:'Lora', Georgia, serif; font-size:26px; font-weight:500; line-height:1.2; }
+  .br-name small { display:block; font-family:'IBM Plex Mono', monospace; font-size:14px; color: rgba(245,241,232,0.55); letter-spacing:0.06em; margin-top:4px; }
+  .br-val { font-family:'IBM Plex Mono', monospace; font-size:30px; font-weight:600; }
+  .br-total {
+    margin-top: 12px; padding-top: 22px; border-top: 2px solid var(--paper);
+    display:grid; grid-template-columns: 1fr auto; align-items:baseline;
+  }
+  .br-total .lbl { font-family:'Lora', Georgia, serif; font-size:30px; font-weight:700; }
+  .br-total .val { font-family:'IBM Plex Mono', monospace; font-size:48px; font-weight:700; color: rgb(0, 127, 18); }
+
+  .br-req {
+    margin-top: 28px; padding: 18px 20px;
+    background: rgba(245,241,232,0.06);
+    border-left: 3px solid var(--accent);
+    display:grid; grid-template-columns: 1fr auto; gap:16px; align-items:baseline;
+  }
+  .br-req .lbl { font-family:'Lora', Georgia, serif; font-size:22px; font-weight:500; }
+  .br-req .lbl small { display:block; font-family:'IBM Plex Mono', monospace; font-size:13px; color: rgba(245,241,232,0.55); letter-spacing:0.06em; margin-top:4px; text-transform:uppercase; }
+  .br-req .val { font-family:'IBM Plex Mono', monospace; font-size:22px; font-weight:600; color: rgba(245,241,232,0.85); }
+
+  /* ========== SLIDE 13: SAFETY ========== */
+  .safety-grid { display:grid; grid-template-columns: 1.2fr 1fr; gap: 72px; flex:1; align-items:stretch; min-height:0; }
+  .safety-list { display:flex; flex-direction:column; gap: 0; }
+  .safety-row {
+    display:grid; grid-template-columns: 56px 1fr; gap: 24px; align-items:flex-start;
+    padding: 18px 0; border-top: 1px solid var(--rule);
+  }
+  .safety-row:last-child { border-bottom: 1px solid var(--rule); }
+  .safety-ix { font-family:'IBM Plex Mono', monospace; font-size:20px; color: var(--accent); font-weight:600; padding-top:4px; }
+  .safety-h { font-family:'Lora', Georgia, serif; font-size:26px; font-weight:700; line-height:1.15; color: var(--ink); margin-bottom: 4px; }
+  .safety-p { font-size:19px; line-height:1.4; color: var(--ink-2); }
+
+  .watermark-mock {
+    background: #fff; border: 1px solid var(--rule); padding: 44px; position:relative; overflow:hidden;
+    display:flex; flex-direction:column; gap:20px;
+    box-shadow: 0 24px 60px -30px rgba(20,30,46,0.25);
+  }
+  .watermark-mock::before {
+    content: "DRAFT — NOT SUBMITTED";
+    position:absolute; inset:0; display:grid; place-items:center;
+    transform: rotate(-18deg);
+    font-family:'Lora', Georgia, serif; font-weight:700; font-size:80px; color: rgba(185,28,28,0.12);
+    letter-spacing:0.04em; pointer-events:none;
+  }
+  .watermark-mock .wm-tag { font-family:'IBM Plex Mono', monospace; font-size:18px; letter-spacing:0.12em; color: var(--accent); text-transform:uppercase; }
+  .watermark-mock .wm-title { font-family:'Lora', Georgia, serif; font-size:42px; font-weight:700; line-height:1.1; }
+  .watermark-mock .wm-line { display:flex; justify-content:space-between; padding: 12px 0; border-bottom: 1px dashed var(--rule); font-size:22px; }
+  .watermark-mock .wm-line:last-child { border-bottom:none; }
+  .watermark-mock .wm-foot { margin-top: 16px; font-family:'IBM Plex Mono', monospace; font-size:16px; color: var(--muted); line-height:1.4; }
+
+  /* ========== SLIDE 14: WHAT'S NEXT ========== */
+  .next-grid { display:grid; grid-template-columns: 1fr 1fr; gap: 72px; flex:1; min-height:0; }
+  .next-lead { font-family:'Lora', Georgia, serif; font-size:48px; font-weight:700; line-height:1.06; letter-spacing:-0.015em; margin:0; }
+  .next-sub { font-size:22px; line-height:1.5; color: var(--ink-2); margin: 20px 0 0 0; max-width: 720px; }
+  .next-list {
+    display:flex; flex-direction:column; gap: 0; border-top:1px solid var(--rule);
+  }
+  .next-row { display:grid; grid-template-columns: 80px 1fr auto; gap: 24px; padding: 18px 0; border-bottom:1px solid var(--rule); align-items:center; }
+  .next-ix { font-family:'IBM Plex Mono', monospace; color: var(--muted); font-size:20px; letter-spacing:0.08em; }
+  .next-h { font-family:'Lora', Georgia, serif; font-size:24px; font-weight:600; color: var(--ink); }
+  .next-h small { display:block; font-family:'Lora', Georgia, serif; font-weight:400; font-size:17px; color: var(--muted); margin-top:4px; }
+  .next-tag {
+    font-family:'IBM Plex Mono', monospace; font-size:16px; letter-spacing:0.14em;
+    padding:6px 12px; border:1px solid var(--accent); color: var(--accent); text-transform:uppercase;
+  }
+  .next-tag.v2 { border-color: var(--ink); color: var(--ink); }
+
+  /* ========== SLIDE 15: THANK YOU ========== */
+  .ty {
+    background: var(--ink); color: var(--paper); padding: 0;
+  }
+  .ty .top-chrome { color: rgba(245,241,232,0.55); }
+  .ty .top-chrome .brand { color: var(--paper); }
+  .ty-grid { display:grid; grid-template-columns: 1.1fr 1fr; height:100%; }
+  .ty-left { padding: 90px 90px 80px; display:flex; flex-direction:column; justify-content:space-between; gap: 40px; }
+  .ty-right { position:relative; border-left:1px solid rgba(245,241,232,0.15); padding: 90px 70px 80px; display:flex; flex-direction:column; }
+  .ty-right::before {
+    content:""; position:absolute; inset:0;
+    background-image:
+      linear-gradient(to right, rgba(245,241,232,0.04) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba(245,241,232,0.04) 1px, transparent 1px);
+    background-size: 80px 80px;
+    pointer-events:none;
+  }
+  .ty-right-stack {
+    position:relative; z-index:1;
+    display:flex; flex-direction:column; gap: 36px; height:100%;
+  }
+  .ty-logo-slot {
+    background: rgba(245,241,232,0.04);
+    border: 2px dashed rgba(245,241,232,0.18);
+    height: 260px;
+    display:grid; place-items:center; padding: 24px; text-align:center;
+  }
+  .ty-logo-slot img { max-width: 100%; max-height: 100%; display:block; }
+  .ty-logo-placeholder {
+    font-family:'IBM Plex Mono', monospace; font-size:22px; letter-spacing:0.1em;
+    text-transform: uppercase; color: rgba(245,241,232,0.55); line-height:1.4;
+  }
+  .ty-logo-placeholder small {
+    display:block; margin-top: 10px; font-size:16px; letter-spacing:0.04em;
+    color: var(--accent); text-transform: none; font-family: 'IBM Plex Mono', monospace;
+  }
+
+  .ty-links { display:flex; flex-wrap:wrap; gap: 14px; margin-top: 40px; }
+  .ty-link {
+    display:inline-flex; align-items:center; gap: 10px;
+    padding: 12px 18px;
+    text-decoration:none;
+    background: rgba(245,241,232,0.06);
+    border: 1px solid rgba(245,241,232,0.35);
+    color: var(--paper);
+    font-family:'IBM Plex Mono', monospace; font-size: 16px; letter-spacing:0.04em;
+    transition: background 0.15s ease, border-color 0.15s ease;
+  }
+  .ty-link:hover { background: rgba(245,241,232,0.12); border-color: var(--paper); }
+  .ty-link .tl-label {
+    font-family:'IBM Plex Mono', monospace; font-size: 16px; letter-spacing: 0.06em;
+    color: var(--paper); font-weight:600;
+  }
+  .ty-link .tl-url {
+    display: none;
+  }
+  .tl-label { display:inline-flex; align-items:center; gap: 8px; }
+  .tl-gh { width: 14px; height: 14px; opacity: 0.7; }
+  .ty-link .tl-label::after { content: "\2192"; margin-left: 4px; color: var(--accent); font-weight:700; }
+
+  .ty-footnote {
+    margin-top:auto; padding-top: 20px;
+    display:flex; flex-direction:column; gap: 6px;
+    font-family:'IBM Plex Mono', monospace; font-size:16px;
+    color: rgba(245,241,232,0.45); letter-spacing:0.06em;
+  }
+
+  .ty-kicker { font-family:'Lora', Georgia, serif; font-size:88px; font-weight:700; line-height:1.0; letter-spacing:-0.02em; margin: 0; }
+  .ty-kicker-accent { color: var(--accent); font-style: italic; }
+  .ty-sub { font-size:26px; line-height:1.5; color: rgba(245,241,232,0.82); margin-top: 28px; max-width: 700px; }
+  .ty-sub strong { color: var(--paper); font-weight:600; }
+
+  .ty-signoff {
+    display:flex; flex-direction:column; gap: 6px;
+    padding-top: 28px; border-top: 1px solid rgba(245,241,232,0.15);
+  }
+  .ty-regards {
+    font-family:'IBM Plex Mono', monospace; font-size:18px; letter-spacing:0.14em;
+    text-transform: uppercase; color: rgba(245,241,232,0.55);
+  }
+  .ty-team {
+    font-family:'Lora', Georgia, serif; font-size:36px; font-weight:500; font-style: italic;
+    color: var(--paper); outline: none; padding: 4px 0;
+  }
+
+</style>
+</head>
+<body>
+
+<deck-stage width="1920" height="1080">
+
+<!-- ============ SLIDE 01 — COVER ============ -->
+<section class="slide cover" data-label="01 Cover">
+  <div class="cover-grid">
+    <div class="cover-left" style="padding: 90px 100px 80px;">
+      <div style="display:flex; align-items:center; gap:16px;">
+        <span class="brand-mark"></span>
+        <span class="t-mono-md" style="color:var(--ink); font-weight:600; letter-spacing:0.16em; text-transform:uppercase;">Layak</span>
+      </div>
+
+      <div style="display:flex; flex-direction:column; gap:32px;">
+        <div class="t-eyebrow" style="font-size:24px;">Project 2030 · MyAI Hackathon · UTM x GCP</div>
+        <h1 class="t-title" style="font-size:80px; max-width: 1100px; line-height:1.02;"><span style="color:var(--accent);">LAYAK</span> &mdash; The agentic concierge for Malaysian social assistance.</h1>
+        <p class="t-subtitle" style="max-width: 860px; font-size:32px; font-weight:500;">Find out every single subsidy you are eligible for as a Malaysian citizen — in just under two minutes.<br/>One website. Three uploads. Five autonomous steps.<br/>That's all it takes. That's LAYAK.</p>
+      </div>
+
+      <div class="cover-footer" style="flex-direction:column; align-items:stretch; gap:20px;">
+        <div style="display:flex; flex-direction:column; gap:6px;">
+          <span class="t-mono-sm" style="font-size:24px; white-space:nowrap;">Track 2 · Citizens First (GovTech & Digital Services)</span>
+          <span class="t-mono-sm" style="font-size:24px;">Version · 24 April 2026</span>
+        </div>
+        <div style="display:flex; flex-direction:column; gap:8px; align-items:flex-start;">
+          <span class="t-mono-sm" style="font-size:14px; letter-spacing:0.16em; color:var(--muted); text-transform:uppercase;">Aligned with UN SDGs</span>
+          <div style="display:flex; gap:10px;">
+            <div title="SDG 1 — No Poverty" style="display:flex; align-items:center; gap:8px; padding:8px 14px; background:#e5243b; color:#fff; font-family:'IBM Plex Mono',monospace; font-weight:700; font-size:15px; letter-spacing:0.04em;"><span style="font-size:18px;">01</span><span style="opacity:0.85; font-weight:500; font-size:13px;">NO POVERTY</span></div>
+            <div title="SDG 10 — Reduced Inequalities" style="display:flex; align-items:center; gap:8px; padding:8px 14px; background:#dd1367; color:#fff; font-family:'IBM Plex Mono',monospace; font-weight:700; font-size:15px; letter-spacing:0.04em;"><span style="font-size:18px;">10</span><span style="opacity:0.85; font-weight:500; font-size:13px;">REDUCED INEQUALITIES</span></div>
+            <div title="SDG 16 — Peace, Justice & Strong Institutions" style="display:flex; align-items:center; gap:8px; padding:8px 14px; background:#00689d; color:#fff; font-family:'IBM Plex Mono',monospace; font-weight:700; font-size:15px; letter-spacing:0.04em;"><span style="font-size:18px;">16</span><span style="opacity:0.85; font-weight:500; font-size:13px;">STRONG INSTITUTIONS</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="cover-right">
+      <div class="cover-right-stack">
+        <div class="cover-logo-slot">
+          <img src="assets/layak-logo.png" alt="Layak logo" class="cover-logo-img"/>
+        </div>
+        <div class="cover-team">
+          <div class="ct-row">
+            <span class="ct-label">Team</span>
+            <span class="ct-val" contenteditable="true" spellcheck="false">Layak</span>
+          </div>
+          <div class="ct-row ct-row-member">
+            <span class="ct-label">Member 01</span>
+            <div class="ct-member">
+              <span class="ct-val" contenteditable="true" spellcheck="false">HZJ</span>
+              <span class="ct-gh">
+                <svg class="gh-icon" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 .5a12 12 0 0 0-3.79 23.4c.6.11.82-.26.82-.58v-2.03c-3.34.73-4.04-1.61-4.04-1.61-.55-1.39-1.33-1.76-1.33-1.76-1.09-.74.08-.73.08-.73 1.2.08 1.83 1.24 1.83 1.24 1.07 1.84 2.8 1.31 3.48 1 .11-.78.42-1.31.76-1.61-2.67-.3-5.47-1.34-5.47-5.95 0-1.31.47-2.39 1.23-3.23-.12-.3-.54-1.52.12-3.17 0 0 1.01-.32 3.3 1.23a11.4 11.4 0 0 1 6 0c2.29-1.55 3.3-1.23 3.3-1.23.66 1.65.24 2.87.12 3.17.77.84 1.23 1.92 1.23 3.23 0 4.62-2.81 5.65-5.49 5.94.43.37.81 1.1.81 2.22v3.29c0 .32.22.7.83.58A12 12 0 0 0 12 .5z"/></svg>
+                <span class="ct-val ct-val-gh" contenteditable="true" spellcheck="false">AlaskanTuna</span>
+              </span>
+            </div>
+          </div>
+          <div class="ct-row ct-row-member">
+            <span class="ct-label">Member 02</span>
+            <div class="ct-member">
+              <span class="ct-val" contenteditable="true" spellcheck="false">Hao</span>
+              <span class="ct-gh">
+                <svg class="gh-icon" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 .5a12 12 0 0 0-3.79 23.4c.6.11.82-.26.82-.58v-2.03c-3.34.73-4.04-1.61-4.04-1.61-.55-1.39-1.33-1.76-1.33-1.76-1.09-.74.08-.73.08-.73 1.2.08 1.83 1.24 1.83 1.24 1.07 1.84 2.8 1.31 3.48 1 .11-.78.42-1.31.76-1.61-2.67-.3-5.47-1.34-5.47-5.95 0-1.31.47-2.39 1.23-3.23-.12-.3-.54-1.52.12-3.17 0 0 1.01-.32 3.3 1.23a11.4 11.4 0 0 1 6 0c2.29-1.55 3.3-1.23 3.3-1.23.66 1.65.24 2.87.12 3.17.77.84 1.23 1.92 1.23 3.23 0 4.62-2.81 5.65-5.49 5.94.43.37.81 1.1.81 2.22v3.29c0 .32.22.7.83.58A12 12 0 0 0 12 .5z"/></svg>
+                <span class="ct-val ct-val-gh" contenteditable="true" spellcheck="false">chaosiris</span>
+              </span>
+            </div>
+          </div>
+          <div class="ct-row ct-row-member">
+            <span class="ct-label">Member 03</span>
+            <div class="ct-member">
+              <span class="ct-val" contenteditable="true" spellcheck="false">JS</span>
+              <span class="ct-gh">
+                <svg class="gh-icon" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 .5a12 12 0 0 0-3.79 23.4c.6.11.82-.26.82-.58v-2.03c-3.34.73-4.04-1.61-4.04-1.61-.55-1.39-1.33-1.76-1.33-1.76-1.09-.74.08-.73.08-.73 1.2.08 1.83 1.24 1.83 1.24 1.07 1.84 2.8 1.31 3.48 1 .11-.78.42-1.31.76-1.61-2.67-.3-5.47-1.34-5.47-5.95 0-1.31.47-2.39 1.23-3.23-.12-.3-.54-1.52.12-3.17 0 0 1.01-.32 3.3 1.23a11.4 11.4 0 0 1 6 0c2.29-1.55 3.3-1.23 3.3-1.23.66 1.65.24 2.87.12 3.17.77.84 1.23 1.92 1.23 3.23 0 4.62-2.81 5.65-5.49 5.94.43.37.81 1.1.81 2.22v3.29c0 .32.22.7.83.58A12 12 0 0 0 12 .5z"/></svg>
+                <span class="ct-val ct-val-gh" contenteditable="true" spellcheck="false">Doraemon-00</span>
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ SLIDE 02 — PROBLEM ============ -->
+<section class="slide" data-label="02 Problem">
+  <div class="slide-pad">
+    <div class="top-chrome">
+      <div class="brand"><span class="brand-mark"></span><span>LAYAK</span></div>
+      <div>02 / 15 · The Problem</div>
+    </div>
+    <div class="frame-head" style="margin-top: 36px;">
+      <div class="frame-title-group">
+        <div class="t-eyebrow">The problem</div>
+        <h2 class="t-title">Fragmented on the supply side. Invisible to the demand side.</h2>
+      </div>
+    </div>
+
+    <div class="problem-grid">
+      <div class="big-stat">
+        <div class="num">167</div>
+        <div class="num-label" style="width: 1200px">social-assistance schemes are currently implemented by 17 ministries and agencies in Malaysia — however, the average citizen is unaware of most of the subsidies available to them. Reason? The effort to search and apply for each one simply isn't worth it.</div>
+        <div class="t-mono-sm" style="margin-top: 16px;">Source · Ministry of Finance, Economic Outlook 2024</div>
+      </div>
+
+      <div class="stat-stack">
+        <div class="stat-card">
+          <div class="sc-num" style="font-size: 64px">MyGov's Attempt</div>
+          <div class="sc-label" style="font-size: 24px">The MyGov Malaysia super-app's in-house AI chatbot was disabled one day after beta launch (Aug 2025) for hallucinating ministers' portfolios and RON95 prices. Layak avoids this chaos via a strict rule-based AI model. Everything is verified.</div>
+        </div>
+        <div class="stat-card">
+          <div class="sc-num" style="font-size: 64px">Future Facing Project</div>
+          <div class="sc-label">The Ministry of Digital launched PPDSA (Polisi Pendigitalan Data Sektor Awam) and publicly named <em>agentic AI</em> as the next layer for public-sector delivery. Agentic AI is exactly what Layak is built upon.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ SLIDE 03 — AISYAH ============ -->
+<section class="slide" data-label="03 Persona">
+  <div class="slide-pad">
+    <div class="top-chrome">
+      <div class="brand"><span class="brand-mark"></span><span>LAYAK</span></div>
+      <div>03 / 15 · The User</div>
+    </div>
+
+    <div class="frame-head" style="margin-top: 36px;">
+      <div class="frame-title-group">
+        <div class="t-eyebrow">Our reference user</div>
+        <h2 class="t-title">Meet Aisyah.</h2>
+      </div>
+    </div>
+
+    <div class="persona-grid">
+      <div class="persona-card">
+        <div class="persona-portrait"><span class="initial">A</span></div>
+        <div>
+          <div class="persona-name">Aisyah, 34</div>
+          <div class="persona-meta" style="margin-top: 10px;">Grab driver · Kuantan, Pahang</div>
+        </div>
+      </div>
+      <div style="display:flex; flex-direction:column; justify-content:space-between;">
+        <div class="persona-facts">
+          <div class="pfact"><div class="pfact-label">Household</div><div class="pfact-value">Two children (7, 10). One father, 70, resident.</div></div>
+          <div class="pfact"><div class="pfact-label">Income</div><div class="pfact-value">~RM 2,800 / month gig income. No EA form.</div></div>
+          <div class="pfact"><div class="pfact-label">Tax form</div><div class="pfact-value">Form B (self-employed). Deadline 30 June 2026.</div></div>
+          <div class="pfact"><div class="pfact-label">Device</div><div class="pfact-value">Mid-range Android. Data-capped plan.</div></div>
+          <div class="pfact"><div class="pfact-label">Schemes in play</div><div class="pfact-value">STR 2026 · JKM Warga Emas · 5 LHDN reliefs</div></div>
+          <div class="pfact"><div class="pfact-label">Trust posture</div><div class="pfact-value">Skeptical after MyGov chatbot incident.</div></div>
+        </div>
+        <div class="quote-block">
+          "I don't know what I'm entitled to, the forms all want the same documents twice, and I don't trust that entering my IC number anywhere online is safe."
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ SLIDE 04 — WHAT LAYAK DOES ============ -->
+<section class="slide" data-label="04 What Layak Does">
+  <div class="slide-pad">
+    <div class="top-chrome">
+      <div class="brand"><span class="brand-mark"></span><span>LAYAK</span></div>
+      <div>04 / 15 · What Layak Does</div>
+    </div>
+
+    <div class="frame-head" style="margin-top: 36px;">
+      <div class="frame-title-group">
+        <div class="t-eyebrow">Product in one sentence</div>
+        <h2 class="t-title">Endless online searches, replaced with one upload page.</h2>
+      </div>
+    </div>
+
+    <div class="what-grid">
+      <div class="what-left">
+        <p class="what-lead">Layak is a <em>grounded</em> agentic concierge: it reads a citizen's documents, matches them against Budget-2026-gazetted rules, and prepares three pre-filled draft packets — each one cited to the exact source PDF.</p>
+        <p class="what-sub">It is explicitly <strong>not</strong> a chatbot. There is no free text answer. Every number comes from a typed rule engine backed by retrieval, and every packet is stamped <em>DRAFT — NOT SUBMITTED</em> to ensure user verification before submission.</p>
+      </div>
+
+      <div class="flow-diagram">
+        <div class="flow-row">
+          <div class="flow-ix">IN →</div>
+          <div class="flow-label">IC + Payslip + Utility bill <small>or · Manual entry form</small></div>
+        </div>
+        <div class="flow-row">
+          <div class="flow-ix">⏱</div>
+          <div class="flow-label">~30–60 seconds, 5 visible agent steps <small>streamed via SSE to the UI</small></div>
+        </div>
+        <div class="flow-row">
+          <div class="flow-ix">OUT →</div>
+          <div class="flow-label">Ranked schemes · Annual RM upside · 5 draft PDFs <small>BK-01 · JKM Warga Emas &amp; BKK · LHDN relief summary · STR 2026</small></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ SLIDE 05 — 5-STEP PIPELINE ============ -->
+<section class="slide" data-label="05 Pipeline">
+  <div class="slide-pad">
+    <div class="top-chrome">
+      <div class="brand"><span class="brand-mark"></span><span>LAYAK</span></div>
+      <div>05 / 15 · The Agentic Moment</div>
+    </div>
+
+    <div class="frame-head" style="margin-top: 36px;">
+      <div class="frame-title-group">
+        <div class="t-eyebrow">Five autonomous steps · ADK-Python SequentialAgent</div>
+        <h2 class="t-title-sm">Chat → Action, made visible on stage.</h2>
+      </div>
+    </div>
+
+    <div class="pipe-rail">
+      <div class="pipe-step">
+        <div class="num">01 · EXTRACT</div>
+        <div class="label">Read documents.</div>
+        <div class="body">Pulls name, IC last-4, income, dependants into a typed Profile.</div>
+        <div class="tech">Gemini 2.5 Flash<br/>multimodal</div>
+      </div>
+      <div class="pipe-step">
+        <div class="num">02 · CLASSIFY</div>
+        <div class="label">Tag household.</div>
+        <div class="body">Income band, children under 18, elderly dependant, form type.</div>
+        <div class="tech">Flash-Lite<br/>structured output</div>
+      </div>
+      <div class="pipe-step accent">
+        <div class="num">03 · MATCH</div>
+        <div class="label">Check rules.</div>
+        <div class="body">Typed engine for STR, JKM, LHDN — each rule grounded by search.</div>
+        <div class="tech">Vertex AI Search<br/>+ rule engine</div>
+      </div>
+      <div class="pipe-step">
+        <div class="num">04 · RANK</div>
+        <div class="label">Compute RM.</div>
+        <div class="body">Runs real Python for STR tier, Warga Emas, LHDN tax delta.</div>
+        <div class="tech">Code Execution<br/>sandboxed</div>
+      </div>
+      <div class="pipe-step">
+        <div class="num">05 · GENERATE</div>
+        <div class="label">Draft packet.</div>
+        <div class="body">Three pre-filled PDFs, watermarked DRAFT — NOT SUBMITTED.</div>
+        <div class="tech">WeasyPrint<br/>HTML → PDF</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ SLIDE 06 — GROUNDED ============ -->
+<section class="slide" data-label="06 Grounded">
+  <div class="slide-pad">
+    <div class="top-chrome">
+      <div class="brand"><span class="brand-mark"></span><span>LAYAK</span></div>
+      <div>06 / 15 · Grounded, Not Guessed</div>
+    </div>
+
+    <div class="frame-head" style="margin-top: 36px;">
+      <div class="frame-title-group">
+        <div class="t-eyebrow">Provenance as a first-class surface</div>
+        <h2 class="t-title-sm" style="font-family: 'Lora', Georgia, serif">Every number on screen links to a source PDF.</h2>
+      </div>
+    </div>
+
+    <div class="grounded-grid">
+      <div>
+        <p class="grounded-lead">No rule value ever appears in the UI <em>without</em> a retrievable citation.</p>
+        <p class="grounded-sub">This is the single beat that separates Layak from the MyGov Malaysia and NYC MyCity chatbot failures. If Vertex AI Search returns no passage for a rule, that rule is flagged <em>unverified</em> and does not contribute to the ranked list.</p>
+      </div>
+
+      <div class="cite-mock">
+        <div class="cm-head">
+          <div class="cm-title">STR 2026 — Household Tier</div>
+          <div class="cm-tag">Provenance</div>
+        </div>
+        <div class="cite-row">
+          <div class="cite-key">Household income band</div>
+          <div class="cite-val">
+            <span class="val-num">≤ RM 2,500</span>
+            <span class="chip">risalah-str-2026.pdf · p.2</span>
+          </div>
+        </div>
+        <div class="cite-row">
+          <div class="cite-key">Children multiplier</div>
+          <div class="cite-val">
+            <span class="val-num">×2</span>
+            <span class="chip">risalah-str-2026.pdf · p.2</span>
+          </div>
+        </div>
+        <div class="cite-row">
+          <div class="cite-key">Annual STR cash tier</div>
+          <div class="cite-val">
+            <span class="val-num">RM 2,500 / yr</span>
+            <span class="chip">risalah-str-2026.pdf · p.3</span>
+          </div>
+        </div>
+        <div class="cite-foot">retrieved via Vertex AI Search · data store <span style="color:var(--accent)">layak-schemes-v1</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ SLIDE 07 — DATA PRIVACY ============ -->
+<section class="slide" data-label="07 Privacy">
+  <div class="slide-pad">
+    <div class="top-chrome">
+      <div class="brand"><span class="brand-mark"></span><span>LAYAK</span></div>
+      <div>07 / 15 · Data Privacy by Design</div>
+    </div>
+
+    <div class="frame-head" style="margin-top: 36px;">
+      <div class="frame-title-group">
+        <div class="t-eyebrow">PDPA 2010-aligned · zero-retention by default</div>
+        <h2 class="t-title-sm">Privacy is the primary design constraint.</h2>
+      </div>
+    </div>
+
+    <div class="priv-grid">
+      <div class="priv-card">
+        <div class="ix">01 · DATA MINIMISATION</div>
+        <div class="h">Only eligibility-relevant fields.</div>
+        <div class="p">Layak reads the fields each rule actually needs — income, dependants, household size — and nothing more. Uploaded documents are parsed in-memory for one request, then discarded. No PII database, no analytics pipeline, no shadow profile.</div>
+        <div class="foot">NFR-3 · §7 TRD</div>
+      </div>
+
+      <div class="priv-card featured">
+        <div class="ix">02 · STATELESS PIPELINE</div>
+        <div class="h">Documents never leave the request.</div>
+        <div class="p">Uploaded IC, payslip, and utility-bill files live in memory for the HTTP request only — and are discarded the moment extraction returns.</div>
+        <div class="foot">v1 stateless · v2 unchanged</div>
+      </div>
+
+      <div class="priv-card">
+        <div class="ix">03 · USER RIGHTS</div>
+        <div class="h">Export + delete, end-to-end.</div>
+        <div class="p">Explicit PDPA consent at sign-up, a JSON export endpoint, and a hard-delete endpoint that cascades every evaluation.</div>
+        <div class="foot">FR-17 · FR-12 · FR-18</div>
+      </div>
+
+      <div class="priv-card">
+        <div class="ix">04 · 30-DAY RETENTION</div>
+        <div class="h">Free-tier history auto-prunes.</div>
+        <div class="p">Cloud Scheduler fires a Cloud Run Job every night at 02:00 MYT that deletes free-tier evaluations older than thirty days.</div>
+        <div class="foot">NFR-8 · Nightly prune</div>
+      </div>
+
+      <div class="priv-card">
+        <div class="ix">05 · NO LIVE SUBMISSION</div>
+        <div class="h">Draft only. You submit.</div>
+        <div class="p">Layak never submits on the citizen's behalf. Every output is watermarked <em>DRAFT — NOT SUBMITTED</em> on every page.</div>
+        <div class="foot">FR-8 · Disclaimer §7 PRD</div>
+      </div>
+
+      <div class="priv-card">
+        <div class="ix">06 · OWNER-GATED READS</div>
+        <div class="h">Firestore rules enforce it.</div>
+        <div class="p">All writes are backend-only; client reads require <code>request.auth.uid == resource.data.userId</code>. A user can only see their own evaluations.</div>
+        <div class="foot">TRD §7 · Security rules</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ SLIDE 08 — MANUAL ENTRY ============ -->
+<section class="slide" data-label="08 Manual Entry">
+  <div class="slide-pad">
+    <div class="top-chrome">
+      <div class="brand"><span class="brand-mark"></span><span>LAYAK</span></div>
+      <div>08 / 15 · Privacy Path</div>
+    </div>
+
+    <div class="frame-head" style="margin-top: 36px;">
+      <div class="frame-title-group">
+        <div class="t-eyebrow">For privacy-conscious users</div>
+        <h2 class="t-title-sm">Manual Entry Mode — same pipeline, no upload.</h2>
+      </div>
+    </div>
+
+    <div class="manual-grid">
+      <div class="manual-copy">
+        <h3>You type it. No MyKad uploads needed.</h3>
+        <p>Worried about handing your documents to an AI? Or don't have the documents conveniently on device? No worries!<br/>A manual input form collects the same info OCR extraction would have produced — then steps 2-5 of the pipeline run unchanged.</p>
+        <p>We adhere to strict PDPA protocols — no personally identifiable information is stored.</p>
+        <div class="callout">Input: Identity | Income | Utility Bills | Dependants<br/>Pipeline: Extract → classify → match → rank → generate</div>
+      </div>
+
+      <div class="toggle-mock" style="padding:0; background:transparent; border:none; display:flex; align-items:center; justify-content:center;">
+        <img src="assets/slide-08-image.png" alt="Manual entry mode" style="width:100%; height:auto; max-height:100%; object-fit:contain; display:block; border: 2px solid var(--ink);"/>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ SLIDE 09 — GEMMA SWAP ============ -->
+<section class="slide sov" data-label="09 Sovereign Swap">
+  <div class="slide-pad">
+    <div class="top-chrome">
+      <div class="brand"><span class="brand-mark"></span><span style="color:var(--paper)">LAYAK</span></div>
+      <div>09 / 15 · Sovereign AI</div>
+    </div>
+
+    <div class="frame-head" style="margin-top: 36px;">
+      <div class="frame-title-group">
+        <div class="t-eyebrow">Hot-swappable model backend</div>
+        <h2 class="t-title">If the data must never leave the country, the model doesn't either.</h2>
+      </div>
+    </div>
+
+    <div class="sov-grid">
+      <div class="swap-box current">
+        <span class="tag">Demo build · today</span>
+        <h3>Gemini on Vertex AI</h3>
+        <p>For the hackathon demo we use Gemini 2.5 Flash, Flash-Lite, and Gemini 3 Flash Preview on Vertex AI — we don't have the GPUs to host a strong local model ourselves.</p>
+        <ul>
+          <li>Multimodal document extraction at 90s target latency</li>
+          <li>Gemini Code Execution for visible arithmetic</li>
+          <li>Vertex AI Search for grounded retrieval</li>
+        </ul>
+        <div class="foot">backend/app/agents/gemini.py · MODEL_ROUTING</div>
+      </div>
+
+      <div class="swap-box">
+        <span class="tag">Privacy-maxed · on-prem</span>
+        <h3>Gemma 4 · local inference</h3>
+        <p>The agentic workflow is model-agnostic by design. For agencies with data-sovereignty requirements, the same ADK-Python pipeline swaps Gemini for <strong>Google's on-device Gemma 4</strong> — no data ever leaves the network boundary.</p>
+        <ul>
+          <li>Same <code>SequentialAgent</code>, same FunctionTools</li>
+          <li>Same typed rule engine, same provenance panel</li>
+          <li>Runs entirely inside a trusted ministry perimeter</li>
+        </ul>
+        <div class="foot">swap surface · one constant in app/agents/gemini.py</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ SLIDE 10 — ARCHITECTURE ============ -->
+<section class="slide" data-label="10 Architecture">
+  <div class="slide-pad">
+    <div class="top-chrome">
+      <div class="brand"><span class="brand-mark"></span><span>LAYAK</span></div>
+      <div>10 / 15 · Architecture</div>
+    </div>
+
+    <div class="frame-head" style="margin-top: 36px;">
+      <div class="frame-title-group">
+        <div class="t-eyebrow">Two services on Cloud Run · stateless pipeline</div>
+        <h2 class="t-title-sm">End-to-end data path.</h2>
+      </div>
+    </div>
+
+    <div class="arch-diagram">
+      <div class="arch-row">
+        <div class="arch-row-label">Client</div>
+        <div class="arch-row-cells">
+          <div class="arch-cell"><span class="name">Browser</span><span class="sub">Next.js 16 · React 19 · Tailwind 4 · SSE consumer</span></div>
+        </div>
+      </div>
+      <div class="arch-arrow">↓  HTTPS · multipart or JSON  ↓</div>
+      <div class="arch-row">
+        <div class="arch-row-label">Edge</div>
+        <div class="arch-row-cells">
+          <div class="arch-cell dark"><span class="name">Next.js · Cloud Run</span><span class="sub">Upload widget · SSE proxy · Firebase ID-token attach</span></div>
+          <div class="arch-cell dark"><span class="name">FastAPI · Cloud Run</span><span class="sub">POST /api/agent/intake · min-instances=1 · cpu-boost</span></div>
+        </div>
+      </div>
+      <div class="arch-arrow">↓  ADK SequentialAgent · Gemini 2.5 Pro orchestrator  ↓</div>
+      <div class="arch-row">
+        <div class="arch-row-label">Agent tools</div>
+        <div class="arch-row-cells">
+          <div class="arch-cell"><span class="name">extract</span><span class="sub">Gemini 2.5 Flash · multimodal</span></div>
+          <div class="arch-cell"><span class="name">classify</span><span class="sub">Flash-Lite · structured</span></div>
+          <div class="arch-cell accent"><span class="name">match</span><span class="sub">Vertex AI Search + rules</span></div>
+          <div class="arch-cell"><span class="name">rank</span><span class="sub">Gemini Code Execution</span></div>
+          <div class="arch-cell"><span class="name">generate</span><span class="sub">WeasyPrint → 3 PDFs</span></div>
+        </div>
+      </div>
+      <div class="arch-arrow">↓  grounded retrieval  ↓</div>
+      <div class="arch-row">
+        <div class="arch-row-label">Data</div>
+        <div class="arch-row-cells">
+          <div class="arch-cell"><span class="name">Scheme PDFs · git</span><span class="sub">backend/data/schemes/ · source of truth</span></div>
+          <div class="arch-cell"><span class="name">Vertex AI Search</span><span class="sub">layak-schemes-v1 · indexed once</span></div>
+          <div class="arch-cell"><span class="name">Firestore (v2)</span><span class="sub">users · evaluations · waitlist</span></div>
+          <div class="arch-cell"><span class="name">Secret Manager</span><span class="sub">firebase-admin-key · ADC for Vertex</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ SLIDE 11 — STACK ============ -->
+<section class="slide" data-label="11 Stack">
+  <div class="slide-pad">
+    <div class="top-chrome">
+      <div class="brand"><span class="brand-mark"></span><span>LAYAK</span></div>
+      <div>11 / 15 · Google AI Ecosystem</div>
+    </div>
+
+    <div class="frame-head" style="margin-top: 36px;">
+      <div class="frame-title-group">
+        <div class="t-eyebrow">Google ecosystem · coverage report</div>
+        <h2 class="t-title-sm">Eight Google components in one flow.</h2>
+      </div>
+    </div>
+
+    <div class="stack-grid">
+      <div class="stack-card">
+        <div>
+          <div class="tier">Brain · 01</div>
+          <h4>Gemini 2.5 Pro</h4>
+          <p>RootAgent orchestrator. Holds tools and the conversation buffer.</p>
+        </div>
+        <div class="code">ORCHESTRATOR_MODEL</div>
+      </div>
+      <div class="stack-card">
+        <div>
+          <div class="tier">Brain · 02</div>
+          <h4>Gemini 2.5 Flash</h4>
+          <p>Multimodal document extraction. Reads IC, payslip, utility bill directly.</p>
+        </div>
+        <div class="code">FAST_MODEL</div>
+      </div>
+      <div class="stack-card">
+        <div>
+          <div class="tier">Brain · 03</div>
+          <h4>Gemini 2.5 Flash-Lite</h4>
+          <p>Household classifier — 5× cheaper than Flash for structured output.</p>
+        </div>
+        <div class="code">WORKER_MODEL</div>
+      </div>
+      <div class="stack-card">
+        <div>
+          <div class="tier">Brain · 04</div>
+          <h4>Gemini Code Execution</h4>
+          <p>Sandboxed Python for annual-RM arithmetic — visible in the SSE stream.</p>
+        </div>
+        <div class="code">tools: [{codeExecution: {}}]</div>
+      </div>
+
+      <div class="stack-card">
+        <div>
+          <div class="tier">Context · 05</div>
+          <h4>Vertex AI Search</h4>
+          <p>Grounded RAG over the three cached scheme PDFs. Every rule carries a passage.</p>
+        </div>
+        <div class="code">layak-schemes-v1 · global</div>
+      </div>
+      <div class="stack-card">
+        <div>
+          <div class="tier">Orchestrator · 06</div>
+          <h4>ADK-Python v1.31</h4>
+          <p>First-party GA agent framework. <code>SequentialAgent</code> + <code>FunctionTool</code>.</p>
+        </div>
+        <div class="code">adk deploy cloud_run --with_ui</div>
+      </div>
+      <div class="stack-card">
+        <div>
+          <div class="tier">Lifecycle · 07</div>
+          <h4>Cloud Run</h4>
+          <p>Two services, both min-instances=1 with CPU boost an hour before demo.</p>
+        </div>
+        <div class="code">region · asia-southeast1</div>
+      </div>
+      <div class="stack-card">
+        <div>
+          <div class="tier">Identity · 08</div>
+          <h4>Firebase Auth · v2</h4>
+          <p>Google OAuth only. ID-token verification on every dashboard call.</p>
+        </div>
+        <div class="code">firebase_admin.auth.verify_id_token</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ SLIDE 12 — OUTCOME ============ -->
+<section class="slide outcome" data-label="12 Outcome">
+  <div class="outcome-grid">
+    <div class="outcome-left">
+      <div style="display:flex; align-items:center; gap:16px;">
+        <span class="brand-mark"></span>
+        <span class="t-mono-md" style="color:var(--ink); font-weight:600; letter-spacing:0.16em; text-transform:uppercase;">Layak</span>
+      </div>
+
+      <div>
+        <div class="t-eyebrow" style="margin-bottom: 24px;">Outcome · Aisyah's annual upside</div>
+        <div class="outcome-num">RM 12,308</div>
+        <div class="outcome-sub" style="width:1050px; max-width:none;">potential relief per year, relative to <strong>RM0 🥀</strong> (that she was aware of) prior to using Layak — 5 upside schemes matched + 1 required contribution flagged, computed live by Gemini Code Execution in the demo.</div>
+      </div>
+
+      <div class="t-mono-sm">12 / 15 · based on Budget 2026 gazetted rates as of 20 Apr 2026</div>
+    </div>
+
+    <div class="outcome-right">
+      <div class="breakdown-title">Breakdown · RM / year</div>
+      <div>
+        <div class="br-row">
+          <div class="br-name">JKM Warga Emas<small>Father, 70 · PLI-makanan means test</small></div>
+          <div class="br-val">7,200</div>
+        </div>
+        <div class="br-row">
+          <div class="br-name">JKM BKK<small>Per-child monthly · 2 × RM150</small></div>
+          <div class="br-val">3,600</div>
+        </div>
+        <div class="br-row">
+          <div class="br-name">LHDN Form B<small>5 reliefs · YA2025 · RM30,500 deduction</small></div>
+          <div class="br-val">558</div>
+        </div>
+        <div class="br-row">
+          <div class="br-name">EPF i-Saraan<small>15% match · self-employed</small></div>
+          <div class="br-val">500</div>
+        </div>
+        <div class="br-row">
+          <div class="br-name">STR 2026<small>Household-with-children tier</small></div>
+          <div class="br-val">450</div>
+        </div>
+        <div class="br-total">
+          <div class="lbl">Total upside</div>
+          <div class="val">RM 12,308</div>
+        </div>
+      </div>
+
+      <div class="br-req">
+        <div class="lbl">PERKESO SKSPS<small>Required contribution · Akta 789 · Plan 3</small></div>
+        <div class="val">− RM 442.80</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ SLIDE 13 — SAFETY ============ -->
+<section class="slide" data-label="13 Safety">
+  <div class="slide-pad">
+    <div class="top-chrome">
+      <div class="brand"><span class="brand-mark"></span><span>LAYAK</span></div>
+      <div>13 / 15 · Safety & Compliance</div>
+    </div>
+
+    <div class="frame-head" style="margin-top: 36px;">
+      <div class="frame-title-group">
+        <div class="t-eyebrow">What a grounded public-sector agent must follow</div>
+        <h2 class="t-title-sm">The rules we built for the agent.</h2>
+      </div>
+    </div>
+
+    <div class="safety-grid">
+      <div class="safety-list">
+        <div class="safety-row">
+          <div class="safety-ix">01</div>
+          <div>
+            <div class="safety-h">No live submission — ever.</div>
+            <div class="safety-p">Layak never writes to any government portal. Outputs are drafts; the citizen submits through the stated official channel.</div>
+          </div>
+        </div>
+        <div class="safety-row">
+          <div class="safety-ix">02</div>
+          <div>
+            <div class="safety-h">No unverified claim appears in the UI.</div>
+            <div class="safety-p">If Vertex AI Search returns no passage, the rule is flagged <em>unverified</em> and does not contribute to the ranked list.</div>
+          </div>
+        </div>
+        <div class="safety-row">
+          <div class="safety-ix">03</div>
+          <div>
+            <div class="safety-h">Synthetic demo documents only.</div>
+            <div class="safety-p">The MyKad, payslip, and utility-bill specimens are fully fictional and watermarked <em>SYNTHETIC — FOR DEMO ONLY</em>.</div>
+          </div>
+        </div>
+        <div class="safety-row">
+          <div class="safety-ix">04</div>
+          <div>
+            <div class="safety-h">No final legal determination is claimed.</div>
+            <div class="safety-p">Every explanation says "you <em>appear to</em> qualify … the agency confirms on application."</div>
+          </div>
+        </div>
+        <div class="safety-row">
+          <div class="safety-ix">05</div>
+          <div>
+            <div class="safety-h">AI disclosure is explicit.</div>
+            <div class="safety-p">README names Claude Code (Anthropic) as the primary agentic coding assistant, per hackathon Rules §4.2.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="watermark-mock">
+        <div class="wm-tag">BK-01 · STR 2026 Application · DRAFT</div>
+        <div class="wm-title">Borang Permohonan & Kemaskini STR 2026</div>
+        <div style="margin-top: 16px;">
+          <div class="wm-line"><span>Nama</span><span>Aisyah binti Ismail</span></div>
+          <div class="wm-line"><span>No. K/P (4 digit akhir)</span><span>●●●● 8472</span></div>
+          <div class="wm-line"><span>Pendapatan isi rumah</span><span>RM 2,800 / bulan</span></div>
+          <div class="wm-line"><span>Bilangan tanggungan</span><span>3</span></div>
+          <div class="wm-line"><span>Tier</span><span>Household · ≤ RM 2,500</span></div>
+        </div>
+        <div class="wm-foot">Generated by Layak on 2026-04-21.<br/>This is a draft. You must submit manually via bantuantunai.hasil.gov.my.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ SLIDE 14 — WHAT'S NEXT ============ -->
+<section class="slide" data-label="14 Roadmap">
+  <div class="slide-pad">
+    <div class="top-chrome">
+      <div class="brand"><span class="brand-mark"></span><span>LAYAK</span></div>
+      <div>14 / 15 · What's Next</div>
+    </div>
+
+    <div class="frame-head" style="margin-top: 36px;">
+      <div class="frame-title-group">
+        <div class="t-eyebrow">v1 hackathon · v2 SaaS pivot · beyond</div>
+        <h2 class="t-title-sm">From five schemes to 67. Then 167.</h2>
+      </div>
+    </div>
+
+    <div class="next-grid">
+      <div style="align-self:center;">
+        <p class="next-lead">Layak is the reference implementation of the grounded agentic layer PPDSA names.</p>
+        <p class="next-sub"><strong>PPDSA</strong> — <em>Polisi Pendigitalan Data Sektor Awam</em>, Malaysia's Public Sector Data Digitalisation Policy launched 10 February 2026 — publicly named agentic AI as the next layer above the MyGDX data exchange. Layak is what that layer looks like when it is grounded, auditable, and never submits on the citizen's behalf.</p>
+      </div>
+
+      <div class="next-list">
+        <div class="next-row">
+          <div class="next-ix">v1</div>
+          <div class="next-h">5 schemes · 2 personas · Form B + BE<small>STR 2026 · JKM Warga Emas · JKM BKK · LHDN reliefs · PERKESO SKSPS</small></div>
+          <div class="next-tag">Shipped</div>
+        </div>
+        <div class="next-row">
+          <div class="next-ix">v1</div>
+          <div class="next-h">Accounts · history · tiered quotas<small>Firebase Auth · Firestore · Free 5/24h · Pro unlimited · EN/BM/中文 UI</small></div>
+          <div class="next-tag">Shipped</div>
+        </div>
+        <div class="next-row">
+          <div class="next-ix">v2</div>
+          <div class="next-h">Profile edit · inline PDF preview · mobile<small>Human-in-loop between extract and classify · structured error recovery</small></div>
+          <div class="next-tag v2">In build</div>
+        </div>
+        <div class="next-row">
+          <div class="next-ix">v3</div>
+          <div class="next-h">Sovereign deploy<small>Gemma on-prem swap · ministry perimeter · MyGDX bridge</small></div>
+          <div class="next-tag v2">Concept</div>
+        </div>
+        <div class="next-row">
+          <div class="next-ix">v3+</div>
+          <div class="next-h">Long-tail schemes<small>i-Saraan · MyKasih · eKasih · state-level aid · appeal workflow</small></div>
+          <div class="next-tag v2">Long-term</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ SLIDE 15 — THANK YOU ============ -->
+<section class="slide ty" data-label="15 Thank You">
+  <div class="ty-grid">
+    <div class="ty-left">
+      <div style="display:flex; align-items:center; gap:16px;">
+        <span class="brand-mark"></span>
+        <span class="t-mono-md" style="color:var(--paper); font-weight:600; letter-spacing:0.16em; text-transform:uppercase;">Layak</span>
+      </div>
+
+      <div>
+        <div class="t-eyebrow" style="margin-bottom: 24px;">Terima kasih · Thank you</div>
+        <h2 class="ty-kicker">Three uploads,<br/>one website,<br/><span class="ty-kicker-accent">zero hallucinated rules.</span></h2>
+        <p class="ty-sub">Aisyah gets <strong>RM 12,308</strong> a year she didn't know she was entitled to — from an agent that cites its sources, never submits on her behalf, and runs on Malaysian infrastructure when it has to.</p>
+
+        <div class="ty-links">
+          <a class="ty-link" href="#" target="_blank" rel="noreferrer">
+            <div class="tl-label">Live demo</div>
+            <div class="tl-url" contenteditable="true" spellcheck="false">layak-frontend-297019726346.asia-southeast1.run.app</div>
+          </a>
+          <a class="ty-link" href="#" target="_blank" rel="noreferrer">
+            <div class="tl-label"><svg class="tl-gh" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 .5a12 12 0 0 0-3.79 23.4c.6.11.82-.26.82-.58v-2.03c-3.34.73-4.04-1.61-4.04-1.61-.55-1.39-1.33-1.76-1.33-1.76-1.09-.74.08-.73.08-.73 1.2.08 1.83 1.24 1.83 1.24 1.07 1.84 2.8 1.31 3.48 1 .11-.78.42-1.31.76-1.61-2.67-.3-5.47-1.34-5.47-5.95 0-1.31.47-2.39 1.23-3.23-.12-.3-.54-1.52.12-3.17 0 0 1.01-.32 3.3 1.23a11.4 11.4 0 0 1 6 0c2.29-1.55 3.3-1.23 3.3-1.23.66 1.65.24 2.87.12 3.17.77.84 1.23 1.92 1.23 3.23 0 4.62-2.81 5.65-5.49 5.94.43.37.81 1.1.81 2.22v3.29c0 .32.22.7.83.58A12 12 0 0 0 12 .5z"/></svg> GitHub</div>
+            <div class="tl-url" contenteditable="true" spellcheck="false">github.com/your-org/layak</div>
+          </a>
+          <a class="ty-link" href="#" target="_blank" rel="noreferrer">
+            <div class="tl-label">Walkthrough video</div>
+            <div class="tl-url" contenteditable="true" spellcheck="false">youtu.be/placeholder</div>
+          </a>
+        </div>
+      </div>
+
+      <div class="ty-signoff">
+        <div class="ty-regards">With regards,</div>
+        <div class="ty-team" contenteditable="true" spellcheck="false">— The Layak Team</div>
+      </div>
+    </div>
+    <div class="ty-right">
+      <div class="ty-right-stack">
+        <div class="ty-logo-slot">
+          <img src="assets/layak-logo.png" alt="Layak logo" class="ty-logo-img"/>
+        </div>
+
+        <div class="ty-footnote">
+          <span>Project 2030 · MyAI Future Hackathon · Track 2 · Open category</span>
+          <span>v0.2.1 · 23 Apr 2026 · Slide 15 / 15</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+</deck-stage>
+
+</body>
+</html>

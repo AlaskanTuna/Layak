@@ -107,27 +107,58 @@
       "headline": "Sedia untuk melihat apa yang anda layak?",
       "description": "Log masuk dengan Google dalam satu klik — tiada pendaftaran akaun diperlukan. Tiga muat naik, senarai tersusun, tiga pakej draf. Kurang daripada seminit."
     },
+    "pricing": {
+      "title": "Harga mudah, telus",
+      "description": "Mula menjejaki kelayakan bantuan anda secara percuma. Naik taraf ke Pro apabila anda perlukan lebih.",
+      "freeTier": {
+        "name": "Percuma",
+        "description": "Untuk individu yang ingin meneroka kelayakan mereka.",
+        "price": "RM 0",
+        "period": "selamanya",
+        "cta": "Mula Sekarang",
+        "features": [
+          "5 penilaian setiap 24 jam",
+          "Rekod penilaian 30 hari",
+          "Akses kepada skim STR, JKM, dan LHDN",
+          "Pakej draf dengan tanda air"
+        ]
+      },
+      "proTier": {
+        "name": "Pro",
+        "description": "Untuk pengguna dan agensi yang berjumlah besar.",
+        "price": "RM 15",
+        "period": "sebulan",
+        "cta": "Sertai Senarai Menunggu",
+        "features": [
+          "Penilaian tanpa had",
+          "Rekod penilaian tanpa had",
+          "Barisan pemprosesan keutamaan",
+          "Eksport CSV seluruh rekod",
+          "Akses awal kepada skim baharu"
+        ]
+      }
+    },
     "features": {
       "sectionTitle": "Cara ejen berfungsi",
       "sectionDescription": "Lima langkah. Setiap langkah dihantar ke antara muka secara langsung supaya anda dapat melihat proses penaakulannya.",
       "step1": {
-        "title": "Extract",
+        "title": "Ekstrak",
         "description": "Gemini Vision membaca tiga dokumen anda dan mengeluarkan medan profil berstruktur."
       },
       "step2": {
-        "title": "Classify",
+        "title": "Kelaskan",
         "description": "Saiz isi rumah, pendapatan per kapita, kategori pemfail, dan tanggungan diperoleh."
       },
       "step3": {
-        "title": "Match",
+        "title": "Padankan",
         "description": "Enjin peraturan menyemak setiap profil terhadap ambang skim dengan rujukan lengkap."
       },
       "step4": {
-        "title": "Compute",
+        "title": "Kira",
         "description": "Gemini Code Execution menjumlahkan faedah tahunan merentasi skim yang layak di atas pentas."
       },
       "step5": {
-        "title": "Generate",
+        "title": "Jana",
         "description": "WeasyPrint menyediakan tiga pakej PDF bertanda air — sedia untuk disemak dan dihantar."
       }
     },
@@ -457,6 +488,44 @@
       "zodIc4Digits": "4 digit",
       "zodCostFormat": "Jumlah sehingga RM100,000 (cth. 240 atau 240.50)",
       "zodKwhFormat": "Nombor bulat sehingga 10,000"
+    },
+    "history": {
+      "loading": "Memuatkan penilaian anda…",
+      "errorTitle": "Tidak dapat memuatkan rekod",
+      "errorUnexpected": "Ralat tidak dijangka telah berlaku.",
+      "emptyEyebrow": "Belum ada penilaian",
+      "emptyTitle": "Jalankan penilaian pertama anda untuk mengisi paparan ini.",
+      "emptyBody": "Muat naik tiga dokumen (atau gunakan Kemasukan Manual) dan kami akan mengira kelayakan merentas skim persekutuan dan negeri.",
+      "emptyCta": "Mulakan penilaian pertama anda",
+      "title": "Rekod",
+      "selected": "{{count}} dipilih",
+      "deleteAction": "Padam {{count}}",
+      "deleteConfirm_one": "Padam {{count}} penilaian? Tindakan ini tidak boleh dibatalkan.",
+      "deleteConfirm_other": "Padam {{count}} penilaian? Tindakan ini tidak boleh dibatalkan.",
+      "deletePartialFailure": "{{failed}} daripada {{total}} pemadaman gagal; senarai yang dimuat semula memaparkan baki yang tinggal.",
+      "count_one": "{{count}} penilaian",
+      "count_other": "{{count}} penilaian",
+      "selectPageAria": "Pilih semua pada halaman",
+      "deselectPageAria": "Nyahpilih semua pada halaman",
+      "selectRowAria": "Pilih penilaian dari {{timestamp}}",
+      "columnStatus": "Status",
+      "columnStarted": "Dimulakan",
+      "columnAnnualRelief": "Pelepasan tahunan (RM)",
+      "view": "Lihat",
+      "prev": "Sebelum",
+      "next": "Seterusnya",
+      "pagination": "Halaman {{page}} daripada {{total}}",
+      "status": {
+        "complete": "Selesai",
+        "running": "Sedang berjalan",
+        "error": "Ralat"
+      },
+      "timestamp": {
+        "justNow": "Baru sahaja",
+        "minutesAgo": "{{count}} min lalu",
+        "hoursAgo": "{{count}} j lalu",
+        "daysAgo": "{{count}} h lalu"
+      }
     },
     "dependants": {
       "description": "Tambah semua orang lain yang berkongsi isi rumah anda. Anak di bawah 18 tahun dan ibu bapa berumur 60+ membuka skim khusus. Saiz isi rumah: {{size}} (anda + {{count}} {{plural}}).",

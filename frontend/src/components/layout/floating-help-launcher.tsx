@@ -70,11 +70,37 @@ export function FloatingHelpLauncher() {
           </DialogHeader>
           <div className="flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto px-5 pb-5">
             <Tabs value={section} onValueChange={handleSectionChange} className="gap-4">
-              <TabsList className="grid h-auto w-full grid-cols-2 gap-2 rounded-xl bg-muted/70 p-1 md:grid-cols-4">
-                <TabsTrigger value="overview">{t('common.help.tabs.overview')}</TabsTrigger>
-                <TabsTrigger value="documents">{t('common.help.tabs.documents')}</TabsTrigger>
-                <TabsTrigger value="samples">{t('common.help.tabs.samples')}</TabsTrigger>
-                <TabsTrigger value="results">{t('common.help.tabs.results')}</TabsTrigger>
+              {/* `md:grid-cols-2` instead of `-4` so longer non-EN labels
+                  ("Apa yang perlu disediakan", "After results") get enough
+                  horizontal room; `whitespace-normal text-center leading-tight`
+                  overrides the primitive's `whitespace-nowrap` so anything
+                  that still doesn't fit wraps in-cell instead of visually
+                  bleeding into the next tab. */}
+              <TabsList className="grid h-auto w-full grid-cols-2 gap-2 rounded-xl bg-muted/70 p-1">
+                <TabsTrigger
+                  value="overview"
+                  className="h-auto min-h-9 whitespace-normal px-3 py-2 text-center text-xs leading-tight sm:text-sm"
+                >
+                  {t('common.help.tabs.overview')}
+                </TabsTrigger>
+                <TabsTrigger
+                  value="documents"
+                  className="h-auto min-h-9 whitespace-normal px-3 py-2 text-center text-xs leading-tight sm:text-sm"
+                >
+                  {t('common.help.tabs.documents')}
+                </TabsTrigger>
+                <TabsTrigger
+                  value="samples"
+                  className="h-auto min-h-9 whitespace-normal px-3 py-2 text-center text-xs leading-tight sm:text-sm"
+                >
+                  {t('common.help.tabs.samples')}
+                </TabsTrigger>
+                <TabsTrigger
+                  value="results"
+                  className="h-auto min-h-9 whitespace-normal px-3 py-2 text-center text-xs leading-tight sm:text-sm"
+                >
+                  {t('common.help.tabs.results')}
+                </TabsTrigger>
               </TabsList>
               <TabsContent value="overview" className="mt-0">
                 <HelpCard

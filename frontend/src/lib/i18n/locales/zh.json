@@ -107,27 +107,58 @@
       "headline": "准备好了解您符合哪些资格了吗？",
       "description": "只需一次点击即可使用 Google 登录 —— 无需设置账户。三次上传，一份排序列表，三份草拟申请包。用时不到一分钟。"
     },
+    "pricing": {
+      "title": "简单、透明的价格",
+      "description": "免费开始追踪您的援助资格；需要更多功能时再升级到 Pro。",
+      "freeTier": {
+        "name": "免费版",
+        "description": "适合希望了解自身资格的个人用户。",
+        "price": "RM 0",
+        "period": "永久免费",
+        "cta": "立即开始",
+        "features": [
+          "每 24 小时 5 次评估",
+          "30 天评估历史",
+          "可使用 STR、JKM、LHDN 等计划",
+          "带水印的草稿申请包"
+        ]
+      },
+      "proTier": {
+        "name": "Pro 版",
+        "description": "适合高频用户及中介机构。",
+        "price": "RM 15",
+        "period": "每月",
+        "cta": "加入等候名单",
+        "features": [
+          "无限次评估",
+          "无限评估历史",
+          "优先处理队列",
+          "导出所有历史记录为 CSV",
+          "优先体验新上线的计划"
+        ]
+      }
+    },
     "features": {
       "sectionTitle": "代理如何运作",
       "sectionDescription": "五个步骤。每一步都实时传送到界面，让您亲眼看到推理过程。",
       "step1": {
-        "title": "Extract",
+        "title": "提取",
         "description": "Gemini Vision 读取您的三份文件并提取结构化的档案字段。"
       },
       "step2": {
-        "title": "Classify",
+        "title": "分类",
         "description": "推导出家庭规模、人均收入、申报类别、受扶养人等信息。"
       },
       "step3": {
-        "title": "Match",
+        "title": "匹配",
         "description": "规则引擎将每份档案与计划门槛进行比对，并附上完整引用。"
       },
       "step4": {
-        "title": "Compute",
+        "title": "计算",
         "description": "Gemini Code Execution 在舞台上汇总所有符合资格计划的年度收益。"
       },
       "step5": {
-        "title": "Generate",
+        "title": "生成",
         "description": "WeasyPrint 生成三份带水印的 PDF 申请包 —— 可供审阅和提交。"
       }
     },
@@ -457,6 +488,44 @@
       "zodIc4Digits": "4 位数字",
       "zodCostFormat": "金额最高 RM100,000（例如 240 或 240.50）",
       "zodKwhFormat": "最高 10,000 的整数"
+    },
+    "history": {
+      "loading": "正在加载您的评估记录…",
+      "errorTitle": "无法加载历史记录",
+      "errorUnexpected": "发生意外错误。",
+      "emptyEyebrow": "尚无评估记录",
+      "emptyTitle": "完成首次评估即可填充此视图。",
+      "emptyBody": "上传三份文件（或使用手动输入模式），我们会跨联邦与州属计划为您评估资格。",
+      "emptyCta": "开始您的首次评估",
+      "title": "历史记录",
+      "selected": "已选 {{count}} 项",
+      "deleteAction": "删除 {{count}} 项",
+      "deleteConfirm_one": "删除 {{count}} 项评估？此操作不可撤销。",
+      "deleteConfirm_other": "删除 {{count}} 项评估？此操作不可撤销。",
+      "deletePartialFailure": "{{total}} 项中有 {{failed}} 项删除失败；刷新后列表仅显示仍保留的记录。",
+      "count_one": "{{count}} 项评估",
+      "count_other": "{{count}} 项评估",
+      "selectPageAria": "选择本页全部",
+      "deselectPageAria": "取消选择本页全部",
+      "selectRowAria": "选择 {{timestamp}} 的评估",
+      "columnStatus": "状态",
+      "columnStarted": "开始于",
+      "columnAnnualRelief": "年度援助 (RM)",
+      "view": "查看",
+      "prev": "上一页",
+      "next": "下一页",
+      "pagination": "第 {{page}} / {{total}} 页",
+      "status": {
+        "complete": "已完成",
+        "running": "进行中",
+        "error": "错误"
+      },
+      "timestamp": {
+        "justNow": "刚刚",
+        "minutesAgo": "{{count}} 分钟前",
+        "hoursAgo": "{{count}} 小时前",
+        "daysAgo": "{{count}} 天前"
+      }
     },
     "dependants": {
       "description": "添加与您共同居住的所有其他成员。18 岁以下子女和 60 岁以上父母可解锁特定计划。家庭规模：{{size}}（您 + {{count}} 位{{plural}}）。",

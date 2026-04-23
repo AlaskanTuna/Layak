@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useState } from 'react'
 import { AlertTriangle, Loader2 } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 
 import { AggregateStatsCards } from '@/components/history/aggregate-stats-cards'
 import { EvaluationHistoryTable } from '@/components/history/evaluation-history-table'
@@ -31,6 +32,7 @@ function getBackendUrl(): string {
 }
 
 export function EvaluationHistorySection() {
+  const { t } = useTranslation()
   const { user, loading: authLoading } = useAuth()
   const [items, setItems] = useState<EvaluationListItem[]>([])
   const [phase, setPhase] = useState<Phase>('loading')
@@ -43,7 +45,9 @@ export function EvaluationHistorySection() {
         { method: 'GET' }
       )
       if (!res.ok) {
-        setErrorMessage(`Backend returned ${res.status} ${res.statusText}`)
+        setErrorMessage(
+          t('evaluation.results.backendReturned', { status: res.status, statusText: res.statusText })
+        )
         setPhase('error')
         return
       }
@@ -54,7 +58,7 @@ export function EvaluationHistorySection() {
       setErrorMessage(err instanceof Error ? err.message : String(err))
       setPhase('error')
     }
-  }, [])
+  }, [t])
 
   // setState lands inside `fetchHistory` AFTER the await; the strict
   // react-hooks/set-state-in-effect rule trips on the call graph but the
@@ -73,7 +77,7 @@ export function EvaluationHistorySection() {
         aria-live="polite"
       >
         <Loader2 className="size-4 animate-spin" aria-hidden />
-        Loading your evaluations…
+        {t('evaluation.history.loading')}
       </div>
     )
   }
@@ -82,9 +86,9 @@ export function EvaluationHistorySection() {
     return (
       <Alert variant="destructive">
         <AlertTriangle className="size-4" />
-        <AlertTitle>Could not load history</AlertTitle>
+        <AlertTitle>{t('evaluation.history.errorTitle')}</AlertTitle>
         <AlertDescription>
-          {errorMessage ?? 'An unexpected error occurred.'}
+          {errorMessage ?? t('evaluation.history.errorUnexpected')}
           <div className="mt-3 flex">
             <Button
               variant="outline"
@@ -94,7 +98,7 @@ export function EvaluationHistorySection() {
                 void fetchHistory()
               }}
             >
-              Retry
+              {t('common.button.retry')}
             </Button>
           </div>
         </AlertDescription>

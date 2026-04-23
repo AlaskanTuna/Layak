@@ -3,6 +3,8 @@
 import Link from 'next/link'
 import { useMemo, useState } from 'react'
 import { ArrowRight, ChevronLeft, ChevronRight, Loader2, Trash2 } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
+import type { TFunction } from 'i18next'
 
 import { StatusPill } from '@/components/ui/status-pill'
 import { Button } from '@/components/ui/button'
@@ -25,12 +27,6 @@ const RM = new Intl.NumberFormat('en-MY', {
   maximumFractionDigits: 0
 })
 
-const STATUS_LABEL: Record<EvaluationStatus, string> = {
-  complete: 'Complete',
-  running: 'Running',
-  error: 'Error'
-}
-
 const STATUS_TONE: Record<EvaluationStatus, 'approved' | 'processing' | 'rejected'> = {
   complete: 'approved',
   running: 'processing',
@@ -41,22 +37,23 @@ function getBackendUrl(): string {
   return process.env.NEXT_PUBLIC_BACKEND_URL ?? 'http://localhost:8080'
 }
 
-function formatTimestamp(value: string | null): string {
+function formatTimestamp(value: string | null, t: TFunction): string {
   if (!value) return '—'
   const date = new Date(value)
   if (Number.isNaN(date.getTime())) return '—'
   const diffMs = Date.now() - date.getTime()
   const diffMin = Math.floor(diffMs / 60_000)
-  if (diffMin < 1) return 'Just now'
-  if (diffMin < 60) return `${diffMin} min ago`
+  if (diffMin < 1) return t('evaluation.history.timestamp.justNow')
+  if (diffMin < 60) return t('evaluation.history.timestamp.minutesAgo', { count: diffMin })
   const diffHr = Math.floor(diffMin / 60)
-  if (diffHr < 24) return `${diffHr} h ago`
+  if (diffHr < 24) return t('evaluation.history.timestamp.hoursAgo', { count: diffHr })
   const diffDay = Math.floor(diffHr / 24)
-  if (diffDay < 7) return `${diffDay} d ago`
+  if (diffDay < 7) return t('evaluation.history.timestamp.daysAgo', { count: diffDay })
   return date.toLocaleDateString('en-MY', { day: 'numeric', month: 'short', year: 'numeric' })
 }
 
 export function EvaluationHistoryTable({ items, onRefresh }: Props) {
+  const { t } = useTranslation()
   const [page, setPage] = useState(0)
   const [selected, setSelected] = useState<Set<string>>(() => new Set())
   const [deleting, setDeleting] = useState(false)
@@ -95,8 +92,7 @@ export function EvaluationHistoryTable({ items, onRefresh }: Props) {
   async function handleDelete() {
     if (selected.size === 0 || deleting) return
     const ids = Array.from(selected)
-    const noun = ids.length === 1 ? 'evaluation' : 'evaluations'
-    if (!window.confirm(`Delete ${ids.length} ${noun}? This cannot be undone.`)) return
+    if (!window.confirm(t('evaluation.history.deleteConfirm', { count: ids.length }))) return
 
     setDeleting(true)
     setDeleteError(null)
@@ -113,22 +109,25 @@ export function EvaluationHistoryTable({ items, onRefresh }: Props) {
     setSelected(new Set())
     onRefresh()
     if (failed.length > 0) {
-      setDeleteError(`${failed.length} of ${ids.length} deletions failed; refreshed list shows the survivors.`)
+      setDeleteError(
+        t('evaluation.history.deletePartialFailure', { failed: failed.length, total: ids.length })
+      )
     }
   }
 
   if (items.length === 0) {
     return (
       <Card className="items-center gap-3 px-6 py-12 text-center sm:py-16">
-        <p className="text-[11px] uppercase tracking-[0.18em] text-muted-foreground">No evaluations yet</p>
-        <h3 className="font-heading text-lg font-medium">Run your first evaluation to populate this view.</h3>
+        <p className="text-[11px] uppercase tracking-[0.18em] text-muted-foreground">
+          {t('evaluation.history.emptyEyebrow')}
+        </p>
+        <h3 className="font-heading text-lg font-medium">{t('evaluation.history.emptyTitle')}</h3>
         <p className="max-w-sm text-sm text-muted-foreground">
-          Upload three documents (or use Manual Entry) and we&rsquo;ll calculate eligibility across federal and
-          state schemes.
+          {t('evaluation.history.emptyBody')}
         </p>
         <div className="mt-2 flex">
           <Button render={<Link href="/dashboard/evaluation/upload" />}>
-            Start your first evaluation
+            {t('evaluation.history.emptyCta')}
             <ArrowRight className="ml-1.5 size-4" aria-hidden />
           </Button>
         </div>
@@ -139,11 +138,11 @@ export function EvaluationHistoryTable({ items, onRefresh }: Props) {
   return (
     <section className="flex flex-col gap-3">
       <div className="flex items-center justify-between gap-3">
-        <h2 className="font-heading text-xl font-semibold tracking-tight">History</h2>
+        <h2 className="font-heading text-xl font-semibold tracking-tight">{t('evaluation.history.title')}</h2>
         {selected.size > 0 ? (
           <div className="flex items-center gap-2">
             <span className="text-xs text-muted-foreground">
-              {selected.size} selected
+              {t('evaluation.history.selected', { count: selected.size })}
             </span>
             <Button
               type="button"
@@ -152,7 +151,7 @@ export function EvaluationHistoryTable({ items, onRefresh }: Props) {
               onClick={() => setSelected(new Set())}
               disabled={deleting}
             >
-              Cancel
+              {t('common.button.cancel')}
             </Button>
             <Button
               type="button"
@@ -166,12 +165,12 @@ export function EvaluationHistoryTable({ items, onRefresh }: Props) {
               ) : (
                 <Trash2 className="size-3.5" aria-hidden />
               )}
-              Delete {selected.size}
+              {t('evaluation.history.deleteAction', { count: selected.size })}
             </Button>
           </div>
         ) : (
           <span className="text-xs text-muted-foreground">
-            {items.length} {items.length === 1 ? 'evaluation' : 'evaluations'}
+            {t('evaluation.history.count', { count: items.length })}
           </span>
         )}
       </div>
@@ -187,17 +186,23 @@ export function EvaluationHistoryTable({ items, onRefresh }: Props) {
               <tr className="border-b border-border bg-muted/40 text-left text-[11px] uppercase tracking-[0.14em] text-muted-foreground">
                 <th scope="col" className="w-10 px-4 py-2.5">
                   <Checkbox
-                    aria-label={allOnPageSelected ? 'Deselect all on page' : 'Select all on page'}
+                    aria-label={t(
+                      allOnPageSelected
+                        ? 'evaluation.history.deselectPageAria'
+                        : 'evaluation.history.selectPageAria'
+                    )}
                     checked={!allOnPageSelected && someOnPageSelected ? 'indeterminate' : allOnPageSelected}
                     onCheckedChange={togglePage}
                     className="cursor-pointer"
                   />
                 </th>
-                <th scope="col" className="px-4 py-2.5 font-medium">Status</th>
-                <th scope="col" className="px-4 py-2.5 font-medium">Started</th>
-                <th scope="col" className="px-4 py-2.5 text-right font-medium">Annual relief (RM)</th>
+                <th scope="col" className="px-4 py-2.5 font-medium">{t('evaluation.history.columnStatus')}</th>
+                <th scope="col" className="px-4 py-2.5 font-medium">{t('evaluation.history.columnStarted')}</th>
+                <th scope="col" className="px-4 py-2.5 text-right font-medium">
+                  {t('evaluation.history.columnAnnualRelief')}
+                </th>
                 <th scope="col" className="px-4 py-2.5 font-medium">
-                  <span className="sr-only">View</span>
+                  <span className="sr-only">{t('evaluation.history.view')}</span>
                 </th>
               </tr>
             </thead>
@@ -205,6 +210,7 @@ export function EvaluationHistoryTable({ items, onRefresh }: Props) {
               {slice.map(item => {
                 const status = item.status as EvaluationStatus
                 const isSelected = selected.has(item.id)
+                const timestampLabel = formatTimestamp(item.createdAt, t)
                 return (
                   <tr
                     key={item.id}
@@ -213,7 +219,7 @@ export function EvaluationHistoryTable({ items, onRefresh }: Props) {
                   >
                     <td className="px-4 py-3">
                       <Checkbox
-                        aria-label={`Select evaluation from ${formatTimestamp(item.createdAt)}`}
+                        aria-label={t('evaluation.history.selectRowAria', { timestamp: timestampLabel })}
                         checked={isSelected}
                         onCheckedChange={checked => toggleOne(item.id, checked)}
                         className="cursor-pointer"
@@ -221,10 +227,10 @@ export function EvaluationHistoryTable({ items, onRefresh }: Props) {
                     </td>
                     <td className="px-4 py-3">
                       <StatusPill tone={STATUS_TONE[status] ?? 'draft'}>
-                        {STATUS_LABEL[status] ?? item.status}
+                        {t(`evaluation.history.status.${status}`, { defaultValue: item.status })}
                       </StatusPill>
                     </td>
-                    <td className="px-4 py-3 text-muted-foreground">{formatTimestamp(item.createdAt)}</td>
+                    <td className="px-4 py-3 text-muted-foreground">{timestampLabel}</td>
                     <td className="px-4 py-3 text-right tabular-nums">
                       {item.status === 'complete' ? RM.format(item.totalAnnualRM) : '—'}
                     </td>
@@ -234,7 +240,7 @@ export function EvaluationHistoryTable({ items, onRefresh }: Props) {
                         variant="ghost"
                         render={<Link href={`/dashboard/evaluation/results/${item.id}`} />}
                       >
-                        View
+                        {t('evaluation.history.view')}
                         <ArrowRight className="ml-1 size-3.5" aria-hidden />
                       </Button>
                     </td>
@@ -249,7 +255,7 @@ export function EvaluationHistoryTable({ items, onRefresh }: Props) {
       {pageCount > 1 && (
         <div className="flex items-center justify-between gap-2 px-1 text-xs text-muted-foreground">
           <span>
-            Page {safePage + 1} of {pageCount}
+            {t('evaluation.history.pagination', { page: safePage + 1, total: pageCount })}
           </span>
           <div className="flex gap-1">
             <Button
@@ -261,7 +267,7 @@ export function EvaluationHistoryTable({ items, onRefresh }: Props) {
               className={cn(safePage === 0 && 'opacity-50')}
             >
               <ChevronLeft className="size-3.5" aria-hidden />
-              Prev
+              {t('evaluation.history.prev')}
             </Button>
             <Button
               type="button"
@@ -271,7 +277,7 @@ export function EvaluationHistoryTable({ items, onRefresh }: Props) {
               disabled={safePage >= pageCount - 1}
               className={cn(safePage >= pageCount - 1 && 'opacity-50')}
             >
-              Next
+              {t('evaluation.history.next')}
               <ChevronRight className="size-3.5" aria-hidden />
             </Button>
           </div>

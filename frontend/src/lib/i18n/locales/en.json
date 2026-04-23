@@ -489,6 +489,44 @@
       "zodCostFormat": "Amount up to RM100,000 (e.g. 240 or 240.50)",
       "zodKwhFormat": "Whole number up to 10,000"
     },
+    "history": {
+      "loading": "Loading your evaluations…",
+      "errorTitle": "Could not load history",
+      "errorUnexpected": "An unexpected error occurred.",
+      "emptyEyebrow": "No evaluations yet",
+      "emptyTitle": "Run your first evaluation to populate this view.",
+      "emptyBody": "Upload three documents (or use Manual Entry) and we'll calculate eligibility across federal and state schemes.",
+      "emptyCta": "Start your first evaluation",
+      "title": "History",
+      "selected": "{{count}} selected",
+      "deleteAction": "Delete {{count}}",
+      "deleteConfirm_one": "Delete {{count}} evaluation? This cannot be undone.",
+      "deleteConfirm_other": "Delete {{count}} evaluations? This cannot be undone.",
+      "deletePartialFailure": "{{failed}} of {{total}} deletions failed; refreshed list shows the survivors.",
+      "count_one": "{{count}} evaluation",
+      "count_other": "{{count}} evaluations",
+      "selectPageAria": "Select all on page",
+      "deselectPageAria": "Deselect all on page",
+      "selectRowAria": "Select evaluation from {{timestamp}}",
+      "columnStatus": "Status",
+      "columnStarted": "Started",
+      "columnAnnualRelief": "Annual relief (RM)",
+      "view": "View",
+      "prev": "Prev",
+      "next": "Next",
+      "pagination": "Page {{page}} of {{total}}",
+      "status": {
+        "complete": "Complete",
+        "running": "Running",
+        "error": "Error"
+      },
+      "timestamp": {
+        "justNow": "Just now",
+        "minutesAgo": "{{count}} min ago",
+        "hoursAgo": "{{count}} h ago",
+        "daysAgo": "{{count}} d ago"
+      }
+    },
     "dependants": {
       "description": "Add everyone else who shares your household. Children under 18 and parents aged 60+ unlock specific schemes. Household size: {{size}} (you + {{count}} {{plural}}).",
       "dependantSingular": "dependant",

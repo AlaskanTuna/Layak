@@ -70,8 +70,9 @@ export function SchemeCardGrid({ matches }: Props) {
           return (
             <li
               key={match.scheme_id}
+              id={`scheme-${match.scheme_id}`}
               className={cn(
-                'flex flex-col gap-4 rounded-xl border p-5 transition-colors',
+                'flex flex-col gap-4 rounded-xl border p-5 transition-colors scroll-mt-24',
                 isTop ? 'border-primary/30 bg-primary/5' : 'border-border bg-card'
               )}
             >

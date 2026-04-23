@@ -660,6 +660,26 @@
       "hide": "Sembunyi butiran",
       "python": "Python",
       "stdout": "stdout"
+    },
+    "chat": {
+      "openButton": "Tanya Layak tentang penilaian ini",
+      "title": "Tanya tentang penilaian ini",
+      "subtitle": "Berasaskan keputusan anda dan PDF rasmi skim",
+      "close": "Tutup sembang",
+      "reset": "Mulakan semula sembang",
+      "send": "Hantar",
+      "abort": "Henti penjanaan",
+      "placeholder": "Tanya tentang keputusan anda…",
+      "emptyBody": "Saya boleh menerangkan kenapa setiap skim sepadan, dokumen apa yang anda perlukan, atau cara memohon melalui portal rasmi. Saya tidak boleh memberi nasihat undang-undang atau kewangan.",
+      "suggestionsLabel": "Soalan cadangan",
+      "suggestions": {
+        "whyQualify": "Kenapa saya layak untuk {{scheme}}?",
+        "howApply": "Bagaimana saya memohon skim ini?",
+        "documents": "Dokumen apa yang saya perlukan?",
+        "deadlines": "Skim mana yang patut saya mohon dahulu?"
+      },
+      "groundingUnavailable": "Nota: rujukan PDF langsung tidak tersedia buat masa ini.",
+      "disclaimer": "Layak membantu anda memahami penilaian ini. Ia bukan peguam, penasihat cukai, atau perancang kewangan."
     }
   },
   "schemes": {

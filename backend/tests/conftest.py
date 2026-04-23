@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import os
 from pathlib import Path
 
 import pytest
@@ -11,6 +12,11 @@ from app.fixtures.aisyah import AISYAH_PROFILE
 from app.schema.profile import Profile
 
 SCHEMES_DIR = Path(__file__).resolve().parent.parent / "data" / "schemes"
+
+# Disable Phase 10 chat warm-up before any test imports `app.main`. Without
+# this, the FastAPI lifespan would fire a real Gemini + Discovery Engine call
+# on every TestClient construction — slow + needs live creds + breaks CI.
+os.environ.setdefault("LAYAK_WARMUP_ENABLED", "false")
 
 
 @pytest.fixture(scope="session")

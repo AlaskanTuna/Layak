@@ -14,6 +14,7 @@ import { PersistedPacketDownload } from '@/components/evaluation/persisted-packe
 import { PipelineStepper } from '@/components/evaluation/pipeline-stepper'
 import { RequiredContributionsCard } from '@/components/evaluation/required-contributions-card'
 import { ResultsActionRail } from '@/components/evaluation/results-action-rail'
+import { ResultsChatPanel } from '@/components/evaluation/results-chat-panel'
 import { SchemeCardGrid } from '@/components/evaluation/scheme-card-grid'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
@@ -301,6 +302,13 @@ export function EvaluationResultsByIdClient({ evalId }: { evalId: string }) {
             {t('evaluation.results.startAnother')}
           </Button>
         </div>
+      )}
+
+      {/* Phase 10 — floating chatbot. Only available when the eval has at
+          least one qualifying match (no chat without context). The panel
+          uses fixed positioning, so it never affects the page layout above. */}
+      {isComplete && matchedCount > 0 && (
+        <ResultsChatPanel evalId={evalId} matches={doc.matches} />
       )}
     </div>
   )

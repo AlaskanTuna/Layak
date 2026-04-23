@@ -104,21 +104,23 @@ Layak collapses that into a single guided flow. A user uploads documents (or use
 - 🔗 **Source-linked provenance** for every rule-backed claim.
 - 📄 **Draft application packets** for manual submission.
 - ⚠️ **Required contributions** surfaced separately so the headline upside stays honest.
+- 🤖 **Conversational concierge** — a grounded chatbot on the results page so a non-technical relative (Aisyah's aunty/uncle) can ask follow-up questions about _their_ evaluation in English, Bahasa Malaysia, or Mandarin.
 
 ---
 
 ## 🏗 Feature Matrix
 
-|     | Feature                     | What it means                                                                                                                            |
-| --- | --------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------- |
-| 📥  | **Dual intake**             | Document upload for IC / payslip / utility, or a manual form for users who'd rather not upload anything.                                 |
-| 🧩  | **Visible 5-step agent**    | Extract → Classify → Match → Rank → Generate, streamed over SSE so the citizen watches the work happen.                                  |
-| 🔎  | **Grounded retrieval**      | Vertex AI Search over committed scheme PDFs — if no passage is retrieved, the rule is flagged `unverified` and drops out of the ranking. |
-| 🧮  | **Live arithmetic**         | Annual upside computed via Gemini Code Execution, not LLM narration.                                                                     |
-| 🖨  | **Draft packet generation** | WeasyPrint renders pre-filled application PDFs for each matched scheme, all watermarked `DRAFT — NOT SUBMITTED`.                         |
-| 👤  | **Accounts & history**      | Firebase Auth (Google), Firestore-backed evaluation history, free-tier quota, and an upgrade waitlist.                                   |
-| 🔐  | **PDPA-aligned**            | Explicit consent on sign-up, JSON export, and hard-delete endpoints. 30-day prune of free-tier history.                                  |
-| 🎭  | **Demo-ready fixtures**     | Five synthetic personas (Aisyah, Farhan, Hashim, Meiling, Ravi) for stable judging walkthroughs.                                         |
+|     | Feature                     | What it means                                                                                                                                                                                                                                                                   |
+| --- | --------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 📥  | **Dual intake**             | Document upload for IC / payslip / utility, or a manual form for users who'd rather not upload anything.                                                                                                                                                                        |
+| 🧩  | **Visible 5-step agent**    | Extract → Classify → Match → Rank → Generate, streamed over SSE so the citizen watches the work happen.                                                                                                                                                                         |
+| 🔎  | **Grounded retrieval**      | Vertex AI Search over committed scheme PDFs — if no passage is retrieved, the rule is flagged `unverified` and drops out of the ranking.                                                                                                                                        |
+| 🧮  | **Live arithmetic**         | Annual upside computed via Gemini Code Execution, not LLM narration.                                                                                                                                                                                                            |
+| 🖨  | **Draft packet generation** | WeasyPrint renders pre-filled application PDFs for each matched scheme, all watermarked `DRAFT — NOT SUBMITTED`.                                                                                                                                                                |
+| 👤  | **Accounts & history**      | Firebase Auth (Google), Firestore-backed evaluation history, free-tier quota, and an upgrade waitlist.                                                                                                                                                                          |
+| 🔐  | **PDPA-aligned**            | Explicit consent on sign-up, JSON export, and hard-delete endpoints. 30-day prune of free-tier history.                                                                                                                                                                         |
+| 🎭  | **Demo-ready fixtures**     | Five synthetic personas (Aisyah, Farhan, Hashim, Meiling, Ravi) for stable judging walkthroughs.                                                                                                                                                                                |
+| 🤖  | **Per-evaluation chatbot**  | A floating panel on every completed results page — grounded on _that_ eval doc + Vertex AI Search retrieval, multilingual (en/ms/zh), with a five-layer guardrail stack (system-prompt language lock, safety filters, input validator, RAG grounding, citation-drift detector). |
 
 ---
 
@@ -184,6 +186,29 @@ flowchart LR
     Results --> Packet[Regenerate packet ZIP]
     User --> Export[User export or delete]
 ```
+
+</details>
+
+<details>
+<summary><strong>Conversational concierge — per-evaluation grounded chatbot</strong></summary>
+
+A floating chatbot on every completed results page lets a low-tech-literacy user (Aisyah's aunty/uncle persona) ask follow-up questions about _their_ evaluation in plain English, Bahasa Malaysia, or Mandarin. The bot is hard-constrained to the loaded `evaluations/{evalId}` doc plus Vertex AI Search retrieval over the nine scheme PDFs — it is **not** a general-purpose chatbot.
+
+```mermaid
+flowchart LR
+    Panel[Floating chat panel<br/>on results page] --> SSE2[POST /api/evaluations/:id/chat]
+    SSE2 --> Auth2[Auth + owner check]
+    Auth2 --> Load[Load eval doc<br/>from Firestore]
+    Load --> Guard[Input guardrails<br/>regex + length]
+    Guard --> Prompt[Build system prompt<br/>Rule 0 language lock<br/>+ eval-context digest]
+    Prompt --> ChatLLM[Gemini 2.5 Flash<br/>+ safety_settings]
+    ChatLLM <--> Retrieve[Vertex AI Search<br/>retrieval Tool]
+    ChatLLM --> Tokens[Stream tokens via SSE]
+    Tokens --> Validate[Citation drift detector]
+    Validate --> Panel
+```
+
+Five layered guardrails defend the surface: a hard-constrained system prompt (Rule 0 language lock, scope, refusals, citation rules), Gemini built-in safety settings, an input regex validator (length cap + prompt-injection patterns), Vertex AI Search grounding (fail-open if Discovery Engine is unreachable), and an output citation-drift detector that strips any cited `scheme_id` not in the user's matches list. A FastAPI lifespan warm-up pre-loads the Gemini + Discovery Engine paths on startup so the first user-facing chat call hits a hot path.
 
 </details>
 

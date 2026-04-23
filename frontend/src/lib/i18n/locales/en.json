@@ -660,6 +660,26 @@
       "hide": "Hide details",
       "python": "Python",
       "stdout": "stdout"
+    },
+    "chat": {
+      "openButton": "Ask Layak about this evaluation",
+      "title": "Ask about this evaluation",
+      "subtitle": "Grounded on your results and the official scheme PDFs",
+      "close": "Close chat",
+      "reset": "Restart conversation",
+      "send": "Send",
+      "abort": "Stop generating",
+      "placeholder": "Ask about your results…",
+      "emptyBody": "I can explain why each scheme matched, what documents you'll need, or how to apply through the official portal. I can't give legal or financial advice.",
+      "suggestionsLabel": "Suggested questions",
+      "suggestions": {
+        "whyQualify": "Why do I qualify for {{scheme}}?",
+        "howApply": "How do I apply for these schemes?",
+        "documents": "What documents will I need?",
+        "deadlines": "Which scheme should I apply for first?"
+      },
+      "groundingUnavailable": "Note: live PDF grounding is unavailable right now.",
+      "disclaimer": "Layak helps you understand this evaluation. It is not a lawyer, tax adviser, or financial planner."
     }
   },
   "schemes": {

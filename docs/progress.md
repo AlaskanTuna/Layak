@@ -941,6 +941,11 @@ Findings the audit flagged that were **not** acted on (cosmetic or external to P
 - Updated the root `package.json` so `pnpm run dev` starts both the Next.js frontend and the FastAPI backend in parallel.
 - Added explicit `dev:frontend` and `dev:backend` scripts as separate entry points, with the backend path using the repo-local `backend/.venv/bin/uvicorn app.main:app --reload --port 8080`.
 
+## [24/04/26] - Results chatbot modal glass pass
+
+- Investigated the new per-evaluation chatbot panel and found it was reusing the lightweight `glass-surface` token, which reads too transparent on a large modal over busy results content.
+- Added a denser `glass-panel` treatment in `globals.css` and applied it to the chatbot shell so the modal keeps the frosted blur feel while looking closer to a solid glass card than a half-transparent overlay.
+
 ## [22/04/26] - Phase 7 Task 3: upload validator tightening + JPG/PNG crop preview
 
 - Tightened `frontend/src/components/evaluation/upload-widget.tsx` validation from the looser `image/*` MIME prefix to a strict allowlist of `image/jpeg | image/png | application/pdf`. The earlier prefix had let BMP / TIFF / HEIC reach the OCR step where they fail.

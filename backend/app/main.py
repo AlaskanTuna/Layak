@@ -15,9 +15,12 @@ Run locally:
 
 from __future__ import annotations
 
+import asyncio
 import json
+import logging
 import os
 from collections.abc import AsyncIterator
+from contextlib import asynccontextmanager
 from pathlib import Path
 from typing import Annotated
 
@@ -54,6 +57,9 @@ from app.services.evaluation_persistence import (  # noqa: E402
     persist_event_stream,
 )
 from app.services.rate_limit import enforce_quota  # noqa: E402
+from app.services.warmup import warmup_chat_dependencies  # noqa: E402
+
+_logger = logging.getLogger(__name__)
 
 _SUPPORTED_LANGUAGES = ("en", "ms", "zh")
 
@@ -69,7 +75,20 @@ def _coerce_language(raw: str | None) -> SupportedLanguage:
         return raw  # type: ignore[return-value]
     return "en"
 
-app = FastAPI(title="Layak Backend", version="0.1.0")
+@asynccontextmanager
+async def _lifespan(_app: FastAPI) -> AsyncIterator[None]:
+    """Phase 10 polish — schedule chat warm-up as a background task on startup
+    so uvicorn becomes ready immediately, and the first user-facing chat
+    request hits a hot Gemini + Discovery Engine path. Toggleable via the
+    `LAYAK_WARMUP_ENABLED` env var (default on)."""
+    try:
+        asyncio.create_task(warmup_chat_dependencies())
+    except Exception:  # noqa: BLE001 — warm-up must NEVER crash startup.
+        _logger.exception("Failed to schedule chat warm-up")
+    yield
+
+
+app = FastAPI(title="Layak Backend", version="0.1.0", lifespan=_lifespan)
 
 app.add_middleware(
     CORSMiddleware,

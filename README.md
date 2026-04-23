@@ -99,26 +99,28 @@ Malaysia's aid landscape is **fragmented** — 167 social-assistance schemes spr
 
 Layak collapses that into a single guided flow. A user uploads documents (or uses the privacy-first manual-entry path), and the agent returns:
 
-- 🥇 **Ranked schemes** ordered by estimated annual RM upside.
-- 💬 **Plain-language reasons** they appear to qualify.
-- 🔗 **Source-linked provenance** for every rule-backed claim.
-- 📄 **Draft application packets** for manual submission.
-- ⚠️ **Required contributions** surfaced separately so the headline upside stays honest.
+- 🥇 **Ranked Schemes** ordered by estimated annual RM upside.
+- 💬 **Plain-Language Reasons** they appear to qualify.
+- 🔗 **Source-Linked Provenance** for every rule-backed claim.
+- 📄 **Draft Application Packets** for manual submission.
+- ⚠️ **Required Contributions** surfaced separately so the headline upside stays honest.
+- 🤖 **Conversational Concierge** — a grounded chatbot on the results page so a non-technical relative (Aisyah's aunty/uncle) can ask follow-up questions about _their_ evaluation in English, Bahasa Malaysia, or Mandarin.
 
 ---
 
 ## 🏗 Feature Matrix
 
-|     | Feature                     | What it means                                                                                                                            |
-| --- | --------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------- |
-| 📥  | **Dual intake**             | Document upload for IC / payslip / utility, or a manual form for users who'd rather not upload anything.                                 |
-| 🧩  | **Visible 5-step agent**    | Extract → Classify → Match → Rank → Generate, streamed over SSE so the citizen watches the work happen.                                  |
-| 🔎  | **Grounded retrieval**      | Vertex AI Search over committed scheme PDFs — if no passage is retrieved, the rule is flagged `unverified` and drops out of the ranking. |
-| 🧮  | **Live arithmetic**         | Annual upside computed via Gemini Code Execution, not LLM narration.                                                                     |
-| 🖨  | **Draft packet generation** | WeasyPrint renders pre-filled application PDFs for each matched scheme, all watermarked `DRAFT — NOT SUBMITTED`.                         |
-| 👤  | **Accounts & history**      | Firebase Auth (Google), Firestore-backed evaluation history, free-tier quota, and an upgrade waitlist.                                   |
-| 🔐  | **PDPA-aligned**            | Explicit consent on sign-up, JSON export, and hard-delete endpoints. 30-day prune of free-tier history.                                  |
-| 🎭  | **Demo-ready fixtures**     | Five synthetic personas (Aisyah, Farhan, Hashim, Meiling, Ravi) for stable judging walkthroughs.                                         |
+|     | Feature                     | What it means                                                                                                                                                                                                                                                                   |
+| --- | --------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 📥  | **Dual Intake**             | Document upload for IC / payslip / utility, or a manual form for users who'd rather not upload anything.                                                                                                                                                                        |
+| 🧩  | **Visible 5-step Agent**    | Extract → Classify → Match → Rank → Generate, streamed over SSE so the citizen watches the work happen.                                                                                                                                                                         |
+| 🔎  | **Grounded Retrieval**      | Vertex AI Search over committed scheme PDFs — if no passage is retrieved, the rule is flagged `unverified` and drops out of the ranking.                                                                                                                                        |
+| 🧮  | **Live Arithmetic**         | Annual upside computed via Gemini Code Execution, not LLM narration.                                                                                                                                                                                                            |
+| 🖨  | **Draft Packet Generation** | WeasyPrint renders pre-filled application PDFs for each matched scheme, all watermarked `DRAFT — NOT SUBMITTED`.                                                                                                                                                                |
+| 👤  | **Accounts & History**      | Firebase Auth (Google), Firestore-backed evaluation history, free-tier quota, and an upgrade waitlist.                                                                                                                                                                          |
+| 🔐  | **PDPA-Aligned**            | Explicit consent on sign-up, JSON export, and hard-delete endpoints. 30-day prune of free-tier history.                                                                                                                                                                         |
+| 🎭  | **Demo-Ready Fixtures**     | Five synthetic personas (Aisyah, Farhan, Hashim, Meiling, Ravi) for stable judging walkthroughs.                                                                                                                                                                                |
+| 🤖  | **Per-Evaluation Chatbot**  | A floating panel on every completed results page — grounded on _that_ eval doc + Vertex AI Search retrieval, multilingual (en/ms/zh), with a five-layer guardrail stack (system-prompt language lock, safety filters, input validator, RAG grounding, citation-drift detector). |
 
 ---
 
@@ -152,7 +154,7 @@ flowchart LR
 ```
 
 <details>
-<summary><strong>Agent pipeline — five autonomous steps</strong></summary>
+<summary><strong>Agent Pipeline — Five Autonomous Steps</strong></summary>
 
 ```mermaid
 flowchart LR
@@ -171,7 +173,7 @@ flowchart LR
 </details>
 
 <details>
-<summary><strong>Authenticated evaluation flow</strong></summary>
+<summary><strong>Authenticated Evaluation Flow</strong></summary>
 
 ```mermaid
 flowchart LR
@@ -184,6 +186,29 @@ flowchart LR
     Results --> Packet[Regenerate packet ZIP]
     User --> Export[User export or delete]
 ```
+
+</details>
+
+<details>
+<summary><strong>Conversational Concierge — Per-Evaluation Grounded Chatbot</strong></summary>
+
+A floating chatbot on every completed results page lets a low-tech-literacy user (Aisyah's aunty/uncle persona) ask follow-up questions about _their_ evaluation in plain English, Bahasa Malaysia, or Mandarin. The bot is hard-constrained to the loaded `evaluations/{evalId}` doc plus Vertex AI Search retrieval over the nine scheme PDFs — it is **not** a general-purpose chatbot.
+
+```mermaid
+flowchart LR
+    Panel[Floating chat panel<br/>on results page] --> SSE2[POST /api/evaluations/:id/chat]
+    SSE2 --> Auth2[Auth + owner check]
+    Auth2 --> Load[Load eval doc<br/>from Firestore]
+    Load --> Guard[Input guardrails<br/>regex + length]
+    Guard --> Prompt[Build system prompt<br/>Rule 0 language lock<br/>+ eval-context digest]
+    Prompt --> ChatLLM[Gemini 2.5 Flash<br/>+ safety_settings]
+    ChatLLM <--> Retrieve[Vertex AI Search<br/>retrieval Tool]
+    ChatLLM --> Tokens[Stream tokens via SSE]
+    Tokens --> Validate[Citation drift detector]
+    Validate --> Panel
+```
+
+Five layered guardrails defend the surface: a hard-constrained system prompt (Rule 0 language lock, scope, refusals, citation rules), Gemini built-in safety settings, an input regex validator (length cap + prompt-injection patterns), Vertex AI Search grounding (fail-open if Discovery Engine is unreachable), and an output citation-drift detector that strips any cited `scheme_id` not in the user's matches list. A FastAPI lifespan warm-up pre-loads the Gemini + Discovery Engine paths on startup so the first user-facing chat call hits a hot path.
 
 </details>
 
@@ -231,7 +256,7 @@ Layak exercises **eight** first-party Google components in one flow:
 - `pnpm@10.33.0`
 - Python `3.12`
 
-### Install & configure
+### Install & Configure
 
 ```bash
 pnpm install          # installs every workspace package
@@ -248,7 +273,7 @@ Required environment variables:
 - `NEXT_PUBLIC_FIREBASE_*`
 - `FIREBASE_ADMIN_KEY`
 
-### Run locally
+### Run Locally
 
 ```bash
 # in terminal 1 — frontend
@@ -258,7 +283,7 @@ pnpm dev                                        # → http://localhost:3000
 cd backend && uvicorn app.main:app --reload --port 8080   # → http://localhost:8080
 ```
 
-### Useful commands
+### Useful Commands
 
 ```bash
 pnpm dev         # start frontend (Next.js 16, webpack, port 3000)
@@ -311,11 +336,11 @@ gcloud run deploy layak-backend \
 > [!CAUTION]
 > Layak is a **preparation** tool, not a submission tool. It never writes to `bantuantunai.hasil.gov.my`, the LHDN portal, or any other live agency endpoint.
 
-- 🚫 **No live submission — ever.** Outputs are drafts. The citizen submits through the official channel.
-- 🧾 **No unverified claim** reaches the UI. If Vertex AI Search returns no passage for a rule, the rule drops out of the ranking.
-- 🎭 **Synthetic demo documents only.** Every MyKad, payslip, and utility bill in `docs/demo/` is fictional and watermarked `SYNTHETIC — FOR DEMO ONLY`.
-- ⚖ **No final legal determination** is claimed. Every explanation uses "you appear to qualify ... the agency confirms on application."
-- 🗑 **30-day retention** on free-tier history, cascade-delete on account deletion, JSON export on demand — PDPA 2010-aligned.
+- 🚫 **No Live Submission — Ever.** Outputs are drafts. The citizen submits through the official channel.
+- 🧾 **No Unverified Claim** reaches the UI. If Vertex AI Search returns no passage for a rule, the rule drops out of the ranking.
+- 🎭 **Synthetic Demo Documents Only.** Every MyKad, payslip, and utility bill in `docs/demo/` is fictional and watermarked `SYNTHETIC — FOR DEMO ONLY`.
+- ⚖ **No Final Legal Determination** is claimed. Every explanation uses "you appear to qualify ... the agency confirms on application."
+- 🗑 **30-Day Retention** on free-tier history, cascade-delete on account deletion, JSON export on demand — PDPA 2010-aligned.
 
 ---
 

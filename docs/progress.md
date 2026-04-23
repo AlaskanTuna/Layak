@@ -924,6 +924,7 @@ Findings the audit flagged that were **not** acted on (cosmetic or external to P
 - Traced the Cloud Run-only glass regression to the custom `.glass-panel` treatment: it looked fine in dev, but the optimized production CSS bundle was not reliably carrying that selector, so the chat shell fell back to a washed-out translucent look live.
 - Replaced the modal shell with the same `topbar-glass` foundation used by the dashboard header, then layered explicit utility background opacity, border, and shadow classes on top so the frosted-card look is preserved in production.
 - Re-verified with `pnpm -C frontend lint` and `pnpm -C frontend build`.
+- Follow-up pass: increased the chatbot shell to a denser `bg-card`-based frosted panel with stronger blur and saturation, because the header-style alpha still read too transparent once the modal covered text-heavy results content.
 
 ## [22/04/26] - Landing and dashboard contrast polish
 

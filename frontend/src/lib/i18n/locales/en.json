@@ -666,9 +666,10 @@
       "title": "Ask about this evaluation",
       "subtitle": "Grounded on your results and the official scheme PDFs",
       "close": "Close chat",
+      "reset": "Restart conversation",
       "send": "Send",
       "abort": "Stop generating",
-      "placeholder": "Ask anything about your results — e.g. why you qualify, how to apply…",
+      "placeholder": "Ask about your results…",
       "emptyBody": "I can explain why each scheme matched, what documents you'll need, or how to apply through the official portal. I can't give legal or financial advice.",
       "suggestionsLabel": "Suggested questions",
       "suggestions": {

@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { AlertCircle, Loader2, MessageCircle, Send, Sparkles, X } from 'lucide-react'
+import { AlertCircle, Bot, Loader2, RotateCcw, Send, Sparkles, X } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
 import type { SchemeMatch } from '@/lib/agent-types'
@@ -81,16 +81,23 @@ export function ResultsChatPanel({ evalId, matches }: Props) {
 
   return (
     <>
-      {/* Floating action button — anchored bottom-right of viewport. */}
+      {/* Floating action button — stacked ABOVE the FloatingHelpLauncher.
+          Uses the exact same `Button size="icon-lg"` shape (size-9 → 36×36 px)
+          and `glass-surface` styling as the help launcher so the two FABs
+          render identically and right-align flush. The help launcher sits
+          at bottom-4 / md:bottom-6; bottom-16 / md:bottom-20 puts this
+          button ~12 px above it (36 px button + 16 px gap = 52 px → bottom-16). */}
       {!isOpen && (
-        <button
+        <Button
           type="button"
-          onClick={() => setIsOpen(true)}
+          variant="ghost"
+          size="icon-lg"
+          className="glass-surface fixed right-4 bottom-16 z-40 rounded-full text-foreground shadow-lg hover:bg-accent/25 hover:text-foreground md:right-6 md:bottom-20 dark:hover:bg-accent/35"
           aria-label={t('evaluation.chat.openButton')}
-          className="fixed right-4 bottom-4 z-40 inline-flex h-14 w-14 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-lg transition hover:scale-105 hover:shadow-xl focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 sm:right-6 sm:bottom-6 sm:h-16 sm:w-16"
+          onClick={() => setIsOpen(true)}
         >
-          <MessageCircle className="h-6 w-6 sm:h-7 sm:w-7" aria-hidden />
-        </button>
+          <Bot className="size-5" aria-hidden />
+        </Button>
       )}
 
       {/* Expanding panel — fixed-position so it never affects page layout. */}
@@ -98,26 +105,43 @@ export function ResultsChatPanel({ evalId, matches }: Props) {
         <div
           role="dialog"
           aria-label={t('evaluation.chat.title')}
-          className="fixed inset-0 z-50 flex items-end justify-center bg-black/40 sm:inset-auto sm:right-6 sm:bottom-6 sm:bg-transparent"
+          className="fixed inset-0 z-50 flex items-end justify-center bg-black/40 backdrop-blur-sm sm:inset-auto sm:right-6 sm:bottom-6 sm:bg-transparent sm:backdrop-blur-none"
           onClick={e => {
             // Click backdrop (mobile) closes the panel.
             if (e.target === e.currentTarget) setIsOpen(false)
           }}
         >
-          <div className="flex h-[85vh] w-full max-w-md flex-col overflow-hidden rounded-t-2xl border border-border bg-background shadow-2xl sm:h-[640px] sm:max-h-[80vh] sm:rounded-2xl">
-            <header className="flex items-center justify-between gap-2 border-b border-border px-4 py-3">
+          <div className="glass-surface flex h-[85vh] w-full max-w-md flex-col overflow-hidden rounded-t-2xl shadow-2xl sm:h-[640px] sm:max-h-[80vh] sm:rounded-2xl">
+            <header className="flex items-center justify-between gap-2 border-b border-border/60 px-4 py-3">
               <div className="flex flex-col">
                 <span className="text-sm font-semibold">{t('evaluation.chat.title')}</span>
                 <span className="text-xs text-muted-foreground">{t('evaluation.chat.subtitle')}</span>
               </div>
-              <button
-                type="button"
-                onClick={() => setIsOpen(false)}
-                aria-label={t('evaluation.chat.close')}
-                className="-mr-1 inline-flex h-8 w-8 items-center justify-center rounded-md text-muted-foreground transition hover:bg-muted hover:text-foreground focus:outline-none focus:ring-2 focus:ring-ring"
-              >
-                <X className="h-4 w-4" aria-hidden />
-              </button>
+              <div className="flex items-center gap-1">
+                {chat.messages.length > 0 && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      chat.reset()
+                      setDraft('')
+                    }}
+                    aria-label={t('evaluation.chat.reset')}
+                    title={t('evaluation.chat.reset')}
+                    disabled={chat.isStreaming}
+                    className="inline-flex h-8 w-8 items-center justify-center rounded-md text-muted-foreground transition hover:bg-muted hover:text-foreground focus:outline-none focus:ring-2 focus:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
+                  >
+                    <RotateCcw className="h-4 w-4" aria-hidden />
+                  </button>
+                )}
+                <button
+                  type="button"
+                  onClick={() => setIsOpen(false)}
+                  aria-label={t('evaluation.chat.close')}
+                  className="-mr-1 inline-flex h-8 w-8 items-center justify-center rounded-md text-muted-foreground transition hover:bg-muted hover:text-foreground focus:outline-none focus:ring-2 focus:ring-ring"
+                >
+                  <X className="h-4 w-4" aria-hidden />
+                </button>
+              </div>
             </header>
 
             <div className="flex-1 space-y-3 overflow-y-auto px-4 py-3">

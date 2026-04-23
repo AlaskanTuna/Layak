@@ -666,9 +666,10 @@
       "title": "询问关于此评估",
       "subtitle": "基于您的评估结果和官方计划 PDF",
       "close": "关闭聊天",
+      "reset": "重新开始对话",
       "send": "发送",
       "abort": "停止生成",
-      "placeholder": "询问任何关于您评估的问题 —— 例如为何合格、如何申请……",
+      "placeholder": "询问您的评估……",
       "emptyBody": "我可以说明每项计划匹配的原因、您需要准备的文件，或如何通过官方门户申请。我无法提供法律或财务建议。",
       "suggestionsLabel": "建议问题",
       "suggestions": {

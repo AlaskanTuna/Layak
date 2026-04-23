@@ -666,9 +666,10 @@
       "title": "Tanya tentang penilaian ini",
       "subtitle": "Berasaskan keputusan anda dan PDF rasmi skim",
       "close": "Tutup sembang",
+      "reset": "Mulakan semula sembang",
       "send": "Hantar",
       "abort": "Henti penjanaan",
-      "placeholder": "Tanya apa-apa tentang keputusan anda — contohnya kenapa anda layak, cara memohon…",
+      "placeholder": "Tanya tentang keputusan anda…",
       "emptyBody": "Saya boleh menerangkan kenapa setiap skim sepadan, dokumen apa yang anda perlukan, atau cara memohon melalui portal rasmi. Saya tidak boleh memberi nasihat undang-undang atau kewangan.",
       "suggestionsLabel": "Soalan cadangan",
       "suggestions": {

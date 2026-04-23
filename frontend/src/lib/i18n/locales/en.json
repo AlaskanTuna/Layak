@@ -93,13 +93,15 @@
     },
     "sectionBadge": {
       "required": "Required",
-      "optional": "Optional"
+      "optional": "Optional",
+      "selected": "Selected"
     }
   },
   "marketing": {
     "pricing": {
       "title": "Simple, transparent pricing",
       "description": "Start tracking your welfare eligibility for free. Upgrade to Pro when you need more power.",
+      "waitlist": "Waitlist",
       "freeTier": {
         "name": "Free",
         "description": "For individuals exploring their eligibility.",
@@ -525,6 +527,12 @@
         "minutesAgo": "{{count}} min ago",
         "hoursAgo": "{{count}} h ago",
         "daysAgo": "{{count}} d ago"
+      },
+      "stats": {
+        "ariaLabel": "Lifetime stats",
+        "totalEvaluations": "Total evaluations",
+        "highestResult": "Highest result",
+        "successfulRuns": "Successful runs"
       }
     },
     "dependants": {

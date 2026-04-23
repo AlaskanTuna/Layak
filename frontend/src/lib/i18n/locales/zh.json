@@ -93,7 +93,8 @@
     },
     "sectionBadge": {
       "required": "必填",
-      "optional": "选填"
+      "optional": "选填",
+      "selected": "已选中"
     }
   },
   "marketing": {
@@ -110,6 +111,7 @@
     "pricing": {
       "title": "简单、透明的价格",
       "description": "免费开始追踪您的援助资格；需要更多功能时再升级到 Pro。",
+      "waitlist": "等候名单",
       "freeTier": {
         "name": "免费版",
         "description": "适合希望了解自身资格的个人用户。",
@@ -525,6 +527,12 @@
         "minutesAgo": "{{count}} 分钟前",
         "hoursAgo": "{{count}} 小时前",
         "daysAgo": "{{count}} 天前"
+      },
+      "stats": {
+        "ariaLabel": "使用总览",
+        "totalEvaluations": "评估总数",
+        "highestResult": "最高结果",
+        "successfulRuns": "成功评估"
       }
     },
     "dependants": {
@@ -646,7 +654,7 @@
       "notificationBody": "您的草拟文件已保存到这台设备。手动提交前请先仔细检查。"
     },
     "codeExecution": {
-      "title": "Gemini Code Execution",
+      "title": "Gemini · 代码执行",
       "description": "这是年度收益计算的可选技术轨迹。若您想查看生成的 Python 与 stdout，可展开查看。",
       "show": "显示详情",
       "hide": "隐藏详情",

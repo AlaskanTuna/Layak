@@ -258,7 +258,7 @@ export const AISYAH_SCHEME_MATCHES: SchemeMatch[] = [
       'Household-with-children tier, income band RM2,501–RM5,000, 1-2 children bucket.',
     why_qualify:
       "Your household earns RM2,800/month, inside the RM2,501–RM5,000 band. You have 2 child(ren) under 18, placing you in the '1-2' children bucket. STR 2026 pays RM450/year in two tranches under the household-with-children tier. You still apply via BK-01 at bantuantunai.hasil.gov.my — Layak drafts the form for you; the final determination is LHDN's on application.",
-    agency: 'LHDN (HASiL) / Ministry of Finance',
+    agency: 'LHDN (HASiL) / Kementerian Kewangan',
     portal_url: 'https://bantuantunai.hasil.gov.my',
     rule_citations: [
       {

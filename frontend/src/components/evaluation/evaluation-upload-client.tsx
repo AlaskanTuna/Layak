@@ -17,6 +17,7 @@ import {
 } from '@/components/evaluation/upload-widget'
 import { UpgradeWaitlistModal } from '@/components/settings/upgrade-waitlist-modal'
 import { Button } from '@/components/ui/button'
+import { SectionBadge } from '@/components/evaluation/section-badge'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { AISYAH_DEPENDANT_OVERRIDES, loadAisyahFixtureFiles } from '@/lib/aisyah-fixtures'
 import { FARHAN_DEPENDANT_OVERRIDES, loadFarhanFixtureFiles } from '@/lib/farhan-fixtures'
@@ -364,7 +365,10 @@ function PathCard({
         >
           {icon}
         </div>
-        <CardTitle>{title}</CardTitle>
+        <div className="flex items-center gap-2">
+          <CardTitle>{title}</CardTitle>
+          {active && <SectionBadge variant="selected" />}
+        </div>
       </CardHeader>
       <CardContent className="flex flex-col gap-2">
         <p className="text-sm leading-relaxed text-muted-foreground">{description}</p>

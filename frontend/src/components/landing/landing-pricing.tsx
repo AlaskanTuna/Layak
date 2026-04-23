@@ -10,6 +10,29 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 export function LandingPricing() {
   const { t } = useTranslation()
 
+  // `returnObjects: true` pulls the localised features array directly out of
+  // the JSON bundle. Fallback to a literal EN array when the key is missing
+  // so pre-deploy environments without the locale addition still render.
+  const freeFeatures = t('marketing.pricing.freeTier.features', {
+    returnObjects: true,
+    defaultValue: [
+      '5 evaluations per 24 hours',
+      '30-day evaluation history',
+      'Access to STR, JKM, and LHDN schemes',
+      'Watermarked draft packets'
+    ]
+  }) as string[]
+  const proFeatures = t('marketing.pricing.proTier.features', {
+    returnObjects: true,
+    defaultValue: [
+      'Unlimited evaluations',
+      'Unlimited evaluation history',
+      'Priority processing queue',
+      'CSV export of all history',
+      'Early access to new schemes'
+    ]
+  }) as string[]
+
   return (
     <section id="pricing" className="mx-auto w-full max-w-5xl px-4 py-16 md:px-6">
       <div className="mb-10 flex flex-col items-center text-center">
@@ -41,13 +64,8 @@ export function LandingPricing() {
               </span>
             </div>
             <ul className="mb-6 space-y-3 flex-1 text-sm text-muted-foreground">
-              {[
-                '5 evaluations per 24 hours',
-                '30-day evaluation history',
-                'Access to STR, JKM, and LHDN schemes',
-                'Watermarked draft packets'
-              ].map((feature, idx) => (
-                <li key={idx} className="flex items-center gap-3">
+              {freeFeatures.map(feature => (
+                <li key={feature} className="flex items-center gap-3">
                   <Check className="size-4 text-primary" />
                   <span>{feature}</span>
                 </li>
@@ -65,7 +83,7 @@ export function LandingPricing() {
             <div className="flex items-center justify-between">
               <CardTitle className="text-2xl font-bold">{t('marketing.pricing.proTier.name', 'Pro')}</CardTitle>
               <span className="rounded-full bg-primary/10 px-2.5 py-1 font-heading text-xs font-semibold text-primary">
-                Waitlist
+                {t('marketing.pricing.waitlist', 'Waitlist')}
               </span>
             </div>
             <CardDescription>
@@ -80,14 +98,8 @@ export function LandingPricing() {
               </span>
             </div>
             <ul className="mb-6 space-y-3 flex-1 text-sm text-muted-foreground">
-              {[
-                'Unlimited evaluations',
-                'Unlimited evaluation history',
-                'Priority processing queue',
-                'CSV export of all history',
-                'Early access to new schemes'
-              ].map((feature, idx) => (
-                <li key={idx} className="flex items-center gap-3">
+              {proFeatures.map(feature => (
+                <li key={feature} className="flex items-center gap-3">
                   <Check className="size-4 text-primary" />
                   <span>{feature}</span>
                 </li>

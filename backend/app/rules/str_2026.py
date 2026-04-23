@@ -48,7 +48,12 @@ STR_HOUSEHOLD_ANNUAL_RM: dict[str, dict[str, float]] = {
     },
 }
 
-_AGENCY = "LHDN (HASiL) / Ministry of Finance"
+# Agency string kept in native Malay ("Kementerian Kewangan" rather than
+# "Ministry of Finance") so it reads consistently alongside the other
+# scheme agencies (JKM, LHDN, KWSP, PERKESO) which are also native-language
+# proper nouns. Proper-noun agency strings never localise per Phase 9
+# policy — they are the name the real portal uses.
+_AGENCY = "LHDN (HASiL) / Kementerian Kewangan"
 _PORTAL_URL = "https://bantuantunai.hasil.gov.my"
 _SCHEME_NAME = "STR 2026 — Household with children tier"
 

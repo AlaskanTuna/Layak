@@ -93,7 +93,8 @@
     },
     "sectionBadge": {
       "required": "Wajib",
-      "optional": "Pilihan"
+      "optional": "Pilihan",
+      "selected": "Dipilih"
     }
   },
   "marketing": {
@@ -110,6 +111,7 @@
     "pricing": {
       "title": "Harga mudah, telus",
       "description": "Mula menjejaki kelayakan bantuan anda secara percuma. Naik taraf ke Pro apabila anda perlukan lebih.",
+      "waitlist": "Senarai Menunggu",
       "freeTier": {
         "name": "Percuma",
         "description": "Untuk individu yang ingin meneroka kelayakan mereka.",
@@ -525,6 +527,12 @@
         "minutesAgo": "{{count}} min lalu",
         "hoursAgo": "{{count}} j lalu",
         "daysAgo": "{{count}} h lalu"
+      },
+      "stats": {
+        "ariaLabel": "Statistik keseluruhan",
+        "totalEvaluations": "Jumlah penilaian",
+        "highestResult": "Keputusan tertinggi",
+        "successfulRuns": "Penilaian berjaya"
       }
     },
     "dependants": {
@@ -646,7 +654,7 @@
       "notificationBody": "Fail draf anda sudah tersedia pada peranti ini. Semak dengan teliti sebelum penghantaran manual."
     },
     "codeExecution": {
-      "title": "Gemini Code Execution",
+      "title": "Gemini · Pelaksanaan Kod",
       "description": "Jejak teknikal pilihan untuk pengiraan faedah tahunan. Kembangkan jika anda mahu menyemak Python dan stdout yang dijana.",
       "show": "Tunjuk butiran",
       "hide": "Sembunyi butiran",

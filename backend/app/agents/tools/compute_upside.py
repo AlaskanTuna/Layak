@@ -26,6 +26,7 @@ from google.genai import types
 from app.agents.gemini import (
     HEAVY_MODEL,
     LANGUAGE_INSTRUCTION_BLOCK,
+    generate_with_retry,
     get_client,
 )
 from app.schema.events import ComputeUpsideResult
@@ -152,7 +153,8 @@ async def compute_upside(
         language_instruction=LANGUAGE_INSTRUCTION_BLOCK[language],
         **labels,
     )
-    response = client.models.generate_content(
+    response = generate_with_retry(
+        client,
         model=HEAVY_MODEL,
         contents=prompt,
         config=types.GenerateContentConfig(

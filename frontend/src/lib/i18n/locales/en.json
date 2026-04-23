@@ -693,6 +693,15 @@
     },
     "iSaraan": {
       "summary": "Government tops up 15% of self-employed voluntary EPF contribution, capped RM 500/yr. Targets Form B filers aged 18-60 without employer EPF."
+    },
+    "namesById": {
+      "str_2026": "STR 2026 — Household with children tier",
+      "jkm_warga_emas": "JKM Warga Emas — dependent elderly payment",
+      "jkm_bkk": "JKM Bantuan Kanak-Kanak — per-child monthly payment",
+      "lhdn_form_b": "LHDN Form B — five YA2025 reliefs",
+      "lhdn_form_be": "LHDN Form BE — five YA2025 reliefs",
+      "perkeso_sksps": "PERKESO SKSPS — Self-Employed Social Security",
+      "i_saraan": "EPF i-Saraan — voluntary contribution government match"
     }
   },
   "settings": {

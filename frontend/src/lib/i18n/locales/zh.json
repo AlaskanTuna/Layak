@@ -693,6 +693,15 @@
     },
     "iSaraan": {
       "summary": "政府按自雇人士的自愿 EPF 缴款额加发 15%，每年上限 RM 500。面向 18-60 岁、无雇主 EPF 缴款路径的 Form B 申报者。"
+    },
+    "namesById": {
+      "str_2026": "STR 2026 — 有子女家庭级别",
+      "jkm_warga_emas": "JKM Warga Emas — 年长受扶养人补助",
+      "jkm_bkk": "JKM Bantuan Kanak-Kanak — 每名子女月度补助",
+      "lhdn_form_b": "LHDN Form B — 五项 YA2025 税务减免",
+      "lhdn_form_be": "LHDN Form BE — 五项 YA2025 税务减免",
+      "perkeso_sksps": "PERKESO SKSPS — 自雇人士社会保障",
+      "i_saraan": "EPF i-Saraan — 自愿缴款政府配对"
     }
   },
   "settings": {

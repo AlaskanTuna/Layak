@@ -6,6 +6,7 @@ import { useTranslation } from 'react-i18next'
 
 import { Button } from '@/components/ui/button'
 import type { SchemeMatch } from '@/lib/agent-types'
+import { localisedSchemeName } from '@/lib/scheme-name'
 import { cn } from '@/lib/utils'
 
 type Props = {
@@ -25,7 +26,9 @@ function SchemeRow({ match }: { match: SchemeMatch }) {
     <li className="rounded-lg border border-border bg-card p-5 shadow-sm transition-colors">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
         <div className="flex min-w-0 flex-col gap-1">
-          <h3 className="font-heading text-lg font-semibold tracking-tight">{match.scheme_name}</h3>
+          <h3 className="font-heading text-lg font-semibold tracking-tight">
+            {localisedSchemeName(t, match.scheme_id, match.scheme_name)}
+          </h3>
           <p className="text-xs leading-relaxed text-muted-foreground">{match.summary}</p>
         </div>
         <div className="shrink-0 text-left tabular-nums sm:text-right">

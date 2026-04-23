@@ -9,6 +9,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { authedFetch } from '@/lib/firebase'
 import { triggerDownload } from '@/lib/packet-download-utils'
 import type { SchemeMatch } from '@/lib/agent-types'
+import { localisedSchemeName } from '@/lib/scheme-name'
 
 type Props = {
   evalId: string
@@ -146,7 +147,9 @@ export function DraftPacketPreview({ evalId, matches }: Props) {
                 <span className="flex min-w-0 flex-1 items-center gap-2.5">
                   <FileText className="size-4 shrink-0 text-muted-foreground" aria-hidden />
                   <span className="flex min-w-0 flex-col">
-                    <span className="truncate text-sm font-medium">{match.scheme_name}</span>
+                    <span className="truncate text-sm font-medium">
+                      {localisedSchemeName(t, match.scheme_id, match.scheme_name)}
+                    </span>
                     <span className="text-xs text-muted-foreground">{match.agency}</span>
                   </span>
                 </span>
@@ -185,7 +188,9 @@ export function DraftPacketPreview({ evalId, matches }: Props) {
                     <div className="flex flex-col gap-2">
                       <iframe
                         src={draft.blobUrl}
-                        title={t('evaluation.preview.iframeTitle', { name: match.scheme_name })}
+                        title={t('evaluation.preview.iframeTitle', {
+                          name: localisedSchemeName(t, match.scheme_id, match.scheme_name)
+                        })}
                         className="h-[480px] w-full rounded-md border border-border bg-background"
                       />
                       <div className="flex justify-end">

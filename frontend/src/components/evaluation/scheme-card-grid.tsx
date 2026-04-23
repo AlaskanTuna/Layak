@@ -5,6 +5,7 @@ import { useTranslation } from 'react-i18next'
 
 import { Button } from '@/components/ui/button'
 import type { SchemeMatch } from '@/lib/agent-types'
+import { localisedSchemeName } from '@/lib/scheme-name'
 import { cn } from '@/lib/utils'
 
 type Props = {
@@ -76,7 +77,9 @@ export function SchemeCardGrid({ matches }: Props) {
             >
               <header className="flex flex-col gap-2">
                 <span className="text-[10px] uppercase tracking-[0.14em] text-primary">{category}</span>
-                <h3 className="font-heading text-base font-semibold tracking-tight">{match.scheme_name}</h3>
+                <h3 className="font-heading text-base font-semibold tracking-tight">
+                  {localisedSchemeName(t, match.scheme_id, match.scheme_name)}
+                </h3>
                 <p className="text-xs leading-relaxed text-muted-foreground">{match.summary}</p>
               </header>
 

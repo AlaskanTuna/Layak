@@ -4,6 +4,7 @@ import { ExternalLink, ShieldCheck } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 
 import type { SchemeMatch } from '@/lib/agent-types'
+import { localisedSchemeName } from '@/lib/scheme-name'
 
 type Props = {
   matches: SchemeMatch[]
@@ -58,7 +59,9 @@ export function RequiredContributionsCard({ matches }: Props) {
               className="flex flex-col gap-3 rounded-lg border border-amber-500/20 bg-card p-4 sm:flex-row sm:items-start sm:justify-between"
             >
               <div className="flex min-w-0 flex-col gap-1">
-                <h3 className="font-heading text-sm font-semibold tracking-tight">{match.scheme_name}</h3>
+                <h3 className="font-heading text-sm font-semibold tracking-tight">
+                  {localisedSchemeName(t, match.scheme_id, match.scheme_name)}
+                </h3>
                 <p className="text-xs leading-relaxed text-muted-foreground">{match.summary}</p>
               </div>
               <div className="shrink-0 text-left tabular-nums sm:text-right">

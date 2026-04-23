@@ -693,6 +693,15 @@
     },
     "iSaraan": {
       "summary": "Kerajaan menambah 15% caruman KWSP sukarela bagi pekerja sendiri, had RM 500/tahun. Sasaran pemfail Borang B berumur 18-60 tahun tanpa caruman KWSP majikan."
+    },
+    "namesById": {
+      "str_2026": "STR 2026 — Tier isi rumah berkanak-kanak",
+      "jkm_warga_emas": "JKM Warga Emas — bayaran warga emas tanggungan",
+      "jkm_bkk": "JKM Bantuan Kanak-Kanak — pembayaran bulanan setiap kanak-kanak",
+      "lhdn_form_b": "LHDN Form B — lima pelepasan YA2025",
+      "lhdn_form_be": "LHDN Form BE — lima pelepasan YA2025",
+      "perkeso_sksps": "PERKESO SKSPS — Jaminan Sosial Pekerja Sendiri",
+      "i_saraan": "EPF i-Saraan — padanan kerajaan untuk caruman sukarela"
     }
   },
   "settings": {

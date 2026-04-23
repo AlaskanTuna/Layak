@@ -1112,11 +1112,7 @@ _Frontend:_
 
 ---
 
-## Phase 9: True Multilingual Analysis Outputs
-
-> Phase 6 Task 7 localised the UI chrome (header / forms / labels). The analysis the pipeline emits — classify notes, compute_upside stdout, rule-engine `why_qualify` and `summary` strings, humanised error copy — is still hardcoded English and ignores the UI toggle. This phase makes the whole evaluation truly multilingual end-to-end, persists the user's choice server-side so it survives across devices, and threads the selected language through every Gemini prompt + rule output.
->
-> **Platform note.** PO1 flagged Supabase in the brief; this project's data layer is **Firestore** (already wired via `users/{uid}` and `evaluations/{evalId}`). No new database — we extend the existing `users/{uid}` document with a `language` field. Firestore rules still apply; no migration required because missing-field reads default to `"en"`.
+## Phase 9: Final App Polishing
 
 ### 1. Feature: Persist user language preference on `users/{uid}`
 

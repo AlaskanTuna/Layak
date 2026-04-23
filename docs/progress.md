@@ -919,6 +919,12 @@ Findings the audit flagged that were **not** acted on (cosmetic or external to P
 - Integrated PDPA Consent routing (`X-PDPA-Consent` header triggering on first app auth via `/api/quota`) within `backend/app/auth.py`.
   \n## 2026-04-26\n\n### Phase 5: Auth + Gateway + Marketing (P5T1)\n- Added simple, transparent pricing structure to `en.json` with Free and Pro tiers.\n- Scaffolded `frontend/src/components/landing/landing-pricing.tsx` implementing the Free/Pro split as seen in the SaaS pivot spec.\n- Integrated `LandingPricing` component into `frontend/src/app/pages/marketing/landing-page.tsx`.\n- Marked Phase 5 Task 1 (Landing Page rewrite) as complete in `docs/plan.md`.
 
+## [24/04/26] - Results chatbot modal production glass fix
+
+- Traced the Cloud Run-only glass regression to the custom `.glass-panel` treatment: it looked fine in dev, but the optimized production CSS bundle was not reliably carrying that selector, so the chat shell fell back to a washed-out translucent look live.
+- Replaced the modal shell with the same `topbar-glass` foundation used by the dashboard header, then layered explicit utility background opacity, border, and shadow classes on top so the frosted-card look is preserved in production.
+- Re-verified with `pnpm -C frontend lint` and `pnpm -C frontend build`.
+
 ## [22/04/26] - Landing and dashboard contrast polish
 
 - Fixed the landing-page language dropdown so its menu and items use explicit card-foreground text even before the transparent marketing header transitions on scroll.

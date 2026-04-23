@@ -111,7 +111,7 @@ export function ResultsChatPanel({ evalId, matches }: Props) {
             if (e.target === e.currentTarget) setIsOpen(false)
           }}
         >
-          <div className="glass-panel flex h-[85vh] w-full max-w-md flex-col overflow-hidden rounded-t-2xl sm:h-[640px] sm:max-h-[80vh] sm:rounded-2xl">
+          <div className="topbar-glass border-border/60 bg-background/90 shadow-[0_28px_72px_rgb(15_23_42/0.14),inset_0_1px_0_rgb(255_255_255/0.36)] dark:bg-background/88 dark:shadow-[0_28px_72px_rgb(0_0_0/0.42),inset_0_1px_0_rgb(255_255_255/0.08)] flex h-[85vh] w-full max-w-md flex-col overflow-hidden rounded-t-2xl border sm:h-[640px] sm:max-h-[80vh] sm:rounded-2xl">
             <header className="flex items-center justify-between gap-2 border-b border-border/60 px-4 py-3">
               <div className="flex flex-col">
                 <span className="text-sm font-semibold">{t('evaluation.chat.title')}</span>

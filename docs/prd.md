@@ -5,8 +5,8 @@
 **Industry**: Malaysian GovTech / social-assistance delivery (Track 2 — Citizens First)
 **Team Size**: 2
 **Target Grade**: Project 2030 — MyAI Future Hackathon, National Open Champion
-**Document Version**: 0.2.0
-**Date**: 21 April 2026
+**Document Version**: 0.2.1
+**Date**: 23 April 2026
 
 ---
 
@@ -29,7 +29,7 @@
    7. [FR-7 — Provenance panel](#fr-7--provenance-panel)
    8. [FR-8 — Draft packet PDF generator](#fr-8--draft-packet-pdf-generator)
    9. [FR-9 — "Why I qualify" explanation per scheme](#fr-9--why-i-qualify-explanation-per-scheme)
-   10. [FR-10 — Aisyah seed-data demo-mode fallback](#fr-10--aisyah-seed-data-demo-mode-fallback)
+   10. [FR-10 — Sample-data demo-mode fallback](#fr-10--sample-data-demo-mode-fallback)
    11. [FR-11 — Google OAuth sign-in](#fr-11--google-oauth-sign-in)
    12. [FR-12 — PDPA-consent sign-up gate](#fr-12--pdpa-consent-sign-up-gate)
    13. [FR-13 — Persisted per-user evaluation history](#fr-13--persisted-per-user-evaluation-history)
@@ -77,7 +77,7 @@ Malaysia's social-assistance estate is fragmented. The Ministry of Finance's _Ec
 2. **Develop** a grounded rule engine encoding STR 2026 tier logic, JKM Warga Emas means-test logic, and five LHDN personal reliefs (individual, parent medical, child 16a ×2, EPF+life #17, lifestyle #9) for Form B (gig/self-employed) filers, with every rule traceable to a cached source PDF URL.
 3. **Develop** a multimodal document-intake layer using Gemini 2.5 Flash to extract profile data directly from IC, payslip, and utility-bill images, without a separate OCR stage.
 4. **Demonstrate** end-to-end on Google Cloud Run with min-instances=1, first-byte latency under 3 seconds during the judging window, and a zero-hallucination rule-provenance layer (every eligibility claim cites its source PDF).
-5. **Demonstrate** at least four Google AI ecosystem components — Gemini 2.5 Pro (orchestrator), Gemini 2.5 Flash (workers), Gemini Code Execution (arithmetic), Vertex AI Search (grounded RAG over scheme PDFs), and Cloud Run + Secret Manager (deployment).
+5. **Demonstrate** at least four Google AI ecosystem components — Gemini family models across the pipeline, Gemini Code Execution (arithmetic), Vertex AI Search (grounded RAG over scheme PDFs), and Cloud Run + Secret Manager (deployment).
 6. **Evaluate** on one outcome metric visible in the demo: estimated annual RM upside per user relative to "did nothing" (e.g., Aisyah's ~RM7,250/year from STR + SARA + three LHDN reliefs). This becomes the headline number in the pitch.
 
 ## 3. Target Users
@@ -92,10 +92,10 @@ Malaysia's social-assistance estate is fragmented. The Ministry of Finance's _Ec
 | Digital literacy     | Moderate — confident with e-wallet apps, photo-uploads MyKad when Grab asks, distrustful of multi-page gov forms                                                                           |
 | Current aid status   | Likely already receives SARA monthly MyKad credit; unclear whether she has applied for STR 2026; father not yet enrolled in Warga Emas; has never claimed parent-medical relief under LHDN |
 | Device               | Mid-range Android, data-capped mobile plan, occasional home WiFi                                                                                                                           |
-| Language             | Prefers Bahasa Malaysia; functional English (v1 UI is English only)                                                                                                                        |
+| Language             | Prefers Bahasa Malaysia; can switch between Bahasa Malaysia, English, and Simplified Chinese UI copy                                                                                       |
 | Pain in one sentence | _"I don't know what I'm entitled to, the forms all want the same documents twice, and I don't trust that entering my IC number anywhere online is safe."_                                  |
 
-**Why Aisyah is the only demo persona.** She activates all three locked schemes simultaneously (STR household tier with children; JKM Warga Emas through her father; LHDN Form B reliefs matching her gig profile), producing the richest three-scheme packet in a 90-second demo. Secondary personas each light up only one or two schemes and would dilute the on-stage moment. A persona switcher is the number-one scope-creep trap; it is out.
+**Why Aisyah remains the primary demo persona.** She activates all three locked schemes simultaneously (STR household tier with children; JKM Warga Emas through her father; LHDN Form B reliefs matching her gig profile), producing the richest three-scheme packet in a 90-second demo. The shipped product now also includes a second salaried sample persona (Farhan) for Form BE coverage and regression checks, but Aisyah remains the headline walkthrough and product-reference persona.
 
 ### 3.2 Secondary personas (OUT OF SCOPE for v1)
 
@@ -109,8 +109,8 @@ Listed for positioning only. Not implemented, not in the demo, not in the rule e
 
 - Owns a smartphone with a working camera.
 - Has intermittent mobile data; home broadband is **not** assumed.
-- Reads English UI copy if it is plain-language.
-- Trust-posture is skeptical after the MyGov chatbot incident and broader scam landscape — therefore Layak must display "we store nothing" and "draft only — you submit manually" prominently.
+- Can navigate plain-language UI copy in either English or Bahasa Malaysia; Simplified Chinese is supported but not assumed.
+- Trust-posture is skeptical after the MyGov chatbot incident and broader scam landscape — therefore Layak must disclose clearly that raw uploads are processed transiently, derived evaluation data may be stored for history/results, and every packet remains "draft only — you submit manually".
 
 ### 3.4 Secondary personas active in v2
 
@@ -128,8 +128,8 @@ Each requirement below ties to one of the in-scope v1 and v2 deliverables. Accep
 
 - [ ] `curl -I https://<cloud-run-url>` returns `HTTP/2 200` within 3 seconds (warm container).
 - [ ] The landing view renders on 375px, 768px, and 1440px viewports without horizontal scroll.
-- [ ] UI copy is entirely in English for v1.
-- [ ] No login is required to reach the upload widget.
+- [ ] UI copy is available in English, Bahasa Malaysia, and Simplified Chinese, with a runtime language toggle.
+- [ ] No login is required to reach the public landing page; authenticated routes gate the intake/dashboard experience.
 - [ ] README Cloud Run URL works from an incognito browser on the demo network.
 
 ### FR-2 — Document upload widget (three files)
@@ -142,7 +142,7 @@ Each requirement below ties to one of the in-scope v1 and v2 deliverables. Accep
 - [ ] Uploads via the phone camera succeed on iOS Safari and Android Chrome.
 - [ ] Files above 10 MB are rejected client-side with a visible error.
 - [ ] Non-image/non-PDF MIME types are rejected client-side.
-- [ ] A single-click "Use Aisyah sample documents" button loads seed fixtures (see FR-10).
+- [ ] Visible sample-data buttons load the bundled Aisyah and Farhan fixtures (see FR-10).
 
 ### FR-3 — Multimodal extraction into strict JSON profile
 
@@ -206,37 +206,37 @@ Each requirement below ties to one of the in-scope v1 and v2 deliverables. Accep
 
 ### FR-8 — Draft packet PDF generator
 
-**Description.** WeasyPrint renders three pre-filled draft PDFs (BK-01 STR application, JKM18 Warga Emas application, LHDN relief summary) each watermarked "DRAFT — NOT SUBMITTED" on every page.
+**Description.** WeasyPrint renders pre-filled draft PDFs (BK-01 STR application, JKM18 Warga Emas application, JKM BKK where applicable, LHDN relief summary, and other mapped in-scope packets) with a localized Layak watermark on every page while the underlying government-form body stays in its source language.
 
 **Acceptance criteria:**
 
 - [ ] The three PDFs download as a single ZIP or as three separate files from the results view.
-- [ ] Watermark is visible on every page and is not removable by the user in-browser.
+- [ ] Watermark is visible on every page, localized to the evaluation language, and is not removable by the user in-browser.
 - [ ] Pre-filled fields match the extracted profile (FR-3) and the rule-engine results (FR-4).
-- [ ] Each PDF includes a footer: "Generated by Layak on YYYY-MM-DD. This is a draft. You must submit manually via the stated official portal."
+- [ ] Each PDF includes a localized Layak footer stating that the packet is a draft, not an official submission, and must be submitted manually via the stated official portal.
 - [ ] Cloud Run container ships with `libpango`, `libcairo`, and `libgdk-pixbuf` preinstalled.
 
 ### FR-9 — "Why I qualify" explanation per scheme
 
-**Description.** The RootAgent (Gemini 2.5 Pro) generates a plain-language explanation for each matched scheme, referencing the provenance map from FR-7.
+**Description.** Each matched scheme returns deterministic plain-language `summary` and `why_qualify` copy from the rule engine, localized to the evaluation language and shown alongside the provenance map from FR-7.
 
 **Acceptance criteria:**
 
-- [ ] Each explanation is under 80 words.
-- [ ] Each explanation cites at least one source PDF inline.
-- [ ] Explanations are written in plain English at a B40-consumer reading level (avoid legalese and tax-speak).
-- [ ] Explanations never claim a final legal determination — they say "you appear to qualify based on Budget 2026 gazetted rates as of 20 Apr 2026; the agency confirms on application."
-- [ ] Explanations render inside the scheme card expander (FR-6).
+- [ ] `summary` and `why_qualify` are produced by the typed rule modules, not by a free-form LLM response.
+- [ ] Explanations are localized to the user's chosen evaluation language (`en`, `ms`, `zh`), while scheme names and cited passages remain in their source form for grounding.
+- [ ] Explanations are written in plain-language consumer copy and avoid legalese / tax jargon where possible.
+- [ ] Explanations never claim a final legal determination — they state that the relevant agency confirms on application.
+- [ ] Explanations render inside the scheme cards / expanders in the results UI (FR-6).
 
-### FR-10 — Aisyah seed-data demo-mode fallback
+### FR-10 — Sample-data demo-mode fallback
 
-**Description.** A visible "Use Aisyah sample documents" button loads hardcoded fixtures so the five-step pipeline can still execute visibly on stage if live extraction misbehaves.
+**Description.** Visible sample-data buttons load hardcoded persona fixtures so the five-step pipeline can still execute visibly on stage if live extraction misbehaves or when the team wants to demo both Form B and Form BE paths.
 
 **Acceptance criteria:**
 
-- [ ] A single click replaces the uploaded documents with the Aisyah fixtures and triggers the pipeline.
-- [ ] Seed fixtures reside at `backend/data/fixtures/aisyah/` and are committed to git.
-- [ ] The seed run produces the same ranked-scheme list and total RM upside as the live-extraction path for the same documents.
+- [ ] A single click replaces the uploaded documents with either the Aisyah or Farhan fixtures and triggers the pipeline.
+- [ ] Seed fixtures reside at `frontend/public/fixtures/` and are loaded through the committed frontend helpers in `frontend/src/lib/aisyah-fixtures.ts` and `frontend/src/lib/farhan-fixtures.ts`.
+- [ ] The seed run produces the same ranked-scheme list and total RM upside as the equivalent live-extraction or manual-entry path for the same persona.
 - [ ] The UI surface labels seed-mode runs with a "DEMO MODE" banner.
 - [ ] Demo mode is idempotent — repeat clicks produce the same result.
 
@@ -363,10 +363,10 @@ Each requirement below ties to one of the in-scope v1 and v2 deliverables. Accep
 - [ ] `employment_type` is a two-value input (`"gig"` or `"salaried"`) and maps server-side to `Profile.form_type` — `gig → form_b`, `salaried → form_be`.
 - [ ] `build_profile_from_manual_entry` applied to the Aisyah payload produces a `Profile` equal to `AISYAH_PROFILE` field-for-field, including `household_flags.income_band`. Feeding that built Profile through the rule engine produces `AISYAH_SCHEME_MATCHES` — the same ranked schemes and total RM upside the upload path produces.
 - [ ] Validation errors return HTTP 422 with field-level messages the form can bind to.
-- [ ] "Use Aisyah sample documents" in manual mode pre-fills every form field with the fixture values and is idempotent on repeat clicks.
+- [ ] Sample-persona actions in manual mode pre-fill every form field with the Aisyah or Farhan fixture values and are idempotent on repeat clicks.
 - [ ] `?mode=manual` query parameter preloads the manual tab on first paint.
 - [ ] The stepper still shows all five steps; the `extract` step label reads "Profile prepared" in manual mode.
-- [ ] The manual path inherits whatever auth policy applies to `/api/agent/intake` at the time (unauthed in v1, authed in v2).
+- [ ] The manual path follows the same authenticated policy as `/api/agent/intake`; there is no manual-entry bypass.
 
 ## 5. Non-Functional Requirements
 
@@ -384,9 +384,9 @@ Each requirement below ties to one of the in-scope v1 and v2 deliverables. Accep
 
 ### NFR-3 — Privacy
 
-- No user documents, profile data, or PII are persisted beyond the HTTP request lifecycle.
-- No user accounts, no login, no session storage beyond in-memory request scope.
-- IC numbers are surfaced in the UI and packet as last-4-digits only; full IC is masked everywhere except the Pydantic Profile object held in request memory.
+- Raw uploaded documents are processed in-memory and are not intentionally persisted by the application after extraction completes.
+- Authenticated v2 flows persist user + evaluation records in Firestore (profile, classification, matches, upside trace, language, status) so history, results rehydration, quota enforcement, and PDPA export/delete can work.
+- IC numbers are surfaced and persisted as last-4-digits only; full IC numbers are never accepted in manual entry and must never be logged or written to Firestore.
 - `.env` is git-ignored; `.env.example` is the only committed environment template.
 
 ### NFR-4 — Accessibility & responsiveness
@@ -395,18 +395,18 @@ Each requirement below ties to one of the in-scope v1 and v2 deliverables. Accep
 - All interactive elements are keyboard-reachable.
 - Alt text on every non-decorative image.
 - Colour contrast ratios meet WCAG 2.1 AA for body copy.
-- Plain-English copy throughout; technical jargon is only shown behind a "show full rule" affordance.
+- Plain-language copy throughout English, Bahasa Malaysia, and Simplified Chinese; source-language legal/proper-noun text is preserved where grounding depends on it.
 
 ### NFR-5 — Reliability
 
 - Bundled PDF sources in `backend/data/schemes/` — live fetches to `hasil.gov.my`, `jkm.gov.my`, or `data.gov.my` are never on the critical path.
-- Cached Aisyah seed data is a one-click fallback (FR-10).
+- Cached Aisyah / Farhan seed data is a one-click fallback (FR-10).
 - Rule-engine unit tests run in CI and fail the build if any threshold value drifts from the cached PDFs without a deliberate version bump.
 
 ### NFR-6 — Security
 
-- Cloud Run service account has `roles/secretmanager.secretAccessor` only; no broader privileges.
-- `GEMINI_API_KEY` lives in GCP Secret Manager, mounted via `--set-secrets=GEMINI_API_KEY=gemini-api-key:latest`.
+- Cloud Run service account has the minimum Vertex AI access roles plus `roles/secretmanager.secretAccessor` for the Firebase admin secret; no broader privileges.
+- Gemini access uses Vertex AI ADC via `GOOGLE_CLOUD_PROJECT` / `GOOGLE_CLOUD_LOCATION`; the backend secret mount is reserved for `FIREBASE_ADMIN_KEY`.
 - HTTPS-only; Cloud Run defaults hold.
 - No credentials, tokens, or IC values appear in any commit, log line, or UI string.
 - AI disclosure section in README names Claude Code explicitly (hackathon Rules §4.2).
@@ -435,7 +435,7 @@ Each requirement below ties to one of the in-scope v1 and v2 deliverables. Accep
 
 Mirrored verbatim from `docs/project-idea.md` §5. Ten items:
 
-1. Single-page Next.js web app deployed at a Cloud Run HTTPS URL, English UI only.
+1. Single-page Next.js web app deployed at a Cloud Run HTTPS URL, localized to English, Bahasa Malaysia, and Simplified Chinese.
 2. Document-upload widget accepting three image/PDF files (IC, payslip or e-wallet income screenshot, utility bill).
 3. Gemini 2.5 Flash multimodal extraction into a strict JSON profile.
 4. Hardcoded eligibility rule engine for STR 2026 (household-with-children tier), JKM Warga Emas, and five LHDN reliefs.
@@ -443,14 +443,15 @@ Mirrored verbatim from `docs/project-idea.md` §5. Ten items:
 6. Ranked scheme list ordered by RM upside.
 7. Provenance panel: every rule cites its source PDF URL.
 8. PDF packet generator producing three pre-filled drafts watermarked "DRAFT — NOT SUBMITTED."
-9. "Why I qualify" explanation per scheme.
-10. Hardcoded Aisyah seed-data button for demo fallback.
+9. Deterministic, localized "Why I qualify" explanation per scheme.
+10. Hardcoded Aisyah / Farhan sample-data buttons for demo fallback.
 
 ### 6.1.1 Additional v2 deliverables
 
 - User accounts via Firebase Auth / Google OAuth.
 - Persistent storage in Firestore.
 - Per-user evaluation history.
+- Per-user language preference synced across devices.
 - Tiered quotas: Free 5/24h, Pro unlimited.
 - PDPA export and deletion endpoints.
 
@@ -459,7 +460,7 @@ Mirrored verbatim from `docs/project-idea.md` §5. Ten items:
 Mirrored verbatim from `docs/project-idea.md` §5. Any item below renders as a greyed-out "Checking… (v2)" card in the UI, never as a working feature.
 
 - Live submission to any government portal (disqualification risk).
-- Malay, Chinese, or Tamil UI.
+- Additional locales beyond English / Bahasa Malaysia / Simplified Chinese (for example Tamil).
 - Schemes beyond the three locked: i-Saraan, PERKESO, MyKasih, eKasih, PADU sync, state-level aid (Kita Selangor, Penang elderly), SARA claim flow.
 - Appeal workflow (BK-02 / BK-05 / JKM20).
 - Mobile native app.
@@ -475,7 +476,7 @@ Mirrored verbatim from `docs/project-idea.md` §5. Any item below renders as a g
 - Budget 2026 SARA Untuk Semua one-off disbursement.
 - eKasih booster tier toggle.
 - Warga Emas discretionary-override path.
-- Form B vs Form BE auto-routing (Aisyah is locked as Form B filer).
+- Tax-form support beyond the current Form B / Form BE split.
 - Stripe billing (deferred to v2.1).
 - Email/password auth (deferred indefinitely).
 - Admin panel (deferred — tier flips via gcloud/script).

@@ -5,8 +5,8 @@
 **Industry**: Malaysian GovTech / social-assistance delivery (Track 2 — Citizens First)
 **Team Size**: 2
 **Target Grade**: Project 2030 — MyAI Future Hackathon, National Open Champion
-**Document Version**: 0.2.0
-**Date**: 21 April 2026
+**Document Version**: 0.2.1
+**Date**: 23 April 2026
 
 ---
 
@@ -30,45 +30,46 @@
 16. [Repo layout](#64-repo-layout)
 17. [Data & storage](#65-data--storage)
 18. [Pre-commit hooks (Husky + lint-staged)](#66-pre-commit-hooks-husky--lint-staged)
-19. [Security & Secrets](#7-security--secrets)
-20. [Feasible-Minimum Tech Stack (Plan B)](#8-feasible-minimum-tech-stack-plan-b)
-21. [Open Questions](#9-open-questions)
-22. [Handbook orchestrator mismatch](#91-handbook-orchestrator-mismatch)
-23. [Vertex AI Search collapse trigger](#92-vertex-ai-search-collapse-trigger)
-24. [GCP project and region pinning](#93-gcp-project-and-region-pinning)
-25. [Backend layout — RESOLVED](#94-backend-layout--resolved)
-26. [JKM Warga Emas rate](#95-jkm-warga-emas-rate)
-27. [Demo document specimens](#96-demo-document-specimens)
-28. [Team & Delivery Responsibilities](#10-team--delivery-responsibilities)
-29. [Roles at a glance](#101-roles-at-a-glance)
-30. [Phase ownership matrix](#102-phase-ownership-matrix)
-31. [Cross-cutting responsibilities](#103-cross-cutting-responsibilities)
-32. [Swap & escalation rules](#104-swap--escalation-rules)
-33. [v2 additions](#v2-additions)
-34. [v2 authenticated topology](#23-v2-authenticated-topology)
-35. [v2 authenticated flow](#41-v2-authenticated-flow)
-36. [Firestore as the session + archive layer](#55-firestore-as-the-session--archive-layer)
-37. [v2 environment variables](#67-v2-environment-variables)
-38. [Supabase fallback for v2 auth + DB layer](#82-supabase-fallback-for-v2-auth--db-layer)
-39. [Rate-limit race condition](#97-rate-limit-race-condition)
+19. [v2 environment variables](#67-v2-environment-variables)
+20. [Internationalization & language persistence](#68-internationalization--language-persistence)
+21. [Security & Secrets](#7-security--secrets)
+22. [Feasible-Minimum Tech Stack (Plan B)](#8-feasible-minimum-tech-stack-plan-b)
+23. [Open Questions](#9-open-questions)
+24. [Handbook orchestrator mismatch](#91-handbook-orchestrator-mismatch)
+25. [Vertex AI Search collapse trigger](#92-vertex-ai-search-collapse-trigger)
+26. [GCP project and region pinning](#93-gcp-project-and-region-pinning)
+27. [Backend layout — RESOLVED](#94-backend-layout--resolved)
+28. [JKM Warga Emas rate](#95-jkm-warga-emas-rate)
+29. [Demo document specimens](#96-demo-document-specimens)
+30. [Team & Delivery Responsibilities](#10-team--delivery-responsibilities)
+31. [Roles at a glance](#101-roles-at-a-glance)
+32. [Phase ownership matrix](#102-phase-ownership-matrix)
+33. [Cross-cutting responsibilities](#103-cross-cutting-responsibilities)
+34. [Swap & escalation rules](#104-swap--escalation-rules)
+35. [v2 additions](#v2-additions)
+36. [v2 authenticated topology](#23-v2-authenticated-topology)
+37. [v2 authenticated flow](#41-v2-authenticated-flow)
+38. [Firestore as the session + archive layer](#55-firestore-as-the-session--archive-layer)
+39. [Supabase fallback for v2 auth + DB layer](#82-supabase-fallback-for-v2-auth--db-layer)
+40. [Rate-limit race condition](#97-rate-limit-race-condition)
 
 ---
 
 ## 1. Architecture Overview
 
-Layak is a two-service application: a **Next.js 16 App Router frontend** (React 19, Tailwind 4) and a **FastAPI + ADK-Python backend**, both deployed to Google Cloud Run. A citizen uploads three documents (IC, payslip or e-wallet income screenshot, utility bill). The frontend streams the upload to the backend, which invokes the **RootAgent** — a Gemini 2.5 Pro orchestrator built on ADK-Python v1.31 (GA) using a `SequentialAgent` composition. The RootAgent runs a five-step pipeline through `FunctionTool` bindings:
+Layak is a two-service application: a **Next.js 16 App Router frontend** (React 19, Tailwind 4) and a **FastAPI + ADK-Python backend**, both deployed to Google Cloud Run. The frontend now ships a multilingual UI (`en`, `ms`, `zh`) with per-user language persistence; an authenticated citizen uploads three documents (IC, payslip or e-wallet income screenshot, utility bill) or uses the manual-entry path. The backend still exposes a `root_agent = SequentialAgent(...)` shell for the five-step workflow, but the live runtime currently executes that workflow directly inside `stream_agent_events()` so it can emit the locked SSE stream and mirror each step into Firestore deterministically.
 
 1. **extract** — Gemini 2.5 Flash reads the documents multimodally into a Pydantic `Profile`.
-2. **classify** — Gemini 2.5 Flash tags household composition, dependants, income band.
-3. **match** — a hardcoded Pydantic rule engine checks STR 2026, JKM Warga Emas, and five LHDN Form B reliefs; grounded retrieval over the scheme PDFs is served by **Vertex AI Search** (primary) returning the passage + URL that backs each rule.
-4. **rank** — Gemini Code Execution computes annual RM upside per scheme + total in a sandboxed Python call.
-5. **generate** — WeasyPrint renders three draft PDFs (BK-01, JKM18, LHDN relief summary) watermarked "DRAFT — NOT SUBMITTED".
+2. **classify** — Gemini 2.5 Flash-Lite tags household composition, dependants, income band, and returns localized classifier notes.
+3. **match** — a hardcoded Pydantic rule engine checks STR 2026, JKM Warga Emas / BKK, LHDN Form B / Form BE, and other enabled schemes; grounded retrieval over the scheme PDFs is served by **Vertex AI Search** (primary) returning the passage + URL that backs each rule, while `summary` / `why_qualify` come from the deterministic rule-copy catalog.
+4. **compute_upside** — Gemini 3 Flash Preview with `code_execution` computes annual RM upside per scheme + total in a sandboxed Python call (`gemini-2.5-pro` is the documented fallback).
+5. **generate** — WeasyPrint renders qualifying draft PDFs; Layak-added packet chrome (eyebrow, watermark, footer) localizes to the evaluation language while the government-form body stays in its source language.
 
-The backend streams each step to the frontend over Server-Sent Events so the agentic moment is visible on stage. The app is **stateless**: user documents are processed in-memory and discarded at request-end. Scheme rules are hardcoded as typed Pydantic models; scheme PDFs are committed to the repo under `backend/data/schemes/`. A one-time seed script uploads those PDFs into a Vertex AI Search data store. There is no application database, no GCS bucket, and no Firestore in v1 — the git repo is the source of truth for the scheme corpus.
+The backend streams each step to the frontend over Server-Sent Events so the pipeline remains visible. The upload path is **raw-file stateless**: user documents are processed in-memory and discarded at request-end. Since v2, the app does persist derived user/evaluation data in Firestore (`users/{uid}`, `evaluations/{evalId}`) so results, quotas, PDPA export/delete, and language sync work across sessions. Scheme rules remain hardcoded as typed Pydantic models; scheme PDFs are committed to the repo under `backend/data/schemes/`. A one-time seed script uploads those PDFs into a Vertex AI Search data store.
 
 ### v2 additions
 
-Layak v2 keeps the v1 stateless agent pipeline unchanged. The new layer adds Firebase Auth (Google OAuth only) for user identity, Firestore in `asia-southeast1` for `users`, `evaluations`, and `waitlist`, plus a Cloud Scheduler + Cloud Run Job pair that prunes free-tier history nightly at 02:00 MYT. Uploaded documents are still discarded immediately after extraction; auth, persistence, and tier gating are layered on top of the existing pipeline rather than replacing it.
+Layak v2 keeps the same five-step pipeline shape, but layers Firebase Auth (Google OAuth only), Firestore in `asia-southeast1` for `users`, `evaluations`, and `waitlist`, per-user language preference sync, and a Cloud Scheduler + Cloud Run Job pair that prunes free-tier history nightly at 02:00 MYT. Uploaded documents are still discarded immediately after extraction; auth, persistence, localization, and tier gating are layered on top of the existing pipeline rather than replacing it.
 
 ## 2. Architecture Diagram (ASCII)
 
@@ -108,94 +109,88 @@ Layak v2 keeps the v1 stateless agent pipeline unchanged. The new layer adds Fir
  GCP Secret Manager ── injects firebase-admin-key; Cloud Run service account provides Vertex AI ADC ──► FastAPI Cloud Run service
 ```
 
+Note: the topology above is conceptual. In the live runtime, `stream_agent_events()` sequences the steps directly, `classify` runs on Gemini 2.5 Flash-Lite, and packet count depends on the qualifying schemes rather than a fixed three-draft set.
+
 ### 2.2 Agent internal tool-call flow
 
-```
- ┌───────────────────────────────────────────────────────────────────────┐
- │ RootAgent  —  Gemini 2.5 Pro  —  ADK SequentialAgent                  │
- │ Entry: POST /api/agent/intake  (multipart IC, payslip, utility bill)  │
- ├───────────────────────────────────────────────────────────────────────┤
- │                                                                       │
- │  Step 1  extract_profile(ic_img, payslip_img, utility_img)            │
- │          └─► Gemini 2.5 Flash (multimodal)                            │
- │          └─► Pydantic Profile {name, ic_last4, age, income,           │
- │                                 dependants, household_flags}          │
- │                                                                       │
- │  Step 2  classify_household(profile)                                  │
- │          └─► Gemini 2.5 Flash (structured output)                     │
- │          └─► dependants, age flags, income band                       │
- │                                                                       │
- │  Step 3  match_schemes(profile)                                       │
- │          └─► Vertex AI Search FunctionTool                            │
- │              └─► retrieves STR / JKM / LHDN passages + source URLs    │
- │          └─► Pydantic rule engine validates thresholds + caps         │
- │              └─► provenance map: rule_id → (source_pdf_url, passage)  │
- │                                                                       │
- │  Step 4  compute_upside(matches)                                      │
- │          └─► Gemini Code Execution (sandboxed Python, 30s cap)        │
- │          └─► annual RM per scheme + total                             │
- │                                                                       │
- │  Step 5  generate_packet(matches, profile)                            │
- │          └─► WeasyPrint HTML → 3 PDFs                                 │
- │              (BK-01 STR, JKM18 Warga Emas, LHDN relief summary)       │
- │          └─► each page watermarked "DRAFT — NOT SUBMITTED"            │
- │                                                                       │
- │  SSE stream emits each step as it lands → UI renders progressively.   │
- │                                                                       │
- └───────────────────────────────────────────────────────────────────────┘
+```text
+Pipeline entry: POST /api/agent/intake or POST /api/agent/intake_manual
+Coordinator : backend/app/agents/root_agent.py::stream_agent_events()
+ADK shell   : root_agent = SequentialAgent(...) (structural scaffold / model ledger)
+
+extract
+  -> Gemini 2.5 Flash (multimodal)
+  -> Pydantic Profile
+
+classify
+  -> Gemini 2.5 Flash-Lite (structured output)
+  -> household classification + localized notes
+
+match
+  -> Pure-Python rule engine in backend/app/rules/
+  -> Vertex AI Search primary citation + hardcoded fallback citation
+  -> deterministic localized summary / why_qualify
+
+compute_upside
+  -> Gemini 3 Flash Preview + code_execution
+  -> annual RM per scheme + total (+ persisted code/stdout trace)
+
+generate
+  -> WeasyPrint + Jinja templates
+  -> localized Layak packet chrome; source-language form body
+
+emit
+  -> step_started -> step_result -> done | error
+  -> Firestore mirrors the same ordered step state for results rehydration
 ```
 
 ### 2.3 v2 authenticated topology
 
-```
-┌──────────┐  OAuth popup  ┌──────────────────────────────┐  ID token  ┌──────────────────────────┐  Authorization: Bearer  ┌──────────────────────────────┐
-│ Browser  │──────────────►│ Firebase Auth SDK            │───────────►│ ID token (IndexedDB)     │───────────────────────►│ Next.js                      │
-└──────────┘               │ (Google OAuth only)          │            └──────────────────────────┘                         │ attaches header              │
-                           └──────────────────────────────┘                                                                  ▼
-                                                                                                           ┌──────────────────────────────────────┐
-                                                                                                           │ FastAPI                              │
-                                                                                                           │ firebase_admin.auth.verify_id_token  │
-                                                                                                           └─────────────────┬────────────────────┘
-                                                                                                                             ▼
-                                                                                                           ┌──────────────────────────────────────┐
-                                                                                                           │ rate-limit count query (Firestore)   │
-                                                                                                           └─────────────────┬────────────────────┘
-                                                                                                                             ▼
-                                                                                                           ┌──────────────────────────────────────┐
-                                                                                                           │ SequentialAgent                      │
-                                                                                                           └─────────────────┬────────────────────┘
-                                                                                                                             ▼
-                                                                                                           ┌──────────────────────────────────────┐
-                                                                                                           │ Firestore eval doc writes per step   │
-                                                                                                           └─────────────────┬────────────────────┘
-                                                                                                                             ├──────────────► SSE stream
-                                                                                                                             └──────────────► Firestore realtime fallback
-                                                                                                                                             ▼
-                                                                                                                                      results/[id]
+```text
+Browser
+  -> Firebase Auth (Google OAuth)
+  -> IndexedDB token + Next.js auth context
+  -> GET /api/user/me hydrates server-stored language when auth resolves
+  -> PATCH /api/user/preferences persists later language toggles
+  -> POST /api/agent/intake or /api/agent/intake_manual with Authorization: Bearer
 
-Cloud Scheduler (daily 02:00 MYT) ─────────► Cloud Run Job (prune) ─────────► Firestore
+FastAPI
+  -> firebase_admin.auth.verify_id_token
+  -> lazy-upsert users/{uid}
+  -> free-tier quota check
+  -> create evaluations/{evalId} with status=running + frozen language
+  -> stream_agent_events()
+  -> persist_event_stream() mirrors each step into Firestore and out over SSE
+
+Frontend results page
+  -> routes to /dashboard/evaluation/results/[id]
+  -> rehydrates from Firestore-backed evaluation state after refresh/deep link
+
+Ops
+  -> Cloud Scheduler (daily 02:00 MYT) -> Cloud Run Job (prune) -> Firestore
 ```
 
 ## 3. Component Responsibilities
 
 | Component         | Responsibility                                                                       | Tech                                                                                        | Notes                                                                                                                              |
 | ----------------- | ------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------- |
-| Frontend          | Upload widget, SSE consumer, ranked results, provenance panel, draft-packet download | Next.js 16.2 App Router, React 19, Tailwind 4, shadcn/ui, Lucide, ESLint 9 (flat config)    | Deployed to Cloud Run. English UI only (v1). Next.js 16 forces `--webpack` (see Plan B/§8).                                        |
-| Backend API       | Single SSE endpoint hosting the agent pipeline                                       | FastAPI 0.115+, Python 3.12, async                                                          | `POST /api/agent/intake` accepts 3 multipart files.                                                                                |
-| RootAgent         | Five-step pipeline orchestrator                                                      | ADK-Python v1.31 GA, `SequentialAgent`, Gemini 2.5 Pro                                      | Five `FunctionTool`s bound at init.                                                                                                |
+| Frontend          | Upload/manual intake, auth shell, SSE consumer, ranked results, provenance panel, draft-packet download, language toggle | Next.js 16.2 App Router, React 19, Tailwind 4, shadcn/ui, Lucide, ESLint 9 (flat config)    | Deployed to Cloud Run. UI is localized to `en` / `ms` / `zh`; language persists via `layak.lng` + backend sync. Next.js 16 forces `--webpack` (see Plan B/§8). |
+| Backend API       | Authenticated intake, SSE pipeline host, evaluation persistence, PDPA/user preference endpoints | FastAPI 0.115+, Python 3.12, async                                                          | `POST /api/agent/intake`, `POST /api/agent/intake_manual`, `GET /api/user/me`, `PATCH /api/user/preferences`, PDPA export/delete. |
+| RootAgent         | Five-step pipeline coordinator                                                      | ADK-Python v1.31 GA, `SequentialAgent` scaffold + `stream_agent_events()` direct sequencer  | The `SequentialAgent` object remains in code, but the live runtime manually sequences the steps to preserve the locked SSE wire shape. |
 | Extractor Worker  | IC / payslip / utility → Pydantic `Profile`                                          | Gemini 2.5 Flash (multimodal)                                                               | Strict JSON schema; no free text.                                                                                                  |
-| Classifier Worker | Household flags, age flags, income band                                              | Gemini 2.5 Flash (structured output)                                                        | Deterministic schema.                                                                                                              |
-| Rule Engine       | STR tier, Warga Emas means test, 5 LHDN reliefs                                      | Pydantic v2 models, Python                                                                  | Hardcoded thresholds; sourced from cached PDFs.                                                                                    |
+| Classifier Worker | Household flags, age flags, income band                                              | Gemini 2.5 Flash-Lite (structured output)                                                   | Deterministic schema; returns localized classifier notes.                                                                          |
+| Rule Engine       | STR tier, Warga Emas / BKK, Form B / Form BE relief logic, and other enabled schemes | Pydantic v2 models, Python                                                                  | Hardcoded thresholds; sourced from cached PDFs.                                                                                    |
 | RAG (primary)     | Grounded retrieval over 3 scheme PDFs                                                | Vertex AI Search data store, FunctionTool wrapper                                           | Each hit returns passage + URL for provenance.                                                                                     |
 | RAG (Plan B)      | Inline PDFs in 1M context                                                            | Gemini 2.5 Pro context window                                                               | Collapse trigger: Vertex AI Search setup stall past sprint hour 12.                                                                |
 | Arithmetic        | Annual RM upside per scheme + total                                                  | Gemini Code Execution (`tools: [{codeExecution: {}}]`)                                      | 30-second sandbox; on-stage Python visible in SSE.                                                                                 |
-| PDF Generator     | Three draft application PDFs                                                         | WeasyPrint 62+, HTML+CSS templates                                                          | Cloud Run container needs libpango, libcairo, libgdk-pixbuf.                                                                       |
+| PDF Generator     | Qualifying draft application PDFs                                                    | WeasyPrint 62+, HTML+CSS templates                                                          | Cloud Run container needs libpango, libcairo, libgdk-pixbuf.                                                                       |
+| i18n layer        | Frontend translations, `<html lang>`, localStorage caching, cross-device language sync | i18next, react-i18next, browser language detector                                           | `layak.lng` in localStorage; `/api/user/me` hydrates from Firestore; `/api/user/preferences` persists toggles.                    |
 | Secrets           | `GOOGLE_CLOUD_PROJECT`, `GOOGLE_CLOUD_LOCATION`                                      | Cloud Run env vars + ADC                                                                    | Injected via `--set-env-vars=GOOGLE_CLOUD_PROJECT=...,GOOGLE_CLOUD_LOCATION=...`; Gemini auth rides the Cloud Run service account. |
 | Deploy            | Frontend + backend                                                                   | Cloud Run `--min-instances=1 --cpu-boost`                                                   | Warm 1 hour before demo slot.                                                                                                      |
 | Scheme corpus     | Three source PDFs                                                                    | Git-versioned at `backend/data/schemes/`                                                    | Repo is the bucket; no GCS in v1.                                                                                                  |
 | Seed script       | Index scheme PDFs into Vertex AI Search                                              | `backend/scripts/seed_vertex_ai_search.py` (exact path subject to backend-layout decisions) | One-time run; idempotent; checked into CI.                                                                                         |
 | Firebase Auth     | Google OAuth sign-in, ID-token issuance, IndexedDB token storage, client bootstrap   | Firebase Auth (Google OAuth only)                                                           | `Continue with Google`, `pdpaConsentAt` gate, fetch wrapper.                                                                       |
-| Firestore         | Session + archive layer for users, evaluations, and waitlist                         | Firestore (`asia-southeast1`)                                                               | Flat collections, owner-gated reads, backend-only writes.                                                                          |
+| Firestore         | Session + archive layer for users, evaluations, and waitlist                         | Firestore (`asia-southeast1`)                                                               | Flat collections, owner-gated reads, backend-only writes; stores language on both `users/{uid}` and `evaluations/{evalId}`.      |
 | Cloud Scheduler   | Triggers nightly 30-day free-tier prune at 02:00 MYT                                 | Cloud Scheduler                                                                             | Schedules the Cloud Run Job once per day.                                                                                          |
 | Cloud Run Job     | Deletes stale free-tier evaluations older than 30 days                               | Cloud Run Job                                                                               | `backend/scripts/prune_free_tier.py`.                                                                                              |
 
@@ -203,29 +198,31 @@ Cloud Scheduler (daily 02:00 MYT) ─────────► Cloud Run Job (
 
 A single end-to-end journey from upload to download, narrated at component level.
 
-1. **User loads the Cloud Run URL.** Next.js renders the landing page with the upload widget. No login. The "we store nothing" and "draft only" notices render above the fold.
-2. **User selects three documents** (IC, payslip or e-wallet income screenshot, utility bill) from the phone's gallery or camera. Client-side validation rejects files >10 MB or non-image/non-PDF MIME types. Alternatively, the "Use Aisyah sample documents" button loads seed fixtures (FR-10).
-3. **Next.js POSTs the files as multipart form-data** to `/api/agent/intake` on the FastAPI service. Upload progress is rendered via a streamed progress bar.
-4. **FastAPI opens an SSE response** and constructs the RootAgent (`SequentialAgent` with five `FunctionTool`s: extract, classify, match, rank, generate). Each tool call emits a `step_started` / `step_done` SSE event so the UI can render the agentic moment.
-5. **Step 1 — extract:** The extractor worker calls Gemini 2.5 Flash with the three document images as multimodal parts and a strict Pydantic `Profile` schema. The returned JSON is validated; an invalid response forces a retry and, on second failure, surfaces a structured error to the client (the UI offers "Use sample documents" as the recovery path).
-6. **Step 2 — classify:** The classifier worker calls Gemini 2.5 Flash again with the `Profile` and a structured-output schema emitting household flags (children under 18, elderly dependant present), age flags, and an income band.
-7. **Step 3 — match:** The rule engine composes three scheme-match calls. For each scheme, it invokes the Vertex AI Search `FunctionTool` against the pre-indexed data store to fetch the relevant passage and source URL, then validates the profile against hardcoded Pydantic thresholds (STR tier tables, JKM PGK Miskin Tegar food-PLI RM1,236, LHDN relief caps tagged `ya_2025`). Each rule result carries a provenance record `{ rule_id, source_pdf_url, page_ref, passage }`.
-8. **Step 4 — compute_upside:** Gemini Code Execution runs three Python computations in a sandbox: STR household-tier lookup, JKM Warga Emas annualised rate, LHDN tax-liability delta across the five locked reliefs. The code and output are streamed to the UI.
-9. **Step 5 — generate_packet:** WeasyPrint composes three HTML-templated PDFs (BK-01, JKM18, LHDN relief summary) with the extracted profile values pre-filled. Every page is watermarked "DRAFT — NOT SUBMITTED" and footered with the disclaimer from PRD §7.
-10. **UI renders the ranked-scheme list, provenance panel, and packet download.** The user downloads the three PDFs. No data is persisted server-side; the request scope ends and memory is released.
+1. **User loads the Cloud Run URL.** Next.js renders the marketing/auth shell and localized UI chrome. The language detector checks `localStorage.layak.lng` first, then browser preferences, then falls back to English.
+2. **User signs in and opens the intake screen.** The app uses Firebase Auth Google OAuth; when auth resolves, `GET /api/user/me` hydrates the persisted language from `users/{uid}` unless this browser already has an explicit local choice.
+3. **User selects three documents** (IC, payslip or e-wallet income screenshot, utility bill) from the phone's gallery or camera. Client-side validation rejects files >10 MB or non-image/non-PDF MIME types. Alternatively, the user can load the Aisyah or Farhan sample fixtures.
+4. **Next.js POSTs the files as multipart form-data** to `/api/agent/intake` on the FastAPI service. Optional dependant overrides from the upload Household section ride along as JSON.
+5. **FastAPI verifies auth, checks quota, creates `evaluations/{evalId}`, and opens an SSE response.** The eval doc is created with `status="running"`, `userId`, and a frozen `language` so mid-run UI toggles do not silently repaint persisted step outputs.
+6. **Step 1 — extract:** Gemini 2.5 Flash reads the three uploaded documents as multimodal parts and validates the returned JSON against the `Profile` schema. Raw upload bytes are kept in memory only for this step.
+7. **Step 2 — classify:** Gemini 2.5 Flash-Lite classifies household composition and income band from the `Profile`, returning structured output plus localized classifier notes.
+8. **Step 3 — match:** The rule engine validates the profile against hardcoded thresholds, prepends a Vertex AI Search citation when available, and returns deterministic localized `summary` / `why_qualify` strings together with the provenance records.
+9. **Step 4 — compute_upside:** Gemini 3 Flash Preview runs `code_execution` to compute per-scheme and total annual RM upside. The generated Python snippet, stdout, and totals are streamed live and persisted for results-page rehydration.
+10. **Step 5 — generate_packet:** WeasyPrint renders qualifying packet PDFs from Jinja templates. Layak-added packet chrome localizes to the evaluation language, while official form content stays in its original language. Packet bytes are streamed in the final `done` event but are not persisted in Firestore.
+11. **UI renders the ranked-scheme list, provenance panel, and packet download.** The results page rehydrates from Firestore on refresh/deep link; persisted docs include the derived profile, classification, matches, step states, totals, and trace. Raw uploaded files are not stored by application code after the request ends.
 
 ### 4.1 v2 authenticated flow
 
 1. User clicks "Continue with Google" on `/sign-in` or `/sign-up`.
 2. Firebase Auth completes Google OAuth and stores the ID token in IndexedDB.
-3. Next.js attaches `Authorization: Bearer <id-token>` on dashboard API requests.
-4. FastAPI runs `Depends(current_user)` / `firebase_admin.auth.verify_id_token` and injects the Firebase `uid`.
-5. Backend performs the free-tier rate-limit count query against Firestore before SSE opens.
-6. Backend creates `evaluations/{evalId}` with `status="running"`, `userId`, and `createdAt`.
-7. The existing ADK `SequentialAgent` pipeline runs unchanged.
-8. Each step writes to the Firestore evaluation doc and streams an SSE event to the frontend.
-9. On completion, backend writes the final state, emits `done`, and the frontend routes to `/dashboard/evaluation/results/[id]`.
-10. `/results/[id]` reads the Firestore document first; on refresh or deep-link it falls back to Firestore realtime updates until the doc is complete.
+3. On the first authenticated render, the frontend calls `GET /api/user/me` so it can hydrate tier + persisted language from `users/{uid}`.
+4. If the user flips the header language toggle later, the browser updates `localStorage.layak.lng` immediately and then best-effort PATCHes `/api/user/preferences` so other devices see the same choice.
+5. Next.js attaches `Authorization: Bearer <id-token>` on dashboard API requests.
+6. FastAPI runs `Depends(current_user)` / `firebase_admin.auth.verify_id_token`, injects the Firebase `uid`, and lazy-upserts `users/{uid}` when needed.
+7. Backend performs the free-tier rate-limit count query against Firestore before SSE opens.
+8. Backend creates `evaluations/{evalId}` with `status="running"`, `userId`, `language`, and `createdAt`.
+9. `stream_agent_events()` runs the five-step pipeline in order; `persist_event_stream()` mirrors each `step_started` / `step_result` / terminal event into Firestore.
+10. On completion, backend writes the final state, emits `done`, and the frontend routes to `/dashboard/evaluation/results/[id]`.
+11. `/results/[id]` reads the Firestore document first; on refresh or deep-link it rebuilds the screen from the persisted evaluation payload while the run is still active.
 
 ### 4.2 Manual Entry alternate flow (FR-21)
 
@@ -237,7 +234,7 @@ Privacy-first alternative to §4 for users unwilling to upload the documents the
 4. FastAPI validates the payload through a Pydantic `ManualEntryPayload` model and builds a `Profile` via `backend/app/agents/tools/build_profile.py::build_profile_from_manual_entry` — no Gemini call.
 5. The backend opens the same SSE response, emits a synthetic `step_started`/`step_result` pair for the `extract` step whose `data.profile` is the built `Profile`, then runs classify → match → compute_upside → generate **unchanged**. The UI stepper renders all five steps with the extract-step label changed to "Profile prepared".
 6. No full IC number is transmitted. Only `ic_last4` and `date_of_birth` are accepted as identity inputs; `age` is derived server-side in the `asia-southeast1` timezone.
-7. Endpoint auth parity: v1 intake is unauthed → manual endpoint is unauthed; v2 intake is authed → manual endpoint is authed. No feature-specific bypass.
+7. Endpoint auth parity: both intake routes are authenticated in the current codebase. No feature-specific bypass exists for manual entry.
 8. Persistence (v2): the resulting `evaluations/{evalId}` is indistinguishable from an upload-path evaluation, so the history view, results page, and PDPA export/delete cascades treat both modes as one.
 
 ## 5. Google AI Ecosystem Integration
@@ -266,9 +263,9 @@ The Handbook (Technical Mandate, §3) names four stack components. Layak's cover
 
 | Handbook component                                                    | Layak v1   | Notes                                                                                                                                                                                                                                 |
 | --------------------------------------------------------------------- | ---------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **The Intelligence (Brain)** — Gemini (Pro / Flash / Flash-Lite)      | ✅         | Pro remains `ORCHESTRATOR_MODEL` and `HEAVY_MODEL_FALLBACK`; Flash powers `extract`; Flash-Lite powers `classify`; Gemini 3 Flash Preview powers `compute_upside`; `match` stays rule-engine-only and `generate` stays deterministic. |
-| **The Orchestrator** — Vertex AI Agent Builder + Firebase Genkit      | ✅ partial | Handbook explicitly names Vertex AI Agent Builder and Firebase Genkit. Layak keeps **ADK-Python v1.31 (GA)** — Google's first-party agent framework — and the existing Genkit deviation rationale.                                    |
-| **The Development Lifecycle** — Google Cloud Workstations + Cloud Run | ✅         | Cloud Run and ADC remain the deployed lifecycle; Workstations stay optional (team laptops used).                                                                                                                                      |
+| **The Intelligence (Brain)** — Gemini (Pro / Flash / Flash-Lite)      | ✅         | Flash powers `extract`; Flash-Lite powers `classify`; Gemini 3 Flash Preview powers `compute_upside`; Pro remains the documented fallback / non-live orchestrator placeholder; `match` stays rule-engine-only and `generate` stays deterministic. |
+| **The Orchestrator** — Vertex AI Agent Builder + Firebase Genkit      | ✅ partial | Handbook explicitly names Vertex AI Agent Builder and Firebase Genkit. Layak keeps **ADK-Python v1.31 (GA)**, but the live runtime currently sequences the five steps manually inside `stream_agent_events()` rather than running via Agent Builder / Genkit. |
+| **The Development Lifecycle** — Google Cloud Workstations + Cloud Run | ✅ partial | Cloud Run and ADC are live. Google Cloud Workstations are not evidenced in the repo / runtime and should be treated as a non-adopted optional tool rather than a shipped requirement.                                               |
 | **The Context** — Vertex AI Search for grounded RAG                   | ✅         | Vertex AI Search is the live RAG layer grounding every eligibility claim.                                                                                                                                                             |
 
 ### 5.4 Cloud Run deploy commands
@@ -293,10 +290,13 @@ Required IAM: ADC handles Gemini auth via the attached Cloud Run service account
 
 ### 5.5 Firestore as the session + archive layer
 
-- **Schema summary:** top-level flat collections `users`, `evaluations`, and `waitlist`; each record carries a `userId` field for owner-scoped queries.
+- **Schema summary:** top-level flat collections `users`, `evaluations`, and `waitlist`; evaluation rows carry `userId` for owner-scoped queries, while user docs are keyed by Firebase `uid`.
+- **User doc shape:** `users/{uid}` stores identity chrome (`email`, `displayName`, `photoURL`), tier, `language`, consent timestamp, and `lastLoginAt`.
+- **Evaluation doc shape:** `evaluations/{evalId}` stores `status`, `language`, `profile`, `classification`, `matches`, `totalAnnualRM`, `upsideTrace`, `stepStates`, and terminal `error` when present.
 - **Composite index:** `evaluations` on `(userId ASC, createdAt DESC)`.
 - **Security rules summary:** backend-only writes; client reads gated on `request.auth.uid == resource.data.userId` (and `request.auth.uid == userId` for user docs).
 - **Rate-limit query pattern:** `.where("userId", "==", uid).where("createdAt", ">=", now - timedelta(hours=24)).count()`.
+- **Packet persistence note:** packet PDF bytes are not stored in Firestore; packets regenerate on demand from persisted `profile` + `matches`.
 - **Migration note:** the flat collection shape keeps cross-user rate-limit checks and history lookups simple without nested subcollections.
 
 ## 6. External Dependencies
@@ -373,11 +373,12 @@ The backend setup notes that used to live in `backend/README.md` are now capture
 
 ### 6.5 Data & storage
 
-- **No application database** in v1. Layak is stateless: user documents and profiles live only in request-scope memory and are discarded at response-end.
-- **Scheme rules** are encoded as typed Pydantic v2 models in `backend/app/rules/` (Phase 1 scaffold).
-- **Scheme PDFs** are the source of truth and live at `backend/data/schemes/`, versioned in git. The repo is the bucket.
+- **Raw uploads are transient.** The intake route reads multipart uploads into memory, passes the bytes into Gemini extraction, and does not intentionally persist the original files to Firestore, disk, or an app-owned blob store.
+- **Derived evaluation data is persisted in v2.** Firestore now stores `users/{uid}` plus `evaluations/{evalId}` so history, quotas, PDPA export/delete, and results-page rehydration work after refresh or deep link.
+- **Scheme rules** are encoded as typed Pydantic v2 models in `backend/app/rules/`.
+- **Scheme PDFs** are the source of truth and live at `backend/data/schemes/`, versioned in git.
 - **Vertex AI Search data store** is populated one-time by `backend/scripts/seed_vertex_ai_search.py`. The script is idempotent and re-runnable.
-- **No GCS bucket, no Firestore, no Cloud SQL, no Redis** — none are provisioned in v1.
+- **No packet blob store / Cloud SQL / Redis.** Packet bytes are streamed in the terminal event and regenerated from persisted data later.
 
 ### 6.6 Pre-commit hooks (Husky + lint-staged)
 
@@ -413,6 +414,19 @@ Both invocations use `pnpm exec` to bypass the pnpm v10 bare-script shortcut whi
 - **Vertex AI auth:** `GOOGLE_CLOUD_PROJECT`, `GOOGLE_CLOUD_LOCATION`.
 - **Retained from v1:** `VERTEX_AI_SEARCH_DATA_STORE`.
 
+### 6.8 Internationalization & language persistence
+
+- **Supported languages:** English (`en`), Bahasa Malaysia (`ms`), and Simplified Chinese (`zh`).
+- **Frontend runtime:** `frontend/src/lib/i18n/index.ts` configures i18next with the three JSON bundles under `frontend/src/lib/i18n/locales/`. Detection order is `localStorage -> navigator -> htmlTag`, and the persisted browser key is `layak.lng`.
+- **Header toggle:** the language picker sits next to the theme toggle and switches the UI at runtime without a reload.
+- **Cross-device sync:** when auth resolves, `LanguageSync` calls `GET /api/user/me`. If this browser already has an explicit `layak.lng`, that local choice wins and is PATCHed up to the backend; otherwise the server value hydrates the UI so device-B inherits device-A's preference.
+- **Persisted fields:** `users/{uid}.language` stores the user's preferred UI language; `evaluations/{evalId}.language` freezes the language an evaluation ran under so stored `summary` / `why_qualify` strings do not silently change later.
+- **What is translated:** frontend copy across marketing, auth, dashboard, upload, manual entry, evaluation stepper, results, settings, privacy/terms pages, placeholders, and aria labels; backend-generated classifier notes, deterministic rule-engine `summary` / `why_qualify`, compute-upside labels/errors, and Layak-added packet chrome.
+- **What intentionally stays in source form:** scheme names and legal references, cited passages from government PDFs, RM currency formatting, agency acronyms, brand names, and the government-form body inside packet templates.
+- **Adding a key:** add the same path to `locales/en.json`, `locales/ms.json`, and `locales/zh.json`; missing non-English keys fall back to English.
+- **Interpolation:** translation placeholders use `{{variable}}`. Plural-sensitive UI currently uses explicit singular/plural keys at the call site instead of i18next `count`.
+- **Server-component rule:** `frontend/src/lib/i18n/index.ts` is client-only; server components should not import the singleton directly.
+
 ## 7. Security & Secrets
 
 - `.env` and `.env.*` are git-ignored repo-wide; `.env.example` / `.env.template` are the only committed templates (whitelisted in root `.gitignore`).
@@ -422,7 +436,7 @@ Both invocations use `pnpm exec` to bypass the pnpm v10 bare-script shortcut whi
   - Root `.env.example` is the single committed template catalogue of env var names; values stay blank.
 - Cloud Run service account has `roles/secretmanager.secretAccessor` for `firebase-admin-key` plus the minimum Vertex AI access roles; no broader privilege.
 - HTTPS-only (Cloud Run defaults).
-- No PII persisted. IC numbers appear in UI and packet as last-4-digits only; full IC is held only in request-scope memory on the backend and never logged.
+- Raw uploaded files are not persisted by application code. Derived profile/evaluation data is persisted in Firestore, and IC numbers appear in UI/storage as last-4-digits only; full IC must never be logged or written to Firestore.
 - Synthetic demo documents carry the "SYNTHETIC — FOR DEMO ONLY" watermark on every page. No real MyKad photos are used.
 - AI-disclosure text in README names Claude Code (Anthropic) per hackathon Rules §4.2.
 
@@ -487,7 +501,7 @@ Both invocations use `pnpm exec` to bypass the pnpm v10 bare-script shortcut whi
 
 **Risk.** A judge may ask why neither named orchestrator is in the stack. The defence is: "ADK-Python is Google's first-party GA agent framework; Genkit-Python is Alpha with a documented warm-instance bug; Agent Builder setup exceeds our sprint budget with no visible-in-demo upside." The README's AI disclosure section will state this explicitly.
 
-**Action.** Raise with human PO before sprint start for final sign-off.
+**Action.** Keep the README / pitch / judge Q&A wording explicit that the repo uses ADK scaffolding plus a manual sequencer in `stream_agent_events()`, not Vertex AI Agent Builder / Genkit.
 
 ### 9.2 Vertex AI Search collapse trigger
 
@@ -499,9 +513,10 @@ Both invocations use `pnpm exec` to bypass the pnpm v10 bare-script shortcut whi
 
 ### 9.3 GCP project and region pinning
 
-- [BLOCKED ON INFRA SETUP] GCP project ID.
-- [BLOCKED ON INFRA SETUP] Cloud Run region (candidate: `asia-southeast1` for latency).
-- [BLOCKED ON INFRA SETUP] Vertex AI Search data store ID and region.
+- **Cloud Run / Firestore region:** `asia-southeast1`.
+- **Vertex publisher-model client location:** `global` (needed for the current multi-model routing matrix).
+- **Vertex AI Search data store region:** `global`.
+- **Project ID:** environment-specific and injected at deploy time via `GOOGLE_CLOUD_PROJECT`; not hardcoded into the repo.
 
 ### 9.4 Backend layout — RESOLVED
 

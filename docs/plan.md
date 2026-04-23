@@ -1248,6 +1248,115 @@ _Frontend:_
 
 ---
 
+## Phase 10: Conversational Concierge (Results-Page Chatbot)
+
+> Adds a grounded, multilingual chatbot to the evaluation results page so a low-tech-literacy user (Aisyah's aunty/uncle persona) can ask follow-up questions about THEIR evaluation in plain language. The chatbot is hard-constrained to (a) the loaded `evaluations/{evalId}` doc context and (b) Vertex AI Search retrieval over the 9 scheme PDFs. NOT a general-purpose chatbot. Built on `chatbot` branch; surfaces only on `/dashboard/evaluation/results/[evalId]` as a floating panel.
+
+### 1. Feature: Backend chat endpoint + Pydantic contract
+
+**Owner:** PO1.  
+**Depends on:** None.  
+**Purpose/Issue:** Land the SSE endpoint that the frontend chat panel will hit. Reuse the auth + rate-limit + Firestore-loading patterns already established by `intake` / `intake_manual`.
+**Implementation (PO1):**
+
+- [ ] New module `backend/app/schema/chat.py` — Pydantic models: `ChatTurn` (role: Literal["user","model"], content: str), `ChatRequest` (history: list[ChatTurn], message: str, language: SupportedLanguage), `ChatTokenEvent` (type=Literal["token"], text), `ChatDoneEvent` (type=Literal["done"], message_id, citations: list[ChatCitation]), `ChatErrorEvent` (type=Literal["error"], category: ErrorCategory|None, message), `ChatCitation` (scheme_id|None, source_pdf|None, snippet).
+- [ ] New route handler `POST /api/evaluations/{evalId}/chat` in a new `backend/app/routes/chat.py` (mounted from `app/main.py`). Verifies caller via `verify_firebase_id_token`, loads the eval doc via `db.collection("evaluations").document(evalId).get()`, returns 404 if missing and 403 if `eval.ownerUid != caller.uid`.
+- [ ] Streams an SSE `text/event-stream` response yielding `ChatTokenEvent` per Gemini chunk, then `ChatDoneEvent` on completion (or `ChatErrorEvent` on failure). Reuses `humanize_error(language=...)` for terminal errors.
+- [ ] Rate-limit: free-tier callers gated by the existing `enforce_free_tier_rate_limit` preflight. Pro callers (judges) bypass.
+
+### 2. Feature: Hard-constrained system prompt (en/ms/zh) + eval-context injection
+
+**Owner:** PO1.  
+**Depends on:** Task 1.  
+**Purpose/Issue:** The chatbot must answer ONLY about the user's specific evaluation (with optional related-domain Q&A on Malaysian schemes). Hallucination control is the entire selling point.
+**Implementation (PO1):**
+
+- [ ] New module `backend/app/agents/chat_prompt.py` exposing `build_system_instruction(eval_doc: dict, language: SupportedLanguage) -> str`.
+- [ ] Per-language system prompt blocks (en/ms/zh) that hard-constrain: identity ("You are Layak, a helper for Malaysian social-assistance schemes"), scope (THIS eval's matches + related scheme Q&A — refuse off-topic), refusals (no legal/financial advice, no portal-submission promises, never solicit IC numbers or PII), citation rules (when referencing a qualifying scheme, cite `scheme_id` from eval matches verbatim), output format (concise, plain-language, register matches user's language).
+- [ ] Eval-context section: render the loaded `evaluations/{evalId}` doc as a structured digest the prompt embeds — profile summary (name, age, household_size, income band — never the IC), classification notes, qualifying scheme list with `scheme_id` + `annual_rm` + `agency`, total upside, draft-packet status. Profile sensitive fields (`ic_last4` only, never full IC) sanitised before injection.
+- [ ] Multilingual register guidance reuses the same Dewan / 普通话 conventions as `LANGUAGE_INSTRUCTION_BLOCK` in `app/agents/gemini.py`.
+
+### 3. Feature: Vertex AI Search grounding for chat retrieval
+
+**Owner:** PO1.  
+**Depends on:** Tasks 1, 2.  
+**Purpose/Issue:** Ground the chatbot on the live Discovery Engine data store so off-context-doc questions still resolve to a cited PDF passage instead of hallucinating.
+**Implementation (PO1):**
+
+- [ ] Wire `google.genai.types.Tool(retrieval=Retrieval(vertex_ai_search=VertexAISearch(datastore=...)))` into the chat `generate_content_stream` call. Datastore name resolved via the existing `LAYAK_VERTEX_AI_SEARCH_*` env vars (`vertex_ai_search.py` carries the canonical resolver).
+- [ ] Fail-open: if the retrieval Tool config raises (e.g. Discovery Engine unreachable), the chat call retries WITHOUT the tool and the response is flagged `grounding_unavailable` on the `ChatDoneEvent.citations` payload so the frontend can surface a "responses are not currently grounded on PDFs" caveat.
+- [ ] Citation extraction: parse `response.candidates[].grounding_metadata` (or equivalent) into `ChatCitation` entries on the terminal `ChatDoneEvent`. Best-effort — missing metadata yields an empty citations list.
+
+### 4. Feature: Five-layer guardrails (input + output validators + safety_settings + grounding + retry)
+
+**Owner:** PO1.  
+**Depends on:** Tasks 1, 2, 3.  
+**Purpose/Issue:** The chatbot is a new live AI surface — needs defence-in-depth so an off-topic / adversarial / quota-blip turn doesn't break the demo. Skip Model Armor for the demo; layer the free defences.
+**Implementation (PO1):**
+
+- [ ] Input validator: `_validate_chat_input(message: str)` — rejects messages > 4000 chars; rejects regex-detected prompt-injection patterns ("ignore previous instructions", "you are now…", "system:" / "<system>" markers, jailbreak phrases). Rejection emits a `ChatErrorEvent(category="extract_validation", message=...)` localised via `humanize_error` and skips the Gemini call.
+- [ ] Output validator: `_validate_chat_output(text, eval_matches)` — runs after the stream completes, asserts any cited `scheme_id` exists in the eval's matches list; if drift detected, logs a warning and strips the bad citation from the `ChatDoneEvent.citations` payload (keeps the response text unmodified to preserve the user's reading flow).
+- [ ] `safety_settings`: BLOCK_LOW_AND_ABOVE on HARM_CATEGORY_HARASSMENT, HATE_SPEECH, SEXUALLY_EXPLICIT, DANGEROUS_CONTENT.
+- [ ] Grounding via Vertex AI Search Tool (Task 3) — handles factual hallucination on Malaysian scheme details.
+- [ ] Wrap the Gemini call in `generate_with_retry` so transient 429/5xx during high concurrency get the same exponential-backoff treatment the pipeline tools already enjoy.
+
+### 5. Feature: Backend chat tests
+
+**Owner:** PO1.  
+**Depends on:** Tasks 1–4.  
+**Purpose/Issue:** Lock the chat contract before the frontend integrates so the wire shape is stable.
+**Implementation (PO1):**
+
+- [ ] `backend/tests/test_chat_prompt.py` — `build_system_instruction` per language × per persona context (Aisyah qualifying, all-out-of-scope), asserts: language-signature tokens present, scheme_ids from eval matches appear in the embedded digest, full IC number never appears, refusal rules are stated.
+- [ ] `backend/tests/test_chat_routes.py` — endpoint tests with mocked Firestore + mocked `generate_content_stream`. Cases: 401 on missing token, 404 on missing eval, 403 on other-user eval, 200 on owner-issued request, prompt-injection input → ChatErrorEvent, off-topic message → model refusal handled, free-tier rate-limit triggers, citation drift on output → drift-stripped from event.
+- [ ] `backend/tests/test_chat_guardrails.py` — `_validate_chat_input` regex coverage (true/false matrix), `_validate_chat_output` citation-drift scenarios, `safety_settings` config sanity check.
+
+### 6. Feature: Frontend floating chat panel on results page
+
+**Owner:** PO1.  
+**Depends on:** Tasks 1–4 (does not block on Task 5).  
+**Purpose/Issue:** Surface the chatbot ONLY on `/dashboard/evaluation/results/[evalId]` without breaking the existing page layout. Floating action button → expanding drawer/modal.
+**Implementation (PO1):**
+
+- [ ] New component `frontend/src/components/evaluation/results-chat-panel.tsx` — fixed-position floating action button (bottom-right, ~64×64, primary colour) with chat-bubble icon. Click expands to a drawer (desktop: bottom-right card ~400×640; mobile: full-screen drawer via shadcn `Sheet` or `Dialog` with `side="bottom"`).
+- [ ] Mounted from `frontend/src/components/evaluation/evaluation-results-by-id-client.tsx` (or its parent) so it appears on every variant of the results page (live + persisted).
+- [ ] Suggested-question chips on first open: 3-4 chips derived from the eval's matches (e.g. "Why do I qualify for STR 2026?", "How do I apply for JKM Warga Emas?", "What documents do I need?"). Chips clear after the first user turn.
+- [ ] Message-bubble UI with streaming token render (live cursor on the assistant turn while in flight). Send box with submit on Enter, Shift+Enter newline. Abort button while a turn is streaming. Disabled while pipeline is still in `running` state on a freshly-streamed eval (chat needs the full eval doc).
+- [ ] Citation chips below the assistant turn — clicking a chip opens the corresponding scheme card already on the page (smooth-scroll + highlight). Empty when grounding metadata is unavailable.
+
+### 7. Feature: Frontend SSE consumer hook for chat
+
+**Owner:** PO1.  
+**Depends on:** Task 1, Task 6.  
+**Purpose/Issue:** Mirror the `use-agent-pipeline` SSE pattern so the chat surface follows the same conventions and shares error-recovery scaffolding.
+**Implementation (PO1):**
+
+- [ ] New hook `frontend/src/hooks/use-chat.ts` exposing `{ messages, send, abort, isStreaming, errorCategory }`. Manages local conversation history; POSTs to `/api/evaluations/{evalId}/chat` with `{history, message, language}`; consumes SSE token events; surfaces `ErrorCategory`-keyed copy via the same i18n keys the recovery card uses.
+- [ ] TypeScript types in `frontend/src/lib/agent-types.ts` (or a new `chat-types.ts`) mirror the backend Pydantic models.
+- [ ] Language input pulled from `useTranslation().i18n.language` so the user's current toggle drives the call.
+
+### 8. Feature: i18n strings for the chat panel (en/ms/zh)
+
+**Owner:** PO1.  
+**Depends on:** Task 6.  
+**Purpose/Issue:** Every user-visible string in the new chat surface must localise alongside the rest of the app.
+**Implementation (PO1):**
+
+- [ ] `frontend/src/lib/i18n/locales/{en,ms,zh}.json` — new `evaluation.chat.*` namespace covering: floating button aria-label, panel title, close button, send placeholder, empty-state body, suggested-question chip labels (parameterised on scheme_id where the chip is dynamic), abort button, "responses are not currently grounded on PDFs" caveat, error-state body per ErrorCategory.
+
+### 9. Feature: Docs + progress log
+
+**Owner:** PO1.  
+**Depends on:** Tasks 1–8.  
+**Purpose/Issue:** Lock the new endpoint + UI surface into TRD so post-hackathon iteration doesn't re-discover the contract.
+**Implementation (PO1):**
+
+- [ ] `docs/trd.md` — new §5.7 (Conversational Concierge) describing the endpoint contract, eval-context injection, grounding wiring, guardrail layers, and SSE event shape.
+- [ ] `docs/progress.md` — Phase 10 dated entry summarising the eight subtasks, demo-day risk assessment, and which guardrails were intentionally skipped (e.g. Model Armor).
+- [ ] All Phase 10 plan checkboxes ticked.
+
+---
+
 ## Phase X: Submission Package
 
 > Covers the final submission artifacts. Keep it simple and complete.

@@ -56,12 +56,17 @@ def test_categorize_error_message_unknown_returns_none(raw: str) -> None:
 
 
 def test_humanize_returns_friendly_copy_for_known_category() -> None:
-    raw = "ClientError: 429 RESOURCE_EXHAUSTED. caller exhausted free-tier quota"
+    raw = "ClientError: 429 RESOURCE_EXHAUSTED. caller exhausted per-minute project quota"
     out = humanize_error_message(raw)
     # Static remediation copy — verbatim from the English table (default language).
     assert out == ERROR_CATEGORY_MESSAGES["en"]["quota_exhausted"]
-    # And in particular, it suggests Manual Entry as the recovery path.
-    assert "Manual Entry" in out
+    # The post-Phase 6 copy leads with a wait-and-retry CTA (the SDK already
+    # retries 429s on its own); Manual Entry is no longer a relevant escape
+    # hatch for non-extract steps so it's been dropped from this string.
+    lowered = out.lower()
+    assert "wait" in lowered
+    assert any(token in lowered for token in ("retry", "retries", "try again"))
+    assert "free-tier" not in out
 
 
 def test_humanize_falls_through_to_sanitize_on_unknown_error() -> None:

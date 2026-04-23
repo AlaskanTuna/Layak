@@ -10,7 +10,7 @@ from __future__ import annotations
 
 from google.genai import types
 
-from app.agents.gemini import FAST_MODEL, detect_mime, get_client, strip_json_fences
+from app.agents.gemini import FAST_MODEL, detect_mime, generate_with_retry, get_client, strip_json_fences
 from app.schema.profile import Profile
 
 _INSTRUCTION = """
@@ -84,7 +84,8 @@ async def extract_profile(ic_bytes: bytes, payslip_bytes: bytes, utility_bytes: 
         types.Part.from_bytes(data=utility_bytes, mime_type=detect_mime("utility.pdf", utility_bytes)),
         types.Part.from_text(text=_INSTRUCTION),
     ]
-    response = client.models.generate_content(
+    response = generate_with_retry(
+        client,
         model=FAST_MODEL,
         contents=parts,
         # Gemini's response_schema dialect rejects `additional_properties` that

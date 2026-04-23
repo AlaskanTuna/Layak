@@ -41,16 +41,22 @@ co-location with the user-facing frontend.
 
 from __future__ import annotations
 
+import logging
 import os
+import random
 import re
+import time
 from functools import lru_cache
 from pathlib import Path
-from typing import Literal
+from typing import Any, Literal
 
 from google import genai
+from google.genai import errors as genai_errors
 
-from app.config import getenv
+from app.config import getenv, getenv_int
 from app.schema.locale import DEFAULT_LANGUAGE, SupportedLanguage
+
+_log = logging.getLogger(__name__)
 
 # Error-recovery category slugs surfaced on the SSE `ErrorEvent.category` so
 # the frontend can render category-aware CTAs without substring-matching the
@@ -156,6 +162,84 @@ def get_client() -> genai.Client:
     )
 
 
+# Retry knobs — overridable via `LAYAK_*` env vars (see `app.config.getenv`).
+# Default 2 retries (3 total attempts) with a 2.0 s base. Exponential backoff
+# with full jitter rescues the common case observed during the 3-concurrent
+# smoke test: a Vertex AI Flash-Lite per-minute quota dip on classify that
+# clears within seconds. Anything beyond 3 attempts pushes the SSE pipeline
+# past a comfortable 60 s budget and starts blocking client perception of
+# progress, so cap defensively rather than waiting out a true outage.
+_RETRY_MAX_RETRIES = getenv_int("LAYAK_GEMINI_MAX_RETRIES", 2)
+try:
+    _RETRY_BASE_DELAY_S = float(getenv("LAYAK_GEMINI_BASE_DELAY_SECONDS", "2.0"))
+except ValueError:
+    _RETRY_BASE_DELAY_S = 2.0
+
+
+def _is_retryable_api_error(exc: BaseException) -> bool:
+    """Return True for transient Vertex AI errors worth a retry.
+
+    Two paths:
+      1. Typed `google.genai.errors.APIError` — definitive. The status code
+         tells us exactly what happened, and we trust it without falling back
+         to string parsing (a 400 whose body happens to mention "quota" must
+         NOT be retried — the request itself is malformed).
+      2. Untyped `Exception` whose `str()` carries the magic words — string
+         fallback. Defends against transport wrappers (httpx pool errors,
+         aiohttp timeouts) that swallow the typed APIError.
+    """
+    if isinstance(exc, genai_errors.APIError):
+        code = getattr(exc, "code", None)
+        if code == 429:
+            return True
+        return isinstance(code, int) and 500 <= code < 600
+    return categorize_error_message(str(exc)) in {"quota_exhausted", "service_unavailable", "deadline_exceeded"}
+
+
+def generate_with_retry(
+    client: genai.Client,
+    *,
+    model: str,
+    contents: Any,
+    config: Any,
+    max_retries: int | None = None,
+    base_delay_seconds: float | None = None,
+) -> Any:
+    """Call `client.models.generate_content` with exponential-backoff retry.
+
+    Retries only on transient Vertex AI failures (HTTP 429 / 5xx). Permission
+    errors, bad-request validation errors, and Pydantic schema drift on the
+    response all re-raise immediately so the caller's SSE error path can
+    surface a category-tailored CTA without the user waiting through pointless
+    retry windows.
+
+    Backoff uses *full jitter* — `random.uniform(0, base * 2**attempt)` —
+    so concurrent callers that all 429 don't synchronously retry on the
+    exact same wall-clock tick. With defaults (2 retries, 2.0 s base) the
+    worst-case added latency is ~6 s before re-raising; a single retry
+    typically rescues a per-minute quota blip in <3 s.
+    """
+    retries = _RETRY_MAX_RETRIES if max_retries is None else max_retries
+    base = _RETRY_BASE_DELAY_S if base_delay_seconds is None else base_delay_seconds
+    attempt = 0
+    while True:
+        try:
+            return client.models.generate_content(model=model, contents=contents, config=config)
+        except Exception as exc:  # noqa: BLE001 — typed re-raise inside
+            if attempt >= retries or not _is_retryable_api_error(exc):
+                raise
+            sleep_for = random.uniform(0, base * (2**attempt))
+            _log.warning(
+                "Gemini generate_content failed with retryable error (attempt %d/%d, sleeping %.2fs): %s",
+                attempt + 1,
+                retries + 1,
+                sleep_for,
+                exc,
+            )
+            time.sleep(sleep_for)
+            attempt += 1
+
+
 _FENCE_RE = re.compile(r"^\s*```(?:json)?\s*\n(.*?)\n```\s*$", re.DOTALL | re.IGNORECASE)
 
 
@@ -202,9 +286,9 @@ def sanitize_error_message(message: str, max_len: int = 240) -> str:
 ERROR_CATEGORY_MESSAGES: dict[SupportedLanguage, dict[ErrorCategory, str]] = {
     "en": {
         "quota_exhausted": (
-            "Gemini's daily free-tier quota is exhausted. Try again later, or "
-            "switch to Manual Entry mode — it skips the OCR step and runs the rest "
-            "of the pipeline against the values you type in."
+            "Gemini is rate-limited right now — the project's per-minute quota "
+            "for this model is temporarily exceeded. Please wait about 30 seconds "
+            "and try again. The pipeline already retries transient 429s on its own."
         ),
         "service_unavailable": (
             "Gemini is temporarily unavailable. Please retry in a minute."
@@ -223,10 +307,10 @@ ERROR_CATEGORY_MESSAGES: dict[SupportedLanguage, dict[ErrorCategory, str]] = {
     },
     "ms": {
         "quota_exhausted": (
-            "Kuota harian Gemini (peringkat percuma) telah habis. Sila cuba "
-            "lagi kemudian, atau tukar kepada mod Kemasukan Manual — ia "
-            "melangkau langkah OCR dan terus menjalankan saluran paip "
-            "berdasarkan nilai yang anda taipkan."
+            "Gemini sedang dihadkan kadarnya — kuota seminit projek untuk "
+            "model ini telah dilampaui buat sementara. Sila tunggu kira-kira "
+            "30 saat dan cuba lagi. Saluran paip kami sudah pun mencuba "
+            "semula ralat 429 sementara secara automatik."
         ),
         "service_unavailable": (
             "Gemini tidak tersedia buat sementara waktu. Sila cuba lagi "
@@ -248,8 +332,8 @@ ERROR_CATEGORY_MESSAGES: dict[SupportedLanguage, dict[ErrorCategory, str]] = {
     },
     "zh": {
         "quota_exhausted": (
-            "Gemini 免费层级的每日配额已用完。请稍后再试，或切换到手动输入模式 "
-            "—— 它会跳过 OCR 步骤，直接根据您手动输入的内容运行后续流程。"
+            "Gemini 当前正受到限流 —— 此模型的项目每分钟配额已暂时用满。"
+            "请稍候约 30 秒后重试。流程本身已会自动重试临时性的 429 错误。"
         ),
         "service_unavailable": (
             "Gemini 服务暂时不可用，请稍后重试。"

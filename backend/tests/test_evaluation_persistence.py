@@ -237,7 +237,7 @@ async def test_persist_error_event_stores_category_slug(doc_ref: MagicMock) -> N
     events = _events(
         ErrorEvent(
             step="classify",
-            message="Gemini's daily free-tier quota is exhausted.",
+            message="Gemini per-minute quota temporarily exceeded — please wait and retry.",
             category="quota_exhausted",
         )
     )

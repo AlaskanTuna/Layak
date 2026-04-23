@@ -12,6 +12,7 @@ from google.genai import types
 from app.agents.gemini import (
     LANGUAGE_INSTRUCTION_BLOCK,
     WORKER_MODEL,
+    generate_with_retry,
     get_client,
     strip_json_fences,
 )
@@ -70,7 +71,8 @@ async def classify_household(
         profile_json=profile.model_dump_json(indent=2),
         language_instruction=LANGUAGE_INSTRUCTION_BLOCK[language],
     )
-    response = client.models.generate_content(
+    response = generate_with_retry(
+        client,
         model=WORKER_MODEL,
         contents=prompt,
         config=types.GenerateContentConfig(

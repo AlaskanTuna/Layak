@@ -89,11 +89,14 @@ jobs:
             --project "$GCP_PROJECT" \
             --region "$GCP_REGION" \
             --min-instances 1 \
+            --max-instances 10 \
+            --concurrency 4 \
+            --cpu 2 \
             --cpu-boost \
             --allow-unauthenticated \
             --set-env-vars "GOOGLE_CLOUD_PROJECT=$GCP_PROJECT,GOOGLE_CLOUD_LOCATION=$VERTEX_AI_LOCATION,VERTEX_AI_SEARCH_DATA_STORE=$VERTEX_AI_SEARCH_DATA_STORE,VERTEX_AI_SEARCH_LOCATION=$VERTEX_AI_SEARCH_LOCATION" \
             --set-secrets FIREBASE_ADMIN_KEY=firebase-admin-key:latest \
-            --memory 1Gi \
+            --memory 2Gi \
             --timeout 300 \
             --quiet
 

@@ -1,70 +1,142 @@
-<h1 align="center">Layak</h1>
+<div align="center">
 
-<p align="center">
-  An agentic AI concierge for Malaysians to discover social-assistance schemes,<br/>
-  estimate annual upside, and generate draft application packets with visible provenance.
+<img src="docs/slides/assets/layak-logo.png" alt="Layak logo" width="140" />
+
+# Layak
+
+### The agentic AI concierge for Malaysian social-assistance schemes.
+
+_Three uploads. One website. Five autonomous steps. **Zero hallucinated rules.**_
+
+<br/>
+
+<p>
+  <img src="https://img.shields.io/badge/node-24.x-brightgreen?style=flat-square&logo=node.js&logoColor=white" alt="Node.js" />
+  <img src="https://img.shields.io/badge/pnpm-10.33.0-F69220?style=flat-square&logo=pnpm&logoColor=white" alt="pnpm" />
+  <img src="https://img.shields.io/badge/next.js-16-black?style=flat-square&logo=next.js&logoColor=white" alt="Next.js" />
+  <img src="https://img.shields.io/badge/react-19-61DAFB?style=flat-square&logo=react&logoColor=black" alt="React" />
+  <img src="https://img.shields.io/badge/fastapi-python%203.12-009688?style=flat-square&logo=fastapi&logoColor=white" alt="FastAPI" />
+  <img src="https://img.shields.io/badge/gemini-2.5%20%2F%203-FF6F00?style=flat-square&logo=googlegemini&logoColor=white" alt="Gemini" />
+  <img src="https://img.shields.io/badge/deploy-cloud%20run-4285F4?style=flat-square&logo=googlecloud&logoColor=white" alt="Cloud Run" />
+  <img src="https://img.shields.io/badge/hackathon-Project%202030-B91C1C?style=flat-square" alt="Project 2030" />
 </p>
 
-<p align="center">
-  <img src="https://img.shields.io/badge/node-24.x-brightgreen" alt="Node.js" />
-  <img src="https://img.shields.io/badge/pnpm-10.33.0-F69220" alt="pnpm" />
-  <img src="https://img.shields.io/badge/next.js-16-black" alt="Next.js" />
-  <img src="https://img.shields.io/badge/fastapi-python%203.12-009688" alt="FastAPI" />
-  <img src="https://img.shields.io/badge/gemini-2.5-orange" alt="Gemini" />
-  <img src="https://img.shields.io/badge/deploy-cloud%20run-4285F4" alt="Cloud Run" />
+<p><strong>Aligned with UN Sustainable Development Goals</strong></p>
+
+<p>
+  <img src="https://img.shields.io/badge/SDG%2001-No%20Poverty-e5243b?style=for-the-badge" alt="SDG 1 - No Poverty" />
+  <img src="https://img.shields.io/badge/SDG%2010-Reduced%20Inequalities-dd1367?style=for-the-badge" alt="SDG 10 - Reduced Inequalities" />
+  <img src="https://img.shields.io/badge/SDG%2016-Strong%20Institutions-00689d?style=for-the-badge" alt="SDG 16 - Peace, Justice & Strong Institutions" />
 </p>
 
-<img src="assets/banner.png" alt="Layak functional diagram banner" />
+<br/>
 
-> **Submission For:** Project 2030: MyAI Future Hackathon;
-> **Track 2:** Citizens First (GovTech and Digital Services);
-> **Category:** Open
+<img src="assets/banner.png" alt="Layak functional diagram" width="900" />
 
----
+<br/>
 
-## What Layak Does
+[**Live Demo**](https://layak-frontend-297019726346.asia-southeast1.run.app) · [**Pitch Deck**](https://docs.google.com/presentation/d/10sZA_cJGqoypqAIinCfxXzN9VCqGtEF-FD8ZZC-NzwM/edit?usp=sharing) · [**Demo Video**](#-demo-video)
 
-Malaysia's aid landscape is fragmented across agencies, forms, and portals. A citizen who may qualify for multiple schemes often has to discover each one separately, interpret different eligibility rules, and resubmit the same information multiple times.
-
-Layak turns that into one guided flow. A user can upload supporting documents or choose a privacy-first manual entry path, then receive:
-
-- Matched schemes ranked by estimated annual RM upside.
-- Plain-language reasons they appear to qualify.
-- Source-linked provenance for rule-backed claims.
-- Downloadable draft application packets for manual submission.
-
-Matched schemes are ranked by estimated annual RM upside, while required contributions are surfaced separately so the headline benefit total stays honest.
-
-Layak is intentionally draft-only. It does not submit to government systems on the user's behalf.
+</div>
 
 ---
 
-## Features
+> **Project 2030: MyAI Future Hackathon** · Track 2 — Citizens First (GovTech & Digital Services) · Open category
+> Built by **Team T010NG**.
 
-- Document upload flow for IC, income, and utility files.
-- Manual entry mode for users who prefer not to upload sensitive documents.
-- Five-step visible agent pipeline: extract, classify, match, rank, generate.
-- Ranked eligibility results ordered by estimated annual RM upside.
-- Source-backed provenance for rule-driven outputs.
-- Draft packet generation for supported schemes and tax-relief summaries.
-- Google sign-in, dashboard, and persisted evaluation history.
-- Free-tier quota controls with upgrade waitlist flow.
-- PDPA-aligned export and account deletion endpoints.
-- Demo personas and fixture documents for stable judging walkthroughs.
+> [!NOTE]
+> Layak is a **draft-only** concierge. It never submits to a real government portal. Every packet is watermarked **`DRAFT — NOT SUBMITTED`** so the citizen reviews, signs, and submits through the official channel themselves.
 
 ---
 
-## Why It Matters
+## ✨ At a Glance
 
-Layak is built around a simple product stance: citizens should not have to portal-hop just to discover what they are already entitled to. The system uses a safer AI pattern than a generic chatbot by grounding eligibility logic in committed source materials, surfacing citations in the UI, and stopping at draft generation instead of live submission.
-
-That combination improves trust, clarity, and preparation while still demonstrating a practical "AI to action" workflow for public-service discovery.
+<table>
+  <tr>
+    <td align="center"><strong>RM 12,308</strong><br/><sub>annual relief surfaced for our reference user, Aisyah</sub></td>
+    <td align="center"><strong>~60s</strong><br/><sub>median end-to-end latency, upload → draft packets</sub></td>
+    <td align="center"><strong>5&nbsp;+&nbsp;1</strong><br/><sub>upside schemes matched + 1 contribution flagged</sub></td>
+    <td align="center"><strong>0</strong><br/><sub>hallucinated rules — every number cites a source PDF</sub></td>
+  </tr>
+</table>
 
 ---
 
-## High-Level Architecture
+## 🎬 Demo Video
 
-Layak is a two-service application: a Next.js frontend and a FastAPI backend, both deployed to Google Cloud Run. The backend runs a RootAgent built on ADK-Python with a five-step pipeline for extraction, classification, matching, ranking, and packet generation.
+<div align="center">
+
+<a href="#-demo-video" title="Demo video — coming soon">
+  <img src="docs/slides/assets/slide-01-cover.png" alt="Watch the 3-minute Layak demo" width="820" />
+</a>
+
+<br/>
+
+</div>
+
+---
+
+## 🖼 Screenshots
+
+<table>
+  <tr>
+    <td width="33%"><img src="assets/screenshots/01-landing.png" alt="Landing page" /><p align="center"><sub>Landing — <em>every Malaysian scheme you qualify for, in one upload</em></sub></p></td>
+    <td width="33%"><img src="assets/screenshots/02-dashboard.png" alt="Signed-in dashboard" /><p align="center"><sub>Dashboard — application drafts and recent activity</sub></p></td>
+    <td width="33%"><img src="assets/screenshots/04-schemes-catalog.png" alt="Scheme library" /><p align="center"><sub>Scheme library — every scheme Layak reasons over</sub></p></td>
+  </tr>
+  <tr>
+    <td width="33%"><img src="assets/screenshots/03-upload-intake.png" alt="Upload intake" /><p align="center"><sub>Upload intake — sample, upload, or manual entry</sub></p></td>
+    <td width="33%"><img src="assets/screenshots/05-manual-entry.png" alt="Manual entry form" /><p align="center"><sub>Manual entry — privacy-first path, no docs required</sub></p></td>
+    <td width="33%"><img src="docs/slides/assets/slide-13-image.png" alt="Draft application packet — STR 2026 · Borang BK-01" /><p align="center"><sub>Draft packet — <code>STR 2026 · Borang BK-01</code>, generated by Layak</sub></p></td>
+  </tr>
+</table>
+
+---
+
+## 🧠 What Layak Does
+
+Malaysia's aid landscape is **fragmented** — 167 social-assistance schemes spread across 17 ministries and agencies. Citizens rarely know what they qualify for because the effort to search and apply for each one isn't worth it.
+
+Layak collapses that into a single guided flow. A user uploads documents (or uses the privacy-first manual-entry path), and the agent returns:
+
+- 🥇 **Ranked schemes** ordered by estimated annual RM upside.
+- 💬 **Plain-language reasons** they appear to qualify.
+- 🔗 **Source-linked provenance** for every rule-backed claim.
+- 📄 **Draft application packets** for manual submission.
+- ⚠️ **Required contributions** surfaced separately so the headline upside stays honest.
+
+---
+
+## 🏗 Feature Matrix
+
+|     | Feature                     | What it means                                                                                                                            |
+| --- | --------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------- |
+| 📥  | **Dual intake**             | Document upload for IC / payslip / utility, or a manual form for users who'd rather not upload anything.                                 |
+| 🧩  | **Visible 5-step agent**    | Extract → Classify → Match → Rank → Generate, streamed over SSE so the citizen watches the work happen.                                  |
+| 🔎  | **Grounded retrieval**      | Vertex AI Search over committed scheme PDFs — if no passage is retrieved, the rule is flagged `unverified` and drops out of the ranking. |
+| 🧮  | **Live arithmetic**         | Annual upside computed via Gemini Code Execution, not LLM narration.                                                                     |
+| 🖨  | **Draft packet generation** | WeasyPrint renders pre-filled application PDFs for each matched scheme, all watermarked `DRAFT — NOT SUBMITTED`.                         |
+| 👤  | **Accounts & history**      | Firebase Auth (Google), Firestore-backed evaluation history, free-tier quota, and an upgrade waitlist.                                   |
+| 🔐  | **PDPA-aligned**            | Explicit consent on sign-up, JSON export, and hard-delete endpoints. 30-day prune of free-tier history.                                  |
+| 🎭  | **Demo-ready fixtures**     | Five synthetic personas (Aisyah, Farhan, Hashim, Meiling, Ravi) for stable judging walkthroughs.                                         |
+
+---
+
+## 🌏 Why It Matters — SDG Alignment
+
+Layak is built around a simple product stance: **citizens should not have to portal-hop just to discover what they are already entitled to.** That stance maps directly to three UN Sustainable Development Goals:
+
+| SDG                                                                    | Goal                                     | How Layak contributes                                                                                                                                                 |
+| ---------------------------------------------------------------------- | ---------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| <img src="https://img.shields.io/badge/01-e5243b?style=flat-square" /> | **No Poverty**                           | Surfacing unclaimed subsidies (STR 2026, JKM Warga Emas, BKK) and tax reliefs directly increases the disposable income of low- and middle-income households.          |
+| <img src="https://img.shields.io/badge/10-dd1367?style=flat-square" /> | **Reduced Inequalities**                 | The manual-entry path works on a data-capped mid-range Android — the same experience the self-employed gig worker gets as the salaried urban professional.            |
+| <img src="https://img.shields.io/badge/16-00689d?style=flat-square" /> | **Peace, Justice & Strong Institutions** | Every output carries a citation to a gazetted PDF, every draft is clearly labelled, and nothing is submitted on the citizen's behalf. Public-sector AI with receipts. |
+
+---
+
+## 🏛 Architecture
+
+Layak is a two-service app on Google Cloud Run: a **Next.js 16 frontend** and a **FastAPI + ADK-Python backend**. The backend runs a `RootAgent` (Gemini 2.5 Pro) that orchestrates five `FunctionTool`s as a `SequentialAgent`.
 
 ```mermaid
 flowchart LR
@@ -80,7 +152,7 @@ flowchart LR
 ```
 
 <details>
-<summary><strong>Agent Pipeline</strong></summary>
+<summary><strong>Agent pipeline — five autonomous steps</strong></summary>
 
 ```mermaid
 flowchart LR
@@ -99,7 +171,7 @@ flowchart LR
 </details>
 
 <details>
-<summary><strong>Authenticated Evaluation Flow</strong></summary>
+<summary><strong>Authenticated evaluation flow</strong></summary>
 
 ```mermaid
 flowchart LR
@@ -117,36 +189,41 @@ flowchart LR
 
 ---
 
-## Google AI Ecosystem
+## 🌀 Google AI Ecosystem
 
-Layak is built around the Google AI stack the hackathon calls for:
+Layak exercises **eight** first-party Google components in one flow:
 
-- `Gemini 2.5 Pro` for orchestration.
-- `Gemini 2.5 Flash` and `Gemini 2.5 Flash-Lite` for extraction and classification.
-- `Vertex AI Search` for grounded retrieval and provenance.
-- `Gemini Code Execution` for visible upside calculations.
-- `Cloud Run`, `Firebase Auth`, `Firestore`, and `Secret Manager` for deployment, auth, persistence, and secrets.
-
----
-
-## Tech Stack
-
-| Category        | Technology                                                    | Notes                                                |
-| --------------- | ------------------------------------------------------------- | ---------------------------------------------------- |
-| Frontend        | Next.js 16, React 19, TypeScript 5, Tailwind CSS 4, shadcn/ui | Public experience, dashboard, evaluation UI          |
-| Backend         | FastAPI, Python 3.12, Pydantic v2                             | Intake APIs, orchestration, rules, packet generation |
-| Agent Framework | Google ADK for Python, `SequentialAgent`                      | RootAgent orchestration                              |
-| Models          | Gemini 2.5 Pro, Gemini 2.5 Flash                              | Orchestration, extraction, classification            |
-| Grounding       | Vertex AI Search                                              | Source passage retrieval for provenance              |
-| Computation     | Gemini Code Execution                                         | Annual upside calculations                           |
-| Document Output | WeasyPrint                                                    | Draft PDF packet generation                          |
-| Identity & Data | Firebase Auth, Firestore                                      | Authenticated flows, saved evaluations, quotas       |
-| Cloud           | Google Cloud Run, Secret Manager                              | Deployment and runtime secrets                       |
-| Tooling         | pnpm, ESLint, Prettier, Husky                                 | Workspace and code quality                           |
+| Layer                | Component                 | Role                                                                         |
+| -------------------- | ------------------------- | ---------------------------------------------------------------------------- |
+| 🧠 Brain · 01        | **Gemini 2.5 Pro**        | `RootAgent` orchestrator. Holds tools and the conversation buffer.           |
+| 🧠 Brain · 02        | **Gemini 2.5 Flash**      | Multimodal document extraction. Reads IC, payslip, utility bill directly.    |
+| 🧠 Brain · 03        | **Gemini 2.5 Flash-Lite** | Household classifier — ~5× cheaper than Flash for structured output.         |
+| 🧠 Brain · 04        | **Gemini Code Execution** | Sandboxed Python for annual-RM arithmetic — visible in the SSE stream.       |
+| 📚 Context · 05      | **Vertex AI Search**      | Grounded RAG over the nine cached scheme PDFs. Every rule carries a passage. |
+| 🎛 Orchestrator · 06 | **ADK-Python v1.31**      | First-party GA agent framework. `SequentialAgent` + `FunctionTool`.          |
+| ☁ Lifecycle · 07     | **Cloud Run**             | Two services, both `min-instances=1` with CPU boost an hour before demo.     |
+| 👤 Identity · 08     | **Firebase Auth**         | Google OAuth only. ID-token verification on every dashboard call.            |
 
 ---
 
-## Getting Started
+## 🧰 Tech Stack
+
+| Category        | Technology                                                        | Notes                                                     |
+| --------------- | ----------------------------------------------------------------- | --------------------------------------------------------- |
+| Frontend        | Next.js 16 · React 19 · TypeScript 5 · Tailwind CSS 4 · shadcn/ui | Public experience, dashboard, evaluation UI               |
+| Backend         | FastAPI · Python 3.12 · Pydantic v2                               | Intake APIs, orchestration, rules, packet generation      |
+| Agent Framework | Google ADK for Python · `SequentialAgent`                         | `RootAgent` orchestration                                 |
+| Models          | Gemini 2.5 Pro · 2.5 Flash · 2.5 Flash-Lite · 3 Flash Preview     | Orchestration, extraction, classification, compute_upside |
+| Grounding       | Vertex AI Search                                                  | Source passage retrieval for provenance                   |
+| Computation     | Gemini Code Execution                                             | Annual upside calculations                                |
+| Document Output | WeasyPrint                                                        | Draft PDF packet generation                               |
+| Identity & Data | Firebase Auth · Firestore                                         | Authenticated flows, saved evaluations, quotas            |
+| Cloud           | Google Cloud Run · Secret Manager · Artifact Registry             | Deployment and runtime secrets                            |
+| Tooling         | pnpm · ESLint · Prettier · Husky · lint-staged                    | Workspace and code quality                                |
+
+---
+
+## 🚀 Getting Started
 
 ### Prerequisites
 
@@ -154,19 +231,14 @@ Layak is built around the Google AI stack the hackathon calls for:
 - `pnpm@10.33.0`
 - Python `3.12`
 
-### Installation
+### Install & configure
 
 ```bash
-pnpm install
+pnpm install          # installs every workspace package
+cp .env.example .env  # then fill in the GCP + Firebase values below
 ```
 
-### Configure Environment Variables
-
-```bash
-cp .env.example .env
-```
-
-Important values include:
+Required environment variables:
 
 - `GOOGLE_CLOUD_PROJECT`
 - `GOOGLE_CLOUD_LOCATION`
@@ -176,95 +248,154 @@ Important values include:
 - `NEXT_PUBLIC_FIREBASE_*`
 - `FIREBASE_ADMIN_KEY`
 
-### Run Locally
-
-Frontend from the repo root:
+### Run locally
 
 ```bash
-pnpm dev
+# in terminal 1 — frontend
+pnpm dev                                        # → http://localhost:3000
+
+# in terminal 2 — backend
+cd backend && uvicorn app.main:app --reload --port 8080   # → http://localhost:8080
 ```
 
-Backend from `backend/`:
+### Useful commands
 
 ```bash
-uvicorn app.main:app --reload --port 8080
-```
-
-Local defaults:
-
-- frontend: `http://localhost:3000`
-- backend: `http://localhost:8080`
-
-### Useful Commands
-
-```bash
-pnpm dev      # start frontend
-pnpm build    # production frontend build
-pnpm start    # run production frontend
-pnpm lint     # lint frontend
-pnpm format   # format repo files
+pnpm dev         # start frontend (Next.js 16, webpack, port 3000)
+pnpm build       # production frontend build
+pnpm start       # run production frontend
+pnpm run lint    # lint frontend (use `run` — `pnpm lint` hits a built-in)
+pnpm format      # prettier --write across the repo
 ```
 
 ---
 
-## Deployment
+## ☁ Deployment
 
-Current deployed URLs referenced in the repo:
+Both services deploy to Google Cloud Run. Current production URLs:
 
-- Frontend: `https://layak-frontend-297019726346.asia-southeast1.run.app`
-- Backend: `https://layak-backend-297019726346.asia-southeast1.run.app`
-
-Cloud Run deployment examples documented for this project:
-
-- Frontend:
-  `gcloud run deploy layak-frontend --source frontend --region asia-southeast1 --min-instances 1 --cpu-boost --allow-unauthenticated --set-build-env-vars NEXT_PUBLIC_BACKEND_URL=https://layak-backend-297019726346.asia-southeast1.run.app --memory 512Mi --timeout 60`
-- Backend:
-  `gcloud run deploy layak-backend --source backend --region asia-southeast1 --min-instances 1 --cpu-boost --allow-unauthenticated --set-env-vars GOOGLE_CLOUD_PROJECT=...,GOOGLE_CLOUD_LOCATION=global,VERTEX_AI_SEARCH_DATA_STORE=layak-schemes-v1,VERTEX_AI_SEARCH_LOCATION=global --set-secrets FIREBASE_ADMIN_KEY=firebase-admin-key:latest --memory 2Gi --timeout 300`
-
-If these URLs or commands drift, treat the runtime configuration and deployment scripts as the source of truth.
-
----
-
-## Privacy & Safety
-
-- Layak does not submit to live government portals.
-- Outputs are clearly draft-only and meant to help users prepare, not bypass agency review.
-- Rule-backed claims surface provenance instead of asking users to trust a hidden model decision.
-- Uploaded documents are processed for evaluation, while authenticated flows persist evaluation records and user account data needed for history, quota, and PDPA actions.
-- The product includes export and deletion capabilities for signed-in users.
-- Demo documents in the repository are synthetic and intended for demonstrations only.
-
----
-
-## AI Disclosure
-
-In line with the hackathon handbook requirement to disclose AI-generated code and AI-assisted development, this project used AI tooling in the following ways:
-
-- `Google AI Studio` for prompt engineering and designing development workflow.
-- `Google Antigravity IDE` for code scaffolding and generation support.
-- `GitHub Copilot` for documentation assistance and Git workflow support.
-
-All AI-assisted output is reviewed and integrated by human developers before commit. If the team decides to disclose additional assistants used during development, this section should be extended only with accurate, project-specific statements.
-
----
-
-## Project Structure
+- **Frontend:** <https://layak-frontend-297019726346.asia-southeast1.run.app>
+- **Backend:** <https://layak-backend-297019726346.asia-southeast1.run.app>
 
 <details>
-<summary><strong>Repository Layout</strong></summary>
+<summary><strong>Reference <code>gcloud run deploy</code> commands</strong></summary>
+
+```bash
+# Frontend
+gcloud run deploy layak-frontend \
+  --source frontend \
+  --region asia-southeast1 \
+  --min-instances 1 --cpu-boost --allow-unauthenticated \
+  --set-build-env-vars NEXT_PUBLIC_BACKEND_URL=https://layak-backend-297019726346.asia-southeast1.run.app \
+  --memory 512Mi --timeout 60
+
+# Backend
+gcloud run deploy layak-backend \
+  --source backend \
+  --region asia-southeast1 \
+  --min-instances 1 --cpu-boost --allow-unauthenticated \
+  --set-env-vars GOOGLE_CLOUD_PROJECT=...,GOOGLE_CLOUD_LOCATION=global,VERTEX_AI_SEARCH_DATA_STORE=layak-schemes-v1,VERTEX_AI_SEARCH_LOCATION=global \
+  --set-secrets FIREBASE_ADMIN_KEY=firebase-admin-key:latest \
+  --memory 2Gi --timeout 300
+```
+
+</details>
+
+> [!IMPORTANT]
+> If these URLs or commands drift, the live runtime configuration and `.github/workflows/cloud-run-deploy.yml` are the source of truth — not this README.
+
+---
+
+## 🔒 Privacy & Safety
+
+> [!CAUTION]
+> Layak is a **preparation** tool, not a submission tool. It never writes to `bantuantunai.hasil.gov.my`, the LHDN portal, or any other live agency endpoint.
+
+- 🚫 **No live submission — ever.** Outputs are drafts. The citizen submits through the official channel.
+- 🧾 **No unverified claim** reaches the UI. If Vertex AI Search returns no passage for a rule, the rule drops out of the ranking.
+- 🎭 **Synthetic demo documents only.** Every MyKad, payslip, and utility bill in `docs/demo/` is fictional and watermarked `SYNTHETIC — FOR DEMO ONLY`.
+- ⚖ **No final legal determination** is claimed. Every explanation uses "you appear to qualify ... the agency confirms on application."
+- 🗑 **30-day retention** on free-tier history, cascade-delete on account deletion, JSON export on demand — PDPA 2010-aligned.
+
+---
+
+## 🤝 AI Disclosure
+
+This project has utilized AI tooling in the following ways to produce sustainable and maintainable code using:
+
+- **Google AI Studio** — Prompt engineering and development-workflow design for the app.
+- **Google Antigravity IDE** — Code scaffolding and generation support.
+- **GitHub Copilot** — Documentation assistance and Git workflow support.
+
+All AI-assisted output is reviewed, tested, and integrated by human developers before commit.
+
+---
+
+## 👥 Team
+
+<p align="center">Built with ❤️ by <strong>Team T010NG</strong>, as we strive to <strong>TOLONG</strong>.</p>
+
+<table align="center">
+  <tr>
+    <td align="center" width="200">
+      <a href="https://github.com/AlaskanTuna"><img src="https://github.com/AlaskanTuna.png" width="100" style="border-radius:50%" alt="HZJ"/></a><br/>
+      <strong>HZJ</strong><br/>
+      <a href="https://github.com/AlaskanTuna"><sub>@AlaskanTuna</sub></a>
+    </td>
+    <td align="center" width="200">
+      <a href="https://github.com/chaosiris"><img src="https://github.com/chaosiris.png" width="100" style="border-radius:50%" alt="Hao"/></a><br/>
+      <strong>Hao</strong><br/>
+      <a href="https://github.com/chaosiris"><sub>@chaosiris</sub></a>
+    </td>
+    <td align="center" width="200">
+      <a href="https://github.com/Doraemon-00"><img src="https://github.com/Doraemon-00.png" width="100" style="border-radius:50%" alt="JS"/></a><br/>
+      <strong>JS</strong><br/>
+      <a href="https://github.com/Doraemon-00"><sub>@Doraemon-00</sub></a>
+    </td>
+  </tr>
+</table>
+
+---
+
+## 📁 Project Structure
+
+<details>
+<summary><strong>Repository layout</strong></summary>
 
 ```text
 Layak/
-|-- assets/              # README visuals and generated banner art
-|-- frontend/            # Next.js app, dashboard, marketing pages, evaluation UI
-|-- backend/             # FastAPI app, agent pipeline, rules, routes, PDF generation
-|-- docs/                # PRD, TRD, handbook notes, plans, diagrams, demo materials
-|-- .github/             # GitHub workflows and repo metadata
-|-- package.json
-|-- pnpm-workspace.yaml
-`-- .env.example
+├── assets/              # README visuals and banner art
+├── frontend/            # Next.js app — dashboard, marketing, evaluation UI
+├── backend/             # FastAPI app — agent pipeline, rules, routes, PDF generation
+│   ├── app/agents/      #   ADK-Python RootAgent + FunctionTools
+│   ├── app/rules/       #   typed Pydantic rule engine (STR, JKM, LHDN, i-Saraan, PERKESO)
+│   ├── app/routes/      #   FastAPI routes (intake, evaluation, packet, user)
+│   ├── app/services/    #   Vertex AI Search client, rate limit, Firestore wrappers
+│   └── data/schemes/    #   committed gazetted source PDFs (source of truth)
+├── docs/                # PRD, TRD, plan, progress, demo personas, pitch deck
+│   ├── slides/          #   HTML pitch deck + exported PNGs (docs/slides/assets/)
+│   └── demo/            #   synthetic persona bibles (aisyah, farhan, hashim, meiling, ravi)
+├── .github/             # workflows: cloud-run-deploy.yml, etc.
+├── package.json         # root workspace orchestrator
+├── pnpm-workspace.yaml
+└── .env.example
 ```
 
 </details>
 
 ---
+
+## 🙏 Acknowledgements
+
+- **Project 2030: MyAI Future Hackathon** — UTM × Google Cloud Platform, for the opportunity and the credits.
+- **Ministry of Finance Malaysia** — for publishing Budget 2026 as a gazetted, citable primary source.
+- **LHDN, JKM, PERKESO, KWSP** — for the public explanatory notes and schedules we ground the rule engine on.
+- The open-source community behind `Next.js`, `FastAPI`, `ADK-Python`, `shadcn/ui`, and `WeasyPrint`.
+
+---
+
+<div align="center">
+
+<sub><strong>Layak</strong> · Project 2030 · MyAI Future Hackathon · Track 2 Open · © 2026 Team T010NG</sub>
+
+</div>

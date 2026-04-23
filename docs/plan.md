@@ -716,6 +716,7 @@ _Frontend:_
 - [ ] Update `README.md` for the v2 SaaS flow, the Firebase-backed architecture, and the new live URL.
 - [ ] Re-record the demo video so it matches the signed-in workflow and the persisted history screens.
 - [ ] Update the deck, export `pitch.pdf`, and resubmit the Google Form.
+- [ ] **Slide 15 (Thank You) — add the two QR codes**: the deck ships with two empty 1:1 placeholder squares labelled `Live Demo` and `GitHub`. Before export, drop in QR codes that resolve to the production URL and the public GitHub repo (generate in Google Slides, or via `qrencode` for PNG and paste over the placeholders in `docs/slides/layak-pitch-deck.html`). Do not submit with empty QR slots.
 
 **Exit criteria:** the repo contains refreshed submission artifacts and the final form is resubmitted.
 

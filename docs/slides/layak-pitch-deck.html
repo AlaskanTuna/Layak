@@ -91,13 +91,13 @@
   }
   .ct-row { display:grid; grid-template-columns: 130px 1fr; gap: 20px; align-items:baseline; }
   .ct-label {
-    font-family:'IBM Plex Mono', monospace; font-size:18px; letter-spacing:0.14em;
+    font-family:'IBM Plex Mono', monospace; font-size:22px; letter-spacing:0.14em;
     text-transform: uppercase; color: var(--muted);
   }
   .ct-val {
-    font-family:'IBM Plex Mono', monospace; font-size:20px; color: var(--ink);
+    font-family:'IBM Plex Mono', monospace; font-size:28px; color: var(--ink); font-weight:600;
     border-bottom: 1px dashed var(--rule); padding: 4px 2px; outline:none;
-    min-height: 28px;
+    min-height: 36px;
   }
   .ct-val:focus { border-bottom-color: var(--accent); border-bottom-style: solid; }
 
@@ -106,7 +106,7 @@
   .ct-gh { display:flex; align-items:center; gap:8px; color: var(--muted); }
   .gh-icon { width: 18px; height: 18px; flex-shrink:0; display:block; }
   .ct-val-gh {
-    font-family:'IBM Plex Mono', monospace; font-size:17px; color: var(--ink-2);
+    font-family:'IBM Plex Mono', monospace; font-size:20px; color: var(--ink-2); font-weight:500;
     border-bottom: 1px dashed var(--rule); padding: 2px 2px;
   }
   .ct-val-gh::before { content: "@"; color: var(--muted); margin-right: 2px; }
@@ -213,7 +213,11 @@
   /* Slides 02–04: tighter head so content doesn't crash the bottom edge */
   .slide[data-label^="02"] .frame-head,
   .slide[data-label^="03"] .frame-head,
-  .slide[data-label^="04"] .frame-head {
+  .slide[data-label^="04"] .frame-head,
+  .slide[data-label^="09"] .frame-head,
+  .slide[data-label^="10"] .frame-head,
+  .slide[data-label^="11"] .frame-head,
+  .slide[data-label^="13"] .frame-head {
     margin-top: 14px !important;
     margin-bottom: 32px;
     padding-bottom: 20px;
@@ -228,6 +232,20 @@
   }
   .slide[data-label^="03"] .persona-facts { align-content:start; }
   .slide[data-label^="03"] .quote-block { margin-top: 24px; }
+
+  /* Slides 09–13: shrink titles so content sits higher — bold statement size */
+  .slide[data-label^="09"] .t-title,
+  .slide[data-label^="10"] .t-title-sm,
+  .slide[data-label^="11"] .t-title-sm,
+  .slide[data-label^="13"] .t-title-sm {
+    font-size: 60px;
+  }
+
+  /* Slides 06, 08, 14: raise the left paragraph block slightly above center */
+  .slide[data-label^="06"] .grounded-grid { align-items: start; }
+  .slide[data-label^="06"] .grounded-grid > :first-child { padding-top: 20px; }
+  .slide[data-label^="08"] .manual-copy { align-self: start; padding-top: 20px; }
+  .slide[data-label^="14"] .next-grid > :first-child { align-self: start !important; padding-top: 20px; }
 
   /* ========== SLIDE 4: WHAT LAYAK DOES ========== */
   .what-grid { display:grid; grid-template-columns: 1fr 1fr; gap: 72px; flex:1; min-height:0; }
@@ -284,8 +302,8 @@
   .cite-row { display:flex; justify-content:space-between; align-items:center; padding: 20px 0; border-bottom: 1px dashed var(--rule); gap: 40px; }
   .cite-row:last-child { border-bottom: none; }
   .cite-key { font-size:24px; color: var(--ink-2); }
-  .cite-val { display:flex; align-items:center; gap:16px; }
-  .cite-val .val-num { font-family:'IBM Plex Mono', monospace; font-weight:600; font-size:28px; color: var(--ink); }
+  .cite-val { display:grid; grid-template-columns: 220px auto; gap:20px; align-items:center; justify-items:start; }
+  .cite-val .val-num { font-family:'IBM Plex Mono', monospace; font-weight:600; font-size:28px; color: var(--ink); text-align:left; }
   .cite-val .chip {
     font-family:'IBM Plex Mono', monospace; font-size:18px; color: var(--accent); border:1px solid var(--accent);
     padding:4px 10px; letter-spacing:0.06em;
@@ -446,10 +464,10 @@
     padding: 120px 80px; display:flex; flex-direction:column; gap: 24px; justify-content:center;
   }
   .outcome-num {
-    font-family:'Lora', Georgia, serif; font-weight:700; font-size:240px; line-height:0.85; color: rgb(0, 83, 12);
-    letter-spacing:-0.04em; white-space: nowrap;
+    font-family:'Lora', Georgia, serif; font-weight:700; font-size:240px; line-height:0.95; color: rgb(0, 83, 12);
+    letter-spacing:-0.04em; white-space: nowrap; padding-bottom: 18px;
   }
-  .outcome-sub { font-size:34px; color: var(--ink-2); line-height:1.25; max-width: 700px; margin-top: 20px; }
+  .outcome-sub { font-size:34px; color: var(--ink-2); line-height:1.25; max-width: 700px; margin-top: 56px; }
   .breakdown-title { font-family:'IBM Plex Mono', monospace; font-size:20px; letter-spacing:0.14em; text-transform:uppercase; color: rgba(245,241,232,0.55); margin-bottom: 12px; }
   .br-row {
     display:grid; grid-template-columns: 1fr auto; gap: 24px; padding: 16px 0;
@@ -524,13 +542,13 @@
   .next-tag.v2 { border-color: var(--ink); color: var(--ink); }
 
   /* ========== SLIDE 15: THANK YOU ========== */
-  .ty {
+  section.slide.ty {
     background: var(--ink); color: var(--paper); padding: 0;
   }
   .ty .top-chrome { color: rgba(245,241,232,0.55); }
   .ty .top-chrome .brand { color: var(--paper); }
   .ty-grid { display:grid; grid-template-columns: 1.1fr 1fr; height:100%; }
-  .ty-left { padding: 90px 90px 80px; display:flex; flex-direction:column; justify-content:space-between; gap: 40px; }
+  .ty-left { padding: 80px 90px 70px; display:flex; flex-direction:column; justify-content:space-between; gap: 24px; }
   .ty-right { position:relative; border-left:1px solid rgba(245,241,232,0.15); padding: 90px 70px 80px; display:flex; flex-direction:column; }
   .ty-right::before {
     content:""; position:absolute; inset:0;
@@ -560,28 +578,24 @@
     color: var(--accent); text-transform: none; font-family: 'IBM Plex Mono', monospace;
   }
 
-  .ty-links { display:flex; flex-wrap:wrap; gap: 14px; margin-top: 40px; }
-  .ty-link {
-    display:inline-flex; align-items:center; gap: 10px;
-    padding: 12px 18px;
-    text-decoration:none;
-    background: rgba(245,241,232,0.06);
-    border: 1px solid rgba(245,241,232,0.35);
-    color: var(--paper);
-    font-family:'IBM Plex Mono', monospace; font-size: 16px; letter-spacing:0.04em;
-    transition: background 0.15s ease, border-color 0.15s ease;
+  .ty-qr-row { display:flex; gap: 28px; margin-top: 24px; align-items:flex-start; }
+  .ty-qr {
+    display:flex; flex-direction:column; gap: 10px; align-items:center;
   }
-  .ty-link:hover { background: rgba(245,241,232,0.12); border-color: var(--paper); }
-  .ty-link .tl-label {
-    font-family:'IBM Plex Mono', monospace; font-size: 16px; letter-spacing: 0.06em;
-    color: var(--paper); font-weight:600;
+  .ty-qr-label {
+    font-family:'IBM Plex Mono', monospace; font-size: 18px; letter-spacing: 0.12em;
+    color: var(--paper); font-weight:600; text-transform: uppercase;
   }
-  .ty-link .tl-url {
-    display: none;
+  .ty-qr-slot {
+    width: 170px; height: 170px;
+    background: rgba(245,241,232,0.04);
+    border: 2px dashed rgba(245,241,232,0.3);
+    display:grid; place-items:center;
   }
-  .tl-label { display:inline-flex; align-items:center; gap: 8px; }
-  .tl-gh { width: 14px; height: 14px; opacity: 0.7; }
-  .ty-link .tl-label::after { content: "\2192"; margin-left: 4px; color: var(--accent); font-weight:700; }
+  .ty-qr-slot .ty-qr-placeholder {
+    font-family:'IBM Plex Mono', monospace; font-size: 13px; letter-spacing: 0.1em;
+    color: rgba(245,241,232,0.4); text-transform: uppercase;
+  }
 
   .ty-footnote {
     margin-top:auto; padding-top: 20px;
@@ -592,7 +606,7 @@
 
   .ty-kicker { font-family:'Lora', Georgia, serif; font-size:88px; font-weight:700; line-height:1.0; letter-spacing:-0.02em; margin: 0; }
   .ty-kicker-accent { color: var(--accent); font-style: italic; }
-  .ty-sub { font-size:26px; line-height:1.5; color: rgba(245,241,232,0.82); margin-top: 28px; max-width: 700px; }
+  .ty-sub { font-size:24px; line-height:1.45; color: rgba(245,241,232,0.82); margin-top: 20px; max-width: 700px; }
   .ty-sub strong { color: var(--paper); font-weight:600; }
 
   .ty-signoff {
@@ -652,7 +666,7 @@
         <div class="cover-team">
           <div class="ct-row">
             <span class="ct-label">Team</span>
-            <span class="ct-val" contenteditable="true" spellcheck="false">Layak</span>
+            <span class="ct-val" contenteditable="true" spellcheck="false">T010NG</span>
           </div>
           <div class="ct-row ct-row-member">
             <span class="ct-label">Member 01</span>
@@ -742,7 +756,7 @@
 
     <div class="persona-grid">
       <div class="persona-card">
-        <div class="persona-portrait"><span class="initial">A</span></div>
+        <div class="persona-portrait"><img src="assets/aisyah-photo.jpeg" alt="Aisyah" style="width:100%; height:100%; object-fit:cover; display:block;"/></div>
         <div>
           <div class="persona-name">Aisyah, 34</div>
           <div class="persona-meta" style="margin-top: 10px;">Grab driver · Kuantan, Pahang</div>
@@ -782,8 +796,8 @@
 
     <div class="what-grid">
       <div class="what-left">
-        <p class="what-lead">Layak is a <em>grounded</em> agentic concierge: it reads a citizen's documents, matches them against Budget-2026-gazetted rules, and prepares three pre-filled draft packets — each one cited to the exact source PDF.</p>
-        <p class="what-sub">It is explicitly <strong>not</strong> a chatbot. There is no free text answer. Every number comes from a typed rule engine backed by retrieval, and every packet is stamped <em>DRAFT — NOT SUBMITTED</em> to ensure user verification before submission.</p>
+        <p class="what-lead">Layak is a <em>grounded</em> agentic concierge: it reads a user's documents, matches them against Budget-2026-gazetted rules, and prepares pre-filled draft packets for all eligible schemes — each one cited to the exact source PDF.</p>
+        <p class="what-sub">It is explicitly <strong>not</strong> a chatbot. There is no free text answer. Every number comes from a typed rule engine backed by retrieval, and every packet has a <em>DRAFT — NOT SUBMITTED</em> disclaimer, to ensure manual user verification before submission.</p>
       </div>
 
       <div class="flow-diagram">
@@ -1285,22 +1299,13 @@
           <div class="safety-ix">05</div>
           <div>
             <div class="safety-h">AI disclosure is explicit.</div>
-            <div class="safety-p">README names Claude Code (Anthropic) as the primary agentic coding assistant, per hackathon Rules §4.2.</div>
+            <div class="safety-p">README names Claude Code (Anthropic) as the primary agentic coding assistant, per hackathon Rules §4.2, which is what allowed us to build and ship Layak within a week.</div>
           </div>
         </div>
       </div>
 
-      <div class="watermark-mock">
-        <div class="wm-tag">BK-01 · STR 2026 Application · DRAFT</div>
-        <div class="wm-title">Borang Permohonan & Kemaskini STR 2026</div>
-        <div style="margin-top: 16px;">
-          <div class="wm-line"><span>Nama</span><span>Aisyah binti Ismail</span></div>
-          <div class="wm-line"><span>No. K/P (4 digit akhir)</span><span>●●●● 8472</span></div>
-          <div class="wm-line"><span>Pendapatan isi rumah</span><span>RM 2,800 / bulan</span></div>
-          <div class="wm-line"><span>Bilangan tanggungan</span><span>3</span></div>
-          <div class="wm-line"><span>Tier</span><span>Household · ≤ RM 2,500</span></div>
-        </div>
-        <div class="wm-foot">Generated by Layak on 2026-04-21.<br/>This is a draft. You must submit manually via bantuantunai.hasil.gov.my.</div>
+      <div style="display:flex; align-items:center; justify-content:center;">
+        <img src="assets/slide-13-image.png" alt="Generated draft form — BK-01 STR 2026 Application" style="width:100%; height:auto; max-height:100%; object-fit:contain; display:block; border: 2px solid var(--ink);"/>
       </div>
     </div>
   </div>
@@ -1345,12 +1350,12 @@
         </div>
         <div class="next-row">
           <div class="next-ix">v3</div>
-          <div class="next-h">Sovereign deploy<small>Gemma on-prem swap · ministry perimeter · MyGDX bridge</small></div>
-          <div class="next-tag v2">Concept</div>
+          <div class="next-h">Open Weights Model Support &amp; Collaborations<small>Gemma on-prem swap · ministry perimeter · MyGDX bridge</small></div>
+          <div class="next-tag v2">Pending</div>
         </div>
         <div class="next-row">
           <div class="next-ix">v3+</div>
-          <div class="next-h">Long-tail schemes<small>i-Saraan · MyKasih · eKasih · state-level aid · appeal workflow</small></div>
+          <div class="next-h">Coverage of most schemes<small>i-Saraan · MyKasih · eKasih · state-level aid · appeal workflow</small></div>
           <div class="next-tag v2">Long-term</div>
         </div>
       </div>
@@ -1372,25 +1377,21 @@
         <h2 class="ty-kicker">Three uploads,<br/>one website,<br/><span class="ty-kicker-accent">zero hallucinated rules.</span></h2>
         <p class="ty-sub">Aisyah gets <strong>RM 12,308</strong> a year she didn't know she was entitled to — from an agent that cites its sources, never submits on her behalf, and runs on Malaysian infrastructure when it has to.</p>
 
-        <div class="ty-links">
-          <a class="ty-link" href="#" target="_blank" rel="noreferrer">
-            <div class="tl-label">Live demo</div>
-            <div class="tl-url" contenteditable="true" spellcheck="false">layak-frontend-297019726346.asia-southeast1.run.app</div>
-          </a>
-          <a class="ty-link" href="#" target="_blank" rel="noreferrer">
-            <div class="tl-label"><svg class="tl-gh" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 .5a12 12 0 0 0-3.79 23.4c.6.11.82-.26.82-.58v-2.03c-3.34.73-4.04-1.61-4.04-1.61-.55-1.39-1.33-1.76-1.33-1.76-1.09-.74.08-.73.08-.73 1.2.08 1.83 1.24 1.83 1.24 1.07 1.84 2.8 1.31 3.48 1 .11-.78.42-1.31.76-1.61-2.67-.3-5.47-1.34-5.47-5.95 0-1.31.47-2.39 1.23-3.23-.12-.3-.54-1.52.12-3.17 0 0 1.01-.32 3.3 1.23a11.4 11.4 0 0 1 6 0c2.29-1.55 3.3-1.23 3.3-1.23.66 1.65.24 2.87.12 3.17.77.84 1.23 1.92 1.23 3.23 0 4.62-2.81 5.65-5.49 5.94.43.37.81 1.1.81 2.22v3.29c0 .32.22.7.83.58A12 12 0 0 0 12 .5z"/></svg> GitHub</div>
-            <div class="tl-url" contenteditable="true" spellcheck="false">github.com/your-org/layak</div>
-          </a>
-          <a class="ty-link" href="#" target="_blank" rel="noreferrer">
-            <div class="tl-label">Walkthrough video</div>
-            <div class="tl-url" contenteditable="true" spellcheck="false">youtu.be/placeholder</div>
-          </a>
+        <div class="ty-qr-row">
+          <div class="ty-qr">
+            <div class="ty-qr-slot"><span class="ty-qr-placeholder">QR</span></div>
+            <div class="ty-qr-label">Live Demo</div>
+          </div>
+          <div class="ty-qr">
+            <div class="ty-qr-slot"><span class="ty-qr-placeholder">QR</span></div>
+            <div class="ty-qr-label">GitHub</div>
+          </div>
         </div>
       </div>
 
       <div class="ty-signoff">
         <div class="ty-regards">With regards,</div>
-        <div class="ty-team" contenteditable="true" spellcheck="false">— The Layak Team</div>
+        <div class="ty-team" contenteditable="true" spellcheck="false">— Team T010NG</div>
       </div>
     </div>
     <div class="ty-right">

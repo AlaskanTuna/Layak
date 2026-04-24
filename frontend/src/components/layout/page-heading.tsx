@@ -19,9 +19,7 @@ export function PageHeading({ eyebrow, title, description, action, children }: P
             </p>
           )}
           <h1 className="font-heading text-3xl font-semibold tracking-tight sm:text-4xl">{title}</h1>
-          {description && (
-            <p className="text-sm leading-relaxed text-muted-foreground sm:text-base">{description}</p>
-          )}
+          {description && <p className="text-sm leading-relaxed text-muted-foreground sm:text-base">{description}</p>}
           {children}
         </div>
         {action && <div className="flex shrink-0 lg:pt-1">{action}</div>}

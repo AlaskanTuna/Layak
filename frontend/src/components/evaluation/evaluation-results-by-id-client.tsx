@@ -49,7 +49,7 @@ function mapStepState(state: EvaluationStepState): StepStatus {
  */
 function docToPipelineState(doc: EvaluationDoc): PipelineState {
   const stepStates = Object.fromEntries(
-    PIPELINE_STEPS.map(step => [step, mapStepState(doc.stepStates[step] ?? 'pending')])
+    PIPELINE_STEPS.map((step) => [step, mapStepState(doc.stepStates[step] ?? 'pending')])
   ) as Record<Step, StepStatus>
 
   // The persistence layer mirrors the compute_upside trace so the panel
@@ -65,9 +65,7 @@ function docToPipelineState(doc: EvaluationDoc): PipelineState {
           total_annual_rm: doc.totalAnnualRM,
           per_scheme_rm:
             doc.upsideTrace?.perSchemeRM ??
-            Object.fromEntries(
-              doc.matches.filter(m => m.qualifies).map(m => [m.scheme_id, m.annual_rm])
-            )
+            Object.fromEntries(doc.matches.filter((m) => m.qualifies).map((m) => [m.scheme_id, m.annual_rm]))
         }
       : null
 
@@ -225,7 +223,7 @@ export function EvaluationResultsByIdClient({ evalId }: { evalId: string }) {
   // `totalAnnualRM` remains upside-only, but the hero copy should reflect the
   // full matched set the user sees on the page, including required-
   // contribution items surfaced in the separate card below.
-  const matchedCount = doc.matches.filter(m => m.qualifies).length
+  const matchedCount = doc.matches.filter((m) => m.qualifies).length
   const totalAnnualRm = doc.totalAnnualRM ?? 0
 
   function handleStartAnother() {
@@ -236,9 +234,7 @@ export function EvaluationResultsByIdClient({ evalId }: { evalId: string }) {
 
   return (
     <div className="flex flex-col gap-6">
-      {(isRunning || isError) && (
-        <PipelineStepper state={pipelineState} />
-      )}
+      {(isRunning || isError) && <PipelineStepper state={pipelineState} />}
 
       {isComplete && (
         <ResultsActionRail
@@ -282,8 +278,7 @@ export function EvaluationResultsByIdClient({ evalId }: { evalId: string }) {
             // Only render the panel when we actually have a trace to show —
             // older evals predating `upsideTrace` persistence would otherwise
             // render empty <pre> blocks.
-            (pipelineState.upside.python_snippet !== '' ||
-              pipelineState.upside.stdout !== '') && (
+            (pipelineState.upside.python_snippet !== '' || pipelineState.upside.stdout !== '') && (
               <CodeExecutionPanel upside={pipelineState.upside} />
             )}
         </>
@@ -307,9 +302,7 @@ export function EvaluationResultsByIdClient({ evalId }: { evalId: string }) {
       {/* Phase 10 — floating chatbot. Only available when the eval has at
           least one qualifying match (no chat without context). The panel
           uses fixed positioning, so it never affects the page layout above. */}
-      {isComplete && matchedCount > 0 && (
-        <ResultsChatPanel evalId={evalId} matches={doc.matches} />
-      )}
+      {isComplete && matchedCount > 0 && <ResultsChatPanel evalId={evalId} matches={doc.matches} />}
     </div>
   )
 }

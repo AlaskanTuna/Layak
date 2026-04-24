@@ -29,5 +29,5 @@ export function downloadAllDrafts(packet: Packet | null): void {
 
 export function hasDownloadableDrafts(packet: Packet | null): boolean {
   if (!packet) return false
-  return packet.drafts.some(d => d.blob_bytes_b64 != null)
+  return packet.drafts.some((d) => d.blob_bytes_b64 != null)
 }

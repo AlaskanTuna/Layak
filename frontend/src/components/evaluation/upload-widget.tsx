@@ -1,7 +1,17 @@
 'use client'
 
 import { useId, useRef, useState } from 'react'
-import { ArrowRight, ChevronDown, FileImage, FileText, Loader2, ShieldCheck, Sparkles, UploadCloud, X } from 'lucide-react'
+import {
+  ArrowRight,
+  ChevronDown,
+  FileImage,
+  FileText,
+  Loader2,
+  ShieldCheck,
+  Sparkles,
+  UploadCloud,
+  X
+} from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import type { TFunction } from 'i18next'
 
@@ -42,8 +52,18 @@ type SlotSpec = {
 
 const SLOT_SPECS: SlotSpec[] = [
   { slot: 'ic', labelKey: 'evaluation.upload.sectionIc', hintKey: 'evaluation.upload.hintIc', required: true },
-  { slot: 'payslip', labelKey: 'evaluation.upload.sectionPayslip', hintKey: 'evaluation.upload.hintPayslip', required: true },
-  { slot: 'utility', labelKey: 'evaluation.upload.sectionUtility', hintKey: 'evaluation.upload.hintUtility', required: true }
+  {
+    slot: 'payslip',
+    labelKey: 'evaluation.upload.sectionPayslip',
+    hintKey: 'evaluation.upload.hintPayslip',
+    required: true
+  },
+  {
+    slot: 'utility',
+    labelKey: 'evaluation.upload.sectionUtility',
+    hintKey: 'evaluation.upload.hintUtility',
+    required: true
+  }
 ]
 
 function validate(file: File, t: TFunction): string | null {
@@ -169,7 +189,7 @@ function UploadSlotCard({ spec, state, inputId, disabled, inputRef, onChange, on
         aria-invalid={error ? true : undefined}
         aria-describedby={error ? errorId : undefined}
         className="sr-only"
-        onChange={e => onChange(e.target.files?.[0] ?? null)}
+        onChange={(e) => onChange(e.target.files?.[0] ?? null)}
       />
 
       {error && (
@@ -203,28 +223,28 @@ export function UploadWidget({ onSubmit, onUseSamples, disabled = false, samples
   const [pendingCrop, setPendingCrop] = useState<{ slot: UploadSlot; file: File } | null>(null)
 
   const canSubmit = (['ic', 'payslip', 'utility'] as const).every(
-    s => state[s].file !== null && state[s].error === null
+    (s) => state[s].file !== null && state[s].error === null
   )
 
   function commitFile(slot: UploadSlot, file: File) {
-    setState(prev => ({ ...prev, [slot]: { file, error: null } }))
+    setState((prev) => ({ ...prev, [slot]: { file, error: null } }))
   }
 
   function handleFileChange(slot: UploadSlot, file: File | null) {
     if (!file) {
-      setState(prev => ({ ...prev, [slot]: { file: null, error: null } }))
+      setState((prev) => ({ ...prev, [slot]: { file: null, error: null } }))
       return
     }
     const error = validate(file, t)
     if (error) {
-      setState(prev => ({ ...prev, [slot]: { file: null, error } }))
+      setState((prev) => ({ ...prev, [slot]: { file: null, error } }))
       return
     }
     if (isImageFile(file)) {
       // Hold the slot blank until the user confirms the crop. Surfacing the
       // file in the slot prematurely would let them hit Continue while the
       // crop modal is still open.
-      setState(prev => ({ ...prev, [slot]: { file: null, error: null } }))
+      setState((prev) => ({ ...prev, [slot]: { file: null, error: null } }))
       setPendingCrop({ slot, file })
       return
     }
@@ -248,7 +268,7 @@ export function UploadWidget({ onSubmit, onUseSamples, disabled = false, samples
   }
 
   function handleClear(slot: UploadSlot) {
-    setState(prev => ({ ...prev, [slot]: { file: null, error: null } }))
+    setState((prev) => ({ ...prev, [slot]: { file: null, error: null } }))
     const el = inputRefs.current[slot]
     if (el) el.value = ''
   }
@@ -261,7 +281,7 @@ export function UploadWidget({ onSubmit, onUseSamples, disabled = false, samples
         payslip: state.payslip.file!,
         utility: state.utility.file!
       },
-      dependants: dependants.map(d => ({
+      dependants: dependants.map((d) => ({
         relationship: d.relationship,
         age: d.age,
         ic_last4: d.ic_last4 === '' ? null : d.ic_last4
@@ -277,7 +297,7 @@ export function UploadWidget({ onSubmit, onUseSamples, disabled = false, samples
       </div>
 
       <div className="flex flex-col gap-4">
-        {SLOT_SPECS.map(spec => {
+        {SLOT_SPECS.map((spec) => {
           const inputId = `${reactId}-${spec.slot}`
           return (
             <UploadSlotCard
@@ -286,10 +306,10 @@ export function UploadWidget({ onSubmit, onUseSamples, disabled = false, samples
               state={state[spec.slot]}
               inputId={inputId}
               disabled={disabled}
-              inputRef={el => {
+              inputRef={(el) => {
                 inputRefs.current[spec.slot] = el
               }}
-              onChange={file => handleFileChange(spec.slot, file)}
+              onChange={(file) => handleFileChange(spec.slot, file)}
               onClear={() => handleClear(spec.slot)}
             />
           )
@@ -298,7 +318,7 @@ export function UploadWidget({ onSubmit, onUseSamples, disabled = false, samples
           <button
             type="button"
             className="flex w-full items-start justify-between gap-3 text-left"
-            onClick={() => setShowHousehold(prev => !prev)}
+            onClick={() => setShowHousehold((prev) => !prev)}
             aria-expanded={showHousehold}
           >
             <div className="flex flex-col gap-1.5">
@@ -319,7 +339,10 @@ export function UploadWidget({ onSubmit, onUseSamples, disabled = false, samples
               </p>
             </div>
             <ChevronDown
-              className={cn('mt-0.5 size-4 shrink-0 text-muted-foreground transition-transform', showHousehold && 'rotate-180')}
+              className={cn(
+                'mt-0.5 size-4 shrink-0 text-muted-foreground transition-transform',
+                showHousehold && 'rotate-180'
+              )}
               aria-hidden
             />
           </button>

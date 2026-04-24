@@ -22,12 +22,8 @@ export function ResultsActionRail({ canReviewMatches, canReviewPacket, onStartAn
         <p className="text-[11px] font-medium uppercase tracking-[0.18em] text-primary">
           {t('evaluation.results.actions.eyebrow')}
         </p>
-        <h2 className="font-heading text-xl font-semibold tracking-tight">
-          {t('evaluation.results.actions.title')}
-        </h2>
-        <p className="text-sm leading-relaxed text-muted-foreground">
-          {t('evaluation.results.actions.description')}
-        </p>
+        <h2 className="font-heading text-xl font-semibold tracking-tight">{t('evaluation.results.actions.title')}</h2>
+        <p className="text-sm leading-relaxed text-muted-foreground">{t('evaluation.results.actions.description')}</p>
       </div>
 
       <div className="grid gap-3 lg:grid-cols-3">
@@ -52,9 +48,7 @@ export function ResultsActionRail({ canReviewMatches, canReviewPacket, onStartAn
           emphasized
           action={
             canReviewPacket ? (
-              <Button render={<a href="#draft-packet" />}>
-                {t('evaluation.results.actions.reviewPacketCta')}
-              </Button>
+              <Button render={<a href="#draft-packet" />}>{t('evaluation.results.actions.reviewPacketCta')}</Button>
             ) : (
               <p className="text-xs text-muted-foreground">{t('evaluation.results.actions.reviewPacketEmpty')}</p>
             )

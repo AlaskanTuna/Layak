@@ -64,7 +64,7 @@ export function LandingPricing() {
               </span>
             </div>
             <ul className="mb-6 space-y-3 flex-1 text-sm text-muted-foreground">
-              {freeFeatures.map(feature => (
+              {freeFeatures.map((feature) => (
                 <li key={feature} className="flex items-center gap-3">
                   <Check className="size-4 text-primary" />
                   <span>{feature}</span>
@@ -98,7 +98,7 @@ export function LandingPricing() {
               </span>
             </div>
             <ul className="mb-6 space-y-3 flex-1 text-sm text-muted-foreground">
-              {proFeatures.map(feature => (
+              {proFeatures.map((feature) => (
                 <li key={feature} className="flex items-center gap-3">
                   <Check className="size-4 text-primary" />
                   <span>{feature}</span>

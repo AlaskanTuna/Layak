@@ -53,39 +53,38 @@ export function DraftPacketPreview({ evalId, matches }: Props) {
   const [openSchemeId, setOpenSchemeId] = useState<string | null>(null)
   const blobUrlsRef = useRef<string[]>([])
 
-  const qualifying = matches.filter(m => m.qualifies && (m.kind ?? 'upside') === 'upside')
+  const qualifying = matches.filter((m) => m.qualifies && (m.kind ?? 'upside') === 'upside')
 
   useEffect(() => {
     const ref = blobUrlsRef
     return () => {
-      ref.current.forEach(url => URL.revokeObjectURL(url))
+      ref.current.forEach((url) => URL.revokeObjectURL(url))
       ref.current = []
     }
   }, [])
 
   const fetchDraft = useCallback(
     async (schemeId: string) => {
-      setDrafts(prev => ({
+      setDrafts((prev) => ({
         ...prev,
         [schemeId]: { ...EMPTY_STATE, loading: true }
       }))
       try {
-        const res = await authedFetch(
-          `${getBackendUrl()}/api/evaluations/${evalId}/packet/${schemeId}`,
-          { method: 'GET' }
-        )
+        const res = await authedFetch(`${getBackendUrl()}/api/evaluations/${evalId}/packet/${schemeId}`, {
+          method: 'GET'
+        })
         if (!res.ok) {
           throw new Error(`HTTP ${res.status} ${res.statusText}`)
         }
         const blob = await res.blob()
         const url = URL.createObjectURL(blob)
         blobUrlsRef.current.push(url)
-        setDrafts(prev => ({
+        setDrafts((prev) => ({
           ...prev,
           [schemeId]: { blobUrl: url, pdfBlob: blob, loading: false, error: null }
         }))
       } catch (err) {
-        setDrafts(prev => ({
+        setDrafts((prev) => ({
           ...prev,
           [schemeId]: {
             ...EMPTY_STATE,
@@ -129,15 +128,12 @@ export function DraftPacketPreview({ evalId, matches }: Props) {
         <CardDescription>{t('evaluation.preview.description')}</CardDescription>
       </CardHeader>
       <CardContent className="flex flex-col gap-2">
-        {qualifying.map(match => {
+        {qualifying.map((match) => {
           const isOpen = openSchemeId === match.scheme_id
           const draft = drafts[match.scheme_id] ?? EMPTY_STATE
           const filename = `${match.scheme_id}-${evalId.slice(0, 6)}.pdf`
           return (
-            <div
-              key={match.scheme_id}
-              className="overflow-hidden rounded-lg border border-border bg-card"
-            >
+            <div key={match.scheme_id} className="overflow-hidden rounded-lg border border-border bg-card">
               <button
                 type="button"
                 onClick={() => handleToggle(match.scheme_id)}

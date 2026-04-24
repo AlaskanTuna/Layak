@@ -168,13 +168,7 @@ export function SettingsPage() {
               <p className="text-sm font-medium">{t('settings.danger.exportTitle')}</p>
               <p className="text-xs text-muted-foreground">{t('settings.danger.exportDescription')}</p>
             </div>
-            <Button
-              type="button"
-              size="sm"
-              variant="outline"
-              onClick={handleExport}
-              disabled={exporting || deleting}
-            >
+            <Button type="button" size="sm" variant="outline" onClick={handleExport} disabled={exporting || deleting}>
               {exporting ? (
                 <Loader2 className="size-3.5 animate-spin" aria-hidden />
               ) : (

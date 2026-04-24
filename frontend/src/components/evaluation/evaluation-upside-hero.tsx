@@ -26,12 +26,12 @@ export function EvaluationUpsideHero({ totalAnnualRm, matchedCount, packet, empt
 
   return (
     <section className="flex flex-col gap-5 rounded-xl border border-border bg-card p-6 shadow-sm sm:p-8">
-      <p className="text-[11px] uppercase tracking-[0.18em] text-muted-foreground">
-        {t('evaluation.upside.label')}
-      </p>
+      <p className="text-[11px] uppercase tracking-[0.18em] text-muted-foreground">{t('evaluation.upside.label')}</p>
 
       <div className="flex flex-wrap items-baseline gap-x-2 gap-y-1 tabular-nums">
-        <span className="font-heading text-2xl font-normal text-muted-foreground sm:text-3xl md:text-4xl">{t('evaluation.upside.currency')}</span>
+        <span className="font-heading text-2xl font-normal text-muted-foreground sm:text-3xl md:text-4xl">
+          {t('evaluation.upside.currency')}
+        </span>
         <span className="font-heading text-4xl font-semibold tracking-tight text-foreground break-all sm:text-5xl md:text-6xl">
           {empty ? '—' : formatRm(totalAnnualRm)}
         </span>
@@ -39,9 +39,7 @@ export function EvaluationUpsideHero({ totalAnnualRm, matchedCount, packet, empt
 
       {empty ? (
         <>
-          <p className="max-w-md text-sm leading-relaxed text-muted-foreground">
-            {t('evaluation.upside.empty')}
-          </p>
+          <p className="max-w-md text-sm leading-relaxed text-muted-foreground">{t('evaluation.upside.empty')}</p>
           <div className="flex">
             <Button render={<Link href="/dashboard/evaluation/upload" />} size="lg">
               {t('evaluation.upside.start')}

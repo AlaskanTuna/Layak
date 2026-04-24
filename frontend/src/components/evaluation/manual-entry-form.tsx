@@ -110,12 +110,7 @@ type Props = {
   disabled?: boolean
 }
 
-export function ManualEntryForm({
-  onSubmit,
-  onUseSamples,
-  onClear,
-  disabled = false
-}: Props) {
+export function ManualEntryForm({ onSubmit, onUseSamples, onClear, disabled = false }: Props) {
   const { t } = useTranslation()
 
   // Zod schema is built inside the component so refinement messages can call `t()`.
@@ -128,7 +123,7 @@ export function ManualEntryForm({
       age: z.number().int().min(0).max(120),
       ic_last4: z
         .string()
-        .refine(v => v === '' || /^\d{4}$/.test(v), { message: t('evaluation.manual.zodIc4Digits') })
+        .refine((v) => v === '' || /^\d{4}$/.test(v), { message: t('evaluation.manual.zodIc4Digits') })
     })
 
     return z.object({
@@ -147,11 +142,7 @@ export function ManualEntryForm({
             ctx.addIssue({ code: z.ZodIssueCode.custom, message: t('evaluation.manual.zodNotRealDate') })
             return
           }
-          if (
-            parsed.getUTCFullYear() !== y ||
-            parsed.getUTCMonth() + 1 !== m ||
-            parsed.getUTCDate() !== d
-          ) {
+          if (parsed.getUTCFullYear() !== y || parsed.getUTCMonth() + 1 !== m || parsed.getUTCDate() !== d) {
             ctx.addIssue({ code: z.ZodIssueCode.custom, message: t('evaluation.manual.zodNotRealDate') })
             return
           }
@@ -167,16 +158,12 @@ export function ManualEntryForm({
       monthly_income_rm: z.number().min(0).max(1_000_000),
       employment_type: z.enum(['gig', 'salaried']),
       address: z.string().max(300),
-      monthly_cost_rm: z
-        .string()
-        .refine(v => v === '' || (/^\d+(\.\d{1,2})?$/.test(v) && Number(v) <= 100000), {
-          message: t('evaluation.manual.zodCostFormat')
-        }),
-      monthly_kwh: z
-        .string()
-        .refine(v => v === '' || (/^\d+$/.test(v) && Number(v) <= 10000), {
-          message: t('evaluation.manual.zodKwhFormat')
-        }),
+      monthly_cost_rm: z.string().refine((v) => v === '' || (/^\d+(\.\d{1,2})?$/.test(v) && Number(v) <= 100000), {
+        message: t('evaluation.manual.zodCostFormat')
+      }),
+      monthly_kwh: z.string().refine((v) => v === '' || (/^\d+$/.test(v) && Number(v) <= 10000), {
+        message: t('evaluation.manual.zodKwhFormat')
+      }),
       dependants: z.array(dependantSchema).max(15)
     })
   }, [t])
@@ -197,7 +184,7 @@ export function ManualEntryForm({
   // plugin flags `watch()` because it can't reliably cache its result.
   const watchedDependants = (useWatch({ control, name: 'dependants' }) ?? []) as DependantInputRow[]
 
-  const submit: SubmitHandler<FormValues> = values => {
+  const submit: SubmitHandler<FormValues> = (values) => {
     const payload: ManualEntryPayload = {
       name: values.name.trim(),
       date_of_birth: values.date_of_birth,
@@ -207,7 +194,7 @@ export function ManualEntryForm({
       address: values.address.trim().length > 0 ? values.address.trim() : null,
       monthly_cost_rm: values.monthly_cost_rm === '' ? null : Number(values.monthly_cost_rm),
       monthly_kwh: values.monthly_kwh === '' ? null : Number(values.monthly_kwh),
-      dependants: values.dependants.map(d => ({
+      dependants: values.dependants.map((d) => ({
         relationship: d.relationship,
         age: d.age,
         ic_last4: d.ic_last4 === '' ? null : d.ic_last4
@@ -257,7 +244,7 @@ export function ManualEntryForm({
                       maxLength={10}
                       disabled={disabled}
                       value={field.value}
-                      onChange={e => field.onChange(formatDateMask(e.target.value))}
+                      onChange={(e) => field.onChange(formatDateMask(e.target.value))}
                       onBlur={field.onBlur}
                       className="flex-1"
                     />
@@ -282,7 +269,7 @@ export function ManualEntryForm({
                       aria-hidden
                       disabled={disabled}
                       value={/^\d{4}-\d{2}-\d{2}$/.test(field.value) ? field.value : ''}
-                      onChange={e => field.onChange(formatDateMask(e.target.value))}
+                      onChange={(e) => field.onChange(formatDateMask(e.target.value))}
                       className="sr-only"
                     />
                   </div>
@@ -358,14 +345,12 @@ export function ManualEntryForm({
           <SectionTitle title={t('evaluation.manual.utilityTitle')} required={false} />
         </CardHeader>
         <CardContent className="flex flex-col gap-3">
-          <Field label={t('evaluation.manual.addressLabel')} error={formState.errors.address?.message} htmlFor="mef-address">
-            <Textarea
-              id="mef-address"
-              rows={3}
-              maxLength={300}
-              disabled={disabled}
-              {...register('address')}
-            />
+          <Field
+            label={t('evaluation.manual.addressLabel')}
+            error={formState.errors.address?.message}
+            htmlFor="mef-address"
+          >
+            <Textarea id="mef-address" rows={3} maxLength={300} disabled={disabled} {...register('address')} />
           </Field>
           <Field
             label={t('evaluation.manual.costLabel')}
@@ -420,7 +405,7 @@ export function ManualEntryForm({
             render={({ field }) => (
               <DependantsFieldset
                 value={watchedDependants}
-                onChange={next => field.onChange(next)}
+                onChange={(next) => field.onChange(next)}
                 disabled={disabled}
                 showSummary={false}
               />

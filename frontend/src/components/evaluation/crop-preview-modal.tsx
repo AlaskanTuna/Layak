@@ -2,12 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { Crop as CropIcon, Loader2, RotateCcw } from 'lucide-react'
-import ReactCrop, {
-  centerCrop,
-  makeAspectCrop,
-  type Crop,
-  type PixelCrop
-} from 'react-image-crop'
+import ReactCrop, { centerCrop, makeAspectCrop, type Crop, type PixelCrop } from 'react-image-crop'
 import { useTranslation } from 'react-i18next'
 
 import 'react-image-crop/dist/ReactCrop.css'
@@ -41,12 +36,7 @@ const DEFAULT_CROP_PCT = 95
 
 function makeDefaultCrop(width: number, height: number): Crop {
   return centerCrop(
-    makeAspectCrop(
-      { unit: '%', width: DEFAULT_CROP_PCT },
-      width / height,
-      width,
-      height
-    ),
+    makeAspectCrop({ unit: '%', width: DEFAULT_CROP_PCT }, width / height, width, height),
     width,
     height
   )
@@ -78,7 +68,7 @@ async function cropToFile(
 
   return new Promise<File>((resolve, reject) => {
     canvas.toBlob(
-      blob => {
+      (blob) => {
         if (!blob) {
           reject(new Error('Canvas toBlob returned null'))
           return
@@ -185,7 +175,7 @@ export function CropPreviewModal({ open, file, onConfirm, onCancel }: Props) {
   return (
     <Dialog
       open={open}
-      onOpenChange={next => {
+      onOpenChange={(next) => {
         if (!next && !processing) onCancel()
       }}
     >
@@ -195,9 +185,7 @@ export function CropPreviewModal({ open, file, onConfirm, onCancel }: Props) {
             <CropIcon className="size-4 text-primary" aria-hidden />
             {t('evaluation.upload.crop.title')}
           </DialogTitle>
-          <DialogDescription>
-            {t('evaluation.upload.crop.description')}
-          </DialogDescription>
+          <DialogDescription>{t('evaluation.upload.crop.description')}</DialogDescription>
         </DialogHeader>
 
         <div className="flex max-h-[60vh] items-center justify-center overflow-auto rounded-md border border-border bg-muted/30 p-3">
@@ -205,7 +193,7 @@ export function CropPreviewModal({ open, file, onConfirm, onCancel }: Props) {
             <ReactCrop
               crop={crop}
               onChange={(_, percentCrop) => setCrop(percentCrop)}
-              onComplete={c => setCompletedCrop(c)}
+              onComplete={(c) => setCompletedCrop(c)}
               keepSelection
               ruleOfThirds
               className="max-h-[55vh]"
@@ -237,12 +225,7 @@ export function CropPreviewModal({ open, file, onConfirm, onCancel }: Props) {
         )}
 
         <DialogFooter>
-          <Button
-            type="button"
-            variant="ghost"
-            onClick={handleReset}
-            disabled={!objectUrl || processing}
-          >
+          <Button type="button" variant="ghost" onClick={handleReset} disabled={!objectUrl || processing}>
             <RotateCcw className="mr-1.5 size-3.5" aria-hidden />
             {t('evaluation.upload.crop.reset')}
           </Button>

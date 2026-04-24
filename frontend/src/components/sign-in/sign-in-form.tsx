@@ -61,13 +61,7 @@ export function SignInForm() {
       </div>
 
       <div className="grid gap-4">
-        <Button
-          type="button"
-          size="lg"
-          onClick={handleGoogle}
-          disabled={busy}
-          className="w-full text-base h-12"
-        >
+        <Button type="button" size="lg" onClick={handleGoogle} disabled={busy} className="w-full text-base h-12">
           {pending === 'google' ? (
             <Loader2 className="mr-2 size-5 animate-spin" aria-hidden />
           ) : (
@@ -95,9 +89,7 @@ export function SignInForm() {
           {t('auth.signIn.continueAsGuest')}
         </Button>
 
-        <p className="text-center text-xs text-muted-foreground leading-relaxed">
-          {t('auth.signIn.guestNotice')}
-        </p>
+        <p className="text-center text-xs text-muted-foreground leading-relaxed">{t('auth.signIn.guestNotice')}</p>
 
         {error && (
           <div className="rounded-md bg-destructive/15 p-3 text-sm text-destructive" role="alert">

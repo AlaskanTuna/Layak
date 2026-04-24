@@ -90,14 +90,7 @@ const CTA_ICONS: Record<CtaKind, LucideIcon> = {
   reset: RotateCcw
 }
 
-export function ErrorRecoveryCard({
-  message,
-  category,
-  onUseSamples,
-  onReset,
-  onRetry,
-  onSwitchToManual
-}: Props) {
+export function ErrorRecoveryCard({ message, category, onUseSamples, onReset, onRetry, onSwitchToManual }: Props) {
   const { t } = useTranslation()
   const spec = CATEGORY_SPEC[category ?? 'generic']
   const Icon = spec.icon
@@ -105,7 +98,7 @@ export function ErrorRecoveryCard({
 
   // Filter CTAs whose handler wasn't wired by the caller — keeps the card
   // from rendering dead buttons on routes that intentionally omit one.
-  const activeCtas = spec.ctas.filter(kind => {
+  const activeCtas = spec.ctas.filter((kind) => {
     if (kind === 'retry') return onRetry !== undefined
     if (kind === 'manual') return onSwitchToManual !== undefined
     return true

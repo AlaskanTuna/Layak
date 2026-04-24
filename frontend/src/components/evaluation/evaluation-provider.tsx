@@ -24,15 +24,10 @@ const EvaluationContext = createContext<EvaluationContextValue | null>(null)
 export function EvaluationProvider({ children }: { children: React.ReactNode }) {
   const pipeline = useAgentPipeline()
   const [demoPersona, setDemoPersona] = useState<DemoPersona | null>(null)
-  const setDemoMode = useCallback(
-    (value: DemoPersona | false) => setDemoPersona(value === false ? null : value),
-    []
-  )
+  const setDemoMode = useCallback((value: DemoPersona | false) => setDemoPersona(value === false ? null : value), [])
 
   return (
-    <EvaluationContext.Provider
-      value={{ ...pipeline, isDemoMode: demoPersona !== null, demoPersona, setDemoMode }}
-    >
+    <EvaluationContext.Provider value={{ ...pipeline, isDemoMode: demoPersona !== null, demoPersona, setDemoMode }}>
       {children}
     </EvaluationContext.Provider>
   )

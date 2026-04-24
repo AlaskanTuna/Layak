@@ -21,10 +21,7 @@ function DraftRow({ draft }: { draft: PacketDraft }) {
     if (!draft.blob_bytes_b64) return
     const blob = base64ToBlob(draft.blob_bytes_b64)
     triggerDownload(blob, draft.filename)
-    notificationStore.push(
-      t('evaluation.packet.notificationTitle'),
-      t('evaluation.packet.notificationBody')
-    )
+    notificationStore.push(t('evaluation.packet.notificationTitle'), t('evaluation.packet.notificationBody'))
   }
 
   return (
@@ -33,7 +30,9 @@ function DraftRow({ draft }: { draft: PacketDraft }) {
         <FileDown className="size-4 shrink-0 text-muted-foreground" aria-hidden />
         <div className="flex min-w-0 flex-col">
           <span className="truncate text-sm font-medium">{draft.filename}</span>
-          <span className="text-xs text-muted-foreground">{t('evaluation.packet.scheme', { id: draft.scheme_id })}</span>
+          <span className="text-xs text-muted-foreground">
+            {t('evaluation.packet.scheme', { id: draft.scheme_id })}
+          </span>
         </div>
       </div>
       <Button
@@ -55,7 +54,7 @@ export function PacketDownload({ packet }: Props) {
   const { t } = useTranslation()
   if (!packet || packet.drafts.length === 0) return null
 
-  const anyDownloadable = packet.drafts.some(d => d.blob_bytes_b64 != null)
+  const anyDownloadable = packet.drafts.some((d) => d.blob_bytes_b64 != null)
   const count = packet.drafts.length
 
   return (
@@ -67,18 +66,14 @@ export function PacketDownload({ packet }: Props) {
             ? t('evaluation.packet.titleSingular', { count })
             : t('evaluation.packet.titlePlural', { count })}
         </CardTitle>
-        <CardDescription>
-          {t('evaluation.packet.description')}
-        </CardDescription>
+        <CardDescription>{t('evaluation.packet.description')}</CardDescription>
       </CardHeader>
       <CardContent className="flex flex-col gap-2">
-        {packet.drafts.map(draft => (
+        {packet.drafts.map((draft) => (
           <DraftRow key={`${draft.scheme_id}-${draft.filename}`} draft={draft} />
         ))}
         {!anyDownloadable && (
-          <p className="text-xs italic text-muted-foreground">
-            {t('evaluation.packet.placeholderNotice')}
-          </p>
+          <p className="text-xs italic text-muted-foreground">{t('evaluation.packet.placeholderNotice')}</p>
         )}
       </CardContent>
     </Card>

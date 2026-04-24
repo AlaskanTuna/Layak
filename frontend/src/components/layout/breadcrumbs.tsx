@@ -31,7 +31,7 @@ export function Breadcrumbs() {
     if (previous === 'results' && segment.length > 12) {
       return `${segment.slice(0, 6)}…`
     }
-    return segment.replace(/-/g, ' ').replace(/\b\w/g, c => c.toUpperCase())
+    return segment.replace(/-/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase())
   }
 
   if (segments.length === 0) return null

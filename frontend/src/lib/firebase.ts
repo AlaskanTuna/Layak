@@ -34,9 +34,7 @@ function assertConfig(): void {
     .filter(([, value]) => !value)
     .map(([key]) => key)
   if (missing.length > 0) {
-    throw new Error(
-      `Missing Firebase Web config keys: ${missing.join(', ')}. Populate NEXT_PUBLIC_FIREBASE_* in .env.`
-    )
+    throw new Error(`Missing Firebase Web config keys: ${missing.join(', ')}. Populate NEXT_PUBLIC_FIREBASE_* in .env.`)
   }
 }
 

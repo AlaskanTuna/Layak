@@ -32,11 +32,8 @@ export function ResultsChatPanel({ evalId, matches }: Props) {
 
   const chat = useChat(evalId)
 
-  const qualifyingMatches = useMemo(() => matches.filter(m => m.qualifies), [matches])
-  const suggestions = useMemo(
-    () => buildSuggestedQuestions(qualifyingMatches, t),
-    [qualifyingMatches, t]
-  )
+  const qualifyingMatches = useMemo(() => matches.filter((m) => m.qualifies), [matches])
+  const suggestions = useMemo(() => buildSuggestedQuestions(qualifyingMatches, t), [qualifyingMatches, t])
 
   // Auto-scroll the message list to the latest token as it streams in.
   useEffect(() => {
@@ -106,7 +103,7 @@ export function ResultsChatPanel({ evalId, matches }: Props) {
           role="dialog"
           aria-label={t('evaluation.chat.title')}
           className="fixed inset-0 z-50 flex items-end justify-center bg-black/40 backdrop-blur-sm sm:inset-auto sm:right-6 sm:bottom-6 sm:bg-transparent sm:backdrop-blur-none"
-          onClick={e => {
+          onClick={(e) => {
             // Click backdrop (mobile) closes the panel.
             if (e.target === e.currentTarget) setIsOpen(false)
           }}
@@ -151,7 +148,7 @@ export function ResultsChatPanel({ evalId, matches }: Props) {
                 </div>
               )}
 
-              {chat.messages.map(msg => (
+              {chat.messages.map((msg) => (
                 <ChatBubble key={msg.id} message={msg} />
               ))}
 
@@ -169,7 +166,7 @@ export function ResultsChatPanel({ evalId, matches }: Props) {
                     {t('evaluation.chat.suggestionsLabel')}
                   </p>
                   <div className="flex flex-wrap gap-2">
-                    {suggestions.map(s => (
+                    {suggestions.map((s) => (
                       <button
                         key={s}
                         type="button"
@@ -192,7 +189,7 @@ export function ResultsChatPanel({ evalId, matches }: Props) {
                 <textarea
                   ref={inputRef}
                   value={draft}
-                  onChange={e => setDraft(e.target.value)}
+                  onChange={(e) => setDraft(e.target.value)}
                   onKeyDown={handleKeyDown}
                   placeholder={t('evaluation.chat.placeholder')}
                   rows={1}
@@ -222,9 +219,7 @@ export function ResultsChatPanel({ evalId, matches }: Props) {
                   </Button>
                 )}
               </div>
-              <p className="mt-2 text-[10px] text-muted-foreground">
-                {t('evaluation.chat.disclaimer')}
-              </p>
+              <p className="mt-2 text-[10px] text-muted-foreground">{t('evaluation.chat.disclaimer')}</p>
             </footer>
           </div>
         </div>
@@ -254,7 +249,7 @@ function ChatBubble({ message }: { message: ChatMessage }) {
         {!isUser && message.citations && message.citations.length > 0 && (
           <div className="mt-2 flex flex-wrap gap-1.5">
             {message.citations
-              .filter(c => c.scheme_id || c.source_pdf)
+              .filter((c) => c.scheme_id || c.source_pdf)
               .slice(0, 5)
               .map((c, idx) => (
                 <button
@@ -275,9 +270,7 @@ function ChatBubble({ message }: { message: ChatMessage }) {
           </div>
         )}
         {!isUser && message.groundingUnavailable && !message.streaming && (
-          <p className="mt-2 text-[10px] text-muted-foreground italic">
-            {t('evaluation.chat.groundingUnavailable')}
-          </p>
+          <p className="mt-2 text-[10px] text-muted-foreground italic">{t('evaluation.chat.groundingUnavailable')}</p>
         )}
       </div>
     </div>

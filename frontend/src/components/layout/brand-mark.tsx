@@ -16,13 +16,7 @@ export function BrandMark({ className, size = 'md' }: Props) {
         className
       )}
     >
-      <Image 
-        src="/layak-logo.png" 
-        alt="Layak Logo" 
-        width={box} 
-        height={box} 
-        className="object-cover" 
-      />
+      <Image src="/layak-logo.png" alt="Layak Logo" width={box} height={box} className="object-cover" />
     </div>
   )
 }

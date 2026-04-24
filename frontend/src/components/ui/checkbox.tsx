@@ -12,13 +12,7 @@ type Props = Omit<React.ComponentProps<'button'>, 'onChange'> & {
   onCheckedChange?: (checked: boolean) => void
 }
 
-export function Checkbox({
-  checked = false,
-  onCheckedChange,
-  className,
-  disabled,
-  ...props
-}: Props) {
+export function Checkbox({ checked = false, onCheckedChange, className, disabled, ...props }: Props) {
   const isIndeterminate = checked === 'indeterminate'
   const isChecked = checked === true
 
@@ -41,7 +35,11 @@ export function Checkbox({
       onClick={() => onCheckedChange?.(!isChecked)}
       {...props}
     >
-      {isIndeterminate ? <Minus className="size-3" aria-hidden /> : isChecked ? <Check className="size-3" aria-hidden /> : null}
+      {isIndeterminate ? (
+        <Minus className="size-3" aria-hidden />
+      ) : isChecked ? (
+        <Check className="size-3" aria-hidden />
+      ) : null}
     </button>
   )
 }

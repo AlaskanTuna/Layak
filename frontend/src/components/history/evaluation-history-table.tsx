@@ -61,16 +61,13 @@ export function EvaluationHistoryTable({ items, onRefresh }: Props) {
 
   const pageCount = Math.max(1, Math.ceil(items.length / PAGE_SIZE))
   const safePage = Math.min(page, pageCount - 1)
-  const slice = useMemo(
-    () => items.slice(safePage * PAGE_SIZE, safePage * PAGE_SIZE + PAGE_SIZE),
-    [items, safePage]
-  )
+  const slice = useMemo(() => items.slice(safePage * PAGE_SIZE, safePage * PAGE_SIZE + PAGE_SIZE), [items, safePage])
 
-  const allOnPageSelected = slice.length > 0 && slice.every(item => selected.has(item.id))
-  const someOnPageSelected = slice.some(item => selected.has(item.id))
+  const allOnPageSelected = slice.length > 0 && slice.every((item) => selected.has(item.id))
+  const someOnPageSelected = slice.some((item) => selected.has(item.id))
 
   function toggleOne(id: string, checked: boolean) {
-    setSelected(prev => {
+    setSelected((prev) => {
       const next = new Set(prev)
       if (checked) next.add(id)
       else next.delete(id)
@@ -79,7 +76,7 @@ export function EvaluationHistoryTable({ items, onRefresh }: Props) {
   }
 
   function togglePage(checked: boolean) {
-    setSelected(prev => {
+    setSelected((prev) => {
       const next = new Set(prev)
       for (const item of slice) {
         if (checked) next.add(item.id)
@@ -97,21 +94,19 @@ export function EvaluationHistoryTable({ items, onRefresh }: Props) {
     setDeleting(true)
     setDeleteError(null)
     const results = await Promise.allSettled(
-      ids.map(id =>
-        authedFetch(`${getBackendUrl()}/api/evaluations/${id}`, { method: 'DELETE' }).then(res => {
+      ids.map((id) =>
+        authedFetch(`${getBackendUrl()}/api/evaluations/${id}`, { method: 'DELETE' }).then((res) => {
           if (!res.ok) throw new Error(`${id}: ${res.status} ${res.statusText}`)
           return id
         })
       )
     )
-    const failed = results.filter(r => r.status === 'rejected')
+    const failed = results.filter((r) => r.status === 'rejected')
     setDeleting(false)
     setSelected(new Set())
     onRefresh()
     if (failed.length > 0) {
-      setDeleteError(
-        t('evaluation.history.deletePartialFailure', { failed: failed.length, total: ids.length })
-      )
+      setDeleteError(t('evaluation.history.deletePartialFailure', { failed: failed.length, total: ids.length }))
     }
   }
 
@@ -122,9 +117,7 @@ export function EvaluationHistoryTable({ items, onRefresh }: Props) {
           {t('evaluation.history.emptyEyebrow')}
         </p>
         <h3 className="font-heading text-lg font-medium">{t('evaluation.history.emptyTitle')}</h3>
-        <p className="max-w-sm text-sm text-muted-foreground">
-          {t('evaluation.history.emptyBody')}
-        </p>
+        <p className="max-w-sm text-sm text-muted-foreground">{t('evaluation.history.emptyBody')}</p>
         <div className="mt-2 flex">
           <Button render={<Link href="/dashboard/evaluation/upload" />}>
             {t('evaluation.history.emptyCta')}
@@ -153,13 +146,7 @@ export function EvaluationHistoryTable({ items, onRefresh }: Props) {
             >
               {t('common.button.cancel')}
             </Button>
-            <Button
-              type="button"
-              size="sm"
-              variant="destructive"
-              onClick={handleDelete}
-              disabled={deleting}
-            >
+            <Button type="button" size="sm" variant="destructive" onClick={handleDelete} disabled={deleting}>
               {deleting ? (
                 <Loader2 className="size-3.5 animate-spin" aria-hidden />
               ) : (
@@ -176,7 +163,9 @@ export function EvaluationHistoryTable({ items, onRefresh }: Props) {
       </div>
 
       {deleteError && (
-        <p role="alert" className="text-xs text-destructive">{deleteError}</p>
+        <p role="alert" className="text-xs text-destructive">
+          {deleteError}
+        </p>
       )}
 
       <Card className="gap-0 py-0">
@@ -187,17 +176,19 @@ export function EvaluationHistoryTable({ items, onRefresh }: Props) {
                 <th scope="col" className="w-10 px-4 py-2.5">
                   <Checkbox
                     aria-label={t(
-                      allOnPageSelected
-                        ? 'evaluation.history.deselectPageAria'
-                        : 'evaluation.history.selectPageAria'
+                      allOnPageSelected ? 'evaluation.history.deselectPageAria' : 'evaluation.history.selectPageAria'
                     )}
                     checked={!allOnPageSelected && someOnPageSelected ? 'indeterminate' : allOnPageSelected}
                     onCheckedChange={togglePage}
                     className="cursor-pointer"
                   />
                 </th>
-                <th scope="col" className="px-4 py-2.5 font-medium">{t('evaluation.history.columnStatus')}</th>
-                <th scope="col" className="px-4 py-2.5 font-medium">{t('evaluation.history.columnStarted')}</th>
+                <th scope="col" className="px-4 py-2.5 font-medium">
+                  {t('evaluation.history.columnStatus')}
+                </th>
+                <th scope="col" className="px-4 py-2.5 font-medium">
+                  {t('evaluation.history.columnStarted')}
+                </th>
                 <th scope="col" className="px-4 py-2.5 text-right font-medium">
                   {t('evaluation.history.columnAnnualRelief')}
                 </th>
@@ -207,7 +198,7 @@ export function EvaluationHistoryTable({ items, onRefresh }: Props) {
               </tr>
             </thead>
             <tbody>
-              {slice.map(item => {
+              {slice.map((item) => {
                 const status = item.status as EvaluationStatus
                 const isSelected = selected.has(item.id)
                 const timestampLabel = formatTimestamp(item.createdAt, t)
@@ -221,7 +212,7 @@ export function EvaluationHistoryTable({ items, onRefresh }: Props) {
                       <Checkbox
                         aria-label={t('evaluation.history.selectRowAria', { timestamp: timestampLabel })}
                         checked={isSelected}
-                        onCheckedChange={checked => toggleOne(item.id, checked)}
+                        onCheckedChange={(checked) => toggleOne(item.id, checked)}
                         className="cursor-pointer"
                       />
                     </td>
@@ -254,15 +245,13 @@ export function EvaluationHistoryTable({ items, onRefresh }: Props) {
 
       {pageCount > 1 && (
         <div className="flex items-center justify-between gap-2 px-1 text-xs text-muted-foreground">
-          <span>
-            {t('evaluation.history.pagination', { page: safePage + 1, total: pageCount })}
-          </span>
+          <span>{t('evaluation.history.pagination', { page: safePage + 1, total: pageCount })}</span>
           <div className="flex gap-1">
             <Button
               type="button"
               size="sm"
               variant="outline"
-              onClick={() => setPage(p => Math.max(0, p - 1))}
+              onClick={() => setPage((p) => Math.max(0, p - 1))}
               disabled={safePage === 0}
               className={cn(safePage === 0 && 'opacity-50')}
             >
@@ -273,7 +262,7 @@ export function EvaluationHistoryTable({ items, onRefresh }: Props) {
               type="button"
               size="sm"
               variant="outline"
-              onClick={() => setPage(p => Math.min(pageCount - 1, p + 1))}
+              onClick={() => setPage((p) => Math.min(pageCount - 1, p + 1))}
               disabled={safePage >= pageCount - 1}
               className={cn(safePage >= pageCount - 1 && 'opacity-50')}
             >

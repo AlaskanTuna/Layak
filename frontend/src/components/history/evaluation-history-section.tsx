@@ -40,14 +40,9 @@ export function EvaluationHistorySection() {
 
   const fetchHistory = useCallback(async () => {
     try {
-      const res = await authedFetch(
-        `${getBackendUrl()}/api/evaluations?limit=${PAGE_LIMIT}`,
-        { method: 'GET' }
-      )
+      const res = await authedFetch(`${getBackendUrl()}/api/evaluations?limit=${PAGE_LIMIT}`, { method: 'GET' })
       if (!res.ok) {
-        setErrorMessage(
-          t('evaluation.results.backendReturned', { status: res.status, statusText: res.statusText })
-        )
+        setErrorMessage(t('evaluation.results.backendReturned', { status: res.status, statusText: res.statusText }))
         setPhase('error')
         return
       }
@@ -71,11 +66,7 @@ export function EvaluationHistorySection() {
 
   if (authLoading || phase === 'loading') {
     return (
-      <div
-        className="flex items-center gap-2 text-sm text-muted-foreground"
-        role="status"
-        aria-live="polite"
-      >
+      <div className="flex items-center gap-2 text-sm text-muted-foreground" role="status" aria-live="polite">
         <Loader2 className="size-4 animate-spin" aria-hidden />
         {t('evaluation.history.loading')}
       </div>

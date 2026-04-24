@@ -6,13 +6,7 @@ import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import { Button } from '@/components/ui/button'
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle
-} from '@/components/ui/dialog'
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 
 type HelpSection = 'overview' | 'documents' | 'samples' | 'results'
@@ -37,7 +31,7 @@ export function FloatingHelpLauncher() {
       const contextSection = getContextSection(pathname)
       const stored =
         typeof window === 'undefined' ? null : (window.localStorage.getItem(STORAGE_KEY) as HelpSection | null)
-      setSection(contextSection !== 'overview' ? contextSection : stored ?? 'overview')
+      setSection(contextSection !== 'overview' ? contextSection : (stored ?? 'overview'))
     }
     setOpen(nextOpen)
   }
@@ -81,10 +75,7 @@ export function FloatingHelpLauncher() {
                   trigger claims ~half the row via basis so two fit per row,
                   with `whitespace-normal` so longer non-EN labels wrap in-cell
                   instead of bleeding into their neighbour. */}
-              <TabsList
-                className="flex w-full flex-wrap gap-2 rounded-xl bg-muted/70 p-1"
-                style={{ height: 'auto' }}
-              >
+              <TabsList className="flex w-full flex-wrap gap-2 rounded-xl bg-muted/70 p-1" style={{ height: 'auto' }}>
                 <TabsTrigger
                   value="overview"
                   className="min-h-9 flex-1 basis-[calc(50%-0.25rem)] whitespace-normal px-3 py-2 text-center text-xs leading-tight sm:text-sm"
@@ -195,7 +186,7 @@ function HelpCard({
       </div>
       <p className="mt-3 text-sm leading-relaxed text-muted-foreground">{body}</p>
       <ul className="mt-3 space-y-2 text-sm text-muted-foreground">
-        {bullets.map(item => (
+        {bullets.map((item) => (
           <li key={item}>{item}</li>
         ))}
       </ul>

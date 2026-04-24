@@ -50,7 +50,7 @@ export function LanguageToggle() {
         aria-label={t('common.aria.languageSelector')}
         aria-haspopup="menu"
         aria-expanded={isOpen}
-        onClick={() => setIsOpen(v => !v)}
+        onClick={() => setIsOpen((v) => !v)}
         className="size-8"
       >
         <Languages className="size-4" aria-hidden />
@@ -66,7 +66,7 @@ export function LanguageToggle() {
         )}
       >
         <div className="p-1">
-          {SUPPORTED_LANGUAGES.map(code => {
+          {SUPPORTED_LANGUAGES.map((code) => {
             const isActive = activeLang === code
             return (
               <button

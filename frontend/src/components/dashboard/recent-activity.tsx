@@ -52,9 +52,7 @@ export function RecentActivity({ items }: Props) {
 
   return (
     <section className="flex flex-col gap-4">
-      <h2 className="font-heading text-xl font-semibold tracking-tight">
-        {t('dashboard.recentActivity.title')}
-      </h2>
+      <h2 className="font-heading text-xl font-semibold tracking-tight">{t('dashboard.recentActivity.title')}</h2>
 
       {slice.length === 0 ? (
         <div className="flex flex-col items-center gap-3 rounded-lg border border-dashed border-border bg-card/40 px-6 py-10 text-center">
@@ -76,10 +74,7 @@ export function RecentActivity({ items }: Props) {
                 const status = item.status as EvaluationStatus
                 const isLast = index === slice.length - 1
                 return (
-                  <li
-                    key={item.id}
-                    className={cn('border-border', !isLast && 'border-b')}
-                  >
+                  <li key={item.id} className={cn('border-border', !isLast && 'border-b')}>
                     <Link
                       href={`/dashboard/evaluation/results/${item.id}`}
                       className="flex items-center gap-3 px-4 py-3 transition-colors hover:bg-muted/30"
@@ -96,15 +91,10 @@ export function RecentActivity({ items }: Props) {
                         </p>
                         <p className="text-xs text-muted-foreground">
                           {relativeTime(item.createdAt, t)}
-                          {item.status === 'complete' && (
-                            <> · RM {RM.format(item.totalAnnualRM)}</>
-                          )}
+                          {item.status === 'complete' && <> · RM {RM.format(item.totalAnnualRM)}</>}
                         </p>
                       </div>
-                      <ArrowRight
-                        className="size-3.5 shrink-0 text-muted-foreground"
-                        aria-hidden
-                      />
+                      <ArrowRight className="size-3.5 shrink-0 text-muted-foreground" aria-hidden />
                     </Link>
                   </li>
                 )

@@ -4,12 +4,7 @@ import { useCallback, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import type { ErrorCategory } from '@/lib/agent-types'
-import type {
-  ChatEvent,
-  ChatMessage,
-  ChatRequest,
-  ChatTurn
-} from '@/lib/chat-types'
+import type { ChatEvent, ChatMessage, ChatRequest, ChatTurn } from '@/lib/chat-types'
 import { authedFetch } from '@/lib/firebase'
 
 /**
@@ -42,7 +37,7 @@ async function* parseSseStream(body: ReadableStream<Uint8Array>): AsyncGenerator
       while ((idx = buffer.indexOf('\n\n')) !== -1) {
         const chunk = buffer.slice(0, idx)
         buffer = buffer.slice(idx + 2)
-        const dataLine = chunk.split('\n').find(line => line.startsWith('data:'))
+        const dataLine = chunk.split('\n').find((line) => line.startsWith('data:'))
         if (!dataLine) continue
         const payload = dataLine.slice(5).trim()
         if (!payload) continue
@@ -115,15 +110,15 @@ export function useChat(evalId: string): UseChatResult {
       setErrorCategory(null)
       setErrorMessage(null)
       setIsStreaming(true)
-      setMessages(prev => [...prev, userTurn, modelTurn])
+      setMessages((prev) => [...prev, userTurn, modelTurn])
 
       // Snapshot history BEFORE this turn — server expects the prior context,
       // not the current user message (which is sent separately).
       const priorHistory: ChatTurn[] = messages
-        .filter(m => !m.streaming && m.content.length > 0)
-        .map(m => ({ role: m.role, content: m.content }))
+        .filter((m) => !m.streaming && m.content.length > 0)
+        .map((m) => ({ role: m.role, content: m.content }))
 
-      const language = (['en', 'ms', 'zh'] as const).find(l => i18n.language.startsWith(l)) ?? 'en'
+      const language = (['en', 'ms', 'zh'] as const).find((l) => i18n.language.startsWith(l)) ?? 'en'
       const body: ChatRequest = {
         history: priorHistory,
         message: trimmed,
@@ -132,7 +127,6 @@ export function useChat(evalId: string): UseChatResult {
 
       const controller = new AbortController()
       abortRef.current = controller
-
       ;(async () => {
         try {
           const res = await authedFetch(`${getBackendUrl()}/api/evaluations/${evalId}/chat`, {
@@ -146,14 +140,12 @@ export function useChat(evalId: string): UseChatResult {
           }
           for await (const event of parseSseStream(res.body)) {
             if (event.type === 'token') {
-              setMessages(prev =>
-                prev.map(m =>
-                  m.id === modelTurnId ? { ...m, content: m.content + event.text } : m
-                )
+              setMessages((prev) =>
+                prev.map((m) => (m.id === modelTurnId ? { ...m, content: m.content + event.text } : m))
               )
             } else if (event.type === 'done') {
-              setMessages(prev =>
-                prev.map(m =>
+              setMessages((prev) =>
+                prev.map((m) =>
                   m.id === modelTurnId
                     ? {
                         ...m,
@@ -168,17 +160,17 @@ export function useChat(evalId: string): UseChatResult {
             } else if (event.type === 'error') {
               setErrorCategory(event.category)
               setErrorMessage(event.message)
-              setMessages(prev => prev.filter(m => m.id !== modelTurnId))
+              setMessages((prev) => prev.filter((m) => m.id !== modelTurnId))
             }
           }
         } catch (err) {
           if ((err as Error).name === 'AbortError') {
             // User-initiated cancel — drop the placeholder turn silently.
-            setMessages(prev => prev.filter(m => m.id !== modelTurnId))
+            setMessages((prev) => prev.filter((m) => m.id !== modelTurnId))
           } else {
             setErrorCategory(null)
             setErrorMessage((err as Error).message || 'Chat request failed')
-            setMessages(prev => prev.filter(m => m.id !== modelTurnId))
+            setMessages((prev) => prev.filter((m) => m.id !== modelTurnId))
           }
         } finally {
           setIsStreaming(false)

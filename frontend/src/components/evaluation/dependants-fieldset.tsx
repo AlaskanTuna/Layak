@@ -48,13 +48,7 @@ function clampAge(raw: string): number {
 /** Shared controlled component — used by UploadWidget (hybrid path) and
  * ManualEntryForm (full manual path). Stays dumb on purpose so each parent
  * manages its own validation/coercion. */
-export function DependantsFieldset({
-  value,
-  onChange,
-  disabled = false,
-  max = 15,
-  showSummary = true
-}: Props) {
+export function DependantsFieldset({ value, onChange, disabled = false, max = 15, showSummary = true }: Props) {
   const { t } = useTranslation()
   const update = (i: number, patch: Partial<DependantInputRow>) =>
     onChange(value.map((row, j) => (j === i ? { ...row, ...patch } : row)))
@@ -63,7 +57,8 @@ export function DependantsFieldset({
 
   const count = value.length
   const householdSize = 1 + count
-  const pluralLabel = count === 1 ? t('evaluation.dependants.dependantSingular') : t('evaluation.dependants.dependantPlural')
+  const pluralLabel =
+    count === 1 ? t('evaluation.dependants.dependantSingular') : t('evaluation.dependants.dependantPlural')
 
   return (
     <div className="flex flex-col gap-3">
@@ -94,7 +89,7 @@ export function DependantsFieldset({
                 }
                 className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
               >
-                {RELATIONSHIPS.map(r => (
+                {RELATIONSHIPS.map((r) => (
                   // Explicit bg/text on <option> — the native dropdown popup
                   // ignores the select's bg and defaults to white, which makes
                   // text invisible in dark mode.
@@ -115,7 +110,7 @@ export function DependantsFieldset({
                 disabled={disabled}
                 placeholder={t('evaluation.dependants.agePlaceholder')}
                 value={Number.isFinite(row.age) ? row.age : ''}
-                onChange={e => update(index, { age: clampAge(e.target.value) })}
+                onChange={(e) => update(index, { age: clampAge(e.target.value) })}
               />
             </div>
             <div className="flex flex-col gap-1.5">
@@ -126,7 +121,7 @@ export function DependantsFieldset({
                 maxLength={4}
                 disabled={disabled}
                 value={row.ic_last4}
-                onChange={e => update(index, { ic_last4: e.target.value })}
+                onChange={(e) => update(index, { ic_last4: e.target.value })}
               />
             </div>
             <div className="flex items-end">

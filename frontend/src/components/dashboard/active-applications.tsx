@@ -35,16 +35,11 @@ function formatTimestamp(value: string | null, locale: string): string {
  */
 export function ActiveApplications({ items }: Props) {
   const { t, i18n } = useTranslation()
-  const completed = useMemo(
-    () => items.filter(item => item.status === 'complete').slice(0, TOP_N),
-    [items]
-  )
+  const completed = useMemo(() => items.filter((item) => item.status === 'complete').slice(0, TOP_N), [items])
 
   return (
     <section className="flex flex-col gap-4">
-      <h2 className="font-heading text-xl font-semibold tracking-tight">
-        {t('dashboard.activeApplications.title')}
-      </h2>
+      <h2 className="font-heading text-xl font-semibold tracking-tight">{t('dashboard.activeApplications.title')}</h2>
 
       {completed.length === 0 ? (
         <div className="flex flex-col items-center gap-3 rounded-lg border border-dashed border-border bg-card/40 px-6 py-10 text-center">
@@ -64,7 +59,7 @@ export function ActiveApplications({ items }: Props) {
         </div>
       ) : (
         <div className="flex flex-col gap-3">
-          {completed.map(item => (
+          {completed.map((item) => (
             <Card key={item.id} className="px-4 py-3">
               <div className="flex items-center justify-between gap-3">
                 <div className="flex min-w-0 flex-1 items-start gap-3">

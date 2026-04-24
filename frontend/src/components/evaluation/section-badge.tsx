@@ -21,8 +21,7 @@ type Props =
  */
 export function SectionBadge(props: Props) {
   const { t } = useTranslation()
-  const variant: Variant =
-    props.variant ?? (props.required ? 'required' : 'optional')
+  const variant: Variant = props.variant ?? (props.required ? 'required' : 'optional')
 
   if (variant === 'required') {
     return (

@@ -7,12 +7,7 @@
 
 export type FormType = 'form_b' | 'form_be'
 
-export type IncomeBand =
-  | 'b40_hardcore'
-  | 'b40_household'
-  | 'b40_household_with_children'
-  | 'm40'
-  | 't20'
+export type IncomeBand = 'b40_hardcore' | 'b40_household' | 'b40_household_with_children' | 'm40' | 't20'
 
 export type Relationship = 'child' | 'parent' | 'spouse' | 'sibling' | 'other'
 

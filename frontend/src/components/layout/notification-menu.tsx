@@ -46,7 +46,7 @@ export function NotificationMenu() {
         }
         aria-haspopup="menu"
         aria-expanded={isOpen}
-        onClick={() => setIsOpen(v => !v)}
+        onClick={() => setIsOpen((v) => !v)}
         className="relative size-8"
       >
         <Bell className="size-4" aria-hidden />
@@ -68,12 +68,7 @@ export function NotificationMenu() {
         <div className="flex items-center justify-between border-b border-border px-4 py-3">
           <h3 className="text-sm font-semibold">{t('common.notifications.title')}</h3>
           {notifications.length > 0 && (
-            <Button
-              type="button"
-              variant="ghost"
-              size="xs"
-              onClick={() => notificationStore.clearAll()}
-            >
+            <Button type="button" variant="ghost" size="xs" onClick={() => notificationStore.clearAll()}>
               {t('common.notifications.clearAll')}
             </Button>
           )}
@@ -85,7 +80,7 @@ export function NotificationMenu() {
           </div>
         ) : (
           <ul className="divide-y divide-border">
-            {notifications.map(n => (
+            {notifications.map((n) => (
               <li
                 key={n.id}
                 role="menuitem"
@@ -104,7 +99,7 @@ export function NotificationMenu() {
                 <button
                   type="button"
                   aria-label={t('common.aria.dismissNotification')}
-                  onClick={event => {
+                  onClick={(event) => {
                     event.stopPropagation()
                     notificationStore.dismiss(n.id)
                   }}

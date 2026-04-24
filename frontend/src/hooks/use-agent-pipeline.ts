@@ -138,7 +138,7 @@ async function* parseSseStream(body: ReadableStream<Uint8Array>): AsyncGenerator
       while ((index = buffer.indexOf('\n\n')) !== -1) {
         const chunk = buffer.slice(0, index)
         buffer = buffer.slice(index + 2)
-        const dataLine = chunk.split('\n').find(line => line.startsWith('data:'))
+        const dataLine = chunk.split('\n').find((line) => line.startsWith('data:'))
         if (!dataLine) continue
         const payload = dataLine.slice(5).trim()
         if (!payload) continue
@@ -173,7 +173,7 @@ export function useAgentPipeline(): {
   }, [cleanup])
 
   const acknowledgeQuotaExceeded = useCallback(() => {
-    setState(prev => (prev.quotaExceeded ? { ...prev, quotaExceeded: null } : prev))
+    setState((prev) => (prev.quotaExceeded ? { ...prev, quotaExceeded: null } : prev))
   }, [])
 
   const startMock = useCallback(() => {
@@ -183,56 +183,53 @@ export function useAgentPipeline(): {
     AISYAH_MOCK_EVENTS.forEach(({ event, delayMs }) => {
       cumulativeMs += delayMs
       const handle = setTimeout(() => {
-        setState(prev => applyEvent(prev, event))
+        setState((prev) => applyEvent(prev, event))
       }, cumulativeMs)
       timeoutsRef.current.push(handle)
     })
   }, [cleanup])
 
-  const streamFromResponse = useCallback(
-    (controller: AbortController, request: () => Promise<Response>) => {
-      ;(async () => {
-        try {
-          const res = await request()
-          // Surface 429 as a structured quota state without ever entering
-          // `streaming`. The upload client opens the waitlist modal off
-          // `state.quotaExceeded`.
-          if (res.status === 429) {
-            const body = (await res.json().catch(() => null)) as RateLimitErrorBody | null
-            const fallback: RateLimitErrorBody = {
-              error: 'rate_limit',
-              tier: 'free',
-              limit: 5,
-              windowHours: 24,
-              resetAt: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
-              message: 'Free-tier evaluation quota reached.'
-            }
-            setState(() => ({ ...INITIAL_STATE, quotaExceeded: body ?? fallback }))
-            return
+  const streamFromResponse = useCallback((controller: AbortController, request: () => Promise<Response>) => {
+    ;(async () => {
+      try {
+        const res = await request()
+        // Surface 429 as a structured quota state without ever entering
+        // `streaming`. The upload client opens the waitlist modal off
+        // `state.quotaExceeded`.
+        if (res.status === 429) {
+          const body = (await res.json().catch(() => null)) as RateLimitErrorBody | null
+          const fallback: RateLimitErrorBody = {
+            error: 'rate_limit',
+            tier: 'free',
+            limit: 5,
+            windowHours: 24,
+            resetAt: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
+            message: 'Free-tier evaluation quota reached.'
           }
-          if (!res.ok || !res.body) {
-            throw new Error(`Backend returned ${res.status} ${res.statusText}`)
-          }
-          for await (const event of parseSseStream(res.body)) {
-            setState(prev => applyEvent(prev, event))
-          }
-        } catch (err) {
-          if (controller.signal.aborted) return
-          const message = err instanceof Error ? err.message : String(err)
-          setState(prev => ({
-            ...prev,
-            phase: 'error',
-            error: message,
-            // Network-layer failure — no backend category reached us, so the
-            // recovery card falls back to its generic "start over" branch.
-            errorCategory: null,
-            stepStates: markFirstActiveStepErrored(prev.stepStates)
-          }))
+          setState(() => ({ ...INITIAL_STATE, quotaExceeded: body ?? fallback }))
+          return
         }
-      })()
-    },
-    []
-  )
+        if (!res.ok || !res.body) {
+          throw new Error(`Backend returned ${res.status} ${res.statusText}`)
+        }
+        for await (const event of parseSseStream(res.body)) {
+          setState((prev) => applyEvent(prev, event))
+        }
+      } catch (err) {
+        if (controller.signal.aborted) return
+        const message = err instanceof Error ? err.message : String(err)
+        setState((prev) => ({
+          ...prev,
+          phase: 'error',
+          error: message,
+          // Network-layer failure — no backend category reached us, so the
+          // recovery card falls back to its generic "start over" branch.
+          errorCategory: null,
+          stepStates: markFirstActiveStepErrored(prev.stepStates)
+        }))
+      }
+    })()
+  }, [])
 
   const startReal = useCallback(
     (files: UploadFiles, dependants: DependantInput[] | undefined) => {
@@ -304,7 +301,7 @@ export function useAgentPipeline(): {
 
 function markFirstActiveStepErrored(states: Record<Step, StepStatus>): Record<Step, StepStatus> {
   const next = { ...states }
-  const active = PIPELINE_STEPS.find(step => next[step] === 'active')
+  const active = PIPELINE_STEPS.find((step) => next[step] === 'active')
   if (active) next[active] = 'error'
   return next
 }

@@ -10,11 +10,7 @@ import { type DemoPersona, useEvaluation } from '@/components/evaluation/evaluat
 import { type IntakeMode, IntakeModeToggle } from '@/components/evaluation/intake-mode-toggle'
 import { ManualEntryForm } from '@/components/evaluation/manual-entry-form'
 import { PipelineStepper } from '@/components/evaluation/pipeline-stepper'
-import {
-  type SamplePersona,
-  UploadWidget,
-  type UploadSubmission
-} from '@/components/evaluation/upload-widget'
+import { type SamplePersona, UploadWidget, type UploadSubmission } from '@/components/evaluation/upload-widget'
 import { UpgradeWaitlistModal } from '@/components/settings/upgrade-waitlist-modal'
 import { Button } from '@/components/ui/button'
 import { SectionBadge } from '@/components/evaluation/section-badge'
@@ -27,10 +23,7 @@ import { cn } from '@/lib/utils'
 
 // Per-persona fixture loader table. Keeps the dispatch branchless in the
 // upload handler — add another persona by adding another entry here.
-const PERSONA_LOADERS: Record<
-  SamplePersona,
-  { load: () => Promise<UploadFiles>; dependants: DependantInput[] }
-> = {
+const PERSONA_LOADERS: Record<SamplePersona, { load: () => Promise<UploadFiles>; dependants: DependantInput[] }> = {
   aisyah: { load: loadAisyahFixtureFiles, dependants: AISYAH_DEPENDANT_OVERRIDES },
   farhan: { load: loadFarhanFixtureFiles, dependants: FARHAN_DEPENDANT_OVERRIDES }
 }
@@ -62,9 +55,7 @@ export function EvaluationUploadClient() {
       // Real + manual intake stamp `evalId` from the SSE done event; mock
       // mode (dev escape hatch) leaves it null and falls back to the
       // in-memory results route.
-      const next = state.evalId
-        ? `/dashboard/evaluation/results/${state.evalId}`
-        : '/dashboard/evaluation/results'
+      const next = state.evalId ? `/dashboard/evaluation/results/${state.evalId}` : '/dashboard/evaluation/results'
       router.push(next)
     }
   }, [state.phase, state.evalId, router])
@@ -85,7 +76,7 @@ export function EvaluationUploadClient() {
   >(null)
 
   function handleSubmitUpload(submission: UploadSubmission) {
-    setDemoByTab(prev => ({ ...prev, upload: null }))
+    setDemoByTab((prev) => ({ ...prev, upload: null }))
     setDemoMode(false)
     lastSubmissionRef.current = {
       kind: 'real',
@@ -104,7 +95,7 @@ export function EvaluationUploadClient() {
   const [sampleLoadError, setSampleLoadError] = useState<string | null>(null)
 
   async function handleUseSamplesUpload(persona: SamplePersona) {
-    setDemoByTab(prev => ({ ...prev, upload: persona }))
+    setDemoByTab((prev) => ({ ...prev, upload: persona }))
     setDemoMode(persona)
     setSampleLoadError(null)
     // Dev escape hatch — when NEXT_PUBLIC_USE_MOCK_SSE=1 the pipeline replays
@@ -112,9 +103,7 @@ export function EvaluationUploadClient() {
     // entirely. The mock pipeline doesn't know about Farhan and would
     // desync, so only honour mock mode for Aisyah.
     const useMock =
-      persona === 'aisyah' &&
-      process.env.NODE_ENV !== 'production' &&
-      process.env.NEXT_PUBLIC_USE_MOCK_SSE === '1'
+      persona === 'aisyah' && process.env.NODE_ENV !== 'production' && process.env.NEXT_PUBLIC_USE_MOCK_SSE === '1'
     if (useMock) {
       start({ mode: 'mock' })
       return
@@ -128,7 +117,7 @@ export function EvaluationUploadClient() {
     } catch (err) {
       setSampleLoadError(err instanceof Error ? err.message : String(err))
       setDemoMode(false)
-      setDemoByTab(prev => ({ ...prev, upload: null }))
+      setDemoByTab((prev) => ({ ...prev, upload: null }))
     } finally {
       setLoadingPersona(null)
     }
@@ -139,13 +128,13 @@ export function EvaluationUploadClient() {
     // chosen persona's values. Mark the manual tab with the matching persona
     // so switching to upload clears the banner and switching back restores
     // the right copy ("gig driver Aisyah" vs "salaried teacher Farhan").
-    setDemoByTab(prev => ({ ...prev, manual: persona }))
+    setDemoByTab((prev) => ({ ...prev, manual: persona }))
     setDemoMode(persona)
   }
 
   function handleClearManual() {
     // User wiped the manual form — demo banner should drop if it was up.
-    setDemoByTab(prev => ({ ...prev, manual: null }))
+    setDemoByTab((prev) => ({ ...prev, manual: null }))
     if (mode === 'manual') setDemoMode(false)
   }
 
@@ -173,7 +162,7 @@ export function EvaluationUploadClient() {
   function handleSwitchToManual() {
     // Quota-exhausted recovery — drop the failed pipeline state and flip
     // the user into Manual Entry mode where the OCR step is synthetic.
-    setDemoByTab(prev => ({ ...prev, upload: null }))
+    setDemoByTab((prev) => ({ ...prev, upload: null }))
     setDemoMode(false)
     setMode('manual')
     reset()
@@ -265,13 +254,7 @@ export function EvaluationUploadClient() {
   )
 }
 
-function QuickStartGuide({
-  mode,
-  onModeChange
-}: {
-  mode: IntakeMode
-  onModeChange: (mode: IntakeMode) => void
-}) {
+function QuickStartGuide({ mode, onModeChange }: { mode: IntakeMode; onModeChange: (mode: IntakeMode) => void }) {
   const { t } = useTranslation()
 
   return (
@@ -280,12 +263,8 @@ function QuickStartGuide({
         <p className="text-[11px] font-medium uppercase tracking-[0.18em] text-primary">
           {t('evaluation.intake.quickStartEyebrow')}
         </p>
-        <h2 className="font-heading text-xl font-semibold tracking-tight">
-          {t('evaluation.intake.quickStartTitle')}
-        </h2>
-        <p className="text-sm leading-relaxed text-muted-foreground">
-          {t('evaluation.intake.quickStartDescription')}
-        </p>
+        <h2 className="font-heading text-xl font-semibold tracking-tight">{t('evaluation.intake.quickStartTitle')}</h2>
+        <p className="text-sm leading-relaxed text-muted-foreground">{t('evaluation.intake.quickStartDescription')}</p>
       </div>
       <div className="grid gap-3 lg:grid-cols-3">
         <PathCard
@@ -347,7 +326,7 @@ function PathCard({
       onClick={onClick}
       onKeyDown={
         clickable
-          ? event => {
+          ? (event) => {
               if (event.key === 'Enter' || event.key === ' ') {
                 event.preventDefault()
                 onClick()

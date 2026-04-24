@@ -139,7 +139,9 @@ function InScopeCard({ scheme }: { scheme: InScopeScheme }) {
           {isContribution && (
             <span className="text-sm font-normal text-muted-foreground">{t('schemes.labels.rm')} </span>
           )}
-          <span className={`text-xl font-semibold ${isContribution ? 'text-amber-700 dark:text-amber-500' : 'text-primary'}`}>
+          <span
+            className={`text-xl font-semibold ${isContribution ? 'text-amber-700 dark:text-amber-500' : 'text-primary'}`}
+          >
             {scheme.upsideRm}
           </span>
           <span className="ml-1 text-xs font-normal text-muted-foreground">{t('schemes.labels.perYear')}</span>

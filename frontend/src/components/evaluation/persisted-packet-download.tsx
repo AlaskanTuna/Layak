@@ -33,7 +33,7 @@ export function PersistedPacketDownload({ evalId, matches }: Props) {
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
-  const qualifyingCount = matches.filter(m => m.qualifies).length
+  const qualifyingCount = matches.filter((m) => m.qualifies).length
 
   if (qualifyingCount === 0) return null
 
@@ -49,10 +49,7 @@ export function PersistedPacketDownload({ evalId, matches }: Props) {
       }
       const blob = await res.blob()
       triggerDownload(blob, `layak-packet-${evalId}.zip`)
-      notificationStore.push(
-        t('evaluation.packet.notificationTitle'),
-        t('evaluation.packet.notificationBody')
-      )
+      notificationStore.push(t('evaluation.packet.notificationTitle'), t('evaluation.packet.notificationBody'))
     } catch (err) {
       setError(err instanceof Error ? err.message : String(err))
     } finally {
@@ -69,9 +66,7 @@ export function PersistedPacketDownload({ evalId, matches }: Props) {
             ? t('evaluation.packet.titleSchemeSingular', { count: qualifyingCount })
             : t('evaluation.packet.titleSchemePlural', { count: qualifyingCount })}
         </CardTitle>
-        <CardDescription>
-          {t('evaluation.packet.description')}
-        </CardDescription>
+        <CardDescription>{t('evaluation.packet.description')}</CardDescription>
       </CardHeader>
       <CardContent className="flex flex-col gap-3">
         <Button type="button" onClick={handleDownload} disabled={busy} size="lg">

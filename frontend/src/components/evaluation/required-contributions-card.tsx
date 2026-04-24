@@ -27,7 +27,7 @@ function formatRm(value: number): string {
  */
 export function RequiredContributionsCard({ matches }: Props) {
   const { t } = useTranslation()
-  const contributions = matches.filter(m => m.qualifies && m.kind === 'required_contribution')
+  const contributions = matches.filter((m) => m.qualifies && m.kind === 'required_contribution')
 
   if (contributions.length === 0) return null
 
@@ -44,14 +44,12 @@ export function RequiredContributionsCard({ matches }: Props) {
           <h2 className="font-heading text-base font-semibold tracking-tight">
             {t('evaluation.requiredContributions.heading')}
           </h2>
-          <p className="text-xs leading-relaxed text-muted-foreground">
-            {t('evaluation.requiredContributions.intro')}
-          </p>
+          <p className="text-xs leading-relaxed text-muted-foreground">{t('evaluation.requiredContributions.intro')}</p>
         </div>
       </header>
 
       <ul className="flex flex-col gap-3">
-        {contributions.map(match => {
+        {contributions.map((match) => {
           const annualRm = match.annual_contribution_rm ?? 0
           return (
             <li
@@ -70,9 +68,7 @@ export function RequiredContributionsCard({ matches }: Props) {
                     {t('evaluation.requiredContributions.annualLabel')}
                   </span>
                   <br />
-                  <span className="text-lg font-semibold text-amber-700 dark:text-amber-300">
-                    {formatRm(annualRm)}
-                  </span>
+                  <span className="text-lg font-semibold text-amber-700 dark:text-amber-300">{formatRm(annualRm)}</span>
                 </p>
                 <a
                   href={match.portal_url}

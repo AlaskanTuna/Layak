@@ -23,11 +23,9 @@ export function CodeExecutionPanel({ upside }: Props) {
           <Code2 className="size-4 text-primary" aria-hidden />
           {t('evaluation.codeExecution.title')}
         </CardTitle>
-        <CardDescription>
-          {t('evaluation.codeExecution.description')}
-        </CardDescription>
+        <CardDescription>{t('evaluation.codeExecution.description')}</CardDescription>
         <div className="col-start-2 row-span-2 row-start-1 self-start justify-self-end">
-          <Button type="button" variant="outline" size="sm" onClick={() => setExpanded(value => !value)}>
+          <Button type="button" variant="outline" size="sm" onClick={() => setExpanded((value) => !value)}>
             {expanded ? (
               <>
                 <ChevronUp className="mr-1.5 size-4" aria-hidden />

@@ -72,12 +72,14 @@ Temporary Items
 *.d.ts
 *.d.ts.map
 *.js.map
+
 # Allow config files that are legitimately JS
 !.eslintrc.cjs
 !vite.config.js
 !tailwind.config.js
 !postcss.config.js
 !components.json
+
 # Compiled JS from TS sources in src/ dirs
 backend/src/**/*.js
 frontend/src/**/*.js
@@ -184,7 +186,3 @@ temp/
 design-system/
 *.tsbuildinfo
 settings.local.json
-
-# CLI agent artifacts
-.codex
-.claude/scheduled_tasks.lock

@@ -15,11 +15,7 @@ import type { SchemeId } from '@/lib/agent-types'
  * scheme (e.g. a new scheme shipped server-side before the locale bundle
  * catches up), we render what the backend sent rather than an empty string.
  */
-export function localisedSchemeName(
-  t: TFunction,
-  schemeId: SchemeId,
-  fallback: string
-): string {
+export function localisedSchemeName(t: TFunction, schemeId: SchemeId, fallback: string): string {
   const key = `schemes.namesById.${schemeId}`
   const translated = t(key, { defaultValue: fallback })
   return translated

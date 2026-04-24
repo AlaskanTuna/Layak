@@ -56,11 +56,11 @@ export const notificationStore = {
     emit()
   },
   markAsRead(id: string): void {
-    notifications = notifications.map(n => (n.id === id ? { ...n, read: true } : n))
+    notifications = notifications.map((n) => (n.id === id ? { ...n, read: true } : n))
     emit()
   },
   dismiss(id: string): void {
-    notifications = notifications.filter(n => n.id !== id)
+    notifications = notifications.filter((n) => n.id !== id)
     emit()
   },
   clearAll(): void {

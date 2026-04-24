@@ -36,10 +36,7 @@ export function DashboardDataSection() {
 
   const fetchHistory = useCallback(async () => {
     try {
-      const res = await authedFetch(
-        `${getBackendUrl()}/api/evaluations?limit=${FETCH_LIMIT}`,
-        { method: 'GET' }
-      )
+      const res = await authedFetch(`${getBackendUrl()}/api/evaluations?limit=${FETCH_LIMIT}`, { method: 'GET' })
       if (!res.ok) {
         setErrorMessage(`Backend returned ${res.status} ${res.statusText}`)
         setPhase('error')
@@ -65,11 +62,7 @@ export function DashboardDataSection() {
 
   if (authLoading || phase === 'loading') {
     return (
-      <div
-        className="flex items-center gap-2 text-sm text-muted-foreground"
-        role="status"
-        aria-live="polite"
-      >
+      <div className="flex items-center gap-2 text-sm text-muted-foreground" role="status" aria-live="polite">
         <Loader2 className="size-4 animate-spin" aria-hidden />
         {t('dashboard.loading')}
       </div>

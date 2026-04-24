@@ -32,15 +32,13 @@ export function SchemeCardGrid({ matches }: Props) {
   // `<RequiredContributionsCard>` so their RM amounts don't get visually
   // confused with annual relief the user would receive.
   const qualifying = matches
-    .filter(m => m.qualifies && (m.kind ?? 'upside') === 'upside')
+    .filter((m) => m.qualifies && (m.kind ?? 'upside') === 'upside')
     .sort((a, b) => b.annual_rm - a.annual_rm)
 
   if (qualifying.length === 0) {
     return (
       <section className="rounded-lg border border-border bg-card p-6 text-center">
-        <p className="text-sm text-muted-foreground">
-          {t('evaluation.schemeCard.noMatches')}
-        </p>
+        <p className="text-sm text-muted-foreground">{t('evaluation.schemeCard.noMatches')}</p>
       </section>
     )
   }
@@ -93,7 +91,9 @@ export function SchemeCardGrid({ matches }: Props) {
 
               <footer className="flex items-end justify-between gap-3">
                 <div className="flex flex-col">
-                  <p className="text-[10px] uppercase tracking-[0.14em] text-muted-foreground">{t('evaluation.schemeCard.estValue')}</p>
+                  <p className="text-[10px] uppercase tracking-[0.14em] text-muted-foreground">
+                    {t('evaluation.schemeCard.estValue')}
+                  </p>
                   <p className="font-heading text-sm font-semibold">{formatRm(match.annual_rm)}</p>
                 </div>
                 <Button

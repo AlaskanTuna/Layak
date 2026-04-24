@@ -62,7 +62,7 @@ export function UserMenu() {
         aria-label={t('common.aria.accountMenu')}
         aria-haspopup="menu"
         aria-expanded={isOpen}
-        onClick={() => setIsOpen(v => !v)}
+        onClick={() => setIsOpen((v) => !v)}
         className="size-8"
       >
         <span className="flex size-6 items-center justify-center rounded-full bg-primary/10 text-xs font-medium text-primary">

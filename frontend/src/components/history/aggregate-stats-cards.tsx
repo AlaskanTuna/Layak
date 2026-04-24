@@ -39,10 +39,7 @@ export function AggregateStatsCards({ items }: Props) {
   }, [items])
 
   return (
-    <section
-      aria-label={t('evaluation.history.stats.ariaLabel')}
-      className="grid grid-cols-1 gap-3 sm:grid-cols-3"
-    >
+    <section aria-label={t('evaluation.history.stats.ariaLabel')} className="grid grid-cols-1 gap-3 sm:grid-cols-3">
       <StatCard
         icon={<FileText className="size-4 text-muted-foreground" aria-hidden />}
         label={t('evaluation.history.stats.totalEvaluations')}

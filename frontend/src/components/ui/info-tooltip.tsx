@@ -12,7 +12,12 @@ type Props = {
 
 export function InfoTooltip({ content, label, className }: Props) {
   return (
-    <span className={cn('group/tooltip relative inline-flex z-10 group-hover/tooltip:z-50 group-focus-within/tooltip:z-50', className)}>
+    <span
+      className={cn(
+        'group/tooltip relative inline-flex z-10 group-hover/tooltip:z-50 group-focus-within/tooltip:z-50',
+        className
+      )}
+    >
       <button
         type="button"
         aria-label={label}

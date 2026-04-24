@@ -81,11 +81,7 @@ export function QuotaMeter({ refreshKey, className }: QuotaMeterProps) {
   }
 
   if (phase === 'error' || !quota) {
-    return (
-      <div className={cn('text-xs text-muted-foreground', className)}>
-        {t('dashboard.quota.unavailable')}
-      </div>
-    )
+    return <div className={cn('text-xs text-muted-foreground', className)}>{t('dashboard.quota.unavailable')}</div>
   }
 
   if (quota.tier === 'pro') {

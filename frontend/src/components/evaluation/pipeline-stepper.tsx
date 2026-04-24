@@ -22,7 +22,7 @@ function StepIcon({ status }: { status: StepStatus }) {
 }
 
 function completedCount(state: PipelineState): number {
-  return PIPELINE_STEPS.filter(step => state.stepStates[step] === 'complete').length
+  return PIPELINE_STEPS.filter((step) => state.stepStates[step] === 'complete').length
 }
 
 export function PipelineStepper({ state, labelOverrides }: Props) {
@@ -51,9 +51,7 @@ export function PipelineStepper({ state, labelOverrides }: Props) {
               aria-current={status === 'active' ? 'step' : undefined}
             >
               <StepIcon status={status} />
-              <span className={cn('flex-1', status === 'pending' && 'text-muted-foreground')}>
-                {labelFor(step)}
-              </span>
+              <span className={cn('flex-1', status === 'pending' && 'text-muted-foreground')}>{labelFor(step)}</span>
               <span className="text-xs text-muted-foreground">{statusLabel(status)}</span>
             </li>
           )

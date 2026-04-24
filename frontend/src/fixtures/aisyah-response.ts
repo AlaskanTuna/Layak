@@ -90,8 +90,7 @@ export const AISYAH_SCHEME_MATCHES: SchemeMatch[] = [
         rule_id: 'jkm.warga_emas.food_pli_threshold',
         source_pdf: 'jkm18.pdf',
         page_ref: 'DOSM 2024 food-PLI constant (external reference)',
-        passage:
-          'Per-capita monthly household income must not exceed the DOSM 2024 food-PLI threshold of RM1,236.',
+        passage: 'Per-capita monthly household income must not exceed the DOSM 2024 food-PLI threshold of RM1,236.',
         source_url: 'https://data.gov.my/data-catalogue/hh_poverty'
       },
       {
@@ -109,8 +108,7 @@ export const AISYAH_SCHEME_MATCHES: SchemeMatch[] = [
     scheme_name: 'JKM Bantuan Kanak-Kanak — per-child monthly payment',
     qualifies: true,
     annual_rm: 3600,
-    summary:
-      'Per-capita income RM 700/month is at/under BKK threshold RM 1,000; 2 × RM 150 (age 7–17) = RM 300/month.',
+    summary: 'Per-capita income RM 700/month is at/under BKK threshold RM 1,000; 2 × RM 150 (age 7–17) = RM 300/month.',
     why_qualify:
       'Your household earns RM 2,800/month across 4 members — per-capita income RM 700 is at/under the BKK threshold of RM 1,000. Per current Budget 2021 rates: 2 × RM 150 (age 7–17), the annual payment works out to RM 3,600. Apply via Borang Permohonan Bantuan Kanak-Kanak at your nearest Pejabat Kebajikan Masyarakat Daerah.',
     agency: 'JKM (Jabatan Kebajikan Masyarakat)',
@@ -147,8 +145,7 @@ export const AISYAH_SCHEME_MATCHES: SchemeMatch[] = [
     scheme_name: 'LHDN Form B — five YA2025 reliefs',
     qualifies: true,
     annual_rm: 558,
-    summary:
-      'Applied YA2025 reliefs totalling RM30,500 against annual income RM33,600; estimated tax saving RM558.',
+    summary: 'Applied YA2025 reliefs totalling RM30,500 against annual income RM33,600; estimated tax saving RM558.',
     why_qualify:
       'As a Form B (self-employed) filer with an annual income of RM33,600, the following YA2025 reliefs stack: individual (RM9,000), lifestyle_9 (RM2,500), epf_life_17 (RM7,000), parent_medical (RM8,000), child_16a (RM4,000). Applying them reduces your chargeable income by RM30,500 and your tax bill by RM558/year. The Form B filing deadline is 30 June 2026.',
     agency: 'LHDN (HASiL)',
@@ -254,8 +251,7 @@ export const AISYAH_SCHEME_MATCHES: SchemeMatch[] = [
     scheme_name: 'STR 2026 — Household with children tier',
     qualifies: true,
     annual_rm: 450,
-    summary:
-      'Household-with-children tier, income band RM2,501–RM5,000, 1-2 children bucket.',
+    summary: 'Household-with-children tier, income band RM2,501–RM5,000, 1-2 children bucket.',
     why_qualify:
       "Your household earns RM2,800/month, inside the RM2,501–RM5,000 band. You have 2 child(ren) under 18, placing you in the '1-2' children bucket. STR 2026 pays RM450/year in two tranches under the household-with-children tier. You still apply via BK-01 at bantuantunai.hasil.gov.my — Layak drafts the form for you; the final determination is LHDN's on application.",
     agency: 'LHDN (HASiL) / Kementerian Kewangan',
@@ -301,8 +297,7 @@ export const AISYAH_SCHEME_MATCHES: SchemeMatch[] = [
     // Upside is zero — SKSPS is a REQUIRED CONTRIBUTION, not a benefit.
     // The actual annual RM Aisyah would PAY lives on `annual_contribution_rm`.
     annual_rm: 0,
-    summary:
-      'Plan 3: RM36.90/month → RM442.80/year mandatory contribution under Akta 789 (income ≤ RM2,950).',
+    summary: 'Plan 3: RM36.90/month → RM442.80/year mandatory contribution under Akta 789 (income ≤ RM2,950).',
     why_qualify:
       'As a self-employed / gig filer aged 34 with monthly income of RM2,800.00, you fall under the Akta 789 mandate for PERKESO SKSPS registration. Your income bracket places you on Plan 3 of the SKSPS Jadual Caruman: RM36.90/month (RM442.80/year). Register via SKSPS-1 at https://www.perkeso.gov.my. This is a MANDATORY contribution — Layak surfaces it alongside your qualifying schemes so you can budget for it; it does NOT stack into your annual relief total.',
     agency: 'PERKESO (SOCSO)',

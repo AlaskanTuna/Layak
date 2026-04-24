@@ -1,236 +1,197 @@
 # Layak Demo Video Director Script - 5 Minutes
 
-Intended runtime: `4:30-4:50`  
+Intended runtime: `4:45`  
 Upper limit used for planning: `5 minutes`
 
-Intended use: richer story-led cut for handbook-aligned demo or finals-style showcase.  
+Intended use: story-led showcase that combines Seedance Aisyah clips with Hao's recorded product walkthrough.  
 Best for: edited recording with either human narration or AI voiceover.  
 Read aloud: only the `VOICEOVER` sections.
 
-Why this version exists: `docs/project-handbook.md` allows a demo video of up to 5 minutes. This version uses the extra time to introduce the citizen problem, the project objective, and the pipeline story more naturally before the live walkthrough.
+Why this version exists: `docs/project-handbook.md` allows a demo video of up to 5 minutes. This version uses that time to show why Layak matters before proving the working system.
 
-Primary objective: preserve the strongest technical proof while giving judges more narrative context.
-
-Demo focus: `v1 hackathon flow` first, with only light acknowledgment that `v2` adds persistence and product shell features around it.
+Primary objective: make the citizen pain visible first, then use Hao's app recording as the technical proof.
 
 ## Recording Setup
 
-- Start already authenticated.
-- Capture one short results-only take for the cold open.
-- Capture one full clean run from `/dashboard/evaluation/upload`.
-- If possible, capture one close-up take of the `PipelineStepper` and one close-up take of the provenance or code-execution area.
-- Keep cursor movement slow and intentional.
-- Do not spend meaningful time on settings, pricing, waitlist, or full account flow.
+- Use Seedance clips for Aisyah's story scenes.
+- Use Hao's recording for the live product section.
+- Keep every Aisyah visual free of real Grab logos or official government form replicas.
+- Keep the forms-flood scene animated: one form appears, then another, then many crowd the frame.
+- End with the Layak landing page plus a Malaysia flag / civic support visual.
+- Avoid settings, pricing, waitlist, full sign-in flow, or unrelated dashboard surfaces.
 
 ## Director Transcript
 
-### 0:00-0:20
+### 0:00-0:25
 
-**TIME:** `0:00-0:20`
+**TIME:** `0:00-0:25`
 
-**ON SCREEN:** Start on the results page with the annual upside hero visible. Hold for 2-3 seconds. Then cut to a clean visual introducing Aisyah: either the upload page with the `Use Aisyah` option visible or a simple title frame built from the synthetic Aisyah assets.
+**ON SCREEN:** Open with a Seedance clip of Aisyah before or during her work day. Show her beside or inside a compact generic e-hailing car with subtle green cues and no logo. The mood is dim, subdued, and early-day tired. Aisyah checks her Android phone, then prepares to continue working.
 
 **VOICEOVER:**  
-"This is Aisyah. She is our reference user for Layak. She is a working Malaysian citizen supporting her household, and like many people, she may qualify for multiple forms of aid or tax relief without knowing which rules actually apply to her."
+"This is Aisyah. She is 34, a self-employed e-hailing driver in Kuantan, supporting two school-age children and her 70-year-old father. [pause 0.4s] Like many working Malaysians, she is not looking for shortcuts. She is trying to understand what support her family may already be eligible for."
 
 **PACE:**  
-`[hold 2.5s on results hero]`  
-`[read warm and steady]`
+`[read warm but restrained]`  
+`[pause 0.4s after eligible for]`
 
 **EDITOR NOTE:**  
-This is the story hook. Do not rush past Aisyah's name or situation.
+Do not make this scene too hopeful yet. Aisyah should look capable, tired, and serious, not defeated.
 
 ---
 
-### 0:20-0:45
+### 0:25-0:55
 
-**TIME:** `0:20-0:45`
+**TIME:** `0:25-0:55`
 
-**ON SCREEN:** Stay on the upload screen or show a clean crop of the README functional diagram if it reads clearly on video. Keep the frame simple and uncluttered.
+**ON SCREEN:** Cut to Aisyah at home with bills, income papers, and a phone on the table. Her children and elderly father are nearby. Keep the room modest, slightly dim, and emotionally grounded. Show family pressure without melodrama.
 
 **VOICEOVER:**  
-"The problem Layak tackles is fragmented public-service discovery. Today, a user like Aisyah still has to search across separate portals, interpret different eligibility rules, and repeat the same information over and over. [pause 0.5s] Our objective was to turn that manual hunt into one guided, grounded, draft-only AI workflow."
+"At home, the pressure is ordinary but constant. Bills arrive. School needs continue. Her father needs care. [pause 0.4s] A little extra support could make a real difference, but finding that support takes time she barely has."
 
 **PACE:**  
-`[slight emphasis: fragmented public-service discovery]`  
+`[slower on ordinary but constant]`  
+`[pause 0.4s before A little extra support]`
+
+**EDITOR NOTE:**  
+This should feel like daily responsibility, not a poverty stereotype. Keep the family dignified.
+
+---
+
+### 0:55-1:25
+
+**TIME:** `0:55-1:25`
+
+**ON SCREEN:** Aisyah notices a clean aid or subsidy card on her phone or laptop. One form card appears. Then a second. Then several more begin stacking around her, still readable but increasingly distracting.
+
+**VOICEOVER:**  
+"Fortunately, Malaysia does have schemes that support families like Aisyah's. [pause 0.4s] But eligibility is scattered across portals, forms, and conditions. For a busy citizen, the hard part is not only applying. It is knowing what to apply for first."
+
+**PACE:**  
+`[slight lift on Fortunately]`  
+`[turn more serious on scattered]`
+
+**EDITOR NOTE:**  
+This is the bridge from personal stress to system complexity. The first form should feel helpful; the later forms should start to feel overwhelming.
+
+---
+
+### 1:25-1:55
+
+**TIME:** `1:25-1:55`
+
+**ON SCREEN:** Animate the forms-flood moment. A first form/card appears, then another, then many cards/tabs/papers pop in like a flood of comments in a viral video. The screen becomes crowded with conditions, portals, repeated document prompts, and eligibility snippets. Aisyah remains composed but visibly overloaded.
+
+**VOICEOVER:**  
+"Malaysia's social-assistance landscape includes 167 schemes across 17 ministries and agencies. [pause 0.4s] That is a lot of support, but also a lot of rules to read, documents to repeat, and conditions to decode. [pause 0.4s] This is the gap Layak is built for."
+
+**PACE:**  
+`[emphasize: 167 schemes]`  
+`[short pause after conditions to decode]`
+
+**EDITOR NOTE:**  
+This is the most stressful story beat. Use dim teal, cream-grey haze, minimal gold, and crowded overlays.
+
+---
+
+### 1:55-2:15
+
+**TIME:** `1:55-2:15`
+
+**ON SCREEN:** Let the cluttered cards begin organizing into a cleaner flow. Transition into the Layak landing page, functional diagram, or first clean product frame. Teal light returns gently; the scene becomes more structured.
+
+**VOICEOVER:**  
+"Layak turns that scattered discovery process into one guided, grounded, draft-only workflow. [pause 0.3s] It does not promise automatic approval. It helps Aisyah understand where to start, why she may qualify, and what she can prepare next."
+
+**PACE:**  
+`[calmer, clearer delivery]`  
 `[slight emphasis: grounded, draft-only]`
 
 **EDITOR NOTE:**  
-This section replaces a traditional problem-statement slide.
+This is the first emotional relief point. The visuals should become cleaner before the app recording begins.
 
 ---
 
-### 0:45-1:10
+### 2:15-3:45
 
-**TIME:** `0:45-1:10`
+**TIME:** `2:15-3:45`
 
-**ON SCREEN:** Show the top functional diagram from the README or a clean pipeline visual. Keep the whole flow visible for a few seconds before returning to the app.
+**ON SCREEN:** Use Hao's recording. Show the evaluation flow, upload/manual entry choice if present, Aisyah sample trigger, and the five-step pipeline. Keep the stepper readable. Continue through the transition into results if the recording includes it.
 
 **VOICEOVER:**  
-"Layak is not just chat. It is an agentic pipeline. Intake goes into a RootAgent, then flows through five visible steps: extract, classify, match, rank, and generate. [pause 0.4s] We use Gemini 2.5 Pro for orchestration, Gemini 2.5 Flash across the document and classification flow, Vertex AI Search for grounded retrieval, Gemini Code Execution for transparent arithmetic, and Cloud Run for the live web deployment."
+"Here is the working flow. Aisyah can upload supporting documents, or use manual entry if she prefers not to upload sensitive files. [pause 0.3s] For the demo, we use bundled synthetic Aisyah documents. The agent then runs five visible steps: extract, classify, match, rank, and generate. [pause 0.3s] Gemini helps prepare and classify the profile. Vertex AI Search grounds the scheme matching in source material. Gemini Code Execution makes the arithmetic visible. Cloud Run serves the live web experience."
 
 **PACE:**  
-`[pause 0.4s after five visible steps]`  
-`[slow slightly on the tool names]`
+`[keep pace matched to Hao's recording]`  
+`[small pause between each technical proof point]`
 
 **EDITOR NOTE:**  
-If the README diagram is not crisp enough on screen, use the app and narration only.
+This is the technical proof section. If the recording shows the exact pipeline step names, let them stay on screen long enough to read.
 
 ---
 
-### 1:10-1:30
+### 3:45-4:20
 
-**TIME:** `1:10-1:30`
+**TIME:** `3:45-4:20`
 
-**ON SCREEN:** Return fully to the evaluation upload page. Show the quick-start cards and the upload/manual-entry toggle.
+**ON SCREEN:** Stay in Hao's recording. Show the ranked results, annual upside hero, scheme cards, provenance/citation detail, code execution panel, and draft packet area if available.
 
 **VOICEOVER:**  
-"From the user's side, the experience stays simple. They can upload supporting documents, or switch to manual entry if they prefer not to hand sensitive documents to an AI model. For this demo, we use bundled synthetic Aisyah documents so the run is stable, repeatable, and safe to review."
+"The result is a ranked action view, not a vague chatbot answer. Layak shows which schemes may be worth acting on first, explains the reasoning in plain language, and keeps important claims grounded in citations. [pause 0.4s] The arithmetic is visible, and the packets are drafts. Aisyah still reviews and submits manually."
 
 **PACE:**  
-`[pause 0.3s after manual entry mention]`  
-`[emphasize: synthetic]`
+`[emphasize: ranked action view]`  
+`[stronger close on submits manually]`
 
 **EDITOR NOTE:**  
-Do not fill the manual form in the main cut.
+If time is tight, prioritize upside hero, provenance, code execution, and packet output over showing every scheme card.
 
 ---
 
-### 1:30-2:20
+### 4:20-4:40
 
-**TIME:** `1:30-2:20`
+**TIME:** `4:20-4:40`
 
-**ON SCREEN:** Click `Use Aisyah` sample documents. Keep the `PipelineStepper` centered while the steps progress. Use a crop if needed so each step is legible.
+**ON SCREEN:** Return to a Seedance or generated family-relief clip. Aisyah is at home with her children and father. The room is brighter, documents are organized, and the family has a calmer moment together.
 
 **VOICEOVER:**  
-"Now we let the workflow run. First, Gemini 2.5 Flash extracts a structured profile from the uploaded documents. Second, the system classifies Aisyah's household context. Third, Layak checks that profile against typed scheme rules and grounds the result with Vertex AI Search. Fourth, Gemini Code Execution computes the annual upside. Fifth, WeasyPrint generates the draft packet the user can review before manual submission."
+"Layak does not decide for the agency. But it gives Aisyah a clearer path, so she can focus on the support that may actually matter for her family. [pause 0.4s] Less guessing. Less portal-hopping. More time back with the people she is working for."
 
 **PACE:**  
-`[short pause between each step]`  
-`[slight emphasis: Vertex AI Search]`  
-`[slight emphasis: Gemini Code Execution]`
+`[warmer, but not sentimental]`  
+`[pause after clearer path]`
 
 **EDITOR NOTE:**  
-This is still the most important technical proof section. Let the audience see the system think in steps.
+This is the emotional payoff. Bring back the warmer cream, teal, and soft gold palette.
 
 ---
 
-### 2:20-2:50
+### 4:40-4:50
 
-**TIME:** `2:20-2:50`
+**TIME:** `4:40-4:50`
 
-**ON SCREEN:** Transition to the finished results page. Hold on the upside hero first. Then scroll slowly to the ranked scheme list and let the required-contributions area appear if the framing stays clean.
-
-**VOICEOVER:**  
-"The output is a ranked action view, not a vague answer. Layak currently evaluates 6 enabled rule paths. In Aisyah's demo flow, 6 matched items are surfaced in total. [pause 0.4s] Five are benefit schemes that contribute to annual upside, while PERKESO SKSPS is shown separately as a required contribution."
-
-**PACE:**  
-`[hold 2s on upside hero]`  
-`[emphasize: ranked action view]`
-
-**EDITOR NOTE:**  
-Make the total upside and matched-scheme framing easy to read before moving further down.
-
----
-
-### 2:50-3:20
-
-**TIME:** `2:50-3:20`
-
-**ON SCREEN:** Keep one strong scheme card in frame. If a qualification or explanation surface opens cleanly, use it.
+**ON SCREEN:** End on the Layak landing page blended with a Malaysia flag or Malaysian civic-support visual. Keep it clean, hopeful, and aligned with the landing-page teal-gold identity. Avoid party-political symbols.
 
 **VOICEOVER:**  
-"This is where the product objective becomes visible. Layak helps the user focus on the schemes most worth acting on first, and it explains the recommendation in plain language. That makes the experience more useful, and more trustworthy, than a generic chatbot answer."
-
-**PACE:**  
-`[read a little slower]`  
-`[slight emphasis: more trustworthy]`
-
-**EDITOR NOTE:**  
-Choose the cleanest card, not the busiest one.
-
----
-
-### 3:20-3:45
-
-**TIME:** `3:20-3:45`
-
-**ON SCREEN:** Show one provenance interaction or hover state with the citation area clearly framed.
-
-**VOICEOVER:**  
-"Trust matters even more in public-service discovery. So every important claim should be grounded in source material that the user can inspect, instead of hidden behind a fluent but unverifiable response."
-
-**PACE:**  
-`[emphasize: grounded]`
-
-**EDITOR NOTE:**  
-If the click is unstable, use a close crop rather than a second take.
-
----
-
-### 3:45-4:05
-
-**TIME:** `3:45-4:05`
-
-**ON SCREEN:** Scroll to the code execution panel and keep the Python trace and output visible.
-
-**VOICEOVER:**  
-"We also make the arithmetic visible. Gemini Code Execution shows how the annual upside is computed, so the audience can see that the number is produced transparently rather than presented as black-box magic."
-
-**PACE:**  
-`[slight emphasis: transparently]`
-
-**EDITOR NOTE:**  
-This is one of the strongest trust beats for technically minded judges.
-
----
-
-### 4:05-4:35
-
-**TIME:** `4:05-4:35`
-
-**ON SCREEN:** Scroll to the draft packet area and packet download section. Hold long enough for the audience to register the packet output.
-
-**VOICEOVER:**  
-"And this is the final shift from analysis to action. Layak prepares draft packets the user can review and submit manually. [pause 0.5s] That is an intentional safety choice. The system helps with preparation, clarity, and prioritization, but the user still stays in control of final submission."
-
-**PACE:**  
-`[hold 2s on packet area]`  
-`[strong emphasis: user still stays in control]`
-
-**EDITOR NOTE:**  
-This is the trust and safety close.
-
----
-
-### 4:35-4:50
-
-**TIME:** `4:35-4:50`
-
-**ON SCREEN:** End on a clean frame that includes either the packet area or the main results hero.
-
-**VOICEOVER:**  
-"Layak is our Track 2 Citizens First submission: a grounded AI concierge that helps someone like Aisyah focus on the schemes she may be eligible for, understand the reasoning, and act on a clearer path with real potential yearly upside."
+"Layak is our Track 2 Citizens First submission: grounded AI for practical public-service discovery in Malaysia."
 
 **PACE:**  
 `[steady close]`
 
 **EDITOR NOTE:**  
-End without extra filler. Let the final sentence land.
+Hold the final frame for a beat after the narration if the music needs a clean landing.
 
 ## Shot Checklist
 
-- outcome-first cold open
-- Aisyah story hook
-- problem/objective section without formal slides
-- one pipeline visual or equivalent explanation beat
-- upload/manual-entry choice
-- `Use Aisyah` trigger
-- full five-step pipeline progression
-- total annual upside hero
-- at least one scheme card
-- if possible, the required-contributions block
-- at least one provenance moment
-- code execution panel
-- draft packet section
-- stable closing frame
+- Aisyah daily hustle as a generic e-hailing driver
+- bills and family-pressure home scene
+- first aid/subsidy discovery moment
+- animated forms-flood scene
+- Layak introduction transition
+- Hao's app recording with five-step pipeline
+- ranked results and annual upside hero
+- provenance or citation proof
+- code execution or visible arithmetic proof
+- draft packet / manual submission proof
+- family relief scene
+- landing page plus Malaysia flag / civic support ending

@@ -336,6 +336,167 @@ Recommended suffixes:
 
 ## Prompt Pack
 
+## Seedance Storyboard Prompts
+
+Use these prompts for the story-led 5-minute video. They follow the updated script arc:
+
+1. daily hustle
+2. bills and family pressure
+3. subsidy discovery
+4. forms flood
+5. Layak steps in
+6. family relief
+7. Malaysia support ending
+
+### Daily Hustle
+
+Purpose:
+
+- establish Aisyah as a working e-hailing driver
+- show pressure before the subsidy discovery
+- keep the tone serious but dignified
+
+Prompt:
+
+```text
+Aisyah binti Ahmad, 34-year-old Malaysian Malay woman from Kuantan, black hijab, warm medium-brown skin, soft oval face, visibly tired but composed expression, self-employed e-hailing driver, stylized editorial illustration, semi-realistic Malaysian character design, subdued teal civic visual language, muted low-contrast palette, standing beside or sitting inside a compact generic ride-hailing car with subtle green cues and no logo, early work day, checking an Android phone with concern, darker Malaysian roadside, muted skyline silhouettes, faint tropical foliage, dim cream-grey atmosphere, soft textured shadows, gentle haze, stressed but dignified, not defeated, consistent character identity
+```
+
+Negative prompt:
+
+```text
+no real Grab logo, no corporate logos, no photorealistic face, no stock photo realism, no anime style, no broad smile, no luxury car, no dramatic cinematic lighting, no cheerful gold glow, no exaggerated despair
+```
+
+### Bills At Home
+
+Purpose:
+
+- show ordinary household pressure
+- include children and father naturally
+- avoid melodrama or poverty stereotypes
+
+Prompt:
+
+```text
+Aisyah binti Ahmad at a modest Malaysian dining table, black hijab, two school-age children nearby, her 70-year-old father seated close by, bills, utility papers, income papers, and an Android phone on the table, stylized editorial illustration, semi-realistic family scene, darker muted teal and beige palette, low warm light, almost no gold glow, lightly crowded layered composition, quiet family stress, responsible and tired expression, dignified household atmosphere, polished social-impact landing page artwork
+```
+
+Negative prompt:
+
+```text
+no exaggerated poverty, no crying, no messy disaster room, no luxury home, no broad smiles, no photorealistic stock photo, no anime style, no official government form replica
+```
+
+### First Subsidy Discovery
+
+Purpose:
+
+- show the first moment of cautious hope
+- one card/form appears and feels useful before complexity takes over
+
+Prompt:
+
+```text
+Aisyah binti Ahmad noticing a single clean aid or subsidy card on her Android phone or laptop, black hijab, modest Malaysian home, two children and elderly father softly in the background, stylized editorial illustration, semi-realistic character art, muted teal palette with one gentle returning highlight, one translucent document card appearing clearly, cautious curiosity, slight hope, not smiling broadly, transition from burden toward possibility
+```
+
+Negative prompt:
+
+```text
+no flood of forms yet, no bright triumphant gold, no corporate logos, no official government branding, no photorealism, no anime style, no exaggerated excitement
+```
+
+### Forms Flood
+
+Purpose:
+
+- visualize the real gap Layak fills
+- make eligibility discovery feel overwhelming
+- animate one form into many, like comments flooding a viral video
+
+Prompt:
+
+```text
+Aisyah binti Ahmad seated at a table as one subsidy form becomes two, then many floating forms, cards, browser tabs, and eligibility-condition panels crowd the frame, black hijab, modest Malaysian home, stylized editorial illustration, semi-realistic character art, dull teal and muted paper tones, dim cream-grey background, almost no amber glow, dense layered composition, documents and conditions multiplying like a flood of comments, portals and repeated document prompts surrounding her, tired focused face, not smiling, visibly mentally overloaded but still composed, polished social-impact visual style
+```
+
+Motion direction:
+
+```text
+start with one clean form card, then a second appears, then several more pop in from different sides, then the frame fills with overlapping forms and condition snippets; Aisyah stays centered or slightly off-center, phone in hand, shoulders slightly slouched, eyes scanning the clutter
+```
+
+Negative prompt:
+
+```text
+no cheerful glow, no gold wash, no official form replicas, no readable private IC numbers, no corporate logos, no comic exaggeration, no anime style, no despairing breakdown, no messy horror tone
+```
+
+### Layak Steps In
+
+Purpose:
+
+- transition from chaos to structure
+- visually bridge Seedance story and Hao's app recording
+
+Prompt:
+
+```text
+The cluttered floating forms around Aisyah begin organizing into a clean guided flow, black hijab, modest Malaysian home, stylized editorial illustration, semi-realistic character art, teal light returning gently, dim form cards aligning into a simple pipeline, soft translucent UI panels, reduced clutter, clearer breathing room, early warm highlights returning, calm focus replacing confusion, polished civic-tech landing page style
+```
+
+Motion direction:
+
+```text
+overlapping forms slow down, align into an ordered row or path, then dissolve into a clean Layak product frame or landing-page visual
+```
+
+Negative prompt:
+
+```text
+no instant magic transformation, no over-bright gold explosion, no corporate logo clutter, no sci-fi hologram overload, no anime style
+```
+
+### Family Relief
+
+Purpose:
+
+- show the emotional payoff after the app proof
+- connect results to time, clarity, and family life
+
+Prompt:
+
+```text
+Aisyah binti Ahmad at home with her two school-age children and her 70-year-old father, documents now organized on the table, Android phone or laptop showing clear helpful results, stylized editorial illustration, semi-realistic family scene, brighter cream background, luminous teal and soft amber palette, gentle gold highlights, calm relief, renewed confidence, family spending quiet time together, hopeful but grounded civic-tech landing page artwork
+```
+
+Negative prompt:
+
+```text
+no exaggerated celebration, no luxury home, no party imagery, no photorealistic stock photo, no anime style, no unrealistic instant wealth mood
+```
+
+### Malaysia Support Ending
+
+Purpose:
+
+- close with national civic support
+- return fully to the landing-page visual identity
+- reinforce Track 2 Citizens First
+
+Prompt:
+
+```text
+Layak landing-page style civic ending visual, warm cream background, luminous teal and soft gold glow, subtle Malaysia flag motif, Malaysian skyline silhouettes, tropical foliage, translucent document and family-support icons, grounded AI public-service discovery theme, polished social-impact landing page artwork, hopeful national civic support mood, clean space for final title text, no party-political symbols
+```
+
+Negative prompt:
+
+```text
+no political party logos, no campaign imagery, no official government seal imitation, no excessive nationalism, no dark cyberpunk palette, no cluttered text, no corporate logos
+```
+
 ### 1. Hero Portrait
 
 Best for:

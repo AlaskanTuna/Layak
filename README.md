@@ -1,6 +1,6 @@
 <div align="center">
 
-<img src="docs/slides/assets/layak-logo.png" alt="Layak logo" width="140" />
+<img src="frontend/public/layak-logo.png" alt="Layak logo" width="140" />
 
 # Layak
 

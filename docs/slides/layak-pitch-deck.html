@@ -588,9 +588,16 @@
   }
   .ty-qr-slot {
     width: 170px; height: 170px;
-    background: rgba(245,241,232,0.04);
-    border: 2px dashed rgba(245,241,232,0.3);
+    background: #ffffff;
+    border: 2px solid rgba(245,241,232,0.25);
+    border-radius: 6px;
+    overflow: hidden;
     display:grid; place-items:center;
+  }
+  .ty-qr-slot .ty-qr-img {
+    width: 100%; height: 100%;
+    object-fit: contain;
+    display: block;
   }
   .ty-qr-slot .ty-qr-placeholder {
     font-family:'IBM Plex Mono', monospace; font-size: 13px; letter-spacing: 0.1em;
@@ -1379,11 +1386,15 @@
 
         <div class="ty-qr-row">
           <div class="ty-qr">
-            <div class="ty-qr-slot"><span class="ty-qr-placeholder">QR</span></div>
+            <div class="ty-qr-slot">
+              <img src="assets/qr-app.jpg" alt="Scan to open the Layak live demo" class="ty-qr-img"/>
+            </div>
             <div class="ty-qr-label">Live Demo</div>
           </div>
           <div class="ty-qr">
-            <div class="ty-qr-slot"><span class="ty-qr-placeholder">QR</span></div>
+            <div class="ty-qr-slot">
+              <img src="assets/qr-github.jpg" alt="Scan to view the Layak GitHub repository" class="ty-qr-img"/>
+            </div>
             <div class="ty-qr-label">GitHub</div>
           </div>
         </div>

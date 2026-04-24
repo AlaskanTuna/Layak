@@ -1,10 +1,7 @@
 """Pydantic models for the citizen profile extracted from uploaded documents.
 
-Source of truth: docs/prd.md FR-3 and docs/trd.md §3.
-
 Privacy invariant: `ic_last4` is the ONLY representation of the citizen's IC that may
-appear in SSE payloads, logs, or draft PDFs. Full IC never leaves request-scope memory
-(see docs/prd.md NFR-3).
+appear in SSE payloads, logs, or draft PDFs. Full IC never leaves request-scope memory.
 """
 
 from __future__ import annotations
@@ -76,7 +73,7 @@ class Profile(BaseModel):
 
 
 class HouseholdClassification(BaseModel):
-    """Output of the classify step (Task 3)."""
+    """Output of the classify step."""
 
     model_config = ConfigDict(extra="forbid")
 

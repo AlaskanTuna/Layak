@@ -1,11 +1,10 @@
 """Pydantic mirrors of the Firestore document shapes.
 
-Source of truth: docs/superpowers/specs/2026-04-21-v2-saas-pivot-design.md §3.3
-(schema summary) and docs/trd.md §5.5. These models are validation-only — the
-Firestore Admin SDK still stores dicts with `SERVER_TIMESTAMP` sentinels on
-write, so server-side writes build dicts directly. These models are used for
-*reading* docs back (validates the shape the frontend will receive), for typing
-the persistence helpers, and for unit tests.
+These models are validation-only — the Firestore Admin SDK still stores dicts
+with `SERVER_TIMESTAMP` sentinels on write, so server-side writes build dicts
+directly. These models are used for *reading* docs back (validates the shape
+the frontend will receive), for typing the persistence helpers, and for unit
+tests.
 """
 
 from __future__ import annotations
@@ -41,9 +40,9 @@ class UserDoc(BaseModel):
     displayName: str | None = None  # noqa: N815 — Firestore field is camelCase
     photoURL: str | None = None  # noqa: N815
     tier: Tier = "free"
-    # Phase 9: persisted UI / pipeline language preference. Pre-Phase-9 docs
-    # have no `language` field; readers default to `"en"` so missing-field
-    # docs validate without a backfill.
+    # Persisted UI / pipeline language preference. Legacy docs have no
+    # `language` field; readers default to `"en"` so missing-field docs
+    # validate without a backfill.
     language: SupportedLanguage = DEFAULT_LANGUAGE
     createdAt: datetime | None = None  # noqa: N815 — SERVER_TIMESTAMP resolves async
     lastLoginAt: datetime | None = None  # noqa: N815
@@ -104,10 +103,10 @@ class EvaluationDoc(BaseModel):
 
     userId: str = Field(min_length=1)  # noqa: N815
     status: EvaluationStatus
-    # Phase 9: the language the eval ran under. Frozen at create-time so
-    # toggling the UI toggle mid-run doesn't silently repaint `why_qualify`
-    # strings in a language they weren't generated in. Pre-Phase-9 docs
-    # default to `"en"` via the field default below.
+    # The language the eval ran under. Frozen at create-time so toggling the
+    # UI toggle mid-run doesn't silently repaint `why_qualify` strings in a
+    # language they weren't generated in. Legacy docs default to `"en"` via
+    # the field default below.
     language: SupportedLanguage = DEFAULT_LANGUAGE
     createdAt: datetime | None = None  # noqa: N815 — SERVER_TIMESTAMP sentinel on write
     completedAt: datetime | None = None  # noqa: N815

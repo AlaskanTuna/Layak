@@ -30,7 +30,7 @@ function getBackendUrl(): string {
 }
 
 /**
- * Phase 7 Task 4 — inline PDF preview for the persisted results page.
+ * Inline PDF preview for the persisted results page.
  *
  * Renders one expandable row per qualifying scheme. Each row lazily fetches
  * the regenerated PDF via `GET /api/evaluations/{id}/packet/{scheme_id}` on

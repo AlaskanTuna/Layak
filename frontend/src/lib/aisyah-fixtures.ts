@@ -1,8 +1,8 @@
 /**
- * Phase 3 Task 5 — fetch the bundled Aisyah PDFs from /public/fixtures/
- * and return them as File objects ready to feed into the real intake
- * pipeline. Mirrors the shape of an `<input type="file">` selection so
- * the UploadWidget treats sample-load and user-upload identically.
+ * Fetches the bundled Aisyah PDFs from /public/fixtures/ and returns
+ * them as File objects ready to feed into the real intake pipeline.
+ * Mirrors the shape of an `<input type="file">` selection so the
+ * UploadWidget treats sample-load and user-upload identically.
  *
  * Dependants are not extractable from MyKad / payslip / TNB documents,
  * so we ship them as an explicit override that the backend overlays on

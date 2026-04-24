@@ -21,12 +21,12 @@ function getBackendUrl(): string {
 }
 
 /**
- * Phase 3 Task 3 — packet download for the persisted results route.
+ * Packet download for the persisted results route.
  *
- * Packet bytes are NEVER stored in Firestore (spec §3.7). The backend
- * regenerates the three PDFs on demand and ships them as a ZIP via
- * `GET /api/evaluations/{id}/packet`. We just stream the response into
- * a download trigger.
+ * Packet bytes are NEVER stored in Firestore. The backend regenerates the
+ * three PDFs on demand and ships them as a ZIP via
+ * `GET /api/evaluations/{id}/packet`. We just stream the response into a
+ * download trigger.
  */
 export function PersistedPacketDownload({ evalId, matches }: Props) {
   const { t } = useTranslation()

@@ -1,4 +1,4 @@
-"""Phase 7 Task 1 regression — Form BE (salaried) filer path.
+"""Regression — Form BE (salaried) filer path.
 
 Two concerns:
   1. The manual-entry builder correctly maps `employment_type="salaried"` to

@@ -27,10 +27,10 @@ export type SchemeId =
   | 'perkeso_sksps'
   | 'i_saraan'
 
-// Phase 7 Task 9 — upside schemes stack into the headline annual-relief
-// total; required_contribution schemes (e.g. PERKESO SKSPS) surface a
-// separate "Required contributions" block and are excluded from the
-// upside total. Keep in lockstep with backend `app/schema/scheme.py`.
+// Upside schemes stack into the headline annual-relief total;
+// required_contribution schemes (e.g. PERKESO SKSPS) surface a separate
+// "Required contributions" block and are excluded from the upside total.
+// Keep in lockstep with backend `app/schema/scheme.py`.
 export type SchemeKind = 'upside' | 'required_contribution'
 
 export type Dependant = {
@@ -67,7 +67,7 @@ export type DependantInput = {
   ic_last4: string | null
 }
 
-/** Body of `POST /api/agent/intake_manual` — manual-entry alternative to the three-document upload (FR-21). */
+/** Body of `POST /api/agent/intake_manual` — manual-entry alternative to the three-document upload. */
 export type ManualEntryPayload = {
   name: string
   /** ISO-8601 `YYYY-MM-DD`. */
@@ -112,9 +112,9 @@ export type SchemeMatch = {
   agency: string
   portal_url: string
   rule_citations: RuleCitation[]
-  /** Phase 7 Task 9 — defaults to `'upside'` on backend matches that pre-date
-   * Task 9. Optional on the type so older persisted Firestore docs still
-   * deserialise in TypeScript. */
+  /** Defaults to `'upside'` on backend matches that pre-date the
+   * required_contribution split. Optional on the type so older persisted
+   * Firestore docs still deserialise in TypeScript. */
   kind?: SchemeKind
   /** Annual mandatory contribution the user PAYS under this scheme. Only set
    * when `kind === 'required_contribution'`. */
@@ -152,7 +152,7 @@ export type StepResultEvent =
   | { type: 'step_result'; step: 'generate'; data: GenerateResult }
 export type DoneEvent = { type: 'done'; packet: Packet; eval_id?: string | null }
 
-// Phase 7 Task 6 — SSE ErrorEvent.category mirrors backend
+// SSE ErrorEvent.category mirrors backend
 // `app/schema/events.py:ErrorCategory`. Keep the two sides in lockstep:
 // adding a category here must land a matching entry in the Python Literal
 // AND category-tailored copy in `frontend/src/lib/i18n/locales/*.json`.
@@ -237,7 +237,7 @@ export type EvaluationListResponse = {
   nextPageToken: string | null
 }
 
-/** Mirror of `GET /api/quota` — Phase 3 Task 4 frontend QuotaMeter. */
+/** Mirror of `GET /api/quota` — drives the frontend QuotaMeter. */
 export type QuotaResponse = {
   tier: Tier
   /** Free tier: 5. Pro tier: -1 (unlimited sentinel). */

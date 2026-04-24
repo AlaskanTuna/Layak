@@ -1,4 +1,4 @@
-"""Tests for the manual-entry intake path (FR-21).
+"""Tests for the manual-entry intake path.
 
 The key invariant: given the Aisyah JSON payload, `build_profile_from_manual_entry`
 produces a `Profile` equal to `AISYAH_PROFILE` field-for-field, and feeding that
@@ -219,16 +219,16 @@ def client(monkeypatch: pytest.MonkeyPatch) -> TestClient:
 
     Two collections are mocked:
       - `users/{uid}` — the auth-layer lazy-upsert path, snapshot.exists=True.
-      - `evaluations/{autoId}` — Phase 3 Task 1 persistence. `.document()` with
-        no argument (auto-id) returns a ref with `id="test-eval-id"`;
-        `.set()` / `.update()` are callable but no-op.
+      - `evaluations/{autoId}` — persistence. `.document()` with no argument
+        (auto-id) returns a ref with `id="test-eval-id"`; `.set()` / `.update()`
+        are callable but no-op.
     """
     monkeypatch.setenv("FIREBASE_ADMIN_KEY", json.dumps({"type": "service_account"}))
     monkeypatch.setattr(auth_module, "_init_firebase_admin", lambda: MagicMock())
 
     # users collection mock — default snapshot for lazy-upsert.
-    # Phase 3 Task 2: `_upsert_user_doc` now reads `tier` from the snapshot
-    # to surface it on `UserInfo`; explicit to_dict response keeps this deterministic.
+    # `_upsert_user_doc` reads `tier` from the snapshot to surface it on
+    # `UserInfo`; explicit to_dict response keeps this deterministic.
     users_snapshot = MagicMock()
     users_snapshot.exists = True
     users_snapshot.to_dict.return_value = {"tier": "free"}
@@ -338,8 +338,8 @@ def test_intake_manual_accepts_aisyah_and_streams_sse(
     assert extract_result["step"] == "extract"
     assert extract_result["data"]["profile"]["name"] == "Aisyah binti Ahmad"
     assert extract_result["data"]["profile"]["household_flags"]["income_band"] == "b40_household_with_children"
-    # Phase 3 Task 1: done event carries the evaluations/{evalId} doc ID so the
-    # frontend can route to `/dashboard/evaluation/results/[id]`.
+    # Done event carries the evaluations/{evalId} doc ID so the frontend can
+    # route to `/dashboard/evaluation/results/[id]`.
     done_event = parsed[-1]
     assert done_event["type"] == "done"
     assert done_event["eval_id"] == "test-eval-id"

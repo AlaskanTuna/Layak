@@ -1,4 +1,4 @@
-"""Phase 10 polish — pre-warm the chat dependencies on FastAPI startup.
+"""Pre-warm the chat dependencies on FastAPI startup.
 
 Fires two best-effort sync calls during the FastAPI lifespan startup so the
 first user-facing chat request doesn't pay cold-start cost on either:

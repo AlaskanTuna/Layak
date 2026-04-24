@@ -1,4 +1,4 @@
-"""Unit tests for `app.services.rate_limit.enforce_quota` (Phase 3 Task 2).
+"""Unit tests for `app.services.rate_limit.enforce_quota`.
 
 Firestore is mocked with a thin wrapper that lets each test dictate what the
 `.where().where().count().get()` chain returns. The order-by/limit/stream

@@ -1,4 +1,4 @@
-"""Supported UI / pipeline languages (Phase 9).
+"""Supported UI / pipeline languages.
 
 Single source of truth for the `SupportedLanguage` Literal reused by
 `UserDoc.language`, the `current_user` dependency, `stream_agent_events`,

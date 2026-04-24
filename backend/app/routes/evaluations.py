@@ -1,13 +1,12 @@
 """Read-side endpoints for the `evaluations/{evalId}` Firestore collection.
 
-Phase 3 Task 1 read-side:
     GET /api/evaluations                    — list the caller's evaluations (paginated)
     GET /api/evaluations/{eval_id}          — one evaluation, owner-gated
     GET /api/evaluations/{eval_id}/packet   — regenerates three PDF drafts as a ZIP
 
-Packet regeneration spec (docs/superpowers/specs/2026-04-21-v2-saas-pivot-design.md §3.7):
-PDFs are never persisted. On demand we read the stored Profile + SchemeMatch[]
-and re-run WeasyPrint through `app.agents.tools.generate_packet`.
+Packet regeneration: PDFs are never persisted. On demand we read the stored
+Profile + SchemeMatch[] and re-run WeasyPrint through
+`app.agents.tools.generate_packet`.
 
 Every endpoint is authed — the caller's `user.uid` is compared against the
 document's `userId` field before any data leaks out. Firestore rules would
@@ -73,8 +72,8 @@ async def list_evaluations(
     """List the caller's evaluations, newest first.
 
     Uses the `(userId ASC, createdAt DESC)` composite index deployed via
-    Firestore rules in Phase 2 Task 1. Pagination via `nextPageToken` is
-    reserved for Phase 4 Task 1 — the MVP page size is enough for demo.
+    Firestore rules. Pagination via `nextPageToken` is reserved for later —
+    the MVP page size is enough for demo.
     """
     db = get_firestore()
     query = (
@@ -145,10 +144,9 @@ async def delete_evaluation(user: CurrentUser, eval_id: str) -> Response:
 async def get_evaluation_packet(user: CurrentUser, eval_id: str) -> Response:
     """Regenerate the three draft PDFs from stored profile + matches, return as ZIP.
 
-    Spec §3.7: packets are never persisted. Every download re-runs WeasyPrint
-    against the embedded `profile` + `matches` so a change to the Jinja
-    template or packet layout propagates to existing evaluations without a
-    backfill.
+    Packets are never persisted. Every download re-runs WeasyPrint against
+    the embedded `profile` + `matches` so a change to the Jinja template or
+    packet layout propagates to existing evaluations without a backfill.
     """
     data, _ref = _load_owned_evaluation(eval_id, user.uid)
 
@@ -190,11 +188,11 @@ async def get_evaluation_packet_draft(
 ) -> Response:
     """Regenerate ONE draft PDF from stored profile + the matching SchemeMatch.
 
-    Phase 7 Task 4 — powers the inline PDF preview on the persisted results
-    page. Returns a single `application/pdf` stream with `inline` disposition
-    so `<iframe>` / browser PDF viewers can render it. Auth is the usual
-    Bearer-token path; the frontend fetches the bytes via `authedFetch`, wraps
-    them in a blob URL, and hands the URL to the iframe.
+    Powers the inline PDF preview on the persisted results page. Returns a
+    single `application/pdf` stream with `inline` disposition so `<iframe>`
+    / browser PDF viewers can render it. Auth is the usual Bearer-token
+    path; the frontend fetches the bytes via `authedFetch`, wraps them in a
+    blob URL, and hands the URL to the iframe.
 
     404 semantics match `get_evaluation`: missing eval, wrong-owner, OR
     `scheme_id` absent from the stored match list all return 404 — never
@@ -249,8 +247,8 @@ def _load_owned_evaluation(eval_id: str, user_uid: str) -> tuple[dict[str, Any],
     """Fetch an evaluation + enforce owner-gate. Raises 404 on missing or wrong-owner.
 
     Returns `(doc_data, doc_ref)` so callers that need to update the doc
-    after reading (e.g. Phase 4 delete cascade) skip the second lookup.
-    The wrong-owner case returns 404, not 403, to avoid leaking existence.
+    after reading (e.g. delete cascade) skip the second lookup. The
+    wrong-owner case returns 404, not 403, to avoid leaking existence.
     """
     db = get_firestore()
     doc_ref = db.collection("evaluations").document(eval_id)

@@ -44,7 +44,7 @@ type FormValues = {
 }
 
 /**
- * Aisyah defaults for one-click pre-fill (FR-10 parity with upload-path samples).
+ * Aisyah defaults for one-click pre-fill (parity with upload-path samples).
  * DOB 1992-03-24 derives age 34 against any 2026 reference date after 24 Mar.
  */
 const AISYAH_DEFAULTS: FormValues = {

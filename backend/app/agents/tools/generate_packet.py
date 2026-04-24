@@ -1,14 +1,14 @@
-"""`generate_packet` FunctionTool — WeasyPrint-rendered draft PDFs (Task 5 PO1).
+"""`generate_packet` FunctionTool — WeasyPrint-rendered draft PDFs.
 
 For each qualifying scheme match, render a Jinja template into HTML, pipe that
 through WeasyPrint into a PDF, and base64-encode the bytes into the
 `PacketDraft.blob_bytes_b64` field. The terminal `DoneEvent.packet` carries the
-same drafts verbatim, so the service stays stateless (docs/trd.md §6.5) — no
-GCS bucket, no packet-lookup endpoint, no session store. The frontend decodes
-the base64 and surfaces downloads.
+same drafts verbatim, so the service stays stateless — no GCS bucket, no
+packet-lookup endpoint, no session store. The frontend decodes the base64 and
+surfaces downloads.
 
 Every page of every PDF carries a repeated diagonal `DRAFT — NOT SUBMITTED`
-watermark (FR-8 acceptance) and a legal footer per docs/prd.md §7 disclaimers.
+watermark and a legal footer with disclaimers.
 
 System deps (see `backend/Dockerfile` / WeasyPrint troubleshooting):
     libpango-1.0-0, libpangoft2-1.0-0, libcairo2, libgdk-pixbuf-2.0-0.
@@ -32,13 +32,13 @@ from app.schema.scheme import SchemeMatch
 # backend/app/agents/tools/generate_packet.py → backend/app/templates/
 _TEMPLATES_DIR = Path(__file__).resolve().parent.parent.parent / "templates"
 
-# scheme_id → (template filename, output filename pattern). Phase-7 additions:
-# - `lhdn_form_be` (Task 1) — Form BE salaried filer layout.
-# - `jkm_bkk` (Task 8) — Bantuan Kanak-Kanak per-child payment.
-# - `perkeso_sksps` (Task 9) — SKSPS self-employed social-security
-#   contribution. Unlike the other four, SKSPS is a required-contribution
-#   scheme (`kind="required_contribution"`); the draft still renders so the
-#   user has a filing artefact, but the match's `annual_rm` is zero and the
+# scheme_id → (template filename, output filename pattern). Notes:
+# - `lhdn_form_be` — Form BE salaried filer layout.
+# - `jkm_bkk` — Bantuan Kanak-Kanak per-child payment.
+# - `perkeso_sksps` — SKSPS self-employed social-security contribution.
+#   Unlike the other four, SKSPS is a required-contribution scheme
+#   (`kind="required_contribution"`); the draft still renders so the user
+#   has a filing artefact, but the match's `annual_rm` is zero and the
 #   upside pipeline filters it out.
 _TEMPLATE_MAP: dict[str, tuple[str, str]] = {
     "str_2026": ("bk01.html.jinja", "BK-01-STR2026-draft-{ic_last4}.pdf"),
@@ -97,9 +97,9 @@ def _scheme_context(
         "has_parent": has_parent,
         "total_relief": total_relief,
         "chargeable_after": chargeable_after,
-        # Phase 9 — templates render their Layak-added "draft review" footer
-        # from this key. The gov-form body itself stays in its source
-        # language (BK-01, JKM18 etc. are the actual forms).
+        # Templates render their Layak-added "draft review" footer from this
+        # key. The gov-form body itself stays in its source language (BK-01,
+        # JKM18 etc. are the actual forms).
         "locale": _LOCALE_STRINGS[language],
     }
 

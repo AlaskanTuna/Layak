@@ -27,8 +27,8 @@ function categoryKeyFor(match: SchemeMatch): 'cashTransfer' | 'taxRelief' | 'wel
 
 export function SchemeCardGrid({ matches }: Props) {
   const { t } = useTranslation()
-  // Phase 7 Task 9 — keep only upside schemes in the ranked grid. Required-
-  // contribution entries (e.g. PERKESO SKSPS) render separately in
+  // Keep only upside schemes in the ranked grid. Required-contribution
+  // entries (e.g. PERKESO SKSPS) render separately in
   // `<RequiredContributionsCard>` so their RM amounts don't get visually
   // confused with annual relief the user would receive.
   const qualifying = matches

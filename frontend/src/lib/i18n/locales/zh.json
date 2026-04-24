@@ -649,7 +649,7 @@
       "scheme": "计划：{{id}}",
       "downloadZip": "以 ZIP 下载所有草稿",
       "generatingZip": "正在生成 ZIP…",
-      "placeholderNotice": "WeasyPrint 申请包生成器将在第 1 阶段任务 5（配对布线块）上线。在此之前将渲染申请包外壳，以便您看到下载按钮将位于何处。",
+      "placeholderNotice": "正在准备您的草拟申请包 —— 生成完成后下载链接会显示在此处。",
       "notificationTitle": "草拟申请包已下载",
       "notificationBody": "您的草拟文件已保存到这台设备。手动提交前请先仔细检查。"
     },

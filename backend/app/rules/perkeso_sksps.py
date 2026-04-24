@@ -1,10 +1,10 @@
 """PERKESO SKSPS — Self-Employed Employment Injury Scheme (Akta 789).
 
-Phase 7 Task 9. Unlike the other four rules in this package, SKSPS is a
-**required contribution**, not an upside. Gig drivers under Akta 789 MUST
-contribute monthly (RM19.40–RM49.70 depending on declared monthly income
-bracket); Layak surfaces the contribution tier so the user knows what they
-owe, but the amount does NOT stack into the annual-relief total.
+Unlike the other four rules in this package, SKSPS is a **required
+contribution**, not an upside. Gig drivers under Akta 789 MUST contribute
+monthly (RM19.40–RM49.70 depending on declared monthly income bracket);
+Layak surfaces the contribution tier so the user knows what they owe, but
+the amount does NOT stack into the annual-relief total.
 
 Implementation notes:
   - `kind="required_contribution"` on the emitted `SchemeMatch` tells the
@@ -82,9 +82,9 @@ _PORTAL_URL = "https://www.perkeso.gov.my"
 _SCHEME_NAME = "PERKESO SKSPS — Self-Employed Social Security"
 _SOURCE_PDF = "perkeso-sksps-rates.pdf"
 
-# Phase 8 Task 3 — Vertex AI Search grounds the primary citation against the
-# live source PDF. URI filter constrains the snippet ranker to the expected
-# document so the rule cannot accidentally cite a different scheme's PDF.
+# Vertex AI Search grounds the primary citation against the live source PDF.
+# URI filter constrains the snippet ranker to the expected document so the
+# rule cannot accidentally cite a different scheme's PDF.
 _RAG_QUERY = getenv("LAYAK_RAG_QUERY_PERKESO_SKSPS", "PERKESO SKSPS self-employed contribution plans")
 _RAG_URI_SUBSTRING = "perkeso-sksps-rates.pdf"
 

@@ -1,4 +1,4 @@
-"""Phase 8 Task 3 — Vertex AI Search (Discovery Engine) retrieval helper.
+"""Vertex AI Search (Discovery Engine) retrieval helper.
 
 The data store is provisioned by `backend/scripts/seed_vertex_ai_search.py` —
 it indexes every PDF under `backend/data/schemes/` so the rule engine can
@@ -16,9 +16,8 @@ Design contract:
   setup; cache one per process via `@lru_cache(maxsize=1)`.
 - **Region-pinned to `global`.** The seed script provisions the data store in
   `global` (per Discovery Engine v1's data-store region constraints), and our
-  Vertex AI Gemini calls also live in `global` (Phase 8 Task 1 finding —
-  asia-southeast1 only publishes 2.5-flash). Keeping both in `global` removes
-  one cross-region hop.
+  Vertex AI Gemini calls also live in `global` (asia-southeast1 only publishes
+  2.5-flash). Keeping both in `global` removes one cross-region hop.
 
 Configuration:
 

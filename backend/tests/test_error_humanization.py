@@ -99,7 +99,7 @@ def test_humanize_truncation_still_applied_on_unknown_error() -> None:
 
 
 # ----------------------------------------------------------------------------
-# Phase 7 Task 6 — `humanize_error` tuple helper feeding the SSE ErrorEvent
+# `humanize_error` tuple helper feeding the SSE ErrorEvent
 # ----------------------------------------------------------------------------
 
 

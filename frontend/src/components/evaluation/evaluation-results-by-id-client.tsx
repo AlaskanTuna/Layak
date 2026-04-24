@@ -249,13 +249,13 @@ export function EvaluationResultsByIdClient({ evalId }: { evalId: string }) {
       )}
 
       {isError && (
-        // Phase 7 Task 6 — category-tailored recovery on persisted errors.
-        // The original files + dependants aren't retained server-side, so
-        // Retry isn't meaningful here; omitted `onRetry` tells the card to
-        // drop the Retry CTA entirely. The remaining CTAs (manual, samples,
-        // settings, reset) all route back to the upload page where the user
-        // picks a fresh submission — category still drives which of those
-        // CTAs renders.
+        // Category-tailored recovery on persisted errors. The original
+        // files + dependants aren't retained server-side, so Retry isn't
+        // meaningful here; omitted `onRetry` tells the card to drop the
+        // Retry CTA entirely. The remaining CTAs (manual, samples,
+        // settings, reset) all route back to the upload page where the
+        // user picks a fresh submission — category still drives which of
+        // those CTAs renders.
         <ErrorRecoveryCard
           message={doc.error?.message ?? t('evaluation.unknownError')}
           category={doc.error?.category ?? null}

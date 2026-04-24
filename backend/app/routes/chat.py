@@ -1,10 +1,9 @@
-"""Phase 10 — `POST /api/evaluations/{eval_id}/chat` SSE endpoint.
+"""`POST /api/evaluations/{eval_id}/chat` SSE endpoint.
 
 Streams a single grounded chat turn against the loaded evaluation. Auth +
 ownership-gating mirrors `routes/evaluations.py::_load_owned_evaluation` —
 wrong-owner returns 404 (NOT 403) so the response shape doesn't leak
-existence to a guesser. The Phase 10 plan said 403; aligned with the
-codebase convention instead.
+existence to a guesser.
 
 Wire shape: see `app/schema/chat.py` for the locked Pydantic models.
 """

@@ -1,4 +1,4 @@
-"""Tests for `app.routes.user` — PDPA export + delete (Phase 4 Task 4).
+"""Tests for `app.routes.user` — PDPA export + delete.
 
 Firestore and `firebase_admin.auth.delete_user` are stubbed end-to-end so CI
 never needs real Firebase creds. The delete cascade is verified both for the

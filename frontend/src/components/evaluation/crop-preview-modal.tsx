@@ -100,11 +100,11 @@ export function CropPreviewModal({ open, file, onConfirm, onCancel }: Props) {
   const [processing, setProcessing] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
-  // Mint a fresh blob URL per file. revoke on unmount or on file swap to
-  // keep memory bounded (Phase 7 Task 4 hit the same pattern). The setStates
-  // here mirror file → derived UI state and pair with a cleanup that revokes
-  // the URL — a synchronous in-effect setState is the right shape, even
-  // though the rule's strict reading flags it.
+  // Mint a fresh blob URL per file. Revoke on unmount or on file swap to
+  // keep memory bounded. The setStates here mirror file → derived UI state
+  // and pair with a cleanup that revokes the URL — a synchronous in-effect
+  // setState is the right shape, even though the rule's strict reading
+  // flags it.
   /* eslint-disable react-hooks/set-state-in-effect */
   useEffect(() => {
     if (!file) {

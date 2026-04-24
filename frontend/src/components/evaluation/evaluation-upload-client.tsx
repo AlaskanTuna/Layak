@@ -74,10 +74,10 @@ export function EvaluationUploadClient() {
     setDemoMode(demoByTab[next] ?? false)
   }
 
-  // Phase 7 Task 6 — retain the last submission so the recovery card's
-  // Retry CTA can replay the same pipeline on a transient failure
-  // (service_unavailable / deadline_exceeded). `null` means there's
-  // nothing to retry (e.g. just after `reset()` or before any submit).
+  // Retain the last submission so the recovery card's Retry CTA can
+  // replay the same pipeline on a transient failure (service_unavailable
+  // / deadline_exceeded). `null` means there's nothing to retry (e.g.
+  // just after `reset()` or before any submit).
   const lastSubmissionRef = useRef<
     | { kind: 'real'; files: UploadFiles; dependants: DependantInput[] }
     | { kind: 'manual'; payload: ManualEntryPayload }

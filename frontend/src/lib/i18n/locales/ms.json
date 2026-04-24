@@ -649,7 +649,7 @@
       "scheme": "skim: {{id}}",
       "downloadZip": "Muat turun semua draf sebagai ZIP",
       "generatingZip": "Menjana ZIP…",
-      "placeholderNotice": "Penjana pakej WeasyPrint akan hadir dalam Fasa 1 Tugas 5 (blok penyambungan berpasangan). Sehingga itu, bentuk pakej dipaparkan supaya anda dapat melihat di mana butang muat turun akan berada.",
+      "placeholderNotice": "Sedang menyediakan pakej draf anda — pautan muat turun akan muncul di sini sebaik sahaja penjana selesai.",
       "notificationTitle": "Pakej draf telah dimuat turun",
       "notificationBody": "Fail draf anda sudah tersedia pada peranti ini. Semak dengan teliti sebelum penghantaran manual."
     },

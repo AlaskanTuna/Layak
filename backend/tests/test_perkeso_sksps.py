@@ -1,4 +1,4 @@
-"""PERKESO SKSPS rule tests — Phase 7 Task 9.
+"""PERKESO SKSPS rule tests.
 
 Asserts:
   1. Constants match the SKSPS contribution schedule (4 plans; per-plan
@@ -203,8 +203,8 @@ async def test_compute_upside_excludes_required_contribution_from_stdout_sum() -
 
 @pytest.mark.asyncio
 async def test_match_schemes_sorts_required_contribution_after_upside(aisyah: Profile) -> None:
-    """Phase 7 Task 9 dual-key sort: upside (annual_rm desc) then
-    required_contribution entries at the bottom."""
+    """Dual-key sort: upside (annual_rm desc) then required_contribution
+    entries at the bottom."""
     matches = await match_schemes(aisyah)
     # Find the boundary: all upside entries come first, then contributions.
     kinds = [m.kind for m in matches]

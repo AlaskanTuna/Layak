@@ -1,4 +1,4 @@
-"""`classify_household` — Gemini 2.5 Flash structured output (Task 3 Path 2).
+"""`classify_household` — Gemini 2.5 Flash structured output.
 
 Takes the `Profile` produced by the extract step and returns a
 `HouseholdClassification` with per-capita income, income band, and a short

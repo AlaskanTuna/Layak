@@ -1,4 +1,4 @@
-"""Per-rule translations for `SchemeMatch.summary` + `SchemeMatch.why_qualify` (Phase 9).
+"""Per-rule translations for `SchemeMatch.summary` + `SchemeMatch.why_qualify`.
 
 Every rule module builds the numeric facts (annual_rm, income band, child count,
 etc.) and then calls `scheme_copy(scheme_id, variant, language, **vars)` here

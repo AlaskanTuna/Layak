@@ -22,7 +22,7 @@ import { authedFetch } from '@/lib/firebase'
  *
  * The hook is instantiated once per chat panel mount; conversation history
  * is local to that instance. Refreshing the page wipes it (server doesn't
- * persist chat in v1 per docs/plan.md Phase 10 Task 7).
+ * persist chat in v1).
  */
 
 function getBackendUrl(): string {

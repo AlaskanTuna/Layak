@@ -34,7 +34,7 @@ type Props = {
   onSwitchToManual?: () => void
 }
 
-// Phase 7 Task 6 — category → category-tailored recovery presentation.
+// Category → category-tailored recovery presentation.
 // Each spec describes the icon + i18n copy key prefix + CTA composition the
 // card renders. Unknown / null category falls through to `generic`.
 type CtaKind = 'retry' | 'manual' | 'samples' | 'settings' | 'reset'

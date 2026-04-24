@@ -15,11 +15,11 @@ function formatRm(value: number): string {
 }
 
 /**
- * Phase 7 Task 9 — surfaces `kind === 'required_contribution'` matches
- * (e.g. PERKESO SKSPS mandatory contribution for gig drivers under Akta 789)
- * in a dedicated block beneath the upside ranked list. These are schemes the
- * user PAYS into, not ones they receive from — distinguishing them visually
- * avoids a misleading "RM X,XXX upside" conflation.
+ * Surfaces `kind === 'required_contribution'` matches (e.g. PERKESO SKSPS
+ * mandatory contribution for gig drivers under Akta 789) in a dedicated
+ * block beneath the upside ranked list. These are schemes the user PAYS
+ * into, not ones they receive from — distinguishing them visually avoids
+ * a misleading "RM X,XXX upside" conflation.
  *
  * Renders nothing when there are no contribution matches, so it can safely
  * be dropped into any results layout without adding conditional render

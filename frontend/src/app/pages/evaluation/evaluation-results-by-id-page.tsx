@@ -4,9 +4,9 @@ import { EvaluationResultsByIdHeading } from '@/components/evaluation/evaluation
 type RouteParams = Promise<{ id: string }>
 
 /**
- * Phase 3 Task 3 — dynamic results route. Hydrates from
- * `GET /api/evaluations/{id}` first; polls every 2 s while
- * `status === "running"` to surface in-flight progress on a refresh.
+ * Dynamic results route. Hydrates from `GET /api/evaluations/{id}` first;
+ * polls every 2 s while `status === "running"` to surface in-flight
+ * progress on a refresh.
  *
  * Next.js 16: dynamic params in app router are passed as a Promise.
  */

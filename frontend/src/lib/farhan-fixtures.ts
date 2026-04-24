@@ -1,5 +1,5 @@
 /**
- * Phase 7 Task 2 — salaried-persona mirror of aisyah-fixtures.ts.
+ * Salaried-persona mirror of aisyah-fixtures.ts.
  *
  * Fetches the bundled Cikgu Farhan PDFs from /public/fixtures/ and returns
  * them as File objects ready to feed into the real intake pipeline. Same

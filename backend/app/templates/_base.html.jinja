@@ -2,7 +2,7 @@
   Base layout shared by every scheme draft PDF.
 
   Every page carries a repeated diagonal "DRAFT — NOT SUBMITTED" watermark
-  (FR-8 acceptance) and a legal footer per docs/prd.md §7 disclaimers.
+  and a legal footer with disclaimers.
 
   Child templates define three blocks:
     title       — short string used in <title> and page header
@@ -257,11 +257,11 @@
       {% block body %}{% endblock %}
 
       <section class="disclaimer">
-        {# Phase 9: the draft disclaimer localises to the eval's language.
-           Gov-form BODY labels (BK-01, JKM18, LHDN forms) stay in their
-           source language since the user transcribes them verbatim onto the
-           live portal. `locale` is injected by `generate_packet._scheme_context`;
-           pre-Phase-9 renders (no `locale` key) fall through to the English
+        {# The draft disclaimer localises to the eval's language. Gov-form
+           BODY labels (BK-01, JKM18, LHDN forms) stay in their source
+           language since the user transcribes them verbatim onto the live
+           portal. `locale` is injected by `generate_packet._scheme_context`;
+           legacy renders (no `locale` key) fall through to the English
            default below so stale tests don't crash on the missing key. #}
         {% if locale and locale.draft_footer -%}
         {{ locale.draft_footer|safe }}

@@ -1,8 +1,8 @@
 """GET /api/quota — current quota state for the signed-in user.
 
-Phase 3 Task 4 read-side endpoint. The frontend `QuotaMeter` calls this on
-mount + after every evaluation finishes so the meter UI reflects the real
-count without re-implementing the rolling-24h aggregate query.
+The frontend `QuotaMeter` calls this on mount + after every evaluation
+finishes so the meter UI reflects the real count without re-implementing
+the rolling-24h aggregate query.
 
 Pro tier responds with sentinels (`limit=-1`, `remaining=-1`) so the UI
 hides the meter and shows a "Pro" badge instead. Free tier returns the

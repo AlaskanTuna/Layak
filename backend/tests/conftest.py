@@ -24,8 +24,7 @@ def pdf_text() -> dict[str, dict[int, str]]:
     """Map every committed scheme PDF → {pypdf page index (1-based): extracted text}.
 
     Tests use this to assert specific RM thresholds + legal references appear on
-    the cited page of the source PDF, enforcing the grounding invariant from
-    docs/prd.md NFR-2.
+    the cited page of the source PDF, enforcing the grounding invariant.
     """
     cache: dict[str, dict[int, str]] = {}
     for path in sorted(SCHEMES_DIR.glob("*.pdf")):
@@ -36,5 +35,5 @@ def pdf_text() -> dict[str, dict[int, str]]:
 
 @pytest.fixture(scope="session")
 def aisyah() -> Profile:
-    """The locked Aisyah persona profile (docs/prd.md §3.1)."""
+    """The locked Aisyah persona profile."""
     return AISYAH_PROFILE

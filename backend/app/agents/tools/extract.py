@@ -1,9 +1,9 @@
-"""`extract_profile` — Gemini 2.5 Flash multimodal (Phase 1 Task 3 Path 2).
+"""`extract_profile` — Gemini 2.5 Flash multimodal.
 
 Reads the three uploaded documents (IC, payslip / income proof, utility bill)
-with Gemini 2.5 Flash and returns a validated `Profile`. Privacy invariant
-(docs/prd.md NFR-3): only `ic_last4` ever leaves the Gemini response — the
-instruction explicitly forbids emitting the full 12-digit IC number.
+with Gemini 2.5 Flash and returns a validated `Profile`. Privacy invariant:
+only `ic_last4` ever leaves the Gemini response — the instruction explicitly
+forbids emitting the full 12-digit IC number.
 """
 
 from __future__ import annotations

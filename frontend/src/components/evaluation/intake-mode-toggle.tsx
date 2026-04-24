@@ -15,7 +15,7 @@ type Props = {
 }
 
 /**
- * Segmented toggle above the intake widgets (FR-21).
+ * Segmented toggle above the intake widgets.
  *
  * Swaps between the three-document upload path (default, Gemini OCR) and the
  * privacy-first manual form (structured input, no OCR). The state is lifted to

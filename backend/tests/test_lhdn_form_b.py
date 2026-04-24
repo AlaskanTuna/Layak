@@ -150,7 +150,7 @@ def test_aisyah_match_has_all_six_citations(aisyah: Profile) -> None:
 
 
 def test_form_be_filer_now_qualifies_with_form_be_scheme_id() -> None:
-    """Phase 7 Task 1 widened the rule to cover Form BE (salaried) filers.
+    """The rule covers Form BE (salaried) filers as well as Form B.
 
     Prior behavior: Form BE was short-circuited to `qualifies=False`. The five
     reliefs apply identically under both forms; the gate has been removed and
@@ -191,7 +191,7 @@ def test_tax_bracket_ya2025_spot_checks() -> None:
 
 
 def test_combined_aisyah_upside_clears_plan_exit_gate(aisyah: Profile) -> None:
-    """Aisyah's three-rule total ≥ RM7,000/year (docs/plan.md Task 4 exit criterion)."""
+    """Aisyah's three-rule total ≥ RM7,000/year."""
     from app.rules import jkm_warga_emas, str_2026
 
     total = (

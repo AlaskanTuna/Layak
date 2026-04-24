@@ -30,7 +30,7 @@ from pydantic import ValidationError
 from starlette.responses import StreamingResponse
 
 # Load repo-root .env into os.environ before any agent module reads
-# GOOGLE_CLOUD_PROJECT / GOOGLE_CLOUD_LOCATION (Phase 6 Task 6 — Vertex AI cutover).
+# GOOGLE_CLOUD_PROJECT / GOOGLE_CLOUD_LOCATION for the Vertex AI cutover.
 # Path: backend/app/main.py -> project root is three levels up.
 _DOTENV = Path(__file__).resolve().parent.parent.parent / ".env"
 if _DOTENV.is_file():
@@ -77,10 +77,10 @@ def _coerce_language(raw: str | None) -> SupportedLanguage:
 
 @asynccontextmanager
 async def _lifespan(_app: FastAPI) -> AsyncIterator[None]:
-    """Phase 10 polish — schedule chat warm-up as a background task on startup
-    so uvicorn becomes ready immediately, and the first user-facing chat
-    request hits a hot Gemini + Discovery Engine path. Toggleable via the
-    `LAYAK_WARMUP_ENABLED` env var (default on)."""
+    """Schedule chat warm-up as a background task on startup so uvicorn becomes
+    ready immediately, and the first user-facing chat request hits a hot
+    Gemini + Discovery Engine path. Toggleable via the `LAYAK_WARMUP_ENABLED`
+    env var (default on)."""
     try:
         asyncio.create_task(warmup_chat_dependencies())
     except Exception:  # noqa: BLE001 — warm-up must NEVER crash startup.
@@ -95,15 +95,15 @@ app.add_middleware(
     # Dev: any localhost port. Prod: ONLY the two Cloud Run URLs that back the
     # Layak frontend. A broad `*.run.app` allowlist would let any attacker-hosted
     # Cloud Run service drive the SSE pipeline from a victim's browser and
-    # exfiltrate the extracted profile JSON — locked down after the Task 6 audit.
+    # exfiltrate the extracted profile JSON — locked down after a security audit.
     allow_origins=[
         "https://layak-frontend-297019726346.asia-southeast1.run.app",
         "https://layak-frontend-i2t7hf6seq-as.a.run.app",
     ],
     allow_origin_regex=r"http://localhost:\d+",
-    # PATCH added Phase 9 — `/api/user/preferences` uses it to persist the
-    # language choice. Without it the CORS preflight blocks the call and the
-    # language toggle can never round-trip to Firestore.
+    # PATCH — `/api/user/preferences` uses it to persist the language choice.
+    # Without it the CORS preflight blocks the call and the language toggle
+    # can never round-trip to Firestore.
     allow_methods=["GET", "POST", "PATCH", "DELETE", "OPTIONS"],
     allow_headers=["*"],
 )
@@ -144,10 +144,10 @@ async def intake(
     `current_user` verifies the token and lazy-creates `users/{uid}` on first
     touch, so the SSE stream that follows already runs in the user's context.
 
-    Phase 3 Task 1: creates `evaluations/{evalId}` with `status="running"`
-    before opening the stream, then mirrors each SSE event into the Firestore
-    doc as it flows through. `DoneEvent.eval_id` carries the id so the
-    frontend can route to `/dashboard/evaluation/results/[id]`.
+    Creates `evaluations/{evalId}` with `status="running"` before opening the
+    stream, then mirrors each SSE event into the Firestore doc as it flows
+    through. `DoneEvent.eval_id` carries the id so the frontend can route to
+    `/dashboard/evaluation/results/[id]`.
 
     `dependants` is an optional JSON-encoded list of `DependantInput` rows
     supplied from the UploadWidget's Household section. When present, the
@@ -175,17 +175,17 @@ async def intake(
 
     db = get_firestore()
 
-    # Phase 3 Task 2 preflight — free-tier cap check before any Firestore
-    # write or SSE stream opens. Pro tier bypasses.
+    # Free-tier cap check before any Firestore write or SSE stream opens.
+    # Pro tier bypasses.
     limited = enforce_quota(db, user)
     if limited is not None:
         return limited
 
     # Pre-SSE Firestore write. On failure this raises HTTPException(503) and
     # the client never sees an SSE stream open — consistent with the frontend
-    # treating 5xx as retryable. Phase 9: freeze the user's language onto the
-    # eval at create-time so `why_qualify` + classify notes stay in the
-    # language the eval was generated with, even if the user toggles later.
+    # treating 5xx as retryable. Freeze the user's language onto the eval at
+    # create-time so `why_qualify` + classify notes stay in the language the
+    # eval was generated with, even if the user toggles later.
     language = _coerce_language(user.language)
     eval_id, doc_ref = create_running_evaluation(db, user_id=user.uid, language=language)
 
@@ -217,15 +217,13 @@ async def intake_manual(
     frontend stepper is unchanged. The built Profile is persisted to
     `evaluations/{evalId}.profile` before the stream opens so the running-
     state results page can render it without waiting for the extract event.
-
-    Contract: docs/prd.md FR-21 + docs/superpowers/specs/2026-04-21-manual-entry-mode-design.md.
     """
     profile = build_profile_from_manual_entry(payload)
 
     db = get_firestore()
 
-    # Phase 3 Task 2 preflight — free-tier cap check before any Firestore
-    # write or SSE stream opens. Pro tier bypasses.
+    # Free-tier cap check before any Firestore write or SSE stream opens.
+    # Pro tier bypasses.
     limited = enforce_quota(db, user)
     if limited is not None:
         return limited

@@ -1,8 +1,8 @@
 """JKM Bantuan Kanak-Kanak (BKK) — per-capita means test + age-tiered per-child payment.
 
-Phase 7 Task 8. Complements `jkm_warga_emas.py` (elderly dependant payment);
-this rule targets the same means-testable households but gates on children
-under 18 instead of parents over 60.
+Complements `jkm_warga_emas.py` (elderly dependant payment); this rule
+targets the same means-testable households but gates on children under 18
+instead of parents over 60.
 
 Scheme description (JKM BKK, current Budget 2021 schedule per JKM SPK ISO 9001
 procedure document, Oct 2024):
@@ -50,9 +50,9 @@ _SCHEME_NAME = "JKM Bantuan Kanak-Kanak — per-child monthly payment"
 # backend/data/schemes/. Documents the current BKK rates verbatim.
 _SOURCE_PDF = "jkm-bkk-brochure.pdf"
 
-# Phase 8 Task 3 — Vertex AI Search grounds the primary citation against the
-# live source PDF. URI filter constrains the snippet ranker to the expected
-# document so the rule cannot accidentally cite a different scheme's PDF.
+# Vertex AI Search grounds the primary citation against the live source PDF.
+# URI filter constrains the snippet ranker to the expected document so the
+# rule cannot accidentally cite a different scheme's PDF.
 _RAG_QUERY = getenv("LAYAK_RAG_QUERY_JKM_BKK", "Bantuan Kanak-Kanak children household monthly")
 _RAG_URI_SUBSTRING = "jkm-bkk-brochure.pdf"
 

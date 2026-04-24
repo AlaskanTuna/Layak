@@ -1,11 +1,10 @@
-"""Pydantic models for the manual-entry intake path (FR-21).
+"""Pydantic models for the manual-entry intake path.
 
 A privacy-cautious user can type the fields the OCR `extract` step would
 otherwise derive from their MyKad / payslip / utility-bill uploads. The
 pipeline reuses the same `Profile` downstream; only the intake payload
 shape is new.
 
-Design contract: docs/superpowers/specs/2026-04-21-manual-entry-mode-design.md §3.
 Sanitisation contract: see `app/schema/sanitize.py` — `name` and `address`
 are run through `sanitize_free_text` before reaching any Gemini prompt or
 WeasyPrint template.

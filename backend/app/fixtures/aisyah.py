@@ -1,16 +1,15 @@
-"""Aisyah canned fixture — Grab driver, Kuantan, Form B filer (docs/prd.md §3.1).
+"""Aisyah canned fixture — Grab driver, Kuantan, Form B filer.
 
 Used by:
-  - Demo-mode fallback path (FR-10) surfaced by the frontend.
-  - Rule-engine unit tests (docs/plan.md Phase 1 Task 4) as the baseline profile
-    the engine is known to produce eligible matches for.
-  - The Task 1 extract-stub (`app/agents/tools/extract.py`) while real Gemini
-    wiring is deferred to Phase 1 Task 3.
+  - Demo-mode fallback path surfaced by the frontend.
+  - Rule-engine unit tests as the baseline profile the engine is known to
+    produce eligible matches for.
+  - The extract-stub (`app/agents/tools/extract.py`) fallback path.
 
-`AISYAH_SCHEME_MATCHES` is **computed live** by running the Task 4 rule engine
-against `AISYAH_PROFILE` at module load — the fixture and the engine output can
-never drift. The three locked rules produce ≥RM7,000/year upside, clearing the
-docs/plan.md Task 4 headline sanity target.
+`AISYAH_SCHEME_MATCHES` is **computed live** by running the rule engine
+against `AISYAH_PROFILE` at module load — the fixture and the engine output
+can never drift. The three locked rules produce ≥RM7,000/year upside,
+clearing the headline sanity target.
 """
 
 from __future__ import annotations

@@ -38,9 +38,9 @@ export type PipelineState = {
   /** Populated when the backend returns 429 — drives the waitlist modal. */
   quotaExceeded: RateLimitErrorBody | null
   error: string | null
-  /** Phase 7 Task 6 — category slug from the SSE `ErrorEvent`. `null` when
-   * the pipeline has not errored OR the error didn't match a known category.
-   * Drives the category-tailored CTAs in `<ErrorRecoveryCard>`. */
+  /** Category slug from the SSE `ErrorEvent`. `null` when the pipeline has
+   * not errored OR the error didn't match a known category. Drives the
+   * category-tailored CTAs in `<ErrorRecoveryCard>`. */
   errorCategory: ErrorCategory | null
 }
 
@@ -194,9 +194,9 @@ export function useAgentPipeline(): {
       ;(async () => {
         try {
           const res = await request()
-          // Phase 3 Task 4 — surface 429 as a structured quota state without
-          // ever entering `streaming`. The upload client opens the waitlist
-          // modal off `state.quotaExceeded`.
+          // Surface 429 as a structured quota state without ever entering
+          // `streaming`. The upload client opens the waitlist modal off
+          // `state.quotaExceeded`.
           if (res.status === 429) {
             const body = (await res.json().catch(() => null)) as RateLimitErrorBody | null
             const fallback: RateLimitErrorBody = {

@@ -1,4 +1,4 @@
-"""PDPA endpoints — export + delete the caller's data (Phase 4 Task 4).
+"""PDPA endpoints — export + delete the caller's data.
 
 Users exercise their PDPA 2010 access-and-deletion rights here:
 
@@ -8,7 +8,7 @@ Users exercise their PDPA 2010 access-and-deletion rights here:
 
 Both endpoints are authed via `CurrentUser`; only the caller's own data is
 touched. No admin-impersonation path is exposed here — tier flips live outside
-the product (gcloud / one-off script per v2 non-goals).
+the product (gcloud / one-off script).
 
 Delete ordering:
     1. Firestore batch: delete every `evaluations/{evalId}` where
@@ -48,7 +48,7 @@ _BATCH_MAX_OPS = 450  # leave headroom for the final user-doc delete
 
 
 class _UserMeResponse(BaseModel):
-    """Shape returned by `GET /api/user/me`. Phase 9."""
+    """Shape returned by `GET /api/user/me`."""
 
     model_config = ConfigDict(extra="forbid")
 
@@ -61,7 +61,7 @@ class _UserMeResponse(BaseModel):
 
 
 class _PreferencesPatch(BaseModel):
-    """Body for `PATCH /api/user/preferences`. Phase 9.
+    """Body for `PATCH /api/user/preferences`.
 
     Only `language` is settable right now. Extra keys rejected so a client
     typo (`"lang": "ms"`) 422s loudly instead of silently no-op'ing.
@@ -93,7 +93,7 @@ async def get_user_me(user: CurrentUser) -> _UserMeResponse:
 
 @router.patch("/preferences", status_code=status.HTTP_204_NO_CONTENT)
 async def patch_user_preferences(payload: _PreferencesPatch, user: CurrentUser) -> Response:
-    """Update a caller's persisted preferences. Phase 9.
+    """Update a caller's persisted preferences.
 
     Right now the only preference is `language`, but the shape leaves room
     for future fields (e.g. notification toggles) without a second endpoint.

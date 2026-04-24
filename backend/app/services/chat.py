@@ -1,8 +1,8 @@
-"""Phase 10 — chat orchestration: guardrails + Vertex AI Search grounding +
-streaming Gemini call. Sits between `app/routes/chat.py` (request lifecycle)
-and `app/agents/gemini.py` + `app/agents/chat_prompt.py` (LLM contract).
+"""Chat orchestration: guardrails + Vertex AI Search grounding + streaming
+Gemini call. Sits between `app/routes/chat.py` (request lifecycle) and
+`app/agents/gemini.py` + `app/agents/chat_prompt.py` (LLM contract).
 
-Five guardrail layers (see docs/plan.md Phase 10 Task 4):
+Five guardrail layers:
 
     1. System prompt hard constraints  → app/agents/chat_prompt.py
     2. `safety_settings` BLOCK_LOW_AND_ABOVE on the four harm categories
@@ -45,7 +45,7 @@ from app.services.vertex_ai_search import _resolve_data_store, _resolve_location
 _logger = logging.getLogger(__name__)
 
 # Chat model selection — overridable via `LAYAK_CHAT_MODEL` env var. Defaults
-# to FAST_MODEL (gemini-2.5-flash) per the Phase 10 design discussion:
+# to FAST_MODEL (gemini-2.5-flash):
 #   - Fast first-token (~1.2 s) so the chat surface feels responsive
 #   - Strong-enough reasoning for grounded Q&A + multilingual refusals
 #   - Dedicated quota pool separate from classify (Flash-Lite) so a chat
@@ -103,7 +103,7 @@ def validate_chat_input(message: str) -> ErrorCategory | None:
 
 
 # -----------------------------------------------------------------------------
-# Vertex AI Search grounding tool — Phase 10 Task 3
+# Vertex AI Search grounding tool
 # -----------------------------------------------------------------------------
 
 # Discovery Engine "default_collection" is a magic string — the seed script
@@ -339,7 +339,10 @@ async def stream_chat_response(
     # constraint on the user's last turn as the most-recent-attention hint.
     _per_turn = {
         "en": "Reply in English. Translate any Malay text from retrieved PDFs into English.",
-        "ms": "Balas dalam Bahasa Malaysia. Terjemahkan mana-mana teks Inggeris dari PDF yang diambil ke Bahasa Malaysia.",
+        "ms": (
+            "Balas dalam Bahasa Malaysia. Terjemahkan mana-mana teks Inggeris dari "
+            "PDF yang diambil ke Bahasa Malaysia."
+        ),
         "zh": "请用简体中文回复。检索到的 PDF 中的任何马来文或英文段落，请翻译成中文。",
     }
     reinforcement = _per_turn.get(language, _per_turn["en"])

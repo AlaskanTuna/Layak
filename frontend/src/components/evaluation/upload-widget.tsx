@@ -14,9 +14,9 @@ import type { DependantInput } from '@/lib/agent-types'
 import { cn } from '@/lib/utils'
 
 const MAX_FILE_BYTES = 10 * 1024 * 1024
-// Strict allowlist — Phase 7 Task 3 tightened from the looser `image/*` prefix
-// because BMP / TIFF / HEIC sneak past the previous check but fail the OCR
-// path. JPG, PNG, PDF only — same set the dropzone label advertises.
+// Strict allowlist — tightened from a looser `image/*` prefix because
+// BMP / TIFF / HEIC sneak past the broader check but fail the OCR path.
+// JPG, PNG, PDF only — same set the dropzone label advertises.
 const ACCEPTED_MIME_TYPES = new Set(['image/jpeg', 'image/png', 'application/pdf'])
 const IMAGE_MIME_TYPES = new Set(['image/jpeg', 'image/png'])
 const ACCEPT_ATTR = 'image/jpeg,image/png,application/pdf'
@@ -72,8 +72,8 @@ type FileSlotState = {
   error: string | null
 }
 
-// Phase 7 Task 2 — sample data now has two personas (Aisyah gig, Farhan
-// salaried) so the demo can side-by-side both form types in one flow.
+// Sample data has two personas (Aisyah gig, Farhan salaried) so the demo
+// can side-by-side both form types in one flow.
 export type SamplePersona = 'aisyah' | 'farhan'
 
 type Props = {
@@ -196,10 +196,10 @@ export function UploadWidget({ onSubmit, onUseSamples, disabled = false, samples
     payslip: null,
     utility: null
   })
-  // Phase 7 Task 3 — crop preview is per-slot. We hold the in-flight image
-  // (the one the user just selected, validated as JPG/PNG) on a separate
-  // pending-slot pair so the slot's `state.file` is only populated AFTER the
-  // user confirms (or is bypassed for PDFs entirely).
+  // Crop preview is per-slot. We hold the in-flight image (the one the
+  // user just selected, validated as JPG/PNG) on a separate pending-slot
+  // pair so the slot's `state.file` is only populated AFTER the user
+  // confirms (or is bypassed for PDFs entirely).
   const [pendingCrop, setPendingCrop] = useState<{ slot: UploadSlot; file: File } | null>(null)
 
   const canSubmit = (['ic', 'payslip', 'utility'] as const).every(

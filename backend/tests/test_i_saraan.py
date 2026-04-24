@@ -1,4 +1,4 @@
-"""EPF i-Saraan rule tests — Phase 7 Task 7.
+"""EPF i-Saraan rule tests.
 
 Asserts:
   1. Constants match the program schedule (15% match rate, RM500/yr cap,
@@ -176,9 +176,8 @@ async def test_generate_packet_renders_i_saraan_pdf_for_aisyah(aisyah: Profile) 
 
 
 def test_aisyah_fixture_precomputed_matches_include_i_saraan() -> None:
-    """`AISYAH_SCHEME_MATCHES` must surface i-Saraan after the Phase 7 Task 7
-    addition — protects the demo-mode mock-SSE replay from desyncing with the
-    live engine output."""
+    """`AISYAH_SCHEME_MATCHES` must surface i-Saraan — protects the demo-mode
+    mock-SSE replay from desyncing with the live engine output."""
     from app.fixtures.aisyah import AISYAH_SCHEME_MATCHES
 
     scheme_ids = {m.scheme_id for m in AISYAH_SCHEME_MATCHES}

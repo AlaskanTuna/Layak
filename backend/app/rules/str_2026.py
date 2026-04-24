@@ -3,13 +3,13 @@
 Source of truth: `backend/data/schemes/risalah-str-2026.pdf`, page 2 (`SYARAT
 KELAYAKAN` + `Nilai Bantuan STR & SARA 2026` tier table).
 
-Scope for MVP (docs/plan.md Phase 1 Task 4):
+Scope for MVP:
     - Household tier only (Isi Rumah).
     - With-children buckets only (1-2, 3-4, ≥5). Couples without children
       (bucket 0) fall outside scope and return qualifies=False.
     - Two income bands: ≤RM2,500 and RM2,501-RM5,000. Above RM5,000 → no match.
-    - Returns the STR amount ONLY. SARA is tracked separately in the same PDF and
-      is out of scope per docs/prd.md §6.2 and docs/roadmap.md non-goals.
+    - Returns the STR amount ONLY. SARA is tracked separately in the same
+      PDF and is out of scope for v1.
 
 The tier amounts below are transcribed from the risalah's 4x2 tier table. The
 test `backend/tests/test_str_2026.py` asserts every RM value appears verbatim on
@@ -51,15 +51,15 @@ STR_HOUSEHOLD_ANNUAL_RM: dict[str, dict[str, float]] = {
 # Agency string kept in native Malay ("Kementerian Kewangan" rather than
 # "Ministry of Finance") so it reads consistently alongside the other
 # scheme agencies (JKM, LHDN, KWSP, PERKESO) which are also native-language
-# proper nouns. Proper-noun agency strings never localise per Phase 9
-# policy — they are the name the real portal uses.
+# proper nouns. Proper-noun agency strings never localise — they are the
+# name the real portal uses.
 _AGENCY = "LHDN (HASiL) / Kementerian Kewangan"
 _PORTAL_URL = "https://bantuantunai.hasil.gov.my"
 _SCHEME_NAME = "STR 2026 — Household with children tier"
 
-# Phase 8 Task 3 — Vertex AI Search grounds the tier-table citation against the
-# live risalah PDF. Query tuned against the standard-edition snippet ranker; the
-# URI filter guards against cross-scheme drift (e.g. the query text could
+# Vertex AI Search grounds the tier-table citation against the live risalah
+# PDF. Query tuned against the standard-edition snippet ranker; the URI
+# filter guards against cross-scheme drift (e.g. the query text could
 # otherwise rank i-saraan-program.pdf above the STR risalah when both mention
 # "Sumbangan Tunai Rahmah" in their Budget extracts).
 _RAG_QUERY = getenv("LAYAK_RAG_QUERY_STR_2026", "Sumbangan Tunai Rahmah household tier with children")
@@ -140,7 +140,7 @@ def match(
     `annual_rm=0` with the same citations, so the provenance panel can still
     explain the non-match.
 
-    Phase 9: `language` picks the localised `summary` + `why_qualify` via the
+    `language` picks the localised `summary` + `why_qualify` via the
     `app.rules._i18n` catalog.
     """
     children_under_18 = sum(1 for d in profile.dependants if d.relationship == "child" and d.age < 18)

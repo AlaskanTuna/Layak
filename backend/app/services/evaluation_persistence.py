@@ -1,4 +1,4 @@
-"""Persist the evaluation lifecycle alongside the SSE stream (Phase 3 Task 1).
+"""Persist the evaluation lifecycle alongside the SSE stream.
 
 The intake route now does three things per request:
 
@@ -19,8 +19,6 @@ The intake route now does three things per request:
 
 Firestore write failures mid-stream are caught and converted into an SSE
 `error` event — the stream never silently swallows a persistence failure.
-
-Contract: docs/superpowers/specs/2026-04-21-v2-saas-pivot-design.md §3.5.
 """
 
 from __future__ import annotations
@@ -64,10 +62,10 @@ def create_running_evaluation(
     Returns `(eval_id, doc_ref)`. The doc ref is used by `persist_event_stream`
     for subsequent updates — stashing it beats re-fetching on every event.
 
-    Phase 9: `language` is frozen onto the doc at create-time. A user
-    toggling languages mid-run does NOT re-run the pipeline — the eval's
+    `language` is frozen onto the doc at create-time. A user toggling
+    languages mid-run does NOT re-run the pipeline — the eval's
     `why_qualify` + classify notes stay in the language they were generated
-    with. Pre-Phase-9 docs without `language` default to `"en"` on read.
+    with. Legacy docs without `language` default to `"en"` on read.
 
     Raises:
         HTTPException(503): if the Firestore write fails (network / permission).

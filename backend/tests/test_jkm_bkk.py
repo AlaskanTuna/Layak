@@ -1,4 +1,4 @@
-"""JKM Bantuan Kanak-Kanak (BKK) rule tests — Phase 7 Task 8 + Budget-2021 rates.
+"""JKM Bantuan Kanak-Kanak (BKK) rule tests — Budget-2021 rates.
 
 Asserts:
   1. Constants match the current Budget-2021 BKK schedule (RM 200/child for

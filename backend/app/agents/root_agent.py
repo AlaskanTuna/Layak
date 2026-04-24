@@ -1,18 +1,14 @@
 """RootAgent — ADK-Python SequentialAgent composition for the five-step pipeline.
 
-Phase 1 Task 3 Path 1 (scaffolding-only tonight; Gemini wiring at sprint start):
-  - Wraps all five stub callables as ADK `FunctionTool`s so the real Task 3
-    sub-agents can bind them onto Gemini-backed `LlmAgent`s without reshaping.
-  - Instantiates a `SequentialAgent` shell with five placeholder `LlmAgent`
-    sub-agents (no `model` set — structural stand-ins, never executed by ADK
-    in stub mode). Each placeholder's `description` names the Task 3 target
-    model + tool binding so the swap is mechanical.
+  - Wraps all five tool callables as ADK `FunctionTool`s so sub-agents can
+    bind them onto Gemini-backed `LlmAgent`s.
+  - Instantiates a `SequentialAgent` shell with five `LlmAgent` sub-agents
+    (no `model` set — structural stand-ins). Each placeholder's `description`
+    names the target model + tool binding.
   - Exports `stream_agent_events()`, a direct async orchestrator that bypasses
-    `SequentialAgent.run_async()` and emits the locked SSE event stream from
-    the stubs. Task 3 Path 2 replaces this with the ADK runner + real Gemini
-    calls.
+    `SequentialAgent.run_async()` and emits the locked SSE event stream.
 
-Locked SSE wire shape (see app/schema/events.py and docs/plan.md Phase 1 Task 1):
+Locked SSE wire shape (see app/schema/events.py):
 
     step_started → step_result → ... → done | error
 
@@ -49,7 +45,7 @@ from app.schema.locale import DEFAULT_LANGUAGE, SupportedLanguage
 from app.schema.manual_entry import DependantInput
 from app.schema.profile import Dependant, Profile
 
-# Tool registry — Task 3 Path 2 binds these to Gemini-backed LlmAgents.
+# Tool registry — bound to Gemini-backed LlmAgents downstream.
 extract_tool = FunctionTool(extract_profile)
 classify_tool = FunctionTool(classify_household)
 match_tool = FunctionTool(match_schemes)
@@ -71,7 +67,7 @@ root_agent = SequentialAgent(
         LlmAgent(
             name="classifier_stub",
             description=(
-                "Classifier. Phase 8 Task 4: Gemini 2.5 Flash-Lite (WORKER_MODEL) structured "
+                "Classifier. Gemini 2.5 Flash-Lite (WORKER_MODEL) structured "
                 "output emitting household-flags + per-capita income + income band. ~5x cheaper "
                 "than Flash for the small structured-output workload."
             ),
@@ -80,7 +76,7 @@ root_agent = SequentialAgent(
             name="matcher_stub",
             description=(
                 "Matcher. Pure-Python rule engine in app/rules/ validates thresholds; "
-                "Phase 8 Task 3: app/services/vertex_ai_search.py augments each rule's "
+                "app/services/vertex_ai_search.py augments each rule's "
                 "_citations() with a Discovery Engine retrieved passage as the primary "
                 "citation, hardcoded URL as fail-open fallback."
             ),
@@ -88,9 +84,9 @@ root_agent = SequentialAgent(
         LlmAgent(
             name="upside_computer_stub",
             description=(
-                "compute_upside. Phase 8 Task 4: Gemini 3 Flash Preview (HEAVY_MODEL) with "
+                "compute_upside. Gemini 3 Flash Preview (HEAVY_MODEL) with "
                 "code_execution runs Python in a sandbox; stdout streamed to the UI verbatim. "
-                "Probe (backend/scripts/probe_gemini_3_flash.py, 2026-04-23) confirmed "
+                "Confirmed via `backend/scripts/probe_gemini_3_flash.py`: "
                 "code_execution + structured-output support in `global` location. "
                 "Fallback: HEAVY_MODEL_FALLBACK = gemini-2.5-pro."
             ),
@@ -122,9 +118,9 @@ async def stream_agent_events(
 
     Two entry modes:
 
-    - **Upload path** (default, FR-2/FR-3): pass `uploads={"ic"|"payslip"|"utility":
+    - **Upload path** (default): pass `uploads={"ic"|"payslip"|"utility":
       (filename, bytes)}`. Gemini OCR runs `extract_profile` on the three files.
-    - **Manual-entry path** (FR-21): pass `prebuilt_profile=<Profile>`. Extract
+    - **Manual-entry path**: pass `prebuilt_profile=<Profile>`. Extract
       is skipped, but the SSE wire still emits a synthetic `step_started`/
       `step_result` pair for `extract` so the frontend stepper animation is
       unchanged.
@@ -157,7 +153,7 @@ async def stream_agent_events(
                 uploads["payslip"][1],
                 uploads["utility"][1],
             )
-            # FR-21 hybrid path: MyKad / payslip / utility bill don't disclose
+            # Hybrid path: MyKad / payslip / utility bill don't disclose
             # household composition, so the frontend may supply a dependants
             # list alongside the uploads. Overlay it on the extracted profile
             # before classify runs; household_flags are re-derived so the

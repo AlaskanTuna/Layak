@@ -18,10 +18,10 @@ from typing import Any
 from unittest.mock import MagicMock
 
 import pytest
+from google.genai import errors as genai_errors
 
 from app.agents import gemini as gemini_module
 from app.agents.gemini import generate_with_retry
-from google.genai import errors as genai_errors
 
 
 def _api_error(code: int) -> genai_errors.APIError:

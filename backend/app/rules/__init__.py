@@ -1,4 +1,4 @@
-"""Rule engine modules for the locked scheme corpus (docs/plan.md Phase 1 Task 4 + Phase 7 additions).
+"""Rule engine modules for the locked scheme corpus.
 
 Each module exposes a single `match(profile) -> SchemeMatch` entry point. Every
 numeric threshold is sourced from a cached PDF under `backend/data/schemes/` and

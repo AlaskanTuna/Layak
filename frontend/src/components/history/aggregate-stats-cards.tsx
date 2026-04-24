@@ -17,7 +17,7 @@ type Props = {
 }
 
 /**
- * Phase 4 Task 2 — derives the three top-of-dashboard metrics from the same
+ * Derives the three top-of-dashboard metrics from the same
  * `GET /api/evaluations` response the history table consumes. Summing the per-
  * run RM totals would double-count (each evaluation re-scores the same person),
  * so we surface the *highest* discovered relief as the meaningful upside number

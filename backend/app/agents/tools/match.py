@@ -1,10 +1,9 @@
 """`match_schemes` FunctionTool — delegates to the rule engine.
 
-Phase 1 Task 4 replaces the Task 1 stub with real rule-engine delegation. Each
-scheme's dedicated module (`app.rules.str_2026`, `app.rules.jkm_warga_emas`,
+Each scheme's dedicated module (`app.rules.str_2026`, `app.rules.jkm_warga_emas`,
 `app.rules.lhdn_form_b`) exposes a `match(profile) -> SchemeMatch`. This tool
-composes the three and filters out non-qualifying matches so the frontend
-ranked list only surfaces the schemes the profile actually qualifies for.
+composes them and filters out non-qualifying matches so the frontend ranked
+list only surfaces the schemes the profile actually qualifies for.
 """
 
 from __future__ import annotations
@@ -24,19 +23,19 @@ async def match_schemes(
 ) -> list[SchemeMatch]:
     """Match a profile to eligible schemes with rule citations.
 
-    Returns only qualifying `SchemeMatch`es, sorted descending by `annual_rm` so
-    the highest-upside schemes render first in the ranked list (docs/prd.md FR-6).
+    Returns only qualifying `SchemeMatch`es, sorted descending by `annual_rm`
+    so the highest-upside schemes render first in the ranked list.
     Non-qualifying matches are filtered out — the frontend can still render
-    out-of-scope schemes as `Checking… (v2)` cards per docs/prd.md §6.2.
+    out-of-scope schemes as `Checking… (v2)` cards.
 
-    Phase 7 Task 9: required-contribution matches (SKSPS) appear in this list
-    too, with `kind="required_contribution"` + `annual_rm=0.0`. The frontend
-    filters on `kind` to render them in a separate "Required contributions"
-    block; `compute_upside` sums `annual_rm` so the zero keeps upside math
-    correct without a second filter there.
+    Required-contribution matches (SKSPS) appear in this list too, with
+    `kind="required_contribution"` + `annual_rm=0.0`. The frontend filters
+    on `kind` to render them in a separate "Required contributions" block;
+    `compute_upside` sums `annual_rm` so the zero keeps upside math correct
+    without a second filter there.
 
-    Phase 9: `language` threads into each rule's `match()` so the human-
-    readable `summary` + `why_qualify` strings render in the user's language.
+    `language` threads into each rule's `match()` so the human-readable
+    `summary` + `why_qualify` strings render in the user's language.
     """
     results = [module.match(profile, language=language) for module in _RULES]
     qualifying = [m for m in results if m.qualifies]

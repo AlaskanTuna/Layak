@@ -1,11 +1,9 @@
-"""Phase 3 Task 2 — free-tier rate limit preflight.
+"""Free-tier rate limit preflight.
 
 Free-tier users are capped at **5 evaluations per rolling 24 hours**. Pro-tier
 users bypass the check entirely. The preflight runs BEFORE `/api/agent/intake`
 (or `intake_manual`) opens the SSE stream so a blocked request never burns
 model time.
-
-Spec: docs/superpowers/specs/2026-04-21-v2-saas-pivot-design.md §3.6.
 
 Response contract when capped:
     HTTP 429 Too Many Requests

@@ -9,14 +9,9 @@ which verifies the incoming Firebase ID token, lazy-creates the user's
 
 Credentials:
     Cloud Run injects the Firebase service-account JSON as `FIREBASE_ADMIN_KEY`
-    via `--set-secrets=FIREBASE_ADMIN_KEY=firebase-admin-key:latest` (see
-    `docs/runbook.md` §2, landing alongside Phase 2 Task 2 deploy). If the env
+    via `--set-secrets=FIREBASE_ADMIN_KEY=firebase-admin-key:latest`. If the env
     var is missing, `current_user` returns 503 Service Unavailable — not 500
     — so the frontend can distinguish a misconfigured service from a bad token.
-
-Contract sources:
-    docs/superpowers/specs/2026-04-21-v2-saas-pivot-design.md §3.3 (user doc
-    shape) and §3.4 (rules contract); docs/trd.md §5.5 (schema summary).
 """
 
 from __future__ import annotations
@@ -74,13 +69,12 @@ class UserInfo:
 
     `tier` ("free" | "pro") is read from `users/{uid}.tier` on every auth
     cycle — it's the single field that flips without a re-sign-in, so it
-    must be fresh per request rather than cached at sign-in time. Phase 3
-    Task 2 consumes it for rate-limit decisions; first-touch users default
-    to "free".
+    must be fresh per request rather than cached at sign-in time. Consumed
+    for rate-limit decisions; first-touch users default to "free".
 
-    `language` ("en" | "ms" | "zh") — Phase 9. Read from `users/{uid}.language`
-    on every auth cycle so the pipeline prompts and `humanize_error` pick up
-    the user's current preference. Pre-Phase-9 docs without the field default
+    `language` ("en" | "ms" | "zh"). Read from `users/{uid}.language` on
+    every auth cycle so the pipeline prompts and `humanize_error` pick up
+    the user's current preference. Legacy docs without the field default
     to `"en"`.
     """
 
@@ -144,10 +138,10 @@ def _get_firestore() -> Any:
 def get_firestore() -> Any:
     """Public re-export of the process-wide Firestore client.
 
-    Route modules (e.g. Phase 3's `evaluations.py`) import this instead of
-    `_get_firestore` so the boundary stays clear: all Firebase surface area
-    flows through this module. Tests should stub this by monkey-patching
-    `app.auth.get_firestore` to return a mock.
+    Route modules import this instead of `_get_firestore` so the boundary
+    stays clear: all Firebase surface area flows through this module. Tests
+    should stub this by monkey-patching `app.auth.get_firestore` to return
+    a mock.
     """
     return _get_firestore()
 
@@ -214,18 +208,17 @@ def _upsert_user_doc(uid: str, claims: dict[str, Any], has_consent: bool = False
     """Lazy-create `users/{uid}` on first touch; refresh `lastLoginAt` after.
 
     Returns `(tier, language)` — both read from the existing doc, or
-    `("free", "en")` on fresh creation. Phase 3 Task 2 consumes `tier` for
-    rate-limit enforcement, Phase 9 consumes `language` for pipeline
-    localisation; piggybacking on the snapshot we already fetched beats two
-    extra round-trips per request.
+    `("free", "en")` on fresh creation. `tier` drives rate-limit enforcement
+    and `language` drives pipeline localisation; piggybacking on the snapshot
+    we already fetched beats two extra round-trips per request.
 
-    Shape per spec §3.3 + Phase 9 addition:
+    Shape:
         email, displayName, photoURL, tier ∈ {"free", "pro"},
         language ∈ {"en", "ms", "zh"}, createdAt, lastLoginAt,
         pdpaConsentAt (null until sign-up consent).
 
-    Two-request race is tolerated (spec §3.5 "acknowledged-and-accepted"):
-    both writers would set the same claims on identical creation data, and
+    Two-request race is tolerated (acknowledged-and-accepted): both writers
+    would set the same claims on identical creation data, and
     `.set(merge=True)` is idempotent.
     """
     db = _get_firestore()

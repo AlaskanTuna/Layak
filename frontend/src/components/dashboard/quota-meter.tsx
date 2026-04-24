@@ -32,7 +32,7 @@ type QuotaMeterProps = {
 }
 
 /**
- * Phase 3 Task 4 — visual meter for the rolling 24h evaluation cap.
+ * Visual meter for the rolling 24h evaluation cap.
  *
  * Free tier: shows used/limit with a usage bar and a reset countdown.
  * Pro tier: shows a "Pro" badge with no meter (limit is the unlimited

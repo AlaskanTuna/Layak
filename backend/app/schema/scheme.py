@@ -1,7 +1,7 @@
-"""Pydantic models for scheme matches and rule provenance (docs/trd.md §3, FR-6/7/9).
+"""Pydantic models for scheme matches and rule provenance.
 
-Every numeric value surfaced in the UI must carry at least one RuleCitation — this is
-the grounding invariant from docs/prd.md NFR-2.
+Every numeric value surfaced in the UI must carry at least one RuleCitation —
+this is the grounding invariant.
 """
 
 from __future__ import annotations
@@ -20,13 +20,13 @@ SchemeId = Literal[
     "i_saraan",
 ]
 
-# Phase 7 Task 9 — `SchemeKind` splits upside schemes (user RECEIVES money,
-# annual_rm sums into the headline upside total) from required-contribution
-# schemes (user PAYS money — e.g. PERKESO SKSPS mandatory social-security
-# contributions). Required contributions render in a separate UI block so
-# they don't misleadingly stack into the "annual relief" total. Defaults to
-# `"upside"` so every pre-Task-9 rule keeps its existing semantics without
-# touching each match() call site.
+# `SchemeKind` splits upside schemes (user RECEIVES money, annual_rm sums
+# into the headline upside total) from required-contribution schemes (user
+# PAYS money — e.g. PERKESO SKSPS mandatory social-security contributions).
+# Required contributions render in a separate UI block so they don't
+# misleadingly stack into the "annual relief" total. Defaults to `"upside"`
+# so every legacy rule keeps its existing semantics without touching each
+# match() call site.
 SchemeKind = Literal["upside", "required_contribution"]
 
 
@@ -52,8 +52,8 @@ class SchemeMatch(BaseModel):
     agency: str = Field(min_length=1)
     portal_url: str = Field(min_length=1)
     rule_citations: list[RuleCitation] = Field(default_factory=list)
-    # Phase 7 Task 9 additions. Defaults preserve the pre-task shape so every
-    # prior rule + persisted Firestore doc validates without migration.
+    # Defaults preserve the prior shape so every earlier rule + persisted
+    # Firestore doc validates without migration.
     kind: SchemeKind = "upside"
     # The annualised RM amount the user would PAY under this scheme; set only
     # when `kind == "required_contribution"`. The frontend renders this in the

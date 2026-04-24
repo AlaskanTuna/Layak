@@ -1,8 +1,8 @@
-"""Draft application packet models (docs/prd.md FR-8, docs/trd.md §3).
+"""Draft application packet models.
 
-WeasyPrint populates `blob_bytes_b64` in Phase 1 Task 5; the field stays None until
-then. The packet is stateless — it lives in the request-scope response and is
-discarded after the SSE stream terminates (docs/trd.md §6.5).
+WeasyPrint populates `blob_bytes_b64`; the field stays None until then. The
+packet is stateless — it lives in the request-scope response and is
+discarded after the SSE stream terminates.
 """
 
 from __future__ import annotations

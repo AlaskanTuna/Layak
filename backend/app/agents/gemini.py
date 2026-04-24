@@ -1,9 +1,9 @@
 """Shared Gemini client setup — Vertex AI mode.
 
-Phase 6 Task 6 cutover: the AI Studio API key keeps silently demoting the
-project from Tier 1 to Free tier even with billing active. Vertex AI uses the
-GCP project's IAM + billing directly, bypasses the AI Studio key tier-management
-bug, and properly draws on the project's $25 Google Cloud Credit.
+The AI Studio API key keeps silently demoting the project from Tier 1 to
+Free tier even with billing active. Vertex AI uses the GCP project's IAM +
+billing directly, bypasses the AI Studio key tier-management bug, and
+properly draws on the project's Google Cloud Credit.
 
 Auth flow:
     Local dev: `gcloud auth application-default login` once. The SDK picks up
@@ -19,24 +19,23 @@ Configuration:
                               `asia-southeast1` so requests stay co-located
                               with the Cloud Run service.
 
-Model routing (Phase 8 Task 4 — per-step assignment, see docs/trd.md §5.1):
+Model routing (per-step assignment):
     FAST_MODEL      — Gemini 2.5 Flash — multimodal extract (OCR-critical, GA-only).
     WORKER_MODEL    — Gemini 2.5 Flash-Lite — structured classify (~5x cheaper than Flash).
     HEAVY_MODEL     — Gemini 3 Flash Preview — compute_upside (code_execution tool).
-                      Cleared by Phase 8 Task 1 probe (2026-04-23):
-                      `backend/scripts/probe_gemini_3_flash.py` confirmed both
-                      `code_execution` and `response_mime_type=application/json`
+                      Confirmed via `backend/scripts/probe_gemini_3_flash.py`:
+                      both `code_execution` and `response_mime_type=application/json`
                       work against this model in the `global` location. Fallback
                       to `gemini-2.5-pro` if the preview model is ever yanked.
-    ORCHESTRATOR    — Gemini 2.5 Pro   — kept for the documented ADK orchestrator
-                      role; not currently invoked by the manual `stream_agent_events`
-                      loop. Reserved for the optional Move 2b ADK runner cutover.
+    ORCHESTRATOR    — Gemini 2.5 Pro   — reserved for an optional ADK orchestrator
+                      runner cutover; not currently invoked by the manual
+                      `stream_agent_events` loop.
 
-Region pinning: Phase 8 Task 1 probe found `asia-southeast1` only publishes
-`gemini-2.5-flash`, while `global` resolves all four models above. The
-`_DEFAULT_LOCATION` flips to `global` so a single Vertex AI endpoint serves
-the entire pipeline. Cloud Run service stays in `asia-southeast1` for
-co-location with the user-facing frontend.
+Region pinning: `asia-southeast1` only publishes `gemini-2.5-flash`, while
+`global` resolves all four models above. The `_DEFAULT_LOCATION` flips to
+`global` so a single Vertex AI endpoint serves the entire pipeline. Cloud
+Run service stays in `asia-southeast1` for co-location with the user-facing
+frontend.
 """
 
 from __future__ import annotations
@@ -70,10 +69,10 @@ ErrorCategory = Literal[
 ]
 
 
-# Phase 9 — per-language instruction block interpolated into worker-model
-# prompts (classify, compute_upside). The three values use the same Dewan /
-# 普通话 registers as `frontend/src/lib/i18n/locales/*.json` so prompt output
-# reads consistently with the UI chrome around it.
+# Per-language instruction block interpolated into worker-model prompts
+# (classify, compute_upside). The three values use the same Dewan / 普通话
+# registers as `frontend/src/lib/i18n/locales/*.json` so prompt output reads
+# consistently with the UI chrome around it.
 LANGUAGE_INSTRUCTION_BLOCK: dict[SupportedLanguage, str] = {
     "en": "Respond in plain English.",
     "ms": (
@@ -282,7 +281,7 @@ def sanitize_error_message(message: str, max_len: int = 240) -> str:
 # Friendly copy keyed off (language, upstream error category). The category
 # slug flows to the frontend on the SSE error event so the UI can surface
 # category-aware CTAs (e.g. "Try Manual Entry" only when OCR is rate-limited);
-# only the human-readable `message` localises. Phase 9.
+# only the human-readable `message` localises.
 ERROR_CATEGORY_MESSAGES: dict[SupportedLanguage, dict[ErrorCategory, str]] = {
     "en": {
         "quota_exhausted": (
@@ -430,8 +429,8 @@ def humanize_error(
     `(sanitized_raw, None)`; the frontend treats `None` as the generic "start
     over" branch.
 
-    Phase 9: the human-readable message tracks `language`; the category slug
-    stays language-neutral (the frontend keys its CTAs off it).
+    The human-readable message tracks `language`; the category slug stays
+    language-neutral (the frontend keys its CTAs off it).
     """
     category = categorize_error_message(raw)
     if category is not None:

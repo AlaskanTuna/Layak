@@ -1,8 +1,7 @@
 """Unit tests for `app.auth` — the Firebase Auth boundary.
 
 These tests stub `firebase_admin` and the Firestore client so they run in CI
-without needing real Firebase credentials. The integration test against a live
-Firebase project lives in Phase 2 Task 4.
+without needing real Firebase credentials.
 """
 
 from __future__ import annotations

@@ -1,8 +1,9 @@
-"""Phase 10 — system prompt + eval-context digest for the results-page chatbot.
+"""System prompt + eval-context digest for the results-page chatbot.
 
 The prompt is the entire selling point of this feature: hallucination control
 on government scheme info would otherwise undermine the citation-grounded
-story Phases 1-9 built. The prompt enforces five hard constraints:
+story the pipeline builds up to this point. The prompt enforces five hard
+constraints:
 
     1. Identity — Layak's helper, not a generic chatbot.
     2. Scope — answers MUST be about the loaded eval, with related scheme
@@ -403,8 +404,9 @@ def build_system_instruction(
     """Render the full system instruction for one chat turn.
 
     `eval_doc` is the raw Firestore doc (NOT the Pydantic-validated form)
-    so this stays robust to legacy doc shapes that pre-date Phase 9 / 10.
-    Missing fields gracefully degrade to "(unnamed)" / empty sections.
+    so this stays robust to legacy doc shapes that pre-date later schema
+    additions. Missing fields gracefully degrade to "(unnamed)" / empty
+    sections.
     """
     template = _SYSTEM_TEMPLATES.get(language) or _SYSTEM_TEMPLATES["en"]
     directive = _LANGUAGE_DIRECTIVES.get(language) or _LANGUAGE_DIRECTIVES["en"]

@@ -1,4 +1,4 @@
-"""Manual-entry Profile builder (FR-21).
+"""Manual-entry Profile builder.
 
 Bypasses the Gemini OCR `extract` step: takes a validated `ManualEntryPayload`
 and returns a `Profile` ready for the classify → match → compute_upside →

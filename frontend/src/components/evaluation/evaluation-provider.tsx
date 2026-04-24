@@ -6,11 +6,11 @@ import { useAgentPipeline } from '@/hooks/use-agent-pipeline'
 
 type PipelineApi = ReturnType<typeof useAgentPipeline>
 
-// Phase 7 Task 2 — demo mode carries a persona id so DemoModeBanner can
-// render the right copy ("gig driver Aisyah" vs "salaried teacher Farhan").
-// `null` means demo mode is off. Callers that don't care about the persona
-// can still call `setDemoMode(false)` to disable; `isDemoMode` stays as
-// the boolean derivation for call sites that only need on/off.
+// Demo mode carries a persona id so DemoModeBanner can render the right
+// copy ("gig driver Aisyah" vs "salaried teacher Farhan"). `null` means
+// demo mode is off. Callers that don't care about the persona can still
+// call `setDemoMode(false)` to disable; `isDemoMode` stays as the boolean
+// derivation for call sites that only need on/off.
 export type DemoPersona = 'aisyah' | 'farhan'
 
 type EvaluationContextValue = PipelineApi & {

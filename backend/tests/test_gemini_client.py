@@ -1,4 +1,4 @@
-"""Pin the `gemini.get_client()` Vertex AI contract — Phase 6 Task 6.
+"""Pin the `gemini.get_client()` Vertex AI contract.
 
 `get_client()` must construct a `google.genai.Client` in Vertex AI mode using
 the project + location resolved from the environment (with a dotenv fallback
@@ -59,9 +59,8 @@ def test_get_client_defaults_location_when_unset(
     _args, kwargs = ctor.call_args
     assert kwargs["vertexai"] is True
     assert kwargs["project"] == "some-project"
-    # Phase 8 Task 4: default location flipped from asia-southeast1 to global
-    # so a single Vertex AI endpoint serves all four pipeline models (probe
-    # found asia-southeast1 only publishes gemini-2.5-flash).
+    # Default location is `global` so a single Vertex AI endpoint serves all
+    # four pipeline models (asia-southeast1 only publishes gemini-2.5-flash).
     assert kwargs["location"] == "global"
 
 

@@ -1,4 +1,4 @@
-"""Phase 10 — Pydantic models for the results-page chatbot.
+"""Pydantic models for the results-page chatbot.
 
 Wire shape (locked):
 
@@ -12,10 +12,10 @@ Wire shape (locked):
         ChatDoneEvent   { type: "done",   message_id, citations[], grounding_unavailable }
         ChatErrorEvent  { type: "error",  category|null, message }
 
-Per docs/plan.md Phase 10 Task 1. The chatbot is hard-constrained to a single
-`evaluations/{eval_id}` doc — the eval is the entire context window. History
-is supplied per-call by the client (no Firestore-side conversation log in
-v1); the client is the source of truth for turn ordering.
+The chatbot is hard-constrained to a single `evaluations/{eval_id}` doc —
+the eval is the entire context window. History is supplied per-call by the
+client (no Firestore-side conversation log in v1); the client is the source
+of truth for turn ordering.
 """
 
 from __future__ import annotations
@@ -55,7 +55,7 @@ class ChatRequest(BaseModel):
 
     The client carries history; the server carries eval context. `language`
     is the language the response should render in — defaults to English so a
-    pre-Phase-9 client that never sends the field still works.
+    legacy client that never sends the field still works.
     """
 
     model_config = ConfigDict(extra="forbid")

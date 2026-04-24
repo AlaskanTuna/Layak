@@ -1,10 +1,10 @@
 """EPF i-Saraan — government 15% match on self-employed voluntary EPF contribution.
 
-Phase 7 Task 7. Complements the LHDN + JKM rules by surfacing the retirement
-layer for self-employed Malaysians: if you're a Form B filer aged 18-60, the
-government tops up 15% of every voluntary contribution you make into your EPF
-Account 1, capped at **RM500/yr**. Free money that gig workers routinely miss
-because i-Saraan isn't part of the mandatory PCB / SOCSO flow.
+Complements the LHDN + JKM rules by surfacing the retirement layer for
+self-employed Malaysians: if you're a Form B filer aged 18-60, the government
+tops up 15% of every voluntary contribution you make into your EPF Account 1,
+capped at **RM500/yr**. Free money that gig workers routinely miss because
+i-Saraan isn't part of the mandatory PCB / SOCSO flow.
 
 Qualifying criteria:
     - `form_type == "form_b"` (the Profile schema's proxy for self-employed —
@@ -26,12 +26,11 @@ annual_rm semantics:
     the rendered PDF.
 
 Source-PDF caveat: the KWSP i-Saraan brochure / program fact sheet is NOT yet
-committed under `backend/data/schemes/` — same pattern as Phase 7 Task 8
-(`jkm-bkk-brochure.pdf`) and Task 9 (`perkeso-sksps-rates.pdf`). This rule
-cites the program PDF by filename plus the public KWSP portal URL so the
-provenance chain stays linkable when the asset lands. Tests avoid asserting
-against `pdf_text["i-saraan-program.pdf"]` so the suite stays green until the
-brochure is committed.
+committed under `backend/data/schemes/` — same pattern as `jkm-bkk-brochure.pdf`
+and `perkeso-sksps-rates.pdf`. This rule cites the program PDF by filename plus
+the public KWSP portal URL so the provenance chain stays linkable when the
+asset lands. Tests avoid asserting against `pdf_text["i-saraan-program.pdf"]`
+so the suite stays green until the brochure is committed.
 """
 
 from __future__ import annotations
@@ -57,9 +56,9 @@ _PORTAL_URL = "https://www.kwsp.gov.my/en/member/contribution/i-saraan"
 _SCHEME_NAME = "EPF i-Saraan — voluntary contribution government match"
 _SOURCE_PDF = "i-saraan-program.pdf"
 
-# Phase 8 Task 3 — Vertex AI Search grounds the primary citation against the
-# live source PDF. URI filter constrains the snippet ranker to the expected
-# document so the rule cannot accidentally cite a different scheme's PDF.
+# Vertex AI Search grounds the primary citation against the live source PDF.
+# URI filter constrains the snippet ranker to the expected document so the
+# rule cannot accidentally cite a different scheme's PDF.
 _RAG_QUERY = getenv("LAYAK_RAG_QUERY_I_SARAAN", "i-Saraan RM500 government match")
 _RAG_URI_SUBSTRING = "i-saraan-program.pdf"
 

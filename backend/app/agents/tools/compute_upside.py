@@ -1,4 +1,4 @@
-"""`compute_upside` — Gemini 3 Flash Preview + code_execution tool (Phase 8 Task 4).
+"""`compute_upside` — Gemini 3 Flash Preview + code_execution tool.
 
 Sends the rule-engine matches to Gemini with the Code Execution tool enabled.
 Gemini writes a short Python script, runs it in a sandbox, and returns the
@@ -6,15 +6,13 @@ executable source + stdout. We parse both out of the response parts and
 populate `ComputeUpsideResult` — the frontend pipeline step renders the
 `<pre>`-block exactly as Gemini produced it.
 
-Phase 8 Task 4 cutover: this step now uses `HEAVY_MODEL` (gemini-3-flash-preview).
-The previous `FAST_MODEL` (gemini-2.5-flash) workaround was driven by the
-AI Studio Free-tier 429 cliff that the Phase 6 Vertex AI cutover already
-solved; with Vertex billing flowing to the project's GCC, we can safely run
-the more capable model here. The Phase 8 Task 1 probe
-(`backend/scripts/probe_gemini_3_flash.py`, 2026-04-23) confirmed
-`code_execution` works against gemini-3-flash-preview in the `global`
-location. Fallback: switch the import to `HEAVY_MODEL_FALLBACK` (gemini-2.5-pro)
-if the preview model is ever yanked.
+This step uses `HEAVY_MODEL` (gemini-3-flash-preview). The Vertex AI cutover
+(away from the AI Studio key) means billing flows to the project's GCC, so we
+can safely run the more capable model here. The probe script
+`backend/scripts/probe_gemini_3_flash.py` confirmed `code_execution` works
+against gemini-3-flash-preview in the `global` location. Fallback: switch the
+import to `HEAVY_MODEL_FALLBACK` (gemini-2.5-pro) if the preview model is ever
+yanked.
 """
 
 from __future__ import annotations
@@ -123,16 +121,16 @@ async def compute_upside(
 ) -> ComputeUpsideResult:
     """Compute annual RM upside via Gemini-run Python (code_execution tool).
 
-    Phase 7 Task 9: `kind="required_contribution"` matches are skipped here —
-    they represent money the user PAYS (e.g. PERKESO SKSPS mandatory
-    contributions), not upside. Filtering before prompt construction keeps
-    them out of the generated Python table; their `annual_rm` is already
-    `0.0` so the final sum is unaffected either way, but omitting them from
-    the stdout table avoids a misleading "PERKESO SKSPS ... 0" row.
+    `kind="required_contribution"` matches are skipped here — they represent
+    money the user PAYS (e.g. PERKESO SKSPS mandatory contributions), not
+    upside. Filtering before prompt construction keeps them out of the
+    generated Python table; their `annual_rm` is already `0.0` so the final
+    sum is unaffected either way, but omitting them from the stdout table
+    avoids a misleading "PERKESO SKSPS ... 0" row.
 
-    Phase 9: `language` swaps the printed header / total labels so the
-    stdout table renders in the user's chosen language. Python identifiers
-    and scheme_id slugs stay English (they're code).
+    `language` swaps the printed header / total labels so the stdout table
+    renders in the user's chosen language. Python identifiers and scheme_id
+    slugs stay English (they're code).
     """
     upside_matches = [m for m in matches if m.kind == "upside"]
     per_scheme = {m.scheme_id: float(m.annual_rm) for m in upside_matches}

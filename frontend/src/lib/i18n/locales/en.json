@@ -649,7 +649,7 @@
       "scheme": "scheme: {{id}}",
       "downloadZip": "Download all drafts as ZIP",
       "generatingZip": "Generating ZIP…",
-      "placeholderNotice": "WeasyPrint packet generator lands in Phase 1 Task 5 (paired wiring block). Until then the packet shell is rendered so you can see where the download CTAs will sit.",
+      "placeholderNotice": "Preparing your draft packet — the download links will appear here once the generator finishes.",
       "notificationTitle": "Draft packet downloaded",
       "notificationBody": "Your draft files are ready on this device. Review them carefully before manual submission."
     },

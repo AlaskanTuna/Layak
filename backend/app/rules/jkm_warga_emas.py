@@ -12,9 +12,9 @@ Two sources contribute to this rule:
    number itself lives in the public DOSM statistics portal, not the form.
 
 The monthly rate (RM600 under Budget 2026, RM500 under the prior JKM schedule)
-is a separate Budget-speech figure — see docs/trd.md §9.5 for the fallback
-note. Task 4 encodes RM600 as the primary with a RM500 fallback constant kept
-so the UI can render either depending on live gazette confirmation.
+is a separate Budget-speech figure; RM600 is encoded as the primary with a
+RM500 fallback constant kept so the UI can render either depending on live
+gazette confirmation.
 """
 
 from __future__ import annotations
@@ -35,9 +35,9 @@ _AGENCY = "JKM (Jabatan Kebajikan Masyarakat)"
 _PORTAL_URL = "https://www.jkm.gov.my"
 _SCHEME_NAME = "JKM Warga Emas — dependent elderly payment"
 
-# Phase 8 Task 3 — Vertex AI Search grounds the primary citation against the
-# live source PDF. URI filter constrains the snippet ranker to the expected
-# document so the rule cannot accidentally cite a different scheme's PDF.
+# Vertex AI Search grounds the primary citation against the live source PDF.
+# URI filter constrains the snippet ranker to the expected document so the
+# rule cannot accidentally cite a different scheme's PDF.
 _RAG_QUERY = getenv("LAYAK_RAG_QUERY_JKM_WARGA_EMAS", "JKM Warga Emas application elderly parent")
 _RAG_URI_SUBSTRING = "jkm18.pdf"
 

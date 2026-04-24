@@ -13,11 +13,11 @@ import { useAuth } from '@/lib/auth-context'
 import { authedFetch } from '@/lib/firebase'
 
 /**
- * Phase 4 Tasks 1 + 2 wrapper — fetches `GET /api/evaluations?limit=50` once
- * (the backend's hard cap), then renders the aggregate stats cards above the
- * paginated history table. Both children are pure presentational components
- * driven by the shared `items` slice, so we only pay for one network round
- * trip per page mount.
+ * Wrapper that fetches `GET /api/evaluations?limit=50` once (the backend's
+ * hard cap), then renders the aggregate stats cards above the paginated
+ * history table. Both children are pure presentational components driven
+ * by the shared `items` slice, so we only pay for one network round trip
+ * per page mount.
  *
  * The 50-row ceiling matches the backend's `_MAX_LIST_PAGE`; cursor pagination
  * via `nextPageToken` is reserved for when a single user crosses that bar

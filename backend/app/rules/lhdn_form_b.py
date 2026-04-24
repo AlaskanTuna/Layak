@@ -1,10 +1,10 @@
 """LHDN Form B / Form BE — five personal reliefs for YA 2025.
 
-Historical note: this module was originally Form-B-only; Phase 7 Task 1
-widened it to cover Form BE (salaried individuals) because every relief we
-cite — PR 4/2024 §6.1 (individual), §6.2.1 (parent medical), §6.18.2(a)
-(child #16a), §6.19.3 (EPF + life insurance), §6.11.3 (lifestyle #9) —
-applies identically to resident individuals under both filing categories.
+Historical note: this module was originally Form-B-only; it was widened to
+cover Form BE (salaried individuals) because every relief we cite — PR
+4/2024 §6.1 (individual), §6.2.1 (parent medical), §6.18.2(a) (child #16a),
+§6.19.3 (EPF + life insurance), §6.11.3 (lifestyle #9) — applies identically
+to resident individuals under both filing categories.
 The only differences that matter operationally are the filing deadline
 (30 June 2026 for Form B, 30 April 2026 for Form BE) and the agency
 portal copy; those are surfaced conditionally below. Module filename kept
@@ -68,9 +68,9 @@ _PORTAL_URL = "https://mytax.hasil.gov.my"
 _SCHEME_NAME_FORM_B = "LHDN Form B — five YA2025 reliefs"
 _SCHEME_NAME_FORM_BE = "LHDN Form BE — five YA2025 reliefs"
 
-# Phase 8 Task 3 — Vertex AI Search grounds the primary citation against the
-# live source PDF. URI filter constrains the snippet ranker to the expected
-# document so the rule cannot accidentally cite a different scheme's PDF.
+# Vertex AI Search grounds the primary citation against the live source PDF.
+# URI filter constrains the snippet ranker to the expected document so the
+# rule cannot accidentally cite a different scheme's PDF.
 _RAG_QUERY = getenv("LAYAK_RAG_QUERY_LHDN_FORM_B", "individual personal relief paragraph 46 RM9000")
 _RAG_URI_SUBSTRING = "pr-no-4-2024.pdf"
 

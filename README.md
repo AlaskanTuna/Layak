@@ -66,13 +66,14 @@ _Three uploads. One website. Five autonomous steps. **Zero hallucinated rules.**
 
 <div align="center">
 
-<a href="https://youtu.be/XuFsiMNjknA" title="Watch Layak on YouTube">
-  <img src="https://img.youtube.com/vi/XuFsiMNjknA/maxresdefault.jpg" alt="Watch the Layak demo video on YouTube" width="820" />
-</a>
+<video src="https://github.com/user-attachments/assets/de170687-e2bd-40fb-a9ec-11484076c729" controls muted width="820" poster="docs/slides/assets/slide-01-cover.png">
+  Your browser does not support inline video playback.
+  <a href="https://youtu.be/XuFsiMNjknA">Watch on YouTube</a> instead.
+</video>
 
 <br/>
 
-<sub>▶ <a href="https://youtu.be/XuFsiMNjknA"><strong>Watch on YouTube</strong></a></sub>
+<sub>▶ Also on <a href="https://youtu.be/XuFsiMNjknA"><strong>YouTube</strong></a></sub>
 
 </div>
 

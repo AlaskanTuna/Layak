@@ -66,11 +66,13 @@ _Three uploads. One website. Five autonomous steps. **Zero hallucinated rules.**
 
 <div align="center">
 
-<a href="#-demo-video" title="Demo video — coming soon">
-  <img src="docs/slides/assets/slide-01-cover.png" alt="Watch the 3-minute Layak demo" width="820" />
+<a href="https://youtu.be/XuFsiMNjknA" title="Watch Layak on YouTube">
+  <img src="https://img.youtube.com/vi/XuFsiMNjknA/maxresdefault.jpg" alt="Watch the Layak demo video on YouTube" width="820" />
 </a>
 
 <br/>
+
+<sub>▶ <a href="https://youtu.be/XuFsiMNjknA"><strong>Watch on YouTube</strong></a></sub>
 
 </div>
 

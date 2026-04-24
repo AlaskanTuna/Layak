@@ -67,10 +67,9 @@ Temporary Items
 .Trash-*
 .nfs*
 
-# Project docs and Claude agent files (managed locally, not committed)
-# ====================================================================
-docs/
-.claude/
+# Project docs (managed locally, not committed)
+# =============================================
+# docs/
 
 # TypeScript build output (tsc -b emits alongside source files)
 # ==========================================================

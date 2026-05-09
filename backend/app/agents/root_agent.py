@@ -59,17 +59,16 @@ root_agent = SequentialAgent(
         LlmAgent(
             name="extractor_stub",
             description=(
-                "Extractor. Gemini 2.5 Flash (FAST_MODEL) multimodal reading "
+                "Extractor. Gemini 3.1 Flash-Lite (FAST_MODEL) multimodal reading "
                 "IC + payslip + utility-bill uploads into a Profile with structured output. "
-                "Quality-critical OCR step; stays on GA Flash."
+                "Quality-critical OCR step."
             ),
         ),
         LlmAgent(
             name="classifier_stub",
             description=(
-                "Classifier. Gemini 2.5 Flash-Lite (WORKER_MODEL) structured "
-                "output emitting household-flags + per-capita income + income band. ~5x cheaper "
-                "than Flash for the small structured-output workload."
+                "Classifier. Gemini 3.1 Flash-Lite (WORKER_MODEL) structured "
+                "output emitting household-flags + per-capita income + income band."
             ),
         ),
         LlmAgent(
@@ -84,11 +83,9 @@ root_agent = SequentialAgent(
         LlmAgent(
             name="upside_computer_stub",
             description=(
-                "compute_upside. Gemini 3 Flash Preview (HEAVY_MODEL) with "
+                "compute_upside. Gemini 2.5 Pro (HEAVY_MODEL) with "
                 "code_execution runs Python in a sandbox; stdout streamed to the UI verbatim. "
-                "Confirmed via `backend/scripts/probe_gemini_3_flash.py`: "
-                "code_execution + structured-output support in `global` location. "
-                "Fallback: HEAVY_MODEL_FALLBACK = gemini-2.5-pro."
+                "code_execution + structured-output support in `global` location."
             ),
         ),
         LlmAgent(

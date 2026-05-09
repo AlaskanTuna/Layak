@@ -1,4 +1,4 @@
-"""`compute_upside` — Gemini 3 Flash Preview + code_execution tool.
+"""`compute_upside` — Gemini 2.5 Pro + code_execution tool.
 
 Sends the rule-engine matches to Gemini with the Code Execution tool enabled.
 Gemini writes a short Python script, runs it in a sandbox, and returns the
@@ -6,13 +6,12 @@ executable source + stdout. We parse both out of the response parts and
 populate `ComputeUpsideResult` — the frontend pipeline step renders the
 `<pre>`-block exactly as Gemini produced it.
 
-This step uses `HEAVY_MODEL` (gemini-3-flash-preview). The Vertex AI cutover
-(away from the AI Studio key) means billing flows to the project's GCC, so we
-can safely run the more capable model here. The probe script
-`backend/scripts/probe_gemini_3_flash.py` confirmed `code_execution` works
-against gemini-3-flash-preview in the `global` location. Fallback: switch the
-import to `HEAVY_MODEL_FALLBACK` (gemini-2.5-pro) if the preview model is ever
-yanked.
+This step uses `HEAVY_MODEL` (gemini-2.5-pro by default — see
+`app/agents/gemini.py`). The Vertex AI cutover (away from the AI Studio key)
+means billing flows to the project's GCC, so we can safely run the more
+capable model here. `gemini-2.5-pro` supports both `code_execution` and
+`response_mime_type=application/json` in the `global` location. Override
+via `LAYAK_HEAVY_MODEL` if a future model becomes preferred.
 """
 
 from __future__ import annotations

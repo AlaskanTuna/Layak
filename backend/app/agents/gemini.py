@@ -20,22 +20,23 @@ Configuration:
                               with the Cloud Run service.
 
 Model routing (per-step assignment):
-    FAST_MODEL      — Gemini 2.5 Flash — multimodal extract (OCR-critical, GA-only).
-    WORKER_MODEL    — Gemini 2.5 Flash-Lite — structured classify (~5x cheaper than Flash).
-    HEAVY_MODEL     — Gemini 3 Flash Preview — compute_upside (code_execution tool).
-                      Confirmed via `backend/scripts/probe_gemini_3_flash.py`:
-                      both `code_execution` and `response_mime_type=application/json`
-                      work against this model in the `global` location. Fallback
-                      to `gemini-2.5-pro` if the preview model is ever yanked.
+    FAST_MODEL      — Gemini 3.1 Flash-Lite — multimodal extract (OCR).
+    WORKER_MODEL    — Gemini 3.1 Flash-Lite — structured classify.
+    HEAVY_MODEL     — Gemini 2.5 Pro — compute_upside (code_execution tool).
+                      `gemini-3.1-flash-lite` availability confirmed via
+                      `backend/scripts/probe_gemini_3_1_flash_lite.py`:
+                      both `response_mime_type=application/json` and
+                      multimodal image input work against the canonical
+                      `gemini-3.1-flash-lite` ID in the `global` location.
     ORCHESTRATOR    — Gemini 2.5 Pro   — reserved for an optional ADK orchestrator
                       runner cutover; not currently invoked by the manual
                       `stream_agent_events` loop.
 
-Region pinning: `asia-southeast1` only publishes `gemini-2.5-flash`, while
-`global` resolves all four models above. The `_DEFAULT_LOCATION` flips to
-`global` so a single Vertex AI endpoint serves the entire pipeline. Cloud
-Run service stays in `asia-southeast1` for co-location with the user-facing
-frontend.
+Region pinning: `asia-southeast1` only publishes a subset of the publisher
+catalogue, while `global` resolves the full matrix. The `_DEFAULT_LOCATION`
+flips to `global` so a single Vertex AI endpoint serves the entire
+pipeline. Cloud Run service stays in `asia-southeast1` for co-location with
+the user-facing frontend.
 """
 
 from __future__ import annotations
@@ -88,9 +89,9 @@ LANGUAGE_INSTRUCTION_BLOCK: dict[SupportedLanguage, str] = {
 # Per-step model assignment — overridable via `LAYAK_*` env vars (see
 # `app.config.getenv` and `.env.example`). Resolved at module import; Cloud
 # Run env-var injection or `.env` overrides win over these literal defaults.
-FAST_MODEL = getenv("LAYAK_FAST_MODEL", "gemini-2.5-flash")
-WORKER_MODEL = getenv("LAYAK_WORKER_MODEL", "gemini-2.5-flash-lite")
-HEAVY_MODEL = getenv("LAYAK_HEAVY_MODEL", "gemini-3-flash-preview")
+FAST_MODEL = getenv("LAYAK_FAST_MODEL", "gemini-3.1-flash-lite")
+WORKER_MODEL = getenv("LAYAK_WORKER_MODEL", "gemini-3.1-flash-lite")
+HEAVY_MODEL = getenv("LAYAK_HEAVY_MODEL", "gemini-2.5-pro")
 HEAVY_MODEL_FALLBACK = getenv("LAYAK_HEAVY_MODEL_FALLBACK", "gemini-2.5-pro")
 ORCHESTRATOR_MODEL = getenv("LAYAK_ORCHESTRATOR_MODEL", "gemini-2.5-pro")
 

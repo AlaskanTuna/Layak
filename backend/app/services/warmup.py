@@ -3,8 +3,9 @@
 Fires two best-effort sync calls during the FastAPI lifespan startup so the
 first user-facing chat request doesn't pay cold-start cost on either:
 
-    1. Gemini (`gemini-2.5-flash`) — Vertex AI model warm-up. Cold first-token
-       can be 3-5 s after a few minutes of idle traffic in the project.
+    1. Gemini (`gemini-3.1-flash-lite` via FAST_MODEL) — Vertex AI model warm-up.
+       Cold first-token can be 3-5 s after a few minutes of idle traffic in the
+       project.
     2. Discovery Engine (`layak-schemes-v1`) — the retrieval Tool's cold-path
        can add ~500 ms - 2 s on the first query of a session.
 

@@ -35,7 +35,7 @@ _Three uploads. One website. Five autonomous steps. **Zero hallucinated rules.**
 
 <br/>
 
-[**Live Demo**](https://layak-frontend-297019726346.asia-southeast1.run.app) · [**Pitch Deck**](https://docs.google.com/presentation/d/10sZA_cJGqoypqAIinCfxXzN9VCqGtEF-FD8ZZC-NzwM/edit?usp=sharing) · [**Demo Video**](#-demo-video)
+[**Live Demo**](https://layak.tech) · [**Pitch Deck**](https://docs.google.com/presentation/d/10sZA_cJGqoypqAIinCfxXzN9VCqGtEF-FD8ZZC-NzwM/edit?usp=sharing) · [**Demo Video**](#-demo-video)
 
 </div>
 
@@ -299,10 +299,10 @@ pnpm format      # prettier --write across the repo
 
 ## ☁ Deployment
 
-Both services deploy to Google Cloud Run. Current production URLs:
+Both services deploy to Google Cloud Run, fronted by custom domains. Current production URLs:
 
-- **Frontend:** <https://layak-frontend-297019726346.asia-southeast1.run.app>
-- **Backend:** <https://layak-backend-297019726346.asia-southeast1.run.app>
+- **Frontend:** <https://layak.tech> (`www.layak.tech` → 308 redirect to apex)
+- **Backend:** <https://api.layak.tech>
 
 <details>
 <summary><strong>Reference <code>gcloud run deploy</code> commands</strong></summary>
@@ -313,7 +313,7 @@ gcloud run deploy layak-frontend \
   --source frontend \
   --region asia-southeast1 \
   --min-instances 1 --cpu-boost --allow-unauthenticated \
-  --set-build-env-vars NEXT_PUBLIC_BACKEND_URL=https://layak-backend-297019726346.asia-southeast1.run.app \
+  --set-build-env-vars NEXT_PUBLIC_BACKEND_URL=https://api.layak.tech \
   --memory 512Mi --timeout 60
 
 # Backend

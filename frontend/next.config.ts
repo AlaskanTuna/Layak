@@ -10,6 +10,16 @@ const nextConfig: NextConfig = {
       }
     }
     return config
+  },
+  async redirects() {
+    return [
+      {
+        source: '/:path*',
+        has: [{ type: 'host', value: 'www.layak.tech' }],
+        destination: 'https://layak.tech/:path*',
+        permanent: true
+      }
+    ]
   }
 }
 

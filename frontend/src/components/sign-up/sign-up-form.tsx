@@ -8,6 +8,7 @@ import { useTranslation } from 'react-i18next'
 
 import { GoogleIcon } from '@/components/auth/google-icon'
 import { Button } from '@/components/ui/button'
+import { Checkbox } from '@/components/ui/checkbox'
 
 import { useAuth } from '@/lib/auth-context'
 import { signInWithGoogle, authedFetch } from '@/lib/firebase'
@@ -57,12 +58,11 @@ export function SignUpForm() {
 
       <div className="grid gap-6">
         <div className="grid gap-4">
-          <label className="flex items-start gap-3 rounded-lg border bg-card p-4 shadow-sm transition-colors hover:bg-accent/50 cursor-pointer">
-            <input
-              type="checkbox"
+          <label className="paper-card flex cursor-pointer items-start gap-3 rounded-[14px] p-4 transition-colors hover:bg-accent/40">
+            <Checkbox
               checked={consent}
-              onChange={(event) => setConsent(event.target.checked)}
-              className="mt-1 size-4 shrink-0 rounded border-primary text-primary focus:ring-primary"
+              onCheckedChange={(next) => setConsent(next === true)}
+              className="mt-1"
               aria-describedby="pdpa-consent-description"
             />
             <div className="grid gap-1.5 leading-none">

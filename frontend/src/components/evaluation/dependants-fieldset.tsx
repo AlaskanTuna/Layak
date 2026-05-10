@@ -1,12 +1,12 @@
 'use client'
 
 import { Plus, Trash2 } from 'lucide-react'
-import type { ChangeEvent } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import type { Relationship } from '@/lib/agent-types'
 
 /** Row shape used by the controlled fieldset — `ic_last4` is a raw string so the
@@ -80,24 +80,22 @@ export function DependantsFieldset({ value, onChange, disabled = false, max = 15
           >
             <div className="flex flex-col gap-1.5">
               <Label htmlFor={`dep-rel-${index}`}>{t('evaluation.dependants.relationship')}</Label>
-              <select
-                id={`dep-rel-${index}`}
-                disabled={disabled}
+              <Select
                 value={row.relationship}
-                onChange={(e: ChangeEvent<HTMLSelectElement>) =>
-                  update(index, { relationship: e.target.value as Relationship })
-                }
-                className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+                onValueChange={(next: unknown) => update(index, { relationship: next as Relationship })}
+                disabled={disabled}
               >
-                {RELATIONSHIPS.map((r) => (
-                  // Explicit bg/text on <option> — the native dropdown popup
-                  // ignores the select's bg and defaults to white, which makes
-                  // text invisible in dark mode.
-                  <option key={r} value={r} className="bg-popover text-popover-foreground">
-                    {t(`evaluation.dependants.relationships.${r}`)}
-                  </option>
-                ))}
-              </select>
+                <SelectTrigger id={`dep-rel-${index}`}>
+                  <SelectValue>{t(`evaluation.dependants.relationships.${row.relationship}`)}</SelectValue>
+                </SelectTrigger>
+                <SelectContent>
+                  {RELATIONSHIPS.map((r) => (
+                    <SelectItem key={r} value={r}>
+                      {t(`evaluation.dependants.relationships.${r}`)}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
             <div className="flex flex-col gap-1.5">
               <Label htmlFor={`dep-age-${index}`}>{t('evaluation.dependants.age')}</Label>

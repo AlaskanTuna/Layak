@@ -2,7 +2,7 @@
 
 import { zodResolver } from '@hookform/resolvers/zod'
 import { CalendarIcon, Eraser, Sparkles } from 'lucide-react'
-import { useMemo, useRef } from 'react'
+import { useMemo } from 'react'
 import { Controller, type SubmitHandler, useForm, useWatch } from 'react-hook-form'
 import { useTranslation } from 'react-i18next'
 import { z } from 'zod'
@@ -10,9 +10,11 @@ import { z } from 'zod'
 import { DependantsFieldset, type DependantInputRow } from '@/components/evaluation/dependants-fieldset'
 import { SectionBadge } from '@/components/evaluation/section-badge'
 import { Button } from '@/components/ui/button'
+import { DatePicker } from '@/components/ui/date-picker'
 import { InfoTooltip } from '@/components/ui/info-tooltip'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
 import { Separator } from '@/components/ui/separator'
 import { Textarea } from '@/components/ui/textarea'
 import type { ManualEntryPayload, Relationship } from '@/lib/agent-types'
@@ -176,12 +178,6 @@ export function ManualEntryForm({ onSubmit, onUseSamples, onClear, disabled = fa
     mode: 'onBlur'
   })
   const { register, handleSubmit, control, formState, reset } = form
-  // Ref on the hidden `<input type="date">` so the visible calendar button can
-  // call `.showPicker()` programmatically — the old overlay-and-click-through
-  // approach didn't reliably trigger the native picker and also fired onBlur
-  // on the text input, flashing the "Use YYYY-MM-DD" error before the picker
-  // appeared.
-  const dobPickerRef = useRef<HTMLInputElement>(null)
   // `useWatch` is the memo-safe alternative to `form.watch()` — the React Compiler
   // plugin flags `watch()` because it can't reliably cache its result.
   const watchedDependants = (useWatch({ control, name: 'dependants' }) ?? []) as DependantInputRow[]
@@ -248,29 +244,13 @@ export function ManualEntryForm({ onSubmit, onUseSamples, onClear, disabled = fa
                       onBlur={field.onBlur}
                       className="flex-1"
                     />
-                    <Button
-                      type="button"
-                      variant="outline"
-                      size="icon"
-                      disabled={disabled}
-                      aria-label={t('evaluation.manual.dobAria')}
-                      onClick={() => dobPickerRef.current?.showPicker?.()}
-                    >
-                      <CalendarIcon className="size-4" aria-hidden />
-                    </Button>
-                    {/* Hidden native date input — the visible button above
-                        calls `showPicker()` on this ref. `sr-only` keeps it
-                        off-screen + off the tab order without blocking the
-                        programmatic open. */}
-                    <input
-                      ref={dobPickerRef}
-                      type="date"
-                      tabIndex={-1}
-                      aria-hidden
-                      disabled={disabled}
+                    <DatePicker
                       value={/^\d{4}-\d{2}-\d{2}$/.test(field.value) ? field.value : ''}
-                      onChange={(e) => field.onChange(formatDateMask(e.target.value))}
-                      className="sr-only"
+                      onChange={(next) => field.onChange(next)}
+                      disableFuture
+                      disabled={disabled}
+                      ariaLabel={t('evaluation.manual.dobAria')}
+                      triggerLabel={<CalendarIcon className="size-4" aria-hidden />}
                     />
                   </div>
                 )}
@@ -316,23 +296,33 @@ export function ManualEntryForm({ onSubmit, onUseSamples, onClear, disabled = fa
               />
             </Field>
             <Field label={t('evaluation.manual.employmentLabel')} error={formState.errors.employment_type?.message}>
-              <fieldset className="flex flex-col gap-1.5" disabled={disabled}>
-                <legend className="sr-only">{t('evaluation.manual.employmentLabel')}</legend>
-                <label className="flex items-start gap-2 text-sm">
-                  <input type="radio" value="gig" {...register('employment_type')} className="mt-1" />
-                  <TooltipLabel
-                    label={t('evaluation.manual.employmentGig')}
-                    tooltip={t('evaluation.manual.employmentGigHelp')}
-                  />
-                </label>
-                <label className="flex items-start gap-2 text-sm">
-                  <input type="radio" value="salaried" {...register('employment_type')} className="mt-1" />
-                  <TooltipLabel
-                    label={t('evaluation.manual.employmentSalaried')}
-                    tooltip={t('evaluation.manual.employmentSalariedHelp')}
-                  />
-                </label>
-              </fieldset>
+              <Controller
+                control={control}
+                name="employment_type"
+                render={({ field }) => (
+                  <RadioGroup
+                    value={field.value}
+                    onValueChange={(next: unknown) => field.onChange(next as 'gig' | 'salaried')}
+                    disabled={disabled}
+                    aria-label={t('evaluation.manual.employmentLabel')}
+                  >
+                    <label className="flex cursor-pointer items-start gap-2 text-sm">
+                      <RadioGroupItem value="gig" className="mt-0.5" />
+                      <TooltipLabel
+                        label={t('evaluation.manual.employmentGig')}
+                        tooltip={t('evaluation.manual.employmentGigHelp')}
+                      />
+                    </label>
+                    <label className="flex cursor-pointer items-start gap-2 text-sm">
+                      <RadioGroupItem value="salaried" className="mt-0.5" />
+                      <TooltipLabel
+                        label={t('evaluation.manual.employmentSalaried')}
+                        tooltip={t('evaluation.manual.employmentSalariedHelp')}
+                      />
+                    </label>
+                  </RadioGroup>
+                )}
+              />
             </Field>
           </div>
         </div>

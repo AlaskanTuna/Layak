@@ -417,33 +417,33 @@ html.landing-snap {
   0% {
     transform: scale(1);
     background-color: var(--paper);
-    outline: 4px solid color-mix(in oklch, var(--hibiscus) 85%, transparent);
+    outline: 2px solid color-mix(in oklch, var(--hibiscus) 70%, transparent);
     outline-offset: 0;
     box-shadow:
       0 18px 40px -18px color-mix(in oklch, var(--ink) 45%, transparent),
-      0 0 0 0 color-mix(in oklch, var(--hibiscus) 85%, transparent);
+      0 0 0 0 color-mix(in oklch, var(--hibiscus) 70%, transparent);
   }
   40% {
-    transform: scale(1.18);
-    background-color: color-mix(in oklch, var(--hibiscus) 22%, var(--paper));
-    outline: 4px solid color-mix(in oklch, var(--hibiscus) 50%, transparent);
-    outline-offset: 12px;
+    transform: scale(1.08);
+    background-color: color-mix(in oklch, var(--hibiscus) 10%, var(--paper));
+    outline: 2px solid color-mix(in oklch, var(--hibiscus) 35%, transparent);
+    outline-offset: 8px;
     box-shadow:
-      0 28px 64px -14px color-mix(in oklch, var(--ink) 55%, transparent),
-      0 0 0 18px color-mix(in oklch, var(--hibiscus) 55%, transparent);
+      0 22px 50px -16px color-mix(in oklch, var(--ink) 48%, transparent),
+      0 0 0 11px color-mix(in oklch, var(--hibiscus) 35%, transparent);
   }
   100% {
     transform: scale(1);
     background-color: var(--paper);
-    outline: 4px solid color-mix(in oklch, var(--hibiscus) 0%, transparent);
-    outline-offset: 28px;
+    outline: 2px solid color-mix(in oklch, var(--hibiscus) 0%, transparent);
+    outline-offset: 18px;
     box-shadow:
       0 18px 40px -18px color-mix(in oklch, var(--ink) 45%, transparent),
-      0 0 0 38px color-mix(in oklch, var(--hibiscus) 0%, transparent);
+      0 0 0 24px color-mix(in oklch, var(--hibiscus) 0%, transparent);
   }
 }
 .pulse-soft {
-  animation: pulse-soft 1.4s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  animation: pulse-soft 1.7s cubic-bezier(0.4, 0, 0.6, 1) infinite;
 }
 
 /* Reduced-motion fallback — accessibility-respectful colour pulse only,

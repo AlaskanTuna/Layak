@@ -6,7 +6,6 @@ import { Suspense } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import { EvaluationUploadClient } from '@/components/evaluation/evaluation-upload-client'
-import { PageHeading } from '@/components/layout/page-heading'
 
 export function EvaluationUploadPage() {
   const { t } = useTranslation()
@@ -19,13 +18,10 @@ export function EvaluationUploadPage() {
         <ArrowLeft className="size-3.5" aria-hidden />
         {t('evaluation.results.backToEvaluations')}
       </Link>
-      <PageHeading
-        eyebrow={t('evaluation.upload.eyebrow')}
-        title={t('evaluation.upload.pageTitle')}
-        description={t('evaluation.upload.pageDescription')}
-      />
-      {/* `EvaluationUploadClient` reads `useSearchParams()` (for ?mode=manual) —
-          Next.js 16 static generation bails out unless that's wrapped in Suspense. */}
+      {/* `EvaluationUploadClient` owns its own PageHeading so it can render
+          the sample-data dropdown in the action slot when on the Upload tab.
+          `useSearchParams()` inside the client requires a Suspense boundary
+          in Next.js 16. */}
       <Suspense fallback={null}>
         <EvaluationUploadClient />
       </Suspense>

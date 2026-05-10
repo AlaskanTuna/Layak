@@ -2,6 +2,7 @@
 
 import { useRouter, useSearchParams } from 'next/navigation'
 import { useEffect, useRef, useState } from 'react'
+import { ChevronDown, Loader2, Sparkles } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 
 import { ErrorRecoveryCard } from '@/components/evaluation/error-recovery-card'
@@ -10,8 +11,16 @@ import { type IntakeMode, IntakeModeToggle } from '@/components/evaluation/intak
 import { ManualEntryForm } from '@/components/evaluation/manual-entry-form'
 import { PipelineStepper } from '@/components/evaluation/pipeline-stepper'
 import { type SamplePersona, UploadWidget, type UploadSubmission } from '@/components/evaluation/upload-widget'
+import { PageHeading } from '@/components/layout/page-heading'
 import { UpgradeWaitlistModal } from '@/components/settings/upgrade-waitlist-modal'
 import { Button } from '@/components/ui/button'
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuTrigger
+} from '@/components/ui/dropdown-menu'
 import { AISYAH_DEPENDANT_OVERRIDES, loadAisyahFixtureFiles } from '@/lib/aisyah-fixtures'
 import { FARHAN_DEPENDANT_OVERRIDES, loadFarhanFixtureFiles } from '@/lib/farhan-fixtures'
 import type { DependantInput, ManualEntryPayload, Step } from '@/lib/agent-types'
@@ -175,18 +184,64 @@ export function EvaluationUploadClient() {
     if (!open) acknowledgeQuotaExceeded()
   }
 
+  const samplesBusy = loadingPersona !== null
+  // Only surface the sample dropdown on the upload tab while idle. Manual
+  // tab has its own inline sample picker tied to form-reset, and the stepper
+  // shouldn't show a "load demo" action mid-pipeline.
+  const showSampleAction = showIntake && mode === 'upload'
+
   return (
-    <div className="flex flex-col gap-4">
+    <div className="flex flex-col gap-6">
+      <PageHeading
+        eyebrow={t('evaluation.upload.eyebrow')}
+        title={t('evaluation.upload.pageTitle')}
+        description={t('evaluation.upload.pageDescription')}
+        action={
+          showSampleAction ? (
+            <DropdownMenu>
+              <DropdownMenuTrigger
+                render={
+                  <Button type="button" variant="outline" size="sm" disabled={samplesBusy} className="gap-1.5">
+                    {samplesBusy ? (
+                      <>
+                        <Loader2 className="size-3.5 animate-spin" aria-hidden />
+                        {t('evaluation.upload.loadingSamples')}
+                      </>
+                    ) : (
+                      <>
+                        <Sparkles className="size-3.5" aria-hidden />
+                        {t('evaluation.upload.sampleDropdownLabel')}
+                        <ChevronDown className="size-3.5 opacity-60" aria-hidden />
+                      </>
+                    )}
+                  </Button>
+                }
+              />
+              <DropdownMenuContent>
+                <DropdownMenuLabel>{t('evaluation.upload.sampleDropdownGroupLabel')}</DropdownMenuLabel>
+                <DropdownMenuItem onClick={() => handleUseSamplesUpload('aisyah')}>
+                  <span className="font-medium">{t('evaluation.upload.useSamplesAisyah')}</span>
+                  <span className="text-xs text-muted-foreground">
+                    {t('evaluation.upload.sampleDropdownAisyahDesc')}
+                  </span>
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => handleUseSamplesUpload('farhan')}>
+                  <span className="font-medium">{t('evaluation.upload.useSamplesFarhan')}</span>
+                  <span className="text-xs text-muted-foreground">
+                    {t('evaluation.upload.sampleDropdownFarhanDesc')}
+                  </span>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          ) : undefined
+        }
+      />
       {showIntake && (
         <>
           <IntakeModeToggle value={mode} onChange={handleModeChange} />
           {/* Both widgets stay mounted so partial form state survives a tab switch. */}
           <div className={cn(mode !== 'upload' && 'hidden')} aria-hidden={mode !== 'upload'}>
-            <UploadWidget
-              onSubmit={handleSubmitUpload}
-              onUseSamples={handleUseSamplesUpload}
-              samplesLoading={loadingPersona}
-            />
+            <UploadWidget onSubmit={handleSubmitUpload} />
             {sampleLoadError && (
               <p className="mt-2 text-xs text-destructive" role="alert">
                 {t('evaluation.sampleLoadError', { error: sampleLoadError })}

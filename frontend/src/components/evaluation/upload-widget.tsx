@@ -1,7 +1,7 @@
 'use client'
 
 import { useId, useRef, useState } from 'react'
-import { ArrowRight, ChevronDown, FileText, Loader2, Sparkles, UploadCloud, X } from 'lucide-react'
+import { ArrowRight, ChevronDown, FileText, UploadCloud, X } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import type { TFunction } from 'i18next'
 
@@ -9,13 +9,6 @@ import { CropPreviewModal } from '@/components/evaluation/crop-preview-modal'
 import { DependantsFieldset, type DependantInputRow } from '@/components/evaluation/dependants-fieldset'
 import { SectionBadge } from '@/components/evaluation/section-badge'
 import { Button } from '@/components/ui/button'
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuTrigger
-} from '@/components/ui/dropdown-menu'
 import { InfoTooltip } from '@/components/ui/info-tooltip'
 import type { DependantInput } from '@/lib/agent-types'
 import { cn } from '@/lib/utils'
@@ -95,12 +88,7 @@ export type SamplePersona = 'aisyah' | 'farhan'
 
 type Props = {
   onSubmit: (submission: UploadSubmission) => void
-  onUseSamples: (persona: SamplePersona) => void
   disabled?: boolean
-  /** Which persona's fixtures are currently being fetched from /public/fixtures/,
-   * or `null` when idle. Drives the per-button spinner + disable state so only
-   * the clicked button spins, not both. */
-  samplesLoading?: SamplePersona | null
 }
 
 type SlotProps = {
@@ -194,7 +182,7 @@ function UploadSlotCard({ spec, state, inputId, disabled, inputRef, onChange, on
   )
 }
 
-export function UploadWidget({ onSubmit, onUseSamples, disabled = false, samplesLoading = null }: Props) {
+export function UploadWidget({ onSubmit, disabled = false }: Props) {
   const { t } = useTranslation()
   const reactId = useId()
   const [showHousehold, setShowHousehold] = useState(false)
@@ -282,48 +270,8 @@ export function UploadWidget({ onSubmit, onUseSamples, disabled = false, samples
     })
   }
 
-  const samplesBusy = samplesLoading !== null
-
   return (
     <div className="flex flex-col gap-5">
-      <div className="flex items-start justify-end">
-        <DropdownMenu>
-          <DropdownMenuTrigger
-            render={
-              <Button type="button" variant="outline" size="sm" disabled={disabled || samplesBusy} className="gap-1.5">
-                {samplesBusy ? (
-                  <>
-                    <Loader2 className="size-3.5 animate-spin" aria-hidden />
-                    {t('evaluation.upload.loadingSamples')}
-                  </>
-                ) : (
-                  <>
-                    <Sparkles className="size-3.5" aria-hidden />
-                    {t('evaluation.upload.sampleDropdownLabel')}
-                    <ChevronDown className="size-3.5 opacity-60" aria-hidden />
-                  </>
-                )}
-              </Button>
-            }
-          />
-          <DropdownMenuContent>
-            <DropdownMenuLabel>{t('evaluation.upload.sampleDropdownGroupLabel')}</DropdownMenuLabel>
-            <DropdownMenuItem onClick={() => onUseSamples('aisyah')}>
-              <span className="font-medium">{t('evaluation.upload.useSamplesAisyah')}</span>
-              <span className="text-xs text-muted-foreground">
-                {t('evaluation.upload.sampleDropdownAisyahDesc')}
-              </span>
-            </DropdownMenuItem>
-            <DropdownMenuItem onClick={() => onUseSamples('farhan')}>
-              <span className="font-medium">{t('evaluation.upload.useSamplesFarhan')}</span>
-              <span className="text-xs text-muted-foreground">
-                {t('evaluation.upload.sampleDropdownFarhanDesc')}
-              </span>
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
-      </div>
-
       <div className="flex flex-col gap-4">
         {SLOT_SPECS.map((spec) => {
           const inputId = `${reactId}-${spec.slot}`
@@ -343,10 +291,22 @@ export function UploadWidget({ onSubmit, onUseSamples, disabled = false, samples
           )
         })}
         <div className="paper-card flex flex-col gap-3 rounded-[14px] p-5">
-          <button
-            type="button"
+          {/* `role="button"` instead of a real <button> — the row contains
+              an InfoTooltip which renders its own <button>, and HTML
+              disallows nested buttons (hydration error). The tooltip's
+              click is swallowed inline so it doesn't bubble up and toggle
+              the disclosure. */}
+          <div
+            role="button"
+            tabIndex={0}
             className="flex w-full cursor-pointer items-start justify-between gap-3 text-left"
             onClick={() => setShowHousehold((prev) => !prev)}
+            onKeyDown={(event) => {
+              if (event.key === 'Enter' || event.key === ' ') {
+                event.preventDefault()
+                setShowHousehold((prev) => !prev)
+              }
+            }}
             aria-expanded={showHousehold}
           >
             <div className="flex flex-col gap-1.5">
@@ -354,10 +314,16 @@ export function UploadWidget({ onSubmit, onUseSamples, disabled = false, samples
                 <p className="font-sans text-base font-medium tracking-tight">
                   {t('evaluation.upload.householdTitle')}
                 </p>
-                <InfoTooltip
-                  content={t('evaluation.upload.householdHint')}
-                  label={t('evaluation.upload.householdHint')}
-                />
+                <span
+                  onClick={(event) => event.stopPropagation()}
+                  onKeyDown={(event) => event.stopPropagation()}
+                  className="inline-flex"
+                >
+                  <InfoTooltip
+                    content={t('evaluation.upload.householdHint')}
+                    label={t('evaluation.upload.householdHint')}
+                  />
+                </span>
                 <SectionBadge required={false} />
               </div>
               <p className="text-xs leading-relaxed text-muted-foreground">
@@ -373,7 +339,7 @@ export function UploadWidget({ onSubmit, onUseSamples, disabled = false, samples
               )}
               aria-hidden
             />
-          </button>
+          </div>
           {showHousehold && (
             <DependantsFieldset value={dependants} onChange={setDependants} disabled={disabled} showSummary={false} />
           )}

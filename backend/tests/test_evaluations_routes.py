@@ -450,13 +450,11 @@ def test_delete_evaluation_cors_preflight_allows_delete(
     resp = tc.options(
         "/api/evaluations/eval-xyz",
         headers={
-            "Origin": "https://layak-frontend-297019726346.asia-southeast1.run.app",
+            "Origin": "https://layak.tech",
             "Access-Control-Request-Method": "DELETE",
             "Access-Control-Request-Headers": "authorization",
         },
     )
     assert resp.status_code == 200
-    assert resp.headers["access-control-allow-origin"] == (
-        "https://layak-frontend-297019726346.asia-southeast1.run.app"
-    )
+    assert resp.headers["access-control-allow-origin"] == "https://layak.tech"
     assert "DELETE" in resp.headers["access-control-allow-methods"]

@@ -97,6 +97,8 @@ app.add_middleware(
     # Cloud Run service drive the SSE pipeline from a victim's browser and
     # exfiltrate the extracted profile JSON — locked down after a security audit.
     allow_origins=[
+        "https://layak.tech",
+        "https://www.layak.tech",
         "https://layak-frontend-297019726346.asia-southeast1.run.app",
         "https://layak-frontend-i2t7hf6seq-as.a.run.app",
     ],

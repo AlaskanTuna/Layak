@@ -33,8 +33,8 @@ env:
   VERTEX_AI_SEARCH_LOCATION: global
   WIF_PROVIDER: projects/297019726346/locations/global/workloadIdentityPools/github-actions/providers/github
   DEPLOY_SA: github-actions-deployer@layak-myaifuturehackathon.iam.gserviceaccount.com
-  FRONTEND_URL: https://layak-frontend-297019726346.asia-southeast1.run.app
-  BACKEND_URL: https://layak-backend-297019726346.asia-southeast1.run.app
+  FRONTEND_URL: https://layak.tech
+  BACKEND_URL: https://api.layak.tech
   FIREBASE_API_KEY: AIzaSyAOkuoODA2epkzPw2Vva1lYrnG3lIqAxXE
   FIREBASE_AUTH_DOMAIN: layak-myaifuturehackathon.firebaseapp.com
   FIREBASE_PROJECT_ID: layak-myaifuturehackathon

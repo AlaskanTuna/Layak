@@ -408,40 +408,64 @@ html.landing-snap {
 }
 .marquee-track:hover { animation-play-state: paused; }
 
-/* Soft attention pulse — used by Cik Lay's floating button to nudge the
-   user without alarming. A 3-stop keyframe so the hibiscus ring is most
-   visible at the mid-stop (still ~50% opaque while already 14 px wide)
-   instead of the spread + opacity interpolating together and cancelling
-   each other out. An outline ripple chases the box-shadow ring for a
-   second, layout-safe cue that survives `overflow-hidden`. */
+/* Cik Lay attention pulse — kitchen-sink visible. A thick hibiscus ring
+   ripples outward from the button's edge, the button itself swells +18%
+   and tints with hibiscus, and a sharper outline chases the shadow ring
+   for redundancy. Three keyframe stops so the visible peak (40%) catches
+   the eye instead of being cancelled out by interpolated opacity. */
 @keyframes pulse-soft {
   0% {
     transform: scale(1);
-    outline: 3px solid color-mix(in oklch, var(--hibiscus) 75%, transparent);
+    background-color: var(--paper);
+    outline: 4px solid color-mix(in oklch, var(--hibiscus) 85%, transparent);
     outline-offset: 0;
     box-shadow:
       0 18px 40px -18px color-mix(in oklch, var(--ink) 45%, transparent),
-      0 0 0 0 color-mix(in oklch, var(--hibiscus) 75%, transparent);
+      0 0 0 0 color-mix(in oklch, var(--hibiscus) 85%, transparent);
   }
   40% {
-    transform: scale(1.1);
-    outline: 3px solid color-mix(in oklch, var(--hibiscus) 35%, transparent);
-    outline-offset: 10px;
+    transform: scale(1.18);
+    background-color: color-mix(in oklch, var(--hibiscus) 22%, var(--paper));
+    outline: 4px solid color-mix(in oklch, var(--hibiscus) 50%, transparent);
+    outline-offset: 12px;
     box-shadow:
-      0 24px 56px -16px color-mix(in oklch, var(--ink) 50%, transparent),
-      0 0 0 14px color-mix(in oklch, var(--hibiscus) 40%, transparent);
+      0 28px 64px -14px color-mix(in oklch, var(--ink) 55%, transparent),
+      0 0 0 18px color-mix(in oklch, var(--hibiscus) 55%, transparent);
   }
   100% {
     transform: scale(1);
-    outline: 3px solid color-mix(in oklch, var(--hibiscus) 0%, transparent);
-    outline-offset: 22px;
+    background-color: var(--paper);
+    outline: 4px solid color-mix(in oklch, var(--hibiscus) 0%, transparent);
+    outline-offset: 28px;
     box-shadow:
       0 18px 40px -18px color-mix(in oklch, var(--ink) 45%, transparent),
-      0 0 0 30px color-mix(in oklch, var(--hibiscus) 0%, transparent);
+      0 0 0 38px color-mix(in oklch, var(--hibiscus) 0%, transparent);
   }
 }
 .pulse-soft {
   animation: pulse-soft 1.4s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+/* Reduced-motion fallback — accessibility-respectful colour pulse only,
+   no transform / outline. The chatbot is an important affordance so we
+   keep SOMETHING visible; we just drop the movement components. */
+@media (prefers-reduced-motion: reduce) {
+  @keyframes pulse-soft {
+    0%,
+    100% {
+      background-color: var(--paper);
+      box-shadow: 0 18px 40px -18px color-mix(in oklch, var(--ink) 45%, transparent);
+    }
+    50% {
+      background-color: color-mix(in oklch, var(--hibiscus) 22%, var(--paper));
+      box-shadow:
+        0 18px 40px -18px color-mix(in oklch, var(--ink) 45%, transparent),
+        0 0 0 4px color-mix(in oklch, var(--hibiscus) 45%, transparent);
+    }
+  }
+  .pulse-soft {
+    animation: pulse-soft 2s ease-in-out infinite;
+  }
 }
 @media (prefers-reduced-motion: reduce) {
   .pulse-soft {

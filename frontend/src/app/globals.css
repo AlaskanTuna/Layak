@@ -409,28 +409,39 @@ html.landing-snap {
 .marquee-track:hover { animation-play-state: paused; }
 
 /* Soft attention pulse — used by Cik Lay's floating button to nudge the
-   user without alarming. Two concentric hibiscus halos radiate outward and
-   fade, while the button itself swells slightly and keeps its ink drop
-   shadow so the depth doesn't flatten during the pulse. */
+   user without alarming. A 3-stop keyframe so the hibiscus ring is most
+   visible at the mid-stop (still ~50% opaque while already 14 px wide)
+   instead of the spread + opacity interpolating together and cancelling
+   each other out. An outline ripple chases the box-shadow ring for a
+   second, layout-safe cue that survives `overflow-hidden`. */
 @keyframes pulse-soft {
-  0%,
-  100% {
+  0% {
     transform: scale(1);
+    outline: 3px solid color-mix(in oklch, var(--hibiscus) 75%, transparent);
+    outline-offset: 0;
     box-shadow:
       0 18px 40px -18px color-mix(in oklch, var(--ink) 45%, transparent),
-      0 0 0 0 color-mix(in oklch, var(--hibiscus) 60%, transparent),
-      0 0 0 0 color-mix(in oklch, var(--hibiscus) 35%, transparent);
+      0 0 0 0 color-mix(in oklch, var(--hibiscus) 75%, transparent);
   }
-  50% {
-    transform: scale(1.08);
+  40% {
+    transform: scale(1.1);
+    outline: 3px solid color-mix(in oklch, var(--hibiscus) 35%, transparent);
+    outline-offset: 10px;
     box-shadow:
-      0 22px 50px -16px color-mix(in oklch, var(--ink) 50%, transparent),
-      0 0 0 10px color-mix(in oklch, var(--hibiscus) 0%, transparent),
-      0 0 0 22px color-mix(in oklch, var(--hibiscus) 0%, transparent);
+      0 24px 56px -16px color-mix(in oklch, var(--ink) 50%, transparent),
+      0 0 0 14px color-mix(in oklch, var(--hibiscus) 40%, transparent);
+  }
+  100% {
+    transform: scale(1);
+    outline: 3px solid color-mix(in oklch, var(--hibiscus) 0%, transparent);
+    outline-offset: 22px;
+    box-shadow:
+      0 18px 40px -18px color-mix(in oklch, var(--ink) 45%, transparent),
+      0 0 0 30px color-mix(in oklch, var(--hibiscus) 0%, transparent);
   }
 }
 .pulse-soft {
-  animation: pulse-soft 1.5s cubic-bezier(0.34, 1.56, 0.64, 1) infinite;
+  animation: pulse-soft 1.4s cubic-bezier(0.4, 0, 0.6, 1) infinite;
 }
 @media (prefers-reduced-motion: reduce) {
   .pulse-soft {

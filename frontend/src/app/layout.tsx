@@ -46,8 +46,8 @@ export const metadata: Metadata = {
     images: [
       {
         url: '/embed-banner.png',
-        width: 1536,
-        height: 1024,
+        width: 1672,
+        height: 941,
         alt: 'Layak — Agentic AI concierge for Malaysian social-assistance schemes'
       }
     ]

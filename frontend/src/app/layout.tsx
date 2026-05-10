@@ -28,11 +28,36 @@ const abrilFatface = Abril_Fatface({
 })
 
 export const metadata: Metadata = {
+  metadataBase: new URL('https://layak.tech'),
   title: 'Layak',
   description:
     'Agentic AI concierge for Malaysian social-assistance schemes. Draft packet only — never submits on your behalf.',
   icons: {
     icon: '/favicon.ico'
+  },
+  openGraph: {
+    type: 'website',
+    siteName: 'Layak',
+    title: 'Layak — Malaysian social-assistance concierge',
+    description:
+      'Find the Malaysian social-assistance schemes you qualify for — IC + payslip + bill in, a ranked list out with cited sources and pre-filled draft applications.',
+    url: 'https://layak.tech',
+    locale: 'en_MY',
+    images: [
+      {
+        url: '/embed-banner.png',
+        width: 1536,
+        height: 1024,
+        alt: 'Layak — Agentic AI concierge for Malaysian social-assistance schemes'
+      }
+    ]
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Layak — Malaysian social-assistance concierge',
+    description:
+      'Find the Malaysian social-assistance schemes you qualify for — IC + payslip + bill in, a ranked list out with cited sources and pre-filled draft applications.',
+    images: ['/embed-banner.png']
   }
 }
 

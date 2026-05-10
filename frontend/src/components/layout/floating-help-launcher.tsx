@@ -46,16 +46,14 @@ export function FloatingHelpLauncher() {
 
   return (
     <>
-      <Button
+      <button
         type="button"
-        variant="ghost"
-        size="icon-lg"
-        className="glass-surface fixed right-4 bottom-4 z-40 rounded-full text-foreground shadow-lg hover:bg-accent/25 hover:text-foreground md:right-6 md:bottom-6 dark:hover:bg-accent/35"
         aria-label={t('common.help.open')}
         onClick={() => handleOpenChange(true)}
+        className="glass-surface fixed right-4 bottom-4 z-40 inline-flex size-12 cursor-pointer items-center justify-center rounded-full text-foreground shadow-[0_18px_40px_-18px_color-mix(in_oklch,var(--ink)_45%,transparent)] transition-transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-foreground/30 md:right-6 md:bottom-6"
       >
         <CircleHelp className="size-5" aria-hidden />
-      </Button>
+      </button>
       <Dialog open={open} onOpenChange={handleOpenChange}>
         <DialogContent className="max-h-[85svh] max-w-xl overflow-hidden border-border/70 bg-card/96 p-0 supports-[backdrop-filter]:bg-card/88 backdrop-blur-2xl backdrop-saturate-150 shadow-[0_28px_72px_rgb(15_23_42/0.16),inset_0_1px_0_rgb(255_255_255/0.42)] dark:bg-card/95 dark:supports-[backdrop-filter]:bg-card/82 dark:shadow-[0_28px_72px_rgb(0_0_0/0.48),inset_0_1px_0_rgb(255_255_255/0.08)] sm:max-w-2xl">
           <DialogHeader className="px-5 pt-5">

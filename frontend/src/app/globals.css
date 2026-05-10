@@ -408,6 +408,32 @@ html.landing-snap {
 }
 .marquee-track:hover { animation-play-state: paused; }
 
+/* Soft attention pulse — used by Cik Lay's floating button to nudge the
+   user without alarming. Scales subtly + radiates a hibiscus halo. */
+@keyframes pulse-soft {
+  0%,
+  100% {
+    transform: scale(1);
+    box-shadow:
+      0 18px 40px -18px color-mix(in oklch, var(--hibiscus) 55%, transparent),
+      0 0 0 0 color-mix(in oklch, var(--hibiscus) 40%, transparent);
+  }
+  50% {
+    transform: scale(1.05);
+    box-shadow:
+      0 22px 50px -16px color-mix(in oklch, var(--hibiscus) 70%, transparent),
+      0 0 0 8px color-mix(in oklch, var(--hibiscus) 0%, transparent);
+  }
+}
+.pulse-soft {
+  animation: pulse-soft 1.6s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .pulse-soft {
+    animation: none;
+  }
+}
+
 /* Staggered editorial entrance */
 @keyframes fade-rise {
   from { opacity: 0; transform: translateY(14px); }

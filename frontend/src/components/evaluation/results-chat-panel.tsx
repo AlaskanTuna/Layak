@@ -26,10 +26,23 @@ type Props = {
   matches: SchemeMatch[]
 }
 
+// Cik Lay attention pulse cadence — keep these as named constants so the
+// scheduling state machine reads cleanly. Click handler swaps the next
+// scheduled wait for `CLICK_COOLDOWN_MS` to give the user breathing room.
+const PULSE_DURATION_MS = 10_000 // pulse softly for 10s
+const IDLE_DURATION_MS = 60_000 // wait 1 min between pulse bursts
+const CLICK_COOLDOWN_MS = 180_000 // 3 min quiet after the user opens the panel
+const INITIAL_DELAY_MS = 2_000 // brief grace before the first pulse on mount
+
 export function ResultsChatPanel({ evalId, matches }: Props) {
   const { t } = useTranslation()
   const [isOpen, setIsOpen] = useState(false)
   const [draft, setDraft] = useState('')
+  const [isPulsing, setIsPulsing] = useState(false)
+  // Bumped by `handleOpenPanel` to re-arm the pulse effect with the
+  // 3-min cooldown delay instead of the standard 60s idle.
+  const [cooldownNonce, setCooldownNonce] = useState(0)
+  const cooldownPendingRef = useRef(false)
   const messagesEndRef = useRef<HTMLDivElement | null>(null)
   const inputRef = useRef<HTMLTextAreaElement | null>(null)
 
@@ -37,6 +50,45 @@ export function ResultsChatPanel({ evalId, matches }: Props) {
 
   const qualifyingMatches = useMemo(() => matches.filter((m) => m.qualifies), [matches])
   const suggestions = useMemo(() => buildSuggestedQuestions(qualifyingMatches, t), [qualifyingMatches, t])
+
+  // Soft-pulse cadence: pulse for 10s → idle for 60s → pulse for 10s → …
+  // When the user opens the panel, `cooldownPendingRef` flips and the next
+  // re-arm starts after `CLICK_COOLDOWN_MS` instead of `INITIAL_DELAY_MS`.
+  // The recursive timeout chain lives inside this effect so cleanup is
+  // single-source-of-truth on unmount + nonce bump.
+  useEffect(() => {
+    let cancelled = false
+    let timer = 0
+
+    const initialDelay = cooldownPendingRef.current ? CLICK_COOLDOWN_MS : INITIAL_DELAY_MS
+    cooldownPendingRef.current = false
+
+    const pulseOn = () => {
+      if (cancelled) return
+      setIsPulsing(true)
+      timer = window.setTimeout(() => {
+        if (cancelled) return
+        setIsPulsing(false)
+        timer = window.setTimeout(pulseOn, IDLE_DURATION_MS)
+      }, PULSE_DURATION_MS)
+    }
+
+    timer = window.setTimeout(pulseOn, initialDelay)
+
+    return () => {
+      cancelled = true
+      window.clearTimeout(timer)
+      setIsPulsing(false)
+    }
+  }, [cooldownNonce])
+
+  const handleOpenPanel = useCallback(() => {
+    setIsOpen(true)
+    setIsPulsing(false)
+    // Re-arm the pulse effect with the 3-min cooldown initial delay.
+    cooldownPendingRef.current = true
+    setCooldownNonce((n) => n + 1)
+  }, [])
 
   // Auto-scroll the message list to the latest token as it streams in.
   useEffect(() => {
@@ -88,8 +140,10 @@ export function ResultsChatPanel({ evalId, matches }: Props) {
         <button
           type="button"
           aria-label={t('evaluation.chat.openButton')}
-          onClick={() => setIsOpen(true)}
-          className="group fixed right-4 bottom-16 z-40 inline-flex size-12 cursor-pointer items-center justify-center overflow-hidden rounded-full border border-[color:var(--hibiscus)]/30 bg-[color:var(--paper)] shadow-[0_18px_40px_-18px_color-mix(in_oklch,var(--ink)_45%,transparent)] transition-transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-[color:var(--hibiscus)]/40 md:right-6 md:bottom-20"
+          onClick={handleOpenPanel}
+          className={`group fixed right-4 bottom-16 z-40 inline-flex size-12 cursor-pointer items-center justify-center overflow-hidden rounded-full border border-[color:var(--hibiscus)]/30 bg-[color:var(--paper)] shadow-[0_18px_40px_-18px_color-mix(in_oklch,var(--ink)_45%,transparent)] transition-transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-[color:var(--hibiscus)]/40 md:right-6 md:bottom-20 ${
+            isPulsing ? 'pulse-soft' : ''
+          }`}
         >
           <Image
             src={CIK_LAY_ICON}

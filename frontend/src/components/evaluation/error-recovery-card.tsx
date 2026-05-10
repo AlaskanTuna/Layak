@@ -15,7 +15,6 @@ import {
 import { useTranslation } from 'react-i18next'
 
 import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import type { ErrorCategory } from '@/lib/agent-types'
 
 type Props = {
@@ -118,28 +117,36 @@ export function ErrorRecoveryCard({ message, category, onUseSamples, onReset, on
   }
 
   return (
-    <Card className="border-destructive/40 bg-destructive/5">
-      <CardHeader>
-        <CardTitle className="flex items-center gap-2 text-sm text-destructive">
+    <section className="paper-card relative isolate overflow-hidden rounded-[14px] p-5">
+      <span
+        aria-hidden
+        className="pointer-events-none absolute inset-y-5 left-0 w-[3px] rounded-r-full bg-[color:var(--hibiscus)]/70"
+      />
+      <header className="mb-4 flex flex-col gap-1.5 border-b border-foreground/10 pb-4">
+        <p className="mono-caption text-[color:var(--hibiscus)]">Recovery</p>
+        <h3 className="flex items-center gap-2 font-heading text-[15px] font-semibold tracking-tight text-[color:var(--hibiscus)]">
           <Icon className="size-4" aria-hidden />
           {t(`${keyPrefix}.title`)}
-        </CardTitle>
-        <CardDescription className="text-destructive/90">{message}</CardDescription>
-      </CardHeader>
-      <CardContent className="flex flex-col gap-3">
-        <p className="text-sm text-muted-foreground">{t(`${keyPrefix}.body`)}</p>
+        </h3>
+        <p className="text-[13.5px] leading-[1.55] text-foreground/70">{message}</p>
+      </header>
+      <div className="flex flex-col gap-3">
+        <p className="text-sm leading-relaxed text-foreground/68">{t(`${keyPrefix}.body`)}</p>
         <div className="flex flex-col gap-2 sm:flex-row">
           {ctas.map((kind, index) => {
             const CtaIcon = CTA_ICONS[kind]
             const primary = index === 0
             const label = ctaLabel(kind)
+            const primaryClasses =
+              'flex-1 rounded-full bg-[color:var(--hibiscus)] text-[color:var(--hibiscus-foreground)] hover:bg-[color:var(--hibiscus)]/92'
+            const outlineClasses = 'flex-1 rounded-full'
             if (kind === 'settings') {
               return (
                 <Button
                   key={kind}
                   type="button"
                   variant={primary ? 'default' : 'outline'}
-                  className="flex-1"
+                  className={primary ? primaryClasses : outlineClasses}
                   render={<Link href="/settings" />}
                 >
                   <CtaIcon className="mr-2 size-4" aria-hidden />
@@ -153,7 +160,7 @@ export function ErrorRecoveryCard({ message, category, onUseSamples, onReset, on
                 type="button"
                 variant={primary ? 'default' : 'outline'}
                 onClick={() => handleClick(kind)}
-                className="flex-1"
+                className={primary ? primaryClasses : outlineClasses}
               >
                 <CtaIcon className="mr-2 size-4" aria-hidden />
                 {label}
@@ -161,7 +168,7 @@ export function ErrorRecoveryCard({ message, category, onUseSamples, onReset, on
             )
           })}
         </div>
-      </CardContent>
-    </Card>
+      </div>
+    </section>
   )
 }

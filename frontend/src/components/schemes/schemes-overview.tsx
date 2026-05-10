@@ -110,52 +110,52 @@ function InScopeCard({ scheme }: { scheme: InScopeScheme }) {
   const Icon = scheme.icon
   const isContribution = scheme.kind === 'required_contribution'
   return (
-    <article className="group flex flex-col gap-4 rounded-xl border border-border bg-card p-6 shadow-sm transition-colors hover:border-primary/35">
+    <article className="paper-card group flex h-full flex-col gap-4 rounded-[16px] p-6 transition-shadow hover:shadow-[0_28px_60px_-22px_color-mix(in_oklch,var(--ink)_28%,transparent)]">
       <div className="flex items-center justify-between gap-3">
-        <div className="flex size-10 items-center justify-center rounded-md bg-primary/10 text-primary">
+        <div className="flex size-10 items-center justify-center rounded-md bg-[color:var(--primary)]/10 text-[color:var(--primary)]">
           <Icon className="size-5" aria-hidden />
         </div>
-        <span className="text-[10px] font-medium uppercase tracking-[0.14em] text-primary">
-          {t(scheme.categoryKey)}
-        </span>
+        <span className="mono-caption text-[color:var(--primary)]">{t(scheme.categoryKey)}</span>
       </div>
       <div className="flex flex-col gap-1">
-        <p className="text-[11px] font-medium uppercase tracking-[0.14em] text-muted-foreground">{scheme.agency}</p>
+        <p className="mono-caption text-foreground/55">{scheme.agency}</p>
         <h3 className="font-heading text-xl font-semibold tracking-tight">{scheme.name}</h3>
       </div>
-      <p className="text-sm leading-relaxed text-muted-foreground">{t(scheme.summaryKey)}</p>
+      <p className="text-sm leading-relaxed text-foreground/65">{t(scheme.summaryKey)}</p>
       <div
         className={`flex flex-col gap-0.5 rounded-lg border border-dashed px-4 py-3 ${
-          isContribution ? 'border-amber-500/30 bg-amber-500/5' : 'border-primary/25 bg-primary/5'
+          isContribution
+            ? 'border-amber-500/30 bg-amber-500/[0.06]'
+            : 'border-[color:var(--hibiscus)]/30 bg-[color:var(--hibiscus)]/[0.05]'
         }`}
       >
-        <p className="text-[10px] font-medium uppercase tracking-[0.14em] text-muted-foreground">
+        <p className="mono-caption text-foreground/55">
           {isContribution ? t('schemes.labels.annualContribution') : t('schemes.labels.typicalUpside')}
         </p>
         <p className="font-heading tabular-nums">
           {!isContribution && (
-            <span className="text-sm font-normal text-muted-foreground">{t('schemes.labels.upTo')} </span>
+            <span className="text-sm font-normal text-foreground/55">{t('schemes.labels.upTo')} </span>
           )}
           {isContribution && (
-            <span className="text-sm font-normal text-muted-foreground">{t('schemes.labels.rm')} </span>
+            <span className="text-sm font-normal text-foreground/55">{t('schemes.labels.rm')} </span>
           )}
           <span
-            className={`text-xl font-semibold ${isContribution ? 'text-amber-700 dark:text-amber-500' : 'text-primary'}`}
+            className={`text-xl font-semibold ${
+              isContribution ? 'text-amber-700 dark:text-amber-400' : 'text-[color:var(--hibiscus)]'
+            }`}
           >
             {scheme.upsideRm}
           </span>
-          <span className="ml-1 text-xs font-normal text-muted-foreground">{t('schemes.labels.perYear')}</span>
+          <span className="ml-1 text-xs font-normal text-foreground/55">{t('schemes.labels.perYear')}</span>
         </p>
       </div>
-      <div className="mt-auto flex items-center justify-between gap-3 border-t border-border pt-4">
-        <span className="text-[10px] font-medium uppercase tracking-[0.14em] text-muted-foreground">
-          {scheme.formLabel}
-        </span>
+      <div className="mt-auto flex items-center justify-between gap-3 border-t border-foreground/10 pt-4">
+        <span className="mono-caption text-foreground/55">{scheme.formLabel}</span>
         <a
           href={scheme.portalUrl}
           target="_blank"
           rel="noopener noreferrer"
-          className="inline-flex items-center gap-1 text-xs font-medium text-primary transition-colors hover:underline"
+          className="inline-flex items-center gap-1 text-xs font-medium text-[color:var(--hibiscus)] transition-colors hover:underline"
         >
           {t('schemes.labels.agencyPortal')}
           <ArrowUpRight className="size-3.5" aria-hidden />
@@ -179,13 +179,18 @@ export function SchemesOverview() {
         </ul>
       </section>
 
-      <aside className="flex flex-col gap-3 rounded-xl border border-border bg-muted/40 p-6">
+      <aside className="paper-card relative isolate flex flex-col gap-3 overflow-hidden rounded-[16px] p-6">
+        <span
+          aria-hidden
+          className="pointer-events-none absolute inset-y-6 left-0 w-[3px] rounded-r-full bg-[color:var(--primary)]/70"
+        />
         <div className="flex items-center gap-2">
-          <Compass className="size-4 text-primary" aria-hidden />
-          <h3 className="font-sans text-sm font-semibold tracking-tight">{t('schemes.howWePick.title')}</h3>
+          <Compass className="size-4 text-[color:var(--primary)]" aria-hidden />
+          <span className="mono-caption text-[color:var(--primary)]">How we pick</span>
         </div>
-        <p className="text-sm leading-relaxed text-muted-foreground">{t('schemes.howWePick.description')}</p>
-        <div className="flex items-center gap-2 text-[11px] uppercase tracking-[0.14em] text-muted-foreground">
+        <h3 className="font-heading text-[16px] font-semibold tracking-tight">{t('schemes.howWePick.title')}</h3>
+        <p className="text-sm leading-relaxed text-foreground/68">{t('schemes.howWePick.description')}</p>
+        <div className="mono-caption flex items-center gap-2 text-foreground/55">
           <Landmark className="size-3.5" aria-hidden />
           <span>{t('schemes.notAffiliated')}</span>
         </div>

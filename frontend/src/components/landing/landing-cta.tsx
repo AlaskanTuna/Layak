@@ -1,25 +1,199 @@
 'use client'
 
+import { useState } from 'react'
 import Link from 'next/link'
-import { ArrowRight } from 'lucide-react'
+import { ArrowLeft, ArrowRight } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 
 import { Button } from '@/components/ui/button'
 
+const FAQS = [
+  {
+    docCode: 'FAQ-01',
+    question: 'Will Layak file my application with the agency?',
+    body: 'No. Every output is a draft watermarked “DRAFT — NOT SUBMITTED.” You review the packet, then lodge it yourself via LHDN, JKM, or the relevant agency portal. Layak never touches a government submission endpoint.'
+  },
+  {
+    docCode: 'FAQ-02',
+    question: 'Which schemes does Layak cover today?',
+    body: 'STR 2026 (household tier), JKM Bantuan Warga Emas, and the five LHDN Form B reliefs. The corpus is committed to the repo and grows each release — coverage notes track which YA each rule is sourced from.'
+  },
+  {
+    docCode: 'FAQ-03',
+    question: 'What documents do I need to upload?',
+    body: 'Three: a MyKad (front side), one recent payslip or income screenshot, and one utility bill for proof of address. Synthetic samples work for testing — every demo asset carries a “SYNTHETIC — FOR DEMO ONLY” watermark.'
+  },
+  {
+    docCode: 'FAQ-04',
+    question: 'How safe is my personal data?',
+    body: 'PDPA-compliant by design. The full IC is never persisted — only the last four digits are stored. Original file bytes are extracted in-memory inside a single request and discarded once the structured profile is produced. No raw documents in logs.'
+  },
+  {
+    docCode: 'FAQ-05',
+    question: 'How accurate are the figures Layak shows?',
+    body: 'Every match cites the exact passage from the source agency PDF — no hallucinated rules. The agency still makes the final call on every application; Layak surfaces estimates so you know which forms are worth filing.'
+  },
+  {
+    docCode: 'FAQ-06',
+    question: 'How long does the whole pipeline take?',
+    body: 'Under a minute end-to-end. The five steps — extract, classify, match, compute, generate — stream live to the UI so you watch the agent reason instead of staring at a spinner.'
+  }
+]
+
 export function LandingCta() {
   const { t } = useTranslation()
+
   return (
-    <section className="border-t border-border bg-muted/50">
-      <div className="mx-auto flex max-w-5xl flex-col items-start gap-6 px-4 py-16 sm:py-20 md:px-6">
-        <h2 className="font-heading text-2xl font-semibold tracking-tight sm:text-3xl capitalize">
-          {t('marketing.cta.headline')}
-        </h2>
-        <p className="max-w-2xl text-sm text-muted-foreground sm:text-base">{t('marketing.cta.description')}</p>
-        <Button render={<Link href="/sign-in" />} size="lg">
-          {t('marketing.hero.getStarted')}
-          <ArrowRight className="ml-1.5 size-4" aria-hidden />
-        </Button>
+    <section className="relative overflow-hidden border-t border-foreground/10 bg-background py-20 lg:py-28">
+      {/* Decorative editorial register marks */}
+      <div className="pointer-events-none absolute inset-y-0 left-0 hidden w-px bg-foreground/10 lg:block" />
+      <div className="pointer-events-none absolute inset-y-0 right-0 hidden w-px bg-foreground/10 lg:block" />
+
+      <div className="mx-auto grid max-w-7xl gap-10 px-4 sm:px-6 lg:grid-cols-12 lg:gap-14">
+        {/* Left — copy */}
+        <div className="lg:col-span-7">
+          <div className="mono-caption text-[color:var(--hibiscus)]">05 — Take it for a spin</div>
+          <h2 className="mt-4 font-heading text-4xl font-semibold leading-[1.04] tracking-[-0.02em] sm:text-5xl lg:text-[60px]">
+            {t('marketing.cta.headline', 'Ready to see what you qualify for?')}
+          </h2>
+          <p className="mt-6 max-w-xl text-base leading-[1.65] text-foreground/65 sm:text-[17px]">
+            {t(
+              'marketing.cta.description',
+              'Sign in with Google is one click — no account setup needed. Upload your documents, get a ranked list with citations, walk away with watermarked draft packets. Takes under a minute.'
+            )}
+          </p>
+
+          <div className="mt-8 flex flex-wrap items-center gap-5">
+            <Button
+              render={<Link href="/sign-in" />}
+              size="lg"
+              className="group h-12 gap-2 rounded-full bg-[color:var(--hibiscus)] px-7 text-[15px] font-medium text-[color:var(--hibiscus-foreground)] shadow-[0_18px_40px_-18px_color-mix(in_oklch,var(--hibiscus)_70%,transparent)] hover:bg-[color:var(--hibiscus)]/92"
+            >
+              {t('marketing.hero.getStarted', 'Get started')}
+              <ArrowRight className="size-4 transition-transform group-hover:translate-x-0.5" aria-hidden />
+            </Button>
+            <Link
+              href="#how-it-works"
+              className="inline-flex items-center gap-1.5 text-sm font-medium text-foreground/75 underline decoration-foreground/25 decoration-2 underline-offset-[6px] transition-colors hover:text-foreground hover:decoration-[color:var(--hibiscus)]"
+            >
+              See the pipeline
+              <ArrowRight className="size-3.5" aria-hidden />
+            </Link>
+          </div>
+        </div>
+
+        {/* Right — paper-shuffle FAQ deck */}
+        <aside className="lg:col-span-5">
+          <FaqShuffleDeck />
+        </aside>
       </div>
     </section>
+  )
+}
+
+function FaqShuffleDeck() {
+  const [active, setActive] = useState(0)
+  const total = FAQS.length
+
+  const next = () => setActive((i) => (i + 1) % total)
+  const prev = () => setActive((i) => (i - 1 + total) % total)
+
+  return (
+    <div className="relative">
+      {/* Header strip */}
+      <div className="mb-3 flex items-center justify-between">
+        <span className="mono-caption text-foreground/55">Common questions · {String(active + 1).padStart(2, '0')} / {String(total).padStart(2, '0')}</span>
+        <div className="flex items-center gap-1.5">
+          <button
+            type="button"
+            onClick={prev}
+            aria-label="Previous question"
+            className="grid size-8 cursor-pointer place-items-center rounded-full border border-foreground/15 bg-background text-foreground/70 transition-colors hover:border-foreground/35 hover:text-foreground"
+          >
+            <ArrowLeft className="size-3.5" aria-hidden />
+          </button>
+          <button
+            type="button"
+            onClick={next}
+            aria-label="Next question"
+            className="grid size-8 cursor-pointer place-items-center rounded-full border border-foreground/15 bg-background text-foreground/70 transition-colors hover:border-foreground/35 hover:text-foreground"
+          >
+            <ArrowRight className="size-3.5" aria-hidden />
+          </button>
+        </div>
+      </div>
+
+      {/* Card stack */}
+      <div className="relative h-[320px] pt-4 sm:h-[300px]">
+        {FAQS.map((faq, i) => {
+          // offset = how many shuffles back from the top this card is
+          const offset = (i - active + total) % total
+          const isTop = offset === 0
+          // Cards beyond the visible 3-deep stack hide behind
+          const visible = offset < 3
+          // Back cards translate UP and scale down — top edges peek above
+          // the front card while their bottoms stay hidden under it.
+          const ty = -offset * 7
+          const scale = 1 - offset * 0.035
+          // Alternate small left/right tilt so the deck feels hand-stacked
+          const rot = offset === 0 ? 0 : offset === 1 ? -1.6 : 1.4
+          const opacity = visible ? 1 - offset * 0.22 : 0
+
+          return (
+            <button
+              key={faq.docCode}
+              type="button"
+              onClick={isTop ? next : undefined}
+              tabIndex={isTop ? 0 : -1}
+              aria-hidden={!isTop}
+              className={`paper-card absolute inset-x-0 left-0 right-0 top-0 cursor-pointer rounded-[18px] p-6 text-left transition-all duration-500 ease-[cubic-bezier(0.2,0.7,0.1,1)] ${
+                isTop ? 'hover:shadow-[0_36px_80px_-30px_color-mix(in_oklch,var(--ink)_36%,transparent)]' : 'pointer-events-none'
+              }`}
+              style={{
+                background: 'var(--paper)',
+                transform: `translateY(${ty}px) rotate(${rot}deg) scale(${scale})`,
+                opacity,
+                zIndex: total - offset,
+                transformOrigin: '50% 100%'
+              }}
+            >
+              {/* Doc-style header */}
+              <div className="flex items-center justify-between border-b border-foreground/10 pb-3">
+                <span className="mono-caption text-foreground/55">{faq.docCode}</span>
+                <span className="mono-caption text-[color:var(--hibiscus)]">FAQ</span>
+              </div>
+
+              {/* Question */}
+              <h3 className="mt-4 font-heading text-[19px] font-semibold leading-[1.25] tracking-[-0.005em] text-foreground sm:text-[20px]">
+                {faq.question}
+              </h3>
+
+              {/* Body */}
+              <p className="mt-3 text-[13.5px] leading-[1.6] text-foreground/70">{faq.body}</p>
+
+              {/* Footer */}
+              <div className="absolute inset-x-6 bottom-4 flex items-center justify-end">
+                <span className="draft-stamp text-[9px]">FILED</span>
+              </div>
+            </button>
+          )
+        })}
+      </div>
+
+      {/* Index dots */}
+      <div className="mt-5 flex items-center justify-center gap-1.5">
+        {FAQS.map((_, i) => (
+          <button
+            key={i}
+            type="button"
+            onClick={() => setActive(i)}
+            aria-label={`Go to question ${i + 1}`}
+            className={`h-1 cursor-pointer rounded-full transition-all duration-300 ${
+              i === active ? 'w-8 bg-[color:var(--hibiscus)]' : 'w-3 bg-foreground/20 hover:bg-foreground/35'
+            }`}
+          />
+        ))}
+      </div>
+    </div>
   )
 }

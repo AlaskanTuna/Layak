@@ -10,16 +10,36 @@ type Props = {
 
 export function PageHeading({ eyebrow, title, description, action, children }: Props) {
   return (
-    <section className="relative overflow-hidden rounded-xl border border-primary/15 bg-gradient-to-br from-primary/8 via-primary/3 to-transparent p-6 sm:p-8">
-      <div className="flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between">
+    <section className="paper-card relative isolate overflow-hidden rounded-[20px] p-6 sm:p-8">
+      {/* Subtle grid texture — civic-document flair */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-0 opacity-[0.04]"
+        style={{
+          backgroundImage:
+            'linear-gradient(to right, currentColor 1px, transparent 1px), linear-gradient(to bottom, currentColor 1px, transparent 1px)',
+          backgroundSize: '28px 28px'
+        }}
+      />
+      {/* Hibiscus tab — left-edge editorial register mark */}
+      <span
+        aria-hidden
+        className="pointer-events-none absolute inset-y-6 left-0 w-[3px] rounded-r-full bg-[color:var(--hibiscus)]/70 sm:inset-y-8"
+      />
+
+      <div className="relative flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between">
         <div className="flex flex-1 flex-col gap-3 sm:max-w-2xl">
           {eyebrow && (
-            <p className="flex items-center gap-1.5 text-[11px] font-medium uppercase tracking-[0.18em] text-primary">
+            <p className="mono-caption flex items-center gap-1.5 text-foreground/55">
               {eyebrow}
             </p>
           )}
-          <h1 className="font-heading text-3xl font-semibold tracking-tight sm:text-4xl">{title}</h1>
-          {description && <p className="text-sm leading-relaxed text-muted-foreground sm:text-base">{description}</p>}
+          <h1 className="font-heading text-3xl font-semibold leading-[1.05] tracking-[-0.015em] text-balance sm:text-4xl">
+            {title}
+          </h1>
+          {description && (
+            <p className="text-[14.5px] leading-[1.6] text-foreground/68 sm:text-[15.5px]">{description}</p>
+          )}
           {children}
         </div>
         {action && <div className="flex shrink-0 lg:pt-1">{action}</div>}

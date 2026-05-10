@@ -99,30 +99,35 @@ export function QuotaMeter({ refreshKey, className }: QuotaMeterProps) {
   const exhausted = quota.remaining === 0
   const nearCap = quota.remaining <= 1 && !exhausted
 
+  const trackTone = exhausted
+    ? 'bg-[color:var(--hibiscus)]'
+    : nearCap
+      ? 'bg-amber-500'
+      : 'bg-[color:var(--primary)]'
+  const numericTone = exhausted
+    ? 'text-[color:var(--hibiscus)]'
+    : nearCap
+      ? 'text-amber-600'
+      : 'text-foreground'
+
   return (
     <div
       className={cn(
-        'flex w-full max-w-sm flex-col gap-1.5 rounded-lg border border-border bg-card px-3 py-2.5',
+        'paper-card flex w-full max-w-sm flex-col gap-2 rounded-[14px] px-3.5 py-3',
         className
       )}
     >
-      <div className="flex items-center justify-between gap-2">
+      <div className="flex items-center justify-between gap-2 border-b border-foreground/10 pb-2">
         <div className="flex items-center gap-1.5">
-          <Zap className="size-3.5 text-muted-foreground" aria-hidden />
-          <span className="text-[11px] uppercase tracking-[0.14em] text-muted-foreground">
-            {t('dashboard.quota.tierFree')}
-          </span>
+          <Zap className="size-3 text-foreground/55" aria-hidden />
+          <span className="mono-caption text-foreground/55">{t('dashboard.quota.tierFree')}</span>
         </div>
-        <span
-          className={cn(
-            'tabular-nums text-xs font-medium',
-            exhausted ? 'text-destructive' : nearCap ? 'text-amber-600' : 'text-foreground'
-          )}
-        >
-          {quota.used} / {quota.limit}
+        <span className={cn('font-heading text-[15px] font-semibold tabular-nums leading-none', numericTone)}>
+          {quota.used}
+          <span className="ml-0.5 text-foreground/45 font-normal">/ {quota.limit}</span>
         </span>
       </div>
-      <div className="h-1.5 w-full overflow-hidden rounded-full bg-muted" aria-hidden>
+      <div className="h-1 w-full overflow-hidden rounded-full bg-foreground/8" aria-hidden>
         <div
           role="progressbar"
           aria-valuenow={quota.used}
@@ -130,13 +135,10 @@ export function QuotaMeter({ refreshKey, className }: QuotaMeterProps) {
           aria-valuemax={quota.limit}
           aria-label={t('dashboard.quota.aria', { used: quota.used, limit: quota.limit })}
           style={{ width: `${pct}%` }}
-          className={cn(
-            'h-full transition-all',
-            exhausted ? 'bg-destructive' : nearCap ? 'bg-amber-500' : 'bg-primary'
-          )}
+          className={cn('h-full transition-all duration-500', trackTone)}
         />
       </div>
-      <p className="text-[11px] text-muted-foreground">
+      <p className="mono-caption text-foreground/55">
         {exhausted
           ? t('dashboard.quota.exhausted', { time: formatResetIn(quota.resetAt) })
           : t('dashboard.quota.remaining', {

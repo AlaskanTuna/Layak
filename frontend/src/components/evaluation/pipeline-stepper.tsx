@@ -3,7 +3,6 @@
 import { AlertCircle, Check, Loader2 } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 
-import { Progress } from '@/components/ui/progress'
 import type { PipelineState, StepStatus } from '@/hooks/use-agent-pipeline'
 import { PIPELINE_STEPS, type Step } from '@/lib/agent-types'
 import { cn } from '@/lib/utils'
@@ -15,10 +14,13 @@ type Props = {
 }
 
 function StepIcon({ status }: { status: StepStatus }) {
-  if (status === 'complete') return <Check className="size-4 text-primary" aria-hidden />
-  if (status === 'active') return <Loader2 className="size-4 animate-spin text-primary" aria-hidden />
-  if (status === 'error') return <AlertCircle className="size-4 text-destructive" aria-hidden />
-  return <div className="size-4 rounded-full border border-muted-foreground/40" aria-hidden />
+  if (status === 'complete')
+    return <Check className="size-3.5 text-[color:var(--forest)]" aria-hidden />
+  if (status === 'active')
+    return <Loader2 className="size-3.5 animate-spin text-[color:var(--hibiscus)]" aria-hidden />
+  if (status === 'error')
+    return <AlertCircle className="size-3.5 text-[color:var(--hibiscus)]" aria-hidden />
+  return <div className="size-2 rounded-full border border-foreground/35" aria-hidden />
 }
 
 function completedCount(state: PipelineState): number {
@@ -34,31 +36,61 @@ export function PipelineStepper({ state, labelOverrides }: Props) {
 
   return (
     <div className="flex flex-col gap-3">
-      <Progress value={percent} />
-      <ol className="flex flex-col gap-2" aria-label={t('evaluation.stepper.aria')}>
-        {PIPELINE_STEPS.map((step: Step) => {
+      {/* Custom progress track — matches mono ledger feel */}
+      <div className="flex items-center gap-3">
+        <div className="h-1 flex-1 overflow-hidden rounded-full bg-foreground/10">
+          <div
+            className="h-full bg-[color:var(--hibiscus)] transition-all duration-500"
+            style={{ width: `${percent}%` }}
+          />
+        </div>
+        <span className="mono-caption text-foreground/55 tabular-nums">
+          {completed} / {PIPELINE_STEPS.length}
+        </span>
+      </div>
+
+      <ol className="flex flex-col gap-1.5" aria-label={t('evaluation.stepper.aria')}>
+        {PIPELINE_STEPS.map((step: Step, index: number) => {
           const status = state.stepStates[step]
+          const num = String(index + 1).padStart(2, '0')
           return (
             <li
               key={step}
               className={cn(
-                'flex items-center gap-3 rounded-md border px-3 py-2 text-sm transition-colors',
-                status === 'active' && 'border-primary/40 bg-primary/5',
-                status === 'complete' && 'border-primary/20',
-                status === 'error' && 'border-destructive/40 bg-destructive/5',
-                status === 'pending' && 'border-border'
+                'flex items-center gap-3 rounded-[10px] border px-3 py-2.5 text-sm transition-colors',
+                status === 'active' && 'border-[color:var(--hibiscus)]/40 bg-[color:var(--hibiscus)]/[0.04]',
+                status === 'complete' && 'border-[color:var(--forest)]/30 bg-[color:var(--forest)]/[0.04]',
+                status === 'error' && 'border-[color:var(--hibiscus)]/50 bg-[color:var(--hibiscus)]/[0.06]',
+                status === 'pending' && 'border-foreground/10'
               )}
               aria-current={status === 'active' ? 'step' : undefined}
             >
-              <StepIcon status={status} />
-              <span className={cn('flex-1', status === 'pending' && 'text-muted-foreground')}>{labelFor(step)}</span>
-              <span className="text-xs text-muted-foreground">{statusLabel(status)}</span>
+              <span
+                className={cn(
+                  'mono-caption w-6 shrink-0 tabular-nums',
+                  status === 'pending' ? 'text-foreground/35' : 'text-foreground/55'
+                )}
+              >
+                {num}
+              </span>
+              <span className="flex w-4 shrink-0 items-center justify-center">
+                <StepIcon status={status} />
+              </span>
+              <span
+                className={cn(
+                  'flex-1 truncate font-sans text-[13.5px]',
+                  status === 'pending' ? 'text-foreground/55' : 'font-medium text-foreground'
+                )}
+              >
+                {labelFor(step)}
+              </span>
+              <span className="mono-caption text-foreground/45">{statusLabel(status)}</span>
             </li>
           )
         })}
       </ol>
       {state.error && (
-        <p className="text-sm text-destructive" role="alert">
+        <p className="mono-caption text-[color:var(--hibiscus)]" role="alert">
           {state.error}
         </p>
       )}

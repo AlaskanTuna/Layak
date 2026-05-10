@@ -124,7 +124,7 @@ function UploadSlotCard({ spec, state, inputId, disabled, inputRef, onChange, on
   const hint = t(spec.hintKey)
 
   return (
-    <div className="flex flex-col gap-3 rounded-xl border border-border bg-card p-5 shadow-sm">
+    <div className="paper-card flex flex-col gap-3 rounded-[14px] p-5">
       <div className="flex flex-col gap-1.5">
         <div className="flex items-center gap-2">
           <p className="font-sans text-base font-medium tracking-tight">{label}</p>
@@ -134,16 +134,14 @@ function UploadSlotCard({ spec, state, inputId, disabled, inputRef, onChange, on
       </div>
 
       {file ? (
-        <div className="flex items-center justify-between gap-3 rounded-lg border border-primary/30 bg-primary/5 p-3">
+        <div className="flex items-center justify-between gap-3 rounded-lg border border-[color:var(--forest)]/35 bg-[color:var(--forest)]/[0.06] p-3">
           <div className="flex min-w-0 items-center gap-3">
-            <div className="flex size-9 shrink-0 items-center justify-center rounded-md bg-primary/10 text-primary">
+            <div className="flex size-9 shrink-0 items-center justify-center rounded-md bg-[color:var(--forest)]/14 text-[color:var(--forest)]">
               <FileText className="size-4" aria-hidden />
             </div>
             <div className="flex min-w-0 flex-col">
               <span className="truncate text-sm font-medium">{file.name}</span>
-              <span className="text-[10px] uppercase tracking-[0.14em] text-muted-foreground">
-                {formatSize(file.size)}
-              </span>
+              <span className="mono-caption text-foreground/55">{formatSize(file.size)}</span>
             </div>
           </div>
           <Button
@@ -161,21 +159,19 @@ function UploadSlotCard({ spec, state, inputId, disabled, inputRef, onChange, on
         <label
           htmlFor={inputId}
           className={cn(
-            'flex cursor-pointer flex-col items-center justify-center gap-2 rounded-lg border border-dashed border-border bg-background/40 px-6 py-8 text-center transition-colors hover:border-primary/40 hover:bg-background/70',
-            error && 'border-destructive/40 bg-destructive/5 hover:border-destructive/60',
+            'flex cursor-pointer flex-col items-center justify-center gap-2 rounded-lg border border-dashed border-foreground/15 bg-foreground/[0.02] px-6 py-8 text-center transition-colors hover:border-[color:var(--hibiscus)]/45 hover:bg-[color:var(--hibiscus)]/[0.03]',
+            error && 'border-[color:var(--hibiscus)]/55 bg-[color:var(--hibiscus)]/[0.06] hover:border-[color:var(--hibiscus)]/70',
             disabled && 'pointer-events-none opacity-50'
           )}
         >
-          <div className="flex size-10 items-center justify-center rounded-md bg-muted text-muted-foreground">
+          <div className="flex size-10 items-center justify-center rounded-md bg-foreground/[0.06] text-foreground/55">
             <UploadCloud className="size-5" aria-hidden />
           </div>
           <p className="text-sm">
-            <span className="font-medium text-primary">{t('evaluation.upload.dropzonePrimary')}</span>{' '}
-            <span className="text-muted-foreground">{t('evaluation.upload.dropzoneSecondary')}</span>
+            <span className="font-medium text-[color:var(--hibiscus)]">{t('evaluation.upload.dropzonePrimary')}</span>{' '}
+            <span className="text-foreground/65">{t('evaluation.upload.dropzoneSecondary')}</span>
           </p>
-          <p className="text-[10px] uppercase tracking-[0.14em] text-muted-foreground">
-            {t('evaluation.upload.dropzoneFormats')}
-          </p>
+          <p className="mono-caption text-foreground/55">{t('evaluation.upload.dropzoneFormats')}</p>
         </label>
       )}
 
@@ -291,8 +287,8 @@ export function UploadWidget({ onSubmit, onUseSamples, disabled = false, samples
 
   return (
     <div className="flex flex-col gap-5">
-      <div className="flex items-start gap-2 rounded-xl border border-border bg-muted/30 p-3 text-xs leading-relaxed text-muted-foreground sm:text-sm">
-        <FileImage className="mt-0.5 size-4 shrink-0 text-primary/70" aria-hidden />
+      <div className="paper-card flex items-start gap-2.5 rounded-[12px] p-3 text-xs leading-relaxed text-foreground/70 sm:text-sm">
+        <FileImage className="mt-0.5 size-4 shrink-0 text-[color:var(--hibiscus)]/80" aria-hidden />
         <p>{t('evaluation.upload.ingestionPathHelper')}</p>
       </div>
 
@@ -314,10 +310,10 @@ export function UploadWidget({ onSubmit, onUseSamples, disabled = false, samples
             />
           )
         })}
-        <div className="flex flex-col gap-3 rounded-xl border border-border bg-card p-5 shadow-sm">
+        <div className="paper-card flex flex-col gap-3 rounded-[14px] p-5">
           <button
             type="button"
-            className="flex w-full items-start justify-between gap-3 text-left"
+            className="flex w-full cursor-pointer items-start justify-between gap-3 text-left"
             onClick={() => setShowHousehold((prev) => !prev)}
             aria-expanded={showHousehold}
           >
@@ -352,11 +348,11 @@ export function UploadWidget({ onSubmit, onUseSamples, disabled = false, samples
         </div>
       </div>
 
-      <div className="flex flex-col items-start gap-4 border-t border-border pt-5 sm:flex-row sm:items-center sm:justify-between">
+      <div className="flex flex-col items-start gap-4 border-t border-foreground/10 pt-5 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex flex-col gap-2">
           <div className="flex flex-col gap-1">
             <p className="text-sm font-medium">{t('evaluation.upload.samplesTitle')}</p>
-            <p className="text-xs leading-relaxed text-muted-foreground">{t('evaluation.upload.samplesHint')}</p>
+            <p className="text-xs leading-relaxed text-foreground/65">{t('evaluation.upload.samplesHint')}</p>
           </div>
           <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
             <SamplePersonaButton
@@ -366,7 +362,7 @@ export function UploadWidget({ onSubmit, onUseSamples, disabled = false, samples
               disabled={disabled || samplesLoading !== null}
               onClick={() => onUseSamples('aisyah')}
             />
-            <span aria-hidden className="text-xs text-muted-foreground/60">
+            <span aria-hidden className="mono-caption text-foreground/40">
               {t('evaluation.upload.samplesDivider')}
             </span>
             <SamplePersonaButton
@@ -378,14 +374,20 @@ export function UploadWidget({ onSubmit, onUseSamples, disabled = false, samples
             />
           </div>
         </div>
-        <Button type="button" onClick={handleSubmit} disabled={disabled || !canSubmit} size="lg">
+        <Button
+          type="button"
+          onClick={handleSubmit}
+          disabled={disabled || !canSubmit}
+          size="lg"
+          className="rounded-full bg-[color:var(--hibiscus)] px-6 text-[color:var(--hibiscus-foreground)] hover:bg-[color:var(--hibiscus)]/92"
+        >
           {t('evaluation.upload.continue')}
           <ArrowRight className="ml-1.5 size-4" aria-hidden />
         </Button>
       </div>
 
-      <div className="flex items-start gap-2 rounded-xl border border-primary/15 bg-primary/5 p-4 text-sm text-muted-foreground">
-        <ShieldCheck className="mt-0.5 size-4 shrink-0 text-primary" aria-hidden />
+      <div className="paper-card flex items-start gap-2.5 rounded-[12px] p-4 text-sm text-foreground/70">
+        <ShieldCheck className="mt-0.5 size-4 shrink-0 text-[color:var(--forest)]" aria-hidden />
         <p>{t('evaluation.upload.trustCopy')}</p>
       </div>
 

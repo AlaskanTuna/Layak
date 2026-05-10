@@ -5,7 +5,6 @@ import { AlertTriangle, ChevronDown, Download, Eye, FileText, Loader2 } from 'lu
 import { useTranslation } from 'react-i18next'
 
 import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { authedFetch } from '@/lib/firebase'
 import { triggerDownload } from '@/lib/packet-download-utils'
 import type { SchemeMatch } from '@/lib/agent-types'
@@ -119,52 +118,57 @@ export function DraftPacketPreview({ evalId, matches }: Props) {
   if (qualifying.length === 0) return null
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle className="flex items-center gap-2 text-sm">
-          <Eye className="size-4 text-primary" aria-hidden />
+    <section className="paper-card rounded-[14px] p-5">
+      <header className="mb-4 flex flex-col gap-1 border-b border-foreground/10 pb-4">
+        <p className="mono-caption text-[color:var(--hibiscus)]">Preview</p>
+        <h3 className="flex items-center gap-2 font-heading text-[15px] font-semibold tracking-tight">
+          <Eye className="size-4 text-foreground/55" aria-hidden />
           {t('evaluation.preview.title', { count: qualifying.length })}
-        </CardTitle>
-        <CardDescription>{t('evaluation.preview.description')}</CardDescription>
-      </CardHeader>
-      <CardContent className="flex flex-col gap-2">
+        </h3>
+        <p className="text-xs leading-relaxed text-foreground/65">{t('evaluation.preview.description')}</p>
+      </header>
+      <div className="flex flex-col gap-2">
         {qualifying.map((match) => {
           const isOpen = openSchemeId === match.scheme_id
           const draft = drafts[match.scheme_id] ?? EMPTY_STATE
           const filename = `${match.scheme_id}-${evalId.slice(0, 6)}.pdf`
           return (
-            <div key={match.scheme_id} className="overflow-hidden rounded-lg border border-border bg-card">
+            <div
+              key={match.scheme_id}
+              className="overflow-hidden rounded-[10px] border border-foreground/10 bg-foreground/[0.02]"
+            >
               <button
                 type="button"
                 onClick={() => handleToggle(match.scheme_id)}
                 aria-expanded={isOpen}
-                className="flex w-full items-center justify-between gap-3 px-4 py-3 text-left hover:bg-muted/40"
+                className="flex w-full cursor-pointer items-center justify-between gap-3 px-4 py-3 text-left transition-colors hover:bg-foreground/[0.04]"
               >
                 <span className="flex min-w-0 flex-1 items-center gap-2.5">
-                  <FileText className="size-4 shrink-0 text-muted-foreground" aria-hidden />
+                  <FileText className="size-4 shrink-0 text-[color:var(--hibiscus)]/80" aria-hidden />
                   <span className="flex min-w-0 flex-col">
                     <span className="truncate text-sm font-medium">
                       {localisedSchemeName(t, match.scheme_id, match.scheme_name)}
                     </span>
-                    <span className="text-xs text-muted-foreground">{match.agency}</span>
+                    <span className="mono-caption mt-0.5 text-foreground/55">{match.agency}</span>
                   </span>
                 </span>
+                <span className="draft-stamp hidden text-[8.5px] sm:inline-flex">DRAFT</span>
                 <ChevronDown
-                  className={`size-4 shrink-0 text-muted-foreground transition-transform ${isOpen ? 'rotate-180' : ''}`}
+                  className={`size-4 shrink-0 text-foreground/45 transition-transform ${isOpen ? 'rotate-180' : ''}`}
                   aria-hidden
                 />
               </button>
 
               {isOpen && (
-                <div className="border-t border-border bg-muted/20 p-3">
+                <div className="border-t border-foreground/10 bg-foreground/[0.025] p-3">
                   {draft.loading && (
-                    <div className="flex items-center gap-2 px-1 py-8 text-xs text-muted-foreground">
+                    <div className="flex items-center gap-2 px-1 py-8 mono-caption text-foreground/55">
                       <Loader2 className="size-3.5 animate-spin" aria-hidden />
                       {t('evaluation.preview.loading')}
                     </div>
                   )}
                   {draft.error && (
-                    <div className="flex items-start gap-2 rounded-md border border-destructive/30 bg-destructive/5 p-3 text-xs text-destructive">
+                    <div className="flex items-start gap-2 rounded-md border border-[color:var(--hibiscus)]/35 bg-[color:var(--hibiscus)]/[0.06] p-3 text-xs text-[color:var(--hibiscus)]">
                       <AlertTriangle className="size-3.5 shrink-0" aria-hidden />
                       <span className="flex flex-col gap-2">
                         <span>{t('evaluation.preview.error', { message: draft.error })}</span>
@@ -187,13 +191,14 @@ export function DraftPacketPreview({ evalId, matches }: Props) {
                         title={t('evaluation.preview.iframeTitle', {
                           name: localisedSchemeName(t, match.scheme_id, match.scheme_name)
                         })}
-                        className="h-[480px] w-full rounded-md border border-border bg-background"
+                        className="h-[480px] w-full rounded-md border border-foreground/10 bg-background"
                       />
                       <div className="flex justify-end">
                         <Button
                           type="button"
                           size="sm"
                           variant="outline"
+                          className="rounded-full"
                           onClick={() => handleDownloadOne(match.scheme_id, filename)}
                         >
                           <Download className="size-3.5" aria-hidden />
@@ -207,7 +212,7 @@ export function DraftPacketPreview({ evalId, matches }: Props) {
             </div>
           )
         })}
-      </CardContent>
-    </Card>
+      </div>
+    </section>
   )
 }

@@ -78,18 +78,15 @@ export function ResultsChatPanel({ evalId, matches }: Props) {
 
   return (
     <>
-      {/* Floating action button — stacked ABOVE the FloatingHelpLauncher.
-          Uses the exact same `Button size="icon-lg"` shape (size-9 → 36×36 px)
-          and `glass-surface` styling as the help launcher so the two FABs
-          render identically and right-align flush. The help launcher sits
-          at bottom-4 / md:bottom-6; bottom-16 / md:bottom-20 puts this
-          button ~12 px above it (36 px button + 16 px gap = 52 px → bottom-16). */}
+      {/* Floating action button — sits one slot above the help launcher.
+          Hibiscus tinted so it reads as the *evaluation-level* action,
+          distinct from the neutral help launcher below it. */}
       {!isOpen && (
         <Button
           type="button"
           variant="ghost"
           size="icon-lg"
-          className="glass-surface fixed right-4 bottom-16 z-40 rounded-full text-foreground shadow-lg hover:bg-accent/25 hover:text-foreground md:right-6 md:bottom-20 dark:hover:bg-accent/35"
+          className="fixed right-4 bottom-16 z-40 cursor-pointer rounded-full border border-[color:var(--hibiscus)]/40 bg-[color:var(--hibiscus)] text-[color:var(--hibiscus-foreground)] shadow-[0_18px_40px_-18px_color-mix(in_oklch,var(--hibiscus)_70%,transparent)] hover:bg-[color:var(--hibiscus)]/92 md:right-6 md:bottom-20"
           aria-label={t('evaluation.chat.openButton')}
           onClick={() => setIsOpen(true)}
         >
@@ -108,11 +105,18 @@ export function ResultsChatPanel({ evalId, matches }: Props) {
             if (e.target === e.currentTarget) setIsOpen(false)
           }}
         >
-          <div className="border-border/70 bg-card/96 supports-[backdrop-filter]:bg-card/88 dark:bg-card/95 dark:supports-[backdrop-filter]:bg-card/82 flex h-[85vh] w-full max-w-md flex-col overflow-hidden rounded-t-2xl border backdrop-blur-2xl backdrop-saturate-150 shadow-[0_28px_72px_rgb(15_23_42/0.16),inset_0_1px_0_rgb(255_255_255/0.42)] dark:shadow-[0_28px_72px_rgb(0_0_0/0.48),inset_0_1px_0_rgb(255_255_255/0.08)] sm:h-[640px] sm:max-h-[80vh] sm:rounded-2xl">
-            <header className="flex items-center justify-between gap-2 border-b border-border/60 px-4 py-3">
+          <div className="glass-grid-panel flex h-[85vh] w-full max-w-md flex-col overflow-hidden rounded-t-[20px] sm:h-[640px] sm:max-h-[80vh] sm:rounded-[20px]">
+            {/* Header — paper letterhead with mono caption + DRAFT-style accent */}
+            <header className="relative flex items-center justify-between gap-2 border-b border-foreground/10 px-4 py-3.5">
+              <span
+                aria-hidden
+                className="pointer-events-none absolute inset-y-2.5 left-0 w-[3px] rounded-r-full bg-[color:var(--hibiscus)]/70"
+              />
               <div className="flex flex-col">
-                <span className="text-sm font-semibold">{t('evaluation.chat.title')}</span>
-                <span className="text-xs text-muted-foreground">{t('evaluation.chat.subtitle')}</span>
+                <span className="mono-caption text-[color:var(--hibiscus)]">Concierge</span>
+                <span className="mt-0.5 font-heading text-[15px] font-semibold text-foreground">
+                  {t('evaluation.chat.title')}
+                </span>
               </div>
               <div className="flex items-center gap-1">
                 {chat.messages.length > 0 && (
@@ -125,7 +129,7 @@ export function ResultsChatPanel({ evalId, matches }: Props) {
                     aria-label={t('evaluation.chat.reset')}
                     title={t('evaluation.chat.reset')}
                     disabled={chat.isStreaming}
-                    className="inline-flex h-8 w-8 items-center justify-center rounded-md text-muted-foreground transition hover:bg-muted hover:text-foreground focus:outline-none focus:ring-2 focus:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
+                    className="inline-flex h-8 w-8 cursor-pointer items-center justify-center rounded-md text-foreground/60 transition hover:bg-foreground/[0.05] hover:text-foreground focus:outline-none focus:ring-2 focus:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
                   >
                     <RotateCcw className="h-4 w-4" aria-hidden />
                   </button>
@@ -134,16 +138,17 @@ export function ResultsChatPanel({ evalId, matches }: Props) {
                   type="button"
                   onClick={() => setIsOpen(false)}
                   aria-label={t('evaluation.chat.close')}
-                  className="-mr-1 inline-flex h-8 w-8 items-center justify-center rounded-md text-muted-foreground transition hover:bg-muted hover:text-foreground focus:outline-none focus:ring-2 focus:ring-ring"
+                  className="-mr-1 inline-flex h-8 w-8 cursor-pointer items-center justify-center rounded-md text-foreground/60 transition hover:bg-foreground/[0.05] hover:text-foreground focus:outline-none focus:ring-2 focus:ring-ring"
                 >
                   <X className="h-4 w-4" aria-hidden />
                 </button>
               </div>
             </header>
 
-            <div className="flex-1 space-y-3 overflow-y-auto px-4 py-3">
+            <div className="flex-1 space-y-3 overflow-y-auto px-4 py-4">
               {chat.messages.length === 0 && (
-                <div className="rounded-lg border border-dashed border-border bg-muted/30 px-3 py-3 text-sm text-muted-foreground">
+                <div className="rounded-[12px] border border-dashed border-foreground/20 bg-foreground/[0.03] px-3.5 py-3 text-sm text-foreground/65">
+                  <p className="mono-caption mb-1.5 text-foreground/55">Ask the concierge</p>
                   {t('evaluation.chat.emptyBody')}
                 </div>
               )}
@@ -153,7 +158,7 @@ export function ResultsChatPanel({ evalId, matches }: Props) {
               ))}
 
               {chat.errorMessage && (
-                <div className="flex items-start gap-2 rounded-lg border border-destructive/30 bg-destructive/5 px-3 py-2 text-sm text-destructive">
+                <div className="flex items-start gap-2 rounded-[10px] border border-[color:var(--hibiscus)]/40 bg-[color:var(--hibiscus)]/[0.06] px-3 py-2.5 text-sm text-[color:var(--hibiscus)]">
                   <AlertCircle className="mt-0.5 h-4 w-4 shrink-0" aria-hidden />
                   <p>{chat.errorMessage}</p>
                 </div>
@@ -161,8 +166,8 @@ export function ResultsChatPanel({ evalId, matches }: Props) {
 
               {showSuggestions && (
                 <div className="flex flex-col gap-2 pt-2">
-                  <p className="flex items-center gap-1 text-xs font-medium text-muted-foreground">
-                    <Sparkles className="h-3.5 w-3.5" aria-hidden />
+                  <p className="mono-caption flex items-center gap-1.5 text-foreground/55">
+                    <Sparkles className="h-3 w-3" aria-hidden />
                     {t('evaluation.chat.suggestionsLabel')}
                   </p>
                   <div className="flex flex-wrap gap-2">
@@ -172,7 +177,7 @@ export function ResultsChatPanel({ evalId, matches }: Props) {
                         type="button"
                         onClick={() => handleSuggestion(s)}
                         disabled={chat.isStreaming}
-                        className="rounded-full border border-border bg-muted/40 px-3 py-1.5 text-xs text-foreground transition hover:bg-muted disabled:cursor-not-allowed disabled:opacity-60"
+                        className="cursor-pointer rounded-full border border-[color:var(--hibiscus)]/30 bg-[color:var(--hibiscus)]/[0.06] px-3 py-1.5 text-xs text-foreground transition hover:border-[color:var(--hibiscus)]/55 hover:bg-[color:var(--hibiscus)]/[0.12] disabled:cursor-not-allowed disabled:opacity-60"
                       >
                         {s}
                       </button>
@@ -184,7 +189,7 @@ export function ResultsChatPanel({ evalId, matches }: Props) {
               <div ref={messagesEndRef} />
             </div>
 
-            <footer className="border-t border-border bg-muted/20 px-3 py-3">
+            <footer className="border-t border-foreground/10 bg-foreground/[0.025] px-3 py-3">
               <div className="flex items-end gap-2">
                 <textarea
                   ref={inputRef}
@@ -193,7 +198,7 @@ export function ResultsChatPanel({ evalId, matches }: Props) {
                   onKeyDown={handleKeyDown}
                   placeholder={t('evaluation.chat.placeholder')}
                   rows={1}
-                  className="max-h-32 min-h-[40px] flex-1 resize-none rounded-md border border-border bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring disabled:opacity-60"
+                  className="max-h-32 min-h-[40px] flex-1 resize-none rounded-md border border-foreground/15 bg-background/70 px-3 py-2 text-sm focus:border-[color:var(--hibiscus)]/45 focus:outline-none focus:ring-2 focus:ring-[color:var(--hibiscus)]/30 disabled:opacity-60"
                   disabled={chat.isStreaming}
                   maxLength={4000}
                 />
@@ -214,12 +219,13 @@ export function ResultsChatPanel({ evalId, matches }: Props) {
                     onClick={handleSend}
                     disabled={!draft.trim()}
                     aria-label={t('evaluation.chat.send')}
+                    className="rounded-full bg-[color:var(--hibiscus)] px-3 text-[color:var(--hibiscus-foreground)] hover:bg-[color:var(--hibiscus)]/92 disabled:bg-foreground/15 disabled:text-foreground/40"
                   >
                     <Send className="h-4 w-4" aria-hidden />
                   </Button>
                 )}
               </div>
-              <p className="mt-2 text-[10px] text-muted-foreground">{t('evaluation.chat.disclaimer')}</p>
+              <p className="mono-caption mt-2 text-foreground/45">{t('evaluation.chat.disclaimer')}</p>
             </footer>
           </div>
         </div>
@@ -236,14 +242,19 @@ function ChatBubble({ message }: { message: ChatMessage }) {
       <div
         className={
           isUser
-            ? 'max-w-[85%] rounded-2xl rounded-br-sm bg-primary px-3 py-2 text-sm text-primary-foreground'
-            : 'max-w-[90%] rounded-2xl rounded-bl-sm bg-muted px-3 py-2 text-sm text-foreground'
+            ? 'max-w-[85%] rounded-2xl rounded-br-sm bg-[color:var(--hibiscus)] px-3.5 py-2 text-sm text-[color:var(--hibiscus-foreground)] shadow-[0_8px_18px_-10px_color-mix(in_oklch,var(--hibiscus)_60%,transparent)]'
+            : 'max-w-[90%] rounded-2xl rounded-bl-sm border border-foreground/10 bg-background/85 px-3.5 py-2 text-sm text-foreground'
         }
       >
         <p className="whitespace-pre-wrap break-words">
           {renderInlineCitations(message.content)}
           {message.streaming && (
-            <span className="ml-0.5 inline-block h-3 w-1.5 animate-pulse bg-current align-middle" aria-hidden />
+            <span
+              className={`ml-0.5 inline-block h-3 w-1.5 animate-pulse align-middle ${
+                isUser ? 'bg-[color:var(--hibiscus-foreground)]' : 'bg-[color:var(--hibiscus)]'
+              }`}
+              aria-hidden
+            />
           )}
         </p>
         {!isUser && message.citations && message.citations.length > 0 && (
@@ -261,7 +272,7 @@ function ChatBubble({ message }: { message: ChatMessage }) {
                       target?.scrollIntoView({ behavior: 'smooth', block: 'center' })
                     }
                   }}
-                  className="inline-flex items-center rounded-full bg-background px-2 py-0.5 text-[11px] text-muted-foreground transition hover:text-foreground"
+                  className="citation-chip cursor-pointer hover:bg-[color:var(--primary)]/16"
                   title={c.snippet || c.source_pdf || c.scheme_id || ''}
                 >
                   {c.scheme_id ?? c.source_pdf}
@@ -270,7 +281,9 @@ function ChatBubble({ message }: { message: ChatMessage }) {
           </div>
         )}
         {!isUser && message.groundingUnavailable && !message.streaming && (
-          <p className="mt-2 text-[10px] text-muted-foreground italic">{t('evaluation.chat.groundingUnavailable')}</p>
+          <p className="mono-caption mt-2 italic text-foreground/55">
+            {t('evaluation.chat.groundingUnavailable')}
+          </p>
         )}
       </div>
     </div>

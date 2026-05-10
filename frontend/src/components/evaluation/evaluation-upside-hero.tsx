@@ -25,23 +25,48 @@ export function EvaluationUpsideHero({ totalAnnualRm, matchedCount, packet, empt
   const draftCount = packet?.drafts.length ?? 0
 
   return (
-    <section className="flex flex-col gap-5 rounded-xl border border-border bg-card p-6 shadow-sm sm:p-8">
-      <p className="text-[11px] uppercase tracking-[0.18em] text-muted-foreground">{t('evaluation.upside.label')}</p>
+    <section className="paper-card relative isolate flex flex-col gap-5 overflow-hidden rounded-[20px] p-6 sm:p-8">
+      {/* Grid texture + hibiscus tab */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-0 opacity-[0.04]"
+        style={{
+          backgroundImage:
+            'linear-gradient(to right, currentColor 1px, transparent 1px), linear-gradient(to bottom, currentColor 1px, transparent 1px)',
+          backgroundSize: '28px 28px'
+        }}
+      />
+      <span
+        aria-hidden
+        className="pointer-events-none absolute inset-y-6 left-0 w-[3px] rounded-r-full bg-[color:var(--hibiscus)]/70 sm:inset-y-8"
+      />
+      {!empty && (
+        <span className="draft-stamp pointer-events-none absolute right-6 top-6 text-[9px] sm:right-8 sm:top-8">
+          DRAFT
+        </span>
+      )}
 
-      <div className="flex flex-wrap items-baseline gap-x-2 gap-y-1 tabular-nums">
-        <span className="font-heading text-2xl font-normal text-muted-foreground sm:text-3xl md:text-4xl">
-          {t('evaluation.upside.currency')}
-        </span>
-        <span className="font-heading text-4xl font-semibold tracking-tight text-foreground break-all sm:text-5xl md:text-6xl">
-          {empty ? '—' : formatRm(totalAnnualRm)}
-        </span>
+      <div className="relative flex flex-col gap-2">
+        <p className="mono-caption text-[color:var(--hibiscus)]">{t('evaluation.upside.label')}</p>
+        <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
+          <span className="display-numeral text-[64px] text-foreground sm:text-[80px] md:text-[96px]">
+            {empty ? '—' : formatRm(totalAnnualRm)}
+          </span>
+          <span className="mono-caption text-foreground/55">{t('evaluation.upside.currency')}</span>
+        </div>
       </div>
 
       {empty ? (
         <>
-          <p className="max-w-md text-sm leading-relaxed text-muted-foreground">{t('evaluation.upside.empty')}</p>
-          <div className="flex">
-            <Button render={<Link href="/dashboard/evaluation/upload" />} size="lg">
+          <p className="relative max-w-md text-[14.5px] leading-[1.6] text-foreground/68">
+            {t('evaluation.upside.empty')}
+          </p>
+          <div className="relative flex">
+            <Button
+              render={<Link href="/dashboard/evaluation/upload" />}
+              size="lg"
+              className="rounded-full bg-[color:var(--hibiscus)] px-6 text-[color:var(--hibiscus-foreground)] hover:bg-[color:var(--hibiscus)]/92"
+            >
               {t('evaluation.upside.start')}
               <ArrowRight className="ml-1.5 size-4" aria-hidden />
             </Button>
@@ -49,12 +74,17 @@ export function EvaluationUpsideHero({ totalAnnualRm, matchedCount, packet, empt
         </>
       ) : (
         <>
-          <p className="max-w-md text-sm leading-relaxed text-muted-foreground">
+          <p className="relative max-w-md text-[14.5px] leading-[1.6] text-foreground/68">
             {t('evaluation.upside.description', { count: matchedCount })}
           </p>
           {canDownloadAll && (
-            <div className="flex">
-              <Button type="button" size="lg" onClick={() => downloadAllDrafts(packet)}>
+            <div className="relative flex">
+              <Button
+                type="button"
+                size="lg"
+                onClick={() => downloadAllDrafts(packet)}
+                className="rounded-full bg-[color:var(--hibiscus)] px-6 text-[color:var(--hibiscus-foreground)] hover:bg-[color:var(--hibiscus)]/92"
+              >
                 <Download className="mr-1.5 size-4" aria-hidden />
                 {draftCount > 0
                   ? t('evaluation.upside.downloadWithCount', { count: draftCount })

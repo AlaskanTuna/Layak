@@ -5,7 +5,6 @@ import { ChevronDown, ChevronUp, Code2, Terminal } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 
 import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import type { ComputeUpsideResult } from '@/lib/agent-types'
 
 type Props = {
@@ -17,51 +16,79 @@ export function CodeExecutionPanel({ upside }: Props) {
   const [expanded, setExpanded] = useState(false)
 
   return (
-    <Card>
-      <CardHeader className="grid-cols-[1fr_auto] gap-2">
-        <CardTitle className="flex items-center gap-2 text-sm">
-          <Code2 className="size-4 text-primary" aria-hidden />
-          {t('evaluation.codeExecution.title')}
-        </CardTitle>
-        <CardDescription>{t('evaluation.codeExecution.description')}</CardDescription>
-        <div className="col-start-2 row-span-2 row-start-1 self-start justify-self-end">
-          <Button type="button" variant="outline" size="sm" onClick={() => setExpanded((value) => !value)}>
-            {expanded ? (
-              <>
-                <ChevronUp className="mr-1.5 size-4" aria-hidden />
-                {t('evaluation.codeExecution.hide')}
-              </>
-            ) : (
-              <>
-                <ChevronDown className="mr-1.5 size-4" aria-hidden />
-                {t('evaluation.codeExecution.show')}
-              </>
-            )}
-          </Button>
+    <section className="paper-card rounded-[14px] p-5">
+      <header className="flex items-start justify-between gap-3">
+        <div className="flex flex-col">
+          <p className="mono-caption text-[color:var(--primary)]">Compute</p>
+          <h3 className="mt-1 flex items-center gap-2 font-heading text-[15px] font-semibold tracking-tight">
+            <Code2 className="size-4 text-foreground/55" aria-hidden />
+            {t('evaluation.codeExecution.title')}
+          </h3>
+          <p className="mt-1 text-xs leading-relaxed text-foreground/65">
+            {t('evaluation.codeExecution.description')}
+          </p>
         </div>
-      </CardHeader>
+        <Button
+          type="button"
+          variant="outline"
+          size="sm"
+          onClick={() => setExpanded((value) => !value)}
+          className="shrink-0 rounded-full"
+        >
+          {expanded ? (
+            <>
+              <ChevronUp className="mr-1.5 size-4" aria-hidden />
+              {t('evaluation.codeExecution.hide')}
+            </>
+          ) : (
+            <>
+              <ChevronDown className="mr-1.5 size-4" aria-hidden />
+              {t('evaluation.codeExecution.show')}
+            </>
+          )}
+        </Button>
+      </header>
       {expanded && (
-        <CardContent className="flex flex-col gap-3">
-          <div className="flex flex-col gap-1">
-            <div className="flex items-center gap-1.5 text-xs font-medium text-muted-foreground">
-              <Code2 className="size-3" aria-hidden />
-              {t('evaluation.codeExecution.python')}
-            </div>
-            <pre className="overflow-x-auto rounded-md border bg-muted/50 px-3 py-2 font-mono text-xs leading-relaxed">
-              {upside.python_snippet}
-            </pre>
-          </div>
-          <div className="flex flex-col gap-1">
-            <div className="flex items-center gap-1.5 text-xs font-medium text-muted-foreground">
-              <Terminal className="size-3" aria-hidden />
-              {t('evaluation.codeExecution.stdout')}
-            </div>
-            <pre className="overflow-x-auto rounded-md border bg-muted/50 px-3 py-2 font-mono text-xs leading-relaxed">
-              {upside.stdout}
-            </pre>
-          </div>
-        </CardContent>
+        <div className="mt-4 flex flex-col gap-3 border-t border-foreground/10 pt-4">
+          <CodeBlock
+            label={t('evaluation.codeExecution.python')}
+            icon={<Code2 className="size-3" aria-hidden />}
+            content={upside.python_snippet}
+          />
+          <CodeBlock
+            label={t('evaluation.codeExecution.stdout')}
+            icon={<Terminal className="size-3" aria-hidden />}
+            content={upside.stdout}
+          />
+        </div>
       )}
-    </Card>
+    </section>
+  )
+}
+
+function CodeBlock({
+  label,
+  icon,
+  content
+}: {
+  label: string
+  icon: React.ReactNode
+  content: string
+}) {
+  return (
+    <div className="mock-chrome">
+      <div className="flex items-center gap-2 border-b border-[color:color-mix(in_oklch,var(--paper)_18%,transparent)]/40 px-3 py-2">
+        <span className="size-2 rounded-full bg-[#ff5f57]" />
+        <span className="size-2 rounded-full bg-[#febc2e]" />
+        <span className="size-2 rounded-full bg-[#28c840]" />
+        <span className="ml-2 mono-caption flex items-center gap-1.5 text-[color:color-mix(in_oklch,var(--paper)_60%,transparent)]">
+          {icon}
+          {label}
+        </span>
+      </div>
+      <pre className="overflow-x-auto px-3.5 py-3 font-mono text-[12px] leading-[1.55] text-[color:color-mix(in_oklch,var(--paper)_94%,transparent)]">
+        {content}
+      </pre>
+    </div>
   )
 }

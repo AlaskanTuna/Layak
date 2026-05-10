@@ -5,7 +5,6 @@ import { useMemo } from 'react'
 import { ArrowRight, Clock } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 
-import { Card } from '@/components/ui/card'
 import type { EvaluationListItem, EvaluationStatus } from '@/lib/agent-types'
 import { cn } from '@/lib/utils'
 
@@ -17,9 +16,9 @@ const RM = new Intl.NumberFormat('en-MY', {
 })
 
 const STATUS_DOT: Record<EvaluationStatus, string> = {
-  complete: 'bg-primary',
+  complete: 'bg-[color:var(--forest)]',
   running: 'bg-amber-500 animate-pulse',
-  error: 'bg-destructive'
+  error: 'bg-[color:var(--hibiscus)]'
 }
 
 type Props = {
@@ -52,58 +51,62 @@ export function RecentActivity({ items }: Props) {
 
   return (
     <section className="flex flex-col gap-4">
-      <h2 className="font-heading text-xl font-semibold tracking-tight">{t('dashboard.recentActivity.title')}</h2>
+      <div className="flex items-baseline justify-between gap-3">
+        <h2 className="font-heading text-xl font-semibold tracking-tight">{t('dashboard.recentActivity.title')}</h2>
+        <span className="mono-caption text-foreground/45">Ledger</span>
+      </div>
 
       {slice.length === 0 ? (
-        <div className="flex flex-col items-center gap-3 rounded-lg border border-dashed border-border bg-card/40 px-6 py-10 text-center">
-          <div className="flex size-10 items-center justify-center rounded-md bg-muted text-muted-foreground">
+        <div className="paper-card flex flex-col items-center gap-3 rounded-[16px] px-6 py-10 text-center">
+          <div className="flex size-10 items-center justify-center rounded-md bg-foreground/[0.05] text-foreground/55">
             <Clock className="size-5" aria-hidden />
           </div>
-          <p className="text-[11px] uppercase tracking-[0.18em] text-muted-foreground">
-            {t('dashboard.recentActivity.empty')}
-          </p>
-          <p className="max-w-xs text-xs leading-relaxed text-muted-foreground">
+          <p className="mono-caption text-foreground/55">{t('dashboard.recentActivity.empty')}</p>
+          <p className="max-w-xs text-xs leading-relaxed text-foreground/65">
             {t('dashboard.recentActivity.emptyDescription')}
           </p>
         </div>
       ) : (
         <>
-          <Card className="gap-0 py-0">
+          <div className="paper-card overflow-hidden rounded-[14px]">
             <ul>
               {slice.map((item, index) => {
                 const status = item.status as EvaluationStatus
                 const isLast = index === slice.length - 1
                 return (
-                  <li key={item.id} className={cn('border-border', !isLast && 'border-b')}>
+                  <li key={item.id} className={cn(!isLast && 'border-b border-foreground/8')}>
                     <Link
                       href={`/dashboard/evaluation/results/${item.id}`}
-                      className="flex items-center gap-3 px-4 py-3 transition-colors hover:bg-muted/30"
+                      className="flex items-center gap-3 px-4 py-3.5 transition-colors hover:bg-foreground/[0.03]"
                     >
+                      <span aria-hidden className="mono-caption w-6 shrink-0 text-foreground/40 tabular-nums">
+                        {String(index + 1).padStart(2, '0')}
+                      </span>
                       <span
                         aria-hidden
-                        className={cn('size-2 shrink-0 rounded-full', STATUS_DOT[status] ?? 'bg-muted')}
+                        className={cn('size-2 shrink-0 rounded-full', STATUS_DOT[status] ?? 'bg-foreground/20')}
                       />
                       <div className="flex min-w-0 flex-1 flex-col">
-                        <p className="truncate text-sm font-medium">
+                        <p className="truncate text-[13.5px] font-medium text-foreground">
                           {t(`dashboard.recentActivity.label.${status}`, {
                             defaultValue: t('dashboard.recentActivity.label.complete')
                           })}
                         </p>
-                        <p className="text-xs text-muted-foreground">
+                        <p className="mono-caption mt-1 truncate text-foreground/55">
                           {relativeTime(item.createdAt, t)}
                           {item.status === 'complete' && <> · RM {RM.format(item.totalAnnualRM)}</>}
                         </p>
                       </div>
-                      <ArrowRight className="size-3.5 shrink-0 text-muted-foreground" aria-hidden />
+                      <ArrowRight className="size-3.5 shrink-0 text-foreground/40" aria-hidden />
                     </Link>
                   </li>
                 )
               })}
             </ul>
-          </Card>
+          </div>
           <Link
             href="/dashboard/evaluation"
-            className="self-end text-xs text-muted-foreground transition-colors hover:text-foreground"
+            className="mono-caption self-end text-foreground/55 transition-colors hover:text-foreground"
           >
             {t('dashboard.recentActivity.viewAll')}
             <ArrowRight className="ml-1 inline size-3" aria-hidden />

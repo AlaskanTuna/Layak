@@ -1,99 +1,126 @@
 'use client'
 
-import { useEffect, useState } from 'react'
-import Link from 'next/link'
-import { ArrowRight } from 'lucide-react'
-import { useTranslation } from 'react-i18next'
+import { useEffect, useRef } from 'react'
 import Image from 'next/image'
-
-import { Button } from '@/components/ui/button'
+import { FileCheck2, ShieldCheck, Sparkles } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 
 export function LandingHero() {
   const { t } = useTranslation()
-  const [scrollProgress, setScrollProgress] = useState(0)
+  const heroImageRef = useRef<HTMLImageElement>(null)
 
+  // Scroll-driven zoom + blur on the hero photograph (SolarSim mechanic).
+  // rAF-batched, with a small delta gate so we don't thrash style writes.
   useEffect(() => {
-    let frame = 0
+    let raf = 0
+    let lastBlur = -1
 
     const update = () => {
-      frame = 0
-      const viewportHeight = Math.max(window.innerHeight, 1)
-      const nextProgress = Math.min(window.scrollY / (viewportHeight * 0.9), 1)
-      setScrollProgress(nextProgress)
+      raf = 0
+      const image = heroImageRef.current
+      if (!image) return
+      const nextBlur = Math.min(14, window.scrollY / 40)
+      if (Math.abs(nextBlur - lastBlur) < 0.1) return
+      lastBlur = nextBlur
+      image.style.filter = `blur(${nextBlur.toFixed(1)}px)`
+      image.style.transform = nextBlur > 0 ? `scale(${(1 + nextBlur * 0.006).toFixed(3)})` : 'scale(1)'
     }
 
     const onScroll = () => {
-      if (frame) return
-      frame = window.requestAnimationFrame(update)
+      if (raf) return
+      raf = window.requestAnimationFrame(update)
     }
 
     update()
     window.addEventListener('scroll', onScroll, { passive: true })
-    window.addEventListener('resize', onScroll)
-
     return () => {
       window.removeEventListener('scroll', onScroll)
-      window.removeEventListener('resize', onScroll)
-      if (frame) window.cancelAnimationFrame(frame)
+      if (raf) window.cancelAnimationFrame(raf)
     }
   }, [])
 
   return (
-    <section className="relative flex min-h-[90vh] md:min-h-screen w-full flex-col items-center justify-center overflow-hidden bg-background">
-      {/* Background Image */}
-      <div className="absolute inset-0 z-0">
+    <section className="relative isolate flex min-h-svh flex-col overflow-hidden bg-background">
+      {/* Background photograph — pinned right, masked on left */}
+      <div className="pointer-events-none absolute inset-0">
         <Image
+          ref={heroImageRef}
           src="/marketing/hero-civic-glow.webp"
-          alt="Civic Glow Hero"
+          alt=""
+          aria-hidden
           fill
-          className="object-cover object-center transition-transform duration-500 ease-out will-change-transform"
-          style={{
-            transform: `scale(${1 + scrollProgress * 0.045})`,
-            filter: `blur(${scrollProgress * 5}px)`
-          }}
           priority
+          className="object-cover object-[72%_center] will-change-[filter,transform] transition-none lg:object-[68%_center]"
+          style={{ filter: 'blur(0px)', transform: 'scale(1)', transformOrigin: 'center' }}
         />
-        {/* Tuned overlays keep the hero readable without washing out the banner art. */}
-        <div className="absolute inset-0 bg-black/18 dark:bg-black/28" />
-        <div className="absolute inset-0 bg-gradient-to-t from-background/62 via-background/10 to-transparent dark:from-background/72 dark:via-background/14" />
-        <div
-          className="pointer-events-none absolute inset-x-0 bottom-0 top-[18%] bg-white/12 backdrop-blur-2xl transition-opacity duration-500 ease-out dark:bg-white/6"
-          style={{ opacity: scrollProgress * 0.4 }}
-        />
-        <div
-          className="pointer-events-none absolute inset-x-0 bottom-0 h-[38vh] bg-gradient-to-t from-background/92 via-background/40 to-transparent transition-opacity duration-500 ease-out dark:from-background dark:via-background/56"
-          style={{ opacity: 0.35 + scrollProgress * 0.5 }}
-        />
+        <div className="absolute inset-0 hero-mask-light" />
+        <div className="absolute inset-x-0 bottom-0 h-40 hero-bottom-fade" />
       </div>
 
-      {/* Hero Content */}
-      <div
-        className="relative z-10 mx-auto flex w-full max-w-6xl px-4 py-24 transition-[opacity,transform] duration-500 ease-out md:px-6"
-        style={{
-          opacity: 1 - scrollProgress * 0.14,
-          transform: `translateY(${scrollProgress * 28}px)`
-        }}
-      >
-        <div className="hero-glass-panel flex w-full flex-col items-center gap-6 rounded-[2rem] px-5 py-8 text-center lg:max-w-3xl lg:items-start lg:px-8 lg:py-10 lg:text-left">
-          <h1 className="max-w-4xl font-display text-5xl leading-[0.92] tracking-[-0.03em] text-balance text-white drop-shadow-[0_12px_36px_rgba(0,0,0,0.38)] sm:text-6xl md:text-7xl lg:text-[5.5rem]">
-            {t('marketing.hero.headlinePart1')} <br className="hidden sm:inline" />
-            {t('marketing.hero.headlinePart2')}
-          </h1>
-          <p className="hero-description max-w-2xl rounded-2xl px-4 py-3 text-base leading-relaxed sm:text-lg">
-            {t('marketing.hero.description')}
-          </p>
-          <div className="mt-4 flex w-full flex-col gap-3 sm:w-auto sm:flex-row">
-            <Button
-              render={<Link href="/sign-in" />}
-              size="lg"
-              className="w-full border border-black/6 bg-white px-8 text-black shadow-[0_12px_32px_rgba(0,0,0,0.14)] hover:bg-zinc-200 sm:w-auto dark:border-white/10 dark:bg-zinc-950/82 dark:text-white dark:hover:bg-zinc-900"
-            >
-              {t('marketing.hero.getStarted')}
-              <ArrowRight className="ml-2 size-4" aria-hidden />
-            </Button>
+      <div className="relative mx-auto grid w-full max-w-7xl flex-1 items-center gap-10 px-4 pb-16 pt-[calc(var(--topbar-height)+3rem)] sm:px-6 md:gap-14 md:pt-[calc(var(--topbar-height)+4rem)] lg:grid-cols-12 lg:pb-20 lg:pt-[calc(var(--topbar-height)+4rem)]">
+        {/* ── Left column: glass editorial card ─────────────────────────── */}
+        <div className="lg:col-span-7 xl:col-span-7">
+          <div className="fade-rise glass-card-paper relative rounded-[28px] p-7 sm:p-9 md:p-11">
+            <h1 className="font-heading text-[42px] font-semibold leading-[1.02] tracking-[-0.02em] text-balance text-foreground sm:text-[54px] md:text-[64px] lg:text-[68px]">
+              {t('marketing.hero.headlinePart1', 'Know every Malaysian scheme')}{' '}
+              <span className="relative inline-block whitespace-nowrap text-[color:var(--hibiscus)]">
+                you qualify for
+                <svg
+                  aria-hidden
+                  viewBox="0 0 320 12"
+                  preserveAspectRatio="none"
+                  className="absolute -bottom-2 left-0 h-2 w-full text-[color:var(--hibiscus)]/45"
+                >
+                  <path
+                    d="M2 8 C 70 2, 140 11, 210 5 S 300 9, 318 4"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2.5"
+                    strokeLinecap="round"
+                  />
+                </svg>
+              </span>
+              <br />
+              <span className="text-foreground/70">in three uploads.</span>
+            </h1>
+
+            <p className="mt-7 max-w-xl text-base leading-[1.65] text-foreground/72 sm:text-[17px]">
+              {t(
+                'marketing.hero.description',
+                'Layak reads your MyKad, payslip, and utility bill, then runs a five-step agent pipeline to match you against government schemes — STR, JKM Warga Emas, LHDN Form B reliefs, and more. Every number cites a source page.'
+              )}
+            </p>
+
+            {/* Meta row — green-dot quick proof */}
+            <div className="mt-9 grid grid-cols-1 gap-3 border-t border-foreground/10 pt-6 sm:grid-cols-3">
+              <MetaItem
+                icon={<Sparkles className="size-3.5" aria-hidden />}
+                label={t('marketing.hero.metaFree', 'Free · 5 evals / day')}
+              />
+              <MetaItem
+                icon={<FileCheck2 className="size-3.5" aria-hidden />}
+                label={t('marketing.hero.metaDrafts', 'Drafts only · you submit')}
+              />
+              <MetaItem
+                icon={<ShieldCheck className="size-3.5" aria-hidden />}
+                label={t('marketing.hero.metaPdpa', 'PDPA-compliant · IC redacted')}
+              />
+            </div>
           </div>
         </div>
       </div>
     </section>
   )
 }
+
+function MetaItem({ icon, label }: { icon: React.ReactNode; label: string }) {
+  return (
+    <div className="flex items-center gap-2.5">
+      <span className="inline-flex size-5 items-center justify-center rounded-full bg-[color:var(--forest)]/12 text-[color:var(--forest)]">
+        {icon}
+      </span>
+      <span className="mono-caption text-[10.5px] text-foreground/65">{label}</span>
+    </div>
+  )
+}
+

@@ -40,12 +40,6 @@ export function EvaluationUpsideHero({ totalAnnualRm, matchedCount, packet, empt
         aria-hidden
         className="pointer-events-none absolute inset-y-6 left-0 w-[3px] rounded-r-full bg-[color:var(--hibiscus)]/70 sm:inset-y-8"
       />
-      {!empty && (
-        <span className="draft-stamp pointer-events-none absolute right-6 top-6 text-[9px] sm:right-8 sm:top-8">
-          DRAFT
-        </span>
-      )}
-
       <div className="relative flex flex-col gap-2">
         <p className="mono-caption text-[color:var(--hibiscus)]">{t('evaluation.upside.label')}</p>
         <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">

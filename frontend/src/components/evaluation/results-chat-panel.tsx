@@ -190,7 +190,7 @@ export function ResultsChatPanel({ evalId, matches }: Props) {
   // promoted to a centred modal. In both cases the panel itself stays the
   // same component — only the surrounding chrome changes.
   const wrapperClass = isModal
-    ? 'fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-md'
+    ? 'fixed inset-0 z-50 flex items-center justify-center bg-black/25 backdrop-blur-md dark:bg-black/55'
     : 'fixed inset-0 z-50 flex items-end justify-center bg-black/40 backdrop-blur-sm sm:inset-auto sm:right-6 sm:bottom-6 sm:bg-transparent sm:backdrop-blur-none'
 
   const panelClass = isModal

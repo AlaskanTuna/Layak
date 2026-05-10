@@ -530,7 +530,7 @@ html.landing-snap {
    floating surfaces that should feel like a vellum sheet pinned over
    the page. */
 .glass-grid-panel {
-  background-color: color-mix(in oklch, var(--paper) 70%, transparent);
+  background-color: color-mix(in oklch, var(--paper) 92%, transparent);
   background-image:
     linear-gradient(
       to right,
@@ -560,7 +560,7 @@ html.landing-snap {
     0 8px 24px -16px color-mix(in oklch, var(--ink) 20%, transparent);
 }
 .dark .glass-grid-panel {
-  background-color: color-mix(in oklch, var(--card) 64%, transparent);
+  background-color: color-mix(in oklch, var(--card) 82%, transparent);
   background-image:
     linear-gradient(
       to right,

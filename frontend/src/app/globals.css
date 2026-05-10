@@ -291,10 +291,16 @@
  * Editorial landing — civic-document utilities
  * ─────────────────────────────────────────────────────────── */
 
-/* Section snap-scroll — applied to <html> while landing is mounted */
-html.landing-snap {
-  scroll-snap-type: y proximity;
-  scroll-padding-top: var(--topbar-height);
+/* Section snap-scroll — applied to <html> while landing is mounted.
+   Gated to >= sm so mobile gets natural scrolling. Proximity snap on a short
+   viewport with a footer (which isn't a snap target) drags the user back to
+   the last snap section ("Take it for a spin") whenever they try to reach
+   the footer — disabling on mobile avoids the trap. */
+@media (min-width: 640px) {
+  html.landing-snap {
+    scroll-snap-type: y proximity;
+    scroll-padding-top: var(--topbar-height);
+  }
 }
 
 /* Glass card sitting over the hero photograph — translucent paper tint

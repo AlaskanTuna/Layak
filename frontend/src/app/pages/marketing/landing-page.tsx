@@ -42,7 +42,7 @@ export function MarketingLandingPage() {
       <div className="snap-start">
         <LandingPricing />
       </div>
-      <div className="snap-start snap-end">
+      <div className="snap-start">
         <LandingCta />
       </div>
 

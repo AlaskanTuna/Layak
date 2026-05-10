@@ -4,7 +4,6 @@ import { useRouter } from 'next/navigation'
 import { useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 
-import { CodeExecutionPanel } from '@/components/evaluation/code-execution-panel'
 import { useEvaluation } from '@/components/evaluation/evaluation-provider'
 import { EvaluationUpsideHero } from '@/components/evaluation/evaluation-upside-hero'
 import { PacketDownload } from '@/components/evaluation/packet-download'
@@ -59,7 +58,6 @@ export function EvaluationResultsClient() {
       <EvaluationUpsideHero totalAnnualRm={totalAnnualRm} matchedCount={matchedCount} packet={state.packet} />
       <SchemeCardGrid matches={state.matches} />
       <RequiredContributionsCard matches={state.matches} />
-      {state.upside && <CodeExecutionPanel upside={state.upside} />}
       <PacketDownload packet={state.packet} />
       <div className="flex">
         <Button type="button" variant="outline" onClick={handleReset}>

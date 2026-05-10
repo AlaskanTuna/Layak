@@ -6,14 +6,12 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { AlertTriangle, ArrowLeft, ArrowRight, Loader2 } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 
-import { CodeExecutionPanel } from '@/components/evaluation/code-execution-panel'
 import { DraftPacketPreview } from '@/components/evaluation/draft-packet-preview'
 import { ErrorRecoveryCard } from '@/components/evaluation/error-recovery-card'
 import { EvaluationUpsideHero } from '@/components/evaluation/evaluation-upside-hero'
 import { PersistedPacketDownload } from '@/components/evaluation/persisted-packet-download'
 import { PipelineStepper } from '@/components/evaluation/pipeline-stepper'
 import { RequiredContributionsCard } from '@/components/evaluation/required-contributions-card'
-import { ResultsActionRail } from '@/components/evaluation/results-action-rail'
 import { ResultsChatPanel } from '@/components/evaluation/results-chat-panel'
 import { SchemeCardGrid } from '@/components/evaluation/scheme-card-grid'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
@@ -236,14 +234,6 @@ export function EvaluationResultsByIdClient({ evalId }: { evalId: string }) {
     <div className="flex flex-col gap-6">
       {(isRunning || isError) && <PipelineStepper state={pipelineState} />}
 
-      {isComplete && (
-        <ResultsActionRail
-          canReviewMatches={matchedCount > 0}
-          canReviewPacket={matchedCount > 0}
-          onStartAnother={handleStartAnother}
-        />
-      )}
-
       {isError && (
         // Category-tailored recovery on persisted errors. The original
         // files + dependants aren't retained server-side, so Retry isn't
@@ -273,14 +263,6 @@ export function EvaluationResultsByIdClient({ evalId }: { evalId: string }) {
             <SchemeCardGrid matches={doc.matches} />
           </div>
           <RequiredContributionsCard matches={doc.matches} />
-          {pipelineState.upside &&
-            pipelineState.upside.total_annual_rm > 0 &&
-            // Only render the panel when we actually have a trace to show —
-            // older evals predating `upsideTrace` persistence would otherwise
-            // render empty <pre> blocks.
-            (pipelineState.upside.python_snippet !== '' || pipelineState.upside.stdout !== '') && (
-              <CodeExecutionPanel upside={pipelineState.upside} />
-            )}
         </>
       )}
 

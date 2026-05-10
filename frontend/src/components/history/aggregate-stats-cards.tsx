@@ -4,7 +4,6 @@ import { useMemo } from 'react'
 import { CheckCircle2, FileText, TrendingUp } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 
-import { Card } from '@/components/ui/card'
 import type { EvaluationListItem } from '@/lib/agent-types'
 
 const RM = new Intl.NumberFormat('en-MY', {
@@ -61,7 +60,7 @@ export function AggregateStatsCards({ items }: Props) {
 
 function StatCard({ icon, label, value }: { icon: React.ReactNode; label: string; value: string }) {
   return (
-    <Card className="gap-2 px-4 py-4">
+    <div className="paper-card flex flex-col gap-2 rounded-[14px] px-4 py-4">
       <div className="flex items-center gap-2.5">
         <span className="flex size-8 items-center justify-center rounded-md bg-[color:var(--primary)]/10 text-[color:var(--primary)]">
           {icon}
@@ -69,6 +68,6 @@ function StatCard({ icon, label, value }: { icon: React.ReactNode; label: string
         <p className="mono-caption text-foreground/55">{label}</p>
       </div>
       <p className="font-heading text-2xl font-semibold tracking-tight tabular-nums">{value}</p>
-    </Card>
+    </div>
   )
 }

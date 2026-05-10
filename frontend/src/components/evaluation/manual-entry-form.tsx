@@ -10,13 +10,17 @@ import { z } from 'zod'
 import { DependantsFieldset, type DependantInputRow } from '@/components/evaluation/dependants-fieldset'
 import { SectionBadge } from '@/components/evaluation/section-badge'
 import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { InfoTooltip } from '@/components/ui/info-tooltip'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Separator } from '@/components/ui/separator'
 import { Textarea } from '@/components/ui/textarea'
 import type { ManualEntryPayload, Relationship } from '@/lib/agent-types'
+
+// Editorial paper surface for form sections — replaces the legacy shadcn Card
+// shell with the design system's `paper-card`. `overflow-visible` is required
+// so the InfoTooltip pop-out clears the card edge.
+const SECTION_CLASS = 'paper-card flex flex-col gap-4 overflow-visible rounded-[14px] p-5'
 
 const RELATIONSHIPS = ['child', 'parent', 'spouse', 'sibling', 'other'] as const satisfies readonly Relationship[]
 
@@ -99,8 +103,6 @@ const EMPTY_DEFAULTS: FormValues = {
   monthly_kwh: '',
   dependants: []
 }
-
-const TOOLTIP_CARD_CLASS = 'overflow-visible'
 
 type Props = {
   onSubmit: (payload: ManualEntryPayload) => void
@@ -215,11 +217,9 @@ export function ManualEntryForm({ onSubmit, onUseSamples, onClear, disabled = fa
 
   return (
     <form onSubmit={handleSubmit(submit)} className="flex flex-col gap-4" noValidate>
-      <Card className={TOOLTIP_CARD_CLASS}>
-        <CardHeader>
-          <SectionTitle title={t('evaluation.manual.identityTitle')} required />
-        </CardHeader>
-        <CardContent className="flex flex-col gap-3">
+      <section className={SECTION_CLASS}>
+        <SectionTitle title={t('evaluation.manual.identityTitle')} required />
+        <div className="flex flex-col gap-3">
           <Field label={t('evaluation.manual.nameLabel')} error={formState.errors.name?.message} htmlFor="mef-name">
             <Input id="mef-name" autoComplete="name" disabled={disabled} {...register('name')} />
           </Field>
@@ -292,14 +292,12 @@ export function ManualEntryForm({ onSubmit, onUseSamples, onClear, disabled = fa
               />
             </Field>
           </div>
-        </CardContent>
-      </Card>
+        </div>
+      </section>
 
-      <Card className={TOOLTIP_CARD_CLASS}>
-        <CardHeader>
-          <SectionTitle title={t('evaluation.manual.incomeTitle')} required />
-        </CardHeader>
-        <CardContent className="flex flex-col gap-3">
+      <section className={SECTION_CLASS}>
+        <SectionTitle title={t('evaluation.manual.incomeTitle')} required />
+        <div className="flex flex-col gap-3">
           <div className="grid gap-3 sm:grid-cols-2">
             <Field
               label={t('evaluation.manual.incomeLabel')}
@@ -337,14 +335,12 @@ export function ManualEntryForm({ onSubmit, onUseSamples, onClear, disabled = fa
               </fieldset>
             </Field>
           </div>
-        </CardContent>
-      </Card>
+        </div>
+      </section>
 
-      <Card className={TOOLTIP_CARD_CLASS}>
-        <CardHeader>
-          <SectionTitle title={t('evaluation.manual.utilityTitle')} required={false} />
-        </CardHeader>
-        <CardContent className="flex flex-col gap-3">
+      <section className={SECTION_CLASS}>
+        <SectionTitle title={t('evaluation.manual.utilityTitle')} required={false} />
+        <div className="flex flex-col gap-3">
           <Field
             label={t('evaluation.manual.addressLabel')}
             error={formState.errors.address?.message}
@@ -387,18 +383,16 @@ export function ManualEntryForm({ onSubmit, onUseSamples, onClear, disabled = fa
               {...register('monthly_kwh')}
             />
           </Field>
-        </CardContent>
-      </Card>
+        </div>
+      </section>
 
-      <Card className={TOOLTIP_CARD_CLASS}>
-        <CardHeader>
-          <SectionTitle
-            title={t('evaluation.manual.householdTitle')}
-            tooltip={t('evaluation.upload.householdHint')}
-            required={false}
-          />
-        </CardHeader>
-        <CardContent>
+      <section className={SECTION_CLASS}>
+        <SectionTitle
+          title={t('evaluation.manual.householdTitle')}
+          tooltip={t('evaluation.upload.householdHint')}
+          required={false}
+        />
+        <div>
           <Controller
             control={control}
             name="dependants"
@@ -411,8 +405,8 @@ export function ManualEntryForm({ onSubmit, onUseSamples, onClear, disabled = fa
               />
             )}
           />
-        </CardContent>
-      </Card>
+        </div>
+      </section>
 
       <Separator />
 
@@ -466,7 +460,7 @@ export function ManualEntryForm({ onSubmit, onUseSamples, onClear, disabled = fa
 function SectionTitle({ title, tooltip, required }: { title: string; tooltip?: string; required: boolean }) {
   return (
     <div className="flex items-center gap-2">
-      <CardTitle>{title}</CardTitle>
+      <h2 className="font-heading text-base font-semibold leading-snug tracking-tight">{title}</h2>
       {tooltip && <InfoTooltip content={tooltip} label={tooltip} />}
       <SectionBadge required={required} />
     </div>

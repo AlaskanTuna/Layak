@@ -8,7 +8,6 @@ import type { TFunction } from 'i18next'
 
 import { StatusPill } from '@/components/ui/status-pill'
 import { Button } from '@/components/ui/button'
-import { Card } from '@/components/ui/card'
 import { Checkbox } from '@/components/ui/checkbox'
 import type { EvaluationListItem, EvaluationStatus } from '@/lib/agent-types'
 import { authedFetch } from '@/lib/firebase'
@@ -112,11 +111,9 @@ export function EvaluationHistoryTable({ items, onRefresh }: Props) {
 
   if (items.length === 0) {
     return (
-      <Card className="items-center gap-3 px-6 py-12 text-center sm:py-16">
-        <p className="text-[11px] uppercase tracking-[0.18em] text-muted-foreground">
-          {t('evaluation.history.emptyEyebrow')}
-        </p>
-        <h3 className="font-heading text-lg font-medium">{t('evaluation.history.emptyTitle')}</h3>
+      <div className="paper-card flex flex-col items-center gap-3 rounded-[16px] px-6 py-12 text-center sm:py-16">
+        <p className="mono-caption text-foreground/55">{t('evaluation.history.emptyEyebrow')}</p>
+        <h3 className="font-heading text-lg font-semibold tracking-tight">{t('evaluation.history.emptyTitle')}</h3>
         <p className="max-w-sm text-sm text-muted-foreground">{t('evaluation.history.emptyBody')}</p>
         <div className="mt-2 flex">
           <Button render={<Link href="/dashboard/evaluation/upload" />}>
@@ -124,7 +121,7 @@ export function EvaluationHistoryTable({ items, onRefresh }: Props) {
             <ArrowRight className="ml-1.5 size-4" aria-hidden />
           </Button>
         </div>
-      </Card>
+      </div>
     )
   }
 
@@ -168,7 +165,7 @@ export function EvaluationHistoryTable({ items, onRefresh }: Props) {
         </p>
       )}
 
-      <Card className="gap-0 py-0">
+      <div className="paper-card overflow-hidden rounded-[14px]">
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
@@ -241,7 +238,7 @@ export function EvaluationHistoryTable({ items, onRefresh }: Props) {
             </tbody>
           </table>
         </div>
-      </Card>
+      </div>
 
       {pageCount > 1 && (
         <div className="flex items-center justify-between gap-2 px-1 text-xs text-muted-foreground">

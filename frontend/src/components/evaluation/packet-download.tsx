@@ -4,7 +4,6 @@ import { Download, FileDown, ShieldCheck } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 
 import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import type { Packet, PacketDraft } from '@/lib/agent-types'
 import { notificationStore } from '@/lib/notification-store'
 import { base64ToBlob, triggerDownload } from '@/lib/packet-download-utils'
@@ -58,24 +57,28 @@ export function PacketDownload({ packet }: Props) {
   const count = packet.drafts.length
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle className="flex items-center gap-2 text-sm">
-          <ShieldCheck className="size-4 text-primary" aria-hidden />
-          {count === 1
-            ? t('evaluation.packet.titleSingular', { count })
-            : t('evaluation.packet.titlePlural', { count })}
-        </CardTitle>
-        <CardDescription>{t('evaluation.packet.description')}</CardDescription>
-      </CardHeader>
-      <CardContent className="flex flex-col gap-2">
+    <section className="paper-card flex flex-col gap-3 rounded-[14px] p-5">
+      <div className="flex flex-col gap-1">
+        <div className="flex items-center gap-2">
+          <span className="flex size-8 items-center justify-center rounded-md bg-[color:var(--primary)]/10 text-[color:var(--primary)]">
+            <ShieldCheck className="size-4" aria-hidden />
+          </span>
+          <h2 className="font-heading text-base font-semibold leading-snug tracking-tight">
+            {count === 1
+              ? t('evaluation.packet.titleSingular', { count })
+              : t('evaluation.packet.titlePlural', { count })}
+          </h2>
+        </div>
+        <p className="text-sm text-muted-foreground">{t('evaluation.packet.description')}</p>
+      </div>
+      <div className="flex flex-col gap-2">
         {packet.drafts.map((draft) => (
           <DraftRow key={`${draft.scheme_id}-${draft.filename}`} draft={draft} />
         ))}
         {!anyDownloadable && (
           <p className="text-xs italic text-muted-foreground">{t('evaluation.packet.placeholderNotice')}</p>
         )}
-      </CardContent>
-    </Card>
+      </div>
+    </section>
   )
 }

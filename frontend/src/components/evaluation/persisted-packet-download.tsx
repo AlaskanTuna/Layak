@@ -5,7 +5,6 @@ import { AlertTriangle, Download, Loader2, ShieldCheck } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 
 import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { notificationStore } from '@/lib/notification-store'
 import { triggerDownload } from '@/lib/packet-download-utils'
 import { authedFetch } from '@/lib/firebase'
@@ -58,37 +57,39 @@ export function PersistedPacketDownload({ evalId, matches }: Props) {
   }
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle className="flex items-center gap-2 text-sm">
-          <ShieldCheck className="size-4 text-primary" aria-hidden />
-          {qualifyingCount === 1
-            ? t('evaluation.packet.titleSchemeSingular', { count: qualifyingCount })
-            : t('evaluation.packet.titleSchemePlural', { count: qualifyingCount })}
-        </CardTitle>
-        <CardDescription>{t('evaluation.packet.description')}</CardDescription>
-      </CardHeader>
-      <CardContent className="flex flex-col gap-3">
-        <Button type="button" onClick={handleDownload} disabled={busy} size="lg">
-          {busy ? (
-            <>
-              <Loader2 className="mr-1.5 size-4 animate-spin" aria-hidden />
-              {t('evaluation.packet.generatingZip')}
-            </>
-          ) : (
-            <>
-              <Download className="mr-1.5 size-4" aria-hidden />
-              {t('evaluation.packet.downloadZip')}
-            </>
-          )}
-        </Button>
-        {error && (
-          <div className="flex items-start gap-2 rounded-md border border-destructive/30 bg-destructive/5 p-3 text-xs text-destructive">
-            <AlertTriangle className="size-3.5 shrink-0" aria-hidden />
-            <span>{error}</span>
-          </div>
+    <section className="paper-card flex flex-col gap-3 rounded-[14px] p-5">
+      <div className="flex flex-col gap-1">
+        <div className="flex items-center gap-2">
+          <span className="flex size-8 items-center justify-center rounded-md bg-[color:var(--primary)]/10 text-[color:var(--primary)]">
+            <ShieldCheck className="size-4" aria-hidden />
+          </span>
+          <h2 className="font-heading text-base font-semibold leading-snug tracking-tight">
+            {qualifyingCount === 1
+              ? t('evaluation.packet.titleSchemeSingular', { count: qualifyingCount })
+              : t('evaluation.packet.titleSchemePlural', { count: qualifyingCount })}
+          </h2>
+        </div>
+        <p className="text-sm text-muted-foreground">{t('evaluation.packet.description')}</p>
+      </div>
+      <Button type="button" onClick={handleDownload} disabled={busy} size="lg">
+        {busy ? (
+          <>
+            <Loader2 className="mr-1.5 size-4 animate-spin" aria-hidden />
+            {t('evaluation.packet.generatingZip')}
+          </>
+        ) : (
+          <>
+            <Download className="mr-1.5 size-4" aria-hidden />
+            {t('evaluation.packet.downloadZip')}
+          </>
         )}
-      </CardContent>
-    </Card>
+      </Button>
+      {error && (
+        <div className="flex items-start gap-2 rounded-md border border-destructive/30 bg-destructive/5 p-3 text-xs text-destructive">
+          <AlertTriangle className="size-3.5 shrink-0" aria-hidden />
+          <span>{error}</span>
+        </div>
+      )}
+    </section>
   )
 }

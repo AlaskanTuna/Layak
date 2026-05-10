@@ -158,9 +158,11 @@ function HelpCard({
   bullets: string[]
 }) {
   return (
-    <div className="rounded-xl border border-border bg-card p-4 shadow-sm">
+    <div className="paper-card rounded-[14px] p-4">
       <div className="flex items-center gap-2">
-        <div className="flex size-8 items-center justify-center rounded-md bg-primary/10 text-primary">{icon}</div>
+        <div className="flex size-8 items-center justify-center rounded-md bg-[color:var(--primary)]/10 text-[color:var(--primary)]">
+          {icon}
+        </div>
         <h3 className="font-heading text-base font-semibold tracking-tight">{title}</h3>
       </div>
       <p className="mt-3 text-sm leading-relaxed text-muted-foreground">{body}</p>

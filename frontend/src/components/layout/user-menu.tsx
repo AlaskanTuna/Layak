@@ -73,7 +73,7 @@ export function UserMenu() {
         role="menu"
         aria-hidden={!isOpen}
         className={cn(
-          'absolute right-0 top-full z-50 mt-2 w-56 overflow-hidden rounded-xl border border-border/70 bg-card/96 supports-[backdrop-filter]:bg-card/88 backdrop-blur-2xl backdrop-saturate-150 shadow-[0_28px_72px_rgb(15_23_42/0.16),inset_0_1px_0_rgb(255_255_255/0.42)] dark:bg-card/95 dark:supports-[backdrop-filter]:bg-card/82 dark:shadow-[0_28px_72px_rgb(0_0_0/0.48),inset_0_1px_0_rgb(255_255_255/0.08)]',
+          'absolute right-0 top-full z-50 mt-2 w-56 overflow-hidden rounded-xl border border-border bg-card shadow-[0_18px_48px_-12px_rgb(15_23_42/0.18)] dark:shadow-[0_18px_48px_-12px_rgb(0_0_0/0.55)]',
           'origin-top-right transition-all duration-200',
           isOpen ? 'scale-100 opacity-100' : 'pointer-events-none scale-95 opacity-0'
         )}

@@ -41,17 +41,17 @@ export function AggregateStatsCards({ items }: Props) {
   return (
     <section aria-label={t('evaluation.history.stats.ariaLabel')} className="grid grid-cols-1 gap-3 sm:grid-cols-3">
       <StatCard
-        icon={<FileText className="size-4 text-muted-foreground" aria-hidden />}
+        icon={<FileText className="size-4" aria-hidden />}
         label={t('evaluation.history.stats.totalEvaluations')}
         value={totalRuns.toString()}
       />
       <StatCard
-        icon={<TrendingUp className="size-4 text-muted-foreground" aria-hidden />}
+        icon={<TrendingUp className="size-4" aria-hidden />}
         label={t('evaluation.history.stats.highestResult')}
         value={completedRuns > 0 ? `RM ${RM.format(peakRm)}` : '—'}
       />
       <StatCard
-        icon={<CheckCircle2 className="size-4 text-muted-foreground" aria-hidden />}
+        icon={<CheckCircle2 className="size-4" aria-hidden />}
         label={t('evaluation.history.stats.successfulRuns')}
         value={completedRuns.toString()}
       />
@@ -62,9 +62,11 @@ export function AggregateStatsCards({ items }: Props) {
 function StatCard({ icon, label, value }: { icon: React.ReactNode; label: string; value: string }) {
   return (
     <Card className="gap-2 px-4 py-4">
-      <div className="flex items-center gap-2">
-        {icon}
-        <p className="text-[11px] uppercase tracking-[0.16em] text-muted-foreground">{label}</p>
+      <div className="flex items-center gap-2.5">
+        <span className="flex size-8 items-center justify-center rounded-md bg-[color:var(--primary)]/10 text-[color:var(--primary)]">
+          {icon}
+        </span>
+        <p className="mono-caption text-foreground/55">{label}</p>
       </div>
       <p className="font-heading text-2xl font-semibold tracking-tight tabular-nums">{value}</p>
     </Card>

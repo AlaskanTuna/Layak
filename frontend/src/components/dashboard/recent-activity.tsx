@@ -58,8 +58,8 @@ export function RecentActivity({ items }: Props) {
 
       {slice.length === 0 ? (
         <div className="paper-card flex flex-col items-center gap-3 rounded-[16px] px-6 py-10 text-center">
-          <div className="flex size-10 items-center justify-center rounded-md bg-foreground/[0.05] text-foreground/55">
-            <Clock className="size-5" aria-hidden />
+          <div className="flex size-9 items-center justify-center rounded-md bg-foreground/[0.05] text-foreground/55">
+            <Clock className="size-4" aria-hidden />
           </div>
           <p className="mono-caption text-foreground/55">{t('dashboard.recentActivity.empty')}</p>
           <p className="max-w-xs text-xs leading-relaxed text-foreground/65">

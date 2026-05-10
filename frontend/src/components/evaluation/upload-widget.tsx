@@ -149,8 +149,8 @@ function UploadSlotCard({ spec, state, inputId, disabled, inputRef, onChange, on
             disabled && 'pointer-events-none opacity-50'
           )}
         >
-          <div className="flex size-10 items-center justify-center rounded-md bg-foreground/[0.06] text-foreground/55">
-            <UploadCloud className="size-5" aria-hidden />
+          <div className="flex size-9 items-center justify-center rounded-md bg-foreground/[0.06] text-foreground/55">
+            <UploadCloud className="size-4" aria-hidden />
           </div>
           <p className="text-sm">
             <span className="font-medium text-[color:var(--hibiscus)]">{t('evaluation.upload.dropzonePrimary')}</span>{' '}

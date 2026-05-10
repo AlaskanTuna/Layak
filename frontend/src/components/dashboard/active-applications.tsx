@@ -45,8 +45,8 @@ export function ActiveApplications({ items }: Props) {
 
       {completed.length === 0 ? (
         <div className="paper-card flex flex-col items-center gap-3 rounded-[16px] px-6 py-10 text-center">
-          <div className="flex size-10 items-center justify-center rounded-md bg-foreground/[0.05] text-foreground/55">
-            <FileCheck className="size-5" aria-hidden />
+          <div className="flex size-9 items-center justify-center rounded-md bg-foreground/[0.05] text-foreground/55">
+            <FileCheck className="size-4" aria-hidden />
           </div>
           <p className="mono-caption text-foreground/55">{t('dashboard.activeApplications.empty')}</p>
           <p className="max-w-xs text-xs leading-relaxed text-foreground/65">
@@ -70,7 +70,7 @@ export function ActiveApplications({ items }: Props) {
             >
               <div className="flex items-center justify-between gap-3">
                 <div className="flex min-w-0 flex-1 items-start gap-3">
-                  <div className="flex size-10 shrink-0 items-center justify-center rounded-lg bg-[color:var(--primary)]/10 text-[color:var(--primary)]">
+                  <div className="flex size-9 shrink-0 items-center justify-center rounded-md bg-[color:var(--primary)]/10 text-[color:var(--primary)]">
                     <FileText className="size-4" aria-hidden />
                   </div>
                   <div className="flex min-w-0 flex-col">

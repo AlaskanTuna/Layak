@@ -101,8 +101,8 @@ function InScopeCard({ scheme }: { scheme: InScopeScheme }) {
   return (
     <article className="paper-card group flex h-full flex-col gap-4 rounded-[16px] p-6 transition-shadow hover:shadow-[0_28px_60px_-22px_color-mix(in_oklch,var(--ink)_28%,transparent)]">
       <div className="flex items-center justify-between gap-3">
-        <div className="flex size-10 items-center justify-center rounded-md bg-[color:var(--primary)]/10 text-[color:var(--primary)]">
-          <Icon className="size-5" aria-hidden />
+        <div className="flex size-9 items-center justify-center rounded-md bg-[color:var(--primary)]/10 text-[color:var(--primary)]">
+          <Icon className="size-4" aria-hidden />
         </div>
         <span className="mono-caption text-[color:var(--primary)]">{t(scheme.categoryKey)}</span>
       </div>

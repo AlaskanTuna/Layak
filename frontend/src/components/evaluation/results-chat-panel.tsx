@@ -1,13 +1,16 @@
 'use client'
 
+import Image from 'next/image'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { AlertCircle, Bot, Loader2, RotateCcw, Send, Sparkles, X } from 'lucide-react'
+import { AlertCircle, Loader2, RotateCcw, Send, Sparkles, X } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
 import type { SchemeMatch } from '@/lib/agent-types'
 import type { ChatMessage } from '@/lib/chat-types'
 import { useChat } from '@/hooks/use-chat'
+
+const CIK_LAY_ICON = '/chatbot/cik-lay-icon.webp'
 
 /**
  * Phase 10 — floating chatbot panel for `/dashboard/evaluation/results/[id]`.
@@ -82,16 +85,21 @@ export function ResultsChatPanel({ evalId, matches }: Props) {
           Hibiscus tinted so it reads as the *evaluation-level* action,
           distinct from the neutral help launcher below it. */}
       {!isOpen && (
-        <Button
+        <button
           type="button"
-          variant="ghost"
-          size="icon-lg"
-          className="fixed right-4 bottom-16 z-40 cursor-pointer rounded-full border border-[color:var(--hibiscus)]/40 bg-[color:var(--hibiscus)] text-[color:var(--hibiscus-foreground)] shadow-[0_18px_40px_-18px_color-mix(in_oklch,var(--hibiscus)_70%,transparent)] hover:bg-[color:var(--hibiscus)]/92 md:right-6 md:bottom-20"
           aria-label={t('evaluation.chat.openButton')}
           onClick={() => setIsOpen(true)}
+          className="group fixed right-4 bottom-16 z-40 inline-flex size-12 cursor-pointer items-center justify-center overflow-hidden rounded-full border border-[color:var(--hibiscus)]/30 bg-[color:var(--paper)] shadow-[0_18px_40px_-18px_color-mix(in_oklch,var(--ink)_45%,transparent)] transition-transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-[color:var(--hibiscus)]/40 md:right-6 md:bottom-20"
         >
-          <Bot className="size-5" aria-hidden />
-        </Button>
+          <Image
+            src={CIK_LAY_ICON}
+            alt="Cik Lay"
+            width={48}
+            height={48}
+            className="size-12 object-cover transition-transform group-hover:scale-110"
+            priority
+          />
+        </button>
       )}
 
       {/* Expanding panel — fixed-position so it never affects page layout. */}
@@ -112,11 +120,22 @@ export function ResultsChatPanel({ evalId, matches }: Props) {
                 aria-hidden
                 className="pointer-events-none absolute inset-y-2.5 left-0 w-[3px] rounded-r-full bg-[color:var(--hibiscus)]/70"
               />
-              <div className="flex flex-col">
-                <span className="mono-caption text-[color:var(--hibiscus)]">Cik Lay · Pegawai Skim</span>
-                <span className="mt-0.5 font-heading text-[15px] font-semibold text-foreground">
-                  {t('evaluation.chat.title')}
+              <div className="flex items-center gap-3">
+                <span className="inline-flex size-10 shrink-0 items-center justify-center overflow-hidden rounded-full border border-[color:var(--hibiscus)]/25 bg-[color:var(--paper)]">
+                  <Image
+                    src={CIK_LAY_ICON}
+                    alt="Cik Lay"
+                    width={40}
+                    height={40}
+                    className="size-10 object-cover"
+                  />
                 </span>
+                <div className="flex flex-col">
+                  <span className="mono-caption text-[color:var(--hibiscus)]">Cik Lay · Pegawai Skim</span>
+                  <span className="mt-0.5 font-heading text-[15px] font-semibold text-foreground">
+                    {t('evaluation.chat.title')}
+                  </span>
+                </div>
               </div>
               <div className="flex items-center gap-1">
                 {chat.messages.length > 0 && (

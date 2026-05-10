@@ -134,7 +134,11 @@ def test_qualifying_scheme_ids_excludes_out_of_scope() -> None:
 def test_system_instruction_en_carries_hard_constraints() -> None:
     text = build_system_instruction(_aisyah_eval_doc(), language="en")
     lowered = text.lower()
-    assert "you are layak" in lowered
+    # Persona identity — Cik Lay (Pegawai Skim) speaks for Layak.
+    assert "cik lay" in lowered
+    assert "pegawai skim" in lowered
+    # Greeting discipline — stateless panel must not open with pleasantries.
+    assert "greeting discipline" in lowered
     assert "scope" in lowered  # rule 1
     assert "no legal" in lowered  # rule 2
     assert "no submission" in lowered  # rule 3
@@ -148,7 +152,9 @@ def test_system_instruction_en_carries_hard_constraints() -> None:
 
 def test_system_instruction_ms_carries_hard_constraints() -> None:
     text = build_system_instruction(_aisyah_eval_doc(), language="ms")
-    assert "Anda Layak" in text  # identity in BM
+    assert "Cik Lay" in text  # persona identity in BM
+    assert "Pegawai Skim" in text
+    assert "Disiplin sapaan" in text  # greeting discipline in BM
     assert "Skop" in text  # rule 1 in BM
     assert "Tiada nasihat" in text  # rules 2/3 in BM
     assert "PII" in text
@@ -157,7 +163,9 @@ def test_system_instruction_ms_carries_hard_constraints() -> None:
 
 def test_system_instruction_zh_carries_hard_constraints() -> None:
     text = build_system_instruction(_aisyah_eval_doc(), language="zh")
-    assert "您是 Layak" in text  # identity
+    assert "Cik Lay" in text  # persona identity carried verbatim
+    assert "Pegawai Skim" in text
+    assert "问候纪律" in text  # greeting discipline in ZH
     assert "范围" in text  # rule 1
     assert "法律" in text  # rule 2 (legal)
     assert "PII" in text or "身份证" in text  # rule 4
@@ -166,7 +174,9 @@ def test_system_instruction_zh_carries_hard_constraints() -> None:
 
 def test_system_instruction_unknown_language_falls_back_to_english() -> None:
     text = build_system_instruction(_aisyah_eval_doc(), language="fr")  # type: ignore[arg-type]
-    assert "you are layak" in text.lower()
+    lowered = text.lower()
+    assert "cik lay" in lowered
+    assert "greeting discipline" in lowered
 
 
 # ---------------------------------------------------------------------------

@@ -194,23 +194,23 @@ flowchart LR
 <details>
 <summary><strong>Conversational Concierge — Per-Evaluation Grounded Chatbot</strong></summary>
 
-A floating chatbot on every completed results page lets a low-tech-literacy user (Aisyah's aunty/uncle persona) ask follow-up questions about _their_ evaluation in plain English, Bahasa Malaysia, or Mandarin. The bot is hard-constrained to the loaded `evaluations/{evalId}` doc plus Vertex AI Search retrieval over the nine scheme PDFs — it is **not** a general-purpose chatbot.
+Cik Lay (Pegawai Skim) fronts a floating chatbot on every completed results page so a low-tech-literacy user can ask follow-up questions about _their_ evaluation in plain English, Bahasa Malaysia, or Mandarin. The bot is hard-constrained to the loaded `evaluations/{evalId}` doc plus Vertex AI Search retrieval over the nine scheme PDFs — it is **not** a general-purpose chatbot.
 
 ```mermaid
-flowchart LR
-    Panel[Floating chat panel<br/>on results page] --> SSE2[POST /api/evaluations/:id/chat]
-    SSE2 --> Auth2[Auth + owner check]
-    Auth2 --> Load[Load eval doc<br/>from Firestore]
-    Load --> Guard[Input guardrails<br/>regex + length]
-    Guard --> Prompt[Build system prompt<br/>Rule 0 language lock<br/>+ eval-context digest]
-    Prompt --> ChatLLM[Gemini 2.5 Flash<br/>+ safety_settings]
-    ChatLLM <--> Retrieve[Vertex AI Search<br/>retrieval Tool]
-    ChatLLM --> Tokens[Stream tokens via SSE]
-    Tokens --> Validate[Citation drift detector]
-    Validate --> Panel
+graph TD
+    User[User message] --> L1[Layer 1 — Input validator<br/>regex prompt-injection guard + length cap]
+    L1 --> L2[Layer 2 — System prompt<br/>identity + Rule 0 language lock + eval-context digest + 5 hard rules]
+    L2 --> L3[Layer 3 — Per-turn language reinforcement<br/>appended to user message]
+    L3 --> L4[Layer 4 — Grounding + safety<br/>Vertex AI Search grounding tool + Gemini built-in safety_settings<br/>BLOCK_LOW_AND_ABOVE on 4 harm categories]
+    L4 --> Gemini[Gemini Flash]
+    L4 --> Search[Vertex AI Search]
+    Search --> Gemini
+    Gemini --> Draft[Draft response]
+    Draft --> L5[Layer 5 — Output validator<br/>citation-drift detector drops &#91;scheme:xxx&#93; markers not in eval's qualifying matches]
+    L5 --> Panel[Floating chat panel<br/>on results page]
 ```
 
-Five layered guardrails defend the surface: a hard-constrained system prompt (Rule 0 language lock, scope, refusals, citation rules), Gemini built-in safety settings, an input regex validator (length cap + prompt-injection patterns), Vertex AI Search grounding (fail-open if Discovery Engine is unreachable), and an output citation-drift detector that strips any cited `scheme_id` not in the user's matches list. A FastAPI lifespan warm-up pre-loads the Gemini + Discovery Engine paths on startup so the first user-facing chat call hits a hot path.
+The stack is explicit end to end: Layer 1, Layer 2, Layer 3, Layer 4, and Layer 5 keep Cik Lay grounded while `use-chat.ts` keeps the conversation state local by holding the rolling history in the browser and persisting nothing server-side. The eval-context digest carries only `ic_last4` for privacy.
 
 </details>
 

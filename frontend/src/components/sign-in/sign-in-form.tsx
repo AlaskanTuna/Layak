@@ -89,8 +89,6 @@ export function SignInForm() {
           {t('auth.signIn.continueAsGuest')}
         </Button>
 
-        <p className="text-center text-xs text-muted-foreground leading-relaxed">{t('auth.signIn.guestNotice')}</p>
-
         {error && (
           <div className="rounded-md bg-destructive/15 p-3 text-sm text-destructive" role="alert">
             {error}

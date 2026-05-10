@@ -1,17 +1,6 @@
 'use client'
 
-import {
-  ArrowUpRight,
-  Baby,
-  Coins,
-  Compass,
-  HeartHandshake,
-  Landmark,
-  PiggyBank,
-  Scale,
-  ShieldCheck,
-  type LucideIcon
-} from 'lucide-react'
+import { ArrowUpRight, Baby, Coins, HeartHandshake, PiggyBank, Scale, ShieldCheck, type LucideIcon } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 
 type SchemeKind = 'upside' | 'required_contribution'
@@ -166,7 +155,6 @@ function InScopeCard({ scheme }: { scheme: InScopeScheme }) {
 }
 
 export function SchemesOverview() {
-  const { t } = useTranslation()
   return (
     <div className="flex flex-col gap-8">
       <section className="flex flex-col gap-4">
@@ -179,22 +167,6 @@ export function SchemesOverview() {
         </ul>
       </section>
 
-      <aside className="paper-card relative isolate flex flex-col gap-3 overflow-hidden rounded-[16px] p-6">
-        <span
-          aria-hidden
-          className="pointer-events-none absolute inset-y-6 left-0 w-[3px] rounded-r-full bg-[color:var(--primary)]/70"
-        />
-        <div className="flex items-center gap-2">
-          <Compass className="size-4 text-[color:var(--primary)]" aria-hidden />
-          <span className="mono-caption text-[color:var(--primary)]">How we pick</span>
-        </div>
-        <h3 className="font-heading text-[16px] font-semibold tracking-tight">{t('schemes.howWePick.title')}</h3>
-        <p className="text-sm leading-relaxed text-foreground/68">{t('schemes.howWePick.description')}</p>
-        <div className="mono-caption flex items-center gap-2 text-foreground/55">
-          <Landmark className="size-3.5" aria-hidden />
-          <span>{t('schemes.notAffiliated')}</span>
-        </div>
-      </aside>
     </div>
   )
 }

@@ -1,6 +1,6 @@
 'use client'
 
-import { CircleHelp, FileText, PlayCircle, Sparkles, Waypoints } from 'lucide-react'
+import { CircleHelp, FileText, PlayCircle, Waypoints } from 'lucide-react'
 import { usePathname } from 'next/navigation'
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
@@ -9,7 +9,7 @@ import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 
-type HelpSection = 'overview' | 'documents' | 'samples' | 'results'
+type HelpSection = 'overview' | 'documents' | 'results'
 
 const STORAGE_KEY = 'layak.help.section'
 
@@ -73,31 +73,24 @@ export function FloatingHelpLauncher() {
                   trigger claims ~half the row via basis so two fit per row,
                   with `whitespace-normal` so longer non-EN labels wrap in-cell
                   instead of bleeding into their neighbour. */}
-              <TabsList className="flex w-full flex-wrap gap-2 rounded-xl bg-muted/70 p-1" style={{ height: 'auto' }}>
+              <TabsList className="flex w-full gap-2 rounded-xl bg-muted/70 p-1" style={{ height: 'auto' }}>
                 <TabsTrigger
                   value="overview"
-                  className="min-h-9 flex-1 basis-[calc(50%-0.25rem)] whitespace-normal px-3 py-2 text-center text-xs leading-tight sm:text-sm"
+                  className="min-h-9 flex-1 whitespace-normal px-3 py-2 text-center text-xs leading-tight sm:text-sm"
                   style={{ height: 'auto' }}
                 >
                   {t('common.help.tabs.overview')}
                 </TabsTrigger>
                 <TabsTrigger
                   value="documents"
-                  className="min-h-9 flex-1 basis-[calc(50%-0.25rem)] whitespace-normal px-3 py-2 text-center text-xs leading-tight sm:text-sm"
+                  className="min-h-9 flex-1 whitespace-normal px-3 py-2 text-center text-xs leading-tight sm:text-sm"
                   style={{ height: 'auto' }}
                 >
                   {t('common.help.tabs.documents')}
                 </TabsTrigger>
                 <TabsTrigger
-                  value="samples"
-                  className="min-h-9 flex-1 basis-[calc(50%-0.25rem)] whitespace-normal px-3 py-2 text-center text-xs leading-tight sm:text-sm"
-                  style={{ height: 'auto' }}
-                >
-                  {t('common.help.tabs.samples')}
-                </TabsTrigger>
-                <TabsTrigger
                   value="results"
-                  className="min-h-9 flex-1 basis-[calc(50%-0.25rem)] whitespace-normal px-3 py-2 text-center text-xs leading-tight sm:text-sm"
+                  className="min-h-9 flex-1 whitespace-normal px-3 py-2 text-center text-xs leading-tight sm:text-sm"
                   style={{ height: 'auto' }}
                 >
                   {t('common.help.tabs.results')}
@@ -124,18 +117,6 @@ export function FloatingHelpLauncher() {
                     t('common.help.documents.point1'),
                     t('common.help.documents.point2'),
                     t('common.help.documents.point3')
-                  ]}
-                />
-              </TabsContent>
-              <TabsContent value="samples" className="mt-0">
-                <HelpCard
-                  icon={<Sparkles className="size-4" aria-hidden />}
-                  title={t('common.help.samples.title')}
-                  body={t('common.help.samples.body')}
-                  bullets={[
-                    t('common.help.samples.point1'),
-                    t('common.help.samples.point2'),
-                    t('common.help.samples.point3')
                   ]}
                 />
               </TabsContent>

@@ -1,17 +1,7 @@
 'use client'
 
 import { useId, useRef, useState } from 'react'
-import {
-  ArrowRight,
-  ChevronDown,
-  FileImage,
-  FileText,
-  Loader2,
-  ShieldCheck,
-  Sparkles,
-  UploadCloud,
-  X
-} from 'lucide-react'
+import { ArrowRight, ChevronDown, FileText, Loader2, Sparkles, UploadCloud, X } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import type { TFunction } from 'i18next'
 
@@ -19,6 +9,13 @@ import { CropPreviewModal } from '@/components/evaluation/crop-preview-modal'
 import { DependantsFieldset, type DependantInputRow } from '@/components/evaluation/dependants-fieldset'
 import { SectionBadge } from '@/components/evaluation/section-badge'
 import { Button } from '@/components/ui/button'
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuTrigger
+} from '@/components/ui/dropdown-menu'
 import { InfoTooltip } from '@/components/ui/info-tooltip'
 import type { DependantInput } from '@/lib/agent-types'
 import { cn } from '@/lib/utils'
@@ -285,11 +282,46 @@ export function UploadWidget({ onSubmit, onUseSamples, disabled = false, samples
     })
   }
 
+  const samplesBusy = samplesLoading !== null
+
   return (
     <div className="flex flex-col gap-5">
-      <div className="paper-card flex items-start gap-2.5 rounded-[12px] p-3 text-xs leading-relaxed text-foreground/70 sm:text-sm">
-        <FileImage className="mt-0.5 size-4 shrink-0 text-[color:var(--hibiscus)]/80" aria-hidden />
-        <p>{t('evaluation.upload.ingestionPathHelper')}</p>
+      <div className="flex items-start justify-end">
+        <DropdownMenu>
+          <DropdownMenuTrigger
+            render={
+              <Button type="button" variant="outline" size="sm" disabled={disabled || samplesBusy} className="gap-1.5">
+                {samplesBusy ? (
+                  <>
+                    <Loader2 className="size-3.5 animate-spin" aria-hidden />
+                    {t('evaluation.upload.loadingSamples')}
+                  </>
+                ) : (
+                  <>
+                    <Sparkles className="size-3.5" aria-hidden />
+                    {t('evaluation.upload.sampleDropdownLabel')}
+                    <ChevronDown className="size-3.5 opacity-60" aria-hidden />
+                  </>
+                )}
+              </Button>
+            }
+          />
+          <DropdownMenuContent>
+            <DropdownMenuLabel>{t('evaluation.upload.sampleDropdownGroupLabel')}</DropdownMenuLabel>
+            <DropdownMenuItem onClick={() => onUseSamples('aisyah')}>
+              <span className="font-medium">{t('evaluation.upload.useSamplesAisyah')}</span>
+              <span className="text-xs text-muted-foreground">
+                {t('evaluation.upload.sampleDropdownAisyahDesc')}
+              </span>
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => onUseSamples('farhan')}>
+              <span className="font-medium">{t('evaluation.upload.useSamplesFarhan')}</span>
+              <span className="text-xs text-muted-foreground">
+                {t('evaluation.upload.sampleDropdownFarhanDesc')}
+              </span>
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
       </div>
 
       <div className="flex flex-col gap-4">
@@ -348,32 +380,7 @@ export function UploadWidget({ onSubmit, onUseSamples, disabled = false, samples
         </div>
       </div>
 
-      <div className="flex flex-col items-start gap-4 border-t border-foreground/10 pt-5 sm:flex-row sm:items-center sm:justify-between">
-        <div className="flex flex-col gap-2">
-          <div className="flex flex-col gap-1">
-            <p className="text-sm font-medium">{t('evaluation.upload.samplesTitle')}</p>
-            <p className="text-xs leading-relaxed text-foreground/65">{t('evaluation.upload.samplesHint')}</p>
-          </div>
-          <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
-            <SamplePersonaButton
-              persona="aisyah"
-              label={t('evaluation.upload.useSamplesAisyah')}
-              loading={samplesLoading === 'aisyah'}
-              disabled={disabled || samplesLoading !== null}
-              onClick={() => onUseSamples('aisyah')}
-            />
-            <span aria-hidden className="mono-caption text-foreground/40">
-              {t('evaluation.upload.samplesDivider')}
-            </span>
-            <SamplePersonaButton
-              persona="farhan"
-              label={t('evaluation.upload.useSamplesFarhan')}
-              loading={samplesLoading === 'farhan'}
-              disabled={disabled || samplesLoading !== null}
-              onClick={() => onUseSamples('farhan')}
-            />
-          </div>
-        </div>
+      <div className="flex justify-end border-t border-foreground/10 pt-5">
         <Button
           type="button"
           onClick={handleSubmit}
@@ -386,11 +393,6 @@ export function UploadWidget({ onSubmit, onUseSamples, disabled = false, samples
         </Button>
       </div>
 
-      <div className="paper-card flex items-start gap-2.5 rounded-[12px] p-4 text-sm text-foreground/70">
-        <ShieldCheck className="mt-0.5 size-4 shrink-0 text-[color:var(--forest)]" aria-hidden />
-        <p>{t('evaluation.upload.trustCopy')}</p>
-      </div>
-
       <CropPreviewModal
         open={pendingCrop !== null}
         file={pendingCrop?.file ?? null}
@@ -398,44 +400,5 @@ export function UploadWidget({ onSubmit, onUseSamples, disabled = false, samples
         onCancel={handleCropCancel}
       />
     </div>
-  )
-}
-
-function SamplePersonaButton({
-  persona,
-  label,
-  loading,
-  disabled,
-  onClick
-}: {
-  persona: SamplePersona
-  label: string
-  loading: boolean
-  disabled: boolean
-  onClick: () => void
-}) {
-  const { t } = useTranslation()
-  return (
-    <Button
-      type="button"
-      variant="outline"
-      size="sm"
-      onClick={onClick}
-      disabled={disabled}
-      data-persona={persona}
-      className="gap-1.5"
-    >
-      {loading ? (
-        <>
-          <Loader2 className="size-4 animate-spin" aria-hidden />
-          {t('evaluation.upload.loadingSamples')}
-        </>
-      ) : (
-        <>
-          <Sparkles className="size-4" aria-hidden />
-          {label}
-        </>
-      )}
-    </Button>
   )
 }

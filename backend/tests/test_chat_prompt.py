@@ -139,6 +139,10 @@ def test_system_instruction_en_carries_hard_constraints() -> None:
     assert "pegawai skim" in lowered
     # Greeting discipline — stateless panel must not open with pleasantries.
     assert "greeting discipline" in lowered
+    # No sign-off rule — duplicate of the persona name in the panel header.
+    assert "no sign-off" in lowered
+    # Markdown allowance — bold/lists/inline code expected for output formatting.
+    assert "markdown is supported" in lowered
     assert "scope" in lowered  # rule 1
     assert "no legal" in lowered  # rule 2
     assert "no submission" in lowered  # rule 3

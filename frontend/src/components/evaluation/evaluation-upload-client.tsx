@@ -8,7 +8,7 @@ import { useTranslation } from 'react-i18next'
 import { ErrorRecoveryCard } from '@/components/evaluation/error-recovery-card'
 import { type DemoPersona, useEvaluation } from '@/components/evaluation/evaluation-provider'
 import { type IntakeMode, IntakeModeToggle } from '@/components/evaluation/intake-mode-toggle'
-import { ManualEntryForm } from '@/components/evaluation/manual-entry-form'
+import { ManualEntryForm, type ManualEntryFormHandle } from '@/components/evaluation/manual-entry-form'
 import { PipelineStepper } from '@/components/evaluation/pipeline-stepper'
 import { type SamplePersona, UploadWidget, type UploadSubmission } from '@/components/evaluation/upload-widget'
 import { PageHeading } from '@/components/layout/page-heading'
@@ -185,10 +185,19 @@ export function EvaluationUploadClient() {
   }
 
   const samplesBusy = loadingPersona !== null
-  // Only surface the sample dropdown on the upload tab while idle. Manual
-  // tab has its own inline sample picker tied to form-reset, and the stepper
-  // shouldn't show a "load demo" action mid-pipeline.
-  const showSampleAction = showIntake && mode === 'upload'
+  // Header dropdown is visible whenever we're on the intake screen. Dispatch
+  // splits by tab: upload tab loads fixture files into the pipeline, manual
+  // tab calls the form's imperative `applySample` to prefill fields.
+  const showSampleAction = showIntake
+  const manualFormRef = useRef<ManualEntryFormHandle | null>(null)
+
+  function handleSampleSelect(persona: SamplePersona) {
+    if (mode === 'manual') {
+      manualFormRef.current?.applySample(persona)
+    } else {
+      handleUseSamplesUpload(persona)
+    }
+  }
 
   return (
     <div className="flex flex-col gap-6">
@@ -219,13 +228,13 @@ export function EvaluationUploadClient() {
               />
               <DropdownMenuContent>
                 <DropdownMenuLabel>{t('evaluation.upload.sampleDropdownGroupLabel')}</DropdownMenuLabel>
-                <DropdownMenuItem onClick={() => handleUseSamplesUpload('aisyah')}>
+                <DropdownMenuItem onClick={() => handleSampleSelect('aisyah')}>
                   <span className="font-medium">{t('evaluation.upload.useSamplesAisyah')}</span>
                   <span className="text-xs text-muted-foreground">
                     {t('evaluation.upload.sampleDropdownAisyahDesc')}
                   </span>
                 </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => handleUseSamplesUpload('farhan')}>
+                <DropdownMenuItem onClick={() => handleSampleSelect('farhan')}>
                   <span className="font-medium">{t('evaluation.upload.useSamplesFarhan')}</span>
                   <span className="text-xs text-muted-foreground">
                     {t('evaluation.upload.sampleDropdownFarhanDesc')}
@@ -250,6 +259,7 @@ export function EvaluationUploadClient() {
           </div>
           <div className={cn(mode !== 'manual' && 'hidden')} aria-hidden={mode !== 'manual'}>
             <ManualEntryForm
+              ref={manualFormRef}
               onSubmit={handleSubmitManual}
               onUseSamples={handleUseSamplesManual}
               onClear={handleClearManual}

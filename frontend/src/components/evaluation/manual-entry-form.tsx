@@ -1,8 +1,8 @@
 'use client'
 
 import { zodResolver } from '@hookform/resolvers/zod'
-import { CalendarIcon, Eraser, Sparkles } from 'lucide-react'
-import { useMemo } from 'react'
+import { ArrowRight, CalendarIcon, Eraser } from 'lucide-react'
+import { useImperativeHandle, useMemo } from 'react'
 import { Controller, type SubmitHandler, useForm, useWatch } from 'react-hook-form'
 import { useTranslation } from 'react-i18next'
 import { z } from 'zod'
@@ -15,7 +15,6 @@ import { InfoTooltip } from '@/components/ui/info-tooltip'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
-import { Separator } from '@/components/ui/separator'
 import { Textarea } from '@/components/ui/textarea'
 import type { ManualEntryPayload, Relationship } from '@/lib/agent-types'
 
@@ -94,6 +93,13 @@ const FARHAN_DEFAULTS: FormValues = {
 
 export type ManualSamplePersona = 'aisyah' | 'farhan'
 
+/** Imperative handle exposed by `ManualEntryForm` so a parent (the upload
+ * page header dropdown) can prefill the form with one of the sample personas
+ * without re-rendering or duplicating the defaults. */
+export type ManualEntryFormHandle = {
+  applySample: (persona: ManualSamplePersona) => void
+}
+
 const EMPTY_DEFAULTS: FormValues = {
   name: '',
   date_of_birth: '',
@@ -112,9 +118,11 @@ type Props = {
   /** Fires after the form is reset to its empty defaults via the Clear button. */
   onClear?: () => void
   disabled?: boolean
+  /** Imperative handle for parent-initiated sample prefill (React 19 ref-as-prop). */
+  ref?: React.Ref<ManualEntryFormHandle>
 }
 
-export function ManualEntryForm({ onSubmit, onUseSamples, onClear, disabled = false }: Props) {
+export function ManualEntryForm({ onSubmit, onUseSamples, onClear, disabled = false, ref }: Props) {
   const { t } = useTranslation()
 
   // Zod schema is built inside the component so refinement messages can call `t()`.
@@ -201,10 +209,21 @@ export function ManualEntryForm({ onSubmit, onUseSamples, onClear, disabled = fa
     onSubmit(payload)
   }
 
-  const handleUseSample = (persona: ManualSamplePersona) => {
-    reset(persona === 'aisyah' ? AISYAH_DEFAULTS : FARHAN_DEFAULTS)
-    onUseSamples(persona)
-  }
+  // Expose `applySample` to the parent so the unified header dropdown can
+  // prefill this form when on the Manual tab. React 19 supports passing the
+  // ref as a regular prop — no `forwardRef` wrapper needed. Inlined here
+  // (rather than reusing a separate `handleUseSample`) so the deps array
+  // doesn't churn on every render.
+  useImperativeHandle(
+    ref,
+    () => ({
+      applySample: (persona: ManualSamplePersona) => {
+        reset(persona === 'aisyah' ? AISYAH_DEFAULTS : FARHAN_DEFAULTS)
+        onUseSamples(persona)
+      }
+    }),
+    [reset, onUseSamples]
+  )
 
   const handleClearInline = () => {
     reset(EMPTY_DEFAULTS)
@@ -398,49 +417,26 @@ export function ManualEntryForm({ onSubmit, onUseSamples, onClear, disabled = fa
         </div>
       </section>
 
-      <Separator />
-
-      <div className="flex flex-col items-start gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <div className="flex flex-wrap items-center gap-x-3 gap-y-2">
-          <Button
-            type="button"
-            variant="outline"
-            size="sm"
-            disabled={disabled}
-            onClick={() => handleUseSample('aisyah')}
-            className="gap-1.5"
-          >
-            <Sparkles className="size-4" aria-hidden />
-            {t('evaluation.upload.useSamplesAisyah')}
-          </Button>
-          <span aria-hidden className="text-xs text-muted-foreground/60">
-            {t('evaluation.upload.samplesDivider')}
-          </span>
-          <Button
-            type="button"
-            variant="outline"
-            size="sm"
-            disabled={disabled}
-            onClick={() => handleUseSample('farhan')}
-            className="gap-1.5"
-          >
-            <Sparkles className="size-4" aria-hidden />
-            {t('evaluation.upload.useSamplesFarhan')}
-          </Button>
-          <Button
-            type="button"
-            variant="ghost"
-            size="sm"
-            disabled={disabled}
-            onClick={handleClearInline}
-            className="gap-1.5 text-muted-foreground hover:text-foreground"
-          >
-            <Eraser className="size-4" aria-hidden />
-            {t('evaluation.manual.clear')}
-          </Button>
-        </div>
-        <Button type="submit" disabled={disabled || formState.isSubmitting}>
-          {t('evaluation.manual.submit')}
+      <div className="flex flex-col items-start gap-4 border-t border-foreground/10 pt-5 sm:flex-row sm:items-center sm:justify-between">
+        <Button
+          type="button"
+          variant="ghost"
+          size="sm"
+          disabled={disabled}
+          onClick={handleClearInline}
+          className="gap-1.5 text-muted-foreground hover:text-foreground"
+        >
+          <Eraser className="size-4" aria-hidden />
+          {t('evaluation.manual.clear')}
+        </Button>
+        <Button
+          type="submit"
+          size="lg"
+          disabled={disabled || formState.isSubmitting}
+          className="rounded-full bg-[color:var(--hibiscus)] px-6 text-[color:var(--hibiscus-foreground)] hover:bg-[color:var(--hibiscus)]/92"
+        >
+          {t('evaluation.upload.continue')}
+          <ArrowRight className="ml-1.5 size-4" aria-hidden />
         </Button>
       </div>
     </form>

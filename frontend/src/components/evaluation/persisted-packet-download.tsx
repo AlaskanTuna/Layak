@@ -69,7 +69,7 @@ export function PersistedPacketDownload({ evalId, matches }: Props) {
               : t('evaluation.packet.titleSchemePlural', { count: qualifyingCount })}
           </h2>
         </div>
-        <p className="text-sm text-muted-foreground">{t('evaluation.packet.description')}</p>
+        <p className="text-xs text-muted-foreground">{t('evaluation.packet.description')}</p>
       </div>
       <Button type="button" onClick={handleDownload} disabled={busy} size="lg">
         {busy ? (

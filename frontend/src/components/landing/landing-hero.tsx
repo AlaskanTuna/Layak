@@ -61,7 +61,7 @@ export function LandingHero() {
         {/* ── Left column: glass editorial card ─────────────────────────── */}
         <div className="lg:col-span-7 xl:col-span-7">
           <div className="fade-rise glass-card-paper relative rounded-[28px] p-7 sm:p-9 md:p-11">
-            <h1 className="font-heading text-[42px] font-semibold leading-[1.02] tracking-[-0.02em] text-balance text-foreground sm:text-[54px] md:text-[64px] lg:text-[68px]">
+            <h1 className="font-display text-[42px] leading-[1.02] tracking-[-0.015em] text-balance text-foreground sm:text-[54px] md:text-[64px] lg:text-[68px]">
               {t('marketing.hero.headlinePart1', 'Know every Malaysian scheme')}{' '}
               <span className="relative inline-block whitespace-nowrap text-[color:var(--hibiscus)]">
                 you qualify for

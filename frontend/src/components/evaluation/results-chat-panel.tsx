@@ -32,7 +32,7 @@ type Props = {
 const PULSE_DURATION_MS = 10_000 // pulse softly for 10s
 const IDLE_DURATION_MS = 60_000 // wait 1 min between pulse bursts
 const CLICK_COOLDOWN_MS = 180_000 // 3 min quiet after the user opens the panel
-const INITIAL_DELAY_MS = 2_000 // brief grace before the first pulse on mount
+const INITIAL_DELAY_MS = 800 // brief grace before the first pulse on mount
 
 export function ResultsChatPanel({ evalId, matches }: Props) {
   const { t } = useTranslation()

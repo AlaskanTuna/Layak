@@ -38,7 +38,7 @@ export const metadata: Metadata = {
   openGraph: {
     type: 'website',
     siteName: 'Layak',
-    title: 'Layak — Malaysian social-assistance concierge',
+    title: 'Layak — Malaysian Social-Assistance Concierge',
     description:
       'Find the Malaysian social-assistance schemes you qualify for — IC + payslip + bill in, a ranked list out with cited sources and pre-filled draft applications.',
     url: 'https://layak.tech',
@@ -54,7 +54,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Layak — Malaysian social-assistance concierge',
+    title: 'Layak — Malaysian Social-Assistance Concierge',
     description:
       'Find the Malaysian social-assistance schemes you qualify for — IC + payslip + bill in, a ranked list out with cited sources and pre-filled draft applications.',
     images: ['/embed-banner.png']

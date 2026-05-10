@@ -531,9 +531,20 @@ function ChatBubble({ message }: { message: ChatMessage }) {
 /**
  * Strip the `[scheme:xxx]` markers from rendered text — they're machine
  * markers consumed by the citation extractor, not human-readable.
+ *
+ * Also repair Gemini's habit of emitting whitespace inside emphasis runs
+ * (e.g. `**PERKESO SKSPS **`). CommonMark's strict flanking rules treat
+ * those as plain text, so bold/italic silently disappears. We normalize
+ * `** word **`, `**word **`, and `** word**` back to `**word**`. Applies
+ * to single-star italics too.
  */
 function cleanInlineCitations(text: string): string {
-  return text.replace(/\s*\[\s*scheme\s*:\s*[a-z0-9_]+\s*\]\s*/gi, ' ').trim()
+  return text
+    .replace(/\s*\[\s*scheme\s*:\s*[a-z0-9_]+\s*\]\s*/gi, ' ')
+    .replace(/(\*{1,2})\s+([^*\n]+?)\s+\1/g, '$1$2$1')
+    .replace(/(\*{1,2})([^*\s\n][^*\n]*?)\s+\1/g, '$1$2$1')
+    .replace(/(\*{1,2})\s+([^*\n]+?[^*\s\n])\1/g, '$1$2$1')
+    .trim()
 }
 
 /**

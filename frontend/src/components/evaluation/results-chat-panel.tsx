@@ -113,7 +113,7 @@ export function ResultsChatPanel({ evalId, matches }: Props) {
                 className="pointer-events-none absolute inset-y-2.5 left-0 w-[3px] rounded-r-full bg-[color:var(--hibiscus)]/70"
               />
               <div className="flex flex-col">
-                <span className="mono-caption text-[color:var(--hibiscus)]">Concierge</span>
+                <span className="mono-caption text-[color:var(--hibiscus)]">Cik Lay · Pegawai Skim</span>
                 <span className="mt-0.5 font-heading text-[15px] font-semibold text-foreground">
                   {t('evaluation.chat.title')}
                 </span>
@@ -147,8 +147,8 @@ export function ResultsChatPanel({ evalId, matches }: Props) {
 
             <div className="flex-1 space-y-3 overflow-y-auto px-4 py-4">
               {chat.messages.length === 0 && (
-                <div className="rounded-[12px] border border-dashed border-foreground/20 bg-foreground/[0.03] px-3.5 py-3 text-sm text-foreground/65">
-                  <p className="mono-caption mb-1.5 text-foreground/55">Ask the concierge</p>
+                <div className="rounded-[12px] border border-dashed border-foreground/20 bg-foreground/[0.04] px-3.5 py-3 text-sm text-foreground/72 backdrop-blur-md backdrop-saturate-150">
+                  <p className="mono-caption mb-1.5 text-foreground/55">Hi, I&apos;m Cik Lay</p>
                   {t('evaluation.chat.emptyBody')}
                 </div>
               )}
@@ -170,14 +170,14 @@ export function ResultsChatPanel({ evalId, matches }: Props) {
                     <Sparkles className="h-3 w-3" aria-hidden />
                     {t('evaluation.chat.suggestionsLabel')}
                   </p>
-                  <div className="flex flex-wrap gap-2">
+                  <div className="flex flex-wrap justify-start gap-2">
                     {suggestions.map((s) => (
                       <button
                         key={s}
                         type="button"
                         onClick={() => handleSuggestion(s)}
                         disabled={chat.isStreaming}
-                        className="cursor-pointer rounded-full border border-[color:var(--hibiscus)]/30 bg-[color:var(--hibiscus)]/[0.06] px-3 py-1.5 text-xs text-foreground transition hover:border-[color:var(--hibiscus)]/55 hover:bg-[color:var(--hibiscus)]/[0.12] disabled:cursor-not-allowed disabled:opacity-60"
+                        className="cursor-pointer rounded-full border border-[color:var(--hibiscus)]/30 bg-[color:var(--hibiscus)]/[0.08] px-3 py-1.5 text-xs text-foreground backdrop-blur-md backdrop-saturate-150 transition hover:border-[color:var(--hibiscus)]/55 hover:bg-[color:var(--hibiscus)]/[0.16] disabled:cursor-not-allowed disabled:opacity-60"
                       >
                         {s}
                       </button>
@@ -225,7 +225,6 @@ export function ResultsChatPanel({ evalId, matches }: Props) {
                   </Button>
                 )}
               </div>
-              <p className="mono-caption mt-2 text-foreground/45">{t('evaluation.chat.disclaimer')}</p>
             </footer>
           </div>
         </div>

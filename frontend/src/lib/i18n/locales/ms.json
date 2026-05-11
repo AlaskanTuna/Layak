@@ -282,9 +282,17 @@
   "dashboard": {
     "hero": {
       "eyebrow": "Papan Pemuka",
-      "greetingWithName": "Selamat kembali, {{name}}.",
-      "greeting": "Selamat kembali.",
-      "subtitle": "Inilah ruang kerja anda. Pilih tempat untuk bermula."
+      "morning": "Selamat pagi.",
+      "morningWithName": "Selamat pagi, {{name}}.",
+      "afternoon": "Selamat petang.",
+      "afternoonWithName": "Selamat petang, {{name}}.",
+      "evening": "Selamat malam.",
+      "eveningWithName": "Selamat malam, {{name}}.",
+      "subtitle": {
+        "morning": "Semoga hari anda bermula dengan baik.",
+        "afternoon": "Sambung dari yang anda tinggalkan.",
+        "evening": "Selesaikan kerja hari ini."
+      }
     },
     "loading": "Memuatkan papan pemuka anda…",
     "errorTitle": "Tidak dapat memuatkan papan pemuka",

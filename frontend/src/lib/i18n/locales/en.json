@@ -282,9 +282,17 @@
   "dashboard": {
     "hero": {
       "eyebrow": "Dashboard",
-      "greetingWithName": "Welcome back, {{name}}.",
-      "greeting": "Welcome back.",
-      "subtitle": "Here's your workspace. Pick where to start."
+      "morning": "Good morning.",
+      "morningWithName": "Good morning, {{name}}.",
+      "afternoon": "Good afternoon.",
+      "afternoonWithName": "Good afternoon, {{name}}.",
+      "evening": "Good evening.",
+      "eveningWithName": "Good evening, {{name}}.",
+      "subtitle": {
+        "morning": "Have a great start to the day.",
+        "afternoon": "Pick up where you left off.",
+        "evening": "Wrap up the day's work."
+      }
     },
     "loading": "Loading your dashboard…",
     "errorTitle": "Could not load dashboard",

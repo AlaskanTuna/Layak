@@ -11,6 +11,8 @@ export function EvaluationResultsByIdHeading() {
       eyebrow={t('evaluation.results.byIdEyebrow')}
       title={t('evaluation.results.byIdTitle')}
       description={t('evaluation.results.byIdDescription')}
+      illustration="/dashboard/evaluations.webp"
+      illustrationClassName="sm:bottom-0 lg:-bottom-2"
     />
   )
 }

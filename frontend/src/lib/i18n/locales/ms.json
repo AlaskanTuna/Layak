@@ -842,6 +842,22 @@
       "freeHint": "Peringkat percuma mengehadkan penilaian dalam tetingkap 24 jam bergulir dan memadam sejarah selepas 30 hari.",
       "usage": "{{used}} / {{limit}} dalam 24 j ini"
     },
+    "appearance": {
+      "title": "Tema",
+      "description": "Pilih rupa Layak di seluruh aplikasi.",
+      "system": {
+        "label": "Sistem",
+        "hint": "Padankan peranti anda"
+      },
+      "light": {
+        "label": "Cerah",
+        "hint": "Antara muka terang"
+      },
+      "dark": {
+        "label": "Gelap",
+        "hint": "Antara muka pencahayaan rendah"
+      }
+    },
     "danger": {
       "title": "Zon bahaya",
       "description": "Eksport atau padam data yang Layak simpan tentang anda.",

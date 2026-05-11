@@ -842,6 +842,22 @@
       "freeHint": "Free tier caps evaluations to a rolling 24-hour window and prunes history after 30 days.",
       "usage": "{{used}} / {{limit}} this 24 h"
     },
+    "appearance": {
+      "title": "Theme",
+      "description": "Pick how Layak looks across the app.",
+      "system": {
+        "label": "System",
+        "hint": "Match your device"
+      },
+      "light": {
+        "label": "Light",
+        "hint": "Bright interface"
+      },
+      "dark": {
+        "label": "Dark",
+        "hint": "Low-light interface"
+      }
+    },
     "danger": {
       "title": "Danger Zone",
       "description": "Export or remove the data Layak holds about you.",

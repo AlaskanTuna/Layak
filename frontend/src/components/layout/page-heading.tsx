@@ -7,9 +7,20 @@ type Props = {
   action?: ReactNode
   children?: ReactNode
   illustration?: string
+  /** Extra Tailwind classes applied to the optional illustration `<img>`.
+   * Useful for page-specific offsets without forking the whole layout. */
+  illustrationClassName?: string
 }
 
-export function PageHeading({ eyebrow, title, description, action, children, illustration }: Props) {
+export function PageHeading({
+  eyebrow,
+  title,
+  description,
+  action,
+  children,
+  illustration,
+  illustrationClassName
+}: Props) {
   return (
     <section className="paper-card relative isolate overflow-hidden rounded-[20px] p-6 sm:p-8">
       {/* Subtle grid texture — civic-document flair */}
@@ -37,7 +48,9 @@ export function PageHeading({ eyebrow, title, description, action, children, ill
           src={illustration}
           alt=""
           aria-hidden
-          className="pointer-events-none absolute -right-2 -bottom-2 hidden size-28 select-none opacity-95 sm:right-4 sm:bottom-4 sm:block sm:size-36 lg:size-44"
+          className={`pointer-events-none absolute -right-2 -bottom-2 hidden size-28 select-none opacity-95 sm:right-4 sm:bottom-4 sm:block sm:size-36 lg:size-44 ${
+            illustrationClassName ?? ''
+          }`}
           loading="lazy"
           onError={(e) => {
             ;(e.currentTarget as HTMLImageElement).style.display = 'none'

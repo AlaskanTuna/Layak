@@ -205,6 +205,7 @@ export function EvaluationUploadClient() {
         eyebrow={t('evaluation.upload.eyebrow')}
         title={t('evaluation.upload.pageTitle')}
         description={t('evaluation.upload.pageDescription')}
+        illustration="/dashboard/start.webp"
         action={
           showSampleAction ? (
             <DropdownMenu>

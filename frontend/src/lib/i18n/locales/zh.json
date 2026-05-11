@@ -831,6 +831,22 @@
       "freeHint": "免费套餐将评估限制在 24 小时滚动窗口内，历史记录在 30 天后自动清除。",
       "usage": "本 24 小时内 {{used}} / {{limit}}"
     },
+    "appearance": {
+      "title": "主题",
+      "description": "选择 Layak 在应用中的外观。",
+      "system": {
+        "label": "跟随系统",
+        "hint": "匹配设备设置"
+      },
+      "light": {
+        "label": "浅色",
+        "hint": "明亮界面"
+      },
+      "dark": {
+        "label": "深色",
+        "hint": "暗光界面"
+      }
+    },
     "danger": {
       "title": "危险区",
       "description": "导出或删除 Layak 持有的与您相关的数据。",

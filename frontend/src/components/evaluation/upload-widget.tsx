@@ -101,6 +101,8 @@ export type SamplePersona = 'aisyah' | 'farhan'
 type Props = {
   onSubmit: (submission: UploadSubmission) => void
   disabled?: boolean
+  /** Optional id applied to the submit button — used by the help tour to anchor a step on it. */
+  submitId?: string
 }
 
 type SlotProps = {
@@ -206,7 +208,7 @@ function UploadSlotCard({ spec, state, inputId, disabled, inputRef, onChange, on
   )
 }
 
-export function UploadWidget({ onSubmit, disabled = false }: Props) {
+export function UploadWidget({ onSubmit, disabled = false, submitId }: Props) {
   const { t } = useTranslation()
   const reactId = useId()
   const [showHousehold, setShowHousehold] = useState(false)
@@ -372,6 +374,7 @@ export function UploadWidget({ onSubmit, disabled = false }: Props) {
 
       <div className="flex justify-end border-t border-foreground/10 pt-5">
         <Button
+          id={submitId}
           type="button"
           onClick={handleSubmit}
           disabled={disabled || !canSubmit}

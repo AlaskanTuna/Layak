@@ -19,6 +19,7 @@ function PopoverContent({
   side,
   align = 'center',
   anchor,
+  positionerStyle,
   children,
   ...props
 }: PopoverPrimitive.Popup.Props & {
@@ -26,10 +27,17 @@ function PopoverContent({
   side?: PopoverPrimitive.Positioner.Props['side']
   align?: PopoverPrimitive.Positioner.Props['align']
   anchor?: PopoverPrimitive.Positioner.Props['anchor']
+  positionerStyle?: React.CSSProperties
 }) {
   return (
     <PopoverPrimitive.Portal>
-      <PopoverPrimitive.Positioner sideOffset={sideOffset} side={side} align={align} anchor={anchor}>
+      <PopoverPrimitive.Positioner
+        sideOffset={sideOffset}
+        side={side}
+        align={align}
+        anchor={anchor}
+        style={{ zIndex: 60, ...positionerStyle }}
+      >
         <PopoverPrimitive.Popup
           data-slot="popover-content"
           className={cn(

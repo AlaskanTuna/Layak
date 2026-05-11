@@ -119,11 +119,13 @@ type Props = {
   /** Fires after the form is reset to its empty defaults via the Clear button. */
   onClear?: () => void
   disabled?: boolean
+  /** Optional id applied to the submit button — used by the help tour to anchor a step on it. */
+  submitId?: string
   /** Imperative handle for parent-initiated sample prefill (React 19 ref-as-prop). */
   ref?: React.Ref<ManualEntryFormHandle>
 }
 
-export function ManualEntryForm({ onSubmit, onUseSamples, onClear, disabled = false, ref }: Props) {
+export function ManualEntryForm({ onSubmit, onUseSamples, onClear, disabled = false, submitId, ref }: Props) {
   const { t } = useTranslation()
 
   // Zod schema is built inside the component so refinement messages can call `t()`.
@@ -431,6 +433,7 @@ export function ManualEntryForm({ onSubmit, onUseSamples, onClear, disabled = fa
           {t('evaluation.manual.clear')}
         </Button>
         <Button
+          id={submitId}
           type="submit"
           size="lg"
           disabled={disabled || formState.isSubmitting}

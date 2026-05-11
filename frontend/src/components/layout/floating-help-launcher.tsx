@@ -138,28 +138,39 @@ export function FloatingHelpLauncher() {
   const currentStep = isTour ? tour[stepIndex] : null
   const totalSteps = tour.length
 
-  // Resolve the anchor + apply highlight on step changes. The popover
-  // anchors next to the highlighted target when one exists, otherwise it
-  // falls back to anchoring on the trigger button.
+  // Resolve the anchor when stepping through the tour. We deliberately
+  // skip when closing — clearing `anchorEl` mid-close makes Base UI
+  // re-anchor to the trigger and produces a flash above the help button
+  // during the fade-out. Letting the anchor stay puts the close animation
+  // exactly where the popover was.
   useEffect(() => {
-    if (!open || !currentStep?.target) {
+    if (!open) return
+    if (!currentStep?.target) {
       // eslint-disable-next-line react-hooks/set-state-in-effect
       setAnchorEl(null)
       return
     }
     const el = document.getElementById(currentStep.target)
     if (!el) {
-       
+
       setAnchorEl(null)
       return
     }
-     
+
     setAnchorEl(el)
     el.scrollIntoView({ behavior: 'smooth', block: 'center', inline: 'nearest' })
   }, [open, currentStep])
 
   function handleOpenChange(next: boolean) {
-    if (next) setStepIndex(0)
+    if (next) {
+      // Resolve the first-step anchor synchronously so the popover opens
+      // in the correct position on first paint, rather than flashing from
+      // a stale anchor (last step from the previous session).
+      setStepIndex(0)
+      const firstTarget = tour[0]?.target
+      const firstEl = firstTarget ? document.getElementById(firstTarget) : null
+      setAnchorEl(firstEl)
+    }
     setOpen(next)
   }
 

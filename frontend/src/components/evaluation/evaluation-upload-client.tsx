@@ -251,13 +251,19 @@ export function EvaluationUploadClient() {
           <div id="tour-upload-mode" className="scroll-mt-24 rounded-lg">
             <IntakeModeToggle value={mode} onChange={handleModeChange} />
           </div>
-          {/* Both widgets stay mounted so partial form state survives a tab switch. */}
+          {/* Both widgets stay mounted so partial form state survives a tab switch.
+              The `tour-upload-form` / `tour-upload-submit` IDs migrate to whichever
+              wrapper is active so the help tour anchors to a visible element instead
+              of the hidden one (which has a 0×0 bbox and breaks Base UI positioning). */}
           <div
-            id="tour-upload-form"
+            id={mode === 'upload' ? 'tour-upload-form' : undefined}
             className={cn('scroll-mt-24 rounded-[14px]', mode !== 'upload' && 'hidden')}
             aria-hidden={mode !== 'upload'}
           >
-            <UploadWidget onSubmit={handleSubmitUpload} />
+            <UploadWidget
+              onSubmit={handleSubmitUpload}
+              submitId={mode === 'upload' ? 'tour-upload-submit' : undefined}
+            />
             {sampleLoadError && (
               <p className="mt-2 text-xs text-destructive" role="alert">
                 {t('evaluation.sampleLoadError', { error: sampleLoadError })}
@@ -265,6 +271,7 @@ export function EvaluationUploadClient() {
             )}
           </div>
           <div
+            id={mode === 'manual' ? 'tour-upload-form' : undefined}
             className={cn('scroll-mt-24 rounded-[14px]', mode !== 'manual' && 'hidden')}
             aria-hidden={mode !== 'manual'}
           >
@@ -273,6 +280,7 @@ export function EvaluationUploadClient() {
               onSubmit={handleSubmitManual}
               onUseSamples={handleUseSamplesManual}
               onClear={handleClearManual}
+              submitId={mode === 'manual' ? 'tour-upload-submit' : undefined}
             />
           </div>
         </>

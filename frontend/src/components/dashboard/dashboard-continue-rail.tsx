@@ -82,7 +82,7 @@ export function DashboardContinueRail({ items, phase, errorMessage, onRetry }: P
         className="pointer-events-none absolute inset-0"
         style={{
           background:
-            'linear-gradient(to left, var(--paper) 0%, color-mix(in oklch, var(--paper) 55%, transparent) 25%, transparent 60%), linear-gradient(to top, var(--paper) 0%, color-mix(in oklch, var(--paper) 55%, transparent) 30%, transparent 65%)'
+            'linear-gradient(to left, color-mix(in oklch, var(--paper) 65%, transparent) 0%, color-mix(in oklch, var(--paper) 25%, transparent) 18%, transparent 40%), linear-gradient(to top, color-mix(in oklch, var(--paper) 65%, transparent) 0%, color-mix(in oklch, var(--paper) 25%, transparent) 20%, transparent 45%)'
         }}
       />
       <div className="relative flex items-start gap-2.5">

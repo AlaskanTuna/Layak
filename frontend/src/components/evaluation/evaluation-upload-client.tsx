@@ -211,7 +211,13 @@ export function EvaluationUploadClient() {
             <DropdownMenu>
               <DropdownMenuTrigger
                 render={
-                  <Button type="button" variant="outline" size="sm" disabled={samplesBusy} className="gap-1.5">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    disabled={samplesBusy}
+                    className="gap-1.5 dark:bg-card dark:hover:bg-card/80"
+                  >
                     {samplesBusy ? (
                       <>
                         <Loader2 className="size-3.5 animate-spin" aria-hidden />

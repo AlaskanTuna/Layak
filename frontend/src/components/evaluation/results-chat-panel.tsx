@@ -204,7 +204,7 @@ export function ResultsChatPanel({ evalId, matches }: Props) {
           type="button"
           aria-label={t('evaluation.chat.openButton')}
           onClick={handleOpenPanel}
-          className={`group fixed right-4 bottom-16 z-40 inline-flex size-12 cursor-pointer items-center justify-center overflow-hidden rounded-full border border-[color:var(--hibiscus)]/30 bg-[color:var(--paper)] shadow-[0_18px_40px_-18px_color-mix(in_oklch,var(--ink)_45%,transparent)] transition-transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-[color:var(--hibiscus)]/40 md:right-6 md:bottom-20 ${
+          className={`group fixed right-4 bottom-20 z-40 inline-flex size-12 cursor-pointer items-center justify-center overflow-hidden rounded-full border border-[color:var(--hibiscus)]/30 bg-[color:var(--paper)] shadow-[0_18px_40px_-18px_color-mix(in_oklch,var(--ink)_45%,transparent)] transition-transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-[color:var(--hibiscus)]/40 md:right-6 md:bottom-20 ${
             isPulsing ? 'pulse-soft' : ''
           }`}
         >

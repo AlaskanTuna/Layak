@@ -23,6 +23,17 @@ type Props = {
 export function EvaluationResultsToc({ visibleSections }: Props) {
   const { t } = useTranslation()
   const [activeId, setActiveId] = useState<TocSectionId>(visibleSections[0] ?? 'overview')
+
+  // Sections appear/disappear as the pipeline progresses (e.g. `preview` and
+  // `download` only mount once `isComplete`; `required` only when at least one
+  // required-contribution match exists). Stored `activeId` may briefly point
+  // at a now-missing section — clamp it for rendering rather than via an
+  // effect so we don't trigger cascading re-renders. Observer/scroll handlers
+  // will overwrite it with a valid id on the next tick.
+  const displayedActiveId: TocSectionId = visibleSections.includes(activeId)
+    ? activeId
+    : (visibleSections[0] ?? activeId)
+
   // Click-lock: when the user clicks a TOC entry, we set activeId to that id
   // immediately and suppress observer/scroll updates for a short window so
   // the smooth-scroll animation doesn't fight the user's intent. This matters
@@ -155,7 +166,7 @@ export function EvaluationResultsToc({ visibleSections }: Props) {
         className="sticky top-[var(--topbar-height,4rem)] z-30 -mx-4 order-first flex gap-2 overflow-x-auto border-b border-foreground/10 bg-background/85 px-4 py-2.5 backdrop-blur-md md:-mx-6 md:px-6 lg:hidden"
       >
         {visibleSections.map((id) => {
-          const active = activeId === id
+          const active = displayedActiveId === id
           return (
             <a
               key={id}
@@ -184,7 +195,7 @@ export function EvaluationResultsToc({ visibleSections }: Props) {
         <nav>
           <ul className="flex flex-col gap-0.5">
             {visibleSections.map((id) => {
-              const active = activeId === id
+              const active = displayedActiveId === id
               return (
                 <li key={id}>
                   <a

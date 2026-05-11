@@ -227,14 +227,27 @@ export function EvaluationResultsByIdClient({ evalId }: { evalId: string }) {
   const totalAnnualRm = doc.totalAnnualRM ?? 0
   const hasContent = isComplete || (isRunning && doc.matches.length > 0)
 
+  // Derive section presence from the *actual* data the children will render.
+  // The cards below all self-hide on empty inputs (RequiredContributionsCard,
+  // DraftPacketPreview, PersistedPacketDownload return null when their
+  // filtered slice is empty); mirroring that here keeps the TOC truthful and
+  // prevents dangling anchors that scroll to nothing.
+  const hasRequiredContributions = doc.matches.some((m) => m.qualifies && m.kind === 'required_contribution')
+  const hasQualifyingForPacket = doc.matches.some((m) => m.qualifies)
+
+  const showOverview = hasContent
+  const showSchemes = hasContent
+  const showRequired = hasContent && hasRequiredContributions
+  const showPreview = isComplete && hasQualifyingForPacket
+  const showDownload = isComplete && hasQualifyingForPacket
+
   const visibleSections: readonly TocSectionId[] = (() => {
     const ids: TocSectionId[] = []
-    if (hasContent) {
-      ids.push('overview', 'schemes', 'required')
-    }
-    if (isComplete) {
-      ids.push('preview', 'download')
-    }
+    if (showOverview) ids.push('overview')
+    if (showSchemes) ids.push('schemes')
+    if (showRequired) ids.push('required')
+    if (showPreview) ids.push('preview')
+    if (showDownload) ids.push('download')
     return ids
   })()
 
@@ -268,73 +281,79 @@ export function EvaluationResultsByIdClient({ evalId }: { evalId: string }) {
       {hasContent && (
         <div className="grid grid-cols-1 gap-6 lg:grid-cols-[1fr_220px] lg:gap-10">
           <div className="flex min-w-0 flex-col gap-6">
-            <section
-              id="overview"
-              aria-label={t('evaluation.results.toc.overview')}
-              className="flex scroll-mt-28 flex-col gap-4 lg:scroll-mt-20"
-            >
-              <div className="flex items-baseline justify-between gap-3">
-                <h2 className="font-heading text-xl font-semibold tracking-tight">
-                  {t('evaluation.results.toc.overview')}
-                </h2>
-              </div>
-              <EvaluationUpsideHero
-                totalAnnualRm={totalAnnualRm}
-                matchedCount={matchedCount}
-                packet={null}
-                empty={!isComplete}
-              />
-              {isComplete && <EvaluationSummaryCard evalId={evalId} />}
-            </section>
-            <section
-              id="schemes"
-              aria-label={t('evaluation.results.toc.schemes')}
-              className="scroll-mt-28 lg:scroll-mt-20"
-            >
-              <SchemeCardGrid matches={doc.matches} />
-            </section>
-            <section
-              id="required"
-              aria-label={t('evaluation.results.toc.required')}
-              className="scroll-mt-28 lg:scroll-mt-20"
-            >
-              <RequiredContributionsCard matches={doc.matches} />
-            </section>
+            {showOverview && (
+              <section
+                id="overview"
+                aria-label={t('evaluation.results.toc.overview')}
+                className="flex scroll-mt-28 flex-col gap-4 lg:scroll-mt-20"
+              >
+                <div className="flex items-baseline justify-between gap-3">
+                  <h2 className="font-heading text-xl font-semibold tracking-tight">
+                    {t('evaluation.results.toc.overview')}
+                  </h2>
+                </div>
+                <EvaluationUpsideHero
+                  totalAnnualRm={totalAnnualRm}
+                  matchedCount={matchedCount}
+                  packet={null}
+                  empty={!isComplete}
+                />
+                {isComplete && <EvaluationSummaryCard evalId={evalId} />}
+              </section>
+            )}
+            {showSchemes && (
+              <section
+                id="schemes"
+                aria-label={t('evaluation.results.toc.schemes')}
+                className="scroll-mt-28 lg:scroll-mt-20"
+              >
+                <SchemeCardGrid matches={doc.matches} />
+              </section>
+            )}
+            {showRequired && (
+              <section
+                id="required"
+                aria-label={t('evaluation.results.toc.required')}
+                className="scroll-mt-28 lg:scroll-mt-20"
+              >
+                <RequiredContributionsCard matches={doc.matches} />
+              </section>
+            )}
 
-            {isComplete && (
-              <>
-                <section
-                  id="preview"
-                  aria-label={t('evaluation.results.toc.preview')}
-                  className="flex scroll-mt-28 flex-col gap-4 lg:scroll-mt-20"
-                >
-                  <h2 className="font-heading text-xl font-semibold tracking-tight">
-                    {t('evaluation.results.toc.preview')}
-                  </h2>
-                  <DraftPacketPreview evalId={evalId} matches={doc.matches} />
-                </section>
-                <section
-                  id="download"
-                  aria-label={t('evaluation.results.toc.download')}
-                  className="flex scroll-mt-28 flex-col gap-4 lg:scroll-mt-20"
-                >
-                  <h2 className="font-heading text-xl font-semibold tracking-tight">
-                    {t('evaluation.results.toc.download')}
-                  </h2>
-                  <PersistedPacketDownload evalId={evalId} matches={doc.matches} />
-                  <div className="flex border-t border-foreground/10 pt-5">
-                    <Button
-                      type="button"
-                      size="lg"
-                      onClick={handleStartAnother}
-                      className="rounded-full bg-[color:var(--hibiscus)] px-6 text-[color:var(--hibiscus-foreground)] hover:bg-[color:var(--hibiscus)]/92"
-                    >
-                      {t('evaluation.results.startAnother')}
-                      <ArrowRight className="ml-1.5 size-4" aria-hidden />
-                    </Button>
-                  </div>
-                </section>
-              </>
+            {showPreview && (
+              <section
+                id="preview"
+                aria-label={t('evaluation.results.toc.preview')}
+                className="flex scroll-mt-28 flex-col gap-4 lg:scroll-mt-20"
+              >
+                <h2 className="font-heading text-xl font-semibold tracking-tight">
+                  {t('evaluation.results.toc.preview')}
+                </h2>
+                <DraftPacketPreview evalId={evalId} matches={doc.matches} />
+              </section>
+            )}
+            {showDownload && (
+              <section
+                id="download"
+                aria-label={t('evaluation.results.toc.download')}
+                className="flex scroll-mt-28 flex-col gap-4 lg:scroll-mt-20"
+              >
+                <h2 className="font-heading text-xl font-semibold tracking-tight">
+                  {t('evaluation.results.toc.download')}
+                </h2>
+                <PersistedPacketDownload evalId={evalId} matches={doc.matches} />
+                <div className="flex border-t border-foreground/10 pt-5">
+                  <Button
+                    type="button"
+                    size="lg"
+                    onClick={handleStartAnother}
+                    className="rounded-full bg-[color:var(--hibiscus)] px-6 text-[color:var(--hibiscus-foreground)] hover:bg-[color:var(--hibiscus)]/92"
+                  >
+                    {t('evaluation.results.startAnother')}
+                    <ArrowRight className="ml-1.5 size-4" aria-hidden />
+                  </Button>
+                </div>
+              </section>
             )}
           </div>
 

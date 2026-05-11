@@ -29,6 +29,7 @@ import {
   type Step
 } from '@/lib/agent-types'
 import { authedFetch } from '@/lib/firebase'
+import { notificationStore } from '@/lib/notification-store'
 
 const POLL_INTERVAL_MS = 2000
 
@@ -95,6 +96,7 @@ export function EvaluationResultsByIdClient({ evalId }: { evalId: string }) {
   const [phase, setPhase] = useState<FetchPhase>('loading')
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
   const pollHandleRef = useRef<ReturnType<typeof setInterval> | null>(null)
+  const lastStatusRef = useRef<string | null>(null)
 
   const fetchDoc = useCallback(async () => {
     try {
@@ -144,6 +146,43 @@ export function EvaluationResultsByIdClient({ evalId }: { evalId: string }) {
       }
     }
   }, [phase, doc, fetchDoc])
+
+  useEffect(() => {
+    if (!doc) return
+    if (lastStatusRef.current === doc.status) return
+    lastStatusRef.current = doc.status
+
+    if (doc.status === 'complete') {
+      const qualifyingCount = doc.matches.filter((m) => m.qualifies).length
+      if (qualifyingCount > 0) {
+        notificationStore.notify({
+          title: t('common.notifications.events.evalComplete.title'),
+          description: t('common.notifications.events.evalComplete.body', { count: qualifyingCount }),
+          severity: 'success',
+          toast: true,
+          groupKey: `eval-${evalId}`
+        })
+      } else {
+        notificationStore.notify({
+          title: t('common.notifications.events.evalCompleteEmpty.title'),
+          description: t('common.notifications.events.evalCompleteEmpty.body'),
+          severity: 'info',
+          toast: true,
+          groupKey: `eval-${evalId}`
+        })
+      }
+    } else if (doc.status === 'error') {
+      notificationStore.notify({
+        title: t('common.notifications.events.evalFailed.title'),
+        description: t('common.notifications.events.evalFailed.body', {
+          category: doc.error?.category ?? 'Unknown error'
+        }),
+        severity: 'error',
+        toast: true,
+        groupKey: `eval-${evalId}`
+      })
+    }
+  }, [doc, evalId, t])
 
   useEffect(
     () => () => {

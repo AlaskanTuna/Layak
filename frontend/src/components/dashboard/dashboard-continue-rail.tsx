@@ -92,13 +92,18 @@ export function DashboardContinueRail({ items, phase, errorMessage, onRetry }: P
       )}
 
       {phase === 'error' && (
-        <div className="relative flex flex-col gap-3 rounded-md border border-[color:var(--hibiscus)]/30 bg-[color:var(--hibiscus)]/[0.06] p-3">
+        <div className="relative flex flex-col gap-3 rounded-md border border-[color:var(--hibiscus)]/30 bg-[color:var(--hibiscus)]/[0.06] p-3 backdrop-blur-md">
           <div className="flex items-start gap-2 text-sm text-foreground/80">
             <AlertTriangle className="mt-0.5 size-4 shrink-0 text-[color:var(--hibiscus)]" aria-hidden />
             <span>{errorMessage ?? t('dashboard.continue.errorGeneric')}</span>
           </div>
           {onRetry && (
-            <Button variant="outline" size="sm" onClick={onRetry} className="self-start">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={onRetry}
+              className="self-start bg-background/60 backdrop-blur-md hover:bg-background/80"
+            >
               {t('common.button.retry')}
             </Button>
           )}
@@ -111,7 +116,7 @@ export function DashboardContinueRail({ items, phase, errorMessage, onRetry }: P
           <Button
             size="sm"
             render={<Link href="/dashboard/evaluation/upload" />}
-            className="self-start rounded-full bg-[color:var(--hibiscus)] px-4 text-[color:var(--hibiscus-foreground)] hover:bg-[color:var(--hibiscus)]/92"
+            className="self-start rounded-full bg-[color:var(--hibiscus)]/92 px-4 text-[color:var(--hibiscus-foreground)] backdrop-blur-md hover:bg-[color:var(--hibiscus)]"
           >
             {t('dashboard.continue.emptyCta')}
             <ArrowRight className="ml-1.5 size-3.5" aria-hidden />
@@ -122,7 +127,7 @@ export function DashboardContinueRail({ items, phase, errorMessage, onRetry }: P
       {phase === 'ready' && latest !== null && (
         <Link
           href={`/dashboard/evaluation/results/${latest.id}`}
-          className="group relative flex flex-col gap-2 rounded-md border border-foreground/8 px-3 py-3 transition-colors hover:bg-foreground/[0.03]"
+          className="group relative flex flex-col gap-2 rounded-md border border-foreground/8 bg-background/60 px-3 py-3 backdrop-blur-md transition-colors hover:bg-background/80"
         >
           <div className="flex items-center gap-2">
             <span

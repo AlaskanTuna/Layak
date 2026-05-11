@@ -11,6 +11,7 @@ import { Button } from '@/components/ui/button'
 import { Checkbox } from '@/components/ui/checkbox'
 import type { EvaluationListItem, EvaluationStatus } from '@/lib/agent-types'
 import { authedFetch } from '@/lib/firebase'
+import { notificationStore } from '@/lib/notification-store'
 import { cn } from '@/lib/utils'
 
 const PAGE_SIZE = 5
@@ -101,11 +102,27 @@ export function EvaluationHistoryTable({ items, onRefresh }: Props) {
       )
     )
     const failed = results.filter((r) => r.status === 'rejected')
+    const deletedCount = ids.length - failed.length
     setDeleting(false)
     setSelected(new Set())
     onRefresh()
     if (failed.length > 0) {
       setDeleteError(t('evaluation.history.deletePartialFailure', { failed: failed.length, total: ids.length }))
+      notificationStore.notify({
+        title: t('common.notifications.events.batchDeleteFailure.title'),
+        description: t('common.notifications.events.batchDeleteFailure.body', {
+          message: t('evaluation.history.deletePartialFailure', { failed: failed.length, total: ids.length })
+        }),
+        severity: 'error',
+        toast: true
+      })
+    } else {
+      notificationStore.notify({
+        title: t('common.notifications.events.batchDeleteSuccess.title'),
+        description: t('common.notifications.events.batchDeleteSuccess.body', { count: deletedCount }),
+        severity: 'success',
+        toast: true
+      })
     }
   }
 

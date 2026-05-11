@@ -31,10 +31,13 @@ type FireToastOptions = {
 /**
  * Render a Layak-styled toast through react-hot-toast's `custom` renderer.
  *
- * Full JSX control: dark command-center pill with a ringed severity icon
- * and centered title + description. Enter/leave animation rides on
- * `t.visible` — react-hot-toast flips this 250ms before unmount, so the
- * `transition-*` classes interpolate to the leaving state during dismissal.
+ * Single-line dark command-center pill: ringed severity icon + description.
+ * The title is dropped on the toast surface (it lives in the bell-popover
+ * log) but folded into the aria-label so screen-readers still hear the
+ * full event ("Packet Ready: ZIP saved to your downloads."). Enter/leave
+ * animation rides on `t.visible` — react-hot-toast flips this 250ms before
+ * unmount, so the `transition-*` classes interpolate to the leaving state
+ * during dismissal.
  */
 export function fireToast({ title, description, severity = 'info', durationMs = 4000, id }: FireToastOptions): void {
   const { Icon, color } = SEVERITY[severity]
@@ -42,21 +45,19 @@ export function fireToast({ title, description, severity = 'info', durationMs = 
     (t: Toast) => (
       <div
         className={cn(
-          'pointer-events-auto flex items-center justify-center gap-2.5 rounded-2xl px-4 py-2.5',
+          'pointer-events-auto flex items-center justify-center gap-2.5 rounded-2xl px-5 py-3',
           'border border-white/[0.08] bg-[oklch(0.18_0.014_78)] text-[oklch(0.93_0.012_82)]',
           'shadow-[inset_0_1px_0_color-mix(in_oklch,white_6%,transparent),0_22px_56px_-22px_rgba(0,0,0,0.45),0_8px_20px_-12px_rgba(0,0,0,0.3)]',
-          'min-w-[260px] max-w-[420px]',
+          'min-w-[260px] max-w-[440px]',
           'transition-all duration-200 ease-out',
           t.visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-2'
         )}
         role="status"
         aria-live="polite"
+        aria-label={`${title}: ${description}`}
       >
         <Icon className={cn('size-4 shrink-0', color)} aria-hidden />
-        <div className="flex min-w-0 flex-col items-center text-center">
-          <p className="text-[13.5px] font-medium leading-snug">{title}</p>
-          {description && <p className="mt-px text-[12.5px] leading-snug text-white/70">{description}</p>}
-        </div>
+        <p className="min-w-0 text-center text-[13.5px] leading-snug">{description}</p>
       </div>
     ),
     {

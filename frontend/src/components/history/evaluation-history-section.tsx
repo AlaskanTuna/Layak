@@ -104,10 +104,15 @@ export function EvaluationHistorySection() {
         <AggregateStatsCards items={items} />
       </div>
       <div className="grid grid-cols-1 items-start gap-6 lg:grid-cols-[1fr_22rem]">
-        <div id="tour-evaluation-history" className="scroll-mt-24 rounded-[14px]">
+        {/* `min-w-0` is critical: grid items default to `min-width: auto`,
+            which lets the inner table's intrinsic content width force the
+            track wider than the viewport. Clamping the track to 0 lets the
+            table's `overflow-x-auto` wrapper trap horizontal scroll inside
+            the card instead of leaking it to the page. */}
+        <div id="tour-evaluation-history" className="min-w-0 scroll-mt-24 rounded-[14px]">
           <EvaluationHistoryTable items={items} onRefresh={fetchHistory} />
         </div>
-        <div id="tour-evaluation-rail" className="scroll-mt-24 rounded-[18px] lg:mt-1.5">
+        <div id="tour-evaluation-rail" className="min-w-0 scroll-mt-24 rounded-[18px] lg:mt-10">
           <HowLayakEvaluatesRail />
         </div>
       </div>

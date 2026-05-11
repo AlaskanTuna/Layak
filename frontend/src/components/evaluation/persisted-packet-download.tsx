@@ -48,7 +48,11 @@ export function PersistedPacketDownload({ evalId, matches }: Props) {
       }
       const blob = await res.blob()
       triggerDownload(blob, `layak-packet-${evalId}.zip`)
-      notificationStore.push(t('evaluation.packet.notificationTitle'), t('evaluation.packet.notificationBody'))
+      notificationStore.notify({
+        title: t('common.notifications.events.packetDownloaded.title'),
+        description: t('common.notifications.events.packetDownloaded.body'),
+        severity: 'success'
+      })
     } catch (err) {
       setError(err instanceof Error ? err.message : String(err))
     } finally {

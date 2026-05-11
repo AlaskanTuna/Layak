@@ -81,6 +81,18 @@ export function DashboardLauncherGrid() {
                 }}
               />
 
+              {/* Paper-coloured fade from bottom + right edges. Lifts text
+                  legibility when the illustration drifts under the title at
+                  narrower widths, and softens the image into the card. */}
+              <span
+                aria-hidden
+                className="pointer-events-none absolute inset-0"
+                style={{
+                  background:
+                    'linear-gradient(to left, var(--paper) 0%, color-mix(in oklch, var(--paper) 55%, transparent) 25%, transparent 60%), linear-gradient(to top, var(--paper) 0%, color-mix(in oklch, var(--paper) 55%, transparent) 30%, transparent 65%)'
+                }}
+              />
+
               <div className="relative flex items-start justify-between gap-3">
                 <span className={`flex size-11 items-center justify-center rounded-md ${ACCENT[tile.accent]}`}>
                   <Icon className="size-5" aria-hidden />

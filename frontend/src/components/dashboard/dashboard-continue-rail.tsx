@@ -74,6 +74,17 @@ export function DashboardContinueRail({ items, phase, errorMessage, onRetry }: P
           ;(e.currentTarget as HTMLImageElement).style.display = 'none'
         }}
       />
+      {/* Paper-coloured fade from bottom + right edges — mirrors the launcher
+          tiles so text on the inner resume card stays legible if the image
+          drifts under it at narrow widths. */}
+      <span
+        aria-hidden
+        className="pointer-events-none absolute inset-0"
+        style={{
+          background:
+            'linear-gradient(to left, var(--paper) 0%, color-mix(in oklch, var(--paper) 55%, transparent) 25%, transparent 60%), linear-gradient(to top, var(--paper) 0%, color-mix(in oklch, var(--paper) 55%, transparent) 30%, transparent 65%)'
+        }}
+      />
       <div className="relative flex items-start gap-2.5">
         <span className="flex size-9 items-center justify-center rounded-md bg-[color:var(--hibiscus)]/10 text-[color:var(--hibiscus)]">
           <History className="size-4" aria-hidden />

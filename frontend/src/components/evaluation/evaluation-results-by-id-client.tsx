@@ -8,6 +8,7 @@ import { useTranslation } from 'react-i18next'
 
 import { DraftPacketPreview } from '@/components/evaluation/draft-packet-preview'
 import { ErrorRecoveryCard } from '@/components/evaluation/error-recovery-card'
+import { EvaluationResultsToc, type TocSectionId } from '@/components/evaluation/evaluation-results-toc'
 import { EvaluationUpsideHero } from '@/components/evaluation/evaluation-upside-hero'
 import { PersistedPacketDownload } from '@/components/evaluation/persisted-packet-download'
 import { PipelineStepper } from '@/components/evaluation/pipeline-stepper'
@@ -223,6 +224,18 @@ export function EvaluationResultsByIdClient({ evalId }: { evalId: string }) {
   // contribution items surfaced in the separate card below.
   const matchedCount = doc.matches.filter((m) => m.qualifies).length
   const totalAnnualRm = doc.totalAnnualRM ?? 0
+  const hasContent = isComplete || (isRunning && doc.matches.length > 0)
+
+  const visibleSections: readonly TocSectionId[] = (() => {
+    const ids: TocSectionId[] = []
+    if (hasContent) {
+      ids.push('overview', 'schemes', 'required')
+    }
+    if (isComplete) {
+      ids.push('preview', 'download')
+    }
+    return ids
+  })()
 
   function handleStartAnother() {
     setDemoMode(false)
@@ -251,33 +264,46 @@ export function EvaluationResultsByIdClient({ evalId }: { evalId: string }) {
         />
       )}
 
-      {(isComplete || (isRunning && doc.matches.length > 0)) && (
-        <>
-          <EvaluationUpsideHero
-            totalAnnualRm={totalAnnualRm}
-            matchedCount={matchedCount}
-            packet={null}
-            empty={!isComplete}
-          />
-          <div id="matched-schemes">
-            <SchemeCardGrid matches={doc.matches} />
+      {hasContent && (
+        <div className="grid grid-cols-1 gap-6 lg:grid-cols-[1fr_220px] lg:gap-10">
+          <div className="flex min-w-0 flex-col gap-6">
+            <section id="overview" aria-label={t('evaluation.results.toc.overview')}>
+              <EvaluationUpsideHero
+                totalAnnualRm={totalAnnualRm}
+                matchedCount={matchedCount}
+                packet={null}
+                empty={!isComplete}
+              />
+            </section>
+            <section id="schemes" aria-label={t('evaluation.results.toc.schemes')}>
+              <SchemeCardGrid matches={doc.matches} />
+            </section>
+            <section id="required" aria-label={t('evaluation.results.toc.required')}>
+              <RequiredContributionsCard matches={doc.matches} />
+            </section>
+
+            {isComplete && (
+              <>
+                <section id="preview" aria-label={t('evaluation.results.toc.preview')}>
+                  <DraftPacketPreview evalId={evalId} matches={doc.matches} />
+                </section>
+                <section
+                  id="download"
+                  aria-label={t('evaluation.results.toc.download')}
+                  className="flex flex-col gap-3"
+                >
+                  <PersistedPacketDownload evalId={evalId} matches={doc.matches} />
+                  <div className="flex">
+                    <Button type="button" variant="outline" onClick={handleStartAnother}>
+                      {t('evaluation.results.startAnother')}
+                    </Button>
+                  </div>
+                </section>
+              </>
+            )}
           </div>
-          <RequiredContributionsCard matches={doc.matches} />
-        </>
-      )}
 
-      {isComplete && (
-        <div id="draft-packet" className="flex flex-col gap-3">
-          <DraftPacketPreview evalId={evalId} matches={doc.matches} />
-          <PersistedPacketDownload evalId={evalId} matches={doc.matches} />
-        </div>
-      )}
-
-      {isComplete && (
-        <div className="flex">
-          <Button type="button" variant="outline" onClick={handleStartAnother}>
-            {t('evaluation.results.startAnother')}
-          </Button>
+          <EvaluationResultsToc visibleSections={visibleSections} />
         </div>
       )}
 

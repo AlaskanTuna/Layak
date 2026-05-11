@@ -378,6 +378,15 @@
       "eyebrow": "评估完成",
       "title": "根据您的文件，您符合多项减免计划的资格。",
       "description": "每个数字都附有来源页面；每个申请包都是 DRAFT，由您亲自提交。",
+      "tocLabel": "本页内容",
+      "tocAriaLabel": "页面分区",
+      "toc": {
+        "overview": "概览",
+        "schemes": "可申请方案",
+        "required": "应缴贡献",
+        "preview": "草稿预览",
+        "download": "下载申请包"
+      },
       "startAnother": "开始另一次评估",
       "viewDetailed": "查看详细结果",
       "backToEvaluations": "返回评估列表",

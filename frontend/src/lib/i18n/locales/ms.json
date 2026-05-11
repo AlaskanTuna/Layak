@@ -389,6 +389,15 @@
       "eyebrow": "Penilaian selesai",
       "title": "Berdasarkan dokumen anda, anda layak untuk pelbagai skim pelepasan.",
       "description": "Setiap nombor merujuk halaman sumber; setiap pakej adalah DRAF yang anda hantar sendiri.",
+      "tocLabel": "Pada halaman ini",
+      "tocAriaLabel": "Bahagian halaman",
+      "toc": {
+        "overview": "Gambaran Keseluruhan",
+        "schemes": "Skim Layak",
+        "required": "Sumbangan Diperlukan",
+        "preview": "Pratonton",
+        "download": "Muat Turun Pakej"
+      },
       "startAnother": "Mulakan penilaian lain",
       "viewDetailed": "Lihat keputusan terperinci",
       "backToEvaluations": "Kembali ke penilaian",

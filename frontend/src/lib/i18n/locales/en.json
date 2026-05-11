@@ -389,6 +389,15 @@
       "eyebrow": "Assessment complete",
       "title": "Based on your documents, you qualify for multiple relief schemes.",
       "description": "Every number cites a source page; every packet is a DRAFT you submit yourself.",
+      "tocLabel": "On this page",
+      "tocAriaLabel": "Page sections",
+      "toc": {
+        "overview": "Overview",
+        "schemes": "Eligible Schemes",
+        "required": "Required Contributions",
+        "preview": "Inline Preview",
+        "download": "Download Packet"
+      },
       "startAnother": "Start another evaluation",
       "viewDetailed": "View detailed results",
       "backToEvaluations": "Back to evaluations",

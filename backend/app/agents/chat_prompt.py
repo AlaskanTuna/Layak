@@ -124,6 +124,13 @@ makes long conversations feel formulaic. End on the substantive content.
 bulleted lists for steps, `inline code` for form IDs (e.g. `BK-01`), and \
 links sparingly. Do NOT use H1/H2 headings — bubbles are short.
 
+**Bold close discipline.** Every `**` opening MUST be matched with `**` (two \
+asterisks) — never a single `*`. Write `**STR 2026**: Apply at …` or \
+`**STR 2026:** Apply at …`. Never write `**STR 2026 :*Apply` — that single \
+trailing `*` leaves the bold unclosed and prints the asterisks as literal \
+characters in the bubble. When listing multiple schemes, put each on its \
+own bullet line (`- **Name**: …`) rather than running them together inline.
+
 {language_lock}
 
 # This evaluation
@@ -179,6 +186,14 @@ hanya membebankan perbualan panjang. Tamatkan dengan kandungan jawapan.
 peluru untuk langkah, `kod sebaris` untuk ID borang (contoh `BK-01`), \
 dan pautan dengan berhemat. JANGAN guna tajuk H1/H2 — gelembung pendek.
 
+**Disiplin penutup tebal.** Setiap pembukaan `**` MESTI ditutup dengan \
+`**` (dua asterisk) — bukan `*` tunggal. Tulis `**STR 2026**: Mohon di …` \
+atau `**STR 2026:** Mohon di …`. JANGAN tulis `**STR 2026 :*Mohon` — \
+asterisk tunggal di belakang menyebabkan tebal tidak ditutup dan watak \
+`**`/`*` muncul sebagai teks biasa dalam gelembung. Apabila menyenaraikan \
+beberapa skim, letakkan setiap satu pada baris peluru sendiri \
+(`- **Nama**: …`), bukan dirangkai dalam satu perenggan.
+
 {language_lock}
 
 # Penilaian ini
@@ -231,6 +246,13 @@ dipetik.
 **支持 Markdown。** 请用 **粗体** 标注金额与计划名称、用项目符号列出步骤、\
 用 `行内代码` 标注表格编号（例如 `BK-01`）、谨慎使用链接。\
 请勿使用 H1 / H2 标题 —— 气泡空间有限。
+
+**粗体闭合纪律。** 每一个 `**` 开头都必须用 `**`（两个星号）闭合，\
+绝不能只写一个 `*`。请写成 `**STR 2026**：请到 …` 或 \
+`**STR 2026：** 请到 …`，不要写成 `**STR 2026 :*请到` —— \
+单独的 `*` 收尾会让粗体未闭合，使 `**` 和 `*` 以字面形式出现在气泡中。\
+列举多个计划时，请将每一项写成独立的项目符号行（`- **名称**：…`），\
+而不要把多项粘连在同一段落里。
 
 {language_lock}
 

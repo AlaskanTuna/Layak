@@ -532,18 +532,31 @@ function ChatBubble({ message }: { message: ChatMessage }) {
  * Strip the `[scheme:xxx]` markers from rendered text — they're machine
  * markers consumed by the citation extractor, not human-readable.
  *
- * Also repair Gemini's habit of emitting whitespace inside emphasis runs
- * (e.g. `**PERKESO SKSPS **`). CommonMark's strict flanking rules treat
- * those as plain text, so bold/italic silently disappears. We normalize
- * `** word **`, `**word **`, and `** word**` back to `**word**`. Applies
- * to single-star italics too.
+ * Also repair two recurring Gemini emphasis defects:
+ *  1. Whitespace inside emphasis runs (`**PERKESO SKSPS **`). CommonMark's
+ *     strict flanking rules treat those as plain text, so bold/italic
+ *     silently disappears. Normalize `** word **`, `**word **`, and
+ *     `** word**` back to `**word**`. Applies to single-star italics too.
+ *  2. Single-star close before a label colon (`**STR 2026 :*Apply…`). The
+ *     model occasionally drops one asterisk on the closer, leaving an
+ *     unbalanced bold run that prints literal `**` and the dangling `*`
+ *     in the bubble. Repair to `**STR 2026:** Apply…`. The trailing
+ *     negative lookahead `(?!\*)` guards against eating a legitimate
+ *     `**X:**Y` close.
  */
 function cleanInlineCitations(text: string): string {
   return text
     .replace(/\s*\[\s*scheme\s*:\s*[a-z0-9_]+\s*\]\s*/gi, ' ')
-    .replace(/(\*{1,2})\s+([^*\n]+?)\s+\1/g, '$1$2$1')
-    .replace(/(\*{1,2})([^*\s\n][^*\n]*?)\s+\1/g, '$1$2$1')
-    .replace(/(\*{1,2})\s+([^*\n]+?[^*\s\n])\1/g, '$1$2$1')
+    .replace(/\*\*([^*\n]+?)\s*:\s*\*(?!\*)/g, '**$1:** ')
+    // Flanking-repair regexes: only operate on short phrase content with no
+    // sentence terminators (`.!?`). Otherwise they happily match across two
+    // adjacent runs (`** B. **` between `**A:**` and `**C:**`) and "bold"
+    // the prose between them. The cap + terminator exclusion confines them
+    // to single-phrase typos like `**word **` / `** word**` / `** word **`.
+    .replace(/(\*{1,2})\s+([^*.!?\n]{1,80}?)\s+\1/g, '$1$2$1')
+    .replace(/(\*{1,2})([^*.!?\s\n][^*.!?\n]{0,80}?)\s+\1/g, '$1$2$1')
+    .replace(/(\*{1,2})\s+([^*.!?\n]{1,80}?[^*\s\n])\1/g, '$1$2$1')
+    .replace(/ {2,}/g, ' ')
     .trim()
 }
 

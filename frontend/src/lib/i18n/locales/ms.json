@@ -367,6 +367,24 @@
       "description": "Pelepasan tertinggi yang ditemui dan sejarah penilaian lepas yang berpaginasi.",
       "createCta": "Cipta penilaian"
     },
+    "evaluatesRail": {
+      "eyebrow": "Saluran",
+      "title": "Cara Layak Menilai",
+      "steps": {
+        "extract": {
+          "title": "Ekstrak",
+          "body": "Kami membaca MyKad, slip gaji dan bil utiliti anda — pendapatan, 4 digit IC akhir, saiz isi rumah."
+        },
+        "match": {
+          "title": "Padan",
+          "body": "Profil anda dinilai terhadap setiap skim 2026 — kelompok isi rumah, umur, jenis pekerjaan, tanggungan."
+        },
+        "generate": {
+          "title": "Hasilkan",
+          "body": "Pakej draf permohonan dihasilkan sebagai PDF yang anda boleh hantar kepada agensi berkenaan."
+        }
+      }
+    },
     "results": {
       "eyebrow": "Penilaian selesai",
       "title": "Berdasarkan dokumen anda, anda layak untuk pelbagai skim pelepasan.",
@@ -540,6 +558,7 @@
       "selectRowAria": "Pilih penilaian dari {{timestamp}}",
       "columnStatus": "Status",
       "columnStarted": "Dimulakan",
+      "columnSchemesEligible": "Skim Layak",
       "columnAnnualRelief": "Pelepasan tahunan (RM)",
       "view": "Lihat",
       "prev": "Sebelum",
@@ -560,7 +579,8 @@
         "ariaLabel": "Statistik keseluruhan",
         "totalEvaluations": "Jumlah penilaian",
         "highestResult": "Keputusan tertinggi",
-        "successfulRuns": "Penilaian berjaya"
+        "successfulRuns": "Penilaian berjaya",
+        "totalDrafts": "Jumlah draf dihasilkan"
       }
     },
     "dependants": {

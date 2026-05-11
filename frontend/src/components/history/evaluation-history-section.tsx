@@ -6,6 +6,7 @@ import { useTranslation } from 'react-i18next'
 
 import { AggregateStatsCards } from '@/components/history/aggregate-stats-cards'
 import { EvaluationHistoryTable } from '@/components/history/evaluation-history-table'
+import { HowLayakEvaluatesRail } from '@/components/history/how-layak-evaluates-rail'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
 import type { EvaluationListItem, EvaluationListResponse } from '@/lib/agent-types'
@@ -100,7 +101,10 @@ export function EvaluationHistorySection() {
   return (
     <div className="flex flex-col gap-6">
       <AggregateStatsCards items={items} />
-      <EvaluationHistoryTable items={items} onRefresh={fetchHistory} />
+      <div className="grid grid-cols-1 items-start gap-6 lg:grid-cols-[1fr_22rem]">
+        <EvaluationHistoryTable items={items} onRefresh={fetchHistory} />
+        <HowLayakEvaluatesRail />
+      </div>
     </div>
   )
 }

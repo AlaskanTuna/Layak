@@ -53,6 +53,17 @@ export function DashboardContinueRail({ items, phase, errorMessage, onRetry }: P
         aria-hidden
         className="pointer-events-none absolute inset-y-5 left-0 w-[3px] rounded-r-full bg-[color:var(--hibiscus)]/70 sm:inset-y-6"
       />
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img
+        src="/dashboard/continue.webp"
+        alt=""
+        aria-hidden
+        className="pointer-events-none absolute -right-3 -bottom-3 size-36 select-none opacity-95 sm:right-2 sm:bottom-2 sm:size-44"
+        loading="lazy"
+        onError={(e) => {
+          ;(e.currentTarget as HTMLImageElement).style.display = 'none'
+        }}
+      />
       <div className="relative flex items-start gap-2.5">
         <span className="flex size-9 items-center justify-center rounded-md bg-[color:var(--hibiscus)]/10 text-[color:var(--hibiscus)]">
           <History className="size-4" aria-hidden />

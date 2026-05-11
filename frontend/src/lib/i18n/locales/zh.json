@@ -356,6 +356,24 @@
       "description": "您发现的最高减免金额，以及过往评估的分页历史记录。",
       "createCta": "创建评估"
     },
+    "evaluatesRail": {
+      "eyebrow": "流程",
+      "title": "Layak 如何评估",
+      "steps": {
+        "extract": {
+          "title": "提取",
+          "body": "读取您的 MyKad、薪资单与水电账单，整理出收入、IC 末四位以及家庭规模。"
+        },
+        "match": {
+          "title": "匹配",
+          "body": "您的档案会与每一项 2026 年方案对比 —— 家庭层级、年龄、就业类型、受抚养人。"
+        },
+        "generate": {
+          "title": "生成",
+          "body": "生成可直接提交给相关机构的申请草稿 PDF 包。"
+        }
+      }
+    },
     "results": {
       "eyebrow": "评估完成",
       "title": "根据您的文件，您符合多项减免计划的资格。",
@@ -529,6 +547,7 @@
       "selectRowAria": "选择 {{timestamp}} 的评估",
       "columnStatus": "状态",
       "columnStarted": "开始于",
+      "columnSchemesEligible": "可申请方案",
       "columnAnnualRelief": "年度援助 (RM)",
       "view": "查看",
       "prev": "上一页",
@@ -549,7 +568,8 @@
         "ariaLabel": "使用总览",
         "totalEvaluations": "评估总数",
         "highestResult": "最高结果",
-        "successfulRuns": "成功评估"
+        "successfulRuns": "成功评估",
+        "totalDrafts": "已生成草稿"
       }
     },
     "dependants": {

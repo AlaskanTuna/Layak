@@ -187,6 +187,9 @@ export function EvaluationHistoryTable({ items, onRefresh }: Props) {
                   {t('evaluation.history.columnStarted')}
                 </th>
                 <th scope="col" className="px-4 py-2.5 text-right font-medium">
+                  {t('evaluation.history.columnSchemesEligible')}
+                </th>
+                <th scope="col" className="px-4 py-2.5 text-right font-medium">
                   {t('evaluation.history.columnAnnualRelief')}
                 </th>
                 <th scope="col" className="px-4 py-2.5 font-medium">
@@ -219,6 +222,9 @@ export function EvaluationHistoryTable({ items, onRefresh }: Props) {
                       </StatusPill>
                     </td>
                     <td className="px-4 py-3 text-muted-foreground">{timestampLabel}</td>
+                    <td className="px-4 py-3 text-right tabular-nums">
+                      {item.status === 'complete' ? item.draftCount : '—'}
+                    </td>
                     <td className="px-4 py-3 text-right tabular-nums">
                       {item.status === 'complete' ? RM.format(item.totalAnnualRM) : '—'}
                     </td>

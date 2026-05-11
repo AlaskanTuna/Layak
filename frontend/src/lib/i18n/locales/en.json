@@ -367,6 +367,24 @@
       "description": "Your highest discovered relief and a paginated history of past evaluations.",
       "createCta": "Create evaluation"
     },
+    "evaluatesRail": {
+      "eyebrow": "Pipeline",
+      "title": "How Layak Evaluates",
+      "steps": {
+        "extract": {
+          "title": "Extract",
+          "body": "We read your MyKad, payslip and utility bill, pulling income, IC last-4, and household size."
+        },
+        "match": {
+          "title": "Match",
+          "body": "Your profile is scored against every 2026 scheme — household tier, age, employment type, dependants."
+        },
+        "generate": {
+          "title": "Generate",
+          "body": "Draft application packets are produced as PDFs you can lodge with the relevant agencies."
+        }
+      }
+    },
     "results": {
       "eyebrow": "Assessment complete",
       "title": "Based on your documents, you qualify for multiple relief schemes.",
@@ -540,6 +558,7 @@
       "selectRowAria": "Select evaluation from {{timestamp}}",
       "columnStatus": "Status",
       "columnStarted": "Started",
+      "columnSchemesEligible": "Schemes Eligible",
       "columnAnnualRelief": "Annual relief (RM)",
       "view": "View",
       "prev": "Prev",
@@ -560,7 +579,8 @@
         "ariaLabel": "Lifetime stats",
         "totalEvaluations": "Total evaluations",
         "highestResult": "Highest result",
-        "successfulRuns": "Successful runs"
+        "successfulRuns": "Successful runs",
+        "totalDrafts": "Total drafts generated"
       }
     },
     "dependants": {

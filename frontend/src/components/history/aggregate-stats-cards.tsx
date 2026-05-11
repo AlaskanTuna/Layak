@@ -1,7 +1,7 @@
 'use client'
 
 import { useMemo } from 'react'
-import { CheckCircle2, FileText, TrendingUp } from 'lucide-react'
+import { CheckCircle2, FileCheck, FileText, TrendingUp } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 
 import type { EvaluationListItem } from '@/lib/agent-types'
@@ -25,20 +25,25 @@ type Props = {
  */
 export function AggregateStatsCards({ items }: Props) {
   const { t } = useTranslation()
-  const { totalRuns, peakRm, completedRuns } = useMemo(() => {
+  const { totalRuns, peakRm, completedRuns, totalDrafts } = useMemo(() => {
     let peak = 0
     let complete = 0
+    let drafts = 0
     for (const item of items) {
       if (item.status === 'complete') {
         complete += 1
+        drafts += item.draftCount
         if (item.totalAnnualRM > peak) peak = item.totalAnnualRM
       }
     }
-    return { totalRuns: items.length, peakRm: peak, completedRuns: complete }
+    return { totalRuns: items.length, peakRm: peak, completedRuns: complete, totalDrafts: drafts }
   }, [items])
 
   return (
-    <section aria-label={t('evaluation.history.stats.ariaLabel')} className="grid grid-cols-1 gap-3 sm:grid-cols-3">
+    <section
+      aria-label={t('evaluation.history.stats.ariaLabel')}
+      className="grid grid-cols-2 gap-3 sm:grid-cols-2 lg:grid-cols-4"
+    >
       <StatCard
         icon={<FileText className="size-4" aria-hidden />}
         label={t('evaluation.history.stats.totalEvaluations')}
@@ -53,6 +58,11 @@ export function AggregateStatsCards({ items }: Props) {
         icon={<CheckCircle2 className="size-4" aria-hidden />}
         label={t('evaluation.history.stats.successfulRuns')}
         value={completedRuns.toString()}
+      />
+      <StatCard
+        icon={<FileCheck className="size-4" aria-hidden />}
+        label={t('evaluation.history.stats.totalDrafts')}
+        value={totalDrafts.toString()}
       />
     </section>
   )

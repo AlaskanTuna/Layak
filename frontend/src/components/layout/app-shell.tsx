@@ -22,7 +22,12 @@ export function AppShell({ children }: Props) {
       <FloatingHelpLauncher />
       <div className="flex min-h-svh flex-col md:pl-[var(--sidebar-collapsed)]">
         <Topbar onMenuClick={handleMobileOpen} />
-        <main className="mx-auto min-h-[calc(100svh-var(--topbar-height))] w-full max-w-7xl flex-1 px-4 py-6 md:px-6 md:py-8">
+        {/* The page sheet (topbar + main) sits on top of the footer via a
+            solid background + higher z-index, so the footer reads as a thin
+            "ground floor" the sheet rolls back to reveal once scrolled past
+            the last content. Generous bottom padding keeps content from
+            butting against the reveal line. */}
+        <main className="relative z-10 mx-auto min-h-[calc(100svh-var(--topbar-height))] w-full max-w-7xl flex-1 bg-background px-4 pt-6 pb-24 md:px-6 md:pt-8 md:pb-32">
           {children}
         </main>
         <Footer />

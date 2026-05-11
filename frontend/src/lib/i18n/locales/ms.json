@@ -38,7 +38,41 @@
     "notifications": {
       "title": "Pemberitahuan",
       "clearAll": "Kosongkan semua",
-      "empty": "Tiada pemberitahuan"
+      "empty": "Tiada pemberitahuan",
+      "events": {
+        "evalComplete": {
+          "title": "Penilaian selesai",
+          "body": "Larian anda selesai — {{count}} skim padanan."
+        },
+        "evalCompleteEmpty": {
+          "title": "Penilaian selesai",
+          "body": "Tiada skim layak buat masa ini."
+        },
+        "evalFailed": {
+          "title": "Penilaian gagal",
+          "body": "{{category}} — cuba lagi atau tukar ke kemasukan manual."
+        },
+        "quotaApproaching": {
+          "title": "Hampir habis kuota percuma",
+          "body": "1 penilaian lagi dalam tetingkap 24 jam anda."
+        },
+        "quotaExceeded": {
+          "title": "Had harian dicapai",
+          "body": "Anda telah menggunakan kesemua 5 penilaian. Set semula dalam {{hours}} jam."
+        },
+        "batchDeleteSuccess": {
+          "title": "Penilaian dipadamkan",
+          "body": "{{count}} penilaian dialih keluar daripada sejarah."
+        },
+        "batchDeleteFailure": {
+          "title": "Tidak dapat memadam penilaian",
+          "body": "{{message}}"
+        },
+        "packetDownloaded": {
+          "title": "Pakej sedia",
+          "body": "ZIP disimpan ke folder muat turun anda."
+        }
+      }
     },
     "stepper": {
       "pending": "Menunggu",
@@ -773,9 +807,7 @@
       "scheme": "skim: {{id}}",
       "downloadZip": "Muat turun semua draf sebagai ZIP",
       "generatingZip": "Menjana ZIP…",
-      "placeholderNotice": "Sedang menyediakan pakej draf anda — pautan muat turun akan muncul di sini sebaik sahaja penjana selesai.",
-      "notificationTitle": "Pakej draf telah dimuat turun",
-      "notificationBody": "Fail draf anda sudah tersedia pada peranti ini. Semak dengan teliti sebelum penghantaran manual."
+      "placeholderNotice": "Sedang menyediakan pakej draf anda — pautan muat turun akan muncul di sini sebaik sahaja penjana selesai."
     },
     "codeExecution": {
       "title": "Gemini · Pelaksanaan Kod",

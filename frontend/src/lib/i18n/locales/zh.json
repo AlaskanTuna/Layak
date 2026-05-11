@@ -38,7 +38,41 @@
     "notifications": {
       "title": "通知",
       "clearAll": "全部清除",
-      "empty": "暂无通知"
+      "empty": "暂无通知",
+      "events": {
+        "evalComplete": {
+          "title": "评估完成",
+          "body": "您的运行已完成 — 匹配到 {{count}} 项方案。"
+        },
+        "evalCompleteEmpty": {
+          "title": "评估完成",
+          "body": "本次未匹配到合资格方案。"
+        },
+        "evalFailed": {
+          "title": "评估失败",
+          "body": "{{category}} — 请重试或改为手动输入。"
+        },
+        "quotaApproaching": {
+          "title": "免费额度快用完了",
+          "body": "您的 24 小时窗口内还剩 1 次评估。"
+        },
+        "quotaExceeded": {
+          "title": "已达每日上限",
+          "body": "您已用完全部 5 次评估,将在 {{hours}} 小时后重置。"
+        },
+        "batchDeleteSuccess": {
+          "title": "评估已删除",
+          "body": "已从历史记录中移除 {{count}} 项评估。"
+        },
+        "batchDeleteFailure": {
+          "title": "无法删除评估",
+          "body": "{{message}}"
+        },
+        "packetDownloaded": {
+          "title": "申请包已就绪",
+          "body": "ZIP 已保存至您的下载文件夹。"
+        }
+      }
     },
     "stepper": {
       "pending": "待处理",
@@ -762,9 +796,7 @@
       "scheme": "计划：{{id}}",
       "downloadZip": "以 ZIP 下载所有草稿",
       "generatingZip": "正在生成 ZIP…",
-      "placeholderNotice": "正在准备您的草拟申请包 —— 生成完成后下载链接会显示在此处。",
-      "notificationTitle": "草拟申请包已下载",
-      "notificationBody": "您的草拟文件已保存到这台设备。手动提交前请先仔细检查。"
+      "placeholderNotice": "正在准备您的草拟申请包 —— 生成完成后下载链接会显示在此处。"
     },
     "codeExecution": {
       "title": "Gemini · 代码执行",

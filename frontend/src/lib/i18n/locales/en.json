@@ -38,7 +38,41 @@
     "notifications": {
       "title": "Notifications",
       "clearAll": "Clear all",
-      "empty": "No notifications"
+      "empty": "No notifications",
+      "events": {
+        "evalComplete": {
+          "title": "Evaluation complete",
+          "body": "Your run finished — {{count}} scheme(s) matched."
+        },
+        "evalCompleteEmpty": {
+          "title": "Evaluation complete",
+          "body": "No qualifying schemes this round."
+        },
+        "evalFailed": {
+          "title": "Evaluation failed",
+          "body": "{{category}} — try again or switch to manual entry."
+        },
+        "quotaApproaching": {
+          "title": "Almost out of free runs",
+          "body": "1 evaluation left in your 24-hour window."
+        },
+        "quotaExceeded": {
+          "title": "Daily limit reached",
+          "body": "You've used all 5 evaluations. Resets in {{hours}}h."
+        },
+        "batchDeleteSuccess": {
+          "title": "Evaluations deleted",
+          "body": "{{count}} evaluation(s) removed from history."
+        },
+        "batchDeleteFailure": {
+          "title": "Couldn't delete evaluations",
+          "body": "{{message}}"
+        },
+        "packetDownloaded": {
+          "title": "Packet ready",
+          "body": "ZIP saved to your downloads."
+        }
+      }
     },
     "stepper": {
       "pending": "Pending",
@@ -773,9 +807,7 @@
       "scheme": "scheme: {{id}}",
       "downloadZip": "Download all drafts as ZIP",
       "generatingZip": "Generating ZIP…",
-      "placeholderNotice": "Preparing your draft packet — the download links will appear here once the generator finishes.",
-      "notificationTitle": "Draft packet downloaded",
-      "notificationBody": "Your draft files are ready on this device. Review them carefully before manual submission."
+      "placeholderNotice": "Preparing your draft packet — the download links will appear here once the generator finishes."
     },
     "codeExecution": {
       "title": "Gemini Code Execution",

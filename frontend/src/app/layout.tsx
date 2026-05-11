@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import { Abril_Fatface, Geist, Geist_Mono, Literata } from 'next/font/google'
 
+import { AppToaster } from '@/components/layout/app-toaster'
 import { AuthProvider } from '@/lib/auth-context'
 import { I18nProvider } from '@/providers/i18n-provider'
 import { LanguageSync } from '@/providers/language-sync'
@@ -85,6 +86,7 @@ export default function RootLayout({
               <LanguageSync>{children}</LanguageSync>
             </AuthProvider>
           </I18nProvider>
+          <AppToaster />
         </ThemeProvider>
       </body>
     </html>

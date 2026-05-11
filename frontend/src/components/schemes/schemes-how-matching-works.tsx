@@ -14,6 +14,16 @@ export function SchemesHowMatchingWorks() {
   const { t } = useTranslation()
   return (
     <section className="paper-card relative isolate flex flex-col items-start gap-5 overflow-hidden rounded-[18px] p-6 sm:flex-row sm:items-center sm:justify-between sm:p-8">
+      {/* Civic-handbook grid texture */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-0 opacity-[0.04]"
+        style={{
+          backgroundImage:
+            'linear-gradient(to right, currentColor 1px, transparent 1px), linear-gradient(to bottom, currentColor 1px, transparent 1px)',
+          backgroundSize: '28px 28px'
+        }}
+      />
       <span
         aria-hidden
         className="pointer-events-none absolute inset-y-6 left-0 w-[3px] rounded-r-full bg-[color:var(--hibiscus)]/70 sm:inset-y-8"

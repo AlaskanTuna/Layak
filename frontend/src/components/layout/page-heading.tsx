@@ -6,9 +6,10 @@ type Props = {
   description?: ReactNode
   action?: ReactNode
   children?: ReactNode
+  illustration?: string
 }
 
-export function PageHeading({ eyebrow, title, description, action, children }: Props) {
+export function PageHeading({ eyebrow, title, description, action, children, illustration }: Props) {
   return (
     <section className="paper-card relative isolate overflow-hidden rounded-[20px] p-6 sm:p-8">
       {/* Subtle grid texture — civic-document flair */}
@@ -26,6 +27,23 @@ export function PageHeading({ eyebrow, title, description, action, children }: P
         aria-hidden
         className="pointer-events-none absolute inset-y-6 left-0 w-[3px] rounded-r-full bg-[color:var(--hibiscus)]/70 sm:inset-y-8"
       />
+      {/* Optional decorative illustration — sits in the bottom-right corner.
+          No fade overlay by design; the topcard is wide enough that the title
+          column never reaches into the illustration. Hidden on the smallest
+          screens where it would crowd the content. */}
+      {illustration && (
+        // eslint-disable-next-line @next/next/no-img-element
+        <img
+          src={illustration}
+          alt=""
+          aria-hidden
+          className="pointer-events-none absolute -right-2 -bottom-2 hidden size-28 select-none opacity-95 sm:right-4 sm:bottom-4 sm:block sm:size-36 lg:size-44"
+          loading="lazy"
+          onError={(e) => {
+            ;(e.currentTarget as HTMLImageElement).style.display = 'none'
+          }}
+        />
+      )}
 
       <div className="relative flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between">
         <div className="flex flex-1 flex-col gap-3 sm:max-w-2xl">

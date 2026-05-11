@@ -17,6 +17,7 @@ export function EvaluationOverviewPage() {
         eyebrow={t('evaluation.overview.eyebrow')}
         title={t('evaluation.overview.title')}
         description={t('evaluation.overview.description')}
+        illustration="/dashboard/evaluations.webp"
         action={
           <Button render={<Link href="/dashboard/evaluation/upload" />} size="lg">
             <Plus className="mr-1 size-4" aria-hidden />

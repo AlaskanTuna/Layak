@@ -118,6 +118,16 @@ export function ErrorRecoveryCard({ message, category, onUseSamples, onReset, on
 
   return (
     <section className="paper-card relative isolate overflow-hidden rounded-[14px] p-5">
+      {/* Civic-handbook grid texture */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-0 opacity-[0.04]"
+        style={{
+          backgroundImage:
+            'linear-gradient(to right, currentColor 1px, transparent 1px), linear-gradient(to bottom, currentColor 1px, transparent 1px)',
+          backgroundSize: '28px 28px'
+        }}
+      />
       <span
         aria-hidden
         className="pointer-events-none absolute inset-y-5 left-0 w-[3px] rounded-r-full bg-[color:var(--hibiscus)]/70"

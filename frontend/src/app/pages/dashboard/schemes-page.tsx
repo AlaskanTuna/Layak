@@ -15,6 +15,7 @@ export function SchemesPage() {
         eyebrow={t('schemes.pageEyebrow')}
         title={t('schemes.pageTitle')}
         description={t('schemes.pageDescription')}
+        illustration="/dashboard/schemes.webp"
       />
       <SchemesStatsStrip />
       <SchemesOverview />

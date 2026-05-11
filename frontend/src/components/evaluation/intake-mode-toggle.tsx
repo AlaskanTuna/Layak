@@ -27,7 +27,7 @@ export function IntakeModeToggle({ value, onChange, disabled = false }: Props) {
     <div
       role="radiogroup"
       aria-label={t('evaluation.intake.aria')}
-      className="grid w-full grid-cols-2 gap-1 rounded-md border border-border bg-muted/30 p-1"
+      className="grid w-full grid-cols-2 gap-1 rounded-lg border border-border bg-muted/30 p-1.5"
     >
       <ToggleButton
         icon={<FileText className="size-4" aria-hidden />}
@@ -66,10 +66,12 @@ function ToggleButton({
       role="radio"
       aria-checked={active}
       variant={active ? 'default' : 'ghost'}
-      size="sm"
       disabled={disabled}
       onClick={onClick}
-      className={cn('w-full gap-1.5', !active && 'text-muted-foreground hover:text-foreground')}
+      className={cn(
+        'h-11 w-full gap-2 rounded-md text-[14px] font-medium',
+        !active && 'text-muted-foreground hover:text-foreground'
+      )}
     >
       {icon}
       {label}

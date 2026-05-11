@@ -1,7 +1,7 @@
 'use client'
 
 import { useId, useRef, useState } from 'react'
-import { ArrowRight, ChevronDown, FileText, UploadCloud, X } from 'lucide-react'
+import { ArrowRight, ChevronDown, Eye, FileText, UploadCloud, X } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import type { TFunction } from 'i18next'
 
@@ -77,6 +77,18 @@ function formatSize(bytes: number): string {
   return `${(bytes / (1024 * 1024)).toFixed(1)} MB`
 }
 
+/**
+ * Open the user-selected file in a fresh tab. Uses an object URL so neither
+ * the file's bytes nor a copy ever leave the browser. The URL is revoked
+ * after 60s — long enough for the new tab to finish loading the resource.
+ */
+function previewFileInNewTab(file: File): void {
+  if (typeof window === 'undefined') return
+  const url = URL.createObjectURL(file)
+  window.open(url, '_blank', 'noopener,noreferrer')
+  window.setTimeout(() => URL.revokeObjectURL(url), 60_000)
+}
+
 type FileSlotState = {
   file: File | null
   error: string | null
@@ -129,16 +141,28 @@ function UploadSlotCard({ spec, state, inputId, disabled, inputRef, onChange, on
               <span className="mono-caption text-foreground/55">{formatSize(file.size)}</span>
             </div>
           </div>
-          <Button
-            type="button"
-            variant="ghost"
-            size="icon"
-            onClick={onClear}
-            aria-label={t('common.aria.clearField', { fieldName: label })}
-            disabled={disabled}
-          >
-            <X className="size-4" aria-hidden />
-          </Button>
+          <div className="flex shrink-0 items-center gap-0.5">
+            <Button
+              type="button"
+              variant="ghost"
+              size="icon"
+              onClick={() => previewFileInNewTab(file)}
+              aria-label={t('evaluation.upload.previewAria', { fieldName: label })}
+              disabled={disabled}
+            >
+              <Eye className="size-4" aria-hidden />
+            </Button>
+            <Button
+              type="button"
+              variant="ghost"
+              size="icon"
+              onClick={onClear}
+              aria-label={t('common.aria.clearField', { fieldName: label })}
+              disabled={disabled}
+            >
+              <X className="size-4" aria-hidden />
+            </Button>
+          </div>
         </div>
       ) : (
         <label

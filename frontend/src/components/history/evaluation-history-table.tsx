@@ -13,7 +13,7 @@ import type { EvaluationListItem, EvaluationStatus } from '@/lib/agent-types'
 import { authedFetch } from '@/lib/firebase'
 import { cn } from '@/lib/utils'
 
-const PAGE_SIZE = 20
+const PAGE_SIZE = 5
 
 type Props = {
   items: EvaluationListItem[]
@@ -152,11 +152,7 @@ export function EvaluationHistoryTable({ items, onRefresh }: Props) {
               {t('evaluation.history.deleteAction', { count: selected.size })}
             </Button>
           </div>
-        ) : (
-          <span className="text-xs text-muted-foreground">
-            {t('evaluation.history.count', { count: items.length })}
-          </span>
-        )}
+        ) : null}
       </div>
 
       {deleteError && (

@@ -14,7 +14,7 @@ import { DatePicker } from '@/components/ui/date-picker'
 import { InfoTooltip } from '@/components/ui/info-tooltip'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Textarea } from '@/components/ui/textarea'
 import type { ManualEntryPayload, Relationship } from '@/lib/agent-types'
 
@@ -315,32 +315,32 @@ export function ManualEntryForm({ onSubmit, onUseSamples, onClear, disabled = fa
                 {...register('monthly_income_rm', { valueAsNumber: true })}
               />
             </Field>
-            <Field label={t('evaluation.manual.employmentLabel')} error={formState.errors.employment_type?.message}>
+            <Field
+              label={t('evaluation.manual.employmentLabel')}
+              help={t('evaluation.manual.employmentHelp')}
+              error={formState.errors.employment_type?.message}
+            >
               <Controller
                 control={control}
                 name="employment_type"
                 render={({ field }) => (
-                  <RadioGroup
+                  <Select
                     value={field.value}
                     onValueChange={(next: unknown) => field.onChange(next as 'gig' | 'salaried')}
                     disabled={disabled}
-                    aria-label={t('evaluation.manual.employmentLabel')}
                   >
-                    <label className="flex cursor-pointer items-start gap-2 text-sm">
-                      <RadioGroupItem value="gig" className="mt-0.5" />
-                      <TooltipLabel
-                        label={t('evaluation.manual.employmentGig')}
-                        tooltip={t('evaluation.manual.employmentGigHelp')}
-                      />
-                    </label>
-                    <label className="flex cursor-pointer items-start gap-2 text-sm">
-                      <RadioGroupItem value="salaried" className="mt-0.5" />
-                      <TooltipLabel
-                        label={t('evaluation.manual.employmentSalaried')}
-                        tooltip={t('evaluation.manual.employmentSalariedHelp')}
-                      />
-                    </label>
-                  </RadioGroup>
+                    <SelectTrigger aria-label={t('evaluation.manual.employmentLabel')}>
+                      <SelectValue>
+                        {field.value === 'salaried'
+                          ? t('evaluation.manual.employmentSalaried')
+                          : t('evaluation.manual.employmentGig')}
+                      </SelectValue>
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="gig">{t('evaluation.manual.employmentGig')}</SelectItem>
+                      <SelectItem value="salaried">{t('evaluation.manual.employmentSalaried')}</SelectItem>
+                    </SelectContent>
+                  </Select>
                 )}
               />
             </Field>
@@ -489,11 +489,3 @@ function LabelRow({ htmlFor, label, tooltip }: { htmlFor?: string; label: string
   )
 }
 
-function TooltipLabel({ label, tooltip }: { label: string; tooltip: string }) {
-  return (
-    <span className="inline-flex items-center gap-2">
-      <span className="font-medium">{label}</span>
-      <InfoTooltip content={tooltip} label={tooltip} />
-    </span>
-  )
-}

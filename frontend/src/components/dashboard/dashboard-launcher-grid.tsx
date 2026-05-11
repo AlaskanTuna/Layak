@@ -111,7 +111,11 @@ export function DashboardLauncherGrid() {
                 />
               </div>
 
-              <div className={`relative mt-auto flex flex-col gap-1.5 ${isHero ? 'max-w-[60%]' : 'max-w-[60%]'}`}>
+              <div
+                className={`relative mt-auto flex flex-col gap-1.5 ${
+                  isHero ? 'max-w-[55%] sm:max-w-[60%]' : 'max-w-[48%] sm:max-w-[60%]'
+                }`}
+              >
                 <h2 className="font-heading text-lg font-semibold tracking-tight sm:text-xl">
                   {t(`dashboard.launcher.${tile.i18nKey}.title`)}
                 </h2>

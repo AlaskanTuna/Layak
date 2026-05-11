@@ -234,8 +234,7 @@ export function DraftPacketPreview({ evalId, matches }: Props) {
           )
         })}
       </div>
-      <div className="mt-4 flex flex-col gap-3 border-t border-foreground/10 pt-4">
-        <p className="text-xs leading-relaxed text-foreground/65">{t('evaluation.preview.description')}</p>
+      <div className="mt-4 flex flex-col gap-3">
         <Button
           type="button"
           onClick={handleDownloadZip}
@@ -262,6 +261,9 @@ export function DraftPacketPreview({ evalId, matches }: Props) {
           </div>
         )}
       </div>
+      <p className="mt-4 border-t border-foreground/10 pt-3 text-xs leading-relaxed text-foreground/65">
+        {t('evaluation.preview.description')}
+      </p>
     </section>
   )
 }

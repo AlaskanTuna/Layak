@@ -41,22 +41,41 @@ export function EvaluationResultsToc({ visibleSections }: Props) {
       return total - scrolled < 48
     }
 
+    // Returns the id of whichever target currently sits inside the observer's
+    // active zone (the 25 %-tall strip from 20 % to 45 % from the viewport
+    // top), picking the topMost one. `null` if nothing intersects — that
+    // signals "fall back to the at-bottom pin if applicable".
+    function activeFromGeometry(): TocSectionId | null {
+      const top = window.innerHeight * 0.2
+      const bottom = window.innerHeight * 0.45
+      let best: { id: TocSectionId; top: number } | null = null
+      for (const { id, el } of targets) {
+        const r = el.getBoundingClientRect()
+        // A section is in the active zone if any part of its bbox crosses
+        // the strip. Pick the one whose top edge is highest in the strip.
+        if (r.bottom > top && r.top < bottom) {
+          if (best === null || r.top < best.top) best = { id, top: r.top }
+        }
+      }
+      return best?.id ?? null
+    }
+
     const observer = new IntersectionObserver(
       (entries) => {
-        // At-bottom override: short trailing sections (like Download Packet)
-        // never crest into the active zone before the page bottoms out, so
-        // they'd otherwise stay unreachable. Pin to the last section instead.
-        if (isAtPageBottom()) {
-          setActiveId(lastId)
-          return
-        }
         const intersecting = entries.filter((e) => e.isIntersecting)
-        if (intersecting.length === 0) return
-        const topMost = intersecting.reduce((best, entry) =>
-          entry.boundingClientRect.top < best.boundingClientRect.top ? entry : best
-        )
-        const id = (topMost.target as HTMLElement).id as TocSectionId
-        if (TOC_SECTIONS.includes(id)) setActiveId(id)
+        if (intersecting.length > 0) {
+          const topMost = intersecting.reduce((best, entry) =>
+            entry.boundingClientRect.top < best.boundingClientRect.top ? entry : best
+          )
+          const id = (topMost.target as HTMLElement).id as TocSectionId
+          if (TOC_SECTIONS.includes(id)) {
+            setActiveId(id)
+            return
+          }
+        }
+        // No section in the active zone — apply the at-bottom fallback so the
+        // short trailing section (Download Packet) is still reachable.
+        if (isAtPageBottom()) setActiveId(lastId)
       },
       // The negative top margin pushes the "active zone" past the sticky
       // topbar so a section is only marked active once it has crested into
@@ -66,10 +85,18 @@ export function EvaluationResultsToc({ visibleSections }: Props) {
 
     targets.forEach(({ el }) => observer.observe(el))
 
-    // Separate scroll listener for the at-bottom case — the observer only
-    // fires when an entry's intersection ratio crosses a threshold, so a user
-    // who scrolls within the same section won't re-trigger it.
+    // Separate scroll listener for the at-bottom edge case — the observer
+    // only fires when an entry's intersection ratio crosses a threshold, so
+    // a user who scrolls within the same section won't re-trigger it. We
+    // only force-pin to `lastId` when geometry confirms no section is in
+    // the active zone; otherwise the previously-observed active section
+    // (e.g. Inline Preview after a TOC click) stays selected.
     function onScroll() {
+      const geomActive = activeFromGeometry()
+      if (geomActive !== null) {
+        setActiveId(geomActive)
+        return
+      }
       if (isAtPageBottom()) setActiveId(lastId)
     }
     window.addEventListener('scroll', onScroll, { passive: true })

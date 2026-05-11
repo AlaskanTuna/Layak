@@ -123,9 +123,6 @@ export function DraftPacketPreview({ evalId, matches }: Props) {
 
   return (
     <section className="paper-card rounded-[14px] p-5">
-      <p className="mb-4 border-b border-foreground/10 pb-3 text-xs leading-relaxed text-foreground/65">
-        {t('evaluation.preview.description')}
-      </p>
       <div className="flex flex-col gap-2">
         {qualifying.map((match) => {
           const isOpen = openSchemeId === match.scheme_id
@@ -212,6 +209,9 @@ export function DraftPacketPreview({ evalId, matches }: Props) {
           )
         })}
       </div>
+      <p className="mt-4 border-t border-foreground/10 pt-3 text-xs leading-relaxed text-foreground/65">
+        {t('evaluation.preview.description')}
+      </p>
     </section>
   )
 }

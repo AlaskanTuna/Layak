@@ -58,9 +58,6 @@ export function PersistedPacketDownload({ evalId, matches }: Props) {
 
   return (
     <section className="paper-card rounded-[14px] p-5">
-      <p className="mb-4 border-b border-foreground/10 pb-3 text-xs leading-relaxed text-foreground/65">
-        {t('evaluation.packet.description')}
-      </p>
       <Button type="button" onClick={handleDownload} disabled={busy} size="lg" className="w-full sm:w-auto">
         {busy ? (
           <>
@@ -80,6 +77,9 @@ export function PersistedPacketDownload({ evalId, matches }: Props) {
           <span>{error}</span>
         </div>
       )}
+      <p className="mt-4 border-t border-foreground/10 pt-3 text-xs leading-relaxed text-foreground/65">
+        {t('evaluation.packet.description')}
+      </p>
     </section>
   )
 }

@@ -189,12 +189,19 @@ export function SettingsPage() {
         description={t('settings.danger.description')}
       >
         <div className="flex flex-col gap-3">
-          <div className="flex flex-wrap items-start justify-between gap-3 rounded-md border border-border px-3 py-2.5">
+          <div className="flex flex-wrap items-start justify-between gap-3 rounded-md border border-border bg-background/60 px-3 py-2.5 backdrop-blur-md">
             <div className="flex flex-col">
               <p className="text-sm font-medium">{t('settings.danger.exportTitle')}</p>
               <p className="text-xs text-muted-foreground">{t('settings.danger.exportDescription')}</p>
             </div>
-            <Button type="button" size="sm" variant="outline" onClick={handleExport} disabled={exporting || deleting}>
+            <Button
+              type="button"
+              size="sm"
+              variant="outline"
+              onClick={handleExport}
+              disabled={exporting || deleting}
+              className="bg-background/60 backdrop-blur-md hover:bg-background/80"
+            >
               {exporting ? (
                 <Loader2 className="size-3.5 animate-spin" aria-hidden />
               ) : (
@@ -205,12 +212,12 @@ export function SettingsPage() {
           </div>
 
           {user?.uid === GUEST_UID ? (
-            <div className="flex flex-col gap-1 rounded-md border border-border bg-muted/40 px-3 py-2.5">
+            <div className="flex flex-col gap-1 rounded-md border border-border bg-muted/40 px-3 py-2.5 backdrop-blur-md">
               <p className="text-sm font-medium">{t('settings.danger.guestLockedTitle')}</p>
               <p className="text-xs text-muted-foreground">{t('settings.danger.guestLockedDescription')}</p>
             </div>
           ) : (
-            <div className="flex flex-wrap items-start justify-between gap-3 rounded-md border border-destructive/30 bg-destructive/5 px-3 py-2.5">
+            <div className="flex flex-wrap items-start justify-between gap-3 rounded-md border border-destructive/30 bg-destructive/[0.08] px-3 py-2.5 backdrop-blur-md">
               <div className="flex flex-col">
                 <p className="text-sm font-medium text-destructive">{t('settings.danger.deleteTitle')}</p>
                 <p className="text-xs text-destructive/80">{t('settings.danger.deleteDescription')}</p>
@@ -326,10 +333,10 @@ function ThemePicker() {
             aria-checked={active}
             onClick={() => setTheme(option.value)}
             className={cn(
-              'flex flex-col items-start gap-1 rounded-md border px-3 py-2.5 text-left transition-colors',
+              'flex flex-col items-start gap-1 rounded-md border px-3 py-2.5 text-left backdrop-blur-md transition-colors',
               active
-                ? 'border-[color:var(--hibiscus)] bg-[color:var(--hibiscus)]/[0.06]'
-                : 'border-border hover:border-foreground/30'
+                ? 'border-[color:var(--hibiscus)] bg-[color:var(--hibiscus)]/[0.10]'
+                : 'border-border bg-background/60 hover:border-foreground/30 hover:bg-background/80'
             )}
           >
             <Icon

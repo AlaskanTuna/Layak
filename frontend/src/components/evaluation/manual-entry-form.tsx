@@ -21,7 +21,8 @@ import type { ManualEntryPayload, Relationship } from '@/lib/agent-types'
 // Editorial paper surface for form sections — replaces the legacy shadcn Card
 // shell with the design system's `paper-card`. `overflow-visible` is required
 // so the InfoTooltip pop-out clears the card edge.
-const SECTION_CLASS = 'paper-card flex flex-col gap-4 overflow-visible rounded-[14px] p-5'
+const SECTION_CLASS =
+  'paper-card flex min-h-[180px] flex-col gap-5 overflow-visible rounded-[14px] p-5 sm:p-6'
 
 const RELATIONSHIPS = ['child', 'parent', 'spouse', 'sibling', 'other'] as const satisfies readonly Relationship[]
 

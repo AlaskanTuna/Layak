@@ -109,7 +109,7 @@ function UploadSlotCard({ spec, state, inputId, disabled, inputRef, onChange, on
   const hint = t(spec.hintKey)
 
   return (
-    <div className="paper-card flex flex-col gap-3 rounded-[14px] p-5">
+    <div className="paper-card flex flex-col gap-3 rounded-[14px] p-5 sm:p-6">
       <div className="flex flex-col gap-1.5">
         <div className="flex items-center gap-2">
           <p className="font-sans text-base font-medium tracking-tight">{label}</p>
@@ -144,7 +144,7 @@ function UploadSlotCard({ spec, state, inputId, disabled, inputRef, onChange, on
         <label
           htmlFor={inputId}
           className={cn(
-            'flex cursor-pointer flex-col items-center justify-center gap-2 rounded-lg border border-dashed border-foreground/15 bg-foreground/[0.02] px-6 py-8 text-center transition-colors hover:border-[color:var(--hibiscus)]/45 hover:bg-[color:var(--hibiscus)]/[0.03]',
+            'flex min-h-[180px] cursor-pointer flex-col items-center justify-center gap-3 rounded-lg border border-dashed border-foreground/15 bg-foreground/[0.02] px-6 py-10 text-center transition-colors hover:border-[color:var(--hibiscus)]/45 hover:bg-[color:var(--hibiscus)]/[0.03] sm:min-h-[220px] sm:gap-4 sm:py-14',
             error && 'border-[color:var(--hibiscus)]/55 bg-[color:var(--hibiscus)]/[0.06] hover:border-[color:var(--hibiscus)]/70',
             disabled && 'pointer-events-none opacity-50'
           )}
@@ -290,7 +290,7 @@ export function UploadWidget({ onSubmit, disabled = false }: Props) {
             />
           )
         })}
-        <div className="paper-card flex flex-col gap-3 rounded-[14px] p-5">
+        <div className="paper-card flex flex-col gap-3 rounded-[14px] p-5 sm:p-6">
           {/* `role="button"` instead of a real <button> — the row contains
               an InfoTooltip which renders its own <button>, and HTML
               disallows nested buttons (hydration error). The tooltip's

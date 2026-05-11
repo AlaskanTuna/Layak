@@ -5,8 +5,13 @@ import { useTranslation } from 'react-i18next'
 
 type SchemeKind = 'upside' | 'required_contribution'
 
+type SchemeGroup = 'cashWelfare' | 'taxRetirement' | 'socialSecurity'
+
+const GROUPS: readonly SchemeGroup[] = ['cashWelfare', 'taxRetirement', 'socialSecurity']
+
 type InScopeScheme = {
   id: string
+  group: SchemeGroup
   categoryKey: string
   icon: LucideIcon
   agency: string
@@ -27,6 +32,7 @@ type InScopeScheme = {
 const IN_SCOPE: InScopeScheme[] = [
   {
     id: 'str-2026',
+    group: 'cashWelfare',
     categoryKey: 'schemes.labels.cashTransfer',
     icon: Coins,
     agency: 'Treasury Malaysia',
@@ -38,6 +44,7 @@ const IN_SCOPE: InScopeScheme[] = [
   },
   {
     id: 'jkm-warga-emas',
+    group: 'cashWelfare',
     categoryKey: 'schemes.labels.welfare',
     icon: HeartHandshake,
     agency: 'JKM',
@@ -49,6 +56,7 @@ const IN_SCOPE: InScopeScheme[] = [
   },
   {
     id: 'jkm-bkk',
+    group: 'cashWelfare',
     categoryKey: 'schemes.labels.welfare',
     icon: Baby,
     agency: 'JKM',
@@ -60,6 +68,7 @@ const IN_SCOPE: InScopeScheme[] = [
   },
   {
     id: 'lhdn-form-b-be',
+    group: 'taxRetirement',
     categoryKey: 'schemes.labels.taxRelief',
     icon: Scale,
     agency: 'LHDN',
@@ -71,6 +80,7 @@ const IN_SCOPE: InScopeScheme[] = [
   },
   {
     id: 'i-saraan',
+    group: 'taxRetirement',
     categoryKey: 'schemes.labels.retirement',
     icon: PiggyBank,
     agency: 'KWSP',
@@ -82,6 +92,7 @@ const IN_SCOPE: InScopeScheme[] = [
   },
   {
     id: 'perkeso-sksps',
+    group: 'socialSecurity',
     categoryKey: 'schemes.labels.socialSecurity',
     icon: ShieldCheck,
     agency: 'PERKESO',
@@ -155,18 +166,34 @@ function InScopeCard({ scheme }: { scheme: InScopeScheme }) {
 }
 
 export function SchemesOverview() {
+  const { t } = useTranslation()
   return (
-    <div className="flex flex-col gap-8">
-      <section className="flex flex-col gap-4">
-        <ul className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
-          {IN_SCOPE.map((scheme) => (
-            <li key={scheme.id} className="h-full">
-              <InScopeCard scheme={scheme} />
-            </li>
-          ))}
-        </ul>
-      </section>
-
+    <div className="flex flex-col gap-10">
+      {GROUPS.map((group) => {
+        const groupSchemes = IN_SCOPE.filter((s) => s.group === group)
+        if (groupSchemes.length === 0) return null
+        return (
+          <section key={group} className="flex flex-col gap-4">
+            <div className="flex items-baseline justify-between gap-3">
+              <h2 className="font-heading text-xl font-semibold tracking-tight">
+                {t(`schemes.groups.${group}.title`)}
+              </h2>
+              <span className="mono-caption text-foreground/55">
+                {groupSchemes.length === 1
+                  ? t('schemes.groups.countSingular', { count: groupSchemes.length })
+                  : t('schemes.groups.countPlural', { count: groupSchemes.length })}
+              </span>
+            </div>
+            <ul className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
+              {groupSchemes.map((scheme) => (
+                <li key={scheme.id} className="h-full">
+                  <InScopeCard scheme={scheme} />
+                </li>
+              ))}
+            </ul>
+          </section>
+        )
+      })}
     </div>
   )
 }

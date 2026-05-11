@@ -751,7 +751,33 @@
   "schemes": {
     "pageEyebrow": "Perpustakaan skim",
     "pageTitle": "Setiap skim Malaysia yang Layak pertimbangkan.",
-    "pageDescription": "Enam skim persekutuan tersedia dalam binaan ini. Setiap peraturan menarik ambang, kadar caruman, dan borang permohonan daripada sumber rasmi agensi — setiap angka RM dalam penilaian anda boleh dikesan kembali ke halaman tertentu.",
+    "pageDescription": "Enam skim persekutuan yang Layak pantau pada 2026.",
+    "stats": {
+      "ariaLabel": "Perpustakaan skim secara ringkas",
+      "schemes": "Skim Dipantau",
+      "agencies": "Agensi Persekutuan",
+      "categories": "Kategori Pelepasan",
+      "year": "Kemas Kini Terkini"
+    },
+    "groups": {
+      "countSingular": "{{count}} skim",
+      "countPlural": "{{count}} skim",
+      "cashWelfare": {
+        "title": "Pemindahan Tunai & Kebajikan"
+      },
+      "taxRetirement": {
+        "title": "Cukai & Persaraan"
+      },
+      "socialSecurity": {
+        "title": "Keselamatan Sosial"
+      }
+    },
+    "howMatching": {
+      "eyebrow": "Padanan",
+      "title": "Layak yang menjalankan padanan untuk anda.",
+      "body": "Muat naik tiga dokumen (MyKad, slip gaji, bil utiliti) dan ejen menilai profil anda terhadap setiap skim di halaman ini, kemudian menjana pakej draf permohonan untuk dihantar.",
+      "cta": "Jalankan penilaian"
+    },
     "howWePick": {
       "title": "Cara kami memilih skim untuk disokong",
       "description": "Layak mengutamakan skim dengan ambang yang didokumentasikan secara terbuka, portal permohonan terbuka, dan faedah sebenar yang tinggi untuk rakyat Malaysia berpendapatan rendah hingga sederhana. Setiap peraturan yang kami sokong disokong oleh sumber yang boleh dirujuk — sama ada dokumen PR kerajaan, borang diwartakan, atau risalah skim — supaya setiap angka RM dalam penilaian anda boleh dikesan ke halaman tertentu."

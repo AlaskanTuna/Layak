@@ -751,7 +751,33 @@
   "schemes": {
     "pageEyebrow": "Scheme library",
     "pageTitle": "Every Malaysian scheme Layak reasons over.",
-    "pageDescription": "Six federal schemes are live in this build. Each rule pulls thresholds, contribution rates, and application forms from the agency's published source — every RM figure on your evaluation traces back to a specific page.",
+    "pageDescription": "The six federal schemes Layak watches in 2026.",
+    "stats": {
+      "ariaLabel": "Scheme library at a glance",
+      "schemes": "Schemes Tracked",
+      "agencies": "Federal Agencies",
+      "categories": "Relief Categories",
+      "year": "Latest Update"
+    },
+    "groups": {
+      "countSingular": "{{count}} scheme",
+      "countPlural": "{{count}} schemes",
+      "cashWelfare": {
+        "title": "Cash Transfer & Welfare"
+      },
+      "taxRetirement": {
+        "title": "Tax & Retirement"
+      },
+      "socialSecurity": {
+        "title": "Social Security"
+      }
+    },
+    "howMatching": {
+      "eyebrow": "Matching",
+      "title": "Layak does the matching for you.",
+      "body": "Upload three documents (MyKad, payslip, utility bill) and the agent scores your profile against every scheme on this page, then drafts the application packets ready to lodge.",
+      "cta": "Run an evaluation"
+    },
     "howWePick": {
       "title": "How We Pick What to Support",
       "description": "Layak prioritises schemes with publicly-documented thresholds, open application portals, and high real-world upside for low-to-middle-income Malaysians. Each rule we support is backed by a citable source — either a government PR document, gazetted form, or scheme brochure — so every RM figure in your evaluation traces back to a specific page."

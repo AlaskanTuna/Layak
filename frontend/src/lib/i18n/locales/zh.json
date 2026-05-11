@@ -740,7 +740,33 @@
   "schemes": {
     "pageEyebrow": "计划库",
     "pageTitle": "Layak 推理的每一项马来西亚计划。",
-    "pageDescription": "本次构建中已上线六项联邦计划。每条规则的门槛、缴费率和申请表都源自机构官方资料——评估中的每一个 RM 数字都可追溯到具体页面。",
+    "pageDescription": "Layak 在 2026 年关注的六项联邦计划。",
+    "stats": {
+      "ariaLabel": "计划库概览",
+      "schemes": "纳入的方案",
+      "agencies": "联邦机构",
+      "categories": "援助类别",
+      "year": "最新更新"
+    },
+    "groups": {
+      "countSingular": "{{count}} 项计划",
+      "countPlural": "{{count}} 项计划",
+      "cashWelfare": {
+        "title": "现金援助与福利"
+      },
+      "taxRetirement": {
+        "title": "税务与退休"
+      },
+      "socialSecurity": {
+        "title": "社会保障"
+      }
+    },
+    "howMatching": {
+      "eyebrow": "匹配",
+      "title": "由 Layak 为您完成匹配。",
+      "body": "上传三份文件（MyKad、薪资单、水电账单），代理会根据本页的每一项计划评估您的资料，并生成可直接提交的申请草稿包。",
+      "cta": "进行评估"
+    },
     "howWePick": {
       "title": "我们如何选择支持的计划",
       "description": "Layak 优先支持具有公开文档门槛、开放申请门户和高实际收益的计划，面向中低收入马来西亚人。我们支持的每条规则都有可引用的来源 —— 可能是政府 PR 文件、宪报登记表格或计划小册子 —— 因此您评估中的每个 RM 数字都可追溯到特定页面。"

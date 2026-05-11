@@ -412,7 +412,7 @@
       "backendReturned": "Backend memulangkan {{status}} {{statusText}}",
       "byIdEyebrow": "Penilaian",
       "byIdTitle": "Keputusan kelayakan anda.",
-      "byIdDescription": "Dimuatkan daripada penilaian anda yang disimpan. Angka merujuk peraturan dan halaman sumber; setiap pakej adalah DRAF yang anda hantar sendiri.",
+      "byIdDescription": "Dimuatkan daripada penilaian anda yang disimpan. Angka merujuk peraturan dan halaman sumber.",
       "deadlineTitle": "Draf sahaja — semak tarikh akhir sebelum menghantar",
       "deadlineBody": "Layak tidak pernah memfailkan bagi pihak anda. Semak skim yang dipadankan, sahkan tarikh akhir rasmi terkini di pihak agensi, kemudian hantar secara manual melalui portal yang betul.",
       "actions": {
@@ -663,7 +663,7 @@
       "currency": "RM",
       "empty": "Jalankan penilaian pertama anda untuk melihat jumlah potensi pelepasan tahunan merentasi skim persekutuan dan negeri.",
       "start": "Mula penilaian",
-      "description": "Dipadankan merentasi {{count}} skim. Jumlah di sini hanya merangkumi skim faedah, berdasarkan profil pendapatan dan status isi rumah anda.",
+      "description": "Dipadankan merentasi {{count}} skim.",
       "download": "Muat turun semua draf",
       "downloadWithCount": "Muat turun semua draf ({{count}})",
       "downloadPending": "Draf belum sedia"
@@ -685,7 +685,7 @@
     },
     "requiredContributions": {
       "heading": "Caruman wajib",
-      "intro": "Caruman wajib yang perlu anda bayar di bawah skim-skim ini. Ini TIDAK termasuk dalam jumlah pelepasan tahunan di atas — ini adalah wang yang anda bayar.",
+      "intro": "Caruman wajib yang perlu anda bayar di bawah skim-skim ini.",
       "categoryLabel": "Keselamatan sosial",
       "badge": "Wajib",
       "countSingular": "{{count}} caruman diperlukan",
@@ -695,8 +695,9 @@
       "footnote": "Daftar dan bayar terus melalui portal agensi. Kegagalan membayar boleh menjejaskan akses kepada faedah kecederaan pekerjaan jika anda membuat tuntutan kemudian."
     },
     "preview": {
-      "title": "Pratonton dalam talian ({{count}} draf)",
-      "description": "Semak setiap PDF draf dalam pelayar sebelum memuat turun; setiap pratonton menjalankan semula WeasyPrint di sisi pelayan daripada profil dan padanan anda yang disimpan, dan baitnya tidak kekal.",
+      "title_one": "Pratonton Dalam Talian ({{count}} Draf)",
+      "title_other": "Pratonton Dalam Talian ({{count}} Draf)",
+      "description": "Semak setiap PDF draf dalam pelayar sebelum memuat turun.",
       "loading": "Memuatkan pratonton…",
       "error": "Pratonton gagal: {{message}}",
       "iframeTitle": "Pratonton dalam talian {{name}}",
@@ -708,7 +709,7 @@
       "titlePlural": "Pakej permohonan draf ({{count}} fail)",
       "titleSchemeSingular": "Pakej permohonan draf ({{count}} skim)",
       "titleSchemePlural": "Pakej permohonan draf ({{count}} skim)",
-      "description": "Setiap halaman membawa tanda air \"DRAFT — NOT SUBMITTED\". Layak tidak pernah menghantar bagi pihak anda. Semak setiap PDF, kemudian hantar sendiri melalui portal rasmi agensi.",
+      "description": "Setiap halaman membawa tanda air \"DRAFT — NOT SUBMITTED\". Hantar setiap PDF sendiri melalui portal rasmi agensi.",
       "download": "Muat turun PDF",
       "pending": "Menunggu backend",
       "scheme": "skim: {{id}}",

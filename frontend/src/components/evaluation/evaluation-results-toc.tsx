@@ -13,9 +13,12 @@ type Props = {
 }
 
 /**
- * Sticky right-rail table of contents for the results page. Tracks the most
- * in-view section via IntersectionObserver and highlights the matching link.
- * Hidden on `< lg` — mobile users rely on the existing scroll-to-top button.
+ * Table of contents for the results page. Two responsive layouts:
+ * - `lg+`: sticky right-rail vertical nav (220px column in the parent grid).
+ * - `< lg`: sticky horizontal chip strip just under the topbar.
+ *
+ * Both share one IntersectionObserver-driven active state and the at-bottom
+ * override so the last (short) section can still be marked active.
  */
 export function EvaluationResultsToc({ visibleSections }: Props) {
   const { t } = useTranslation()
@@ -81,39 +84,71 @@ export function EvaluationResultsToc({ visibleSections }: Props) {
   if (visibleSections.length === 0) return null
 
   return (
-    <aside
-      className="sticky top-[calc(var(--topbar-height,4rem)+1.5rem)] hidden h-fit self-start lg:block"
-      aria-label={t('evaluation.results.tocAriaLabel')}
-    >
-      <p className="mono-caption mb-3 text-foreground/55">{t('evaluation.results.tocLabel')}</p>
-      <nav>
-        <ul className="flex flex-col gap-0.5">
-          {visibleSections.map((id) => {
-            const active = activeId === id
-            return (
-              <li key={id}>
-                <a
-                  href={`#${id}`}
-                  className={cn(
-                    'relative block py-1.5 pl-3 text-sm leading-snug transition-colors',
-                    active
-                      ? 'font-medium text-foreground'
-                      : 'text-foreground/55 hover:text-foreground/85'
-                  )}
-                >
-                  {active && (
-                    <span
-                      aria-hidden
-                      className="absolute inset-y-1 left-0 w-[2px] rounded-r-full bg-[color:var(--hibiscus)]"
-                    />
-                  )}
-                  {t(`evaluation.results.toc.${id}`)}
-                </a>
-              </li>
-            )
-          })}
-        </ul>
+    <>
+      {/* Mobile: horizontal sticky chip strip pinned just under the topbar.
+          `order-first` floats it above the content column on the single-column
+          mobile grid; `lg:hidden` retires it on desktop where the right-rail
+          aside takes over. */}
+      <nav
+        aria-label={t('evaluation.results.tocAriaLabel')}
+        className="sticky top-[var(--topbar-height,4rem)] z-30 -mx-4 order-first flex gap-2 overflow-x-auto border-b border-foreground/10 bg-background/85 px-4 py-2.5 backdrop-blur-md md:-mx-6 md:px-6 lg:hidden"
+      >
+        {visibleSections.map((id) => {
+          const active = activeId === id
+          return (
+            <a
+              key={id}
+              href={`#${id}`}
+              aria-current={active ? 'true' : undefined}
+              className={cn(
+                'shrink-0 whitespace-nowrap rounded-full border px-3 py-1 text-xs transition-colors',
+                active
+                  ? 'border-[color:var(--hibiscus)] bg-[color:var(--hibiscus)]/10 font-medium text-[color:var(--hibiscus)]'
+                  : 'border-foreground/15 text-foreground/65 hover:text-foreground'
+              )}
+            >
+              {t(`evaluation.results.toc.${id}`)}
+            </a>
+          )
+        })}
       </nav>
-    </aside>
+
+      {/* Desktop: vertical sticky aside in the second grid column. */}
+      <aside
+        className="sticky top-[calc(var(--topbar-height,4rem)+1.5rem)] hidden h-fit self-start lg:block"
+        aria-label={t('evaluation.results.tocAriaLabel')}
+      >
+        <p className="mono-caption mb-3 text-foreground/55">{t('evaluation.results.tocLabel')}</p>
+        <nav>
+          <ul className="flex flex-col gap-0.5">
+            {visibleSections.map((id) => {
+              const active = activeId === id
+              return (
+                <li key={id}>
+                  <a
+                    href={`#${id}`}
+                    aria-current={active ? 'true' : undefined}
+                    className={cn(
+                      'relative block py-1.5 pl-3 text-sm leading-snug transition-colors',
+                      active
+                        ? 'font-medium text-foreground'
+                        : 'text-foreground/55 hover:text-foreground/85'
+                    )}
+                  >
+                    {active && (
+                      <span
+                        aria-hidden
+                        className="absolute inset-y-1 left-0 w-[2px] rounded-r-full bg-[color:var(--hibiscus)]"
+                      />
+                    )}
+                    {t(`evaluation.results.toc.${id}`)}
+                  </a>
+                </li>
+              )
+            })}
+          </ul>
+        </nav>
+      </aside>
+    </>
   )
 }

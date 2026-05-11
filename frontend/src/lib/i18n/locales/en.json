@@ -412,7 +412,7 @@
       "backendReturned": "Backend returned {{status}} {{statusText}}",
       "byIdEyebrow": "Evaluation",
       "byIdTitle": "Your eligibility results.",
-      "byIdDescription": "Hydrated from your saved evaluation. Numbers cite the rule and source page; every packet is a DRAFT you submit yourself.",
+      "byIdDescription": "Hydrated from your saved evaluation. Numbers cite the rule and source page.",
       "deadlineTitle": "Draft Only — Check Deadlines Before You Submit",
       "deadlineBody": "Layak never files for you. Review the matched schemes, confirm the latest official deadline on the agency side, then submit manually through the correct portal.",
       "actions": {
@@ -663,7 +663,7 @@
       "currency": "RM",
       "empty": "Run your first evaluation to see your total potential annual relief across federal and state schemes.",
       "start": "Start evaluation",
-      "description": "Matched across {{count}} scheme(s). Total shown here includes upside schemes only, based on your income profile and household status.",
+      "description": "Matched across {{count}} scheme(s).",
       "download": "Download all drafts",
       "downloadWithCount": "Download all drafts ({{count}})",
       "downloadPending": "Drafts pending"
@@ -685,7 +685,7 @@
     },
     "requiredContributions": {
       "heading": "Required Contributions",
-      "intro": "Mandatory contributions you owe under these schemes. These are NOT included in your annual relief total above — they're money you pay.",
+      "intro": "Mandatory contributions you owe under these schemes.",
       "categoryLabel": "Social Security",
       "badge": "Required",
       "countSingular": "{{count}} required contribution",
@@ -695,8 +695,9 @@
       "footnote": "Register and pay directly via the agency portal. Non-payment may affect access to employment-injury benefits if you claim later."
     },
     "preview": {
-      "title": "Inline Preview ({{count}} drafts)",
-      "description": "Inspect each draft PDF in the browser before downloading. Each preview re-runs WeasyPrint server-side from your stored profile + matches; the bytes never persist.",
+      "title_one": "Inline Preview ({{count}} Draft)",
+      "title_other": "Inline Preview ({{count}} Drafts)",
+      "description": "Inspect each draft PDF in the browser before downloading.",
       "loading": "Loading preview…",
       "error": "Preview Failed: {{message}}",
       "iframeTitle": "Inline Preview of {{name}}",
@@ -708,7 +709,7 @@
       "titlePlural": "Draft Application Packet ({{count}} Files)",
       "titleSchemeSingular": "Draft Application Packet ({{count}} Scheme)",
       "titleSchemePlural": "Draft Application Packet ({{count}} Schemes)",
-      "description": "Every page carries a \"DRAFT — NOT SUBMITTED\" watermark. Layak never submits on your behalf. Review each PDF, then lodge it yourself via the agency's official portal.",
+      "description": "Every page carries a \"DRAFT — NOT SUBMITTED\" watermark. Lodge each PDF yourself via the agency's official portal.",
       "download": "Download PDF",
       "pending": "Pending backend",
       "scheme": "scheme: {{id}}",

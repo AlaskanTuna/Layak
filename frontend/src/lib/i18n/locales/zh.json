@@ -401,7 +401,7 @@
       "backendReturned": "后端返回 {{status}} {{statusText}}",
       "byIdEyebrow": "评估",
       "byIdTitle": "您的资格评估结果。",
-      "byIdDescription": "从您保存的评估中加载。数字引用规则和来源页面；每个申请包都是 DRAFT，由您亲自提交。",
+      "byIdDescription": "从您保存的评估中加载。数字引用规则和来源页面。",
       "deadlineTitle": "仅为草稿 — 提交前请先确认截止日期",
       "deadlineBody": "Layak 不会代您提交。请先查看匹配到的计划，在相关机构一侧确认最新官方截止日期，然后通过正确的门户手动提交。",
       "actions": {
@@ -652,7 +652,7 @@
       "currency": "RM",
       "empty": "运行您的第一次评估，查看您在联邦和州级计划中的年度潜在减免总额。",
       "start": "开始评估",
-      "description": "已按您的收入档案和家庭状况匹配 {{count}} 项计划。这里显示的总额只计算正向收益计划。",
+      "description": "已匹配 {{count}} 项计划。",
       "download": "下载所有草稿",
       "downloadWithCount": "下载所有草稿（{{count}}）",
       "downloadPending": "草稿待处理"
@@ -674,7 +674,7 @@
     },
     "requiredContributions": {
       "heading": "强制性缴款",
-      "intro": "您在这些计划下需要缴纳的强制性费用。这些款项不计入上方的年度减免总额 —— 这是您需要支付的金额。",
+      "intro": "您在这些计划下需要缴纳的强制性费用。",
       "categoryLabel": "社会保障",
       "badge": "强制",
       "countSingular": "{{count}} 项强制缴款",
@@ -684,8 +684,9 @@
       "footnote": "请直接通过机构门户注册并缴款。未缴款可能影响日后您申请工伤福利时的权益。"
     },
     "preview": {
-      "title": "在线预览（{{count}} 份草稿）",
-      "description": "先在浏览器中查看每份草稿 PDF 再下载；每次预览都会根据你已存储的个人资料和匹配项在服务器端重新运行 WeasyPrint，字节不会持久保存。",
+      "title_one": "在线预览（{{count}} 份草稿）",
+      "title_other": "在线预览（{{count}} 份草稿）",
+      "description": "在浏览器中查看每份草稿 PDF 再下载。",
       "loading": "正在加载预览…",
       "error": "预览失败：{{message}}",
       "iframeTitle": "{{name}} 的在线预览",
@@ -697,7 +698,7 @@
       "titlePlural": "草拟申请包（{{count}} 份文件）",
       "titleSchemeSingular": "草拟申请包（{{count}} 项计划）",
       "titleSchemePlural": "草拟申请包（{{count}} 项计划）",
-      "description": "每页都带有「DRAFT — NOT SUBMITTED」水印。Layak 从不代您提交。请审阅每份 PDF，然后亲自通过机构的官方门户递交。",
+      "description": "每页都带有「DRAFT — NOT SUBMITTED」水印。请亲自通过机构的官方门户递交每份 PDF。",
       "download": "下载 PDF",
       "pending": "等待后端",
       "scheme": "计划：{{id}}",

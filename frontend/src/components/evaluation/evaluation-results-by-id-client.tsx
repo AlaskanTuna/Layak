@@ -267,7 +267,11 @@ export function EvaluationResultsByIdClient({ evalId }: { evalId: string }) {
       {hasContent && (
         <div className="grid grid-cols-1 gap-6 lg:grid-cols-[1fr_220px] lg:gap-10">
           <div className="flex min-w-0 flex-col gap-6">
-            <section id="overview" aria-label={t('evaluation.results.toc.overview')}>
+            <section
+              id="overview"
+              aria-label={t('evaluation.results.toc.overview')}
+              className="scroll-mt-28 lg:scroll-mt-20"
+            >
               <EvaluationUpsideHero
                 totalAnnualRm={totalAnnualRm}
                 matchedCount={matchedCount}
@@ -275,22 +279,34 @@ export function EvaluationResultsByIdClient({ evalId }: { evalId: string }) {
                 empty={!isComplete}
               />
             </section>
-            <section id="schemes" aria-label={t('evaluation.results.toc.schemes')}>
+            <section
+              id="schemes"
+              aria-label={t('evaluation.results.toc.schemes')}
+              className="scroll-mt-28 lg:scroll-mt-20"
+            >
               <SchemeCardGrid matches={doc.matches} />
             </section>
-            <section id="required" aria-label={t('evaluation.results.toc.required')}>
+            <section
+              id="required"
+              aria-label={t('evaluation.results.toc.required')}
+              className="scroll-mt-28 lg:scroll-mt-20"
+            >
               <RequiredContributionsCard matches={doc.matches} />
             </section>
 
             {isComplete && (
               <>
-                <section id="preview" aria-label={t('evaluation.results.toc.preview')}>
+                <section
+                  id="preview"
+                  aria-label={t('evaluation.results.toc.preview')}
+                  className="scroll-mt-28 lg:scroll-mt-20"
+                >
                   <DraftPacketPreview evalId={evalId} matches={doc.matches} />
                 </section>
                 <section
                   id="download"
                   aria-label={t('evaluation.results.toc.download')}
-                  className="flex flex-col gap-5"
+                  className="flex scroll-mt-28 flex-col gap-5 lg:scroll-mt-20"
                 >
                   <PersistedPacketDownload evalId={evalId} matches={doc.matches} />
                   <div className="flex border-t border-foreground/10 pt-5">

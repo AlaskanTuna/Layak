@@ -52,7 +52,11 @@ export function DraftPacketPreview({ evalId, matches }: Props) {
   const [openSchemeId, setOpenSchemeId] = useState<string | null>(null)
   const blobUrlsRef = useRef<string[]>([])
 
-  const qualifying = matches.filter((m) => m.qualifies && (m.kind ?? 'upside') === 'upside')
+  // Surface every qualifying scheme — including `required_contribution`
+  // forms (e.g. PERKESO SKSPS). The ZIP packet below ships PDFs for the same
+  // set; filtering by `kind === 'upside'` here previously produced a 5-vs-6
+  // mismatch where the contribution form was downloadable but unpreviewable.
+  const qualifying = matches.filter((m) => m.qualifies)
 
   useEffect(() => {
     const ref = blobUrlsRef

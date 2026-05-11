@@ -1,28 +1,27 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { AlertTriangle, CheckCircle2, Info, XCircle } from 'lucide-react'
-import { useTheme } from 'next-themes'
+import { AlertCircle, CheckCircle2, Info, XCircle } from 'lucide-react'
 import { Toaster } from 'sonner'
 
 /**
- * Theme-aware sonner toast layer. Mounted once in the root layout.
+ * Sonner toast layer mounted once in the root layout.
  *
- * - Position: bottom-center, expanded stack (each toast at full size) so a
- *   chain of notifications reads as a clean list rather than a fanned pile
- *   with scale-shrunk back members.
- * - Theme is read from next-themes' `resolvedTheme`. The first server-render
- *   pass returns undefined; we delay rendering the Toaster until hydration
- *   to avoid a one-frame light-theme flash for hard-refresh-into-dark.
- * - Toasts inherit the .layak-toast class so globals.css styles the surface
- *   to match `.paper-card`. Severity is communicated by the inline lucide
- *   icon below — no accent strip.
- * - Animations are sonner-native (slide-in from bottom + fade-out). We don't
- *   add CSS transitions on the toast surface because they fight sonner's
- *   data-state transforms.
+ * - **Surface:** always dark ("command-center pill") regardless of theme —
+ *   surface styling lives in `globals.css` under `.layak-toast`. The Toaster
+ *   theme prop is pinned to `dark` so sonner's internal text/border defaults
+ *   don't fight our overrides in light mode.
+ * - **Position:** bottom-center, expanded stack — every toast renders at full
+ *   size so a chain reads as a clean list, not a fanned-and-scaled pile.
+ * - **Mounting:** gated behind a `mounted` flag so the first server pass
+ *   produces no output and we never ship a hydration mismatch.
+ * - **Severity icons:** lucide ringed-icon family (CheckCircle2 / XCircle /
+ *   AlertCircle / Info) at 16px in brand colour against the dark surface.
+ * - **Animations:** sonner-native (slide-in from bottom + fade-out). The CSS
+ *   block deliberately omits `transition:` on the surface to avoid fighting
+ *   sonner's data-state transforms.
  */
 export function AppToaster() {
-  const { resolvedTheme } = useTheme()
   const [mounted, setMounted] = useState(false)
 
   useEffect(() => {
@@ -35,7 +34,7 @@ export function AppToaster() {
   return (
     <Toaster
       position="bottom-center"
-      theme={resolvedTheme === 'dark' ? 'dark' : 'light'}
+      theme="dark"
       duration={4000}
       visibleToasts={3}
       expand
@@ -44,10 +43,10 @@ export function AppToaster() {
       gap={12}
       toastOptions={{ className: 'layak-toast' }}
       icons={{
-        success: <CheckCircle2 className="size-3.5 text-[color:var(--forest)]" aria-hidden />,
-        error: <XCircle className="size-3.5 text-[color:var(--hibiscus)]" aria-hidden />,
-        warning: <AlertTriangle className="size-3.5 text-[color:var(--warning)]" aria-hidden />,
-        info: <Info className="size-3.5 text-[color:var(--primary)]" aria-hidden />
+        success: <CheckCircle2 className="size-4 text-[color:var(--forest)]" aria-hidden />,
+        error: <XCircle className="size-4 text-[color:var(--hibiscus)]" aria-hidden />,
+        warning: <AlertCircle className="size-4 text-[color:var(--warning)]" aria-hidden />,
+        info: <Info className="size-4 text-[color:var(--primary)]" aria-hidden />
       }}
     />
   )

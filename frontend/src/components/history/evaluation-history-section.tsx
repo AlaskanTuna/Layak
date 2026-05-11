@@ -107,7 +107,7 @@ export function EvaluationHistorySection() {
         <div id="tour-evaluation-history" className="scroll-mt-24 rounded-[14px]">
           <EvaluationHistoryTable items={items} onRefresh={fetchHistory} />
         </div>
-        <div id="tour-evaluation-rail" className="scroll-mt-24 rounded-[18px]">
+        <div id="tour-evaluation-rail" className="scroll-mt-24 rounded-[18px] lg:mt-1.5">
           <HowLayakEvaluatesRail />
         </div>
       </div>

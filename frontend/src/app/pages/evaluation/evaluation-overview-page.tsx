@@ -19,7 +19,11 @@ export function EvaluationOverviewPage() {
         description={t('evaluation.overview.description')}
         illustration="/dashboard/evaluations.webp"
         action={
-          <Button render={<Link href="/dashboard/evaluation/upload" />} size="lg">
+          <Button
+            render={<Link href="/dashboard/evaluation/upload" />}
+            size="lg"
+            className="rounded-full bg-[color:var(--hibiscus)] px-5 text-[color:var(--hibiscus-foreground)] hover:bg-[color:var(--hibiscus)] [a]:hover:bg-[color:var(--hibiscus)]"
+          >
             <Plus className="mr-1 size-4" aria-hidden />
             {t('evaluation.overview.createCta')}
           </Button>

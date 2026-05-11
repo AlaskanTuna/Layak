@@ -184,5 +184,6 @@ temp/
 # ===========
 
 design-system/
+.agents/
 *.tsbuildinfo
 settings.local.json

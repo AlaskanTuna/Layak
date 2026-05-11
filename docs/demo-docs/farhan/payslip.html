@@ -1,0 +1,476 @@
+<!doctype html>
+<html lang="ms">
+  <head>
+    <meta charset="utf-8" />
+    <title>Slip Gaji Bulan Mac 2026 — Farhan bin Mohd Yusof</title>
+    <style>
+      @page {
+        size: A4;
+        margin: 14mm;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      html,
+      body {
+        margin: 0;
+        padding: 0;
+        background: #edf1f7;
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+        color: #213142;
+        font-size: 3.2mm;
+        line-height: 1.45;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+      }
+
+      body {
+        display: flex;
+        justify-content: center;
+        padding: 22px;
+      }
+
+      .page {
+        width: 210mm;
+        min-height: 297mm;
+        background: #ffffff;
+        padding: 14mm;
+        position: relative;
+        overflow: hidden;
+        box-shadow: 0 8px 28px rgba(0, 0, 0, 0.08);
+      }
+
+      @media print {
+        body {
+          background: #fff;
+          padding: 0;
+          display: block;
+        }
+
+        .page {
+          width: auto;
+          min-height: auto;
+          padding: 0;
+          box-shadow: none;
+        }
+      }
+
+      .topbar {
+        display: grid;
+        grid-template-columns: 56mm 1fr;
+        gap: 6mm;
+        align-items: stretch;
+      }
+
+      .logo-panel {
+        position: relative;
+        overflow: hidden;
+        padding: 4mm;
+        border-radius: 2mm;
+        color: #ffffff;
+        background: linear-gradient(135deg, #0a3d7e 0%, #1e5cab 100%);
+      }
+
+      .logo-panel::after {
+        content: '';
+        position: absolute;
+        inset: auto -14mm -12mm auto;
+        width: 40mm;
+        height: 40mm;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.08);
+      }
+
+      .logo-mark {
+        width: 12mm;
+        height: 12mm;
+        display: grid;
+        place-items: center;
+        border-radius: 2mm;
+        background: rgba(255, 255, 255, 0.14);
+        border: 0.25mm solid rgba(255, 255, 255, 0.22);
+        font-size: 4mm;
+        font-weight: 700;
+        letter-spacing: 0.3mm;
+      }
+
+      .logo-name {
+        margin-top: 3mm;
+        font-size: 5mm;
+        font-weight: 700;
+        letter-spacing: 0.2mm;
+      }
+
+      .logo-sub {
+        margin-top: 1mm;
+        font-size: 2.7mm;
+        opacity: 0.92;
+      }
+
+      .title-panel {
+        padding: 4mm 5mm;
+        border-radius: 2mm;
+        background: linear-gradient(180deg, #f7fafc 0%, #eef4fb 100%);
+        border: 0.28mm solid #d6e1ee;
+      }
+
+      .title-panel h1 {
+        margin: 0;
+        font-size: 6mm;
+        letter-spacing: 0.35mm;
+        color: #0a3d7e;
+      }
+
+      .title-panel .sub {
+        margin-top: 1.5mm;
+        display: grid;
+        grid-template-columns: auto 1fr;
+        gap: 0.8mm 3mm;
+        font-size: 3mm;
+      }
+
+      .title-panel .sub span:nth-child(odd) {
+        color: #5b6670;
+      }
+
+      .banner {
+        margin-top: 5mm;
+        padding: 2.6mm 3.5mm;
+        border-left: 1.2mm solid #0a3d7e;
+        border-radius: 0.8mm;
+        background: #f6f9fd;
+        color: #3a4459;
+      }
+
+      .grid {
+        margin-top: 6mm;
+        display: grid;
+        grid-template-columns: 1.2fr 0.8fr;
+        gap: 6mm;
+      }
+
+      .card {
+        padding: 3.5mm;
+        border-radius: 1.6mm;
+        border: 0.25mm solid #d7e0eb;
+        background: #fbfdff;
+      }
+
+      .card h2 {
+        margin: 0 0 2.4mm;
+        font-size: 3.4mm;
+        color: #0a3d7e;
+        letter-spacing: 0.15mm;
+      }
+
+      .detail-grid {
+        display: grid;
+        grid-template-columns: 35mm 1fr;
+        gap: 1.1mm 3mm;
+      }
+
+      .detail-grid .label {
+        color: #5b6670;
+      }
+
+      .detail-grid .value {
+        color: #213142;
+      }
+
+      table {
+        width: 100%;
+        border-collapse: collapse;
+      }
+
+      .earnings {
+        margin-top: 6mm;
+        display: grid;
+        grid-template-columns: 1.15fr 0.95fr;
+        gap: 6mm;
+      }
+
+      .section-title {
+        margin: 0 0 2.4mm;
+        font-size: 3.4mm;
+        color: #0a3d7e;
+        letter-spacing: 0.15mm;
+      }
+
+      table.items thead th {
+        padding: 2.4mm 2.6mm;
+        background: #0a3d7e;
+        color: #fff;
+        text-align: left;
+        font-size: 3mm;
+        letter-spacing: 0.18mm;
+      }
+
+      table.items tbody td {
+        padding: 2.3mm 2.6mm;
+        border-bottom: 0.2mm solid #e4e9f0;
+        vertical-align: top;
+      }
+
+      .num {
+        text-align: right;
+        font-variant-numeric: tabular-nums;
+      }
+
+      .summary {
+        padding: 3.5mm;
+        border-radius: 1.6mm;
+        background: #f5f8fc;
+        border: 0.25mm solid #d7e0eb;
+      }
+
+      .summary-row {
+        display: grid;
+        grid-template-columns: 1fr auto;
+        gap: 2mm;
+        padding: 1.6mm 0;
+        border-bottom: 0.2mm dotted #d7e0eb;
+      }
+
+      .summary-row.total {
+        border-bottom: 0;
+        margin-top: 2.5mm;
+        padding: 3mm 3.5mm;
+        border-radius: 1.2mm;
+        color: #fff;
+        background: linear-gradient(135deg, #0a3d7e 0%, #1e5cab 100%);
+        font-size: 4.6mm;
+      }
+
+      .summary-row.total .value {
+        font-size: 4.8mm;
+        font-weight: 700;
+      }
+
+      .household {
+        margin-top: 6mm;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 6mm;
+      }
+
+      .note-list {
+        display: grid;
+        gap: 1.2mm;
+        font-size: 2.8mm;
+      }
+
+      .note-list div {
+        display: grid;
+        grid-template-columns: 1fr auto;
+        gap: 4mm;
+        padding-bottom: 1.2mm;
+        border-bottom: 0.18mm dotted #d8e1ec;
+      }
+
+      .note-list .lbl {
+        color: #5b6670;
+      }
+
+      .note-list .val {
+        color: #213142;
+      }
+
+      .footer-note {
+        margin-top: 7mm;
+        padding-top: 2.5mm;
+        border-top: 0.25mm solid #e1e6ef;
+        font-size: 2.4mm;
+        color: #5b6670;
+        line-height: 1.45;
+      }
+
+      .wm-layer {
+        position: absolute;
+        inset: 0;
+        pointer-events: none;
+        overflow: hidden;
+      }
+
+      .wm {
+        position: absolute;
+        left: 50%;
+        font-size: 32mm;
+        font-weight: 500;
+        letter-spacing: 4mm;
+        color: rgba(200, 16, 46, 0.07);
+        white-space: nowrap;
+        transform-origin: center;
+        transform: translate(-50%, -50%) rotate(-28deg);
+      }
+
+      .wm.top {
+        top: 28%;
+      }
+
+      .wm.bot {
+        top: 74%;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="page">
+      <div class="topbar">
+        <div class="logo-panel">
+          <div class="logo-mark">KPM</div>
+          <div class="logo-name">Kementerian Pendidikan Malaysia</div>
+          <div class="logo-sub">Slip gaji sintetik untuk demo Layak</div>
+        </div>
+        <div class="title-panel">
+          <h1>SLIP GAJI BULAN MAC 2026</h1>
+          <div class="sub">
+            <span>No. Slip</span><span>: KPM-SLIP-2026-03-0418</span> <span>Tarikh</span><span>: 31/03/2026</span>
+            <span>Status Cukai</span><span>: Form BE (salaried)</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="banner">
+        Synthetic data generated for the Layak hackathon submission. No real personal information.
+      </div>
+
+      <section class="grid">
+        <div class="card">
+          <h2>Maklumat Pegawai</h2>
+          <div class="detail-grid">
+            <div class="label">Nama</div>
+            <div class="value">Cikgu Farhan bin Mohd Yusof</div>
+            <div class="label">No. Pekerja</div>
+            <div class="value">KPM-118042</div>
+            <div class="label">Jawatan</div>
+            <div class="value">Guru Sekolah Menengah</div>
+            <div class="label">Gred / Tempoh</div>
+            <div class="value">DG41 · 11 tahun perkhidmatan</div>
+            <div class="label">Sekolah / Majikan</div>
+            <div class="value">SMK Subang Jaya · Kementerian Pendidikan Malaysia</div>
+            <div class="label">IC</div>
+            <div class="value">880322-10-5837</div>
+            <div class="label">Alamat</div>
+            <div class="value">No. 24, Jalan Putera 3/2, Taman Putera Subang, 47600 Subang Jaya, Selangor</div>
+          </div>
+        </div>
+
+        <div class="card">
+          <h2>Ringkasan Isi Rumah</h2>
+          <div class="note-list">
+            <div><span class="lbl">Status keluarga</span><span class="val">Berkahwin</span></div>
+            <div><span class="lbl">Isteri</span><span class="val">Nurul Hidayah · suri rumah · 35</span></div>
+            <div><span class="lbl">Anak</span><span class="val">Adam Hakim (8), Aleesya Sofea (5)</span></div>
+            <div><span class="lbl">Band cukai</span><span class="val">M40 lower band</span></div>
+            <div><span class="lbl">Taksiran</span><span class="val">Form BE</span></div>
+            <div><span class="lbl">Jenis kediaman</span><span class="val">Teres dua tingkat</span></div>
+          </div>
+        </div>
+      </section>
+
+      <section class="earnings">
+        <div>
+          <h2 class="section-title">Pecahan Pendapatan</h2>
+          <table class="items">
+            <thead>
+              <tr>
+                <th>Butiran</th>
+                <th class="num">Amaun (RM)</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Gaji pokok DG41</td>
+                <td class="num">3,210.00</td>
+              </tr>
+              <tr>
+                <td>Elaun Wilayah</td>
+                <td class="num">150.00</td>
+              </tr>
+              <tr>
+                <td>Bantuan Sara Hidup</td>
+                <td class="num">300.00</td>
+              </tr>
+              <tr>
+                <td>Elaun Khas Mengikut Lokasi</td>
+                <td class="num">520.50</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <h2 class="section-title" style="margin-top: 6mm">Potongan Statutori</h2>
+          <table class="items">
+            <thead>
+              <tr>
+                <th>Butiran</th>
+                <th class="num">Amaun (RM)</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>KWSP 11%</td>
+                <td class="num">353.10</td>
+              </tr>
+              <tr>
+                <td>SOCSO</td>
+                <td class="num">24.75</td>
+              </tr>
+              <tr>
+                <td>EIS</td>
+                <td class="num">9.90</td>
+              </tr>
+              <tr>
+                <td>LHDN PCB</td>
+                <td class="num">85.00</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="summary">
+          <div class="section-title" style="margin-bottom: 2mm">Rumusan Bulanan</div>
+          <div class="summary-row"><span>Jumlah kasar</span><span class="value">RM 4,180.50</span></div>
+          <div class="summary-row"><span>Jumlah potongan</span><span class="value">RM 472.75</span></div>
+          <div class="summary-row"><span>Gaji bersih</span><span class="value">RM 3,707.75</span></div>
+          <div class="summary-row total"><span>Net Pay</span><span class="value">RM 3,707.75</span></div>
+          <div style="margin-top: 3mm; font-size: 2.8mm; color: #5b6670">
+            Bulan: Mac 2026 · Kaedah bayaran: pindahan bank
+          </div>
+        </div>
+      </section>
+
+      <section class="household">
+        <div class="card">
+          <h2>Maklumat Cukai</h2>
+          <div class="note-list">
+            <div><span class="lbl">Borang</span><span class="val">BE</span></div>
+            <div><span class="lbl">Kategori</span><span class="val">Pekerja bergaji</span></div>
+            <div><span class="lbl">Relief keluarga</span><span class="val">Pasangan + 2 anak</span></div>
+            <div><span class="lbl">Status pendapatan</span><span class="val">Pertengahan M40</span></div>
+          </div>
+        </div>
+
+        <div class="card">
+          <h2>Nota Pentadbiran</h2>
+          <div class="note-list">
+            <div><span class="lbl">Emel</span><span class="val">Slip dalaman KPM</span></div>
+            <div><span class="lbl">Kehadiran</span><span class="val">Lengkap bulan ini</span></div>
+            <div><span class="lbl">Tugas khas</span><span class="val">Kelas petang & kokurikulum</span></div>
+            <div><span class="lbl">Pengesahan</span><span class="val">Tiada tandatangan diperlukan</span></div>
+          </div>
+        </div>
+      </section>
+
+      <div class="footer-note">
+        Synthetic data generated for the Layak hackathon submission. No real personal information. This document is a
+        demo-only payslip for scenario testing.
+      </div>
+
+      <div class="wm-layer" aria-hidden="true">
+        <span class="wm top">SYNTHETIC — FOR DEMO ONLY</span>
+        <span class="wm bot">SYNTHETIC — FOR DEMO ONLY</span>
+      </div>
+    </div>
+  </body>
+</html>

@@ -1,0 +1,547 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Grab Monthly Earnings Statement (synthetic) — Aisyah binti Ahmad</title>
+    <style>
+      @page {
+        size: A4;
+        margin: 18mm;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      html,
+      body {
+        margin: 0;
+        padding: 0;
+        background: #f1f3f2;
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+        color: #222d35;
+        font-size: 3.4mm;
+        line-height: 1.4;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+      }
+
+      body {
+        display: flex;
+        justify-content: center;
+        padding: 24px;
+      }
+
+      .page {
+        width: 210mm;
+        min-height: 297mm;
+        background: #ffffff;
+        padding: 18mm 16mm 16mm;
+        position: relative;
+        box-shadow: 0 8px 28px rgba(0, 0, 0, 0.08);
+        overflow: hidden;
+      }
+
+      @media print {
+        body {
+          background: #ffffff;
+          padding: 0;
+          display: block;
+        }
+        .page {
+          width: auto;
+          min-height: auto;
+          padding: 0;
+          box-shadow: none;
+        }
+      }
+
+      /* ── Header ──────────────────────────────────────────────────────── */
+      header.top {
+        display: grid;
+        grid-template-columns: 1fr auto;
+        align-items: flex-start;
+        gap: 10mm;
+      }
+
+      .logo {
+        display: inline-flex;
+        align-items: center;
+      }
+
+      .logo-word {
+        color: #00b14f;
+        font-size: 10mm;
+        font-family: 'Segoe UI', Tahoma, sans-serif;
+        font-style: italic;
+        letter-spacing: -0.4mm;
+        font-weight: 500;
+        line-height: 1;
+      }
+
+      .title-box {
+        background: #00b14f;
+        color: #ffffff;
+        padding: 4mm 5mm;
+        border-radius: 1.2mm;
+        min-width: 78mm;
+      }
+
+      .title-box h1 {
+        margin: 0 0 2.5mm;
+        font-size: 6mm;
+        letter-spacing: 0.4mm;
+        font-weight: 500;
+      }
+
+      .title-box .meta {
+        display: grid;
+        grid-template-columns: auto 1fr;
+        gap: 0.8mm 3mm;
+        font-size: 3.2mm;
+      }
+
+      .title-box .meta span:nth-child(even) {
+        font-weight: 500;
+      }
+
+      /* ── Issuer block ─────────────────────────────────────────────── */
+      .issuer {
+        margin-top: 8mm;
+        font-size: 3.2mm;
+        line-height: 1.5;
+      }
+
+      .issuer .name {
+        font-size: 3.8mm;
+        color: #00b14f;
+      }
+
+      .issuer a {
+        color: #00793f;
+        text-decoration: none;
+      }
+
+      /* ── Customer / partner ──────────────────────────────────────── */
+      .meta-grid {
+        margin-top: 8mm;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 8mm;
+        font-size: 3.2mm;
+      }
+
+      .meta-grid .label {
+        color: #5b6670;
+      }
+
+      .meta-grid table {
+        width: 100%;
+        border-collapse: collapse;
+      }
+
+      .meta-grid td {
+        padding: 0.8mm 0;
+        vertical-align: top;
+      }
+
+      .meta-grid td:first-child {
+        width: 42%;
+        color: #5b6670;
+      }
+
+      .meta-grid td:nth-child(2) {
+        color: #222d35;
+      }
+
+      .meta-grid .section-title {
+        background: #e8f6ef;
+        color: #00793f;
+        padding: 1.6mm 2.5mm;
+        margin-bottom: 1.2mm;
+        border-left: 0.8mm solid #00b14f;
+        letter-spacing: 0.3mm;
+        font-size: 3mm;
+      }
+
+      /* ── Earnings table ──────────────────────────────────────────── */
+      table.items {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 8mm;
+        font-size: 3.2mm;
+      }
+
+      table.items thead th {
+        background: #00793f;
+        color: #ffffff;
+        text-align: left;
+        padding: 2.4mm 3mm;
+        font-weight: 500;
+        letter-spacing: 0.3mm;
+        font-size: 3mm;
+      }
+
+      table.items thead th.num {
+        text-align: right;
+      }
+
+      table.items tbody td {
+        padding: 2.6mm 3mm;
+        border-bottom: 0.2mm solid #e7ebe9;
+        vertical-align: top;
+      }
+
+      table.items tbody td.num {
+        text-align: right;
+        font-variant-numeric: tabular-nums;
+      }
+
+      table.items td.idx {
+        width: 12mm;
+        color: #5b6670;
+      }
+
+      table.items td.rate {
+        width: 24mm;
+        text-align: right;
+        color: #5b6670;
+      }
+
+      table.items td.amount {
+        width: 34mm;
+      }
+
+      /* ── Bank + totals grid ──────────────────────────────────────── */
+      .footer-grid {
+        margin-top: 6mm;
+        display: grid;
+        grid-template-columns: 1.25fr 1fr;
+        gap: 8mm;
+      }
+
+      .bank {
+        border: 0.15mm solid #c7d0cb;
+        padding: 3mm 4mm;
+        font-size: 3mm;
+      }
+
+      .bank .title {
+        background: #e8f6ef;
+        color: #00793f;
+        margin: -3mm -4mm 2mm;
+        padding: 1.8mm 4mm;
+        letter-spacing: 0.3mm;
+      }
+
+      .bank table {
+        width: 100%;
+        border-collapse: collapse;
+      }
+
+      .bank td {
+        padding: 0.6mm 0;
+        vertical-align: top;
+      }
+
+      .bank td:first-child {
+        color: #5b6670;
+        width: 34mm;
+      }
+
+      .totals {
+        font-size: 3.2mm;
+      }
+
+      .totals table {
+        width: 100%;
+        border-collapse: collapse;
+      }
+
+      .totals td {
+        padding: 1.8mm 2mm;
+      }
+
+      .totals td:first-child {
+        color: #5b6670;
+      }
+
+      .totals td:last-child {
+        text-align: right;
+        font-variant-numeric: tabular-nums;
+      }
+
+      .totals tr.sub td {
+        border-top: 0.2mm solid #d6dcd9;
+      }
+
+      .totals tr.net td {
+        background: #e8f6ef;
+        color: #00562d;
+        border-left: 0.8mm solid #00b14f;
+        padding-top: 2.4mm;
+        padding-bottom: 2.4mm;
+        font-size: 4mm;
+      }
+
+      .totals tr.net td:last-child {
+        letter-spacing: 0.2mm;
+      }
+
+      /* ── Footer notes ────────────────────────────────────────────── */
+      .notes {
+        margin-top: 12mm;
+        font-size: 2.8mm;
+        color: #3a4249;
+        line-height: 1.5;
+      }
+
+      .notes p {
+        margin: 0 0 1.6mm;
+      }
+
+      .notes .thanks {
+        margin-top: 6mm;
+        font-size: 3.2mm;
+        color: #00793f;
+      }
+
+      footer.rule {
+        margin-top: 10mm;
+        border-top: 0.3mm solid #00b14f;
+        padding-top: 3mm;
+        font-size: 2.6mm;
+        color: #5b6670;
+      }
+
+      /* ── Watermark ───────────────────────────────────────────────── */
+      .wm-layer {
+        position: absolute;
+        inset: 0;
+        pointer-events: none;
+        overflow: hidden;
+      }
+
+      .wm {
+        position: absolute;
+        left: 50%;
+        font-size: 32mm;
+        letter-spacing: 4mm;
+        color: rgba(200, 16, 46, 0.07);
+        white-space: nowrap;
+        transform-origin: center;
+        transform: translate(-50%, -50%) rotate(-28deg);
+      }
+
+      .wm.top {
+        top: 28%;
+      }
+
+      .wm.bot {
+        top: 74%;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="page">
+      <header class="top">
+        <div>
+          <div class="logo">
+            <span class="logo-word">Grab</span>
+          </div>
+        </div>
+        <div class="title-box">
+          <h1>MONTHLY EARNINGS STATEMENT</h1>
+          <div class="meta">
+            <span>Statement No</span>
+            <span>: GRB-2026-03-38271</span>
+            <span>Date</span>
+            <span>: 31/03/2026</span>
+            <span>Currency</span>
+            <span>: MYR</span>
+          </div>
+        </div>
+      </header>
+
+      <section class="issuer">
+        <div class="name">Grab Malaysia Sdn. Bhd.</div>
+        Level 3A, Axiata Tower, No. 9, Jalan Stesen Sentral 5<br />
+        Kuala Lumpur Sentral, 50470 Kuala Lumpur, Malaysia<br />
+        <a href="https://www.grab.com">www.grab.com</a>
+      </section>
+
+      <section class="meta-grid">
+        <div>
+          <div class="section-title">Partner</div>
+          <table>
+            <tbody>
+              <tr>
+                <td>Name</td>
+                <td>Aisyah binti Ahmad</td>
+              </tr>
+              <tr>
+                <td>Partner ID</td>
+                <td>KTN-GRAB-38271</td>
+              </tr>
+              <tr>
+                <td>Address</td>
+                <td>
+                  No. 42, Jalan IM 7/10<br />
+                  Bandar Indera Mahkota<br />
+                  25200 Kuantan, Pahang
+                </td>
+              </tr>
+              <tr>
+                <td>Vehicle Type</td>
+                <td>GrabCar Saver</td>
+              </tr>
+              <tr>
+                <td>Partner Tier</td>
+                <td>Gold (14 months active)</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div>
+          <div class="section-title">Statement</div>
+          <table>
+            <tbody>
+              <tr>
+                <td>Billing Period</td>
+                <td>01/03/2026 – 31/03/2026</td>
+              </tr>
+              <tr>
+                <td>Payout Date</td>
+                <td>31/03/2026</td>
+              </tr>
+              <tr>
+                <td>Next Statement</td>
+                <td>30/04/2026</td>
+              </tr>
+              <tr>
+                <td>City Zone</td>
+                <td>Kuantan, Pahang</td>
+              </tr>
+              <tr>
+                <td>Completed Trips</td>
+                <td>412</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <table class="items">
+        <thead>
+          <tr>
+            <th style="width: 12mm">No</th>
+            <th>Description</th>
+            <th class="num" style="width: 24mm">Tax Rate (%)</th>
+            <th class="num" style="width: 34mm">Amount (MYR)</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="idx">1</td>
+            <td>Gross ride fare (412 completed trips)</td>
+            <td class="rate">0</td>
+            <td class="num">3,520.00</td>
+          </tr>
+          <tr>
+            <td class="idx">2</td>
+            <td>Platform commission (20% service fee)</td>
+            <td class="rate">0</td>
+            <td class="num">−704.00</td>
+          </tr>
+          <tr>
+            <td class="idx">3</td>
+            <td>Tolls reimbursed to rider</td>
+            <td class="rate">0</td>
+            <td class="num">−116.00</td>
+          </tr>
+          <tr>
+            <td class="idx">4</td>
+            <td>Incentive bonus — active days</td>
+            <td class="rate">0</td>
+            <td class="num">+100.00</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <section class="footer-grid">
+        <div class="bank">
+          <div class="title">Please credit to</div>
+          <table>
+            <tbody>
+              <tr>
+                <td>Beneficiary Name</td>
+                <td>Aisyah binti Ahmad</td>
+              </tr>
+              <tr>
+                <td>Bank Name</td>
+                <td>Malayan Banking Berhad (Maybank)</td>
+              </tr>
+              <tr>
+                <td>Account Number</td>
+                <td>5124••••••8276</td>
+              </tr>
+              <tr>
+                <td>SWIFT Code</td>
+                <td>MBBEMYKL</td>
+              </tr>
+              <tr>
+                <td>Reference</td>
+                <td>GRB-PAY-2026-03-38271</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="totals">
+          <table>
+            <tbody>
+              <tr>
+                <td>Gross earnings</td>
+                <td>3,520.00</td>
+              </tr>
+              <tr class="sub">
+                <td>Total deductions</td>
+                <td>−820.00</td>
+              </tr>
+              <tr>
+                <td>Incentives</td>
+                <td>+100.00</td>
+              </tr>
+              <tr class="net">
+                <td>Net Payout</td>
+                <td>RM 2,800.00</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="notes">
+        <p class="thanks">Thank you for driving with Grab.</p>
+        <p>
+          As a self-employed partner, Grab Malaysia does not withhold income tax on your behalf. You are responsible for
+          filing under LHDN Form B by 30 June 2026 (YA 2025). A consolidated trip CSV can be downloaded from the Driver
+          app → Earnings → Statements → Export.
+        </p>
+        <p>** This is a computer generated document. No signature required. **</p>
+      </section>
+
+      <footer class="rule">
+        Synthetic specimen generated for the Layak hackathon demo (Project 2030 · MyAI Future). Any resemblance to real
+        Grab branding is stylistic only; the Grab name and green are used in good-faith reference. No real partner,
+        trip, or bank data is represented. This document is not a statement of earnings from Grab Malaysia Sdn. Bhd.
+      </footer>
+
+      <div class="wm-layer" aria-hidden="true">
+        <span class="wm top">For Demo</span>
+        <span class="wm bot">For Demo</span>
+      </div>
+    </div>
+  </body>
+</html>

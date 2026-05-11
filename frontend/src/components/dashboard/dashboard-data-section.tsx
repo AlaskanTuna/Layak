@@ -1,39 +1,28 @@
 'use client'
 
 import { useCallback, useEffect, useState } from 'react'
-import { AlertTriangle, Loader2 } from 'lucide-react'
-import { useTranslation } from 'react-i18next'
 
-import { ActiveApplications } from '@/components/dashboard/active-applications'
-import { DashboardKpiStrip } from '@/components/dashboard/dashboard-kpi-strip'
-import { DashboardSchemesSpotlight } from '@/components/dashboard/dashboard-schemes-spotlight'
-import { RecentActivity } from '@/components/dashboard/recent-activity'
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
-import { Button } from '@/components/ui/button'
+import { DashboardContinueRail, type ContinueRailPhase } from '@/components/dashboard/dashboard-continue-rail'
+import { DashboardLauncherGrid } from '@/components/dashboard/dashboard-launcher-grid'
 import type { EvaluationListItem, EvaluationListResponse } from '@/lib/agent-types'
 import { useAuth } from '@/lib/auth-context'
 import { authedFetch } from '@/lib/firebase'
 
 const FETCH_LIMIT = 10
 
-type Phase = 'loading' | 'ready' | 'error'
-
 function getBackendUrl(): string {
   return process.env.NEXT_PUBLIC_BACKEND_URL ?? 'http://localhost:8080'
 }
 
 /**
- * Single fetch of `GET /api/evaluations?limit=10` shared by both dashboard
- * cards. Active = top 3 most recent *completed* evaluations rendered as
- * draft-packet cards. Recent = last 5 evaluations of any status as a
- * compact timeline. Both children are pure props-driven so the dashboard
- * pays for one network round trip per page mount.
+ * Launcher pattern (mirrors SolarSim): big nav tiles on the left, single
+ * resume rail on the right. The grid renders immediately; only the rail
+ * waits on `GET /api/evaluations` to surface the latest item.
  */
 export function DashboardDataSection() {
-  const { t } = useTranslation()
   const { user, loading: authLoading } = useAuth()
   const [items, setItems] = useState<EvaluationListItem[]>([])
-  const [phase, setPhase] = useState<Phase>('loading')
+  const [phase, setPhase] = useState<ContinueRailPhase>('loading')
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
 
   const fetchHistory = useCallback(async () => {
@@ -53,56 +42,26 @@ export function DashboardDataSection() {
     }
   }, [])
 
-  // setState lands inside `fetchHistory` AFTER the await — same pattern
-  // QuotaMeter / EvaluationHistorySection use; the strict
-  // react-hooks/set-state-in-effect rule trips on the call graph regardless.
   useEffect(() => {
     if (authLoading || !user) return
     // eslint-disable-next-line react-hooks/set-state-in-effect
     void fetchHistory()
   }, [authLoading, user, fetchHistory])
 
-  if (authLoading || phase === 'loading') {
-    return (
-      <div className="flex items-center gap-2 text-sm text-muted-foreground" role="status" aria-live="polite">
-        <Loader2 className="size-4 animate-spin" aria-hidden />
-        {t('dashboard.loading')}
-      </div>
-    )
-  }
-
-  if (phase === 'error') {
-    return (
-      <Alert variant="destructive">
-        <AlertTriangle className="size-4" />
-        <AlertTitle>{t('dashboard.errorTitle')}</AlertTitle>
-        <AlertDescription>
-          {errorMessage ?? t('dashboard.errorUnexpected')}
-          <div className="mt-3 flex">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => {
-                setPhase('loading')
-                void fetchHistory()
-              }}
-            >
-              {t('common.button.retry')}
-            </Button>
-          </div>
-        </AlertDescription>
-      </Alert>
-    )
-  }
+  const handleRetry = useCallback(() => {
+    setPhase('loading')
+    void fetchHistory()
+  }, [fetchHistory])
 
   return (
-    <div className="flex flex-col gap-6">
-      <DashboardKpiStrip items={items} />
-      <div className="grid grid-cols-1 gap-6 lg:grid-cols-[1fr_22rem]">
-        <ActiveApplications items={items} />
-        <RecentActivity items={items} />
-      </div>
-      <DashboardSchemesSpotlight />
+    <div className="grid grid-cols-1 gap-4 lg:grid-cols-[1fr_22rem] lg:gap-6">
+      <DashboardLauncherGrid />
+      <DashboardContinueRail
+        items={items}
+        phase={authLoading ? 'loading' : phase}
+        errorMessage={errorMessage}
+        onRetry={handleRetry}
+      />
     </div>
   )
 }

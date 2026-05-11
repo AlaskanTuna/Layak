@@ -273,25 +273,41 @@
       "eyebrow": "仪表板",
       "greetingWithName": "欢迎回来，{{name}}。",
       "greeting": "欢迎回来。",
-      "description": "您的公民档案已是最新。Layak 将您当前的情况与 2026 年最新政府计划进行对比 —— STR、JKM Warga Emas、LHDN Form B 减免。大约需时 4 分钟。"
+      "subtitle": "这是您的工作台，选择一处开始。"
     },
     "loading": "正在加载您的仪表板…",
     "errorTitle": "无法加载仪表板",
     "errorUnexpected": "发生了意外错误。",
-    "activeApplications": {
-      "title": "申请草稿已就绪",
-      "empty": "尚无内容",
-      "emptyDescription": "评估完成后，相应的申请草稿包会显示在这里，供您提交给相关机构。",
-      "startCta": "开始评估",
-      "draftsReady": "{{count}} 份草稿可提交",
-      "totalRm": "RM {{amount}} 总额",
-      "openCta": "打开包"
+    "launcher": {
+      "startEvaluation": {
+        "title": "开始评估",
+        "description": "上传三份文件，Layak 将在约四分钟内为您匹配每一项方案。"
+      },
+      "myEvaluations": {
+        "title": "我的评估",
+        "description": "查看过去的运行记录，并重新下载已生成的申请草稿包。"
+      },
+      "schemesLibrary": {
+        "title": "方案库",
+        "description": "浏览 Layak 关注的六项联邦方案 —— STR、JKM、LHDN、EPF 与 PERKESO。"
+      },
+      "settings": {
+        "title": "设置与数据",
+        "description": "管理您的资料、语言以及符合 PDPA 规范的数据导出。"
+      }
+    },
+    "continue": {
+      "eyebrow": "继续",
+      "title": "继续上次的进度",
+      "loading": "正在查找您最近的运行…",
+      "errorGeneric": "无法加载您最近的一次运行。",
+      "empty": "尚无评估记录。完成首次评估后，这里将显示可继续的选项。",
+      "emptyCta": "立即开始",
+      "openPacket": "打开包",
+      "viewProgress": "查看进度",
+      "openRun": "打开运行"
     },
     "recentActivity": {
-      "title": "近期活动",
-      "empty": "无",
-      "emptyDescription": "评估发生时实时显示在此处。",
-      "viewAll": "查看所有评估",
       "justNow": "刚刚",
       "minutesAgo": "{{count}} 分钟前",
       "hoursAgo": "{{count}} 小时前",
@@ -301,18 +317,6 @@
         "running": "评估进行中",
         "error": "评估失败"
       }
-    },
-    "kpi": {
-      "ariaLabel": "仪表盘摘要",
-      "draftsReady": "可提交草稿",
-      "highestRelief": "最高补助金额",
-      "successfulRuns": "成功评估",
-      "schemesTracked": "纳入的方案"
-    },
-    "spotlight": {
-      "title": "Layak 关注的方案",
-      "viewAll": "查看全部方案",
-      "explore": "浏览"
     },
     "quota": {
       "tierFree": "免费层级 · 24 小时",

@@ -15,7 +15,7 @@ export function DashboardHero({ name }: Props) {
     <PageHeading
       eyebrow={t('dashboard.hero.eyebrow')}
       title={greeting}
-      description={t('dashboard.hero.description')}
+      description={t('dashboard.hero.subtitle')}
     />
   )
 }

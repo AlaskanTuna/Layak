@@ -284,25 +284,41 @@
       "eyebrow": "Dashboard",
       "greetingWithName": "Welcome back, {{name}}.",
       "greeting": "Welcome back.",
-      "description": "Your civic profile is up to date. Layak reviews your current situation against the latest 2026 government schemes — STR, JKM Warga Emas, LHDN Form B reliefs. Takes about 4 minutes."
+      "subtitle": "Here's your workspace. Pick where to start."
     },
     "loading": "Loading your dashboard…",
     "errorTitle": "Could not load dashboard",
     "errorUnexpected": "An unexpected error occurred.",
-    "activeApplications": {
-      "title": "Application Drafts Ready",
-      "empty": "None yet",
-      "emptyDescription": "When an evaluation completes, its draft application packets land here so you can lodge them with the agencies.",
-      "startCta": "Start an evaluation",
-      "draftsReady": "{{count}} drafts ready to submit",
-      "totalRm": "RM {{amount}} total",
-      "openCta": "Open Packet"
+    "launcher": {
+      "startEvaluation": {
+        "title": "Start an Evaluation",
+        "description": "Upload three documents and Layak ranks every scheme in about four minutes."
+      },
+      "myEvaluations": {
+        "title": "My Evaluations",
+        "description": "Review past runs and re-download your draft application packets."
+      },
+      "schemesLibrary": {
+        "title": "Schemes Library",
+        "description": "Browse the six federal schemes Layak watches across STR, JKM, LHDN, EPF, and PERKESO."
+      },
+      "settings": {
+        "title": "Settings & Data",
+        "description": "Manage your profile, language, and PDPA-compliant data exports."
+      }
+    },
+    "continue": {
+      "eyebrow": "Pick up",
+      "title": "Continue where you left off",
+      "loading": "Looking up your latest run…",
+      "errorGeneric": "We couldn't load your latest run.",
+      "empty": "No evaluations yet. Run your first one to see resume options here.",
+      "emptyCta": "Start now",
+      "openPacket": "Open packet",
+      "viewProgress": "View progress",
+      "openRun": "Open run"
     },
     "recentActivity": {
-      "title": "Recent Activity",
-      "empty": "None",
-      "emptyDescription": "Evaluations stream here as they happen.",
-      "viewAll": "View All Evaluations",
       "justNow": "Just now",
       "minutesAgo": "{{count}} min ago",
       "hoursAgo": "{{count}} h ago",
@@ -312,18 +328,6 @@
         "running": "Evaluation Running",
         "error": "Evaluation Failed"
       }
-    },
-    "kpi": {
-      "ariaLabel": "Dashboard summary",
-      "draftsReady": "Drafts Ready",
-      "highestRelief": "Highest Relief Found",
-      "successfulRuns": "Successful Runs",
-      "schemesTracked": "Schemes Tracked"
-    },
-    "spotlight": {
-      "title": "Schemes Layak watches",
-      "viewAll": "View all schemes",
-      "explore": "Explore"
     },
     "quota": {
       "tierFree": "Free Tier · 24H",

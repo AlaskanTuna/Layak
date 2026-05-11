@@ -284,25 +284,41 @@
       "eyebrow": "Papan Pemuka",
       "greetingWithName": "Selamat kembali, {{name}}.",
       "greeting": "Selamat kembali.",
-      "description": "Profil sivik anda terkini. Layak menyemak keadaan semasa anda terhadap skim kerajaan 2026 terkini — STR, JKM Warga Emas, pelepasan LHDN Borang B. Mengambil masa kira-kira 4 minit."
+      "subtitle": "Inilah ruang kerja anda. Pilih tempat untuk bermula."
     },
     "loading": "Memuatkan papan pemuka anda…",
     "errorTitle": "Tidak dapat memuatkan papan pemuka",
     "errorUnexpected": "Ralat tidak dijangka berlaku.",
-    "activeApplications": {
-      "title": "Draf Permohonan Sedia",
-      "empty": "Belum ada",
-      "emptyDescription": "Apabila penilaian selesai, pakej-pakej draf permohonan akan muncul di sini supaya anda boleh menghantarnya kepada agensi.",
-      "startCta": "Mulakan penilaian",
-      "draftsReady": "{{count}} draf sedia untuk dihantar",
-      "totalRm": "Jumlah RM {{amount}}",
-      "openCta": "Buka pakej"
+    "launcher": {
+      "startEvaluation": {
+        "title": "Mulakan Penilaian",
+        "description": "Muat naik tiga dokumen dan Layak menyusun setiap skim dalam kira-kira empat minit."
+      },
+      "myEvaluations": {
+        "title": "Penilaian Saya",
+        "description": "Semak larian terdahulu dan muat turun semula pakej draf permohonan anda."
+      },
+      "schemesLibrary": {
+        "title": "Pustaka Skim",
+        "description": "Layari enam skim persekutuan yang Layak pantau — STR, JKM, LHDN, EPF dan PERKESO."
+      },
+      "settings": {
+        "title": "Tetapan & Data",
+        "description": "Urus profil, bahasa dan eksport data anda yang mematuhi PDPA."
+      }
+    },
+    "continue": {
+      "eyebrow": "Sambung",
+      "title": "Sambung dari yang terakhir",
+      "loading": "Mencari larian terakhir anda…",
+      "errorGeneric": "Kami tidak dapat memuatkan larian terakhir anda.",
+      "empty": "Belum ada penilaian. Jalankan yang pertama untuk lihat pilihan sambungan di sini.",
+      "emptyCta": "Mulakan sekarang",
+      "openPacket": "Buka pakej",
+      "viewProgress": "Lihat kemajuan",
+      "openRun": "Buka larian"
     },
     "recentActivity": {
-      "title": "Aktiviti Terkini",
-      "empty": "Tiada",
-      "emptyDescription": "Penilaian dialirkan di sini apabila berlaku.",
-      "viewAll": "Lihat semua penilaian",
       "justNow": "Baru sahaja",
       "minutesAgo": "{{count}} min lalu",
       "hoursAgo": "{{count}} j lalu",
@@ -312,18 +328,6 @@
         "running": "Penilaian sedang berjalan",
         "error": "Penilaian gagal"
       }
-    },
-    "kpi": {
-      "ariaLabel": "Ringkasan papan pemuka",
-      "draftsReady": "Draf Sedia",
-      "highestRelief": "Pelepasan Tertinggi",
-      "successfulRuns": "Larian Berjaya",
-      "schemesTracked": "Skim Dipantau"
-    },
-    "spotlight": {
-      "title": "Skim yang Layak pantau",
-      "viewAll": "Lihat semua skim",
-      "explore": "Terokai"
     },
     "quota": {
       "tierFree": "Peringkat percuma · 24 jam",

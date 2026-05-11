@@ -64,19 +64,24 @@ function nextId(): string {
 }
 
 /**
- * Sonner dispatch. Imported dynamically and guarded behind `window` because
- * the store is consumed from both server and client modules — the toast
- * call must be a no-op during SSR. Sonner itself is ESM and tree-shakes
- * the unused entry points; the dynamic import keeps cold-start lean.
+ * Toast dispatch via react-hot-toast's custom JSX renderer. The store is
+ * consumed from both server and client modules, so the call is guarded
+ * behind `window` to make it a no-op during SSR; the actual renderer in
+ * `./toast.tsx` is dynamically imported to keep cold-start lean.
+ *
+ * `groupKey` is passed as the react-hot-toast `id` so duplicate emits
+ * (e.g. a polling loop confirming the same evaluation completion) collapse
+ * into a single visible toast.
  */
-async function fireToast(options: NotifyOptions): Promise<void> {
+async function dispatchToast(options: NotifyOptions): Promise<void> {
   if (typeof window === 'undefined') return
-  const { toast } = await import('sonner')
-  const severity = options.severity ?? 'info'
-  const variant = toast[severity] ?? toast.message
-  variant(options.title, {
+  const { fireToast } = await import('./toast')
+  fireToast({
+    title: options.title,
     description: options.description,
-    duration: options.toastDurationMs ?? 4000
+    severity: options.severity ?? 'info',
+    durationMs: options.toastDurationMs ?? 4000,
+    id: options.groupKey
   })
 }
 
@@ -106,7 +111,7 @@ export const notificationStore = {
     ].slice(0, 50)
     emit()
     if (options.toast) {
-      void fireToast(options)
+      void dispatchToast(options)
     }
   },
   /** Backward-compat wrapper. Routes to notify() with severity='info'. */

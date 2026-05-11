@@ -1,7 +1,7 @@
 'use client'
 
 import Link from 'next/link'
-import { ArrowUpRight, Library, ListChecks, Settings2, Sparkles, type LucideIcon } from 'lucide-react'
+import { ArrowUpRight, Library, ListChecks, Sparkles, type LucideIcon } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 
 type Accent = 'hibiscus' | 'forest' | 'primary'
@@ -11,14 +11,37 @@ type Tile = {
   href: string
   icon: LucideIcon
   accent: Accent
-  i18nKey: 'startEvaluation' | 'myEvaluations' | 'schemesLibrary' | 'settings'
+  i18nKey: 'startEvaluation' | 'myEvaluations' | 'schemesLibrary'
+  image: string
+  hero?: boolean
 }
 
 const TILES: readonly Tile[] = [
-  { id: 'start', href: '/dashboard/evaluation/upload', icon: Sparkles, accent: 'hibiscus', i18nKey: 'startEvaluation' },
-  { id: 'evaluations', href: '/dashboard/evaluation', icon: ListChecks, accent: 'forest', i18nKey: 'myEvaluations' },
-  { id: 'schemes', href: '/dashboard/schemes', icon: Library, accent: 'primary', i18nKey: 'schemesLibrary' },
-  { id: 'settings', href: '/settings', icon: Settings2, accent: 'primary', i18nKey: 'settings' }
+  {
+    id: 'start',
+    href: '/dashboard/evaluation/upload',
+    icon: Sparkles,
+    accent: 'hibiscus',
+    i18nKey: 'startEvaluation',
+    image: '/dashboard/start.webp',
+    hero: true
+  },
+  {
+    id: 'evaluations',
+    href: '/dashboard/evaluation',
+    icon: ListChecks,
+    accent: 'forest',
+    i18nKey: 'myEvaluations',
+    image: '/dashboard/evaluations.webp'
+  },
+  {
+    id: 'schemes',
+    href: '/dashboard/schemes',
+    icon: Library,
+    accent: 'primary',
+    i18nKey: 'schemesLibrary',
+    image: '/dashboard/schemes.webp'
+  }
 ]
 
 const ACCENT: Record<Accent, string> = {
@@ -33,12 +56,31 @@ export function DashboardLauncherGrid() {
     <ul className="grid grid-cols-1 gap-4 sm:grid-cols-2">
       {TILES.map((tile) => {
         const Icon = tile.icon
+        const isHero = tile.hero === true
         return (
-          <li key={tile.id}>
+          <li key={tile.id} className={isHero ? 'sm:col-span-2' : undefined}>
             <Link
               href={tile.href}
-              className="paper-card group relative flex h-full min-h-[180px] flex-col gap-5 overflow-hidden rounded-[18px] p-5 transition-shadow hover:shadow-[0_30px_70px_-22px_color-mix(in_oklch,var(--ink)_30%,transparent)] sm:min-h-[210px] sm:p-6"
+              className={`paper-card group relative flex h-full flex-col gap-5 overflow-hidden rounded-[18px] p-5 transition-shadow hover:shadow-[0_30px_70px_-22px_color-mix(in_oklch,var(--ink)_30%,transparent)] sm:p-6 ${
+                isHero ? 'min-h-[260px] sm:min-h-[280px]' : 'min-h-[260px] sm:min-h-[280px]'
+              }`}
             >
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={tile.image}
+                alt=""
+                aria-hidden
+                className={`pointer-events-none absolute select-none transition-transform duration-500 group-hover:translate-y-[-2px] ${
+                  isHero
+                    ? '-right-2 -bottom-2 size-44 opacity-95 sm:right-4 sm:bottom-2 sm:size-56 lg:size-64'
+                    : '-right-2 -bottom-2 size-36 opacity-95 sm:right-2 sm:bottom-2 sm:size-44'
+                }`}
+                loading="lazy"
+                onError={(e) => {
+                  ;(e.currentTarget as HTMLImageElement).style.display = 'none'
+                }}
+              />
+
               <div className="relative flex items-start justify-between gap-3">
                 <span className={`flex size-11 items-center justify-center rounded-md ${ACCENT[tile.accent]}`}>
                   <Icon className="size-5" aria-hidden />
@@ -48,7 +90,8 @@ export function DashboardLauncherGrid() {
                   aria-hidden
                 />
               </div>
-              <div className="relative mt-auto flex flex-col gap-1.5">
+
+              <div className={`relative mt-auto flex flex-col gap-1.5 ${isHero ? 'max-w-[60%]' : 'max-w-[60%]'}`}>
                 <h2 className="font-heading text-lg font-semibold tracking-tight sm:text-xl">
                   {t(`dashboard.launcher.${tile.i18nKey}.title`)}
                 </h2>

@@ -309,7 +309,7 @@
     },
     "continue": {
       "eyebrow": "Pick up",
-      "title": "Continue where you left off",
+      "title": "Continue Where You Left Off",
       "loading": "Looking up your latest run…",
       "errorGeneric": "We couldn't load your latest run.",
       "empty": "No evaluations yet. Run your first one to see resume options here.",

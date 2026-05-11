@@ -30,8 +30,23 @@ export function EvaluationResultsToc({ visibleSections }: Props) {
 
     if (targets.length === 0) return
 
+    const lastId = visibleSections[visibleSections.length - 1]
+
+    function isAtPageBottom(): boolean {
+      const scrolled = window.scrollY + window.innerHeight
+      const total = document.documentElement.scrollHeight
+      return total - scrolled < 48
+    }
+
     const observer = new IntersectionObserver(
       (entries) => {
+        // At-bottom override: short trailing sections (like Download Packet)
+        // never crest into the active zone before the page bottoms out, so
+        // they'd otherwise stay unreachable. Pin to the last section instead.
+        if (isAtPageBottom()) {
+          setActiveId(lastId)
+          return
+        }
         const intersecting = entries.filter((e) => e.isIntersecting)
         if (intersecting.length === 0) return
         const topMost = intersecting.reduce((best, entry) =>
@@ -47,7 +62,20 @@ export function EvaluationResultsToc({ visibleSections }: Props) {
     )
 
     targets.forEach(({ el }) => observer.observe(el))
-    return () => observer.disconnect()
+
+    // Separate scroll listener for the at-bottom case — the observer only
+    // fires when an entry's intersection ratio crosses a threshold, so a user
+    // who scrolls within the same section won't re-trigger it.
+    function onScroll() {
+      if (isAtPageBottom()) setActiveId(lastId)
+    }
+    window.addEventListener('scroll', onScroll, { passive: true })
+    onScroll()
+
+    return () => {
+      observer.disconnect()
+      window.removeEventListener('scroll', onScroll)
+    }
   }, [visibleSections])
 
   if (visibleSections.length === 0) return null

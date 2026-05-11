@@ -686,7 +686,12 @@
     "requiredContributions": {
       "heading": "Caruman wajib",
       "intro": "Caruman wajib yang perlu anda bayar di bawah skim-skim ini. Ini TIDAK termasuk dalam jumlah pelepasan tahunan di atas — ini adalah wang yang anda bayar.",
+      "categoryLabel": "Keselamatan sosial",
+      "badge": "Wajib",
+      "countSingular": "{{count}} caruman diperlukan",
+      "countPlural": "{{count}} caruman diperlukan",
       "annualLabel": "Caruman tahunan",
+      "portalCta": "Portal agensi",
       "footnote": "Daftar dan bayar terus melalui portal agensi. Kegagalan membayar boleh menjejaskan akses kepada faedah kecederaan pekerjaan jika anda membuat tuntutan kemudian."
     },
     "preview": {
@@ -698,6 +703,7 @@
       "downloadOne": "Muat turun PDF ini"
     },
     "packet": {
+      "eyebrow": "Pakej",
       "titleSingular": "Pakej permohonan draf ({{count}} fail)",
       "titlePlural": "Pakej permohonan draf ({{count}} fail)",
       "titleSchemeSingular": "Pakej permohonan draf ({{count}} skim)",

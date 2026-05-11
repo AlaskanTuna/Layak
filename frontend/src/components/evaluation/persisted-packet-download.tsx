@@ -57,21 +57,18 @@ export function PersistedPacketDownload({ evalId, matches }: Props) {
   }
 
   return (
-    <section className="paper-card flex flex-col gap-3 rounded-[14px] p-5">
-      <div className="flex flex-col gap-1">
-        <div className="flex items-center gap-2">
-          <span className="flex size-8 items-center justify-center rounded-md bg-[color:var(--primary)]/10 text-[color:var(--primary)]">
-            <ShieldCheck className="size-4" aria-hidden />
-          </span>
-          <h2 className="font-heading text-base font-semibold leading-snug tracking-tight">
-            {qualifyingCount === 1
-              ? t('evaluation.packet.titleSchemeSingular', { count: qualifyingCount })
-              : t('evaluation.packet.titleSchemePlural', { count: qualifyingCount })}
-          </h2>
-        </div>
-        <p className="text-xs text-muted-foreground">{t('evaluation.packet.description')}</p>
-      </div>
-      <Button type="button" onClick={handleDownload} disabled={busy} size="lg">
+    <section className="paper-card rounded-[14px] p-5">
+      <header className="mb-4 flex flex-col gap-1 border-b border-foreground/10 pb-4">
+        <p className="mono-caption text-[color:var(--hibiscus)]">{t('evaluation.packet.eyebrow')}</p>
+        <h3 className="flex items-center gap-2 font-heading text-[15px] font-semibold tracking-tight">
+          <ShieldCheck className="size-4 text-foreground/55" aria-hidden />
+          {qualifyingCount === 1
+            ? t('evaluation.packet.titleSchemeSingular', { count: qualifyingCount })
+            : t('evaluation.packet.titleSchemePlural', { count: qualifyingCount })}
+        </h3>
+        <p className="text-xs leading-relaxed text-foreground/65">{t('evaluation.packet.description')}</p>
+      </header>
+      <Button type="button" onClick={handleDownload} disabled={busy} size="lg" className="w-full sm:w-auto">
         {busy ? (
           <>
             <Loader2 className="mr-1.5 size-4 animate-spin" aria-hidden />
@@ -85,7 +82,7 @@ export function PersistedPacketDownload({ evalId, matches }: Props) {
         )}
       </Button>
       {error && (
-        <div className="flex items-start gap-2 rounded-md border border-destructive/30 bg-destructive/5 p-3 text-xs text-destructive">
+        <div className="mt-3 flex items-start gap-2 rounded-md border border-destructive/30 bg-destructive/5 p-3 text-xs text-destructive">
           <AlertTriangle className="size-3.5 shrink-0" aria-hidden />
           <span>{error}</span>
         </div>

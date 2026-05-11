@@ -290,12 +290,18 @@ export function EvaluationResultsByIdClient({ evalId }: { evalId: string }) {
                 <section
                   id="download"
                   aria-label={t('evaluation.results.toc.download')}
-                  className="flex flex-col gap-3"
+                  className="flex flex-col gap-5"
                 >
                   <PersistedPacketDownload evalId={evalId} matches={doc.matches} />
-                  <div className="flex">
-                    <Button type="button" variant="outline" onClick={handleStartAnother}>
+                  <div className="flex border-t border-foreground/10 pt-5">
+                    <Button
+                      type="button"
+                      size="lg"
+                      onClick={handleStartAnother}
+                      className="rounded-full bg-[color:var(--hibiscus)] px-6 text-[color:var(--hibiscus-foreground)] hover:bg-[color:var(--hibiscus)]/92"
+                    >
                       {t('evaluation.results.startAnother')}
+                      <ArrowRight className="ml-1.5 size-4" aria-hidden />
                     </Button>
                   </div>
                 </section>

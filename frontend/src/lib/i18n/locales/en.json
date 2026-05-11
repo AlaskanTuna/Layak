@@ -686,7 +686,12 @@
     "requiredContributions": {
       "heading": "Required Contributions",
       "intro": "Mandatory contributions you owe under these schemes. These are NOT included in your annual relief total above — they're money you pay.",
+      "categoryLabel": "Social Security",
+      "badge": "Required",
+      "countSingular": "{{count}} required contribution",
+      "countPlural": "{{count}} required contributions",
       "annualLabel": "Annual Contribution",
+      "portalCta": "Agency portal",
       "footnote": "Register and pay directly via the agency portal. Non-payment may affect access to employment-injury benefits if you claim later."
     },
     "preview": {
@@ -698,6 +703,7 @@
       "downloadOne": "Download this PDF"
     },
     "packet": {
+      "eyebrow": "Packet",
       "titleSingular": "Draft Application Packet ({{count}} File)",
       "titlePlural": "Draft Application Packet ({{count}} Files)",
       "titleSchemeSingular": "Draft Application Packet ({{count}} Scheme)",

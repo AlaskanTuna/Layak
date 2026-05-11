@@ -675,7 +675,12 @@
     "requiredContributions": {
       "heading": "强制性缴款",
       "intro": "您在这些计划下需要缴纳的强制性费用。这些款项不计入上方的年度减免总额 —— 这是您需要支付的金额。",
+      "categoryLabel": "社会保障",
+      "badge": "强制",
+      "countSingular": "{{count}} 项强制缴款",
+      "countPlural": "{{count}} 项强制缴款",
       "annualLabel": "年度缴款",
+      "portalCta": "机构门户",
       "footnote": "请直接通过机构门户注册并缴款。未缴款可能影响日后您申请工伤福利时的权益。"
     },
     "preview": {
@@ -687,6 +692,7 @@
       "downloadOne": "下载此 PDF"
     },
     "packet": {
+      "eyebrow": "申请包",
       "titleSingular": "草拟申请包（{{count}} 份文件）",
       "titlePlural": "草拟申请包（{{count}} 份文件）",
       "titleSchemeSingular": "草拟申请包（{{count}} 项计划）",

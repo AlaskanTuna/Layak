@@ -1,8 +1,9 @@
 'use client'
 
-import { ExternalLink, ShieldCheck } from 'lucide-react'
+import { ArrowUpRight, ShieldAlert } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 
+import { Button } from '@/components/ui/button'
 import type { SchemeMatch } from '@/lib/agent-types'
 import { localisedSchemeName } from '@/lib/scheme-name'
 
@@ -16,14 +17,12 @@ function formatRm(value: number): string {
 
 /**
  * Surfaces `kind === 'required_contribution'` matches (e.g. PERKESO SKSPS
- * mandatory contribution for gig drivers under Akta 789) in a dedicated
- * block beneath the upside ranked list. These are schemes the user PAYS
- * into, not ones they receive from — distinguishing them visually avoids
- * a misleading "RM X,XXX upside" conflation.
+ * mandatory contribution for gig drivers under Akta 789). Mirrors the visual
+ * structure of `SchemeCardGrid` so the page reads as a coherent set of
+ * sections — heading + card grid — distinguished only by the amber accent
+ * tone (you PAY into these schemes, you don't receive from them).
  *
- * Renders nothing when there are no contribution matches, so it can safely
- * be dropped into any results layout without adding conditional render
- * scaffolding at the call site.
+ * Renders nothing when there are no contribution matches.
  */
 export function RequiredContributionsCard({ matches }: Props) {
   const { t } = useTranslation()
@@ -32,54 +31,63 @@ export function RequiredContributionsCard({ matches }: Props) {
   if (contributions.length === 0) return null
 
   return (
-    <section
-      className="flex flex-col gap-3 rounded-xl border border-amber-500/30 bg-amber-500/5 p-5"
-      aria-label={t('evaluation.requiredContributions.heading')}
-    >
-      <header className="flex items-start gap-3">
-        <div className="flex size-9 shrink-0 items-center justify-center rounded-md bg-amber-500/15 text-amber-700 dark:text-amber-300">
-          <ShieldCheck className="size-4" aria-hidden />
-        </div>
-        <div className="flex flex-col gap-0.5">
-          <h2 className="font-heading text-base font-semibold tracking-tight">
-            {t('evaluation.requiredContributions.heading')}
-          </h2>
-          <p className="text-xs leading-relaxed text-muted-foreground">{t('evaluation.requiredContributions.intro')}</p>
-        </div>
-      </header>
+    <section className="flex flex-col gap-4">
+      <div className="flex items-baseline justify-between gap-3">
+        <h2 className="font-heading text-lg font-semibold tracking-tight">
+          {t('evaluation.requiredContributions.heading')}
+        </h2>
+        <span className="mono-caption text-foreground/55">
+          {contributions.length === 1
+            ? t('evaluation.requiredContributions.countSingular', { count: contributions.length })
+            : t('evaluation.requiredContributions.countPlural', { count: contributions.length })}
+        </span>
+      </div>
 
-      <ul className="flex flex-col gap-3">
+      <ul className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
         {contributions.map((match) => {
           const annualRm = match.annual_contribution_rm ?? 0
           return (
             <li
               key={match.scheme_id}
-              className="flex flex-col gap-3 rounded-lg border border-amber-500/20 bg-card p-4 sm:flex-row sm:items-start sm:justify-between"
+              className="paper-card relative flex flex-col gap-4 rounded-[14px] p-5 transition-shadow hover:shadow-[0_24px_50px_-22px_color-mix(in_oklch,var(--ink)_28%,transparent)]"
             >
-              <div className="flex min-w-0 flex-col gap-1">
-                <h3 className="font-heading text-sm font-semibold tracking-tight">
+              <header className="flex flex-col gap-2">
+                <div className="flex items-center justify-between gap-2">
+                  <span className="mono-caption text-amber-700 dark:text-amber-300">
+                    {t('evaluation.requiredContributions.categoryLabel')}
+                  </span>
+                  <span className="inline-flex items-center gap-1 rounded-full border border-amber-500/35 bg-amber-500/12 px-2 py-0.5 mono-caption text-[9.5px] text-amber-700 dark:text-amber-300">
+                    <ShieldAlert className="size-3" aria-hidden />
+                    {t('evaluation.requiredContributions.badge')}
+                  </span>
+                </div>
+                <h3 className="font-heading text-base font-semibold tracking-tight">
                   {localisedSchemeName(t, match.scheme_id, match.scheme_name)}
                 </h3>
-                <p className="text-xs leading-relaxed text-muted-foreground">{match.summary}</p>
-              </div>
-              <div className="shrink-0 text-left tabular-nums sm:text-right">
-                <p className="font-heading">
-                  <span className="text-xs text-muted-foreground">
-                    {t('evaluation.requiredContributions.annualLabel')}
-                  </span>
-                  <br />
-                  <span className="text-lg font-semibold text-amber-700 dark:text-amber-300">{formatRm(annualRm)}</span>
+                <p className="text-xs leading-relaxed text-foreground/65">{match.summary}</p>
+              </header>
+
+              <div className="flex flex-1 flex-col gap-1 rounded-md border border-amber-500/20 bg-amber-500/[0.05] p-3">
+                <p className="mono-caption text-amber-700 dark:text-amber-300">
+                  {t('evaluation.requiredContributions.annualLabel')}
                 </p>
-                <a
-                  href={match.portal_url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="mt-1 inline-flex items-center gap-1 text-xs text-primary underline-offset-2 hover:underline"
-                >
-                  <ExternalLink className="size-3" aria-hidden />
-                  {t('evaluation.schemeCard.openAgencyPortal', { agency: match.agency })}
-                </a>
+                <p className="font-heading text-lg font-semibold tabular-nums text-amber-700 dark:text-amber-300">
+                  {formatRm(annualRm)}
+                </p>
               </div>
+
+              <footer className="flex items-center justify-between gap-3 border-t border-foreground/10 pt-3">
+                <span className="mono-caption text-foreground/55">{match.agency}</span>
+                <Button
+                  render={<a href={match.portal_url} target="_blank" rel="noopener noreferrer" />}
+                  size="sm"
+                  variant="outline"
+                  className="rounded-full"
+                >
+                  {t('evaluation.requiredContributions.portalCta')}
+                  <ArrowUpRight className="ml-1 size-3.5" aria-hidden />
+                </Button>
+              </footer>
             </li>
           )
         })}

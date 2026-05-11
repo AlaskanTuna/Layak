@@ -20,7 +20,11 @@ function DraftRow({ draft }: { draft: PacketDraft }) {
     if (!draft.blob_bytes_b64) return
     const blob = base64ToBlob(draft.blob_bytes_b64)
     triggerDownload(blob, draft.filename)
-    notificationStore.push(t('evaluation.packet.notificationTitle'), t('evaluation.packet.notificationBody'))
+    notificationStore.notify({
+      title: t('common.notifications.events.packetDownloaded.title'),
+      description: t('common.notifications.events.packetDownloaded.body'),
+      severity: 'success',
+    })
   }
 
   return (

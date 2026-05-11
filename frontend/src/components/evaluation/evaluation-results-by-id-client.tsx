@@ -11,7 +11,6 @@ import { ErrorRecoveryCard } from '@/components/evaluation/error-recovery-card'
 import { EvaluationResultsToc, type TocSectionId } from '@/components/evaluation/evaluation-results-toc'
 import { EvaluationSummaryCard } from '@/components/evaluation/evaluation-summary-card'
 import { EvaluationUpsideHero } from '@/components/evaluation/evaluation-upside-hero'
-import { PersistedPacketDownload } from '@/components/evaluation/persisted-packet-download'
 import { PipelineStepper } from '@/components/evaluation/pipeline-stepper'
 import { RequiredContributionsCard } from '@/components/evaluation/required-contributions-card'
 import { ResultsChatPanel } from '@/components/evaluation/results-chat-panel'
@@ -274,10 +273,10 @@ export function EvaluationResultsByIdClient({ evalId }: { evalId: string }) {
   const hasContent = isComplete || (isRunning && doc.matches.length > 0)
 
   // Derive section presence from the *actual* data the children will render.
-  // The cards below all self-hide on empty inputs (RequiredContributionsCard,
-  // DraftPacketPreview, PersistedPacketDownload return null when their
-  // filtered slice is empty); mirroring that here keeps the TOC truthful and
-  // prevents dangling anchors that scroll to nothing.
+  // The cards below all self-hide on empty inputs (RequiredContributionsCard
+  // and DraftPacketPreview return null when their filtered slice is empty);
+  // mirroring that here keeps the TOC truthful and prevents dangling anchors
+  // that scroll to nothing.
   const hasRequiredContributions = doc.matches.some((m) => m.qualifies && m.kind === 'required_contribution')
   const hasQualifyingForPacket = doc.matches.some((m) => m.qualifies)
 
@@ -285,7 +284,6 @@ export function EvaluationResultsByIdClient({ evalId }: { evalId: string }) {
   const showSchemes = hasContent
   const showRequired = hasContent && hasRequiredContributions
   const showPreview = isComplete && hasQualifyingForPacket
-  const showDownload = isComplete && hasQualifyingForPacket
 
   const visibleSections: readonly TocSectionId[] = (() => {
     const ids: TocSectionId[] = []
@@ -293,7 +291,6 @@ export function EvaluationResultsByIdClient({ evalId }: { evalId: string }) {
     if (showSchemes) ids.push('schemes')
     if (showRequired) ids.push('required')
     if (showPreview) ids.push('preview')
-    if (showDownload) ids.push('download')
     return ids
   })()
 
@@ -378,28 +375,18 @@ export function EvaluationResultsByIdClient({ evalId }: { evalId: string }) {
                 <DraftPacketPreview evalId={evalId} matches={doc.matches} />
               </section>
             )}
-            {showDownload && (
-              <section
-                id="download"
-                aria-label={t('evaluation.results.toc.download')}
-                className="flex scroll-mt-28 flex-col gap-4 lg:scroll-mt-20"
-              >
-                <h2 className="font-heading text-xl font-semibold tracking-tight">
-                  {t('evaluation.results.toc.download')}
-                </h2>
-                <PersistedPacketDownload evalId={evalId} matches={doc.matches} />
-                <div className="flex border-t border-foreground/10 pt-5">
-                  <Button
-                    type="button"
-                    size="lg"
-                    onClick={handleStartAnother}
-                    className="rounded-full bg-[color:var(--hibiscus)] px-6 text-[color:var(--hibiscus-foreground)] hover:bg-[color:var(--hibiscus)]/92"
-                  >
-                    {t('evaluation.results.startAnother')}
-                    <ArrowRight className="ml-1.5 size-4" aria-hidden />
-                  </Button>
-                </div>
-              </section>
+            {isComplete && (
+              <div className="flex border-t border-foreground/10 pt-5">
+                <Button
+                  type="button"
+                  size="lg"
+                  onClick={handleStartAnother}
+                  className="rounded-full bg-[color:var(--hibiscus)] px-6 text-[color:var(--hibiscus-foreground)] hover:bg-[color:var(--hibiscus)]/92"
+                >
+                  {t('evaluation.results.startAnother')}
+                  <ArrowRight className="ml-1.5 size-4" aria-hidden />
+                </Button>
+              </div>
             )}
           </div>
 

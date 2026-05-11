@@ -5,7 +5,7 @@ import { useTranslation } from 'react-i18next'
 
 import { cn } from '@/lib/utils'
 
-export const TOC_SECTIONS = ['overview', 'schemes', 'required', 'preview', 'download'] as const
+export const TOC_SECTIONS = ['overview', 'schemes', 'required', 'preview'] as const
 export type TocSectionId = (typeof TOC_SECTIONS)[number]
 
 type Props = {

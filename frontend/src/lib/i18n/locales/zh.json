@@ -471,8 +471,7 @@
         "overview": "概览",
         "schemes": "可申请方案",
         "required": "应缴贡献",
-        "preview": "草稿预览",
-        "download": "申请草稿包"
+        "preview": "草稿预览"
       },
       "startAnother": "开始另一次评估",
       "viewDetailed": "查看详细结果",
@@ -778,7 +777,7 @@
     "preview": {
       "title_one": "在线预览（{{count}} 份草稿）",
       "title_other": "在线预览（{{count}} 份草稿）",
-      "description": "在浏览器中查看每份草稿 PDF 再下载。",
+      "description": "在浏览器中预览每份草稿 PDF,再一并打包成 ZIP 下载。每页均带有 \"DRAFT — NOT SUBMITTED\" 水印 —— 请自行通过相关机构的官方门户提交。",
       "loading": "正在加载预览…",
       "error": "预览失败：{{message}}",
       "iframeTitle": "{{name}} 的在线预览",

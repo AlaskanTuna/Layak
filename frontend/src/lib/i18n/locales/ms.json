@@ -482,8 +482,7 @@
         "overview": "Gambaran Keseluruhan",
         "schemes": "Skim Layak",
         "required": "Sumbangan Diperlukan",
-        "preview": "Pratonton",
-        "download": "Pakej Permohonan Draf"
+        "preview": "Pratonton"
       },
       "startAnother": "Mulakan penilaian lain",
       "viewDetailed": "Lihat keputusan terperinci",
@@ -789,7 +788,7 @@
     "preview": {
       "title_one": "Pratonton Dalam Talian ({{count}} Draf)",
       "title_other": "Pratonton Dalam Talian ({{count}} Draf)",
-      "description": "Semak setiap PDF draf dalam pelayar sebelum memuat turun.",
+      "description": "Periksa setiap PDF draf dalam talian, kemudian muat turun semuanya sebagai satu ZIP. Setiap halaman bertera \"DRAFT — NOT SUBMITTED\" — hantar sendiri melalui portal rasmi agensi.",
       "loading": "Memuatkan pratonton…",
       "error": "Pratonton gagal: {{message}}",
       "iframeTitle": "Pratonton dalam talian {{name}}",

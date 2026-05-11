@@ -482,8 +482,7 @@
         "overview": "Overview",
         "schemes": "Eligible Schemes",
         "required": "Required Contributions",
-        "preview": "Inline Preview",
-        "download": "Draft Application Packet"
+        "preview": "Inline Preview"
       },
       "startAnother": "Start another evaluation",
       "viewDetailed": "View detailed results",
@@ -789,7 +788,7 @@
     "preview": {
       "title_one": "Inline Preview ({{count}} Draft)",
       "title_other": "Inline Preview ({{count}} Drafts)",
-      "description": "Inspect each draft PDF in the browser before downloading.",
+      "description": "Inspect each draft PDF inline, then grab them all as a single ZIP. Every page is watermarked \"DRAFT — NOT SUBMITTED\" — lodge each one yourself via the agency's official portal.",
       "loading": "Loading preview…",
       "error": "Preview Failed: {{message}}",
       "iframeTitle": "Inline Preview of {{name}}",

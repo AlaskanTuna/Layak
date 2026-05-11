@@ -6,6 +6,7 @@ import { useTranslation } from 'react-i18next'
 
 import { Button } from '@/components/ui/button'
 import { authedFetch } from '@/lib/firebase'
+import { notificationStore } from '@/lib/notification-store'
 import { triggerDownload } from '@/lib/packet-download-utils'
 import type { SchemeMatch } from '@/lib/agent-types'
 import { localisedSchemeName } from '@/lib/scheme-name'
@@ -29,27 +30,26 @@ function getBackendUrl(): string {
 }
 
 /**
- * Inline PDF preview for the persisted results page.
+ * Inline PDF preview + bundled ZIP download for the persisted results page.
  *
- * Renders one expandable row per qualifying scheme. Each row lazily fetches
- * the regenerated PDF via `GET /api/evaluations/{id}/packet/{scheme_id}` on
+ * One expandable row per qualifying scheme. Each row lazily fetches the
+ * regenerated PDF via `GET /api/evaluations/{id}/packet/{scheme_id}` on
  * first expand, wraps the bytes in a blob URL, and hands it to a sandboxed
- * iframe. The blob URL stays cached for the component lifetime so collapsing
- * + re-expanding the same row is instant; all blob URLs are revoked on
- * unmount to keep memory bounded.
+ * iframe. Blob URLs stay cached for the component lifetime so collapsing +
+ * re-expanding is instant, and all are revoked on unmount.
  *
- * The download CTA on each row pipes the same blob through the existing
- * `triggerDownload` helper — no second network round-trip needed once the
- * preview has loaded.
- *
- * Sits ABOVE the existing ZIP download CTA. The two are additive — preview
- * is for trust ("can I see what Layak drafted before downloading?"); the ZIP
- * is for keeping a copy.
+ * The card's footer carries the bulk action — "Download all drafts as ZIP"
+ * — which hits `GET /api/evaluations/{id}/packet` for the regenerated
+ * archive. Previously this sat in a separate "Draft Application Packet"
+ * section/card below, but the two surfaces overlapped semantically and
+ * read as redundant; bundling them keeps the user in one place.
  */
 export function DraftPacketPreview({ evalId, matches }: Props) {
   const { t } = useTranslation()
   const [drafts, setDrafts] = useState<Record<string, DraftState>>({})
   const [openSchemeId, setOpenSchemeId] = useState<string | null>(null)
+  const [zipBusy, setZipBusy] = useState(false)
+  const [zipError, setZipError] = useState<string | null>(null)
   const blobUrlsRef = useRef<string[]>([])
 
   // Surface every qualifying scheme — including `required_contribution`
@@ -118,6 +118,31 @@ export function DraftPacketPreview({ evalId, matches }: Props) {
     },
     [drafts]
   )
+
+  const handleDownloadZip = useCallback(async () => {
+    setZipBusy(true)
+    setZipError(null)
+    try {
+      const res = await authedFetch(`${getBackendUrl()}/api/evaluations/${evalId}/packet`, {
+        method: 'GET'
+      })
+      if (!res.ok) {
+        throw new Error(t('evaluation.results.backendReturned', { status: res.status, statusText: res.statusText }))
+      }
+      const blob = await res.blob()
+      triggerDownload(blob, `layak-packet-${evalId}.zip`)
+      notificationStore.notify({
+        title: t('common.notifications.events.packetDownloaded.title'),
+        description: t('common.notifications.events.packetDownloaded.body'),
+        severity: 'success',
+        toast: true
+      })
+    } catch (err) {
+      setZipError(err instanceof Error ? err.message : String(err))
+    } finally {
+      setZipBusy(false)
+    }
+  }, [evalId, t])
 
   if (qualifying.length === 0) return null
 
@@ -209,9 +234,34 @@ export function DraftPacketPreview({ evalId, matches }: Props) {
           )
         })}
       </div>
-      <p className="mt-4 border-t border-foreground/10 pt-3 text-xs leading-relaxed text-foreground/65">
-        {t('evaluation.preview.description')}
-      </p>
+      <div className="mt-4 flex flex-col gap-3 border-t border-foreground/10 pt-4">
+        <p className="text-xs leading-relaxed text-foreground/65">{t('evaluation.preview.description')}</p>
+        <Button
+          type="button"
+          onClick={handleDownloadZip}
+          disabled={zipBusy}
+          size="lg"
+          className="w-full sm:w-auto"
+        >
+          {zipBusy ? (
+            <>
+              <Loader2 className="mr-1.5 size-4 animate-spin" aria-hidden />
+              {t('evaluation.packet.generatingZip')}
+            </>
+          ) : (
+            <>
+              <Download className="mr-1.5 size-4" aria-hidden />
+              {t('evaluation.packet.downloadZip')}
+            </>
+          )}
+        </Button>
+        {zipError && (
+          <div className="flex items-start gap-2 rounded-md border border-destructive/30 bg-destructive/5 p-3 text-xs text-destructive">
+            <AlertTriangle className="size-3.5 shrink-0" aria-hidden />
+            <span>{zipError}</span>
+          </div>
+        )}
+      </div>
     </section>
   )
 }

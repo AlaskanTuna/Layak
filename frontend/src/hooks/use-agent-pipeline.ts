@@ -1,6 +1,7 @@
 'use client'
 
 import { useCallback, useEffect, useRef, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 
 import type { UploadFiles } from '@/components/evaluation/upload-widget'
 import { AISYAH_MOCK_EVENTS } from '@/fixtures/aisyah-response'
@@ -19,6 +20,7 @@ import type {
   Step
 } from '@/lib/agent-types'
 import { PIPELINE_STEPS } from '@/lib/agent-types'
+import { notificationStore } from '@/lib/notification-store'
 
 export type StepStatus = 'pending' | 'active' | 'complete' | 'error'
 
@@ -156,9 +158,11 @@ export function useAgentPipeline(): {
   reset: () => void
   acknowledgeQuotaExceeded: () => void
 } {
+  const { t } = useTranslation()
   const [state, setState] = useState<PipelineState>(INITIAL_STATE)
   const abortRef = useRef<AbortController | null>(null)
   const timeoutsRef = useRef<ReturnType<typeof setTimeout>[]>([])
+  const prevPhaseRef = useRef<PipelinePhase>(INITIAL_STATE.phase)
 
   const cleanup = useCallback(() => {
     abortRef.current?.abort()
@@ -207,6 +211,15 @@ export function useAgentPipeline(): {
             message: 'Free-tier evaluation quota reached.'
           }
           setState(() => ({ ...INITIAL_STATE, quotaExceeded: body ?? fallback }))
+          const usedBody = body ?? fallback
+          const resetHours = Math.max(1, Math.round((new Date(usedBody.resetAt).getTime() - Date.now()) / 3_600_000))
+          notificationStore.notify({
+            title: t('common.notifications.events.quotaExceeded.title'),
+            description: t('common.notifications.events.quotaExceeded.body', { hours: resetHours }),
+            severity: 'error',
+            toast: true,
+            groupKey: 'quota-exceeded'
+          })
           return
         }
         if (!res.ok || !res.body) {
@@ -229,7 +242,7 @@ export function useAgentPipeline(): {
         }))
       }
     })()
-  }, [])
+  }, [t])
 
   const startReal = useCallback(
     (files: UploadFiles, dependants: DependantInput[] | undefined) => {
@@ -295,6 +308,45 @@ export function useAgentPipeline(): {
   )
 
   useEffect(() => cleanup, [cleanup])
+
+  // Emit notifications on phase transitions to 'done' or 'error'.
+  useEffect(() => {
+    const prev = prevPhaseRef.current
+    prevPhaseRef.current = state.phase
+
+    if (state.phase === 'done' && prev !== 'done') {
+      const qualifyingCount = state.matches.filter((m) => m.qualifies).length
+      if (qualifyingCount > 0) {
+        notificationStore.notify({
+          title: t('common.notifications.events.evalComplete.title'),
+          description: t('common.notifications.events.evalComplete.body', { count: qualifyingCount }),
+          severity: 'success',
+          toast: true,
+          groupKey: state.evalId ? `eval-${state.evalId}` : 'eval-current'
+        })
+      } else {
+        notificationStore.notify({
+          title: t('common.notifications.events.evalCompleteEmpty.title'),
+          description: t('common.notifications.events.evalCompleteEmpty.body'),
+          severity: 'info',
+          toast: true,
+          groupKey: state.evalId ? `eval-${state.evalId}` : 'eval-current'
+        })
+      }
+    }
+
+    if (state.phase === 'error' && prev !== 'error') {
+      notificationStore.notify({
+        title: t('common.notifications.events.evalFailed.title'),
+        description: t('common.notifications.events.evalFailed.body', {
+          category: state.errorCategory ?? 'Unknown error'
+        }),
+        severity: 'error',
+        toast: true,
+        groupKey: state.evalId ? `eval-${state.evalId}` : 'eval-current'
+      })
+    }
+  }, [state.phase, state.matches, state.evalId, state.errorCategory, t])
 
   return { state, start, reset, acknowledgeQuotaExceeded }
 }

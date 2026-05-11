@@ -721,6 +721,11 @@
       "downloadWithCount": "Muat turun semua draf ({{count}})",
       "downloadPending": "Draf belum sedia"
     },
+    "summary": {
+      "title": "Ringkasan",
+      "aiBadge": "Jana oleh AI",
+      "loading": "Menjana ringkasan…"
+    },
     "schemeCard": {
       "heading": "Skim Yang Layak",
       "matchesSingular": "{{count}} padanan",

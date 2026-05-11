@@ -232,7 +232,7 @@ export function ResultsChatPanel({ evalId, matches }: Props) {
         >
           <div className={panelClass}>
             {/* Header */}
-            <header className="relative flex items-center justify-between gap-2 border-b border-foreground/10 px-4 py-3.5">
+            <header className="relative flex items-center justify-between gap-2 border-b border-foreground/10 bg-foreground/[0.025] px-4 py-3.5 backdrop-blur-md backdrop-saturate-150">
               <span
                 aria-hidden
                 className="pointer-events-none absolute inset-y-2.5 left-0 w-[3px] rounded-r-full bg-[color:var(--hibiscus)]/70"
@@ -336,7 +336,7 @@ export function ResultsChatPanel({ evalId, matches }: Props) {
 
             {/* Composer — `items-stretch` + matched heights keep textarea +
                 send button visually consistent at all times. */}
-            <footer className="border-t border-foreground/10 bg-foreground/[0.025] px-3 py-3">
+            <footer className="border-t border-foreground/10 bg-foreground/[0.025] px-3 py-3 backdrop-blur-md backdrop-saturate-150">
               <div className="flex items-stretch gap-2">
                 <textarea
                   ref={inputRef}
@@ -345,7 +345,7 @@ export function ResultsChatPanel({ evalId, matches }: Props) {
                   onKeyDown={handleKeyDown}
                   placeholder={t('evaluation.chat.placeholder')}
                   rows={1}
-                  className="max-h-32 min-h-[44px] flex-1 resize-none rounded-md border border-foreground/15 bg-background/70 px-3 py-2.5 text-sm focus:border-[color:var(--hibiscus)]/45 focus:outline-none focus:ring-2 focus:ring-[color:var(--hibiscus)]/30 disabled:opacity-60"
+                  className="max-h-32 min-h-[44px] flex-1 resize-none rounded-md border border-foreground/15 bg-background/55 px-3 py-2.5 text-sm backdrop-blur-md backdrop-saturate-150 focus:border-[color:var(--hibiscus)]/45 focus:outline-none focus:ring-2 focus:ring-[color:var(--hibiscus)]/30 disabled:opacity-60"
                   disabled={chat.isStreaming}
                   maxLength={4000}
                 />
@@ -355,7 +355,7 @@ export function ResultsChatPanel({ evalId, matches }: Props) {
                     variant="outline"
                     onClick={chat.abort}
                     aria-label={t('evaluation.chat.abort')}
-                    className="h-11 w-11 shrink-0 rounded-md p-0"
+                    className="h-11 w-11 shrink-0 rounded-md bg-background/55 p-0 backdrop-blur-md backdrop-saturate-150"
                   >
                     <Loader2 className="h-4 w-4 animate-spin" aria-hidden />
                   </Button>
@@ -365,7 +365,7 @@ export function ResultsChatPanel({ evalId, matches }: Props) {
                     onClick={handleSend}
                     disabled={!draft.trim()}
                     aria-label={t('evaluation.chat.send')}
-                    className="h-11 w-11 shrink-0 rounded-md bg-[color:var(--hibiscus)] p-0 text-[color:var(--hibiscus-foreground)] hover:bg-[color:var(--hibiscus)]/92 disabled:bg-foreground/15 disabled:text-foreground/40"
+                    className="h-11 w-11 shrink-0 rounded-md bg-[color:var(--hibiscus)]/82 p-0 text-[color:var(--hibiscus-foreground)] backdrop-blur-md backdrop-saturate-150 hover:bg-[color:var(--hibiscus)]/95 disabled:bg-foreground/15 disabled:text-foreground/40 disabled:backdrop-blur-none"
                   >
                     <Send className="h-4 w-4" aria-hidden />
                   </Button>

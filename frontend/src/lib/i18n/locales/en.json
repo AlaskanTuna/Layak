@@ -721,6 +721,11 @@
       "downloadWithCount": "Download all drafts ({{count}})",
       "downloadPending": "Drafts pending"
     },
+    "summary": {
+      "title": "Summary",
+      "aiBadge": "AI-generated",
+      "loading": "Generating summary…"
+    },
     "schemeCard": {
       "heading": "Eligible Schemes",
       "matchesSingular": "{{count}} match",

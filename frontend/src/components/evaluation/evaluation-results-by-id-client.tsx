@@ -9,6 +9,7 @@ import { useTranslation } from 'react-i18next'
 import { DraftPacketPreview } from '@/components/evaluation/draft-packet-preview'
 import { ErrorRecoveryCard } from '@/components/evaluation/error-recovery-card'
 import { EvaluationResultsToc, type TocSectionId } from '@/components/evaluation/evaluation-results-toc'
+import { EvaluationSummaryCard } from '@/components/evaluation/evaluation-summary-card'
 import { EvaluationUpsideHero } from '@/components/evaluation/evaluation-upside-hero'
 import { PersistedPacketDownload } from '@/components/evaluation/persisted-packet-download'
 import { PipelineStepper } from '@/components/evaluation/pipeline-stepper'
@@ -270,14 +271,20 @@ export function EvaluationResultsByIdClient({ evalId }: { evalId: string }) {
             <section
               id="overview"
               aria-label={t('evaluation.results.toc.overview')}
-              className="scroll-mt-28 lg:scroll-mt-20"
+              className="flex scroll-mt-28 flex-col gap-4 lg:scroll-mt-20"
             >
+              <div className="flex items-baseline justify-between gap-3">
+                <h2 className="font-heading text-xl font-semibold tracking-tight">
+                  {t('evaluation.results.toc.overview')}
+                </h2>
+              </div>
               <EvaluationUpsideHero
                 totalAnnualRm={totalAnnualRm}
                 matchedCount={matchedCount}
                 packet={null}
                 empty={!isComplete}
               />
+              {isComplete && <EvaluationSummaryCard evalId={evalId} />}
             </section>
             <section
               id="schemes"

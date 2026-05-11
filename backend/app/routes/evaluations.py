@@ -31,6 +31,7 @@ from app.auth import CurrentUser, get_firestore
 from app.schema.firestore import EvaluationDoc
 from app.schema.profile import Profile
 from app.schema.scheme import SchemeMatch
+from app.services.evaluation_summary import generate_summary
 
 _logger = logging.getLogger(__name__)
 
@@ -59,6 +60,14 @@ class EvaluationListResponse(BaseModel):
 
     items: list[EvaluationListItem]
     nextPageToken: str | None = None  # noqa: N815
+
+
+class EvaluationSummaryResponse(BaseModel):
+    """AI-generated overview of one evaluation — powers the Summary card."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    summary: str
 
 
 _MAX_LIST_PAGE = 50
@@ -117,6 +126,21 @@ async def get_evaluation(user: CurrentUser, eval_id: str) -> EvaluationDoc:
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Evaluation document is malformed",
         ) from exc
+
+
+@router.get("/{eval_id}/summary", response_model=EvaluationSummaryResponse)
+async def get_evaluation_summary(user: CurrentUser, eval_id: str) -> EvaluationSummaryResponse:
+    """Return a brief AI-written overview of the evaluation.
+
+    Calls `FAST_MODEL` (gemini-3.1-flash-lite) against the stored profile +
+    matches. Stateless — every request re-runs the model so a copy fix to
+    the system instruction propagates without a Firestore backfill. The
+    service is fail-open: any Gemini error returns a deterministic
+    fallback string so the card still renders something meaningful.
+    """
+    data, _ref = _load_owned_evaluation(eval_id, user.uid)
+    summary = generate_summary(data)
+    return EvaluationSummaryResponse(summary=summary)
 
 
 @router.delete("/{eval_id}", status_code=status.HTTP_204_NO_CONTENT)

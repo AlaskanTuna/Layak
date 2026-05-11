@@ -710,6 +710,11 @@
       "downloadWithCount": "下载所有草稿（{{count}}）",
       "downloadPending": "草稿待处理"
     },
+    "summary": {
+      "title": "摘要",
+      "aiBadge": "AI 生成",
+      "loading": "正在生成摘要…"
+    },
     "schemeCard": {
       "heading": "符合资格的计划",
       "matchesSingular": "{{count}} 项匹配",

@@ -248,9 +248,15 @@ export function EvaluationUploadClient() {
       />
       {showIntake && (
         <>
-          <IntakeModeToggle value={mode} onChange={handleModeChange} />
+          <div id="tour-upload-mode" className="scroll-mt-24 rounded-lg">
+            <IntakeModeToggle value={mode} onChange={handleModeChange} />
+          </div>
           {/* Both widgets stay mounted so partial form state survives a tab switch. */}
-          <div className={cn(mode !== 'upload' && 'hidden')} aria-hidden={mode !== 'upload'}>
+          <div
+            id="tour-upload-form"
+            className={cn('scroll-mt-24 rounded-[14px]', mode !== 'upload' && 'hidden')}
+            aria-hidden={mode !== 'upload'}
+          >
             <UploadWidget onSubmit={handleSubmitUpload} />
             {sampleLoadError && (
               <p className="mt-2 text-xs text-destructive" role="alert">
@@ -258,7 +264,10 @@ export function EvaluationUploadClient() {
               </p>
             )}
           </div>
-          <div className={cn(mode !== 'manual' && 'hidden')} aria-hidden={mode !== 'manual'}>
+          <div
+            className={cn('scroll-mt-24 rounded-[14px]', mode !== 'manual' && 'hidden')}
+            aria-hidden={mode !== 'manual'}
+          >
             <ManualEntryForm
               ref={manualFormRef}
               onSubmit={handleSubmitManual}

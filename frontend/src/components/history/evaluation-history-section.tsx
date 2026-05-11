@@ -100,10 +100,16 @@ export function EvaluationHistorySection() {
 
   return (
     <div className="flex flex-col gap-6">
-      <AggregateStatsCards items={items} />
+      <div id="tour-evaluation-stats" className="scroll-mt-24 rounded-[14px]">
+        <AggregateStatsCards items={items} />
+      </div>
       <div className="grid grid-cols-1 items-start gap-6 lg:grid-cols-[1fr_22rem]">
-        <EvaluationHistoryTable items={items} onRefresh={fetchHistory} />
-        <HowLayakEvaluatesRail />
+        <div id="tour-evaluation-history" className="scroll-mt-24 rounded-[14px]">
+          <EvaluationHistoryTable items={items} onRefresh={fetchHistory} />
+        </div>
+        <div id="tour-evaluation-rail" className="scroll-mt-24 rounded-[18px]">
+          <HowLayakEvaluatesRail />
+        </div>
       </div>
     </div>
   )

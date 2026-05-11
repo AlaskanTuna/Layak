@@ -53,6 +53,59 @@
     },
     "help": {
       "open": "Open quick help",
+      "close": "Close help",
+      "tours": {
+        "next": "Next",
+        "previous": "Back",
+        "done": "Got it",
+        "stepCounter": "{{current}} of {{total}}",
+        "evaluation": {
+          "step1": {
+            "title": "Your Lifetime Stats",
+            "body": "Total evaluations, highest relief discovered, and how many runs completed — all at a glance."
+          },
+          "step2": {
+            "title": "Past Evaluations",
+            "body": "Every run lands here. Click 'View' to revisit matched schemes and redownload packets."
+          },
+          "step3": {
+            "title": "How Layak Evaluates",
+            "body": "A quick refresher on the three-step pipeline that turns your profile into draft packets."
+          }
+        },
+        "upload": {
+          "step1": {
+            "title": "Pick Your Path",
+            "body": "Upload three documents for OCR, or type details manually for a fully offline run."
+          },
+          "step2": {
+            "title": "Fill in What You Can",
+            "body": "Provide your IC, payslip and utility bill. Households unlock extra schemes — add them if relevant."
+          },
+          "step3": {
+            "title": "Submit When Ready",
+            "body": "Layak takes about four minutes to match schemes and prepare your draft packets."
+          }
+        },
+        "results": {
+          "step1": {
+            "title": "Your Headline Number",
+            "body": "Total annual relief across every scheme that matched your profile."
+          },
+          "step2": {
+            "title": "Schemes You Qualified For",
+            "body": "Each card cites the rule and source page. Open the agency portal to start the actual application."
+          },
+          "step3": {
+            "title": "Preview Before Lodging",
+            "body": "Expand any draft to inspect the PDF in-browser before downloading."
+          },
+          "step4": {
+            "title": "Grab Your Packet",
+            "body": "Download the ZIP and lodge each PDF with the relevant agency portal."
+          }
+        }
+      },
       "title": "Quick help",
       "description": "A fast guide for first-time users. Pick the section that matches where you are in the flow.",
       "footer": "Layak gives draft guidance only. You still review and submit manually.",

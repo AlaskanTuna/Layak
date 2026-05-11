@@ -53,6 +53,59 @@
     },
     "help": {
       "open": "Buka bantuan ringkas",
+      "close": "Tutup bantuan",
+      "tours": {
+        "next": "Seterusnya",
+        "previous": "Kembali",
+        "done": "Faham",
+        "stepCounter": "{{current}} daripada {{total}}",
+        "evaluation": {
+          "step1": {
+            "title": "Statistik Anda",
+            "body": "Jumlah penilaian, pelepasan tertinggi yang ditemui, dan bilangan larian selesai — semua secara ringkas."
+          },
+          "step2": {
+            "title": "Penilaian Terdahulu",
+            "body": "Setiap larian disimpan di sini. Klik 'Lihat' untuk semak skim yang dipadan dan muat turun semula pakej."
+          },
+          "step3": {
+            "title": "Cara Layak Menilai",
+            "body": "Imbasan ringkas saluran tiga langkah yang mengubah profil anda menjadi pakej draf."
+          }
+        },
+        "upload": {
+          "step1": {
+            "title": "Pilih Laluan Anda",
+            "body": "Muat naik tiga dokumen untuk OCR, atau taipkan butiran secara manual untuk larian luar talian sepenuhnya."
+          },
+          "step2": {
+            "title": "Lengkapkan Yang Anda Boleh",
+            "body": "Sertakan IC, slip gaji, dan bil utiliti anda. Isi rumah membuka skim tambahan — tambah jika relevan."
+          },
+          "step3": {
+            "title": "Hantar Apabila Sedia",
+            "body": "Layak mengambil masa kira-kira empat minit untuk memadan skim dan menyediakan pakej draf anda."
+          }
+        },
+        "results": {
+          "step1": {
+            "title": "Nombor Utama Anda",
+            "body": "Jumlah pelepasan tahunan merentasi setiap skim yang dipadan dengan profil anda."
+          },
+          "step2": {
+            "title": "Skim Yang Anda Layak",
+            "body": "Setiap kad merujuk peraturan dan halaman sumber. Buka portal agensi untuk memulakan permohonan."
+          },
+          "step3": {
+            "title": "Pratonton Sebelum Hantar",
+            "body": "Kembangkan mana-mana draf untuk semak PDF dalam pelayar sebelum memuat turun."
+          },
+          "step4": {
+            "title": "Ambil Pakej Anda",
+            "body": "Muat turun ZIP dan hantar setiap PDF melalui portal agensi yang berkenaan."
+          }
+        }
+      },
       "title": "Bantuan ringkas",
       "description": "Panduan pantas untuk pengguna kali pertama. Pilih bahagian yang sepadan dengan tempat anda berada dalam aliran.",
       "footer": "Layak hanya memberi panduan draf. Anda masih perlu menyemak dan menghantar secara manual.",

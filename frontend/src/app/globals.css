@@ -631,14 +631,19 @@
   background: oklch(0.18 0.014 78);
   color: oklch(0.93 0.012 82);
   border: 1px solid color-mix(in oklch, white 8%, transparent);
-  border-radius: 16px;
-  padding: 14px 18px;
-  min-width: 340px;
+  border-radius: 14px;
+  padding: 10px 16px;
+  min-width: 260px;
+  width: max-content;
+  max-width: 420px;
   font-family: var(--font-sans);
+  /* Center the icon + content row inside the toast so the pill reads as a
+     compact, balanced status badge rather than a left-anchored card. */
+  justify-content: center;
   box-shadow:
     inset 0 1px 0 color-mix(in oklch, white 6%, transparent),
-    0 24px 60px -20px rgba(0, 0, 0, 0.45),
-    0 8px 22px -10px rgba(0, 0, 0, 0.3);
+    0 22px 56px -22px rgba(0, 0, 0, 0.45),
+    0 8px 20px -12px rgba(0, 0, 0, 0.3);
 }
 .dark .layak-toast[data-sonner-toast] {
   /* In dark mode, page bg is already warm-cocoa at 0.16. Drop the toast
@@ -646,26 +651,30 @@
   background: oklch(0.12 0.014 78);
   box-shadow:
     inset 0 1px 0 color-mix(in oklch, white 5%, transparent),
-    0 26px 66px -22px rgba(0, 0, 0, 0.65),
-    0 10px 24px -12px rgba(0, 0, 0, 0.5);
+    0 24px 60px -22px rgba(0, 0, 0, 0.65),
+    0 10px 22px -12px rgba(0, 0, 0, 0.5);
+}
+.layak-toast[data-sonner-toast] [data-content] {
+  text-align: center;
+  flex: 0 1 auto;
 }
 .layak-toast[data-sonner-toast] [data-title] {
   font-family: var(--font-sans);
   font-weight: 500;
-  font-size: 14px;
-  line-height: 1.4;
+  font-size: 13.5px;
+  line-height: 1.35;
   color: oklch(0.93 0.012 82);
   letter-spacing: 0;
 }
 .layak-toast[data-sonner-toast] [data-description] {
-  font-size: 13px;
-  line-height: 1.45;
+  font-size: 12.5px;
+  line-height: 1.4;
   color: color-mix(in oklch, oklch(0.93 0.012 82) 72%, transparent);
-  margin-top: 2px;
+  margin-top: 1px;
 }
 .layak-toast[data-sonner-toast] [data-icon] {
-  margin-right: 12px;
-  align-self: flex-start;
-  padding-top: 1px;
+  margin-right: 9px;
+  align-self: center;
+  padding-top: 0;
 }
 

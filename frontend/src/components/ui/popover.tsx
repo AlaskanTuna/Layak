@@ -16,16 +16,18 @@ function PopoverTrigger({ ...props }: PopoverPrimitive.Trigger.Props) {
 function PopoverContent({
   className,
   sideOffset = 8,
+  side,
   align = 'center',
   children,
   ...props
 }: PopoverPrimitive.Popup.Props & {
   sideOffset?: number
+  side?: PopoverPrimitive.Positioner.Props['side']
   align?: PopoverPrimitive.Positioner.Props['align']
 }) {
   return (
     <PopoverPrimitive.Portal>
-      <PopoverPrimitive.Positioner sideOffset={sideOffset} align={align}>
+      <PopoverPrimitive.Positioner sideOffset={sideOffset} side={side} align={align}>
         <PopoverPrimitive.Popup
           data-slot="popover-content"
           className={cn(

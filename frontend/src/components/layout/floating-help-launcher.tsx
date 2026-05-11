@@ -1,17 +1,18 @@
 'use client'
 
-import { CircleHelp, FileText, PlayCircle, Waypoints } from 'lucide-react'
+import { CircleHelp, FileText, PlayCircle, Waypoints, type LucideIcon } from 'lucide-react'
 import { usePathname } from 'next/navigation'
-import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
-import { Button } from '@/components/ui/button'
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 
 type HelpSection = 'overview' | 'documents' | 'results'
 
-const STORAGE_KEY = 'layak.help.section'
+const SECTION_ICONS: Record<HelpSection, LucideIcon> = {
+  overview: Waypoints,
+  documents: FileText,
+  results: PlayCircle
+}
 
 function getContextSection(pathname: string | null): HelpSection {
   if (!pathname) return 'overview'
@@ -20,157 +21,74 @@ function getContextSection(pathname: string | null): HelpSection {
   return 'overview'
 }
 
+/**
+ * Floating help affordance. Opens a single context-aware popover anchored to
+ * the launcher button — no tabs, just the card that matches the current
+ * route. Mirrors the same paper-card + hibiscus-ribbon + grid-texture
+ * pattern as the rest of the app's editorial surfaces.
+ */
 export function FloatingHelpLauncher() {
   const pathname = usePathname()
   const { t } = useTranslation()
-  const [open, setOpen] = useState(false)
-  const [section, setSection] = useState<HelpSection>('overview')
-
-  function handleOpenChange(nextOpen: boolean) {
-    if (nextOpen) {
-      const contextSection = getContextSection(pathname)
-      const stored =
-        typeof window === 'undefined' ? null : (window.localStorage.getItem(STORAGE_KEY) as HelpSection | null)
-      setSection(contextSection !== 'overview' ? contextSection : (stored ?? 'overview'))
-    }
-    setOpen(nextOpen)
-  }
-
-  function handleSectionChange(value: string) {
-    const next = value as HelpSection
-    setSection(next)
-    if (typeof window !== 'undefined') {
-      window.localStorage.setItem(STORAGE_KEY, next)
-    }
-  }
+  const section = getContextSection(pathname)
+  const Icon = SECTION_ICONS[section]
 
   return (
-    <>
-      <button
-        type="button"
-        aria-label={t('common.help.open')}
-        onClick={() => handleOpenChange(true)}
-        className="glass-surface fixed right-4 bottom-4 z-40 inline-flex size-12 cursor-pointer items-center justify-center rounded-full text-foreground shadow-[0_18px_40px_-18px_color-mix(in_oklch,var(--ink)_45%,transparent)] transition-transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-foreground/30 md:right-6 md:bottom-6"
+    <Popover>
+      <PopoverTrigger
+        render={
+          <button
+            type="button"
+            aria-label={t('common.help.open')}
+            className="glass-surface fixed right-4 bottom-4 z-40 inline-flex size-12 cursor-pointer items-center justify-center rounded-full text-foreground shadow-[0_18px_40px_-18px_color-mix(in_oklch,var(--ink)_45%,transparent)] transition-transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-foreground/30 md:right-6 md:bottom-6"
+          >
+            <CircleHelp className="size-5" aria-hidden />
+          </button>
+        }
+      />
+      <PopoverContent
+        side="top"
+        align="end"
+        sideOffset={12}
+        className="relative isolate w-[min(22rem,calc(100vw-2rem))] overflow-hidden p-5"
       >
-        <CircleHelp className="size-5" aria-hidden />
-      </button>
-      <Dialog open={open} onOpenChange={handleOpenChange}>
-        <DialogContent className="max-h-[85svh] max-w-xl overflow-hidden border-border/70 bg-card/96 p-0 supports-[backdrop-filter]:bg-card/88 backdrop-blur-2xl backdrop-saturate-150 shadow-[0_28px_72px_rgb(15_23_42/0.16),inset_0_1px_0_rgb(255_255_255/0.42)] dark:bg-card/95 dark:supports-[backdrop-filter]:bg-card/82 dark:shadow-[0_28px_72px_rgb(0_0_0/0.48),inset_0_1px_0_rgb(255_255_255/0.08)] sm:max-w-2xl">
-          <DialogHeader className="px-5 pt-5">
-            <DialogTitle>{t('common.help.title')}</DialogTitle>
-            <DialogDescription>{t('common.help.description')}</DialogDescription>
-          </DialogHeader>
-          <div className="flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto px-5 pb-5">
-            <Tabs value={section} onValueChange={handleSectionChange} className="gap-4">
-              {/* shadcn's `TabsList` pins `h-8` under
-                  `group-data-horizontal/tabs:h-8` + uses `inline-flex` — a
-                  Tailwind `h-auto` / `grid` override via cn() doesn't reliably
-                  win through tailwind-merge + base-ui's render layer, so the
-                  list only allocates height for one row and any wrapped row
-                  overflows on top of the content below. Inline `style` wins
-                  deterministically against both. `flex-wrap` is the natural
-                  pairing — lets the height grow with content for free. Each
-                  trigger claims ~half the row via basis so two fit per row,
-                  with `whitespace-normal` so longer non-EN labels wrap in-cell
-                  instead of bleeding into their neighbour. */}
-              <TabsList className="flex w-full gap-2 rounded-xl bg-muted/70 p-1" style={{ height: 'auto' }}>
-                <TabsTrigger
-                  value="overview"
-                  className="min-h-9 flex-1 whitespace-normal px-3 py-2 text-center text-xs leading-tight sm:text-sm"
-                  style={{ height: 'auto' }}
-                >
-                  {t('common.help.tabs.overview')}
-                </TabsTrigger>
-                <TabsTrigger
-                  value="documents"
-                  className="min-h-9 flex-1 whitespace-normal px-3 py-2 text-center text-xs leading-tight sm:text-sm"
-                  style={{ height: 'auto' }}
-                >
-                  {t('common.help.tabs.documents')}
-                </TabsTrigger>
-                <TabsTrigger
-                  value="results"
-                  className="min-h-9 flex-1 whitespace-normal px-3 py-2 text-center text-xs leading-tight sm:text-sm"
-                  style={{ height: 'auto' }}
-                >
-                  {t('common.help.tabs.results')}
-                </TabsTrigger>
-              </TabsList>
-              <TabsContent value="overview" className="mt-0">
-                <HelpCard
-                  icon={<Waypoints className="size-4" aria-hidden />}
-                  title={t('common.help.overview.title')}
-                  body={t('common.help.overview.body')}
-                  bullets={[
-                    t('common.help.overview.point1'),
-                    t('common.help.overview.point2'),
-                    t('common.help.overview.point3')
-                  ]}
-                />
-              </TabsContent>
-              <TabsContent value="documents" className="mt-0">
-                <HelpCard
-                  icon={<FileText className="size-4" aria-hidden />}
-                  title={t('common.help.documents.title')}
-                  body={t('common.help.documents.body')}
-                  bullets={[
-                    t('common.help.documents.point1'),
-                    t('common.help.documents.point2'),
-                    t('common.help.documents.point3')
-                  ]}
-                />
-              </TabsContent>
-              <TabsContent value="results" className="mt-0">
-                <HelpCard
-                  icon={<PlayCircle className="size-4" aria-hidden />}
-                  title={t('common.help.results.title')}
-                  body={t('common.help.results.body')}
-                  bullets={[
-                    t('common.help.results.point1'),
-                    t('common.help.results.point2'),
-                    t('common.help.results.point3')
-                  ]}
-                />
-              </TabsContent>
-            </Tabs>
-            <div className="flex items-center justify-between rounded-xl border border-border/80 bg-muted/40 px-4 py-3">
-              <p className="pr-3 text-xs text-muted-foreground">{t('common.help.footer')}</p>
-              <Button type="button" variant="outline" onClick={() => setOpen(false)}>
-                {t('common.button.done')}
-              </Button>
-            </div>
-          </div>
-        </DialogContent>
-      </Dialog>
-    </>
-  )
-}
-
-function HelpCard({
-  icon,
-  title,
-  body,
-  bullets
-}: {
-  icon: React.ReactNode
-  title: string
-  body: string
-  bullets: string[]
-}) {
-  return (
-    <div className="paper-card rounded-[14px] p-4">
-      <div className="flex items-center gap-2">
-        <div className="flex size-8 items-center justify-center rounded-md bg-[color:var(--primary)]/10 text-[color:var(--primary)]">
-          {icon}
+        {/* Civic-handbook grid texture, matches other accent-strip cards */}
+        <div
+          aria-hidden
+          className="pointer-events-none absolute inset-0 opacity-[0.04]"
+          style={{
+            backgroundImage:
+              'linear-gradient(to right, currentColor 1px, transparent 1px), linear-gradient(to bottom, currentColor 1px, transparent 1px)',
+            backgroundSize: '28px 28px'
+          }}
+        />
+        <span
+          aria-hidden
+          className="pointer-events-none absolute inset-y-5 left-0 w-[3px] rounded-r-full bg-[color:var(--hibiscus)]/70"
+        />
+        <div className="relative flex items-center gap-2.5">
+          <span className="flex size-8 items-center justify-center rounded-md bg-[color:var(--hibiscus)]/10 text-[color:var(--hibiscus)]">
+            <Icon className="size-4" aria-hidden />
+          </span>
+          <h3 className="font-heading text-base font-semibold tracking-tight">
+            {t(`common.help.${section}.title`)}
+          </h3>
         </div>
-        <h3 className="font-heading text-base font-semibold tracking-tight">{title}</h3>
-      </div>
-      <p className="mt-3 text-sm leading-relaxed text-muted-foreground">{body}</p>
-      <ul className="mt-3 space-y-2 text-sm text-muted-foreground">
-        {bullets.map((item) => (
-          <li key={item}>{item}</li>
-        ))}
-      </ul>
-    </div>
+        <p className="relative mt-3 text-[13px] leading-[1.55] text-foreground/65">
+          {t(`common.help.${section}.body`)}
+        </p>
+        <ul className="relative mt-3 flex flex-col gap-1.5 text-[12.5px] leading-[1.55] text-foreground/65">
+          {(['point1', 'point2', 'point3'] as const).map((key) => (
+            <li key={key} className="flex gap-2">
+              <span
+                aria-hidden
+                className="mt-[7px] size-1 shrink-0 rounded-full bg-[color:var(--hibiscus)]/55"
+              />
+              <span>{t(`common.help.${section}.${key}`)}</span>
+            </li>
+          ))}
+        </ul>
+      </PopoverContent>
+    </Popover>
   )
 }

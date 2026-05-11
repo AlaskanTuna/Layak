@@ -63,14 +63,14 @@
         "results": "After results"
       },
       "overview": {
-        "title": "How Layak works",
+        "title": "How Layak Works",
         "body": "Layak turns one evaluation into a guided flow: understand your profile, match schemes, estimate upside, then prepare draft packets for you to review.",
         "point1": "Start with sample data if you want a no-risk walkthrough first.",
         "point2": "Upload or type your details, then wait for the pipeline to finish.",
         "point3": "Use the results page to review schemes and download your draft packet."
       },
       "documents": {
-        "title": "What documents to prepare",
+        "title": "What Documents to Prepare",
         "body": "The upload path works best when your files are recent, readable, and cropped to the important details.",
         "point1": "Use the front of your IC, your latest payslip, and your latest utility bill.",
         "point2": "Make sure names, dates, addresses, and RM amounts are easy to read.",
@@ -84,7 +84,7 @@
         "point3": "Both demos are synthetic and safe to explore."
       },
       "results": {
-        "title": "What happens after results",
+        "title": "What Happens After Results",
         "body": "The results page is where you decide what to do next: review matched schemes, inspect the draft packet, or start another evaluation.",
         "point1": "Check why each scheme matched before you act on it.",
         "point2": "Download the draft packet and review it carefully.",

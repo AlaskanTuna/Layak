@@ -104,6 +104,7 @@ export function SettingsPage() {
         title={t('settings.title')}
         description={t('settings.description')}
         illustration="/dashboard/settings.webp"
+        illustrationClassName="sm:bottom-0 lg:-bottom-2"
       />
 
       {actionError && (

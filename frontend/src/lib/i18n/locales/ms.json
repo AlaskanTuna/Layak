@@ -313,6 +313,18 @@
         "error": "Penilaian gagal"
       }
     },
+    "kpi": {
+      "ariaLabel": "Ringkasan papan pemuka",
+      "draftsReady": "Draf Sedia",
+      "highestRelief": "Pelepasan Tertinggi",
+      "successfulRuns": "Larian Berjaya",
+      "schemesTracked": "Skim Dipantau"
+    },
+    "spotlight": {
+      "title": "Skim yang Layak pantau",
+      "viewAll": "Lihat semua skim",
+      "explore": "Terokai"
+    },
     "quota": {
       "tierFree": "Peringkat percuma · 24 jam",
       "tierPro": "Pro · tanpa had",

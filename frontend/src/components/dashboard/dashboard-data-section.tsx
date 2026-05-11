@@ -5,6 +5,8 @@ import { AlertTriangle, Loader2 } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 
 import { ActiveApplications } from '@/components/dashboard/active-applications'
+import { DashboardKpiStrip } from '@/components/dashboard/dashboard-kpi-strip'
+import { DashboardSchemesSpotlight } from '@/components/dashboard/dashboard-schemes-spotlight'
 import { RecentActivity } from '@/components/dashboard/recent-activity'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
@@ -94,9 +96,13 @@ export function DashboardDataSection() {
   }
 
   return (
-    <div className="grid grid-cols-1 gap-8 lg:grid-cols-[1fr_22rem]">
-      <ActiveApplications items={items} />
-      <RecentActivity items={items} />
+    <div className="flex flex-col gap-6">
+      <DashboardKpiStrip items={items} />
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-[1fr_22rem]">
+        <ActiveApplications items={items} />
+        <RecentActivity items={items} />
+      </div>
+      <DashboardSchemesSpotlight />
     </div>
   )
 }

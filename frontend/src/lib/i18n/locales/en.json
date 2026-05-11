@@ -313,6 +313,18 @@
         "error": "Evaluation Failed"
       }
     },
+    "kpi": {
+      "ariaLabel": "Dashboard summary",
+      "draftsReady": "Drafts Ready",
+      "highestRelief": "Highest Relief Found",
+      "successfulRuns": "Successful Runs",
+      "schemesTracked": "Schemes Tracked"
+    },
+    "spotlight": {
+      "title": "Schemes Layak watches",
+      "viewAll": "View all schemes",
+      "explore": "Explore"
+    },
     "quota": {
       "tierFree": "Free Tier · 24H",
       "tierPro": "Pro · Unlimited",

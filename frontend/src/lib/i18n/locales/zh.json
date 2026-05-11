@@ -302,6 +302,18 @@
         "error": "评估失败"
       }
     },
+    "kpi": {
+      "ariaLabel": "仪表盘摘要",
+      "draftsReady": "可提交草稿",
+      "highestRelief": "最高补助金额",
+      "successfulRuns": "成功评估",
+      "schemesTracked": "纳入的方案"
+    },
+    "spotlight": {
+      "title": "Layak 关注的方案",
+      "viewAll": "查看全部方案",
+      "explore": "浏览"
+    },
     "quota": {
       "tierFree": "免费层级 · 24 小时",
       "tierPro": "Pro · 无限量",

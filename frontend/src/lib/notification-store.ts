@@ -63,6 +63,23 @@ function nextId(): string {
   return `${Date.now()}-${Math.random().toString(36).slice(2, 6)}`
 }
 
+/**
+ * Sonner dispatch. Imported dynamically and guarded behind `window` because
+ * the store is consumed from both server and client modules — the toast
+ * call must be a no-op during SSR. Sonner itself is ESM and tree-shakes
+ * the unused entry points; the dynamic import keeps cold-start lean.
+ */
+async function fireToast(options: NotifyOptions): Promise<void> {
+  if (typeof window === 'undefined') return
+  const { toast } = await import('sonner')
+  const severity = options.severity ?? 'info'
+  const variant = toast[severity] ?? toast.message
+  variant(options.title, {
+    description: options.description,
+    duration: options.toastDurationMs ?? 4000
+  })
+}
+
 export const notificationStore = {
   get: getSnapshot,
   subscribe,
@@ -88,6 +105,9 @@ export const notificationStore = {
       ...filtered
     ].slice(0, 50)
     emit()
+    if (options.toast) {
+      void fireToast(options)
+    }
   },
   /** Backward-compat wrapper. Routes to notify() with severity='info'. */
   push(title: string, description: string): void {

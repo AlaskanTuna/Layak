@@ -156,10 +156,6 @@ export function FloatingHelpLauncher() {
      
     setAnchorEl(el)
     el.scrollIntoView({ behavior: 'smooth', block: 'center', inline: 'nearest' })
-    el.setAttribute('data-tour-highlight', '')
-    return () => {
-      el.removeAttribute('data-tour-highlight')
-    }
   }, [open, currentStep])
 
   function handleOpenChange(next: boolean) {

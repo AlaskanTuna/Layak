@@ -609,18 +609,3 @@
   .fade-rise { animation: none; opacity: 1; transform: none; }
 }
 
-/* Tour-guide highlight — applied to the element the active help-popover step
-   is anchored to. Renders a hibiscus ring + soft glow so the user can spot
-   the target at a glance. z-index 45 sits above normal page content but
-   below the popover itself (z-100). */
-[data-tour-highlight] {
-  position: relative;
-  z-index: 45;
-  box-shadow:
-    0 0 0 3px color-mix(in oklch, var(--hibiscus) 60%, transparent),
-    0 22px 60px -16px color-mix(in oklch, var(--hibiscus) 38%, transparent);
-  transition: box-shadow 250ms ease;
-}
-@media (prefers-reduced-motion: reduce) {
-  [data-tour-highlight] { transition: none; }
-}

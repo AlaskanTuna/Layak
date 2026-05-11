@@ -51,7 +51,8 @@ export function PersistedPacketDownload({ evalId, matches }: Props) {
       notificationStore.notify({
         title: t('common.notifications.events.packetDownloaded.title'),
         description: t('common.notifications.events.packetDownloaded.body'),
-        severity: 'success'
+        severity: 'success',
+        toast: true
       })
     } catch (err) {
       setError(err instanceof Error ? err.message : String(err))

@@ -8,14 +8,18 @@ import { Toaster } from 'sonner'
 /**
  * Theme-aware sonner toast layer. Mounted once in the root layout.
  *
- * - Position: bottom-center, stacked (max 4 visible, older queue offscreen).
+ * - Position: bottom-center, expanded stack (each toast at full size) so a
+ *   chain of notifications reads as a clean list rather than a fanned pile
+ *   with scale-shrunk back members.
  * - Theme is read from next-themes' `resolvedTheme`. The first server-render
  *   pass returns undefined; we delay rendering the Toaster until hydration
  *   to avoid a one-frame light-theme flash for hard-refresh-into-dark.
- * - Toasts inherit the .layak-toast class so globals.css can override the
- *   surface and add the severity accent bar.
- * - Severity icons are passed through the `icons` slot so they render
- *   inline with the title at lucide's 3.5 (14px) size.
+ * - Toasts inherit the .layak-toast class so globals.css styles the surface
+ *   to match `.paper-card`. Severity is communicated by the inline lucide
+ *   icon below — no accent strip.
+ * - Animations are sonner-native (slide-in from bottom + fade-out). We don't
+ *   add CSS transitions on the toast surface because they fight sonner's
+ *   data-state transforms.
  */
 export function AppToaster() {
   const { resolvedTheme } = useTheme()
@@ -33,10 +37,11 @@ export function AppToaster() {
       position="bottom-center"
       theme={resolvedTheme === 'dark' ? 'dark' : 'light'}
       duration={4000}
-      visibleToasts={4}
+      visibleToasts={3}
+      expand
       closeButton={false}
       richColors={false}
-      gap={8}
+      gap={12}
       toastOptions={{ className: 'layak-toast' }}
       icons={{
         success: <CheckCircle2 className="size-3.5 text-[color:var(--forest)]" aria-hidden />,

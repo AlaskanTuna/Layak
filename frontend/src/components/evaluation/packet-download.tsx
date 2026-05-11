@@ -24,6 +24,7 @@ function DraftRow({ draft }: { draft: PacketDraft }) {
       title: t('common.notifications.events.packetDownloaded.title'),
       description: t('common.notifications.events.packetDownloaded.body'),
       severity: 'success',
+      toast: true
     })
   }
 

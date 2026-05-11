@@ -5,15 +5,8 @@ import { useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import { Button } from '@/components/ui/button'
-import { notificationStore, useNotifications, type NotificationSeverity } from '@/lib/notification-store'
+import { notificationStore, useNotifications } from '@/lib/notification-store'
 import { cn } from '@/lib/utils'
-
-const SEVERITY_BAR: Record<NotificationSeverity, string> = {
-  success: 'var(--forest)',
-  error: 'var(--hibiscus)',
-  warning: 'var(--warning)',
-  info: 'var(--primary)'
-}
 
 export function NotificationMenu() {
   const { t } = useTranslation()
@@ -94,11 +87,6 @@ export function NotificationMenu() {
                 className="group relative p-4 transition-colors hover:bg-accent/40"
                 onClick={() => notificationStore.markAsRead(n.id)}
               >
-                <span
-                  aria-hidden
-                  className="absolute inset-y-2 left-0 w-[2px] rounded-r-sm"
-                  style={{ background: SEVERITY_BAR[n.severity] }}
-                />
                 <div className="flex items-start gap-2 pr-6">
                   <div className="flex-1">
                     <div className="flex items-center gap-2">

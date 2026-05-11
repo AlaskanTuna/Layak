@@ -49,6 +49,16 @@ export function DashboardContinueRail({ items, phase, errorMessage, onRetry }: P
 
   return (
     <aside className="paper-card relative isolate flex h-full flex-col gap-5 overflow-hidden rounded-[18px] p-5 sm:p-6">
+      {/* Civic-handbook grid texture, identical to the hero PageHeading */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-0 opacity-[0.04]"
+        style={{
+          backgroundImage:
+            'linear-gradient(to right, currentColor 1px, transparent 1px), linear-gradient(to bottom, currentColor 1px, transparent 1px)',
+          backgroundSize: '28px 28px'
+        }}
+      />
       <span
         aria-hidden
         className="pointer-events-none absolute inset-y-5 left-0 w-[3px] rounded-r-full bg-[color:var(--hibiscus)]/70 sm:inset-y-6"

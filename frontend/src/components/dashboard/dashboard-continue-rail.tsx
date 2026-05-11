@@ -68,20 +68,20 @@ export function DashboardContinueRail({ items, phase, errorMessage, onRetry }: P
         src="/dashboard/continue.webp"
         alt=""
         aria-hidden
-        className="pointer-events-none absolute -right-2 -bottom-2 size-28 select-none opacity-95 sm:right-2 sm:bottom-2 sm:size-44"
+        className="pointer-events-none absolute -right-2 -bottom-2 size-20 select-none opacity-95 sm:right-2 sm:bottom-2 sm:size-44"
         loading="lazy"
         onError={(e) => {
           ;(e.currentTarget as HTMLImageElement).style.display = 'none'
         }}
       />
-      {/* Responsive fades — strong on mobile to keep the resume card text
-          crisp, subtle on sm+ so the illustration stays vivid. */}
+      {/* Responsive fades — heavy on mobile so the resume card stays crisp,
+          subtle on sm+ so the illustration stays vivid. */}
       <span
         aria-hidden
         className="pointer-events-none absolute inset-0 sm:hidden"
         style={{
           background:
-            'linear-gradient(to left, color-mix(in oklch, var(--paper) 90%, transparent) 0%, color-mix(in oklch, var(--paper) 55%, transparent) 30%, transparent 65%), linear-gradient(to top, color-mix(in oklch, var(--paper) 90%, transparent) 0%, color-mix(in oklch, var(--paper) 55%, transparent) 30%, transparent 65%)'
+            'linear-gradient(to left, var(--paper) 0%, color-mix(in oklch, var(--paper) 80%, transparent) 35%, transparent 75%), linear-gradient(to top, var(--paper) 0%, color-mix(in oklch, var(--paper) 80%, transparent) 35%, transparent 75%)'
         }}
       />
       <span

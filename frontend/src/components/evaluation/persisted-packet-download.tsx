@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { AlertTriangle, Download, Loader2, ShieldCheck } from 'lucide-react'
+import { AlertTriangle, Download, Loader2 } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 
 import { Button } from '@/components/ui/button'
@@ -58,16 +58,9 @@ export function PersistedPacketDownload({ evalId, matches }: Props) {
 
   return (
     <section className="paper-card rounded-[14px] p-5">
-      <header className="mb-4 flex flex-col gap-1 border-b border-foreground/10 pb-4">
-        <p className="mono-caption text-[color:var(--hibiscus)]">{t('evaluation.packet.eyebrow')}</p>
-        <h3 className="flex items-center gap-2 font-heading text-[15px] font-semibold tracking-tight">
-          <ShieldCheck className="size-4 text-foreground/55" aria-hidden />
-          {qualifyingCount === 1
-            ? t('evaluation.packet.titleSchemeSingular', { count: qualifyingCount })
-            : t('evaluation.packet.titleSchemePlural', { count: qualifyingCount })}
-        </h3>
-        <p className="text-xs leading-relaxed text-foreground/65">{t('evaluation.packet.description')}</p>
-      </header>
+      <p className="mb-4 border-b border-foreground/10 pb-3 text-xs leading-relaxed text-foreground/65">
+        {t('evaluation.packet.description')}
+      </p>
       <Button type="button" onClick={handleDownload} disabled={busy} size="lg" className="w-full sm:w-auto">
         {busy ? (
           <>

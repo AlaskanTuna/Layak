@@ -1,7 +1,7 @@
 'use client'
 
 import { useCallback, useEffect, useRef, useState } from 'react'
-import { AlertTriangle, ChevronDown, Download, Eye, FileText, Loader2 } from 'lucide-react'
+import { AlertTriangle, ChevronDown, Download, FileText, Loader2 } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 
 import { Button } from '@/components/ui/button'
@@ -123,14 +123,9 @@ export function DraftPacketPreview({ evalId, matches }: Props) {
 
   return (
     <section className="paper-card rounded-[14px] p-5">
-      <header className="mb-4 flex flex-col gap-1 border-b border-foreground/10 pb-4">
-        <p className="mono-caption text-[color:var(--hibiscus)]">Preview</p>
-        <h3 className="flex items-center gap-2 font-heading text-[15px] font-semibold tracking-tight">
-          <Eye className="size-4 text-foreground/55" aria-hidden />
-          {t('evaluation.preview.title', { count: qualifying.length })}
-        </h3>
-        <p className="text-xs leading-relaxed text-foreground/65">{t('evaluation.preview.description')}</p>
-      </header>
+      <p className="mb-4 border-b border-foreground/10 pb-3 text-xs leading-relaxed text-foreground/65">
+        {t('evaluation.preview.description')}
+      </p>
       <div className="flex flex-col gap-2">
         {qualifying.map((match) => {
           const isOpen = openSchemeId === match.scheme_id

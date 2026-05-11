@@ -73,25 +73,6 @@ export function SchemeCardGrid({ matches }: Props) {
                 'paper-card relative isolate flex scroll-mt-24 flex-col gap-4 overflow-hidden rounded-[14px] p-5 transition-shadow hover:shadow-[0_24px_50px_-22px_color-mix(in_oklch,var(--ink)_28%,transparent)]'
               )}
             >
-              {isTop && (
-                <>
-                  {/* Civic-handbook grid texture, paired with the hibiscus
-                      accent strip below */}
-                  <div
-                    aria-hidden
-                    className="pointer-events-none absolute inset-0 opacity-[0.04]"
-                    style={{
-                      backgroundImage:
-                        'linear-gradient(to right, currentColor 1px, transparent 1px), linear-gradient(to bottom, currentColor 1px, transparent 1px)',
-                      backgroundSize: '28px 28px'
-                    }}
-                  />
-                  <span
-                    aria-hidden
-                    className="pointer-events-none absolute inset-y-5 left-0 w-[3px] rounded-r-full bg-[color:var(--hibiscus)]/70"
-                  />
-                </>
-              )}
               <header className="flex flex-col gap-2">
                 <div className="flex items-center justify-between gap-2">
                   <span className="mono-caption text-[color:var(--primary)]">{category}</span>

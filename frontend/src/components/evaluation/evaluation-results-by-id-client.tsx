@@ -306,15 +306,21 @@ export function EvaluationResultsByIdClient({ evalId }: { evalId: string }) {
                 <section
                   id="preview"
                   aria-label={t('evaluation.results.toc.preview')}
-                  className="scroll-mt-28 lg:scroll-mt-20"
+                  className="flex scroll-mt-28 flex-col gap-4 lg:scroll-mt-20"
                 >
+                  <h2 className="font-heading text-xl font-semibold tracking-tight">
+                    {t('evaluation.results.toc.preview')}
+                  </h2>
                   <DraftPacketPreview evalId={evalId} matches={doc.matches} />
                 </section>
                 <section
                   id="download"
                   aria-label={t('evaluation.results.toc.download')}
-                  className="flex scroll-mt-28 flex-col gap-5 lg:scroll-mt-20"
+                  className="flex scroll-mt-28 flex-col gap-4 lg:scroll-mt-20"
                 >
+                  <h2 className="font-heading text-xl font-semibold tracking-tight">
+                    {t('evaluation.results.toc.download')}
+                  </h2>
                   <PersistedPacketDownload evalId={evalId} matches={doc.matches} />
                   <div className="flex border-t border-foreground/10 pt-5">
                     <Button

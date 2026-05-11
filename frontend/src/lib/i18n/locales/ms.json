@@ -41,35 +41,35 @@
       "empty": "Tiada pemberitahuan",
       "events": {
         "evalComplete": {
-          "title": "Penilaian selesai",
+          "title": "Penilaian Selesai",
           "body": "Larian anda selesai — {{count}} skim padanan."
         },
         "evalCompleteEmpty": {
-          "title": "Penilaian selesai",
+          "title": "Penilaian Selesai",
           "body": "Tiada skim layak buat masa ini."
         },
         "evalFailed": {
-          "title": "Penilaian gagal",
+          "title": "Penilaian Gagal",
           "body": "{{category}} — cuba lagi atau tukar ke kemasukan manual."
         },
         "quotaApproaching": {
-          "title": "Hampir habis kuota percuma",
+          "title": "Hampir Habis Kuota Percuma",
           "body": "1 penilaian lagi dalam tetingkap 24 jam anda."
         },
         "quotaExceeded": {
-          "title": "Had harian dicapai",
+          "title": "Had Harian Dicapai",
           "body": "Anda telah menggunakan kesemua 5 penilaian. Set semula dalam {{hours}} jam."
         },
         "batchDeleteSuccess": {
-          "title": "Penilaian dipadamkan",
+          "title": "Penilaian Dipadamkan",
           "body": "{{count}} penilaian dialih keluar daripada sejarah."
         },
         "batchDeleteFailure": {
-          "title": "Tidak dapat memadam penilaian",
+          "title": "Tidak Dapat Memadam Penilaian",
           "body": "{{message}}"
         },
         "packetDownloaded": {
-          "title": "Pakej sedia",
+          "title": "Pakej Sedia",
           "body": "ZIP disimpan ke folder muat turun anda."
         }
       }

@@ -41,35 +41,35 @@
       "empty": "No notifications",
       "events": {
         "evalComplete": {
-          "title": "Evaluation complete",
+          "title": "Evaluation Complete",
           "body": "Your run finished — {{count}} scheme(s) matched."
         },
         "evalCompleteEmpty": {
-          "title": "Evaluation complete",
+          "title": "Evaluation Complete",
           "body": "No qualifying schemes this round."
         },
         "evalFailed": {
-          "title": "Evaluation failed",
+          "title": "Evaluation Failed",
           "body": "{{category}} — try again or switch to manual entry."
         },
         "quotaApproaching": {
-          "title": "Almost out of free runs",
+          "title": "Almost Out of Free Runs",
           "body": "1 evaluation left in your 24-hour window."
         },
         "quotaExceeded": {
-          "title": "Daily limit reached",
+          "title": "Daily Limit Reached",
           "body": "You've used all 5 evaluations. Resets in {{hours}}h."
         },
         "batchDeleteSuccess": {
-          "title": "Evaluations deleted",
+          "title": "Evaluations Deleted",
           "body": "{{count}} evaluation(s) removed from history."
         },
         "batchDeleteFailure": {
-          "title": "Couldn't delete evaluations",
+          "title": "Couldn't Delete Evaluations",
           "body": "{{message}}"
         },
         "packetDownloaded": {
-          "title": "Packet ready",
+          "title": "Packet Ready",
           "body": "ZIP saved to your downloads."
         }
       }

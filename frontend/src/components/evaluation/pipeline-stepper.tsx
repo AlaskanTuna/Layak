@@ -17,7 +17,7 @@ function StepIcon({ status }: { status: StepStatus }) {
   if (status === 'complete')
     return <Check className="size-3.5 text-[color:var(--forest)]" aria-hidden />
   if (status === 'active')
-    return <Loader2 className="size-3.5 animate-spin text-[color:var(--hibiscus)]" aria-hidden />
+    return <Loader2 className="size-3.5 animate-spin text-[color:var(--primary)]" aria-hidden />
   if (status === 'error')
     return <AlertCircle className="size-3.5 text-[color:var(--hibiscus)]" aria-hidden />
   return <div className="size-2 rounded-full border border-foreground/35" aria-hidden />
@@ -40,7 +40,7 @@ export function PipelineStepper({ state, labelOverrides }: Props) {
       <div className="flex items-center gap-3">
         <div className="h-1 flex-1 overflow-hidden rounded-full bg-foreground/10">
           <div
-            className="h-full bg-[color:var(--hibiscus)] transition-all duration-500"
+            className="h-full bg-[color:var(--primary)] transition-all duration-500"
             style={{ width: `${percent}%` }}
           />
         </div>
@@ -58,7 +58,7 @@ export function PipelineStepper({ state, labelOverrides }: Props) {
               key={step}
               className={cn(
                 'flex items-center gap-3 rounded-[10px] border px-3 py-2.5 text-sm transition-colors',
-                status === 'active' && 'border-[color:var(--hibiscus)]/40 bg-[color:var(--hibiscus)]/[0.04]',
+                status === 'active' && 'border-[color:var(--primary)]/40 bg-[color:var(--primary)]/[0.04]',
                 status === 'complete' && 'border-[color:var(--forest)]/30 bg-[color:var(--forest)]/[0.04]',
                 status === 'error' && 'border-[color:var(--hibiscus)]/50 bg-[color:var(--hibiscus)]/[0.06]',
                 status === 'pending' && 'border-foreground/10'

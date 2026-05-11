@@ -149,8 +149,15 @@ export function EvaluationResultsByIdClient({ evalId }: { evalId: string }) {
 
   useEffect(() => {
     if (!doc) return
-    if (lastStatusRef.current === doc.status) return
+    const prev = lastStatusRef.current
     lastStatusRef.current = doc.status
+    if (prev === doc.status) return
+    // Only fire on a real transition FROM 'running' to a terminal state —
+    // i.e. the user was actively watching the pipeline finish in this session.
+    // When navigating into a historical (already-complete) eval from the
+    // history table, `prev` is `null` so we skip the emit; the streaming
+    // path's bell entry already captured the original completion at the time.
+    if (prev !== 'running') return
 
     if (doc.status === 'complete') {
       const qualifyingCount = doc.matches.filter((m) => m.qualifies).length

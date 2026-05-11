@@ -216,7 +216,7 @@ export function EvaluationUploadClient() {
                     variant="outline"
                     size="sm"
                     disabled={samplesBusy}
-                    className="gap-1.5 dark:bg-card dark:hover:bg-card/80"
+                    className="gap-1.5 dark:bg-card dark:hover:bg-secondary"
                   >
                     {samplesBusy ? (
                       <>
@@ -338,4 +338,3 @@ export function EvaluationUploadClient() {
     </div>
   )
 }
-

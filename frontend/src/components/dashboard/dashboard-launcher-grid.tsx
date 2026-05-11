@@ -103,9 +103,7 @@ export function DashboardLauncherGrid() {
 
               <div className="relative flex items-start gap-3">
                 <span
-                  className={`size-11 items-center justify-center rounded-md ${ACCENT[tile.accent]} ${
-                    isHero ? 'flex' : 'hidden sm:flex'
-                  }`}
+                  className={`flex size-11 items-center justify-center rounded-md ${ACCENT[tile.accent]}`}
                 >
                   <Icon className="size-5" aria-hidden />
                 </span>

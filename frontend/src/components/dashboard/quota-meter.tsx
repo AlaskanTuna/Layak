@@ -1,6 +1,6 @@
 'use client'
 
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { Loader2, Sparkles, Zap } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 
@@ -8,6 +8,7 @@ import { Badge } from '@/components/ui/badge'
 import { useAuth } from '@/lib/auth-context'
 import type { QuotaResponse } from '@/lib/agent-types'
 import { authedFetch } from '@/lib/firebase'
+import { notificationStore } from '@/lib/notification-store'
 import { cn } from '@/lib/utils'
 
 function getBackendUrl(): string {
@@ -46,6 +47,7 @@ export function QuotaMeter({ refreshKey, className }: QuotaMeterProps) {
   const { user, loading: authLoading } = useAuth()
   const [quota, setQuota] = useState<QuotaResponse | null>(null)
   const [phase, setPhase] = useState<'loading' | 'ready' | 'error'>('loading')
+  const prevRemainingRef = useRef<number | null>(null)
 
   const fetchQuota = useCallback(async () => {
     try {
@@ -56,11 +58,22 @@ export function QuotaMeter({ refreshKey, className }: QuotaMeterProps) {
       }
       const next = (await res.json()) as QuotaResponse
       setQuota(next)
+      const prev = prevRemainingRef.current
+      prevRemainingRef.current = next.remaining
+      if (next.tier === 'free' && prev !== null && prev > 1 && next.remaining === 1) {
+        notificationStore.notify({
+          title: t('common.notifications.events.quotaApproaching.title'),
+          description: t('common.notifications.events.quotaApproaching.body'),
+          severity: 'warning',
+          toast: true,
+          groupKey: 'quota-warn'
+        })
+      }
       setPhase('ready')
     } catch {
       setPhase('error')
     }
-  }, [])
+  }, [t])
 
   // setState lands inside `fetchQuota` AFTER the await; the lint's strict
   // reading covers a synchronous-setState-in-effect pattern this code never

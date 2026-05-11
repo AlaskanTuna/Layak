@@ -81,7 +81,7 @@ export function DashboardContinueRail({ items, phase, errorMessage, onRetry }: P
         className="pointer-events-none absolute inset-0 sm:hidden"
         style={{
           background:
-            'linear-gradient(to left, var(--paper) 0%, color-mix(in oklch, var(--paper) 80%, transparent) 35%, transparent 75%), linear-gradient(to top, var(--paper) 0%, var(--paper) 35%, color-mix(in oklch, var(--paper) 90%, transparent) 55%, transparent 90%)'
+            'linear-gradient(to left, var(--paper) 0%, color-mix(in oklch, var(--paper) 80%, transparent) 35%, transparent 75%), linear-gradient(to top, var(--paper) 0%, var(--paper) 55%, color-mix(in oklch, var(--paper) 60%, transparent) 80%, transparent 100%)'
         }}
       />
       <span

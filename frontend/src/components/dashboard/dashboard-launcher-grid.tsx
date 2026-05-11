@@ -72,8 +72,8 @@ export function DashboardLauncherGrid() {
                 aria-hidden
                 className={`pointer-events-none absolute select-none transition-transform duration-500 group-hover:translate-y-[-2px] ${
                   isHero
-                    ? '-right-2 -bottom-2 size-44 opacity-95 sm:right-4 sm:bottom-2 sm:size-56 lg:size-64'
-                    : '-right-2 -bottom-2 size-36 opacity-95 sm:right-2 sm:bottom-2 sm:size-44'
+                    ? '-right-2 -bottom-2 size-32 opacity-95 sm:right-4 sm:bottom-2 sm:size-56 lg:size-64'
+                    : '-right-2 -bottom-2 size-24 opacity-95 sm:right-2 sm:bottom-2 sm:size-44'
                 }`}
                 loading="lazy"
                 onError={(e) => {
@@ -81,12 +81,20 @@ export function DashboardLauncherGrid() {
                 }}
               />
 
-              {/* Paper-coloured fade from bottom + right edges. Lifts text
-                  legibility when the illustration drifts under the title at
-                  narrower widths, and softens the image into the card. */}
+              {/* Responsive fades. Mobile: strong veil to keep text crisp on
+                  tight cards where the illustration crowds the title.
+                  sm+: subtle veil so the illustration stays vivid. */}
               <span
                 aria-hidden
-                className="pointer-events-none absolute inset-0"
+                className="pointer-events-none absolute inset-0 sm:hidden"
+                style={{
+                  background:
+                    'linear-gradient(to left, color-mix(in oklch, var(--paper) 90%, transparent) 0%, color-mix(in oklch, var(--paper) 55%, transparent) 30%, transparent 65%), linear-gradient(to top, color-mix(in oklch, var(--paper) 90%, transparent) 0%, color-mix(in oklch, var(--paper) 55%, transparent) 30%, transparent 65%)'
+                }}
+              />
+              <span
+                aria-hidden
+                className="pointer-events-none absolute inset-0 hidden sm:block"
                 style={{
                   background:
                     'linear-gradient(to left, color-mix(in oklch, var(--paper) 65%, transparent) 0%, color-mix(in oklch, var(--paper) 25%, transparent) 18%, transparent 40%), linear-gradient(to top, color-mix(in oklch, var(--paper) 65%, transparent) 0%, color-mix(in oklch, var(--paper) 25%, transparent) 20%, transparent 45%)'

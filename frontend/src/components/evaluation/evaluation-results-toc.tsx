@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import { cn } from '@/lib/utils'
@@ -23,6 +23,13 @@ type Props = {
 export function EvaluationResultsToc({ visibleSections }: Props) {
   const { t } = useTranslation()
   const [activeId, setActiveId] = useState<TocSectionId>(visibleSections[0] ?? 'overview')
+  // Click-lock: when the user clicks a TOC entry, we set activeId to that id
+  // immediately and suppress observer/scroll updates for a short window so
+  // the smooth-scroll animation doesn't fight the user's intent. This matters
+  // most at end-of-page where a short trailing section (Download Packet) can
+  // never crest into the rootMargin-defined active zone — geometry alone
+  // would always prefer the preceding section.
+  const clickLockUntilRef = useRef<number>(0)
 
   useEffect(() => {
     if (typeof window === 'undefined' || visibleSections.length === 0) return
@@ -41,18 +48,29 @@ export function EvaluationResultsToc({ visibleSections }: Props) {
       return total - scrolled < 48
     }
 
-    // Returns the id of whichever target currently sits inside the observer's
-    // active zone (the 25 %-tall strip from 20 % to 45 % from the viewport
-    // top), picking the topMost one. `null` if nothing intersects — that
-    // signals "fall back to the at-bottom pin if applicable".
+    // Pick the section that best matches the current scroll position:
+    //   - At end-of-page, prefer the *bottom-most* section in viewport so a
+    //     trailing short section (Download Packet) wins over a tall preceding
+    //     one (Inline Preview) when both happen to be visible.
+    //   - Otherwise prefer the topMost section in the 20–45 % active strip,
+    //     mirroring the IntersectionObserver's rootMargin geometry.
     function activeFromGeometry(): TocSectionId | null {
+      const atBottom = isAtPageBottom()
+      if (atBottom) {
+        let last: { id: TocSectionId; top: number } | null = null
+        for (const { id, el } of targets) {
+          const r = el.getBoundingClientRect()
+          if (r.bottom > 0 && r.top < window.innerHeight) {
+            if (last === null || r.top > last.top) last = { id, top: r.top }
+          }
+        }
+        return last?.id ?? null
+      }
       const top = window.innerHeight * 0.2
       const bottom = window.innerHeight * 0.45
       let best: { id: TocSectionId; top: number } | null = null
       for (const { id, el } of targets) {
         const r = el.getBoundingClientRect()
-        // A section is in the active zone if any part of its bbox crosses
-        // the strip. Pick the one whose top edge is highest in the strip.
         if (r.bottom > top && r.top < bottom) {
           if (best === null || r.top < best.top) best = { id, top: r.top }
         }
@@ -62,36 +80,35 @@ export function EvaluationResultsToc({ visibleSections }: Props) {
 
     const observer = new IntersectionObserver(
       (entries) => {
+        if (Date.now() < clickLockUntilRef.current) return
         const intersecting = entries.filter((e) => e.isIntersecting)
         if (intersecting.length > 0) {
-          const topMost = intersecting.reduce((best, entry) =>
-            entry.boundingClientRect.top < best.boundingClientRect.top ? entry : best
-          )
-          const id = (topMost.target as HTMLElement).id as TocSectionId
+          // At-bottom inverts the pick: take the bottom-most so a trailing
+          // short section can win even when a tall preceding section is also
+          // still partially in view.
+          const atBottom = isAtPageBottom()
+          const pick = intersecting.reduce((best, entry) => {
+            const a = entry.boundingClientRect.top
+            const b = best.boundingClientRect.top
+            return atBottom ? (a > b ? entry : best) : a < b ? entry : best
+          })
+          const id = (pick.target as HTMLElement).id as TocSectionId
           if (TOC_SECTIONS.includes(id)) {
             setActiveId(id)
             return
           }
         }
-        // No section in the active zone — apply the at-bottom fallback so the
-        // short trailing section (Download Packet) is still reachable.
+        // No section in the rootMargin'd active zone — pin to lastId so the
+        // short trailing section is still reachable at end-of-page.
         if (isAtPageBottom()) setActiveId(lastId)
       },
-      // The negative top margin pushes the "active zone" past the sticky
-      // topbar so a section is only marked active once it has crested into
-      // the readable area, not just touched the viewport edge.
       { rootMargin: '-20% 0% -55% 0%', threshold: [0, 0.25, 0.5, 0.75, 1] }
     )
 
     targets.forEach(({ el }) => observer.observe(el))
 
-    // Separate scroll listener for the at-bottom edge case — the observer
-    // only fires when an entry's intersection ratio crosses a threshold, so
-    // a user who scrolls within the same section won't re-trigger it. We
-    // only force-pin to `lastId` when geometry confirms no section is in
-    // the active zone; otherwise the previously-observed active section
-    // (e.g. Inline Preview after a TOC click) stays selected.
     function onScroll() {
+      if (Date.now() < clickLockUntilRef.current) return
       const geomActive = activeFromGeometry()
       if (geomActive !== null) {
         setActiveId(geomActive)
@@ -107,6 +124,23 @@ export function EvaluationResultsToc({ visibleSections }: Props) {
       window.removeEventListener('scroll', onScroll)
     }
   }, [visibleSections])
+
+  // Handle TOC link clicks directly so the active state reflects user intent
+  // regardless of whether the clicked section can be brought into the
+  // observer's active zone (e.g. a short trailing section at end-of-page).
+  const handleTocClick = useCallback((e: React.MouseEvent<HTMLAnchorElement>, id: TocSectionId) => {
+    e.preventDefault()
+    const el = document.getElementById(id)
+    if (!el) return
+    setActiveId(id)
+    // 800 ms covers the smooth-scroll animation; observer/scroll callbacks
+    // skip during this window, then resume normal geometry tracking.
+    clickLockUntilRef.current = Date.now() + 800
+    el.scrollIntoView({ behavior: 'smooth', block: 'start' })
+    if (typeof history !== 'undefined' && history.pushState) {
+      history.pushState(null, '', `#${id}`)
+    }
+  }, [])
 
   if (visibleSections.length === 0) return null
 
@@ -126,6 +160,7 @@ export function EvaluationResultsToc({ visibleSections }: Props) {
             <a
               key={id}
               href={`#${id}`}
+              onClick={(e) => handleTocClick(e, id)}
               aria-current={active ? 'true' : undefined}
               className={cn(
                 'shrink-0 whitespace-nowrap rounded-full border px-3 py-1 text-xs transition-colors',
@@ -154,6 +189,7 @@ export function EvaluationResultsToc({ visibleSections }: Props) {
                 <li key={id}>
                   <a
                     href={`#${id}`}
+                    onClick={(e) => handleTocClick(e, id)}
                     aria-current={active ? 'true' : undefined}
                     className={cn(
                       'relative block py-1.5 pl-3 text-sm leading-snug transition-colors',

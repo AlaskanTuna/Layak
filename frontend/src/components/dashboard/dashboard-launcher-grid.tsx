@@ -62,7 +62,7 @@ export function DashboardLauncherGrid() {
             <Link
               href={tile.href}
               className={`paper-card group relative flex h-full flex-col gap-5 overflow-hidden rounded-[18px] p-5 transition-shadow hover:shadow-[0_30px_70px_-22px_color-mix(in_oklch,var(--ink)_30%,transparent)] sm:p-6 ${
-                isHero ? 'min-h-[260px] sm:min-h-[280px]' : 'min-h-0 sm:min-h-[280px]'
+                isHero ? 'min-h-[200px] sm:min-h-[280px]' : 'min-h-0 sm:min-h-[280px]'
               }`}
             >
               {/* eslint-disable-next-line @next/next/no-img-element */}

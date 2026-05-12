@@ -1091,6 +1091,11 @@ Findings the audit flagged that were **not** acted on (cosmetic or external to P
 - On `/dashboard/evaluation/upload`, changed the `Try Sample Data` action to use a solid `bg-card` surface in both light and dark themes so it no longer reads as a half-transparent outline button.
 - Verified with targeted ESLint on `evaluation-upload-client.tsx` and a full `pnpm -C frontend build`.
 
+## [13/05/26] - Landing header scroll transparency restore
+
+- Restored the marketing topbar to start fully transparent at the top of the landing page, then gradually gain background opacity, border, blur, shadow, and foreground contrast as the user scrolls down.
+- Verified with targeted ESLint on `marketing-header.tsx` and a full `pnpm -C frontend build`.
+
 ## [13/05/26] - Alert recovery button underline fix
 
 - Scanned the frontend error/recovery surfaces and traced the underlined CTA bug to the shared `AlertTitle` and `AlertDescription` typography rules, which were underlining every nested anchor, including button-rendered links.

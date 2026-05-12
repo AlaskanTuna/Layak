@@ -82,9 +82,7 @@ export function PageHeading({
           // `lg:self-center` overrides the parent's `lg:items-start` so a tall
           // title block doesn't leave the action stranded at the top — it
           // sits centered against the text column instead.
-          <div
-            className={`flex shrink-0 lg:self-center ${illustration ? 'sm:mr-40 lg:mr-52' : 'lg:pt-1'}`}
-          >
+          <div className={`flex shrink-0 lg:self-center ${illustration ? 'sm:mr-40 lg:mr-52' : 'lg:pt-1'}`}>
             {action}
           </div>
         )}

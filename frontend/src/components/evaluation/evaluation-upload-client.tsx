@@ -214,20 +214,19 @@ export function EvaluationUploadClient() {
                   <Button
                     type="button"
                     variant="outline"
-                    size="sm"
                     disabled={samplesBusy}
-                    className="gap-1.5 dark:bg-card dark:hover:bg-secondary"
+                    className="h-11 gap-2 px-5 text-sm font-medium dark:bg-card dark:hover:bg-secondary"
                   >
                     {samplesBusy ? (
                       <>
-                        <Loader2 className="size-3.5 animate-spin" aria-hidden />
+                        <Loader2 className="size-4 animate-spin" aria-hidden />
                         {t('evaluation.upload.loadingSamples')}
                       </>
                     ) : (
                       <>
-                        <Sparkles className="size-3.5" aria-hidden />
+                        <Sparkles className="size-4" aria-hidden />
                         {t('evaluation.upload.sampleDropdownLabel')}
-                        <ChevronDown className="size-3.5 opacity-60" aria-hidden />
+                        <ChevronDown className="size-4 opacity-60" aria-hidden />
                       </>
                     )}
                   </Button>

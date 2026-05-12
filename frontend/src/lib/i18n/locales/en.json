@@ -581,15 +581,23 @@
       "steps": {
         "extract": {
           "title": "Extract",
-          "body": "We read your MyKad, payslip and utility bill, pulling income, IC last-6, and household size."
+          "body": "Read your documents and pull out the structured profile."
+        },
+        "classify": {
+          "title": "Classify",
+          "body": "Derive household band, filer type, and dependant counts."
         },
         "match": {
           "title": "Match",
-          "body": "Your profile is scored against every 2026 scheme — household tier, age, employment type, dependants."
+          "body": "Score your profile against every locked 2026 scheme."
+        },
+        "compute": {
+          "title": "Compute",
+          "body": "Sum the annual upside with Gemini-run Python."
         },
         "generate": {
           "title": "Generate",
-          "body": "Draft application packets are produced as PDFs you can lodge with the relevant agencies."
+          "body": "Produce watermarked draft packets you can lodge yourself."
         }
       }
     },
@@ -715,7 +723,10 @@
       "summaryRunning": "Layak's pipeline is running…",
       "summaryDone": "Layak's pipeline completed across {{count}} steps.",
       "summaryError": "Layak's pipeline stopped early — see the error below.",
-      "technicalLogLabel": "Technical execution log"
+      "technicalLogLabel": "Technical execution log",
+      "codeExecutionTitle": "Gemini Code Execution",
+      "codeExecutionSnippet": "python_snippet",
+      "codeExecutionStdout": "stdout"
     },
     "upload": {
       "sectionIc": "MyKad (IC)",

@@ -581,15 +581,23 @@
       "steps": {
         "extract": {
           "title": "Ekstrak",
-          "body": "Kami membaca MyKad, slip gaji dan bil utiliti anda — pendapatan, 6 digit IC akhir, saiz isi rumah."
+          "body": "Baca dokumen anda dan keluarkan profil berstruktur."
+        },
+        "classify": {
+          "title": "Kelaskan",
+          "body": "Terbitkan kelompok isi rumah, jenis pemfail, dan bilangan tanggungan."
         },
         "match": {
           "title": "Padan",
-          "body": "Profil anda dinilai terhadap setiap skim 2026 — kelompok isi rumah, umur, jenis pekerjaan, tanggungan."
+          "body": "Nilai profil anda terhadap setiap skim 2026 yang dikunci."
+        },
+        "compute": {
+          "title": "Kira",
+          "body": "Jumlahkan pelepasan tahunan dengan Python yang dijalankan oleh Gemini."
         },
         "generate": {
           "title": "Hasilkan",
-          "body": "Pakej draf permohonan dihasilkan sebagai PDF yang anda boleh hantar kepada agensi berkenaan."
+          "body": "Hasilkan pakej draf bertanda air yang boleh anda hantar sendiri."
         }
       }
     },
@@ -715,7 +723,10 @@
       "summaryRunning": "Saluran Layak sedang berjalan…",
       "summaryDone": "Saluran Layak telah selesai dalam {{count}} langkah.",
       "summaryError": "Saluran Layak terhenti awal — lihat ralat di bawah.",
-      "technicalLogLabel": "Log pelaksanaan teknikal"
+      "technicalLogLabel": "Log pelaksanaan teknikal",
+      "codeExecutionTitle": "Pelaksanaan Kod Gemini",
+      "codeExecutionSnippet": "python_snippet",
+      "codeExecutionStdout": "stdout"
     },
     "upload": {
       "sectionIc": "MyKad (IC)",

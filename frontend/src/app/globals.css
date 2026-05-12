@@ -507,6 +507,20 @@
 .fade-rise-delay-4 { animation-delay: 320ms; }
 .fade-rise-delay-5 { animation-delay: 400ms; }
 
+/* Cross-fade for cycling pipeline-narrative status labels */
+@keyframes cycle-fade {
+  0%   { opacity: 0; transform: translateY(-2px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+.cycle-fade {
+  animation: cycle-fade 320ms ease-out both;
+}
+@media (prefers-reduced-motion: reduce) {
+  .cycle-fade {
+    animation: none;
+  }
+}
+
 /* DRAFT stamp — slightly worn rubber-stamp look */
 .draft-stamp {
   font-family: var(--font-mono), ui-monospace, monospace;

@@ -1,11 +1,11 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { AlertCircle, Check, ChevronDown, Loader2, Terminal } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 
 import type { PipelineState, StepStatus } from '@/hooks/use-agent-pipeline'
-import { PIPELINE_STEPS, type Step } from '@/lib/agent-types'
+import { PIPELINE_STEPS, type PipelineNarrativeEvent, type Step } from '@/lib/agent-types'
 import { cn } from '@/lib/utils'
 
 type Props = {
@@ -18,6 +18,8 @@ type Props = {
    *  default to a single summary line on the persisted results page. */
   retrospective?: boolean
 }
+
+const CYCLE_MS = 3000
 
 function StepIcon({ status }: { status: StepStatus }) {
   if (status === 'complete') return <Check className="size-3.5 text-[color:var(--forest)]" aria-hidden />
@@ -39,12 +41,29 @@ export function PipelineNarrative({ state, labelOverrides, retrospective }: Prop
   const labelFor = (step: Step) => labelOverrides?.[step] ?? t(`evaluation.stepper.labels.${step}`)
   const statusLabel = (status: StepStatus): string => t(`common.stepper.${status}`)
 
+  // Map narrative events by step so the cycling status label can pull
+  // headline + data_point per row.
+  const narrativeByStep = useMemo(() => {
+    const map = new Map<Step, PipelineNarrativeEvent>()
+    for (const ev of state.narrativeEvents) {
+      // Latest event for a given step wins — matches the backend contract
+      // (one narrative event per step, emitted right after step_result).
+      map.set(ev.step, ev)
+    }
+    return map
+  }, [state.narrativeEvents])
+
   const summary =
     state.phase === 'done'
       ? t('evaluation.narrative.summaryDone', { count: state.narrativeEvents.length })
       : state.phase === 'error'
         ? t('evaluation.narrative.summaryError')
         : t('evaluation.narrative.summaryRunning')
+
+  const hasTechnical =
+    state.technicalEvents.length > 0 ||
+    Boolean(state.upside?.python_snippet) ||
+    Boolean(state.upside?.stdout)
 
   // Retrospective + collapsed → one-line summary with a chevron to expand.
   if (retrospective && collapsed) {
@@ -78,7 +97,6 @@ export function PipelineNarrative({ state, labelOverrides, retrospective }: Prop
         </header>
       )}
 
-      {/* Progress strip — preserves the existing pipeline-stepper feel */}
       <div className="flex items-center gap-3">
         <div className="h-1 flex-1 overflow-hidden rounded-full bg-foreground/10">
           <div
@@ -91,58 +109,11 @@ export function PipelineNarrative({ state, labelOverrides, retrospective }: Prop
         </span>
       </div>
 
-      {/* Tier 1 — Lay narration */}
-      <NarrativeLayer state={state} labelFor={labelFor} statusLabel={statusLabel} />
-
-      {/* Tier 2 — Technical transcript (collapsed by default) */}
-      {state.technicalEvents.length > 0 && (
-        <div className="flex flex-col gap-2 border-t border-foreground/10 pt-3">
-          <button
-            type="button"
-            onClick={() => setShowTechnical((v) => !v)}
-            aria-expanded={showTechnical}
-            className="inline-flex items-center gap-1.5 self-start text-xs font-medium text-foreground/70 hover:text-foreground"
-          >
-            <Terminal className="size-3.5" aria-hidden />
-            {showTechnical ? t('evaluation.narrative.hideTechnical') : t('evaluation.narrative.showTechnical')}
-            <ChevronDown
-              className={cn('size-3.5 transition-transform', showTechnical && 'rotate-180')}
-              aria-hidden
-            />
-          </button>
-          {showTechnical && <TechnicalLayer state={state} />}
-        </div>
-      )}
-
-      {state.error && (
-        <p className="mono-caption text-[color:var(--hibiscus)]" role="alert">
-          {state.error}
-        </p>
-      )}
-    </section>
-  )
-}
-
-function NarrativeLayer({
-  state,
-  labelFor,
-  statusLabel
-}: {
-  state: PipelineState
-  labelFor: (step: Step) => string
-  statusLabel: (status: StepStatus) => string
-}) {
-  // When narrative events haven't streamed yet (e.g., legacy persisted eval
-  // with no narrativeLog), fall back to the old stepper labels so the card
-  // doesn't go blank.
-  const fallback = state.narrativeEvents.length === 0
-
-  if (fallback) {
-    return (
       <ol className="flex flex-col gap-1.5">
         {PIPELINE_STEPS.map((step, index) => {
           const status = state.stepStates[step]
           const num = String(index + 1).padStart(2, '0')
+          const narrative = narrativeByStep.get(step) ?? null
           return (
             <li
               key={step}
@@ -174,49 +145,135 @@ function NarrativeLayer({
               >
                 {labelFor(step)}
               </span>
-              <span className="mono-caption text-foreground/45">{statusLabel(status)}</span>
+              <CyclingStatus status={status} statusLabel={statusLabel} narrative={narrative} />
             </li>
           )
         })}
       </ol>
-    )
-  }
 
-  // Backend-supplied narration — render headline + data point per event.
+      {hasTechnical && (
+        <div className="flex flex-col gap-2 border-t border-foreground/10 pt-3">
+          <button
+            type="button"
+            onClick={() => setShowTechnical((v) => !v)}
+            aria-expanded={showTechnical}
+            className="inline-flex items-center gap-1.5 self-start text-xs font-medium text-foreground/70 hover:text-foreground"
+          >
+            <Terminal className="size-3.5" aria-hidden />
+            {showTechnical ? t('evaluation.narrative.hideTechnical') : t('evaluation.narrative.showTechnical')}
+            <ChevronDown
+              className={cn('size-3.5 transition-transform', showTechnical && 'rotate-180')}
+              aria-hidden
+            />
+          </button>
+          {showTechnical && <TechnicalLayer state={state} />}
+        </div>
+      )}
+
+      {state.error && (
+        <p className="mono-caption text-[color:var(--hibiscus)]" role="alert">
+          {state.error}
+        </p>
+      )}
+    </section>
+  )
+}
+
+/**
+ * Right-aligned status pill that cross-fades through the step's status label
+ * + narrative headline + data point every {CYCLE_MS}ms. Pending/error rows
+ * skip the cycle and render a single static label.
+ */
+function CyclingStatus({
+  status,
+  statusLabel,
+  narrative
+}: {
+  status: StepStatus
+  statusLabel: (status: StepStatus) => string
+  narrative: PipelineNarrativeEvent | null
+}) {
+  const items = useMemo(() => {
+    const base = statusLabel(status)
+    if (status === 'pending' || status === 'error') return [base]
+    if (!narrative) return [base]
+    const out: string[] = [base, narrative.headline]
+    if (narrative.data_point) out.push(narrative.data_point)
+    return out
+  }, [status, statusLabel, narrative])
+
+  const [idx, setIdx] = useState(0)
+
+  useEffect(() => {
+    if (items.length <= 1) return
+    const id = setInterval(() => {
+      setIdx((i) => (i + 1) % items.length)
+    }, CYCLE_MS)
+    return () => clearInterval(id)
+  }, [items])
+
+  const safeIdx = items.length > 0 ? idx % items.length : 0
+  const label = items[safeIdx] ?? ''
   return (
-    <ol className="flex flex-col gap-1.5">
-      {state.narrativeEvents.map((ev, i) => (
-        <li
-          key={`${ev.step}-${i}`}
-          className="flex items-center gap-3 rounded-[10px] border border-[color:var(--forest)]/25 bg-[color:var(--forest)]/[0.04] px-3 py-2.5"
-        >
-          <span className="flex w-4 shrink-0 items-center justify-center">
-            <Check className="size-3.5 text-[color:var(--forest)]" aria-hidden />
-          </span>
-          <span className="flex-1 truncate font-sans text-[13.5px] font-medium text-foreground">
-            {ev.headline}
-          </span>
-          {ev.data_point && (
-            <span className="mono-caption shrink-0 tabular-nums text-foreground/65">{ev.data_point}</span>
-          )}
-        </li>
-      ))}
-    </ol>
+    <span
+      key={`${label}-${safeIdx}`}
+      className={cn(
+        'mono-caption cycle-fade ml-auto max-w-[200px] truncate text-right',
+        status === 'pending' ? 'text-foreground/45' : 'text-foreground/65'
+      )}
+      title={label}
+    >
+      {label}
+    </span>
   )
 }
 
 function TechnicalLayer({ state }: { state: PipelineState }) {
   const { t } = useTranslation()
+  const lines = state.technicalEvents
+    .map((ev) => `[${ev.timestamp.slice(11, 19)}] step=${ev.step}\n${ev.log_lines.join('\n')}`)
+    .join('\n\n')
+  const snippet = state.upside?.python_snippet?.trim()
+  const stdout = state.upside?.stdout?.trim()
   return (
-    <pre
-      tabIndex={0}
-      role="region"
-      aria-label={t('evaluation.narrative.technicalLogLabel')}
-      className="overflow-x-auto rounded-[8px] border border-foreground/15 bg-foreground/[0.04] p-3 font-mono text-[12px] leading-relaxed text-foreground/85"
-    >
-      {state.technicalEvents
-        .map((ev) => `[${ev.timestamp.slice(11, 19)}] step=${ev.step}\n${ev.log_lines.join('\n')}`)
-        .join('\n\n')}
-    </pre>
+    <div className="flex flex-col gap-3">
+      {lines && (
+        <pre
+          tabIndex={0}
+          role="region"
+          aria-label={t('evaluation.narrative.technicalLogLabel')}
+          className="overflow-x-auto rounded-[8px] border border-foreground/15 bg-foreground/[0.04] p-3 font-mono text-[12px] leading-relaxed text-foreground/85"
+        >
+          {lines}
+        </pre>
+      )}
+      {(snippet || stdout) && (
+        <div className="rounded-[8px] border border-foreground/15 bg-foreground/[0.04]">
+          <p className="mono-caption px-3 pt-2.5 text-[color:var(--primary)]">
+            {t('evaluation.narrative.codeExecutionTitle')}
+          </p>
+          {snippet && (
+            <div className="border-t border-foreground/10 px-3 pb-3 pt-2">
+              <p className="mono-caption text-foreground/55">
+                {t('evaluation.narrative.codeExecutionSnippet')}
+              </p>
+              <pre className="mt-1.5 overflow-x-auto font-mono text-[12px] leading-relaxed text-foreground/85">
+                {snippet}
+              </pre>
+            </div>
+          )}
+          {stdout && (
+            <div className="border-t border-foreground/10 px-3 pb-3 pt-2">
+              <p className="mono-caption text-foreground/55">
+                {t('evaluation.narrative.codeExecutionStdout')}
+              </p>
+              <pre className="mt-1.5 overflow-x-auto whitespace-pre-wrap font-mono text-[12px] leading-relaxed text-[color:var(--forest)]">
+                {stdout}
+              </pre>
+            </div>
+          )}
+        </div>
+      )}
+    </div>
   )
 }

@@ -581,15 +581,23 @@
       "steps": {
         "extract": {
           "title": "提取",
-          "body": "读取您的 MyKad、薪资单与水电账单，整理出收入、IC 末四位以及家庭规模。"
+          "body": "读取您的文件并整理出结构化档案。"
+        },
+        "classify": {
+          "title": "分类",
+          "body": "推导出家庭层级、申报人类型与受抚养人数。"
         },
         "match": {
           "title": "匹配",
-          "body": "您的档案会与每一项 2026 年方案对比 —— 家庭层级、年龄、就业类型、受抚养人。"
+          "body": "将您的档案对照每一项 2026 锁定方案。"
+        },
+        "compute": {
+          "title": "计算",
+          "body": "用 Gemini 运行 Python 汇总年度减免。"
         },
         "generate": {
           "title": "生成",
-          "body": "生成可直接提交给相关机构的申请草稿 PDF 包。"
+          "body": "生成可由您亲自提交的水印草稿包。"
         }
       }
     },
@@ -715,7 +723,10 @@
       "summaryRunning": "Layak 的流程正在运行…",
       "summaryDone": "Layak 的流程已完成共 {{count}} 个步骤。",
       "summaryError": "Layak 的流程提前中止 —— 请查看下方错误。",
-      "technicalLogLabel": "技术执行日志"
+      "technicalLogLabel": "技术执行日志",
+      "codeExecutionTitle": "Gemini 代码执行",
+      "codeExecutionSnippet": "python_snippet",
+      "codeExecutionStdout": "stdout"
     },
     "upload": {
       "sectionIc": "MyKad（身份证）",

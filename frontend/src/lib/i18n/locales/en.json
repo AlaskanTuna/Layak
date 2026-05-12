@@ -1017,6 +1017,14 @@
       "triggerSuccess": "{{checked}} sources checked, {{changed}} changed, {{extracted}} candidates extracted",
       "triggerErrorTitle": "Discovery Run Failed",
       "triggerError": "Discovery run failed: {{message}}",
+      "searchPlaceholder": "Search by name, agency, or source…",
+      "confidence": {
+        "band": {
+          "high": "above threshold",
+          "mid": "needs review",
+          "low": "low confidence"
+        }
+      },
       "filters": {
         "all": "All",
         "pending": "Pending",
@@ -1046,14 +1054,23 @@
         "deletePartialFailure": "Deleted {{deleted}} of {{total}}; {{failed}} failed.",
         "selectRowAria": "Select candidate {{name}}",
         "selectPageAria": "Select all candidates",
-        "deselectPageAria": "Deselect all candidates"
+        "deselectPageAria": "Deselect all candidates",
+        "paginationSummary": "Showing {{shown}} of {{total}}",
+        "sortAria": "Sort by {{column}}"
       },
       "health": {
         "title": "Scheme Verification Health",
         "subtitle": "Last successful verification per scheme from the discovery pipeline.",
         "empty": "No schemes verified yet. Trigger a discovery run to populate this list.",
-        "verifiedPrefix": "Source verified ",
-        "neverVerified": "Never verified"
+        "verifiedPrefix": "Verified ",
+        "neverVerified": "Never verified",
+        "countSummary": "{{healthy}} healthy · {{stale}} stale",
+        "dotAria": {
+          "healthy": "Verified within the last 7 days",
+          "stale": "Verified over 30 days ago",
+          "aging": "Verified within the last 30 days",
+          "never": "Never verified"
+        }
       },
       "detail": {
         "backToQueue": "← Back to Queue",
@@ -1085,7 +1102,18 @@
         "actionSuccess": "Done. Status is now {{status}}.",
         "actionError": "Action failed: {{message}}",
         "manifestReady": "Approved · YAML manifest persisted to candidate document",
-        "downloadManifest": "Download Manifest"
+        "downloadManifest": "Download Manifest",
+        "metaLine": "{{agency}} · {{scheme}} · Extracted {{extracted}}",
+        "metaLineUnmatched": "{{agency}} · No match · Extracted {{extracted}}",
+        "note": "Moderator Note",
+        "openSource": "Open Source",
+        "copyHashAria": "Copy content hash",
+        "copyHashSuccess": "Hash copied",
+        "newScheme": {
+          "title": "New Scheme",
+          "body": "No existing rule — manifest will be drafted for engineer review."
+        },
+        "decisionTitle": "Decision"
       },
       "notify": {
         "approve": {

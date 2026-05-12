@@ -1017,6 +1017,14 @@
       "triggerSuccess": "{{checked}} sumber diperiksa, {{changed}} berubah, {{extracted}} calon diekstrak",
       "triggerErrorTitle": "Penemuan gagal",
       "triggerError": "Penemuan gagal: {{message}}",
+      "searchPlaceholder": "Cari ikut nama, agensi, atau sumber…",
+      "confidence": {
+        "band": {
+          "high": "melebihi ambang",
+          "mid": "perlu disemak",
+          "low": "keyakinan rendah"
+        }
+      },
       "filters": {
         "all": "Semua",
         "pending": "Menunggu",
@@ -1046,14 +1054,23 @@
         "deletePartialFailure": "{{deleted}} daripada {{total}} dipadam; {{failed}} gagal.",
         "selectRowAria": "Pilih calon {{name}}",
         "selectPageAria": "Pilih semua calon",
-        "deselectPageAria": "Nyahpilih semua calon"
+        "deselectPageAria": "Nyahpilih semua calon",
+        "paginationSummary": "Menunjukkan {{shown}} daripada {{total}}",
+        "sortAria": "Susun ikut {{column}}"
       },
       "health": {
         "title": "Kesihatan pengesahan skim",
         "subtitle": "Pengesahan terakhir berjaya untuk setiap skim daripada saluran penemuan.",
         "empty": "Belum ada skim disahkan. Jalankan penemuan untuk mengisi senarai ini.",
-        "verifiedPrefix": "Sumber disahkan ",
-        "neverVerified": "Tidak pernah disahkan"
+        "verifiedPrefix": "Disahkan ",
+        "neverVerified": "Tidak pernah disahkan",
+        "countSummary": "{{healthy}} sihat · {{stale}} lama",
+        "dotAria": {
+          "healthy": "Disahkan dalam tempoh 7 hari yang lalu",
+          "stale": "Disahkan lebih 30 hari yang lalu",
+          "aging": "Disahkan dalam tempoh 30 hari yang lalu",
+          "never": "Tidak pernah disahkan"
+        }
       },
       "detail": {
         "backToQueue": "← Kembali ke barisan",
@@ -1085,7 +1102,18 @@
         "actionSuccess": "Selesai. Status kini {{status}}.",
         "actionError": "Tindakan gagal: {{message}}",
         "manifestReady": "Diluluskan · Manifes YAML disimpan dalam dokumen calon",
-        "downloadManifest": "Muat turun manifes"
+        "downloadManifest": "Muat turun manifes",
+        "metaLine": "{{agency}} · {{scheme}} · Diekstrak {{extracted}}",
+        "metaLineUnmatched": "{{agency}} · Tiada padanan · Diekstrak {{extracted}}",
+        "note": "Nota moderator",
+        "openSource": "Buka sumber",
+        "copyHashAria": "Salin cincang kandungan",
+        "copyHashSuccess": "Cincang disalin",
+        "newScheme": {
+          "title": "Skim baharu",
+          "body": "Tiada peraturan sedia ada — manifes akan dirangka untuk semakan jurutera."
+        },
+        "decisionTitle": "Keputusan"
       },
       "notify": {
         "approve": {

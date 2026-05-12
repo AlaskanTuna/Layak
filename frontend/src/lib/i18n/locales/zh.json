@@ -1017,6 +1017,14 @@
       "triggerSuccess": "已检查 {{checked}} 个来源，{{changed}} 个有变更，提取 {{extracted}} 个候选",
       "triggerErrorTitle": "发现运行失败",
       "triggerError": "发现运行失败：{{message}}",
+      "searchPlaceholder": "按名称、机构或来源搜索…",
+      "confidence": {
+        "band": {
+          "high": "超过阈值",
+          "mid": "需要审核",
+          "low": "置信度低"
+        }
+      },
       "filters": {
         "all": "全部",
         "pending": "待审",
@@ -1046,14 +1054,23 @@
         "deletePartialFailure": "已删除 {{total}} 项中的 {{deleted}} 项；{{failed}} 项失败。",
         "selectRowAria": "选择候选项 {{name}}",
         "selectPageAria": "选择全部候选项",
-        "deselectPageAria": "取消选择全部候选项"
+        "deselectPageAria": "取消选择全部候选项",
+        "paginationSummary": "显示 {{shown}} / {{total}}",
+        "sortAria": "按 {{column}} 排序"
       },
       "health": {
         "title": "计划验证健康状况",
         "subtitle": "发现管道针对每个计划的最近一次成功验证。",
         "empty": "尚无已验证的计划。运行发现以填充此列表。",
-        "verifiedPrefix": "来源已验证于 ",
-        "neverVerified": "从未验证"
+        "verifiedPrefix": "已验证 ",
+        "neverVerified": "从未验证",
+        "countSummary": "{{healthy}} 个健康 · {{stale}} 个陈旧",
+        "dotAria": {
+          "healthy": "近 7 天内验证",
+          "stale": "超过 30 天前验证",
+          "aging": "近 30 天内验证",
+          "never": "从未验证"
+        }
       },
       "detail": {
         "backToQueue": "← 返回队列",
@@ -1085,7 +1102,18 @@
         "actionSuccess": "完成。当前状态：{{status}}。",
         "actionError": "操作失败：{{message}}",
         "manifestReady": "已批准 · YAML 清单已保存到候选文档",
-        "downloadManifest": "下载清单"
+        "downloadManifest": "下载清单",
+        "metaLine": "{{agency}} · {{scheme}} · 提取于 {{extracted}}",
+        "metaLineUnmatched": "{{agency}} · 无匹配 · 提取于 {{extracted}}",
+        "note": "审核人备注",
+        "openSource": "打开来源",
+        "copyHashAria": "复制内容哈希",
+        "copyHashSuccess": "已复制哈希",
+        "newScheme": {
+          "title": "新计划",
+          "body": "未找到现有规则 —— 将为工程师审查起草清单。"
+        },
+        "decisionTitle": "决定"
       },
       "notify": {
         "approve": {

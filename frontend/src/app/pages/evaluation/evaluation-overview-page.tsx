@@ -22,7 +22,7 @@ export function EvaluationOverviewPage() {
           <Button
             render={<Link href="/dashboard/evaluation/upload" />}
             size="lg"
-            className="rounded-full bg-[color:var(--hibiscus)] px-5 text-[color:var(--hibiscus-foreground)] hover:bg-[color:var(--hibiscus)] [a]:hover:bg-[color:var(--hibiscus)]"
+            className="rounded-full bg-[color:var(--hibiscus)]/92 px-5 text-[color:var(--hibiscus-foreground)] backdrop-blur-md hover:bg-[color:var(--hibiscus)] [a]:hover:bg-[color:var(--hibiscus)]"
           >
             <Plus className="mr-1 size-4" aria-hidden />
             {t('evaluation.overview.createCta')}

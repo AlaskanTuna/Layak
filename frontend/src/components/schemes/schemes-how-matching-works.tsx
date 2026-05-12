@@ -38,7 +38,7 @@ export function SchemesHowMatchingWorks() {
       <Button
         render={<Link href="/dashboard/evaluation/upload" />}
         size="lg"
-        className="relative rounded-full bg-[color:var(--hibiscus)] px-6 text-[color:var(--hibiscus-foreground)] hover:bg-[color:var(--hibiscus)]/92"
+        className="relative rounded-full bg-[color:var(--hibiscus)]/92 px-6 text-[color:var(--hibiscus-foreground)] backdrop-blur-md hover:bg-[color:var(--hibiscus)]"
       >
         <Sparkles className="mr-1.5 size-4" aria-hidden />
         {t('schemes.howMatching.cta')}

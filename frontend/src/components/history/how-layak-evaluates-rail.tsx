@@ -53,7 +53,7 @@ export function HowLayakEvaluatesRail() {
                 <span className="mono-caption text-foreground/45 tabular-nums">
                   {String(index + 1).padStart(2, '0')}
                 </span>
-                <span className="flex size-9 items-center justify-center rounded-md bg-[color:var(--hibiscus)]/10 text-[color:var(--hibiscus)]">
+                <span className="flex size-9 items-center justify-center rounded-md bg-[color:var(--hibiscus)]/10 text-[color:var(--hibiscus)] backdrop-blur-md">
                   <Icon className="size-4" aria-hidden />
                 </span>
               </div>

@@ -148,7 +148,7 @@ export function ErrorRecoveryCard({ message, category, onUseSamples, onReset, on
             const primary = index === 0
             const label = ctaLabel(kind)
             const primaryClasses =
-              'flex-1 rounded-full bg-[color:var(--hibiscus)] text-[color:var(--hibiscus-foreground)] hover:bg-[color:var(--hibiscus)]/92'
+              'flex-1 rounded-full bg-[color:var(--hibiscus)]/92 text-[color:var(--hibiscus-foreground)] backdrop-blur-md hover:bg-[color:var(--hibiscus)]'
             const outlineClasses = 'flex-1 rounded-full'
             if (kind === 'settings') {
               return (

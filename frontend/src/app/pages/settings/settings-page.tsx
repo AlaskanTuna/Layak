@@ -122,7 +122,7 @@ export function SettingsPage() {
           description={t('settings.profile.description')}
         >
           <div className="flex items-center gap-3">
-            <div className="flex size-10 items-center justify-center rounded-full bg-[color:var(--primary)]/10 text-sm font-medium text-[color:var(--primary)]">
+            <div className="flex size-10 items-center justify-center rounded-full bg-[color:var(--primary)]/10 text-sm font-medium text-[color:var(--primary)] backdrop-blur-md">
               {(user?.displayName || user?.email || 'A').charAt(0).toUpperCase()}
             </div>
             <div className="flex flex-col">

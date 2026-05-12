@@ -59,7 +59,7 @@ export function EvaluationUpsideHero({ totalAnnualRm, matchedCount, packet, empt
             <Button
               render={<Link href="/dashboard/evaluation/upload" />}
               size="lg"
-              className="rounded-full bg-[color:var(--hibiscus)] px-6 text-[color:var(--hibiscus-foreground)] hover:bg-[color:var(--hibiscus)]/92"
+              className="rounded-full bg-[color:var(--hibiscus)]/92 px-6 text-[color:var(--hibiscus-foreground)] backdrop-blur-md hover:bg-[color:var(--hibiscus)]"
             >
               {t('evaluation.upside.start')}
               <ArrowRight className="ml-1.5 size-4" aria-hidden />
@@ -77,7 +77,7 @@ export function EvaluationUpsideHero({ totalAnnualRm, matchedCount, packet, empt
                 type="button"
                 size="lg"
                 onClick={() => downloadAllDrafts(packet)}
-                className="rounded-full bg-[color:var(--hibiscus)] px-6 text-[color:var(--hibiscus-foreground)] hover:bg-[color:var(--hibiscus)]/92"
+                className="rounded-full bg-[color:var(--hibiscus)]/92 px-6 text-[color:var(--hibiscus-foreground)] backdrop-blur-md hover:bg-[color:var(--hibiscus)]"
               >
                 <Download className="mr-1.5 size-4" aria-hidden />
                 {draftCount > 0

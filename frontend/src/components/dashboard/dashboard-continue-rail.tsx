@@ -93,7 +93,7 @@ export function DashboardContinueRail({ items, phase, errorMessage, onRetry }: P
         }}
       />
       <div className="relative flex items-start gap-2.5">
-        <span className="flex size-9 items-center justify-center rounded-md bg-[color:var(--hibiscus)]/10 text-[color:var(--hibiscus)]">
+        <span className="flex size-9 items-center justify-center rounded-md bg-[color:var(--hibiscus)]/10 text-[color:var(--hibiscus)] backdrop-blur-md">
           <History className="size-4" aria-hidden />
         </span>
         <div className="flex min-w-0 flex-col gap-0.5">

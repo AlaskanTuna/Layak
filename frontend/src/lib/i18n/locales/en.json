@@ -10,7 +10,10 @@
       "notifications": "Notifications",
       "notificationsUnread": "Notifications ({{count}} unread)",
       "dismissNotification": "Dismiss notification",
-      "clearField": "Clear {{fieldName}}"
+      "clearField": "Clear {{fieldName}}",
+      "previousQuestion": "Previous question",
+      "nextQuestion": "Next question",
+      "goToQuestion": "Go to question {{n}}"
     },
     "button": {
       "signIn": "Sign In",
@@ -189,6 +192,9 @@
     "pricing": {
       "title": "Simple, transparent pricing",
       "description": "Start tracking your welfare eligibility for free. Upgrade to Pro when you need more power.",
+      "eyebrow": "04 — Pricing",
+      "headlineLead": "Free for citizens.",
+      "headlineTail": "Pro for everyone else.",
       "waitlist": "Waitlist",
       "freeTier": {
         "name": "Free",
@@ -220,13 +226,92 @@
     },
     "hero": {
       "headlinePart1": "Know every Malaysian scheme",
-      "headlinePart2": "you qualify for — in three uploads.",
+      "headlineEmphasis": "you qualify for",
+      "headlineTail": "in three uploads.",
       "description": "Layak reads your MyKad, payslip, and utility bill, then runs a five-step agent pipeline to match you against government schemes — STR, JKM Warga Emas, LHDN Form B reliefs, and more. Every number cites a source page.",
-      "getStarted": "Get Started"
+      "getStarted": "Get Started",
+      "metaFree": "Free · 5 evals / day",
+      "metaDrafts": "Drafts only · you submit",
+      "metaPdpa": "PDPA-compliant · IC redacted"
+    },
+    "pipeline": {
+      "eyebrow": "02 — How it works",
+      "headlineLead": "Five steps, streamed live —",
+      "headlineTail": "so you watch the agent reason.",
+      "description": "Layak is not a black box. Every step writes its working back to your screen — the extracted profile, the matched rules, the Python that does the math, the PDF that comes out the other side.",
+      "steps": [
+        {
+          "label": "Extract",
+          "title": "Read three documents,\npull a structured profile.",
+          "body": "Gemini Vision opens your MyKad, payslip, and utility bill in one pass. Last four IC digits surface; the rest are redacted in-memory and never logged."
+        },
+        {
+          "label": "Classify",
+          "title": "Derive household, filer,\nand dependant counts.",
+          "body": "Per-capita monthly income, Form B vs BE, children under 18, elderly dependants 60+. The classifier is a Pydantic schema you can audit, not a black box."
+        },
+        {
+          "label": "Match",
+          "title": "Check against every locked\nMalaysian scheme.",
+          "body": "STR 2026 tiers, JKM Warga Emas, the five LHDN Form B reliefs. Each match cites the exact passage from the agency PDF — no hallucinated rules."
+        },
+        {
+          "label": "Compute",
+          "title": "Sum the annual upside.\nShow the working.",
+          "body": "Gemini writes a Python snippet, runs it in Google's sandbox, and streams both the source and stdout to the UI. Verifiable arithmetic, not a final number."
+        },
+        {
+          "label": "Generate",
+          "title": "Watermarked draft packets,\nready to lodge.",
+          "body": "WeasyPrint renders one packet per qualifying scheme — BK-01 for STR, JKM18 for Warga Emas, an LHDN Form B relief summary, and so on. Every page reads \"DRAFT — NOT SUBMITTED.\""
+        }
+      ]
+    },
+    "packetsPreview": {
+      "eyebrow": "03 — What you get",
+      "headlineLine1": "Watermarked",
+      "headlineLine2": "draft packets,",
+      "headlineLine3": "ready to lodge.",
+      "description": "Layak never submits on your behalf. You walk away with pre-filled, citation-rich PDFs — review them, then lodge each one yourself via the agency portal."
     },
     "cta": {
+      "eyebrow": "05 — Take it for a spin",
       "headline": "Ready to see what you qualify for?",
-      "description": "Sign in with Google is one click — no account setup needed. Three uploads, a ranked list, three draft packets. Takes under a minute."
+      "description": "Sign in with Google is one click — no account setup needed. Three uploads, a ranked list, three draft packets. Takes under a minute.",
+      "seePipeline": "See the pipeline",
+      "faqHeader": "Common questions",
+      "faqs": [
+        {
+          "docCode": "FAQ-01",
+          "question": "Will Layak file my application with the agency?",
+          "body": "No. Every output is a draft watermarked \"DRAFT — NOT SUBMITTED.\" You review the packet, then lodge it yourself via LHDN, JKM, or the relevant agency portal. Layak never touches a government submission endpoint."
+        },
+        {
+          "docCode": "FAQ-02",
+          "question": "Which schemes does Layak cover today?",
+          "body": "STR 2026 (household tier), JKM Bantuan Warga Emas, and the five LHDN Form B reliefs. The corpus is committed to the repo and grows each release — coverage notes track which YA each rule is sourced from."
+        },
+        {
+          "docCode": "FAQ-03",
+          "question": "What documents do I need to upload?",
+          "body": "Three: a MyKad (front side), one recent payslip or income screenshot, and one utility bill for proof of address. Synthetic samples work for testing — every demo asset carries a \"SYNTHETIC — FOR DEMO ONLY\" watermark."
+        },
+        {
+          "docCode": "FAQ-04",
+          "question": "How safe is my personal data?",
+          "body": "PDPA-compliant by design. The full IC is never persisted — only the last four digits are stored. Original file bytes are extracted in-memory inside a single request and discarded once the structured profile is produced. No raw documents in logs."
+        },
+        {
+          "docCode": "FAQ-05",
+          "question": "How accurate are the figures Layak shows?",
+          "body": "Every match cites the exact passage from the source agency PDF — no hallucinated rules. The agency still makes the final call on every application; Layak surfaces estimates so you know which forms are worth filing."
+        },
+        {
+          "docCode": "FAQ-06",
+          "question": "How long does the whole pipeline take?",
+          "body": "Under a minute end-to-end. The five steps — extract, classify, match, compute, generate — stream live to the UI so you watch the agent reason instead of staring at a spinner."
+        }
+      ]
     },
     "features": {
       "sectionTitle": "How the agent works",

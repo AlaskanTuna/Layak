@@ -6,6 +6,12 @@ import { useTranslation } from 'react-i18next'
 
 import { useLatestVerifiedAt } from '@/hooks/use-verified-schemes'
 
+// User-facing scheme count rolls `lhdn_form_b` + `lhdn_form_be` together as
+// one "LHDN tax relief" scheme — the rule engine treats them as a single
+// rule module that diverges only on the user's `Profile.form_type` (gig vs.
+// salaried). The backend `SchemeId` literal has 9 distinct slugs because
+// of that internal split; the user-facing count is 8 (matches README +
+// Phase 12 progress entry).
 const STATIC_STATS = [
   { id: 'schemes', icon: Layers, accent: 'hibiscus', value: '8' },
   { id: 'agencies', icon: Building2, accent: 'forest', value: '6' },

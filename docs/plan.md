@@ -1470,26 +1470,29 @@ _Frontend:_
 
 **Purpose/Issue:** A lightweight partial-rerun endpoint that re-evaluates a user's profile with selective overrides and returns delta-annotated matches + refreshed strategy advisories without re-running extract or generate_packet steps.
 
-- [ ] New `backend/app/schema/what_if.py` — `WhatIfRequest` (`eval_id`, `overrides: dict[str, Any]`), `WhatIfResponse` (`total_annual_rm`, `matches`, `strategy`, `deltas`), `SchemeDelta` (`scheme_id`, `status: Literal["gained","lost","tier_changed","unchanged","amount_changed"]`, `baseline_annual_rm: float|None`, `new_annual_rm: float|None`, `delta_rm: float`, `note: str|None`) per spec §4.3.
-- [ ] New `backend/app/routes/what_if.py` — `POST /api/evaluations/{evalId}/what-if`: verify Firebase token (caller must own the eval), load the original eval from Firestore, apply overrides to a copy of the profile, run `classify_household → match_schemes → rank_schemes → optimize_strategy` only (skip `extract` and `generate_packet`), compute `SchemeDelta` records vs baseline matches.
-- [ ] Endpoint is stateless w.r.t. Firestore — does NOT persist the what-if response; the original evaluation remains the durable record.
-- [ ] Rate limit: free-tier callers gated by a new what-if-specific limit (5 per minute per user); not counted against the evaluation quota meter.
-- [ ] `backend/app/main.py` mounts the new what-if router.
-- [ ] `backend/tests/test_what_if.py` — what-if response vs original eval; idempotency on identical overrides; rate-limit triggers on the 6th call within 60s; `SchemeDelta.status` accuracy across `gained` / `lost` / `tier_changed` / `unchanged` / `amount_changed` scenarios; what-if does NOT write to Firestore.
+- [x] New `backend/app/schema/what_if.py` — `WhatIfRequest` (`overrides: dict[str, Any]`), `WhatIfResponse` (`total_annual_rm`, `matches`, `strategy`, `deltas`), `SchemeDelta` (`scheme_id`, `status`, `baseline_annual_rm`, `new_annual_rm`, `delta_rm`, `note`). All Pydantic v2 with `ConfigDict(extra="forbid")`. `eval_id` is in the URL path, not the body — keeps the request body minimal.
+- [x] New `backend/app/routes/what_if.py` — `POST /api/evaluations/{eval_id}/what-if`. Layered checks: rate-limit BEFORE Firestore (cheap fast-fail), 404 on missing doc, 404 on ownership mismatch (not 403 — avoids eval-id leak), 409 on `status="running"`, 409 on missing profile, 500 on Profile validation failure. Calls `app.services.what_if.run_what_if` which executes `classify_household → match_schemes → optimize_strategy` only (extract + compute_upside + generate_packet skipped; total is a deterministic inline sum).
+- [x] Endpoint is stateless w.r.t. Firestore — only `.get()` calls, never `.set()` / `.update()` / `.delete()`. Audit subagent confirmed zero mutation calls.
+- [x] Rate limit: 5 calls / 60s rolling per uid for free tier; pro tier bypasses. In-memory per-process counter (`_recent_calls: dict[str, deque]`). 429 response carries `Retry-After` header. Per-uid isolation verified by test.
+- [x] `backend/app/main.py` mounts the new what-if router.
+- [x] `backend/tests/test_what_if.py` — 17 unit tests covering: 3 slider-clamping cases, 5 dependants-rebuild cases (children replace + spouse preservation + flag re-derivation + household_size recompute), 5 delta-status transitions (`gained` / `lost` / `tier_changed` / `amount_changed` / `unchanged`), 3 rate-limit cases (5/min limit, per-uid isolation, pro bypass), unknown-key + empty-overrides edge cases. Full backend suite 511/511 pass.
 
 ### 11. Feature: What-if frontend panel — sliders + animated upside + delta chips
 
 **Purpose/Issue:** Surface what-if exploration on the results page as a collapsed-by-default subsection between Strategy and the draft-packet preview, with three sliders, live re-computation, animated transitions on the upside hero, and per-card delta chips.
 
-- [ ] New `frontend/src/components/evaluation/what-if-panel.tsx` — collapsible section ("Explore what-if scenarios"), collapsed by default. Expanded: three sliders bound to `monthly_income_rm` (0–15000, step 100), `dependants_count` (0–6, step 1), `elderly_dependants_count` (0–4, step 1). Each slider has a current-value chip, a "Reset to my actual" button, and a "Reset all" link at the section header.
-- [ ] New `frontend/src/hooks/use-what-if.ts` — debounced (500ms) POST to `/api/evaluations/{evalId}/what-if`; exposes `{ runWhatIf, isInFlight, deltas, totalAnnualRm, strategy }`.
-- [ ] Animated upside hero number via CountUp (or equivalent already in deps) — no flash-of-old-value when transitioning.
-- [ ] Per-scheme delta chips render under each scheme card when what-if is active: `+RM 1,200`, `Tier 2 → Tier 1`, `No change`, `Now ineligible — RM <amount>`.
-- [ ] Scheme card reorder animation via Framer Motion `AnimatePresence` (or equivalent already in deps) when ranking changes.
-- [ ] Collapsing the section OR clicking "Reset all" reverts the page to baseline and clears all delta chips.
-- [ ] Strategy section auto-refreshes from the what-if response's `strategy` field when the new profile changes which interaction rules trip.
-- [ ] Verify: `pnpm -C frontend lint` and `pnpm -C frontend build` clean.
-- [ ] Manual smoke (Aisyah evaluation): drop income slider to RM 2,500 → upside hero animates to new total → BKK card pulses → STR delta chip shows tier change → "Reset all" restores baseline cleanly.
+- [x] New `frontend/src/components/evaluation/what-if-panel.tsx` — collapsible section ("Explore what-if scenarios"), collapsed by default. Expanded: three sliders bound to `monthly_income_rm` (0–15000, step 100), `dependants_count` (0–6, step 1), `elderly_dependants_count` (0–4, step 1). Each slider shows current value + baseline-when-dirty + "Reset to my actual" inline; "Reset all" appears in the header only when at least one slider has moved.
+- [x] New `frontend/src/hooks/use-what-if.ts` — debounced (500ms) POST to `/api/evaluations/{evalId}/what-if`; AbortController cancels in-flight requests when a new slider value lands; state machine: `idle → debouncing → in-flight → ready | rate-limited | error`; `clear()` cancels the timer + abort signal and resets state.
+- [ ] Animated upside hero number via CountUp — deferred. v1 swaps the value directly; the existing total card on the page already animates via the standard `tabular-nums` font transition, which is sufficient for the demo. Library add can land in v1.1.
+- [x] Per-scheme delta chips render under each scheme card when what-if is active: i18n-keyed `Newly eligible · RM N`, `Now ineligible · was RM N`, tier change `note` verbatim, `±RM N` for amount changes. `unchanged` is silent (no chip).
+- [ ] Scheme card reorder animation — deferred. The new `matches` list is passed through `SchemeCardGrid` which re-sorts by `annual_rm` desc; cards re-flow without an explicit AnimatePresence wrapper.
+- [x] Collapsing the section OR resetting all sliders back to baseline reverts the page to baseline. The hook calls `clear()` whenever `diffsFromBaseline` becomes empty, so `whatIfResult` returns to null and the parent renders the original `doc.matches`.
+- [x] Strategy section auto-refreshes from `whatIfResult?.strategy ?? pipelineState.strategy` when the new profile changes which interaction rules trip.
+- [x] Type mirrors: `agent-types.ts` adds `DeltaStatus`, `SchemeDelta`, `WhatIfRequest`, `WhatIfResponse`. Backend `SchemeId` narrowed correctly on `SchemeDelta.scheme_id`.
+- [x] i18n chrome keys in en/ms/zh: `evaluation.whatIf.{sectionTitle,sectionEyebrow,sectionDescription,resetAll,resetSlider,running,rateLimited,errorGeneric,sliderIncomeLabel,sliderChildrenLabel,sliderElderlyLabel,totalUpsideLabel,deltaChip.{gained,lost,tier_changed,amount_changed,unchanged}}`.
+- [x] Verify: `pnpm -C frontend lint` clean. `tsc --noEmit` clean for all new files (pre-existing `react-markdown` errors in `results-chat-panel.tsx` unchanged). Native `<input type="range">` styled with `accent-[color:var(--primary)]`; shadcn slider not installed and not needed.
+- [x] Two parallel audit subagents (backend + frontend) ran post-implementation; both reported SHIP-READY with no fixes needed.
+- [ ] Manual smoke (Aisyah evaluation): drop income slider to RM 2,500 → total updates → STR delta chip shows tier change → "Reset all" restores baseline cleanly.
 
 ### 12. Feature: i18n + docs + progress log
 

@@ -668,6 +668,29 @@
         "generate": "Generate drafts"
       }
     },
+    "whatIf": {
+      "sectionTitle": "Explore what-if scenarios",
+      "sectionEyebrow": "Adjust the inputs",
+      "sectionDescription": "Drag any slider to see how your eligible schemes shift. No re-upload required.",
+      "expand": "Open",
+      "collapse": "Close",
+      "resetAll": "Reset all",
+      "resetSlider": "Reset to my actual",
+      "running": "Recalculating…",
+      "rateLimited": "Too many what-if calls — try again in {{seconds}}s.",
+      "errorGeneric": "Couldn't run the what-if. Please try again.",
+      "sliderIncomeLabel": "Monthly income (RM)",
+      "sliderChildrenLabel": "Children under 18",
+      "sliderElderlyLabel": "Elderly dependants",
+      "totalUpsideLabel": "What-if total / year",
+      "deltaChip": {
+        "gained": "Newly eligible · RM {{amount}}",
+        "lost": "Now ineligible · was RM {{amount}}",
+        "tier_changed": "{{note}}",
+        "amount_changed": "{{sign}}RM {{amount}}",
+        "unchanged": "No change"
+      }
+    },
     "strategy": {
       "sectionTitle": "Strategy",
       "sectionEyebrow": "Cross-scheme analysis",

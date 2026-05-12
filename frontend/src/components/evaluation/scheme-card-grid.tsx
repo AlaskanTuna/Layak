@@ -5,13 +5,17 @@ import { useTranslation } from 'react-i18next'
 
 import { SchemeVerifiedBadge } from '@/components/schemes/scheme-verified-badge'
 import { Button } from '@/components/ui/button'
-import type { SchemeMatch } from '@/lib/agent-types'
+import type { SchemeDelta, SchemeMatch } from '@/lib/agent-types'
 import { localisedSchemeName } from '@/lib/scheme-name'
 import { cn } from '@/lib/utils'
 
 type Props = {
   matches: SchemeMatch[]
+  /** Phase 11 Feature 3 — when present, render per-scheme delta chips
+   *  below each card's footer. `null` while what-if hasn't been run. */
+  deltas?: SchemeDelta[] | null
 }
+
 
 function formatRm(value: number): string {
   return `RM ${value.toLocaleString('en-MY', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
@@ -26,8 +30,12 @@ function categoryKeyFor(match: SchemeMatch): 'cashTransfer' | 'taxRelief' | 'wel
   return 'assistance'
 }
 
-export function SchemeCardGrid({ matches }: Props) {
+export function SchemeCardGrid({ matches, deltas }: Props) {
   const { t } = useTranslation()
+  const deltaByScheme = new Map<string, SchemeDelta>()
+  for (const d of deltas ?? []) {
+    deltaByScheme.set(d.scheme_id, d)
+  }
   // Keep only upside schemes in the ranked grid. Required-contribution
   // entries (e.g. PERKESO SKSPS) render separately in
   // `<RequiredContributionsCard>` so their RM amounts don't get visually
@@ -119,10 +127,59 @@ export function SchemeCardGrid({ matches }: Props) {
                   <ArrowRight className="ml-1 size-3.5" aria-hidden />
                 </Button>
               </footer>
+
+              {/* Phase 11 Feature 3 — what-if delta chip under the footer.
+                  Renders only when the user has dragged a slider and the
+                  rerun has landed. `unchanged` is silent. */}
+              <DeltaChip delta={deltaByScheme.get(match.scheme_id)} t={t} />
             </li>
           )
         })}
       </ul>
     </section>
+  )
+}
+
+function DeltaChip({
+  delta,
+  t
+}: {
+  delta: SchemeDelta | undefined
+  t: ReturnType<typeof useTranslation>['t']
+}) {
+  if (!delta || delta.status === 'unchanged') return null
+  const tone =
+    delta.status === 'lost'
+      ? 'border-destructive/40 bg-destructive/10 text-destructive'
+      : delta.status === 'gained'
+        ? 'border-[color:var(--forest)]/40 bg-[color:var(--forest)]/10 text-[color:var(--forest)]'
+        : 'border-[color:var(--primary)]/40 bg-[color:var(--primary)]/10 text-[color:var(--primary)]'
+  let label = ''
+  if (delta.status === 'gained' && delta.new_annual_rm != null) {
+    label = t('evaluation.whatIf.deltaChip.gained', {
+      amount: Math.round(delta.new_annual_rm).toLocaleString('en-MY')
+    })
+  } else if (delta.status === 'lost' && delta.baseline_annual_rm != null) {
+    label = t('evaluation.whatIf.deltaChip.lost', {
+      amount: Math.round(delta.baseline_annual_rm).toLocaleString('en-MY')
+    })
+  } else if (delta.status === 'tier_changed') {
+    label = t('evaluation.whatIf.deltaChip.tier_changed', { note: delta.note ?? '' })
+  } else if (delta.status === 'amount_changed') {
+    label = t('evaluation.whatIf.deltaChip.amount_changed', {
+      sign: delta.delta_rm >= 0 ? '+' : '−',
+      amount: Math.round(Math.abs(delta.delta_rm)).toLocaleString('en-MY')
+    })
+  }
+  return (
+    <div
+      className={cn(
+        'mt-2 inline-flex w-fit items-center rounded-full border px-2 py-0.5 text-[10.5px] font-medium uppercase tracking-[0.1em]',
+        tone
+      )}
+      role="status"
+    >
+      {label}
+    </div>
   )
 }

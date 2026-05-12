@@ -15,6 +15,7 @@ import { PipelineNarrative } from '@/components/evaluation/pipeline-narrative'
 import { RequiredContributionsCard } from '@/components/evaluation/required-contributions-card'
 import { ResultsChatPanel } from '@/components/evaluation/results-chat-panel'
 import { StrategySection } from '@/components/evaluation/strategy-section'
+import { WhatIfPanel } from '@/components/evaluation/what-if-panel'
 import { useChat } from '@/hooks/use-chat'
 import { SchemeCardGrid } from '@/components/evaluation/scheme-card-grid'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
@@ -27,7 +28,8 @@ import {
   type EvaluationDoc,
   type EvaluationStepState,
   PIPELINE_STEPS,
-  type Step
+  type Step,
+  type WhatIfResponse
 } from '@/lib/agent-types'
 import { authedFetch } from '@/lib/firebase'
 import { notificationStore } from '@/lib/notification-store'
@@ -110,6 +112,9 @@ export function EvaluationResultsByIdClient({ evalId }: { evalId: string }) {
   // and the Strategy section's "Ask Cik Lay about this" CTA so the handoff
   // stages a draft + advisory on the SAME hook instance the panel renders.
   const chat = useChat(evalId)
+  // Phase 11 Feature 3 — latest what-if rerun. When non-null, scheme cards
+  // render delta chips and the upside hero swaps to `total_annual_rm`.
+  const [whatIfResult, setWhatIfResult] = useState<WhatIfResponse | null>(null)
 
   const fetchDoc = useCallback(async () => {
     try {
@@ -374,7 +379,10 @@ export function EvaluationResultsByIdClient({ evalId }: { evalId: string }) {
                 aria-label={t('evaluation.results.toc.schemes')}
                 className="scroll-mt-28 lg:scroll-mt-20"
               >
-                <SchemeCardGrid matches={doc.matches} />
+                <SchemeCardGrid
+                  matches={whatIfResult?.matches ?? doc.matches}
+                  deltas={whatIfResult?.deltas ?? null}
+                />
               </section>
             )}
             {showStrategy && (
@@ -384,10 +392,17 @@ export function EvaluationResultsByIdClient({ evalId }: { evalId: string }) {
                 className="scroll-mt-28 lg:scroll-mt-20"
               >
                 <StrategySection
-                  advisories={pipelineState.strategy}
+                  advisories={whatIfResult?.strategy ?? pipelineState.strategy}
                   onAskCikLay={chat.handoffFromAdvice}
                 />
               </section>
+            )}
+            {isComplete && doc.profile && (
+              <WhatIfPanel
+                evalId={evalId}
+                baselineProfile={doc.profile}
+                onResult={setWhatIfResult}
+              />
             )}
             {showRequired && (
               <section

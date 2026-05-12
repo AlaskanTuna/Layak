@@ -173,6 +173,35 @@ export type StrategyAdvice = {
 
 export type OptimizeStrategyResult = { advisories: StrategyAdvice[] }
 
+// Phase 11 Feature 3 — What-If Scenario types.
+
+export type DeltaStatus = 'gained' | 'lost' | 'tier_changed' | 'amount_changed' | 'unchanged'
+
+export type SchemeDelta = {
+  scheme_id: SchemeId
+  status: DeltaStatus
+  baseline_annual_rm: number | null
+  new_annual_rm: number | null
+  delta_rm: number
+  note: string | null
+}
+
+/** POST body for `/api/evaluations/{evalId}/what-if`. */
+export type WhatIfRequest = {
+  overrides: {
+    monthly_income_rm?: number
+    dependants_count?: number
+    elderly_dependants_count?: number
+  }
+}
+
+export type WhatIfResponse = {
+  total_annual_rm: number
+  matches: SchemeMatch[]
+  strategy: StrategyAdvice[]
+  deltas: SchemeDelta[]
+}
+
 export type StepStartedEvent = { type: 'step_started'; step: Step }
 export type StepResultEvent =
   | { type: 'step_result'; step: 'extract'; data: ExtractResult }

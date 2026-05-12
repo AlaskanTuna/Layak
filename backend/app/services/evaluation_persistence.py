@@ -47,6 +47,7 @@ _INITIAL_STEP_STATES: dict[str, str] = {
     "extract": "pending",
     "classify": "pending",
     "match": "pending",
+    "optimize_strategy": "pending",
     "compute_upside": "pending",
     "generate": "pending",
 }
@@ -86,6 +87,10 @@ def create_running_evaluation(
         "matches": [],
         "totalAnnualRM": 0.0,
         "stepStates": dict(_INITIAL_STEP_STATES),
+        # Phase 11 Feature 2 — cross-scheme strategy advisories from the
+        # optimizer step. Empty list until the step completes; populated by
+        # the StepResultEvent mirror below.
+        "strategy": [],
         # Phase 11 Feature 4 — lay-tier + developer-tier event logs.
         # `persist_event_stream` appends to these as events flow through so
         # the results page can replay both tiers on deep-link or refresh.
@@ -186,6 +191,11 @@ def _mirror_to_firestore(  # noqa: PLR0912 — per-event-type dispatch is natura
         elif event.step == "match":
             # `data` is `MatchResult {matches}`.
             updates["matches"] = [m.model_dump(mode="json") for m in data.matches]
+        elif event.step == "optimize_strategy":
+            # `data` is `OptimizeStrategyResult {advisories}`. Persist so the
+            # results page can rebuild the Strategy section on deep-link, and
+            # the chat handoff can pull a specific advisory's context back in.
+            updates["strategy"] = [a.model_dump(mode="json") for a in data.advisories]
         elif event.step == "compute_upside":
             # `data` IS the `ComputeUpsideResult` — carries the executed code,
             # its stdout, the total upside, and the per-scheme breakdown.

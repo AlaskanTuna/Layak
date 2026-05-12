@@ -19,7 +19,8 @@ import type {
   Profile,
   RateLimitErrorBody,
   SchemeMatch,
-  Step
+  Step,
+  StrategyAdvice
 } from '@/lib/agent-types'
 import { PIPELINE_STEPS } from '@/lib/agent-types'
 import { notificationStore } from '@/lib/notification-store'
@@ -49,6 +50,10 @@ export type PipelineState = {
   /** Phase 11 Feature 4 — accumulated lay/dev tier events in stream order. */
   narrativeEvents: PipelineNarrativeEvent[]
   technicalEvents: PipelineTechnicalEvent[]
+  /** Phase 11 Feature 2 — Cross-Scheme Strategy advisories from the
+   *  optimize_strategy step. Empty when the optimizer hasn't run yet, or
+   *  when no interaction rules tripped. */
+  strategy: StrategyAdvice[]
 }
 
 export type StartOptions =
@@ -60,6 +65,7 @@ const INITIAL_STEP_STATES: Record<Step, StepStatus> = {
   extract: 'pending',
   classify: 'pending',
   match: 'pending',
+  optimize_strategy: 'pending',
   compute_upside: 'pending',
   generate: 'pending'
 }
@@ -77,7 +83,8 @@ const INITIAL_STATE: PipelineState = {
   error: null,
   errorCategory: null,
   narrativeEvents: [],
-  technicalEvents: []
+  technicalEvents: [],
+  strategy: []
 }
 
 function shouldForceMock(): boolean {
@@ -108,6 +115,7 @@ export function applyEvent(prev: PipelineState, event: AgentEvent): PipelineStat
       if (event.step === 'extract') next.profile = event.data.profile
       if (event.step === 'classify') next.classification = event.data.classification
       if (event.step === 'match') next.matches = event.data.matches
+      if (event.step === 'optimize_strategy') next.strategy = event.data.advisories
       if (event.step === 'compute_upside') next.upside = event.data
       if (event.step === 'generate') next.packet = event.data.packet
       return next

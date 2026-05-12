@@ -505,6 +505,7 @@
       "toc": {
         "overview": "概览",
         "schemes": "可申请方案",
+        "strategy": "策略",
         "required": "应缴贡献",
         "preview": "草稿预览"
       },
@@ -566,9 +567,25 @@
         "extractManual": "档案已就绪",
         "classify": "分类家庭",
         "match": "匹配计划",
+        "optimize_strategy": "优化策略",
         "compute_upside": "计算收益",
         "generate": "生成草稿"
       }
+    },
+    "strategy": {
+      "sectionTitle": "策略",
+      "sectionEyebrow": "跨计划分析",
+      "sectionDescription": "Layak 的优化器比较您匹配到的计划，并标记可协调的机会。",
+      "emptyHeadline": "未发现跨计划冲突",
+      "emptyDescription": "您匹配的计划未触发 Layak 关注的任何协调边缘情况。",
+      "askCikLay": "向 Cik Lay 询问此项",
+      "citedPrefix": "引用：",
+      "severity": {
+        "info": "提示",
+        "warn": "注意",
+        "act": "行动"
+      },
+      "softSuggestion": "Layak 尚未完全确定 —— 值得问问 Cik Lay。"
     },
     "narrative": {
       "showTechnical": "显示技术细节",

@@ -32,8 +32,20 @@ from pydantic import BaseModel, ConfigDict, Field
 from app.schema.packet import Packet
 from app.schema.profile import HouseholdClassification, Profile
 from app.schema.scheme import SchemeMatch
+from app.schema.strategy import StrategyAdvice
 
-Step = Literal["extract", "classify", "match", "compute_upside", "generate"]
+# Pipeline steps in execution order. `optimize_strategy` (Phase 11 Feature 2)
+# slots between `match` and `compute_upside` — the strategy advisor reasons
+# over the matched set, and the upside total is computed afterwards so any
+# advisory note can also influence packet copy in the generate step.
+Step = Literal[
+    "extract",
+    "classify",
+    "match",
+    "optimize_strategy",
+    "compute_upside",
+    "generate",
+]
 
 
 class ExtractResult(BaseModel):
@@ -63,13 +75,34 @@ class ComputeUpsideResult(BaseModel):
     per_scheme_rm: dict[str, float]
 
 
+class OptimizeStrategyResult(BaseModel):
+    """Output of the new `optimize_strategy` step.
+
+    The optimizer emits 0–3 grounded `StrategyAdvice` records. An empty list
+    is a valid output — it means the profile + matches didn't trip any
+    interaction rule, and the frontend renders the "no conflicts detected"
+    state without a CTA. See spec §3.10 acceptance criteria.
+    """
+
+    model_config = ConfigDict(extra="forbid")
+
+    advisories: list[StrategyAdvice] = Field(default_factory=list, max_length=3)
+
+
 class GenerateResult(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
     packet: Packet
 
 
-StepData = ExtractResult | ClassifyResult | MatchResult | ComputeUpsideResult | GenerateResult
+StepData = (
+    ExtractResult
+    | ClassifyResult
+    | MatchResult
+    | OptimizeStrategyResult
+    | ComputeUpsideResult
+    | GenerateResult
+)
 
 
 class StepStartedEvent(BaseModel):

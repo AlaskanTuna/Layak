@@ -3,7 +3,7 @@
 import { useCallback, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
-import type { ErrorCategory } from '@/lib/agent-types'
+import type { ErrorCategory, StrategyAdvice } from '@/lib/agent-types'
 import type { ChatEvent, ChatMessage, ChatRequest, ChatTurn } from '@/lib/chat-types'
 import { authedFetch } from '@/lib/firebase'
 
@@ -55,12 +55,20 @@ function localId(): string {
 
 export type UseChatResult = {
   messages: ChatMessage[]
-  send: (message: string) => void
+  send: (message: string, opts?: { advisory?: StrategyAdvice }) => void
   abort: () => void
   reset: () => void
   isStreaming: boolean
   errorCategory: ErrorCategory | null
   errorMessage: string | null
+  /** Phase 11 Feature 2 — Strategy section handoff. Stages the advisory's
+   *  `suggested_chat_prompt` as a draft (the chat panel reads `pendingDraft`
+   *  to populate its textarea); the next `send()` call will carry the
+   *  advisory through to the backend's `recent_advisory` field. */
+  handoffFromAdvice: (advice: StrategyAdvice) => void
+  pendingDraft: string | null
+  consumePendingDraft: () => void
+  pendingAdvisory: StrategyAdvice | null
 }
 
 export function useChat(evalId: string): UseChatResult {
@@ -70,6 +78,13 @@ export function useChat(evalId: string): UseChatResult {
   const [errorCategory, setErrorCategory] = useState<ErrorCategory | null>(null)
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
   const abortRef = useRef<AbortController | null>(null)
+  // Phase 11 Feature 2 — handoff staging. `pendingDraft` is the prefilled
+  // textarea content; `pendingAdvisory` is the advisory whose context
+  // should be attached to the NEXT `send()`. The chat panel reads both,
+  // calls `consumePendingDraft()` after rendering the textarea value, and
+  // forwards the advisory as the second arg to `send()`.
+  const [pendingDraft, setPendingDraft] = useState<string | null>(null)
+  const [pendingAdvisory, setPendingAdvisory] = useState<StrategyAdvice | null>(null)
 
   const cleanup = useCallback(() => {
     abortRef.current?.abort()
@@ -90,7 +105,7 @@ export function useChat(evalId: string): UseChatResult {
   }, [cleanup])
 
   const send = useCallback(
-    (message: string) => {
+    (message: string, opts?: { advisory?: StrategyAdvice }) => {
       const trimmed = message.trim()
       if (!trimmed || isStreaming) return
 
@@ -119,10 +134,18 @@ export function useChat(evalId: string): UseChatResult {
         .map((m) => ({ role: m.role, content: m.content }))
 
       const language = (['en', 'ms', 'zh'] as const).find((l) => i18n.language.startsWith(l)) ?? 'en'
+      // Prefer an explicit per-call advisory, then fall back to the staged
+      // handoff advisory. Either way, clear the staged advisory after one
+      // consumption so the next free-form turn is plain.
+      const attachedAdvisory = opts?.advisory ?? pendingAdvisory ?? null
+      if (pendingAdvisory && !opts?.advisory) {
+        setPendingAdvisory(null)
+      }
       const body: ChatRequest = {
         history: priorHistory,
         message: trimmed,
-        language
+        language,
+        recent_advisory: attachedAdvisory
       }
 
       const controller = new AbortController()
@@ -178,8 +201,17 @@ export function useChat(evalId: string): UseChatResult {
         }
       })()
     },
-    [evalId, i18n.language, isStreaming, messages]
+    [evalId, i18n.language, isStreaming, messages, pendingAdvisory]
   )
+
+  const handoffFromAdvice = useCallback((advice: StrategyAdvice) => {
+    setPendingDraft(advice.suggested_chat_prompt ?? advice.headline)
+    setPendingAdvisory(advice)
+  }, [])
+
+  const consumePendingDraft = useCallback(() => {
+    setPendingDraft(null)
+  }, [])
 
   return {
     messages,
@@ -188,6 +220,10 @@ export function useChat(evalId: string): UseChatResult {
     reset,
     isStreaming,
     errorCategory,
-    errorMessage
+    errorMessage,
+    handoffFromAdvice,
+    pendingDraft,
+    consumePendingDraft,
+    pendingAdvisory
   }
 }

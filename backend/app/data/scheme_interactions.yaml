@@ -1,0 +1,102 @@
+# Cross-scheme interaction rules — Phase 11 Feature 2 v1 registry.
+#
+# Each entry is one StrategyAdvice candidate the OptimizerAgent may
+# surface when its trigger conditions trip against the user's profile +
+# matched schemes. The Gemini call reads this file (NOT the source PDFs)
+# as its grounding base — the cited `(pdf, section, page)` triple is
+# carried verbatim into the StrategyAdvice record so the frontend can
+# render "Cited: <pdf> §<section> p.<page>".
+#
+# Pydantic-validated on load via `app.schema.strategy.SchemeInteractionRule`.
+# Adding a 4th rule is a YAML edit, not a code change.
+#
+# Trigger conditions are evaluated server-side in Python BEFORE the Gemini
+# call, so the optimizer never asks the model to invent a triggering case.
+# Supported conditions:
+#   has_elderly_dependant: <bool>
+#   has_children_under_18: <bool>
+#   matched_scheme:        <SchemeId>   (true iff that scheme appears in
+#                                        the user's qualifying matches)
+#   form_type:             <FormType>
+#   max_monthly_income_rm: <float>      (trip when income ≤ this value)
+#   filer_has_siblings_filing_taxes: <bool|"unknown">  (always trip when
+#                                        not in profile — we err toward
+#                                        surfacing the advisory).
+
+- id: lhdn_dependent_parent_single_claimer
+  applies_to:
+    - lhdn_form_b
+    - lhdn_form_be
+  trigger_conditions:
+    has_elderly_dependant: true
+    filer_has_siblings_filing_taxes: unknown
+  rule: |
+    LHDN dependent-parent relief is RM 1,500 per parent and can only be
+    claimed by ONE filer per parent. When multiple siblings file taxes,
+    the sibling in the highest marginal tax bracket maximises family-level
+    cash benefit by being the sole claimer.
+  advice_template: |
+    Coordinate with siblings who also file taxes. Whichever sibling has
+    the highest marginal tax bracket should claim the RM 1,500
+    dependent-parent relief — they save more total tax. Then split the
+    cash benefit informally.
+  severity: warn
+  citation:
+    pdf: pr-no-4-2024.pdf
+    section: '§5.2'
+    page: 12
+  suggested_chat_prompt: |
+    Who in my family should claim the dependent-parent relief, and how
+    do we coordinate it on the LHDN portal?
+
+- id: i_saraan_liquidity_tradeoff
+  applies_to:
+    - i_saraan
+  trigger_conditions:
+    matched_scheme: i_saraan
+    max_monthly_income_rm: 3500
+  rule: |
+    EPF i-Saraan returns up to RM 500/year as a government match for
+    voluntary EPF contributions, but requires the user to lock in RM
+    3,333 of voluntary contribution to hit the full match. For households
+    in the B40 income band, that locked-in cash may matter more for
+    monthly liquidity than the eventual RM 500 government top-up.
+  advice_template: |
+    i-Saraan adds RM 500/year if you contribute RM 3,333 voluntarily —
+    but that money is locked in EPF until retirement. On a tight monthly
+    budget, the cash-flow trade-off may not be worth it. Contribute a
+    smaller voluntary amount or skip this scheme this year.
+  severity: info
+  citation:
+    pdf: i-saraan-program.pdf
+    section: '§3'
+    page: 3
+  suggested_chat_prompt: |
+    Given my monthly income, is i-Saraan worth the locked-in EPF
+    contribution this year?
+
+- id: lhdn_spouse_relief_filing_status
+  applies_to:
+    - lhdn_form_b
+    - lhdn_form_be
+  trigger_conditions:
+    form_type: form_b
+    has_spouse_dependant: unknown
+  rule: |
+    LHDN spouse relief is RM 4,000 but requires joint assessment OR a
+    non-working spouse with no separate Form B/BE income. Filers whose
+    spouse filing status is ambiguous may either over- or under-claim
+    this relief.
+  advice_template: |
+    The RM 4,000 spouse relief only applies if you file jointly OR your
+    spouse has no separate taxable income. Confirm your spouse's filing
+    status before claiming — over-claiming triggers an LHDN audit
+    request later.
+  severity: act
+  citation:
+    pdf: pr-no-4-2024.pdf
+    section: '§4.1'
+    page: 9
+  suggested_chat_prompt: |
+    My spouse and I have different income types — should we file jointly
+    or separately for the relief?

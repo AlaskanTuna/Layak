@@ -35,6 +35,8 @@ from app.agents.narration import (
     narrate_generate_technical,
     narrate_match_lay,
     narrate_match_technical,
+    narrate_optimize_strategy_lay,
+    narrate_optimize_strategy_technical,
 )
 from app.agents.tools.build_profile import derive_household_flags
 from app.agents.tools.classify import classify_household
@@ -42,6 +44,7 @@ from app.agents.tools.compute_upside import compute_upside
 from app.agents.tools.extract import extract_profile
 from app.agents.tools.generate_packet import generate_packet
 from app.agents.tools.match import match_schemes
+from app.agents.tools.optimize_strategy import optimize_strategy
 from app.schema.events import (
     ClassifyResult,
     DoneEvent,
@@ -49,6 +52,7 @@ from app.schema.events import (
     ExtractResult,
     GenerateResult,
     MatchResult,
+    OptimizeStrategyResult,
     PipelineNarrativeEvent,
     PipelineTechnicalEvent,
     Step,
@@ -218,6 +222,25 @@ async def stream_agent_events(
         yield StepResultEvent(step=current_step, data=MatchResult(matches=matches))
         yield narrate_match_lay(matches, language=language)
         yield narrate_match_technical(matches, latency_ms=_match_latency_ms)
+
+        current_step = "optimize_strategy"
+        yield StepStartedEvent(step=current_step)
+        await asyncio.sleep(_INTER_STEP_DELAY_S)
+        _t0 = asyncio.get_event_loop().time()
+        advisories = await optimize_strategy(
+            profile, matches, classification, language=language
+        )
+        _optimize_latency_ms = int((asyncio.get_event_loop().time() - _t0) * 1000)
+        yield StepResultEvent(
+            step=current_step,
+            data=OptimizeStrategyResult(advisories=advisories),
+        )
+        yield narrate_optimize_strategy_lay(advisories, language=language)
+        yield narrate_optimize_strategy_technical(
+            advisories,
+            triggered_rule_ids=[a.interaction_id for a in advisories],
+            latency_ms=_optimize_latency_ms,
+        )
 
         current_step = "compute_upside"
         yield StepStartedEvent(step=current_step)

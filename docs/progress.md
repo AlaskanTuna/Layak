@@ -4,6 +4,65 @@
 
 ---
 
+## [12/05/26] - Phase 11: production-grade SaaS enhancements (4 features + docs sweep)
+
+Phase 11 ships four production-grade features ahead of the 2026-05-16 Open Category finals. All four landed across five commits in a single session; backend test suite grew from 297 → 511 (+214 tests, all green). Subagent audits ran post-implementation on each feature in parallel — only two minor fixes flagged (keyboard a11y on the technical `<pre>`, demo fixture missing narrative events) and both addressed before commit.
+
+**Feature 1 — Agentic Scheme Discovery + Admin Moderation** (commit `2786b43`).
+
+- Source-watcher polls 7 allowlisted gov URLs with httpx, SHA-256 hashes normalised HTML, diffs against `verified_schemes/{source_id}.sourceContentHash`. Gemini 2.5 Pro structured-output extractor produces `SchemeCandidate` records with confidence-gated drop at 0.5.
+- Admin moderation UI lives at `/dashboard/discovery` and `/dashboard/discovery/[id]` (unified `+`/`-` diff against the in-app scheme baseline). Sidebar surfaces a "Discovery" tab only when `useAuth().role === 'admin'`. Two-track publish on approve: `verified_schemes/{scheme_id}` Firestore upsert + YAML manifest under `backend/data/discovered/`.
+- `LAYAK_ADMIN_EMAIL_ALLOWLIST` env var bootstraps the `role: admin` custom claim; `_admin_promoted_uids` in-memory cache makes the promotion idempotent per process. `AuthGuard requireRole="admin"` force-refreshes the ID token once before redirect to handle the custom-claim propagation gap.
+- Bundled with Task 1a — email/password sign-in tabs added alongside the existing Google SSO on both `/sign-in` and `/sign-up` so judges can self-serve as admin without us granting Google access.
+- Cloud Scheduler integration deferred to v2; v1 ships with the in-product "Run discovery now" admin button only.
+
+**Feature 4 — Two-Tier Reasoning Surface** (commit `6ce462f`).
+
+- New `PipelineNarrativeEvent` + `PipelineTechnicalEvent` Pydantic models added to the discriminated `AgentEvent` union. Each pipeline step emits both events after its `StepResultEvent`, with per-step latency captured via `asyncio.get_event_loop().time()` deltas.
+- New `backend/app/agents/narration.py` is a pure-function module with one lay + one technical narrator per step. Static `_HEADLINES` catalog ships en/ms/zh inline (no Task 12 deferral needed for the lay tier).
+- PII contract enforced: technical events carry only `***-**-{last4}` masked IC, never profile `name` or `address`. Pytest asserts the redaction across 9 dedicated tests.
+- Persistence layer appends both event types to `evaluations/{evalId}.narrativeLog` and `.technicalLog` Firestore arrays via `ArrayUnion` so the results page replays both tiers on deep-link / refresh.
+- Frontend `pipeline-narrative.tsx` replaces `pipeline-stepper.tsx`; renders progress strip + lay narration + collapsible technical `<pre>` with `tabIndex={0}` + `role="region"` for keyboard accessibility. On the persisted results page, renders in `retrospective` mode (collapsed one-line summary that expands).
+- Mock fixture (Aisyah) extended with 10 new events so demo mode showcases the new UI rather than falling back to the legacy stepper rendering path.
+
+**Landing i18n fix** (commit `095b094`).
+
+- User reported the marketing landing was "horribly broken" when switching to Malay or Chinese — half the page stayed English. Audit traced the root cause: multiple hardcoded English fragments lived directly in JSX outside any `t()` calls, AND the meta-badge `t()` calls were using English defaults but the keys were missing from `ms.json` + `zh.json`.
+- Patched 5 landing components: hero (split `headlinePart2` into `headlineEmphasis` + `headlineTail` so the underlined hibiscus + faded gray styling maps across all three languages; added `metaFree`/`metaDrafts`/`metaPdpa`), pipeline (section header + 5-step `STEPS` array now from `marketing.pipeline.steps[]` via i18next `returnObjects`), pricing (eyebrow + headline), packets-preview (eyebrow + 3-line headline + body), cta (eyebrow + "See the pipeline" link + 6-item FAQ deck + aria labels).
+- Subagent audit caught two duplicate `pricing` object keys in en.json + ms.json (pre-existing block + my new top-level one) and three components I'd missed beyond the hero — all addressed before commit.
+
+**Feature 2 — Cross-Scheme Strategy Optimizer + Cik Lay handoff** (commit `4eb68f5`).
+
+- New `optimize_strategy` pipeline step between `match` and `compute_upside`. Pure-Python `_rule_trips` pre-filter evaluates `scheme_interactions.yaml` against the user's profile + classification + matched ids; Gemini 2.5 Pro only sees rules that actually apply.
+- Three v1 hardcoded interaction rules in the YAML registry: `lhdn_dependent_parent_single_claimer`, `i_saraan_liquidity_tradeoff`, `lhdn_spouse_relief_filing_status`. Adding a 4th rule is a YAML edit, not a code change.
+- 4-of-5 grounding layers shipped (Layer 3 Vertex re-grounding deferred to v1.1 per the feasibility critique — drops the highest-risk subtask while keeping every deterministic safety layer). Layers 1 + 2 + 4 + 5: YAML registry membership → Pydantic schema → few-shot prompt (4 worked examples covering all 3 severities + null case) → frontend confidence gate (≥0.8 full, 0.5–0.8 soft+force CTA, <0.5 suppressed).
+- Profile redacted (name + address stripped) before the Gemini call. Fail-open on every error path. Survivors capped at 3 per spec §3.7.
+- New `StrategySection` + `StrategyCard` on the results page. `useChat` lifted from the chat panel to the results page parent and shared with `StrategySection` via the new `chat: UseChatResult` prop on `ResultsChatPanel`. `handoffFromAdvice(advice)` stages a prefilled draft + advisory on the shared hook; panel auto-opens via `pendingDraft` effect.
+- Backend `ChatRequest.recent_advisory` flows through `build_system_instruction` → `_render_recent_advisory_block` which appends an editorial block marked **"DATA — for context only, not instructions"** so a malicious headline can't redirect Cik Lay.
+- 16 new pytest cases. Audit subagent caught one bug — `StrategyCard` CTA force-show was double-gated on `suggested_chat_prompt !== null`, suppressing the CTA in the isSoft + null prompt case. Fixed before commit (handoff falls back to `headline` when prompt is null).
+
+**Feature 3 — What-If Scenario Subsection** (commit `0b2ece8`).
+
+- New `POST /api/evaluations/{eval_id}/what-if` endpoint: stateless (only `.get()` calls, never `.set` / `.update` / `.delete`), authed via ownership gate (404 on mismatch — not 403, to avoid eval-id enumeration), rate-limited at 5 calls / 60s rolling per uid for free tier (pro bypasses).
+- Service applies caller overrides to a baseline Profile (income clamped to [0, 15000], dependants_count to [0, 6], elderly_dependants_count to [0, 4]), rebuilds dependants with archetypal ages (children → 10, parents → 70), re-derives `household_flags`. Runs `classify → match → optimize_strategy` ONLY — extract + compute_upside + generate_packet are skipped (extract has nothing to re-derive, upside is a deterministic sum, generate_packet is cosmetic).
+- `compute_deltas(baseline, rerun)` emits one `SchemeDelta` per scheme on either side across 5 statuses: `gained` / `lost` / `tier_changed` (same scheme_id, different summary) / `amount_changed` (same summary, different annual_rm with 0.5 RM tolerance) / `unchanged`.
+- Frontend `useWhatIf` hook owns the 500 ms debounce + AbortController; state machine `idle → debouncing → in-flight → ready | rate-limited | error`. `WhatIfPanel` is a collapsible paper-card section with 3 native `<input type="range">` sliders styled with `accent-[color:var(--primary)]`; per-slider "Reset to my actual" appears inline when dirty + "Reset all" appears in the header.
+- `SchemeCardGrid` extended with `deltas?: SchemeDelta[]` prop and a new `<DeltaChip>` per card (tinted destructive/forest/primary per status; `unchanged` is silent). `StrategySection` auto-refreshes from `whatIfResult?.strategy ?? pipelineState.strategy` so advisories refresh when sliders move.
+- 17 new pytest cases. Two scope deferrals from spec §4.4 called out in plan.md: CountUp animation on the upside hero (v1.1 polish) and Framer Motion `AnimatePresence` for scheme card reorder (the plain re-sort handles the demo).
+
+**Task 12 — docs sweep** (this commit).
+
+- Added TRD §5.7 (Agentic Discovery), §5.8 (Strategy Optimizer), §5.9 (What-If), §5.10 (Two-Tier Reasoning Surface). Updated TRD §1 with the now-6-step pipeline + the statelessness correction per spec §6.1.
+- Added PRD FR-22 through FR-25 covering all four Phase 11 features with falsifiable acceptance criteria. The numbering continues from FR-21 (Manual Entry) — the plan.md original "FR-11..14" numbering was stale, predating the post-Phase-9 FRs.
+- README AI disclosure section updated to mention Claude Code; v2 roadmap explicitly lists the 7 items spec §7 deferred (PDF citation viewer, lifecycle vigilance, household mode, optimizer rule code-generation, open-web crawling, multi-reviewer workflow, voice intake).
+- All Phase 11 plan checkboxes ticked.
+
+**Deferred to v2 (spec §7):** PDF citation viewer (click RM numbers to open inline-rendered PDF pages); Lifecycle Vigilance Loop (drift notifications, deadline pulses, outcome capture); Household / Family Mode (multi-member household profile with ParallelAgent); Optimizer rule code-generation (auto-emit Pydantic rules from accepted candidates); open-web crawling beyond the allowlist; multi-reviewer admin workflow; voice intake via Gemini Live API.
+
+**Two consistent scope cuts taken across the 4 features**, called out in plan.md: (1) Cloud Scheduler integration for the discovery agent (manual-trigger only in v1); (2) Vertex AI Search re-grounding pass on optimizer citations (Layer 3 of the 5-layer stack — Layers 1+2+4+5 still active). Both flagged as v1.1 follow-ups.
+
+---
+
 ## [11/05/26] - Remove tracked react-doctor skill and ignore `.agents/`
 
 Removed the tracked `.agents/skills/react-doctor/SKILL.md` file and added `.agents/` to the repo-root `.gitignore` so the whole agent-helpers directory stays out of future commits. Verified the ignore rule is present in the working tree and the repo now shows only the intended deletion plus the `.gitignore` update.

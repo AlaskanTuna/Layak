@@ -353,8 +353,25 @@ This project has utilized AI tooling in the following ways to produce sustainabl
 - **Google AI Studio** — Prompt engineering and development-workflow design for the app.
 - **Google Antigravity IDE** — Code scaffolding and generation support.
 - **GitHub Copilot** — Documentation assistance and Git workflow support.
+- **Claude Code (Anthropic)** — Phase 11 production-grade SaaS enhancements: agentic scheme discovery + admin moderation, cross-scheme strategy optimizer with Cik Lay handoff, what-if scenario partial-rerun endpoint, two-tier reasoning surface, and the Phase 11 docs sweep. Every commit was audited by a parallel subagent before landing.
 
 All AI-assisted output is reviewed, tested, and integrated by human developers before commit.
+
+---
+
+## 🗺 v2 Roadmap (deferred from Phase 11)
+
+Phase 11 shipped four production-grade features for the Open Category finals. Seven items were deliberately deferred to v2 to keep the scope honest at ≈6 working days. They're tracked here so the team can point to them when asked "what about X?":
+
+- **PDF Citation Viewer** — clicking any RM value or eligibility claim opens the cited PDF page inline with the relevant paragraph highlighted. High-value for verification UX; deferred because it adds a PDF-rendering pipeline (PDF.js + page-extract) that doesn't fit the v1 timebox.
+- **Lifecycle Vigilance Loop** — user-facing drift notifications when an admin approves a discovery candidate that affects the user's matched schemes, plus deadline pulses for scheme filing windows and outcome capture on submitted packets.
+- **Household / Family Mode** — multi-member household profile, `ParallelAgent` per-member evaluation, and an aggregator agent that produces the family-level recommendation. Currently the pipeline evaluates one filer at a time.
+- **Optimizer rule code-generation** — auto-emit Pydantic rule modules from approved discovery candidates. v1 produces YAML manifests instead; an engineer hand-codes the Pydantic rule from the manifest. Auto-codegen needs more rigorous test coverage before it can ship without a human review step.
+- **Open-web crawling** — discovery agent scanning beyond the 7-source allowlist (e.g. via Google Custom Search or a curated RSS feed). v1 keeps the allowlist closed to prevent prompt-injection vectors.
+- **Multi-reviewer admin workflow** — reviewer + approver split with an audit log of who-approved-what. v1 ships a deliberately simple two-tier (user / admin) role scheme.
+- **Voice intake via Gemini Live API** — Bahasa Malaysia conversational profile capture as an alternative to the upload + manual-entry paths. Strong UX win for accessibility; needs a separate latency budget + safety harness.
+
+Two cuts taken inside Phase 11 itself (also v1.1 targets): Cloud Scheduler integration for the discovery agent (v1 ships manual-trigger only) and the Vertex AI Search re-grounding pass on optimizer citations (Layer 3 of the spec's 5-layer grounding stack — Layers 1+2+4+5 are active).
 
 ---
 

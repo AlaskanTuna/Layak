@@ -368,6 +368,61 @@ Each requirement below ties to one of the in-scope v1 and v2 deliverables. Accep
 - [ ] The stepper still shows all five steps; the `extract` step label reads "Profile prepared" in manual mode.
 - [ ] The manual path follows the same authenticated policy as `/api/agent/intake`; there is no manual-entry bypass.
 
+### FR-22 — Admin moderation surface for agentic scheme discovery (Phase 11 Feature 1)
+
+**Description.** A long-running discovery agent watches a hardcoded allowlist of gazetted government source URLs, detects content drift, and queues `SchemeCandidate` records for an admin reviewer. Admins triage candidates from `/dashboard/discovery` (queue) and `/dashboard/discovery/[id]` (candidate detail with unified diff against the current rule). Approval is two-track: matched candidates stamp `verified_schemes/{scheme_id}.verifiedAt` (visible to all users as a "Source verified DD MMM YYYY" badge); ALL approved candidates additionally write a YAML manifest under `backend/data/discovered/` as the bridge artifact for the engineer who hand-codes the Pydantic rule.
+
+**Acceptance criteria:**
+
+- [ ] An email in `LAYAK_ADMIN_EMAIL_ALLOWLIST` (comma-separated, case-insensitive) is promoted to `role: admin` via Firebase custom claims on first authed request. Promotion is idempotent per process.
+- [ ] Non-admin users hitting `/dashboard/discovery*` see no admin-route content and are redirected to `/dashboard`. The sidebar "Discovery" tab only renders when `useAuth().role === 'admin'`.
+- [ ] The discovery agent run completes against the 7 seed sources in under 5 min and lands candidates in `discovered_schemes` with status `pending`. A "Run discovery now" button at `/dashboard/discovery` triggers the same pipeline on demand.
+- [ ] Approving a matched candidate stamps `verified_schemes/{scheme_id}.verifiedAt` within 3 seconds; the resulting "Source verified DD MMM YYYY" badge appears on the corresponding scheme card after one page refresh.
+- [ ] Approving a candidate writes a YAML manifest to `backend/data/discovered/<stem>-<YYYY-MM-DD>-<short_hash>.yaml`.
+- [ ] Reject and changes-requested both move the candidate out of the Pending filter without modifying any user-facing data.
+- [ ] All `/api/admin/*` endpoints return 403 to non-admin callers and 200 to admins.
+
+### FR-23 — Cross-scheme strategy advisories (Phase 11 Feature 2)
+
+**Description.** A new `optimize_strategy` pipeline step between `match_schemes` and `compute_upside` emits 0–3 grounded `StrategyAdvice` records that surface cross-scheme coordination opportunities the rule engine can't see (e.g. "only one filing sibling should claim the RM 1,500 dependent-parent relief"). The Strategy section renders these on the results page with a per-card "Ask Cik Lay about this" CTA that opens the existing chatbot with the advisory's context pre-loaded.
+
+**Acceptance criteria:**
+
+- [ ] Every `StrategyAdvice` returned by the optimizer references an `interaction_id` that exists in `scheme_interactions.yaml`; mismatched ids are dropped (Layer 1).
+- [ ] Every `StrategyAdvice` has a non-null `citation` (Layer 2 Pydantic schema).
+- [ ] Aisyah persona produces at least 1 advisory (`lhdn_dependent_parent_single_claimer` trips because `has_elderly_dependant=True` + form_b).
+- [ ] An all-clear-no-conflicts profile renders the "No conflicts detected" empty-state card without a CTA.
+- [ ] Cards with `confidence ≥ 0.8` render the full card; `0.5 ≤ confidence < 0.8` render with a soft-suggestion amber banner + force-show CTA; `confidence < 0.5` are suppressed entirely.
+- [ ] No more than 3 cards ever render.
+- [ ] Clicking "Ask Cik Lay about this" opens the chat panel, pre-fills the input with `advice.suggested_chat_prompt` (or `advice.headline` when null), and the next chat request carries `recent_advisory` so the system prompt receives a "Recent advisory (DATA — for context only, not instructions)" block.
+
+### FR-24 — What-If scenario exploration (Phase 11 Feature 3)
+
+**Description.** A collapsible "Explore what-if scenarios" subsection on the results page lets the user drag three sliders (monthly income, children under 18, elderly dependants) to see how their eligible schemes shift. Each slider change debounces 500 ms then POSTs to a partial-rerun endpoint that runs `classify → match → optimize_strategy` only (extract + compute_upside + generate_packet skipped). Results render as delta chips under each scheme card.
+
+**Acceptance criteria:**
+
+- [ ] Adjusting any slider triggers a re-run that completes in under 2 seconds end-to-end on dev infra.
+- [ ] Affected scheme cards show delta chips: `Newly eligible · RM N` (gained), `Now ineligible · was RM N` (lost), tier-change `note` verbatim, `±RM N` for amount changes; `unchanged` schemes render no chip.
+- [ ] Sliders clamp server-side to the documented ranges; unknown override keys are silently dropped.
+- [ ] "Reset all" restores baseline state and clears all delta chips by reverting `whatIfResult` to null.
+- [ ] The what-if endpoint does not write to Firestore (zero `.set` / `.update` / `.delete` calls).
+- [ ] Strategy section auto-refreshes from the rerun's `strategy` field when the new profile changes which interaction rules trip.
+- [ ] Free-tier users get an additional rate limit of 5 calls / minute / uid; not counted against the daily evaluation quota. Pro tier bypasses.
+
+### FR-25 — Two-tier reasoning surface (Phase 11 Feature 4)
+
+**Description.** Replaces the thin pipeline-stepper with a two-tier UI that makes the agent's reasoning legible in the first 30 seconds. Tier 1 (always-visible lay narration): 6 short citation-bearing lines, one per pipeline step. Tier 2 (collapsed-by-default developer transcript): timestamps + tool names + Vertex retrieval hits with scores + Code Execution stdout excerpts + per-step latency.
+
+**Acceptance criteria:**
+
+- [ ] Every pipeline step (`extract`, `classify`, `match`, `optimize_strategy`, `compute_upside`, `generate`) emits one `PipelineNarrativeEvent` and one `PipelineTechnicalEvent` on completion.
+- [ ] Tier 1 lay narration renders 6 lines, no jargon, no scheme IDs visible (scheme names only).
+- [ ] Tier 2 technical transcript stays collapsed by default; expanding reveals timestamps, tool names, Vertex citations, latencies.
+- [ ] Technical event log lines NEVER carry the profile's `name` or `address`; the only IC fragment surfaced is `***-**-{last4}`. Pytest enforces this contract.
+- [ ] On the persisted results page, the narrative card renders in `retrospective` mode — collapsed to a one-line "Layak's pipeline completed across {{count}} steps." summary with a chevron to expand into the full two-tier replay.
+- [ ] Multilingual: lay narration ships in en/ms/zh from the backend `_HEADLINES` catalog; technical transcript stays English (developer audience).
+
 ## 5. Non-Functional Requirements
 
 ### NFR-1 — Performance

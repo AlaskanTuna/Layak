@@ -27,8 +27,8 @@ export type SchemeId =
   | 'lhdn_form_be'
   | 'perkeso_sksps'
   | 'i_saraan'
-  // `'budi95'` + `'mykasih'` ship in Phase 12 Features 4 + 5 alongside the
-  // rule modules + their localised display names.
+  | 'budi95'
+  // `'mykasih'` ships in Phase 12 Feature 5 alongside its rule module + display name.
 
 // `upside` stacks into the headline annual-relief total. `required_contribution`
 // (e.g. PERKESO SKSPS) surfaces a separate block — user pays money, not receives.

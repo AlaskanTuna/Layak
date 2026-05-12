@@ -8,12 +8,12 @@ list only surfaces the schemes the profile actually qualifies for.
 
 from __future__ import annotations
 
-from app.rules import i_saraan, jkm_bkk, jkm_warga_emas, lhdn_form_b, perkeso_sksps, str_2026
+from app.rules import budi95, i_saraan, jkm_bkk, jkm_warga_emas, lhdn_form_b, perkeso_sksps, str_2026
 from app.schema.locale import DEFAULT_LANGUAGE, SupportedLanguage
 from app.schema.profile import Profile
 from app.schema.scheme import SchemeMatch
 
-_RULES = (str_2026, jkm_warga_emas, jkm_bkk, lhdn_form_b, i_saraan, perkeso_sksps)
+_RULES = (str_2026, jkm_warga_emas, jkm_bkk, lhdn_form_b, i_saraan, perkeso_sksps, budi95)
 
 
 async def match_schemes(
@@ -28,20 +28,23 @@ async def match_schemes(
     Non-qualifying matches are filtered out — the frontend can still render
     out-of-scope schemes as `Checking… (v2)` cards.
 
-    Required-contribution matches (SKSPS) appear in this list too, with
-    `kind="required_contribution"` + `annual_rm=0.0`. The frontend filters
-    on `kind` to render them in a separate "Required contributions" block;
-    `compute_upside` sums `annual_rm` so the zero keeps upside math correct
-    without a second filter there.
+    Required-contribution matches (SKSPS) and subsidy-credit matches (BUDI95,
+    MyKasih) appear in this list too with `annual_rm=0.0`. The frontend
+    filters on `kind` to render them in distinct UI blocks; `compute_upside`
+    sums `annual_rm` so the zeros keep upside math correct without a second
+    filter there.
 
     `language` threads into each rule's `match()` so the human-readable
     `summary` + `why_qualify` strings render in the user's language.
     """
     results = [module.match(profile, language=language) for module in _RULES]
     qualifying = [m for m in results if m.qualifies]
-    # Primary sort: upside descending. Secondary sort: kind — pushes
-    # required_contribution entries to the bottom when two matches tie on
-    # annual_rm (SKSPS's zero would otherwise float up against a zero-upside
-    # upside scheme, but in practice no upside scheme returns 0 and qualifies).
-    qualifying.sort(key=lambda m: (m.kind != "upside", -m.annual_rm))
+    # Three-tier sort: upside first (descending by annual_rm), then
+    # subsidy_credit (info-only — user RECEIVES benefit, no payment),
+    # then required_contribution at the bottom (user PAYS). Within each
+    # bucket, descending annual_rm. Python's sort is stable so original
+    # iteration order is preserved within ties (both subsidy_credit and
+    # required_contribution have annual_rm=0.0).
+    _KIND_ORDER = {"upside": 0, "subsidy_credit": 1, "required_contribution": 2}
+    qualifying.sort(key=lambda m: (_KIND_ORDER.get(m.kind, 3), -m.annual_rm))
     return qualifying

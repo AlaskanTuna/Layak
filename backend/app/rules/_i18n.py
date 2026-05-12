@@ -530,6 +530,75 @@ def _perkeso_sksps_out_of_scope(language: SupportedLanguage, **v: Any) -> Scheme
 
 
 # ---------------------------------------------------------------------------
+# BUDI95 — info-only RON95 petrol subsidy card (Phase 12)
+# ---------------------------------------------------------------------------
+
+
+def _budi95_qualify(language: SupportedLanguage, **v: Any) -> SchemeCopy:
+    age = v["age"]
+    price = v["subsidised_price_rm"]
+    quota = v["monthly_quota_l"]
+    if language == "ms":
+        return {
+            "summary": (
+                f"Anda layak untuk subsidi RON95 BUDI95 pada RM{price:.2f}/L, "
+                f"hingga {quota} liter sebulan."
+            ),
+            "why_qualify": (
+                f"Anda berumur {age} (≥16) — layak untuk BUDI95. Bayar petrol "
+                f"RON95 pada RM{price:.2f} seliter di mana-mana stesen yang "
+                f"menyertai, dengan had {quota} L sebulan per pemegang MyKad. "
+                f"Klik 'Semak Baki' untuk melihat kuota tersisa di portal "
+                f"rasmi (memerlukan lesen memandu Malaysia yang sah)."
+            ),
+        }
+    if language == "zh":
+        return {
+            "summary": (
+                f"您符合 BUDI95 RON95 补贴资格，享受每升 RM{price:.2f} 的价格，"
+                f"每月最多 {quota} 升。"
+            ),
+            "why_qualify": (
+                f"您的年龄 {age} 岁（≥16），符合 BUDI95 资格。可在任何参与的加油站"
+                f"以每升 RM{price:.2f} 加 RON95 汽油，每位 MyKad 持有人每月限额"
+                f" {quota} 升。点击「查询余额」前往官方门户查看剩余配额（需持有"
+                f"有效的马来西亚驾照）。"
+            ),
+        }
+    return {
+        "summary": (
+            f"You're eligible for the BUDI95 RON95 subsidy at RM{price:.2f}/L, "
+            f"up to {quota} L per month."
+        ),
+        "why_qualify": (
+            f"You're {age} (≥16) — eligible for BUDI95. Pay RM{price:.2f} per "
+            f"litre for RON95 petrol at any participating station, capped at "
+            f"{quota} L per MyKad holder per month. Click 'Check your balance' "
+            f"to see your remaining quota on the official portal (requires a "
+            f"valid Malaysian driving licence)."
+        ),
+    }
+
+
+def _budi95_out_of_scope(language: SupportedLanguage, **v: Any) -> SchemeCopy:
+    reasons: list[str] = v["reasons"]
+    if language == "ms":
+        return {
+            "summary": "Belum layak untuk BUDI95.",
+            "why_qualify": "Di luar skop: " + "; ".join(reasons) + ".",
+        }
+    if language == "zh":
+        return {
+            "summary": "暂不符合 BUDI95 资格。",
+            "why_qualify": "不在受惠范围内：" + "；".join(reasons) + "。",
+        }
+    return {
+        "summary": "Not yet eligible for BUDI95.",
+        "why_qualify": "Out of scope: " + "; ".join(reasons) + ".",
+    }
+
+
+# ---------------------------------------------------------------------------
 # Reason fragments — rule modules pass localised reason strings into the
 # `out_of_scope` callables above. Keeping reason strings here (rather than
 # re-translating the full "Out of scope: X; Y." sentence inside every rule)
@@ -597,6 +666,12 @@ _REASON_FRAGMENTS: dict[str, dict[SupportedLanguage, str]] = {
         "en": "age {age} outside the i-Saraan window ({min_age}-{max_age})",
         "ms": "umur {age} di luar tetingkap i-Saraan ({min_age}-{max_age})",
         "zh": "年龄 {age} 岁超出 i-Saraan 的 {min_age}-{max_age} 岁区间",
+    },
+    # ---- BUDI95 ----
+    "budi95_age_below_min": {
+        "en": "age {age} below the BUDI95 minimum of {min_age}",
+        "ms": "umur {age} di bawah minimum BUDI95 iaitu {min_age}",
+        "zh": "年龄 {age} 岁低于 BUDI95 的最低 {min_age} 岁",
     },
     # ---- PERKESO SKSPS ----
     "perkeso_sksps_not_gig": {
@@ -690,6 +765,7 @@ _CATALOG: dict[SchemeId, dict[Variant, Callable[..., SchemeCopy]]] = {
         "qualify": _perkeso_sksps_qualify,
         "out_of_scope": _perkeso_sksps_out_of_scope,
     },
+    "budi95": {"qualify": _budi95_qualify, "out_of_scope": _budi95_out_of_scope},
 }
 
 

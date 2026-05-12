@@ -202,18 +202,22 @@ async def test_compute_upside_excludes_required_contribution_from_stdout_sum() -
 
 @pytest.mark.asyncio
 async def test_match_schemes_sorts_required_contribution_after_upside(aisyah: Profile) -> None:
-    """Dual-key sort: upside (annual_rm desc) then required_contribution
-    entries at the bottom."""
+    """Three-tier sort: upside (annual_rm desc) → subsidy_credit → required_contribution.
+    Phase 12 added BUDI95 (subsidy_credit) which sits between the upside cards
+    and the SKSPS required-contribution card."""
     matches = await match_schemes(aisyah)
-    # Find the boundary: all upside entries come first, then contributions.
     kinds = [m.kind for m in matches]
     upside_count = sum(1 for k in kinds if k == "upside")
+    subsidy_count = sum(1 for k in kinds if k == "subsidy_credit")
     contribution_count = sum(1 for k in kinds if k == "required_contribution")
-    # First `upside_count` entries are kind="upside"; the rest are contributions.
+    # Each bucket appears as a contiguous block in the locked order.
     assert kinds[:upside_count] == ["upside"] * upside_count
-    assert kinds[upside_count:] == ["required_contribution"] * contribution_count
-    # Aisyah: STR + Warga Emas + BKK + LHDN Form B + i-Saraan (5 upside) + SKSPS (1 contribution).
+    assert kinds[upside_count : upside_count + subsidy_count] == ["subsidy_credit"] * subsidy_count
+    assert kinds[upside_count + subsidy_count :] == ["required_contribution"] * contribution_count
+    # Aisyah: STR + Warga Emas + BKK + LHDN Form B + i-Saraan (5 upside) +
+    # BUDI95 (1 subsidy_credit, age 34 ≥ 16) + SKSPS (1 required_contribution).
     assert upside_count == 5
+    assert subsidy_count == 1
     assert contribution_count == 1
     assert matches[-1].scheme_id == "perkeso_sksps"
 

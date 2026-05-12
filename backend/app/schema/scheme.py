@@ -18,9 +18,7 @@ SchemeId = Literal[
     "lhdn_form_be",
     "perkeso_sksps",
     "i_saraan",
-    # `"budi95"` + `"mykasih"` added in Phase 12 Features 4 + 5 alongside
-    # their rule modules + i18n catalog entries so the rule_copy_coverage
-    # tests stay green.
+    "budi95",
 ]
 
 # `SchemeKind` taxonomy:

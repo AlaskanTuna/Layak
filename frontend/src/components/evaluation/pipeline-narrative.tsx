@@ -145,7 +145,7 @@ export function PipelineNarrative({ state, labelOverrides, retrospective }: Prop
               >
                 {labelFor(step)}
               </span>
-              <CyclingStatus status={status} statusLabel={statusLabel} narrative={narrative} />
+              <CyclingStatus status={status} statusLabel={statusLabel} narrative={narrative} activeLabel={labelFor(step)} />
             </li>
           )
         })}
@@ -187,20 +187,22 @@ export function PipelineNarrative({ state, labelOverrides, retrospective }: Prop
 function CyclingStatus({
   status,
   statusLabel,
-  narrative
+  narrative,
+  activeLabel
 }: {
   status: StepStatus
   statusLabel: (status: StepStatus) => string
   narrative: PipelineNarrativeEvent | null
+  activeLabel?: string | null
 }) {
   const items = useMemo(() => {
     const base = statusLabel(status)
     if (status === 'pending' || status === 'error') return [base]
-    if (!narrative) return [base]
+    if (!narrative) return status === 'active' && activeLabel ? [base, activeLabel] : [base]
     const out: string[] = [base, narrative.headline]
     if (narrative.data_point) out.push(narrative.data_point)
     return out
-  }, [status, statusLabel, narrative])
+  }, [status, statusLabel, narrative, activeLabel])
 
   const [idx, setIdx] = useState(0)
 

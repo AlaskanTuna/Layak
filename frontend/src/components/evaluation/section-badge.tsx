@@ -24,10 +24,13 @@ export function SectionBadge(props: Props) {
   const variant: Variant = props.variant ?? (props.required ? 'required' : 'optional')
 
   if (variant === 'required') {
+    // Neutral warm-ink pill — decoupled from the forest/teal active-tab
+    // indicator and from any severity colour. "Required" is the baseline
+    // here; we don't want it to grab attention, just to mark presence.
     return (
       <span
         className={cn(
-          'inline-flex items-center rounded-full border border-amber-500/30 bg-amber-500/10 px-2 py-0.5 text-[10px] font-medium uppercase tracking-[0.14em] text-amber-700 dark:text-amber-400',
+          'inline-flex items-center rounded-full border border-foreground/20 bg-foreground/[0.04] px-2 py-0.5 text-[10px] font-medium uppercase tracking-[0.14em] text-foreground/70',
           props.className
         )}
       >
@@ -52,10 +55,11 @@ export function SectionBadge(props: Props) {
     )
   }
 
+  // Optional — even lighter, outlined-only. Communicates "skip if you want."
   return (
     <span
       className={cn(
-        'inline-flex items-center rounded-full border border-emerald-500/30 bg-emerald-500/10 px-2 py-0.5 text-[10px] font-medium uppercase tracking-[0.14em] text-emerald-700 dark:text-emerald-400',
+        'inline-flex items-center rounded-full border border-foreground/15 px-2 py-0.5 text-[10px] font-medium uppercase tracking-[0.14em] text-foreground/55',
         props.className
       )}
     >

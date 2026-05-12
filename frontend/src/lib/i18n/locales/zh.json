@@ -572,6 +572,7 @@
       "sampleDropdownAisyahDesc": "Grab 司机 · 表格 B",
       "sampleDropdownFarhanDesc": "受薪教师 · 表格 BE",
       "continue": "继续评估",
+      "readyCount": "已准备 {{ready}} / {{total}} 份文件",
       "readyTitle": "继续前请先确认",
       "readyIc": "使用身份证正面，并确保文字清晰可读。",
       "readyPayslip": "使用您最新的工资单或收入证明。",

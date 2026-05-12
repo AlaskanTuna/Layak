@@ -360,41 +360,43 @@ export function ManualEntryForm({ onSubmit, onUseSamples, onClear, disabled = fa
           >
             <Textarea id="mef-address" rows={3} maxLength={300} disabled={disabled} {...register('address')} />
           </Field>
-          <Field
-            label={t('evaluation.manual.costLabel')}
-            help={t('evaluation.manual.costHelp')}
-            error={formState.errors.monthly_cost_rm?.message}
-            htmlFor="mef-cost"
-          >
-            <Input
-              id="mef-cost"
-              type="number"
-              inputMode="decimal"
-              step="0.01"
-              min={0}
-              max={100000}
-              placeholder={t('evaluation.manual.costPlaceholder')}
-              disabled={disabled}
-              {...register('monthly_cost_rm')}
-            />
-          </Field>
-          <Field
-            label={t('evaluation.manual.kwhLabel')}
-            help={t('evaluation.manual.kwhHelp')}
-            error={formState.errors.monthly_kwh?.message}
-            htmlFor="mef-kwh"
-          >
-            <Input
-              id="mef-kwh"
-              type="number"
-              inputMode="numeric"
-              min={0}
-              max={10000}
-              placeholder={t('evaluation.manual.kwhPlaceholder')}
-              disabled={disabled}
-              {...register('monthly_kwh')}
-            />
-          </Field>
+          <div className="grid gap-3 sm:grid-cols-2">
+            <Field
+              label={t('evaluation.manual.costLabel')}
+              help={t('evaluation.manual.costHelp')}
+              error={formState.errors.monthly_cost_rm?.message}
+              htmlFor="mef-cost"
+            >
+              <Input
+                id="mef-cost"
+                type="number"
+                inputMode="decimal"
+                step="0.01"
+                min={0}
+                max={100000}
+                placeholder={t('evaluation.manual.costPlaceholder')}
+                disabled={disabled}
+                {...register('monthly_cost_rm')}
+              />
+            </Field>
+            <Field
+              label={t('evaluation.manual.kwhLabel')}
+              help={t('evaluation.manual.kwhHelp')}
+              error={formState.errors.monthly_kwh?.message}
+              htmlFor="mef-kwh"
+            >
+              <Input
+                id="mef-kwh"
+                type="number"
+                inputMode="numeric"
+                min={0}
+                max={10000}
+                placeholder={t('evaluation.manual.kwhPlaceholder')}
+                disabled={disabled}
+                {...register('monthly_kwh')}
+              />
+            </Field>
+          </div>
         </div>
       </section>
 

@@ -583,6 +583,7 @@
       "sampleDropdownAisyahDesc": "Gig driver · Form B",
       "sampleDropdownFarhanDesc": "Salaried teacher · Form BE",
       "continue": "Continue Evaluation",
+      "readyCount": "{{ready}} of {{total}} documents ready",
       "readyTitle": "Before you continue",
       "readyIc": "Use the front of your IC and make sure the text is easy to read.",
       "readyPayslip": "Use your latest payslip or income statement.",

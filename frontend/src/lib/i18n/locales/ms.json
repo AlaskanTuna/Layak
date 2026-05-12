@@ -583,6 +583,7 @@
       "sampleDropdownAisyahDesc": "Pemandu gig · Borang B",
       "sampleDropdownFarhanDesc": "Guru bergaji · Borang BE",
       "continue": "Teruskan penilaian",
+      "readyCount": "{{ready}} daripada {{total}} dokumen sedia",
       "readyTitle": "Sebelum anda teruskan",
       "readyIc": "Gunakan bahagian hadapan IC anda dan pastikan teks mudah dibaca.",
       "readyPayslip": "Gunakan slip gaji atau penyata pendapatan terkini anda.",

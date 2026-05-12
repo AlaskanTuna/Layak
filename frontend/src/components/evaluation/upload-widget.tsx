@@ -1,7 +1,18 @@
 'use client'
 
 import { useId, useRef, useState } from 'react'
-import { ArrowRight, ChevronDown, Eye, FileText, UploadCloud, X } from 'lucide-react'
+import {
+  ArrowRight,
+  ChevronDown,
+  Eye,
+  FileText,
+  IdCard,
+  type LucideIcon,
+  Receipt,
+  UploadCloud,
+  X,
+  Zap
+} from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import type { TFunction } from 'i18next'
 
@@ -38,21 +49,30 @@ type SlotSpec = {
   labelKey: string
   hintKey: string
   required: boolean
+  icon: LucideIcon
 }
 
 const SLOT_SPECS: SlotSpec[] = [
-  { slot: 'ic', labelKey: 'evaluation.upload.sectionIc', hintKey: 'evaluation.upload.hintIc', required: true },
+  {
+    slot: 'ic',
+    labelKey: 'evaluation.upload.sectionIc',
+    hintKey: 'evaluation.upload.hintIc',
+    required: true,
+    icon: IdCard
+  },
   {
     slot: 'payslip',
     labelKey: 'evaluation.upload.sectionPayslip',
     hintKey: 'evaluation.upload.hintPayslip',
-    required: true
+    required: true,
+    icon: Receipt
   },
   {
     slot: 'utility',
     labelKey: 'evaluation.upload.sectionUtility',
     hintKey: 'evaluation.upload.hintUtility',
-    required: true
+    required: true,
+    icon: Zap
   }
 ]
 
@@ -121,15 +141,17 @@ function UploadSlotCard({ spec, state, inputId, disabled, inputRef, onChange, on
   const errorId = `${inputId}-error`
   const label = t(spec.labelKey)
   const hint = t(spec.hintKey)
+  const SlotIcon = spec.icon
 
   return (
-    <div className="paper-card flex flex-col gap-3 rounded-[14px] p-5 sm:p-6">
-      <div className="flex flex-col gap-1.5">
-        <div className="flex items-center gap-2">
-          <p className="font-sans text-base font-medium tracking-tight">{label}</p>
-          <InfoTooltip content={hint} label={hint} />
-          <SectionBadge required={spec.required} />
-        </div>
+    <div className="paper-card flex flex-col gap-3 rounded-[14px] p-4 sm:p-5">
+      <div className="flex items-center gap-2.5">
+        <span className="flex size-8 shrink-0 items-center justify-center rounded-md bg-foreground/[0.05] text-foreground/70">
+          <SlotIcon className="size-4" aria-hidden />
+        </span>
+        <p className="font-sans text-[15px] font-medium tracking-tight">{label}</p>
+        <InfoTooltip content={hint} label={hint} />
+        <SectionBadge required={spec.required} className="ml-auto" />
       </div>
 
       {file ? (
@@ -170,14 +192,12 @@ function UploadSlotCard({ spec, state, inputId, disabled, inputRef, onChange, on
         <label
           htmlFor={inputId}
           className={cn(
-            'flex min-h-[180px] cursor-pointer flex-col items-center justify-center gap-3 rounded-lg border border-dashed border-foreground/15 bg-foreground/[0.02] px-6 py-10 text-center transition-colors hover:border-[color:var(--hibiscus)]/45 hover:bg-[color:var(--hibiscus)]/[0.03] sm:min-h-[220px] sm:gap-4 sm:py-14',
+            'flex min-h-[110px] cursor-pointer flex-col items-center justify-center gap-2 rounded-lg border border-dashed border-foreground/15 bg-foreground/[0.02] px-6 py-6 text-center transition-colors hover:border-[color:var(--hibiscus)]/45 hover:bg-[color:var(--hibiscus)]/[0.03] sm:min-h-[130px] sm:py-7',
             error && 'border-[color:var(--hibiscus)]/55 bg-[color:var(--hibiscus)]/[0.06] hover:border-[color:var(--hibiscus)]/70',
             disabled && 'pointer-events-none opacity-50'
           )}
         >
-          <div className="flex size-9 items-center justify-center rounded-md bg-foreground/[0.06] text-foreground/55">
-            <UploadCloud className="size-4" aria-hidden />
-          </div>
+          <UploadCloud className="size-5 text-foreground/45" aria-hidden />
           <p className="text-sm">
             <span className="font-medium text-[color:var(--hibiscus)]">{t('evaluation.upload.dropzonePrimary')}</span>{' '}
             <span className="text-foreground/65">{t('evaluation.upload.dropzoneSecondary')}</span>
@@ -372,7 +392,13 @@ export function UploadWidget({ onSubmit, disabled = false, submitId }: Props) {
         </div>
       </div>
 
-      <div className="flex justify-end border-t border-foreground/10 pt-5">
+      <div className="flex flex-col gap-3 border-t border-foreground/10 pt-5 sm:flex-row sm:items-center sm:justify-between">
+        <span className="mono-caption text-foreground/55">
+          {t('evaluation.upload.readyCount', {
+            ready: (['ic', 'payslip', 'utility'] as const).filter((s) => state[s].file !== null).length,
+            total: 3
+          })}
+        </span>
         <Button
           id={submitId}
           type="button"

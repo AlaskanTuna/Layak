@@ -1035,9 +1035,17 @@
           "status": "Status",
           "actions": "Actions"
         },
-        "review": "Review →",
+        "review": "Review",
         "approve": "Approve",
-        "reject": "Reject"
+        "reject": "Reject",
+        "selected": "{{count}} selected",
+        "selectedSummary": "{{count}} candidate(s) staged for deletion.",
+        "deleteAction": "Delete {{count}}",
+        "deleteConfirm": "Delete {{count}} candidate(s) from the queue? This cannot be undone.",
+        "deletePartialFailure": "Deleted {{deleted}} of {{total}}; {{failed}} failed.",
+        "selectRowAria": "Select candidate {{name}}",
+        "selectPageAria": "Select all candidates",
+        "deselectPageAria": "Deselect all candidates"
       },
       "health": {
         "title": "Scheme verification health",
@@ -1077,6 +1085,27 @@
         "actionError": "Action failed: {{message}}",
         "manifestReady": "Approved · YAML manifest persisted to candidate document",
         "downloadManifest": "Download manifest"
+      },
+      "notify": {
+        "approve": {
+          "title": "Candidate approved",
+          "body": "{{name}} marked verified."
+        },
+        "reject": {
+          "title": "Candidate rejected",
+          "body": "{{name}} moved to Rejected."
+        },
+        "changes": {
+          "title": "Changes requested",
+          "body": "{{name}} moved to Changes Requested."
+        },
+        "deleteSuccess": {
+          "title": "Candidates deleted",
+          "body": "{{count}} candidate(s) removed from the queue."
+        },
+        "deleteFailure": {
+          "title": "Delete failed"
+        }
       }
     }
   },

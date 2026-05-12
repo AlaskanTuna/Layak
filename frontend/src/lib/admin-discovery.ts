@@ -142,6 +142,15 @@ export async function requestChangesCandidate(
   return jsonOrThrow<ActionResponse>(res)
 }
 
+export async function deleteCandidate(candidateId: string): Promise<void> {
+  const res = await authedFetch(`${backendBase()}/api/admin/discovery/${candidateId}`, {
+    method: 'DELETE'
+  })
+  if (!res.ok) {
+    throw new Error(`${candidateId}: ${res.status} ${res.statusText}`)
+  }
+}
+
 export async function fetchSchemeHealth(): Promise<SchemeHealthResponse> {
   const res = await authedFetch(`${backendBase()}/api/admin/schemes/health`)
   return jsonOrThrow<SchemeHealthResponse>(res)

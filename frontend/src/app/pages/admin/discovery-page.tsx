@@ -14,7 +14,7 @@ import { fetchQueue, type CandidateRow, type QueueFilter } from '@/lib/admin-dis
 
 function DiscoveryPageInner() {
   const { t } = useTranslation()
-  const [filter, setFilter] = useState<QueueFilter>('pending')
+  const [filter, setFilter] = useState<QueueFilter>('all')
   const [rows, setRows] = useState<CandidateRow[]>([])
   const [phase, setPhase] = useState<'loading' | 'ready' | 'error'>('loading')
   const [error, setError] = useState<string | null>(null)
@@ -78,7 +78,7 @@ function DiscoveryPageInner() {
             {error}
           </p>
         )}
-        {phase === 'ready' && <DiscoveryQueueTable rows={rows} />}
+        {phase === 'ready' && <DiscoveryQueueTable rows={rows} onRefresh={reload} />}
       </section>
     </div>
   )

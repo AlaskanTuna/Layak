@@ -1035,9 +1035,17 @@
           "status": "Status",
           "actions": "Tindakan"
         },
-        "review": "Semak →",
+        "review": "Semak",
         "approve": "Luluskan",
-        "reject": "Tolak"
+        "reject": "Tolak",
+        "selected": "{{count}} dipilih",
+        "selectedSummary": "{{count}} calon ditandakan untuk dipadam.",
+        "deleteAction": "Padam {{count}}",
+        "deleteConfirm": "Padam {{count}} calon dari baris gilir? Tindakan ini tidak boleh diundur.",
+        "deletePartialFailure": "{{deleted}} daripada {{total}} dipadam; {{failed}} gagal.",
+        "selectRowAria": "Pilih calon {{name}}",
+        "selectPageAria": "Pilih semua calon",
+        "deselectPageAria": "Nyahpilih semua calon"
       },
       "health": {
         "title": "Kesihatan pengesahan skim",
@@ -1077,6 +1085,27 @@
         "actionError": "Tindakan gagal: {{message}}",
         "manifestReady": "Diluluskan · Manifes YAML disimpan dalam dokumen calon",
         "downloadManifest": "Muat turun manifes"
+      },
+      "notify": {
+        "approve": {
+          "title": "Calon diluluskan",
+          "body": "{{name}} ditandakan sebagai disahkan."
+        },
+        "reject": {
+          "title": "Calon ditolak",
+          "body": "{{name}} dipindah ke Ditolak."
+        },
+        "changes": {
+          "title": "Permohonan perubahan",
+          "body": "{{name}} dipindah ke Perubahan Dipohon."
+        },
+        "deleteSuccess": {
+          "title": "Calon dipadam",
+          "body": "{{count}} calon dibuang dari baris gilir."
+        },
+        "deleteFailure": {
+          "title": "Padam gagal"
+        }
       }
     }
   },

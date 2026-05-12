@@ -15,6 +15,7 @@ import {
   requestChangesCandidate,
   type CandidateDetail
 } from '@/lib/admin-discovery'
+import { notificationStore } from '@/lib/notification-store'
 
 type ExistingRule = {
   name: string
@@ -56,6 +57,14 @@ export function CandidateDetailCard({
       if (res.manifest_yaml) {
         setManifestYaml(res.manifest_yaml)
       }
+      const notifyKey = action === 'approve' ? 'approve' : action === 'reject' ? 'reject' : 'changes'
+      const severity = action === 'approve' ? 'success' : action === 'reject' ? 'error' : 'info'
+      notificationStore.notify({
+        title: t(`admin.discovery.notify.${notifyKey}.title`),
+        description: t(`admin.discovery.notify.${notifyKey}.body`, { name: candidate.name }),
+        severity,
+        toast: true
+      })
       router.refresh()
     } catch (err) {
       setError(err instanceof Error ? err.message : String(err))

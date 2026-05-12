@@ -32,7 +32,7 @@ from pathlib import Path
 from typing import Annotated, Any, Literal
 
 import yaml
-from fastapi import APIRouter, BackgroundTasks, HTTPException, Query, status
+from fastapi import APIRouter, BackgroundTasks, HTTPException, Query, Response, status
 from fastapi import Path as PathParam
 from google.cloud.firestore_v1 import SERVER_TIMESTAMP  # type: ignore[attr-defined, unused-ignore]
 from pydantic import BaseModel, ConfigDict, Field
@@ -330,6 +330,29 @@ async def request_changes_candidate(
 ) -> ActionResponse:
     _transition(user, candidate_id, "changes_requested", payload.note)
     return ActionResponse(candidate_id=candidate_id, status="changes_requested")
+
+
+@router.delete("/discovery/{candidate_id}", status_code=status.HTTP_204_NO_CONTENT)
+async def delete_candidate(
+    _admin: AdminUser,
+    candidate_id: Annotated[str, PathParam(min_length=1)],
+) -> Response:
+    """Remove a candidate from the moderation queue.
+
+    Used by the admin UI's bulk-delete action. 204 on success even when the
+    doc doesn't exist — idempotent so concurrent reviewers don't 404 each
+    other when both delete the same row.
+    """
+    db = get_firestore()
+    try:
+        db.collection("discovered_schemes").document(candidate_id).delete()
+    except Exception as exc:  # noqa: BLE001 — surface as 503 so the client can retry.
+        _logger.exception("Failed to delete discovered_schemes/%s", candidate_id)
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail="Failed to delete candidate",
+        ) from exc
+    return Response(status_code=status.HTTP_204_NO_CONTENT)
 
 
 @router.post("/discovery/trigger", response_model=DiscoveryRunSummary)

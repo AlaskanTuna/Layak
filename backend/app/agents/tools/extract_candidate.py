@@ -136,8 +136,19 @@ async def extract_candidate(changed: ChangedSource) -> SchemeCandidate | None:
         )
         return None
 
+    # Prefer the curated source id when it's a canonical SchemeId — the YAML
+    # allowlist entry's id is the operator's declared intent for what the page
+    # represents (e.g. lhdn_form_b), which is more reliable than Gemini's
+    # free-form proposal (which often returns something close but non-canonical
+    # like "lhdn_personal_relief" for a multi-relief LHDN page). Falls back to
+    # Gemini's proposal only when the source id itself isn't canonical.
     proposed_scheme_id = raw.get("scheme_id")
-    scheme_id = proposed_scheme_id if proposed_scheme_id in _KNOWN_SCHEME_IDS else None
+    if changed.source.id in _KNOWN_SCHEME_IDS:
+        scheme_id: str | None = changed.source.id
+    elif isinstance(proposed_scheme_id, str) and proposed_scheme_id in _KNOWN_SCHEME_IDS:
+        scheme_id = proposed_scheme_id
+    else:
+        scheme_id = None
 
     citation_snippet = raw.get("citation_snippet")
     if not isinstance(citation_snippet, str) or not citation_snippet.strip():

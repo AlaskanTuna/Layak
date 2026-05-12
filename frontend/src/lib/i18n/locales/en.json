@@ -560,6 +560,7 @@
       "upload": "Upload",
       "results": "Results",
       "schemes": "Schemes",
+      "discovery": "Discovery",
       "settings": "Settings",
       "signIn": "Sign In",
       "signUp": "Sign Up"
@@ -1010,21 +1011,21 @@
       "pageEyebrow": "Discovery",
       "pageTitle": "Scheme Discovery Queue",
       "pageDescription": "Review source changes before they reach users.",
-      "triggerButton": "Run discovery now",
+      "triggerButton": "Run Discovery Now",
       "triggerRunning": "Running…",
-      "triggerSuccessTitle": "Discovery run complete",
+      "triggerSuccessTitle": "Discovery Run Complete",
       "triggerSuccess": "{{checked}} sources checked, {{changed}} changed, {{extracted}} candidates extracted",
-      "triggerErrorTitle": "Discovery run failed",
+      "triggerErrorTitle": "Discovery Run Failed",
       "triggerError": "Discovery run failed: {{message}}",
       "filters": {
         "all": "All",
         "pending": "Pending",
         "approved": "Approved",
         "rejected": "Rejected",
-        "changes_requested": "Changes requested"
+        "changes_requested": "Changes Requested"
       },
       "queue": {
-        "title": "Moderation queue",
+        "title": "Moderation Queue",
         "empty": "No candidates match this filter.",
         "loading": "Loading queue…",
         "columns": {
@@ -1048,63 +1049,63 @@
         "deselectPageAria": "Deselect all candidates"
       },
       "health": {
-        "title": "Scheme verification health",
+        "title": "Scheme Verification Health",
         "subtitle": "Last successful verification per scheme from the discovery pipeline.",
         "empty": "No schemes verified yet. Trigger a discovery run to populate this list.",
         "verifiedPrefix": "Source verified ",
         "neverVerified": "Never verified"
       },
       "detail": {
-        "backToQueue": "← Back to queue",
-        "headingNew": "New scheme candidate",
-        "headingMatched": "Update to existing scheme",
-        "sectionCandidate": "Proposed payload",
-        "sectionExisting": "Current rule",
+        "backToQueue": "← Back to Queue",
+        "headingNew": "New Scheme Candidate",
+        "headingMatched": "Update to Existing Scheme",
+        "sectionCandidate": "Proposed Payload",
+        "sectionExisting": "Current Rule",
         "fields": {
           "name": "Name",
           "agency": "Agency",
           "schemeId": "Scheme ID",
           "schemeIdUnmatched": "(no match — engineer hand-code required)",
-          "eligibilitySummary": "Eligibility summary",
-          "rateSummary": "Rate summary",
-          "citation": "Citation snippet",
+          "eligibilitySummary": "Eligibility Summary",
+          "rateSummary": "Rate Summary",
+          "citation": "Citation Snippet",
           "sourceUrl": "Source URL",
-          "confidence": "AI confidence",
+          "confidence": "AI Confidence",
           "extractedAt": "Extracted",
-          "contentHash": "Source content hash"
+          "contentHash": "Source Content Hash"
         },
-        "diffTitle": "Proposed vs. current",
+        "diffTitle": "Proposed vs. Current",
         "diffEmpty": "No existing rule found — this is a brand-new scheme. Approving will write a YAML manifest for engineer review only.",
         "actions": {
           "approve": "Approve",
           "reject": "Reject",
-          "requestChanges": "Request changes",
+          "requestChanges": "Request Changes",
           "notePlaceholder": "Optional admin note…"
         },
         "actionSuccess": "Done. Status is now {{status}}.",
         "actionError": "Action failed: {{message}}",
         "manifestReady": "Approved · YAML manifest persisted to candidate document",
-        "downloadManifest": "Download manifest"
+        "downloadManifest": "Download Manifest"
       },
       "notify": {
         "approve": {
-          "title": "Candidate approved",
+          "title": "Candidate Approved",
           "body": "{{name}} marked verified."
         },
         "reject": {
-          "title": "Candidate rejected",
+          "title": "Candidate Rejected",
           "body": "{{name}} moved to Rejected."
         },
         "changes": {
-          "title": "Changes requested",
+          "title": "Changes Requested",
           "body": "{{name}} moved to Changes Requested."
         },
         "deleteSuccess": {
-          "title": "Candidates deleted",
+          "title": "Candidates Deleted",
           "body": "{{count}} candidate(s) removed from the queue."
         },
         "deleteFailure": {
-          "title": "Delete failed"
+          "title": "Delete Failed"
         }
       }
     }

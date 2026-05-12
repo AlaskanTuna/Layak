@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { Loader2, Radar } from 'lucide-react'
+import { Loader2 } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 
 import { Button } from '@/components/ui/button'
@@ -55,7 +55,7 @@ export function DiscoveryTrigger({ onCompleted }: { onCompleted: () => void }) {
   return (
     <div className="flex flex-col items-end gap-2">
       <Button type="button" onClick={handleClick} disabled={busy} className="gap-2">
-        {busy ? <Loader2 className="size-4 animate-spin" aria-hidden /> : <Radar className="size-4" aria-hidden />}
+        {busy && <Loader2 className="size-4 animate-spin" aria-hidden />}
         {busy ? t('admin.discovery.triggerRunning') : t('admin.discovery.triggerButton')}
       </Button>
       {phase === 'done' && summary && (

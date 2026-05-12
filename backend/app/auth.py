@@ -12,6 +12,14 @@ Credentials:
     via `--set-secrets=FIREBASE_ADMIN_KEY=firebase-admin-key:latest`. If the env
     var is missing, `current_user` returns 503 Service Unavailable — not 500
     — so the frontend can distinguish a misconfigured service from a bad token.
+
+Role model:
+    Every `users/{uid}` doc carries a `role` field (`"user"` or `"admin"`).
+    Sign-ups default to `"user"`. Admins are set by direct Firestore write
+    (e.g. via a seed script or the Firebase Console). The backend reads
+    `role` from Firestore on every authed request — single source of truth,
+    no token-claim mirror. Legacy docs missing the field are backfilled to
+    `"user"` on first authed touch so the field is monotonically present.
 """
 
 from __future__ import annotations
@@ -21,7 +29,7 @@ import logging
 import os
 from dataclasses import dataclass
 from threading import Lock
-from typing import Annotated, Any
+from typing import Annotated, Any, Literal
 
 import firebase_admin
 from fastapi import Depends, Header, HTTPException, Request, status
@@ -32,12 +40,7 @@ from google.cloud.firestore_v1 import SERVER_TIMESTAMP  # type: ignore[attr-defi
 _logger = logging.getLogger(__name__)
 
 _FIREBASE_ADMIN_KEY_ENV = "FIREBASE_ADMIN_KEY"
-_ADMIN_EMAIL_ALLOWLIST_ENV = "LAYAK_ADMIN_EMAIL_ALLOWLIST"
 _init_lock = Lock()
-# Per-process record of uids we've already promoted to admin since cold start.
-# The bootstrap is idempotent; this guard exists so steady-state requests skip
-# the Firebase Auth round-trip after the first promotion in a given process.
-_admin_promoted_uids: set[str] = set()
 
 # Shared demo account used by the public-access guest sign-in flow. Hackathon
 # submission requires the deployed URL to be reachable without Google sign-in,
@@ -63,51 +66,6 @@ class _FirebaseState:
 _state = _FirebaseState()
 
 
-def _admin_email_allowlist() -> frozenset[str]:
-    """Parse the comma-separated `LAYAK_ADMIN_EMAIL_ALLOWLIST` env var.
-
-    Whitespace is stripped, entries are lower-cased, and empty tokens are
-    discarded. Returns an empty frozenset when the env var is unset — in
-    that mode no user is ever promoted to admin, which is the correct
-    fail-closed default for prod environments that haven't been configured.
-    """
-    raw = os.environ.get(_ADMIN_EMAIL_ALLOWLIST_ENV, "")
-    return frozenset(email.strip().lower() for email in raw.split(",") if email.strip())
-
-
-def _ensure_admin_claim(uid: str, email: str | None) -> bool:
-    """Promote `uid` to `role=admin` when its verified email is allowlisted.
-
-    Idempotent per process: a uid that has already been promoted (or skipped)
-    in this process is cached so subsequent requests do not call Firebase
-    Auth again. The promotion writes a custom claim via the Admin SDK; the
-    user must refresh their ID token (force-refresh or sign-out + sign-in)
-    before the claim becomes visible to the frontend.
-
-    Returns True when this call wrote the claim, False otherwise.
-    """
-    if not email or uid in _admin_promoted_uids:
-        return False
-    allowlist = _admin_email_allowlist()
-    if not allowlist or email.lower() not in allowlist:
-        _admin_promoted_uids.add(uid)  # negative cache — skip the lookup next time
-        return False
-    try:
-        record = fb_auth.get_user(uid)
-        existing = dict(record.custom_claims or {})
-        if existing.get("role") == "admin":
-            _admin_promoted_uids.add(uid)
-            return False
-        existing["role"] = "admin"
-        fb_auth.set_custom_user_claims(uid, existing)
-        _admin_promoted_uids.add(uid)
-        _logger.info("Promoted %s to admin role via allowlist", email)
-        return True
-    except Exception:  # noqa: BLE001 — promotion is best-effort, must not break the request
-        _logger.exception("Failed to ensure admin claim for uid=%s", uid)
-        return False
-
-
 @dataclass(frozen=True, slots=True)
 class UserInfo:
     """Owner identity propagated to every authed route.
@@ -126,6 +84,10 @@ class UserInfo:
     every auth cycle so the pipeline prompts and `humanize_error` pick up
     the user's current preference. Legacy docs without the field default
     to `"en"`.
+
+    `role` ("user" | "admin"). Read from `users/{uid}.role` on every auth
+    cycle. Defaults to `"user"` for fresh sign-ups and legacy docs missing
+    the field (backfilled on first authed touch via `_upsert_user_doc`).
     """
 
     uid: str
@@ -134,10 +96,7 @@ class UserInfo:
     photo_url: str | None
     tier: str = "free"
     language: str = "en"
-    # `role` is read from the verified ID token's custom claims on every
-    # auth cycle. `None` for ordinary users; `"admin"` after the email
-    # allowlist bootstrap promotes a uid (see `_ensure_admin_claim`).
-    role: str | None = None
+    role: Literal["user", "admin"] = "user"
 
 
 def _init_firebase_admin() -> firebase_admin.App:
@@ -171,8 +130,6 @@ def _init_firebase_admin() -> firebase_admin.App:
                 detail="Firebase Admin key is malformed",
             ) from exc
         except (ValueError, TypeError) as exc:
-            # `credentials.Certificate` raises ValueError on missing keys
-            # (e.g. no "private_key") and TypeError on wrong-shape inputs.
             _logger.exception("FIREBASE_ADMIN_KEY is not a valid service-account credential")
             raise HTTPException(
                 status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
@@ -226,6 +183,7 @@ def mint_guest_custom_token() -> str:
             "photoURL": None,
             "tier": GUEST_TIER,
             "language": "en",
+            "role": "user",
             "createdAt": SERVER_TIMESTAMP,
             "lastLoginAt": SERVER_TIMESTAMP,
             "pdpaConsentAt": SERVER_TIMESTAMP,
@@ -249,6 +207,7 @@ def verify_firebase_id_token(id_token: str) -> dict[str, Any]:
 
 
 _SUPPORTED_LANGUAGES = ("en", "ms", "zh")
+_VALID_ROLES: tuple[Literal["user", "admin"], ...] = ("user", "admin")
 
 
 def _coerce_language(raw: Any) -> str:
@@ -258,18 +217,28 @@ def _coerce_language(raw: Any) -> str:
     return "en"
 
 
-def _upsert_user_doc(uid: str, claims: dict[str, Any], has_consent: bool = False) -> tuple[str, str]:
+def _coerce_role(raw: Any) -> Literal["user", "admin"]:
+    """Clamp a Firestore `role` value to a known role or `"user"`."""
+    if isinstance(raw, str) and raw in _VALID_ROLES:
+        return raw  # type: ignore[return-value]
+    return "user"
+
+
+def _upsert_user_doc(
+    uid: str, claims: dict[str, Any], has_consent: bool = False
+) -> tuple[str, str, Literal["user", "admin"]]:
     """Lazy-create `users/{uid}` on first touch; refresh `lastLoginAt` after.
 
-    Returns `(tier, language)` — both read from the existing doc, or
-    `("free", "en")` on fresh creation. `tier` drives rate-limit enforcement
-    and `language` drives pipeline localisation; piggybacking on the snapshot
-    we already fetched beats two extra round-trips per request.
+    Returns `(tier, language, role)` — read from the existing doc, or
+    `("free", "en", "user")` on fresh creation. `tier` drives rate-limit
+    enforcement, `language` drives pipeline localisation, `role` gates
+    admin routes. Legacy docs missing the `role` field are backfilled to
+    `"user"` on touch so the field is monotonically present.
 
     Shape:
         email, displayName, photoURL, tier ∈ {"free", "pro"},
-        language ∈ {"en", "ms", "zh"}, createdAt, lastLoginAt,
-        pdpaConsentAt (null until sign-up consent).
+        language ∈ {"en", "ms", "zh"}, role ∈ {"user", "admin"},
+        createdAt, lastLoginAt, pdpaConsentAt (null until sign-up consent).
 
     Two-request race is tolerated (acknowledged-and-accepted): both writers
     would set the same claims on identical creation data, and
@@ -284,12 +253,16 @@ def _upsert_user_doc(uid: str, claims: dict[str, Any], has_consent: bool = False
         update_data["pdpaConsentAt"] = SERVER_TIMESTAMP
 
     if snapshot.exists:
-        ref.update(update_data)
         data = snapshot.to_dict() or {}
         tier = data.get("tier", "free")
         tier = tier if tier in ("free", "pro") else "free"
         language = _coerce_language(data.get("language"))
-        return tier, language
+        role = _coerce_role(data.get("role"))
+        if data.get("role") not in _VALID_ROLES:
+            # Backfill the role field on legacy docs — idempotent on touch.
+            update_data["role"] = role
+        ref.update(update_data)
+        return tier, language, role
 
     new_doc = {
         "email": claims.get("email"),
@@ -297,12 +270,13 @@ def _upsert_user_doc(uid: str, claims: dict[str, Any], has_consent: bool = False
         "photoURL": claims.get("picture"),
         "tier": "free",
         "language": "en",
+        "role": "user",
         "createdAt": SERVER_TIMESTAMP,
         "lastLoginAt": SERVER_TIMESTAMP,
         "pdpaConsentAt": SERVER_TIMESTAMP if has_consent else None,
     }
     ref.set(new_doc)
-    return "free", "en"
+    return "free", "en", "user"
 
 
 async def current_user(
@@ -363,16 +337,7 @@ async def current_user(
         )
 
     has_consent = x_pdpa_consent == "true"
-    tier, language = _upsert_user_doc(uid, claims, has_consent)
-
-    # Idempotent per-process bootstrap: if this uid's email is in the admin
-    # allowlist and the claim is not yet set, promote on this request. The
-    # client must refresh its ID token (auto-handled via `getIdToken(true)`
-    # on the frontend) before the claim becomes visible.
-    email = claims.get("email")
-    _ensure_admin_claim(uid, email if isinstance(email, str) else None)
-    raw_role = claims.get("role")
-    role = raw_role if isinstance(raw_role, str) else None
+    tier, language, role = _upsert_user_doc(uid, claims, has_consent)
 
     request.state.user_id = uid
     return UserInfo(

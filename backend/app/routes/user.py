@@ -26,7 +26,7 @@ from __future__ import annotations
 import json
 import logging
 from datetime import UTC, datetime
-from typing import Any
+from typing import Any, Literal
 
 from fastapi import APIRouter, HTTPException, status
 from firebase_admin import auth as fb_auth
@@ -58,6 +58,7 @@ class _UserMeResponse(BaseModel):
     photoURL: str | None  # noqa: N815
     tier: str
     language: SupportedLanguage
+    role: Literal["user", "admin"]
 
 
 class _PreferencesPatch(BaseModel):
@@ -88,6 +89,7 @@ async def get_user_me(user: CurrentUser) -> _UserMeResponse:
         photoURL=user.photo_url,
         tier=user.tier,
         language=user.language,  # type: ignore[arg-type]
+        role=user.role,
     )
 
 

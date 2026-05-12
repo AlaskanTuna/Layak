@@ -47,6 +47,11 @@ class UserDoc(BaseModel):
     # `language` field; readers default to `"en"` so missing-field docs
     # validate without a backfill.
     language: SupportedLanguage = DEFAULT_LANGUAGE
+    # RBAC role for admin-gated routes. Sign-ups default to "user". Admins
+    # are set by direct Firestore write (seed script or Firebase Console).
+    # Legacy docs without the field are backfilled to "user" on first authed
+    # touch by `app.auth._upsert_user_doc`.
+    role: Literal["user", "admin"] = "user"
     createdAt: datetime | None = None  # noqa: N815 — SERVER_TIMESTAMP resolves async
     lastLoginAt: datetime | None = None  # noqa: N815
     pdpaConsentAt: datetime | None = None  # noqa: N815

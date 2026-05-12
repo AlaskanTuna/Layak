@@ -1,0 +1,71 @@
+# Discovery agent v1 source allowlist.
+#
+# Each entry pins one gazetted government URL that the source-watcher polls,
+# hashes, and diffs against the last-seen content hash stored in the
+# `verified_schemes` Firestore collection. A diff triggers the Gemini
+# extractor; the extracted SchemeCandidate lands in `discovered_schemes`
+# with status="pending" for admin review.
+#
+# Schema (Pydantic-validated on load by app.agents.tools.source_watcher):
+#   id                       lower_snake_case key; matches `scheme_id` in
+#                             backend/app/rules/<id>.py when the source maps
+#                             to a scheme Layak already supports
+#   name                     human-readable label shown in the admin UI
+#   agency                   issuing agency acronym (MOF / JKM / LHDN / ...)
+#   url                      authoritative source URL
+#   content_selector         optional CSS selector to narrow the diffed
+#                             content (falls through to the full body)
+#   check_frequency_hours    polling cadence hint; v1 always polls every
+#                             scheduled run, this is recorded for v2 cron
+#
+# Out of scope (v2 roadmap, per spec §2.4):
+#   open-web crawling, dynamic allowlist editing in-product, RSS/Atom feeds.
+
+- id: str_2026
+  name: STR 2026 Bantuan Sara Hidup
+  agency: MOF
+  url: https://belanjawan.mof.gov.my/sumbangan-tunai-rahmah-str
+  content_selector: null
+  check_frequency_hours: 24
+
+- id: bk_01
+  name: BK-01 Bantuan Kanak-Kanak
+  agency: MOF
+  url: https://www.hasil.gov.my/en/individual/individual-life-cycle/family/child-relief
+  content_selector: null
+  check_frequency_hours: 24
+
+- id: jkm_warga_emas
+  name: JKM Warga Emas monthly allowance
+  agency: JKM
+  url: https://www.jkm.gov.my/jkm/index.php?r=portal/left&id=ZE5QRldRRy85WGRuNWlMa0lyQTNFUT09
+  content_selector: null
+  check_frequency_hours: 24
+
+- id: jkm_bkk
+  name: JKM Bantuan Kanak-Kanak (BKK)
+  agency: JKM
+  url: https://www.jkm.gov.my/jkm/index.php?r=portal/left&id=NUFGQURJUmJzMmkrcmZuVnFZSlhZQT09
+  content_selector: null
+  check_frequency_hours: 24
+
+- id: lhdn_form_b
+  name: LHDN Form B reliefs (Public Ruling 4/2024)
+  agency: LHDN
+  url: https://www.hasil.gov.my/en/individual/individual-life-cycle/employment/personal-income-tax-relief/
+  content_selector: null
+  check_frequency_hours: 24
+
+- id: i_saraan
+  name: KWSP i-Saraan voluntary contribution
+  agency: KWSP
+  url: https://www.kwsp.gov.my/en/member/savings/i-saraan
+  content_selector: null
+  check_frequency_hours: 24
+
+- id: perkeso_sksps
+  name: PERKESO SKSPS Self-Employment Social Security
+  agency: PERKESO
+  url: https://www.perkeso.gov.my/en/our-services/protection/self-employment-social-security-scheme.html
+  content_selector: null
+  check_frequency_hours: 24

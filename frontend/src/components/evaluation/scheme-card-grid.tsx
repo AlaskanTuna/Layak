@@ -3,6 +3,7 @@
 import { ArrowRight } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 
+import { SchemeVerifiedBadge } from '@/components/schemes/scheme-verified-badge'
 import { Button } from '@/components/ui/button'
 import type { SchemeMatch } from '@/lib/agent-types'
 import { localisedSchemeName } from '@/lib/scheme-name'
@@ -97,11 +98,12 @@ export function SchemeCardGrid({ matches }: Props) {
               </div>
 
               <footer className="flex items-end justify-between gap-3 border-t border-foreground/10 pt-3">
-                <div className="flex flex-col">
+                <div className="flex flex-col gap-1">
                   <p className="mono-caption text-foreground/55">{t('evaluation.schemeCard.estValue')}</p>
                   <p className="font-heading text-[15px] font-semibold tabular-nums text-foreground">
                     {formatRm(match.annual_rm)}
                   </p>
+                  <SchemeVerifiedBadge schemeId={match.scheme_id} />
                 </div>
                 <Button
                   render={<a href={match.portal_url} target="_blank" rel="noopener noreferrer" />}

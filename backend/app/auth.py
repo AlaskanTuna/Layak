@@ -32,7 +32,12 @@ from google.cloud.firestore_v1 import SERVER_TIMESTAMP  # type: ignore[attr-defi
 _logger = logging.getLogger(__name__)
 
 _FIREBASE_ADMIN_KEY_ENV = "FIREBASE_ADMIN_KEY"
+_ADMIN_EMAIL_ALLOWLIST_ENV = "LAYAK_ADMIN_EMAIL_ALLOWLIST"
 _init_lock = Lock()
+# Per-process record of uids we've already promoted to admin since cold start.
+# The bootstrap is idempotent; this guard exists so steady-state requests skip
+# the Firebase Auth round-trip after the first promotion in a given process.
+_admin_promoted_uids: set[str] = set()
 
 # Shared demo account used by the public-access guest sign-in flow. Hackathon
 # submission requires the deployed URL to be reachable without Google sign-in,
@@ -56,6 +61,51 @@ class _FirebaseState:
 
 
 _state = _FirebaseState()
+
+
+def _admin_email_allowlist() -> frozenset[str]:
+    """Parse the comma-separated `LAYAK_ADMIN_EMAIL_ALLOWLIST` env var.
+
+    Whitespace is stripped, entries are lower-cased, and empty tokens are
+    discarded. Returns an empty frozenset when the env var is unset — in
+    that mode no user is ever promoted to admin, which is the correct
+    fail-closed default for prod environments that haven't been configured.
+    """
+    raw = os.environ.get(_ADMIN_EMAIL_ALLOWLIST_ENV, "")
+    return frozenset(email.strip().lower() for email in raw.split(",") if email.strip())
+
+
+def _ensure_admin_claim(uid: str, email: str | None) -> bool:
+    """Promote `uid` to `role=admin` when its verified email is allowlisted.
+
+    Idempotent per process: a uid that has already been promoted (or skipped)
+    in this process is cached so subsequent requests do not call Firebase
+    Auth again. The promotion writes a custom claim via the Admin SDK; the
+    user must refresh their ID token (force-refresh or sign-out + sign-in)
+    before the claim becomes visible to the frontend.
+
+    Returns True when this call wrote the claim, False otherwise.
+    """
+    if not email or uid in _admin_promoted_uids:
+        return False
+    allowlist = _admin_email_allowlist()
+    if not allowlist or email.lower() not in allowlist:
+        _admin_promoted_uids.add(uid)  # negative cache — skip the lookup next time
+        return False
+    try:
+        record = fb_auth.get_user(uid)
+        existing = dict(record.custom_claims or {})
+        if existing.get("role") == "admin":
+            _admin_promoted_uids.add(uid)
+            return False
+        existing["role"] = "admin"
+        fb_auth.set_custom_user_claims(uid, existing)
+        _admin_promoted_uids.add(uid)
+        _logger.info("Promoted %s to admin role via allowlist", email)
+        return True
+    except Exception:  # noqa: BLE001 — promotion is best-effort, must not break the request
+        _logger.exception("Failed to ensure admin claim for uid=%s", uid)
+        return False
 
 
 @dataclass(frozen=True, slots=True)
@@ -84,6 +134,10 @@ class UserInfo:
     photo_url: str | None
     tier: str = "free"
     language: str = "en"
+    # `role` is read from the verified ID token's custom claims on every
+    # auth cycle. `None` for ordinary users; `"admin"` after the email
+    # allowlist bootstrap promotes a uid (see `_ensure_admin_claim`).
+    role: str | None = None
 
 
 def _init_firebase_admin() -> firebase_admin.App:
@@ -311,6 +365,15 @@ async def current_user(
     has_consent = x_pdpa_consent == "true"
     tier, language = _upsert_user_doc(uid, claims, has_consent)
 
+    # Idempotent per-process bootstrap: if this uid's email is in the admin
+    # allowlist and the claim is not yet set, promote on this request. The
+    # client must refresh its ID token (auto-handled via `getIdToken(true)`
+    # on the frontend) before the claim becomes visible.
+    email = claims.get("email")
+    _ensure_admin_claim(uid, email if isinstance(email, str) else None)
+    raw_role = claims.get("role")
+    role = raw_role if isinstance(raw_role, str) else None
+
     request.state.user_id = uid
     return UserInfo(
         uid=uid,
@@ -319,7 +382,36 @@ async def current_user(
         photo_url=claims.get("picture"),
         tier=tier,
         language=language,
+        role=role,
     )
 
 
 CurrentUser = Annotated[UserInfo, Depends(current_user)]
+
+
+async def require_admin(user: CurrentUser) -> UserInfo:
+    """FastAPI dependency that 403s any non-admin caller.
+
+    Pairs with `verify_admin_role(user)` for routes that need to check the
+    role mid-handler (rather than via `Depends`). Both paths read the same
+    `user.role` snapshot.
+    """
+    verify_admin_role(user)
+    return user
+
+
+def verify_admin_role(user: UserInfo) -> None:
+    """Raise 403 when `user.role` is not `"admin"`.
+
+    Imperative-style guard for code paths that already have a `UserInfo`
+    in hand. Routes that want dependency-style enforcement should use
+    `Depends(require_admin)` instead.
+    """
+    if user.role != "admin":
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Admin role required",
+        )
+
+
+AdminUser = Annotated[UserInfo, Depends(require_admin)]

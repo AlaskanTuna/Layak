@@ -7,7 +7,9 @@ import { ArrowRight, Loader2 } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 
 import { GoogleIcon } from '@/components/auth/google-icon'
+import { EmailSignInForm } from '@/components/sign-in/email-sign-in-form'
 import { Button } from '@/components/ui/button'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 
 import { useAuth } from '@/lib/auth-context'
 import { signInAsGuest, signInWithGoogle } from '@/lib/firebase'
@@ -60,41 +62,52 @@ export function SignInForm() {
         <p className="text-sm text-muted-foreground">{t('auth.signIn.description')}</p>
       </div>
 
-      <div className="grid gap-4">
-        <Button type="button" size="lg" onClick={handleGoogle} disabled={busy} className="w-full text-base h-12">
-          {pending === 'google' ? (
-            <Loader2 className="mr-2 size-5 animate-spin" aria-hidden />
-          ) : (
-            <GoogleIcon className="mr-2 size-5" />
-          )}
-          {t('common.button.continueWithGoogle')}
-          <ArrowRight className="ml-2 size-5 opacity-70" aria-hidden />
-        </Button>
+      <Tabs defaultValue="google" className="w-full">
+        <TabsList className="grid w-full grid-cols-2">
+          <TabsTrigger value="google">{t('auth.signIn.tabGoogle')}</TabsTrigger>
+          <TabsTrigger value="email">{t('auth.signIn.tabEmail')}</TabsTrigger>
+        </TabsList>
 
-        <div className="flex items-center gap-3 text-[11px] uppercase tracking-[0.16em] text-muted-foreground">
-          <span aria-hidden className="h-px flex-1 bg-border" />
-          {t('auth.signIn.orDivider')}
-          <span aria-hidden className="h-px flex-1 bg-border" />
-        </div>
+        <TabsContent value="google" className="mt-4 grid gap-4">
+          <Button type="button" size="lg" onClick={handleGoogle} disabled={busy} className="w-full text-base h-12">
+            {pending === 'google' ? (
+              <Loader2 className="mr-2 size-5 animate-spin" aria-hidden />
+            ) : (
+              <GoogleIcon className="mr-2 size-5" />
+            )}
+            {t('common.button.continueWithGoogle')}
+            <ArrowRight className="ml-2 size-5 opacity-70" aria-hidden />
+          </Button>
+        </TabsContent>
 
-        <Button
-          type="button"
-          size="lg"
-          variant="outline"
-          onClick={handleGuest}
-          disabled={busy}
-          className="w-full text-base h-12"
-        >
-          {pending === 'guest' && <Loader2 className="mr-2 size-5 animate-spin" aria-hidden />}
-          {t('auth.signIn.continueAsGuest')}
-        </Button>
+        <TabsContent value="email" className="mt-4">
+          <EmailSignInForm onSuccess={() => router.replace('/dashboard')} disabled={busy} />
+        </TabsContent>
+      </Tabs>
 
-        {error && (
-          <div className="rounded-md bg-destructive/15 p-3 text-sm text-destructive" role="alert">
-            {error}
-          </div>
-        )}
+      <div className="flex items-center gap-3 text-[11px] uppercase tracking-[0.16em] text-muted-foreground">
+        <span aria-hidden className="h-px flex-1 bg-border" />
+        {t('auth.signIn.orDivider')}
+        <span aria-hidden className="h-px flex-1 bg-border" />
       </div>
+
+      <Button
+        type="button"
+        size="lg"
+        variant="outline"
+        onClick={handleGuest}
+        disabled={busy}
+        className="w-full text-base h-12"
+      >
+        {pending === 'guest' && <Loader2 className="mr-2 size-5 animate-spin" aria-hidden />}
+        {t('auth.signIn.continueAsGuest')}
+      </Button>
+
+      {error && (
+        <div className="rounded-md bg-destructive/15 p-3 text-sm text-destructive" role="alert">
+          {error}
+        </div>
+      )}
 
       <p className="px-8 text-center text-sm text-muted-foreground">
         {t('auth.signIn.noAccountPrefix')}{' '}

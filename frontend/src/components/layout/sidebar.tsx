@@ -3,23 +3,26 @@
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useEffect, useState } from 'react'
-import { LayoutDashboard, Library, Menu, Sparkles, type LucideIcon } from 'lucide-react'
+import { LayoutDashboard, Library, Menu, Radar, Sparkles, type LucideIcon } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 
 import { BrandMark } from '@/components/layout/brand-mark'
 import { Button } from '@/components/ui/button'
+import { useAuth } from '@/lib/auth-context'
 import { cn } from '@/lib/utils'
 
 type NavItem = {
   href: string
   labelKey: string
   icon: LucideIcon
+  requireRole?: 'admin'
 }
 
 const NAV_ITEMS: NavItem[] = [
   { href: '/dashboard', labelKey: 'common.nav.dashboard', icon: LayoutDashboard },
   { href: '/dashboard/evaluation', labelKey: 'common.nav.evaluation', icon: Sparkles },
-  { href: '/dashboard/schemes', labelKey: 'common.nav.schemes', icon: Library }
+  { href: '/dashboard/schemes', labelKey: 'common.nav.schemes', icon: Library },
+  { href: '/dashboard/discovery', labelKey: 'common.nav.discovery', icon: Radar, requireRole: 'admin' }
 ]
 
 type SidebarProps = {
@@ -30,11 +33,14 @@ type SidebarProps = {
 export function Sidebar({ mobileOpen, onMobileClose }: SidebarProps) {
   const { t } = useTranslation()
   const pathname = usePathname()
+  const { role } = useAuth()
   const [collapsed, setCollapsed] = useState(true)
 
   useEffect(() => {
     onMobileClose()
   }, [pathname, onMobileClose])
+
+  const visibleNavItems = NAV_ITEMS.filter((item) => !item.requireRole || role === item.requireRole)
 
   function renderContent(isCollapsed: boolean) {
     return (
@@ -54,7 +60,7 @@ export function Sidebar({ mobileOpen, onMobileClose }: SidebarProps) {
         </div>
 
         <nav className="flex flex-1 flex-col gap-0.5 overflow-y-auto p-2">
-          {NAV_ITEMS.map((item) => {
+          {visibleNavItems.map((item) => {
             const Icon = item.icon
             const active = pathname === item.href
             const label = t(item.labelKey)

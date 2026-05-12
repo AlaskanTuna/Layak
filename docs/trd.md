@@ -450,54 +450,70 @@ Layak's v2 surface is editorial-civic — government-handbook reimagined as a di
 
 **colour tokens.** source: `frontend/src/app/globals.css`.
 
-| Token                          | Light (oklch)                  | Dark (oklch)              | Role                    |
-| ------------------------------ | ------------------------------ | ------------------------- | ----------------------- |
-| `--background`                 | `oklch(0.945 0.012 82)`        | `oklch(0.145 0 0)`        | app canvas              |
-| `--foreground`                 | `oklch(0.21 0.008 55)`         | `oklch(0.985 0 0)`        | default text            |
-| `--card`                       | `oklch(0.975 0.008 82)`        | `oklch(0.2 0 0)`          | card surface            |
-| `--card-foreground`            | `oklch(0.21 0.008 55)`         | `oklch(0.985 0 0)`        | card text               |
-| `--popover`                    | `oklch(0.975 0.008 82)`        | `oklch(0.2 0 0)`          | popover surface         |
-| `--popover-foreground`         | `oklch(0.21 0.008 55)`         | `oklch(0.985 0 0)`        | popover text            |
-| `--primary`                    | `oklch(0.47 0.065 177)`        | `oklch(0.65 0.1 177)`     | primary accent          |
-| `--primary-foreground`         | `oklch(0.975 0.008 82)`        | `oklch(0.145 0 0)`        | text on primary         |
-| `--secondary`                  | `oklch(0.88 0.02 82)`          | `oklch(0.25 0 0)`         | secondary surface       |
-| `--secondary-foreground`       | `oklch(0.21 0.008 55)`         | `oklch(0.985 0 0)`        | text on secondary       |
-| `--muted`                      | `oklch(0.88 0.02 82)`          | `oklch(0.25 0 0)`         | muted surface           |
-| `--muted-foreground`           | `oklch(0.5 0.015 65)`          | `oklch(0.7 0 0)`          | muted text              |
-| `--accent`                     | `oklch(0.88 0.02 82)`          | `oklch(0.25 0 0)`         | accent surface          |
-| `--accent-foreground`          | `oklch(0.21 0.008 55)`         | `oklch(0.985 0 0)`        | text on accent          |
-| `--destructive`                | `oklch(0.55 0.19 27)`          | `oklch(0.6 0.19 27)`      | destructive state       |
-| `--border`                     | `oklch(0.82 0.022 80)`         | `oklch(0.25 0 0)`         | border                  |
-| `--input`                      | `oklch(0.82 0.022 80)`         | `oklch(0.25 0 0)`         | form control border     |
-| `--ring`                       | `oklch(0.47 0.065 177)`        | `oklch(0.65 0.1 177)`     | focus ring              |
-| `--chart-1`                    | `oklch(0.47 0.065 177)`        | `oklch(0.65 0.1 177)`     | chart slot 1            |
-| `--chart-2`                    | `oklch(0.5 0.015 65)`          | `oklch(0.7 0 0)`          | chart slot 2            |
-| `--chart-3`                    | `oklch(0.65 0.08 177)`         | `oklch(0.75 0.08 176)`    | chart slot 3            |
-| `--chart-4`                    | `oklch(0.35 0.05 177)`         | `oklch(0.45 0.06 176)`    | chart slot 4            |
-| `--chart-5`                    | `oklch(0.75 0.06 177)`         | `oklch(0.85 0.05 176)`    | chart slot 5            |
-| `--radius`                     | `0.625rem`                     | same                      | radius seed             |
-| `--sidebar`                    | `oklch(0.945 0.012 82)`        | `oklch(0.145 0 0)`        | sidebar surface         |
-| `--sidebar-foreground`         | `oklch(0.21 0.008 55)`         | `oklch(0.985 0 0)`        | sidebar text            |
-| `--sidebar-primary`            | `oklch(0.47 0.065 177)`        | `oklch(0.65 0.1 177)`     | sidebar primary         |
-| `--sidebar-primary-foreground` | `oklch(0.975 0.008 82)`        | `oklch(0.145 0 0)`        | sidebar primary text    |
-| `--sidebar-accent`             | `oklch(0.88 0.02 82)`          | `oklch(0.25 0 0)`         | sidebar accent          |
-| `--sidebar-accent-foreground`  | `oklch(0.21 0.008 55)`         | `oklch(0.985 0 0)`        | sidebar accent text     |
-| `--sidebar-border`             | `oklch(0.82 0.022 80)`         | `oklch(0.25 0 0)`         | sidebar border          |
-| `--sidebar-ring`               | `oklch(0.47 0.065 177)`        | `oklch(0.65 0.1 177)`     | sidebar focus ring      |
-| `--sidebar-width`              | `220px`                        | same                      | expanded sidebar width  |
-| `--sidebar-collapsed`          | `64px`                         | same                      | collapsed sidebar width |
-| `--topbar-height`              | `56px`                         | same                      | topbar height           |
-| `--glass-blur`                 | `16px`                         | same                      | glass blur radius       |
-| `--glass-bg`                   | `oklch(0.945 0.012 82 / 0.72)` | `oklch(0.145 0 0 / 0.72)` | glass surface fill      |
-| `--glass-border`               | `oklch(0.21 0.008 55 / 0.08)`  | `oklch(0.985 0 0 / 0.08)` | glass surface border    |
-| `--hibiscus`                   | `oklch(0.58 0.19 25)`          | `oklch(0.66 0.18 25)`     | hibiscus accent         |
-| `--hibiscus-foreground`        | `oklch(0.985 0.008 82)`        | `oklch(0.145 0 0)`        | text on hibiscus        |
-| `--forest`                     | `oklch(0.5 0.09 160)`          | `oklch(0.65 0.1 160)`     | forest accent           |
-| `--forest-foreground`          | `oklch(0.985 0.008 82)`        | `oklch(0.145 0 0)`        | text on forest          |
-| `--ink`                        | `oklch(0.16 0.01 55)`          | `oklch(0.985 0 0)`        | ink text                |
-| `--paper`                      | `oklch(0.98 0.012 82)`         | `oklch(0.2 0 0)`          | paper surface           |
+Light mode is a warm sand palette (hue family ~55–82, chroma 0.008–0.022) on aged-paper white. Dark mode is a deliberately warm "midnight-sepia" palette: it mirrors the light theme's hue family (~78–82, warm yellow-orange) at low chroma (0.012–0.016) so dark surfaces read as "aged vellum at night" rather than chroma-0 SaaS black. Hibiscus retains its accent role in both themes, reading warm-on-warm in dark mode instead of hot-on-cold.
 
-the editorial accent triad is fixed: teal `--primary`, hibiscus `--hibiscus`, and forest `--forest`. no other brand accent enters the system without updating this section.
+| Token                          | Light (oklch)                  | Dark (oklch)                  | Role                    |
+| ------------------------------ | ------------------------------ | ----------------------------- | ----------------------- |
+| `--background`                 | `oklch(0.945 0.012 82)`        | `oklch(0.16 0.014 78)`        | app canvas              |
+| `--foreground`                 | `oklch(0.21 0.008 55)`         | `oklch(0.93 0.012 82)`        | default text            |
+| `--card`                       | `oklch(0.975 0.008 82)`        | `oklch(0.21 0.014 78)`        | card surface            |
+| `--card-foreground`            | `oklch(0.21 0.008 55)`         | `oklch(0.93 0.012 82)`        | card text               |
+| `--popover`                    | `oklch(0.975 0.008 82)`        | `oklch(0.21 0.014 78)`        | popover surface         |
+| `--popover-foreground`         | `oklch(0.21 0.008 55)`         | `oklch(0.93 0.012 82)`        | popover text            |
+| `--primary`                    | `oklch(0.47 0.065 177)`        | `oklch(0.72 0.075 177)`       | primary accent          |
+| `--primary-foreground`         | `oklch(0.975 0.008 82)`        | `oklch(0.16 0.014 78)`        | text on primary         |
+| `--secondary`                  | `oklch(0.88 0.02 82)`          | `oklch(0.27 0.014 78)`        | secondary surface       |
+| `--secondary-foreground`       | `oklch(0.21 0.008 55)`         | `oklch(0.93 0.012 82)`        | text on secondary       |
+| `--muted`                      | `oklch(0.88 0.02 82)`          | `oklch(0.27 0.014 78)`        | muted surface           |
+| `--muted-foreground`           | `oklch(0.5 0.015 65)`          | `oklch(0.7 0.012 80)`         | muted text              |
+| `--accent`                     | `oklch(0.88 0.02 82)`          | `oklch(0.27 0.014 78)`        | accent surface          |
+| `--accent-foreground`          | `oklch(0.21 0.008 55)`         | `oklch(0.93 0.012 82)`        | text on accent          |
+| `--destructive`                | `oklch(0.55 0.19 27)`          | `oklch(0.65 0.19 27)`         | destructive state       |
+| `--warning`                    | `oklch(0.72 0.15 75)`          | `oklch(0.78 0.13 75)`         | warning state           |
+| `--warning-foreground`         | `oklch(0.21 0.008 55)`         | `oklch(0.16 0.014 78)`        | text on warning         |
+| `--border`                     | `oklch(0.82 0.022 80)`         | `oklch(0.3 0.014 78)`         | border                  |
+| `--input`                      | `oklch(0.82 0.022 80)`         | `oklch(0.3 0.014 78)`         | form control border     |
+| `--ring`                       | `oklch(0.47 0.065 177)`        | `oklch(0.72 0.075 177)`       | focus ring              |
+| `--chart-1`                    | `oklch(0.47 0.065 177)`        | `oklch(0.72 0.075 177)`       | chart slot 1            |
+| `--chart-2`                    | `oklch(0.5 0.015 65)`          | `oklch(0.7 0.012 80)`         | chart slot 2            |
+| `--chart-3`                    | `oklch(0.65 0.08 177)`         | `oklch(0.78 0.08 176)`        | chart slot 3            |
+| `--chart-4`                    | `oklch(0.35 0.05 177)`         | `oklch(0.5 0.07 176)`         | chart slot 4            |
+| `--chart-5`                    | `oklch(0.75 0.06 177)`         | `oklch(0.85 0.05 176)`        | chart slot 5            |
+| `--radius`                     | `0.625rem`                     | same                          | radius seed             |
+| `--sidebar`                    | `oklch(0.945 0.012 82)`        | `oklch(0.16 0.014 78)`        | sidebar surface         |
+| `--sidebar-foreground`         | `oklch(0.21 0.008 55)`         | `oklch(0.93 0.012 82)`        | sidebar text            |
+| `--sidebar-primary`            | `oklch(0.47 0.065 177)`        | `oklch(0.72 0.075 177)`       | sidebar primary         |
+| `--sidebar-primary-foreground` | `oklch(0.975 0.008 82)`        | `oklch(0.16 0.014 78)`        | sidebar primary text    |
+| `--sidebar-accent`             | `oklch(0.88 0.02 82)`          | `oklch(0.27 0.014 78)`        | sidebar accent          |
+| `--sidebar-accent-foreground`  | `oklch(0.21 0.008 55)`         | `oklch(0.93 0.012 82)`        | sidebar accent text     |
+| `--sidebar-border`             | `oklch(0.82 0.022 80)`         | `oklch(0.3 0.014 78)`         | sidebar border          |
+| `--sidebar-ring`               | `oklch(0.47 0.065 177)`        | `oklch(0.72 0.075 177)`       | sidebar focus ring      |
+| `--sidebar-width`              | `220px`                        | same                          | expanded sidebar width  |
+| `--sidebar-collapsed`          | `64px`                         | same                          | collapsed sidebar width |
+| `--topbar-height`              | `56px`                         | same                          | topbar height           |
+| `--glass-blur`                 | `16px`                         | same                          | glass blur radius       |
+| `--glass-bg`                   | `oklch(0.945 0.012 82 / 0.72)` | `oklch(0.16 0.014 78 / 0.72)` | glass surface fill      |
+| `--glass-border`               | `oklch(0.21 0.008 55 / 0.08)`  | `oklch(0.93 0.012 82 / 0.08)` | glass surface border    |
+| `--hibiscus`                   | `oklch(0.58 0.19 25)`          | `oklch(0.66 0.18 25)`         | hibiscus accent         |
+| `--hibiscus-foreground`        | `oklch(0.985 0.008 82)`        | `oklch(0.16 0.014 78)`        | text on hibiscus        |
+| `--forest`                     | `oklch(0.5 0.09 160)`          | `oklch(0.62 0.09 160)`        | forest accent           |
+| `--forest-foreground`          | `oklch(0.985 0.008 82)`        | `oklch(0.16 0.014 78)`        | text on forest          |
+| `--ink`                        | `oklch(0.16 0.01 55)`          | `oklch(0.93 0.012 82)`        | ink text                |
+| `--paper`                      | `oklch(0.98 0.012 82)`         | `oklch(0.21 0.014 78)`        | paper surface           |
+
+the editorial accent triad is fixed: teal `--primary`, hibiscus `--hibiscus`, and forest `--forest`. `--warning` (amber-yellow ~75) is reserved for transient states (toast, validation) and is not part of the brand triad. no other brand accent enters the system without updating this section.
+
+**radius scale.** source: `@theme inline` in `frontend/src/app/globals.css`. All radii derive from `--radius` (light + dark: `0.625rem`).
+
+| Token          | Multiplier | Computed (default) |
+| -------------- | ---------- | ------------------ |
+| `--radius-sm`  | `× 0.6`    | `0.375rem`         |
+| `--radius-md`  | `× 0.8`    | `0.5rem`           |
+| `--radius-lg`  | `× 1.0`    | `0.625rem`         |
+| `--radius-xl`  | `× 1.4`    | `0.875rem`         |
+| `--radius-2xl` | `× 1.8`    | `1.125rem`         |
+| `--radius-3xl` | `× 2.2`    | `1.375rem`         |
+| `--radius-4xl` | `× 2.6`    | `1.625rem`         |
 
 **typography stack.** source: `frontend/src/app/layout.tsx` and the `@theme inline` block in `frontend/src/app/globals.css`.
 
@@ -510,32 +526,51 @@ the editorial accent triad is fixed: teal `--primary`, hibiscus `--hibiscus`, an
 
 `@theme inline` aliases `--font-sans`, `--font-mono`, `--font-serif`, `--font-heading`, and `--font-display` to those bindings.
 
+**global primitives.** source: `frontend/src/app/globals.css`.
+
+- **paper grain.** The `body` carries an inline SVG fractal-noise overlay (`background-blend-mode: soft-light` light / `overlay` dark) at fixed attachment. This grain is the global aesthetic baseline — every surface composes over it. Do not remove without coordinating with design.
+- **custom scrollbars.** Webkit gets a 10px translucent thumb (`color-mix(in oklch, var(--muted-foreground) 18%, transparent)`, hover-darkens to 32%) over a transparent track; Firefox gets the equivalent via `scrollbar-color` / `scrollbar-width: thin`. Both gate `transition` on `prefers-reduced-motion`.
+- **scroll behaviour.** `html` carries `scroll-behavior: smooth` (disabled under `prefers-reduced-motion`) and `scrollbar-gutter: stable` so layout doesn't jitter when scrollbars appear.
+
 **utility classes.** source: `frontend/src/app/globals.css`.
 
-| Class                                             | Purpose                                                                                                          |
-| ------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------- |
-| `.paper-card`                                     | warm off-white surface with deckled shadow + thin rule                                                           |
-| `.glass-card-paper`                               | translucent paper tint over the hero photograph so dark text stays legible while the photograph breathes through |
-| `.hero-mask-light`                                | gentle cream gradient; the glass card itself carries text legibility, so the mask stays light                    |
-| `.hero-bottom-fade`                               | soft cream → vignette fade at hero bottom for clean section join                                                 |
-| `.ink-rule`                                       | inkstroke divider: editorial section break                                                                       |
-| `.mono-caption`                                   | typewritten government-memo flavour                                                                              |
-| `.draft-stamp`                                    | slightly worn rubber-stamp look                                                                                  |
-| `.display-numeral`                                | pairs Abril Fatface with tabular numerals                                                                        |
-| `.citation-chip`                                  | for "cited from page N" badges                                                                                   |
-| `.mock-chrome`                                    | pipeline mock browser chrome                                                                                     |
-| `.marquee-track`                                  | marquee for the trust band; hover pauses it, reduced motion removes it                                           |
-| `.fade-rise`                                      | staggered editorial entrance; reduced motion removes it                                                          |
-| `.fade-rise-delay-1` through `.fade-rise-delay-5` | 80ms stagger offsets for `.fade-rise`                                                                            |
-| `html.landing-snap`                               | section snap-scroll, applied to `<html>` while the marketing landing is mounted                                  |
+| Class                                             | Purpose                                                                                                                                                                    |
+| ------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `.paper-card`                                     | warm off-white surface with deckled shadow + thin rule; dark variant rebases shadow on real black                                                                          |
+| `.glass-card-paper`                               | translucent paper tint over the hero photograph so dark text stays legible while the photograph breathes through                                                           |
+| `.hero-glass-panel`                               | landing hero glass composition: white-tinted gradient + 18px blur + soft drop-shadow; dark variant softens both                                                            |
+| `.hero-description`                               | dark glass strip behind hero copy: black-tinted gradient + 10px blur + text-shadow for legibility over photo                                                               |
+| `.hero-mask-light`                                | gentle cream gradient; the glass card itself carries text legibility, so the mask stays light                                                                              |
+| `.hero-bottom-fade`                               | soft cream → vignette fade at hero bottom for clean section join                                                                                                           |
+| `.sidebar-glass`                                  | dashboard sidebar chrome: `--glass-bg` + `--glass-blur` + right border                                                                                                     |
+| `.topbar-glass`                                   | dashboard topbar chrome: `--glass-bg` + `--glass-blur` + bottom border                                                                                                     |
+| `.glass-surface`                                  | generic translucent surface for floating panels: glass bg + blur + border                                                                                                  |
+| `.glass-grid-panel`                               | vellum-grid floating surface (per-evaluation chat etc.): paper tint + 28px ink grid + 24px blur + saturate(170%)                                                           |
+| `.ink-rule`                                       | inkstroke divider: editorial section break                                                                                                                                 |
+| `.mono-caption`                                   | typewritten government-memo flavour                                                                                                                                        |
+| `.draft-stamp`                                    | slightly worn rubber-stamp look in hibiscus                                                                                                                                |
+| `.display-numeral`                                | pairs Abril Fatface with tabular numerals                                                                                                                                  |
+| `.citation-chip`                                  | for "cited from page N" badges                                                                                                                                             |
+| `.mock-chrome`                                    | pipeline mock browser chrome                                                                                                                                               |
+| `.marquee-track`                                  | marquee for the trust band; hover pauses it, reduced motion removes it                                                                                                     |
+| `.fade-rise`                                      | staggered editorial entrance; reduced motion removes it                                                                                                                    |
+| `.fade-rise-delay-1` through `.fade-rise-delay-5` | 80ms stagger offsets for `.fade-rise`                                                                                                                                      |
+| `.pulse-soft`                                     | Cik Lay attention pulse: hibiscus ring + 1.08× swell + outline chase. Reduced-motion fallback keeps a colour-only pulse so the affordance remains visible without movement |
+| `html.landing-snap`                               | section snap-scroll, applied to `<html>` while the marketing landing is mounted (≥640px only)                                                                              |
 
 **conventions.**
 
 - section eyebrows on landing/dashboard read `01 — Title` (no `§` prefix); numbering is decorative, not semantic.
-- snap-scroll is opt-in via `html.landing-snap` and is applied by a landing-only `useEffect`; it is not global behaviour.
-- hibiscus is the single sharp accent; do not introduce additional brand colours without updating this section.
-- dark mode mirrors every token; never hard-code hex except inside controlled mock components (e.g. pipeline mock syntax-highlight palette).
-- `prefers-reduced-motion` is respected at the utility layer: `.marquee-track` and `.fade-rise` both gate on it.
+- snap-scroll is opt-in via `html.landing-snap`, applied by a landing-only `useEffect`, and gated to `min-width: 640px` so mobile gets natural scrolling (proximity snap on a short viewport with a non-snapping footer drags the user back to the last snap section).
+- the editorial accent triad is teal `--primary` + hibiscus `--hibiscus` + forest `--forest`; hibiscus is the single sharp accent. Do not introduce additional brand colours without updating this section.
+- dark mode mirrors every semantic token but is **not** a chroma-0 inversion — it shifts to the warm-yellow hue family (~78) at low chroma to preserve the aged-paper feel. Never hard-code hex except inside controlled mock components (e.g. pipeline mock syntax-highlight palette).
+- `prefers-reduced-motion` is respected at the utility layer: `.marquee-track`, `.fade-rise`, `.pulse-soft`, custom scrollbar transitions, and `html { scroll-behavior }` all gate on it.
+
+**production-safety patterns (do not regress).**
+
+- **glass surfaces use direct `oklch(... / α)` literals**, not `color-mix(in oklch, var(--token) X%, transparent)`. The latter is stripped by the prod CSS minifier — root cause of the `.glass-panel` removal in commit `5cfabb3`. `.glass-card-paper` and the dark `.glass-card-paper` override both follow the safe form.
+- **`backdrop-filter` is written unprefixed only.** When both prefixed and unprefixed are authored manually, Lightning CSS dedupes and keeps only the `-webkit-` variant, which Chromium then ignores in some configs. Let Lightning CSS auto-prefix via browserslist.
+- **dark `.paper-card` overrides shadow tint** because `--ink` resolves to a near-white in dark mode; without the override the shadow would glow. Any new card-style utility that uses `--ink` for shadow must add the same dark variant.
 
 ## 7. Security & Secrets
 

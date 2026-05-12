@@ -29,7 +29,7 @@ from __future__ import annotations
 import logging
 from datetime import UTC, datetime
 from pathlib import Path
-from typing import Annotated, Any, Literal
+from typing import Annotated, Any, Literal, get_args
 
 import yaml
 from fastapi import APIRouter, BackgroundTasks, HTTPException, Query, Response, status
@@ -40,12 +40,18 @@ from pydantic import BaseModel, ConfigDict, Field
 from app.agents.discovery_agent import run_discovery
 from app.auth import AdminUser, get_firestore
 from app.schema.discovery import CandidateStatus, DiscoveryRunSummary, SchemeCandidate
+from app.schema.scheme import SchemeId
 
 _logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/api/admin", tags=["admin"])
 
 _DISCOVERED_YAML_DIR = Path(__file__).resolve().parent.parent.parent / "data" / "discovered"
+
+# Canonical scheme ids the badge mechanism can write against. Sourced from
+# `SchemeId` so any new scheme added to the Literal lights up the verified
+# badge automatically — no duplicate list to drift.
+_CANONICAL_SCHEME_IDS: frozenset[str] = frozenset(get_args(SchemeId))
 
 
 # ---------------------------------------------------------------------------
@@ -293,10 +299,17 @@ async def approve_candidate(
         {"manifestYaml": manifest_yaml, "manifestApprovedAt": SERVER_TIMESTAMP},
         merge=True,
     )
-    if candidate.scheme_id is not None:
-        db.collection("verified_schemes").document(candidate.scheme_id).set(
+    # Heal legacy rows: candidates extracted before the canonical-preference
+    # fix landed in extract_candidate persisted with scheme_id=None even when
+    # source.id was itself a canonical SchemeId (e.g. lhdn_form_b). Fall back
+    # to source_id here so re-approving those rows still updates the badge.
+    resolved_scheme_id = candidate.scheme_id
+    if resolved_scheme_id is None and candidate.source_id in _CANONICAL_SCHEME_IDS:
+        resolved_scheme_id = candidate.source_id
+    if resolved_scheme_id is not None:
+        db.collection("verified_schemes").document(resolved_scheme_id).set(
             {
-                "schemeId": candidate.scheme_id,
+                "schemeId": resolved_scheme_id,
                 "verifiedAt": SERVER_TIMESTAMP,
                 "sourceContentHash": candidate.source_content_hash,
                 "lastKnownPayload": candidate.model_dump(mode="json"),

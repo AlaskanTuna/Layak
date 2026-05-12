@@ -28,13 +28,6 @@
   content_selector: null
   check_frequency_hours: 24
 
-- id: bk_01
-  name: BK-01 Bantuan Kanak-Kanak
-  agency: MOF
-  url: https://www.hasil.gov.my/en/individual/individual-life-cycle/income-declaration/tax-reliefs/
-  content_selector: null
-  check_frequency_hours: 24
-
 - id: jkm_warga_emas
   name: JKM Warga Emas monthly allowance
   agency: JKM

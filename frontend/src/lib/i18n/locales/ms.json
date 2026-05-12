@@ -264,7 +264,7 @@
         {
           "docCode": "FAQ-04",
           "question": "Sejauh manakah data peribadi saya selamat?",
-          "body": "Dokumen yang anda muat naik diproses dalam memori dalam satu permintaan dan dibuang sebaik sahaja profil berstruktur dihasilkan. Maklumat IC yang digunakan semasa saluran penilaian dilupuskan selepas proses selesai. Profil berstruktur disimpan dalam Firestore supaya chatbot dan pakej draf boleh dijana semula bila diperlukan. Tiada dokumen mentah dalam log."
+          "body": "Pengguna laluan manual memberikan hanya umur, pendapatan, susunan isi rumah, dan alamat — Layak tidak mengumpul sebarang maklumat IC pada laluan ini. Pengguna laluan muat naik mempunyai imej MyKad diproses sementara oleh Gemini dalam memori permintaan; tiada maklumat IC dikekalkan pada profil berstruktur. Profil berstruktur disimpan dalam Firestore untuk chatbot + penjanaan semula pakej. Tiada dokumen mentah dalam log."
         },
         {
           "docCode": "FAQ-05",
@@ -371,7 +371,7 @@
       "section1History": "<strong>Sejarah penilaian</strong>: profil berstruktur yang kami ekstrak daripada dokumen anda dan skim yang dipadankan, disimpan di Firestore supaya anda dapat melihat larian lepas.",
       "section1Consent": "<strong>Cap waktu persetujuan</strong> direkodkan apabila anda menanda kotak PDPA semasa mendaftar.",
       "section2Title": "2. Apa yang kami tidak simpan",
-      "section2MyKad": "Nombor MyKad penuh anda. Maklumat IC yang digunakan semasa saluran penilaian dilupuskan selepas proses selesai.",
+      "section2MyKad": "Nombor MyKad penuh anda, dan sebarang ekor IC. Profil yang disimpan tidak membawa sebarang maklumat IC; laluan masukan manual tidak meminta IC sama sekali.",
       "section2Files": "Bait asal fail yang anda muat naik. Pengekstrakan dijalankan dalam memori dalam satu permintaan, dan fail mentah dibuang sebaik sahaja profil berstruktur dihasilkan.",
       "section2Logs": "Nombor IC, token pengesahan, atau kandungan dokumen dalam mana-mana baris log.",
       "section3Title": "3. Kenapa kami mengumpulnya",

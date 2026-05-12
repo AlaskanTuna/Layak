@@ -35,7 +35,7 @@ const FAQS_FALLBACK: FaqItem[] = [
   {
     docCode: 'FAQ-04',
     question: 'How safe is my personal data?',
-    body: 'Your uploaded documents are processed in memory inside a single request and discarded once the structured profile is produced. IC information used during the evaluation pipeline is disposed of after the process completes. We persist the structured profile in Firestore so the chatbot and draft packets can be regenerated on demand. No raw documents in logs.'
+    body: 'Manual-entry users supply only age, income, household composition, and address — Layak collects no IC information at all. Upload-path users have their MyKad image processed transiently by Gemini in request-scope memory; no IC information is retained on the persisted profile. The structured profile we keep in Firestore drives chat handoff and packet regeneration. No raw documents in logs.'
   },
   {
     docCode: 'FAQ-05',

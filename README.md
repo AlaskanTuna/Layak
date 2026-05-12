@@ -55,7 +55,7 @@ _Three uploads. One website. Five autonomous steps. **Zero hallucinated rules.**
   <tr>
     <td align="center"><strong>RM 12,308</strong><br/><sub>annual relief surfaced for our reference user, Aisyah</sub></td>
     <td align="center"><strong>~60s</strong><br/><sub>median end-to-end latency, upload → draft packets</sub></td>
-    <td align="center"><strong>5&nbsp;+&nbsp;1</strong><br/><sub>upside schemes matched + 1 contribution flagged</sub></td>
+    <td align="center"><strong>5&nbsp;+&nbsp;2&nbsp;+&nbsp;1</strong><br/><sub>upside + subsidy-credit info cards + 1 contribution flagged</sub></td>
     <td align="center"><strong>0</strong><br/><sub>hallucinated rules — every number cites a source PDF</sub></td>
   </tr>
 </table>
@@ -302,7 +302,7 @@ flowchart TD
     Narrate --> Tier2["PipelineTechnicalEvent<br/>timestamp + log lines<br/>(English only)"]
     Tier1 --> SSE[SSE stream]
     Tier2 --> SSE
-    SSE --> Lay["Lay narration card<br/>'Read your documents · RM 2,800'<br/>'Matched against 6 schemes · 5 qualifying'"]
+    SSE --> Lay["Lay narration card<br/>'Read your documents · RM 2,800'<br/>'Matched against 8 schemes · 7 qualifying'"]
     SSE --> Tech["Technical transcript<br/>collapsed by default<br/>show details ▾"]
     Tier1 --> Firestore["evaluations/{id}.narrativeLog"]
     Tier2 --> Firestore2["evaluations/{id}.technicalLog"]

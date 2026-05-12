@@ -4,6 +4,31 @@
 
 ---
 
+## [13/05/26] - Phase 12 SHIPPED: BUDI95 + MyKasih cards + IC removal + stats-strip auto-derive
+
+Phase 12 landed as 7 implementation commits on top of the planning commit `ba4f67a`. Direction held to the locked design: info-only subsidy cards (no API calls, no user inputs beyond what we already collect), tighter PDPA posture via full IC removal, schemes-page Latest Update now lives.
+
+**Commits (in order).**
+
+- `0bd9a59` `feat(phase12): drop IC field from manual entry + remove ic_last6 from entire codebase` — 45 files, +233/-390. Schema removal (`Profile`, `Dependant`, `ManualEntryPayload`, `DependantInput` all lose `ic_last6`). Gemini extract prompt no longer asks for it. `_mask_ic_last6` deleted from `narration.py`; `_render_profile` digest line + `ic_suffix` label dropped from `chat_prompt.py`. 7 Jinja templates lose their IC display row entirely; `_base.html.jinja` "Filer IC (last 6)" header replaced with "Filer: {name}". Generate-packet filenames switch from `{ic_last6}.pdf` to `{date}.pdf`. 16 test files updated. Frontend types + form + fixtures + i18n all swept. Net result: zero ic_last6 references in live code (only intentional defense-in-depth assertions in privacy tests).
+- `c17cebe` `feat(phase12): SchemeKind gains subsidy_credit + SchemeMatch.expires_at_iso` — schema foundation. `SchemeKind = upside | required_contribution | subsidy_credit`. New optional `expires_at_iso: str | None`. `compute_upside` filters on `kind == "upside"` (Phase 11 behaviour preserved).
+- `b2044f7` `feat(phase12): BUDI95 info-only subsidy_credit rule` — `app/rules/budi95.py`, eligibility `age >= 16`, `annual_rm = 0.0`, 3 citations (MOF + Maybank2u + Feb 2026 reach). Match-sort pivot: 2-tier `kind != "upside"` → 3-tier `upside → subsidy_credit → required_contribution`.
+- `7080712` `feat(phase12): MyKasih (SARA RM100) info-only subsidy_credit rule` — `app/rules/mykasih.py`, eligibility `age >= 18`, `annual_rm = 0.0`, **`expires_at_iso = "2026-12-31"`** (the bold expiry line is the load-bearing user-facing piece). Display label "MyKasih"; citations preserve official "SARA Untuk Semua via MyKasih" wording. 4 citations.
+- `f816b95` `feat(phase12): subsidy_credit card UX (bold expiry + Check Balance CTA)` — `SchemeCardGrid` learns a second card variant for `kind === 'subsidy_credit'`: hibiscus "Subsidy" eyebrow, "Auto-credited to your MyKad" info line replacing the RM `estValue`, bold hibiscus "Expires {date}" line driven by `expires_at_iso` via `Intl.DateTimeFormat`, outline "Check your balance" CTA with ExternalLink icon opening the official portal in a new tab. Top-match badge skipped on subsidy cards. New scheme_id display-name mappings + new i18n keys for the card chrome.
+- `b076ef9` `feat(phase12): schemes-stats-strip auto-derive + day-1 seed script` — `SchemesStatsStrip` swaps hardcoded `'2026'` for `useLatestVerifiedAt()` fetching `/api/schemes/verified` and computing `max(verified_at)`. Static counts updated: schemes 6 → 8. Date formatted locale-aware via `Intl.DateTimeFormat` (`May 13, 2026` / `13 Mei 2026` / `2026年5月13日`). New `scripts/seed_verified_schemes.py` idempotently stamps every locked scheme in `SchemeId` Literal with `SERVER_TIMESTAMP` so the tile renders a real date on day-1 of deploy.
+
+**Tests.** Backend: 554 green (was 510 pre-Phase-12). New: `test_budi95.py` (6), `test_mykasih.py` (9). Existing-test updates: 16 files for IC removal, `test_perkeso_sksps.py` sort-order pivot to expect BUDI95+MyKasih between upside and SKSPS, `test_rule_copy_coverage.py` adds budi95+mykasih to `_QUALIFY_VARS`+`_OUT_OF_SCOPE_VARS` and the i18n catalog parametrizes over both new schemes across en/ms/zh. Frontend: `npx tsc --noEmit` clean for every touched file across all 7 commits.
+
+**Naming + expiry verification.** Verified before code: "MyKasih" is the user-facing label (more memorable + widely Googled than the official program name "SARA Untuk Semua"); the 9 Feb 2026 RM100 tranche **expires 31 December 2026, unused balance forfeited**, confirmed across SoyaCincau + Reeracoen + thesmartlocal.my. The expiry surfaces in bold hibiscus on the MyKasih card so users see the deadline at a glance.
+
+**No-API-research finding (locked in TRD §5.11).** 10 search angles confirmed no public developer API exists for BUDI95 or MyKasih balance lookup. All "third-party MyKasih checker" sites are cosmetic redirect wrappers — `mykasih.my` explicitly disclaims it. Layak ships the same redirect-wrapper pattern but with substance (age-gated eligibility + portal CTA). Web-scraping path explicitly rejected (ToS risk, fragility).
+
+**Open design questions parked for future phases.** SARA RM100 recurrence + auto-retirement (nightly job checks `today > expires_at_iso`), BUDI95 targeting changes (discovery agent already polls budimadani.gov.my), agency-count semantics (BUDI95 operator + MyKasih Foundation either count as separate or roll under MOF — went with 6 in the stats strip).
+
+**README + privacy copy.** README headline "5+1" → "5+2+1" (upside + subsidy-credit + contribution). Architecture diagram label "Matched against 6 schemes" → "8 schemes". FAQ-04 + privacy-page `section2MyKad` rewritten to reflect zero-IC-on-manual-path / transient-only on upload-path. Landing CTA FAQ matched. All 37 unticked checkboxes in plan.md Phase 12 flipped to `[x]`.
+
+---
+
 ## [13/05/26] - Phase 12 brainstorm: BUDI95 + MyKasih SARA info-only cards + manual-entry IC removal (planning only)
 
 Scoping session for the next scheme-library expansion. Two highest-reach Malaysian schemes that aren't yet in Layak's rule engine: **BUDI95** (RON95 petrol subsidy, 14.8M users by Feb 2026, RM1.99/L for eligible Malaysians) and **MyKasih SARA RM100** (one-off MyKad credit, every adult Malaysian, 9 Feb 2026). Plus two ops follow-ups bundled into the same phase: dropping the full-IC field from manual entry, and replacing the schemes-page "Latest Update" hardcoded `'2026'` with a real `max(verified_at)` derivation.

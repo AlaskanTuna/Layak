@@ -26,6 +26,7 @@ from pydantic import BaseModel, ConfigDict, Field
 
 from app.schema.events import ErrorCategory
 from app.schema.locale import DEFAULT_LANGUAGE, SupportedLanguage
+from app.schema.strategy import StrategyAdvice
 
 # Hard caps. The 4 KiB per-message cap matches the input-validator length
 # guard in `app.services.chat`; the 20-turn history cap keeps the prompt
@@ -56,6 +57,12 @@ class ChatRequest(BaseModel):
     The client carries history; the server carries eval context. `language`
     is the language the response should render in — defaults to English so a
     legacy client that never sends the field still works.
+
+    `recent_advisory` (Phase 11 Feature 2): optional handoff context from the
+    Strategy section. When the user clicks "Ask Cik Lay about this" on a
+    StrategyCard, the frontend packages the card's payload here so the
+    system prompt can inject a "Recent advisory" block — Cik Lay then
+    answers with the specific cross-scheme context already in mind.
     """
 
     model_config = ConfigDict(extra="forbid")
@@ -63,6 +70,7 @@ class ChatRequest(BaseModel):
     history: list[ChatTurn] = Field(default_factory=list, max_length=MAX_HISTORY_TURNS)
     message: str = Field(min_length=1, max_length=MAX_MESSAGE_CHARS)
     language: SupportedLanguage = DEFAULT_LANGUAGE
+    recent_advisory: StrategyAdvice | None = None
 
 
 class ChatCitation(BaseModel):

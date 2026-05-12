@@ -516,6 +516,7 @@
       "toc": {
         "overview": "Overview",
         "schemes": "Eligible Schemes",
+        "strategy": "Strategy",
         "required": "Required Contributions",
         "preview": "Inline Preview"
       },
@@ -577,9 +578,25 @@
         "extractManual": "Profile prepared",
         "classify": "Classify household",
         "match": "Match schemes",
+        "optimize_strategy": "Optimize strategy",
         "compute_upside": "Compute upside",
         "generate": "Generate drafts"
       }
+    },
+    "strategy": {
+      "sectionTitle": "Strategy",
+      "sectionEyebrow": "Cross-scheme analysis",
+      "sectionDescription": "Layak's optimizer compares your matched schemes against each other and flags coordination opportunities.",
+      "emptyHeadline": "No cross-scheme conflicts detected",
+      "emptyDescription": "Your matched schemes don't stack into any of the coordination edge cases Layak watches for.",
+      "askCikLay": "Ask Cik Lay about this",
+      "citedPrefix": "Cited:",
+      "severity": {
+        "info": "Info",
+        "warn": "Heads up",
+        "act": "Action"
+      },
+      "softSuggestion": "Layak isn't fully certain — worth asking Cik Lay."
     },
     "narrative": {
       "showTechnical": "Show technical details",

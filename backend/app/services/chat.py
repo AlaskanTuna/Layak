@@ -317,7 +317,9 @@ async def stream_chat_response(
         yield ChatErrorEvent(category=rejection, message=message)
         return
 
-    system_instruction = build_system_instruction(eval_doc, language=language)
+    system_instruction = build_system_instruction(
+        eval_doc, language=language, recent_advisory=request.recent_advisory
+    )
     contents = _history_to_contents(request.history, request.message)
     valid_ids = qualifying_scheme_ids(eval_doc)
 

@@ -11,7 +11,13 @@ export type IncomeBand = 'b40_hardcore' | 'b40_household' | 'b40_household_with_
 
 export type Relationship = 'child' | 'parent' | 'spouse' | 'sibling' | 'other'
 
-export type Step = 'extract' | 'classify' | 'match' | 'compute_upside' | 'generate'
+export type Step =
+  | 'extract'
+  | 'classify'
+  | 'match'
+  | 'optimize_strategy'
+  | 'compute_upside'
+  | 'generate'
 
 export type SchemeId =
   | 'str_2026'
@@ -138,11 +144,41 @@ export type ComputeUpsideResult = {
 }
 export type GenerateResult = { packet: Packet }
 
+// Phase 11 Feature 2 — Cross-Scheme Strategy Optimizer types.
+
+export type StrategySeverity = 'info' | 'warn' | 'act'
+
+export type StrategyCitation = {
+  pdf: string
+  section?: string | null
+  page?: number | null
+}
+
+export type StrategyAdvice = {
+  advice_id: string
+  interaction_id: string
+  severity: StrategySeverity
+  /** ≤ 80 chars; pre-localised at v1 in editorial English. */
+  headline: string
+  /** ≤ 280 chars. */
+  rationale: string
+  citation: StrategyCitation
+  /** 0–1. Frontend gates: ≥0.8 full card; 0.5–0.8 soft suggestion + CTA. */
+  confidence: number
+  /** Populates the chat input on the "Ask Cik Lay about this" handoff.
+   *  `null` means no CTA is shown for this card. */
+  suggested_chat_prompt: string | null
+  applies_to_scheme_ids: string[]
+}
+
+export type OptimizeStrategyResult = { advisories: StrategyAdvice[] }
+
 export type StepStartedEvent = { type: 'step_started'; step: Step }
 export type StepResultEvent =
   | { type: 'step_result'; step: 'extract'; data: ExtractResult }
   | { type: 'step_result'; step: 'classify'; data: ClassifyResult }
   | { type: 'step_result'; step: 'match'; data: MatchResult }
+  | { type: 'step_result'; step: 'optimize_strategy'; data: OptimizeStrategyResult }
   | { type: 'step_result'; step: 'compute_upside'; data: ComputeUpsideResult }
   | { type: 'step_result'; step: 'generate'; data: GenerateResult }
 
@@ -196,12 +232,20 @@ export type AgentEvent =
   | DoneEvent
   | ErrorEvent
 
-export const PIPELINE_STEPS: Step[] = ['extract', 'classify', 'match', 'compute_upside', 'generate']
+export const PIPELINE_STEPS: Step[] = [
+  'extract',
+  'classify',
+  'match',
+  'optimize_strategy',
+  'compute_upside',
+  'generate'
+]
 
 export const STEP_LABELS: Record<Step, string> = {
   extract: 'Extract profile',
   classify: 'Classify household',
   match: 'Match schemes',
+  optimize_strategy: 'Optimize strategy',
   compute_upside: 'Compute upside',
   generate: 'Generate drafts'
 }
@@ -249,6 +293,9 @@ export type EvaluationDoc = {
    * deserialise; the frontend treats `undefined` as empty arrays. */
   narrativeLog?: PipelineNarrativeEvent[]
   technicalLog?: PipelineTechnicalEvent[]
+  /** Phase 11 Feature 2 — Cross-Scheme Strategy advisories. Optional for
+   * backward compat with pre-Feature-2 evaluations. */
+  strategy?: StrategyAdvice[]
 }
 
 export type EvaluationListItem = {

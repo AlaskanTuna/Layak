@@ -516,6 +516,7 @@
       "toc": {
         "overview": "Gambaran Keseluruhan",
         "schemes": "Skim Layak",
+        "strategy": "Strategi",
         "required": "Sumbangan Diperlukan",
         "preview": "Pratonton"
       },
@@ -577,9 +578,25 @@
         "extractManual": "Profil disediakan",
         "classify": "Kelaskan isi rumah",
         "match": "Padankan skim",
+        "optimize_strategy": "Optimalkan strategi",
         "compute_upside": "Kira faedah",
         "generate": "Jana draf"
       }
+    },
+    "strategy": {
+      "sectionTitle": "Strategi",
+      "sectionEyebrow": "Analisis merentas skim",
+      "sectionDescription": "Pengoptimum Layak membandingkan skim yang dipadankan dan menandakan peluang koordinasi.",
+      "emptyHeadline": "Tiada konflik merentas skim",
+      "emptyDescription": "Skim anda tidak mencetus mana-mana kes koordinasi yang Layak pantau.",
+      "askCikLay": "Tanya Cik Lay tentang ini",
+      "citedPrefix": "Dipetik:",
+      "severity": {
+        "info": "Maklumat",
+        "warn": "Perhatian",
+        "act": "Tindakan"
+      },
+      "softSuggestion": "Layak tidak sepenuhnya pasti — eloklah tanya Cik Lay."
     },
     "narrative": {
       "showTechnical": "Lihat butiran teknikal",

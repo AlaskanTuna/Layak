@@ -74,9 +74,11 @@ def test_create_running_evaluation_writes_initial_shape_no_profile(
         "extract": "pending",
         "classify": "pending",
         "match": "pending",
+        "optimize_strategy": "pending",
         "compute_upside": "pending",
         "generate": "pending",
     }
+    assert payload["strategy"] == []
     assert payload["error"] is None
 
 

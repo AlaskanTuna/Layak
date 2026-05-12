@@ -309,9 +309,15 @@ def test_intake_manual_accepts_aisyah_and_streams_sse(
 
         return Packet(drafts=[], generated_at=datetime(2026, 4, 21, 15, 0, 0))
 
+    async def _fake_optimize(_profile: Any, _matches: Any, _classification: Any, **_kwargs: Any) -> list[Any]:
+        # Optimizer fail-opens to [] when Gemini is unreachable; stub here so
+        # the test doesn't depend on network availability OR a live API key.
+        return []
+
     monkeypatch.setattr(ra, "classify_household", _fake_classify)
     monkeypatch.setattr(ra, "compute_upside", _fake_compute_upside)
     monkeypatch.setattr(ra, "generate_packet", _fake_generate)
+    monkeypatch.setattr(ra, "optimize_strategy", _fake_optimize)
 
     with client.stream(
         "POST",
@@ -323,13 +329,14 @@ def test_intake_manual_accepts_aisyah_and_streams_sse(
         assert resp.headers["content-type"].startswith("text/event-stream")
         events = [line for line in resp.iter_lines() if line.startswith("data:")]
 
-    # Full healthy stream (Phase 11 Feature 4): per step we now emit
+    # Full healthy stream (Phase 11 Features 2 + 4): per step we now emit
     # step_started → step_result → narrative → technical, then a final done.
-    # 5 steps × 4 + 1 done = 21 events.
-    assert len(events) == 21
+    # Feature 2 added the optimize_strategy step between match and
+    # compute_upside, so 6 steps × 4 + 1 done = 25 events.
+    assert len(events) == 25
     parsed = [json.loads(e[5:].strip()) for e in events]
     expected_per_step = ["step_started", "step_result", "narrative", "technical"]
-    assert [p.get("type") for p in parsed] == expected_per_step * 5 + ["done"]
+    assert [p.get("type") for p in parsed] == expected_per_step * 6 + ["done"]
     extract_result = parsed[1]
     assert extract_result["step"] == "extract"
     assert extract_result["data"]["profile"]["name"] == "Aisyah binti Ahmad"

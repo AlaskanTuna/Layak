@@ -19,7 +19,7 @@ import remarkGfm from 'remark-gfm'
 import { Button } from '@/components/ui/button'
 import type { SchemeMatch } from '@/lib/agent-types'
 import type { ChatMessage } from '@/lib/chat-types'
-import { useChat } from '@/hooks/use-chat'
+import { type UseChatResult } from '@/hooks/use-chat'
 
 const CIK_LAY_ICON = '/chatbot/cik-lay-icon.webp'
 
@@ -37,6 +37,11 @@ const CIK_LAY_ICON = '/chatbot/cik-lay-icon.webp'
 type Props = {
   evalId: string
   matches: SchemeMatch[]
+  /** Phase 11 Feature 2 — the parent owns the `useChat` instance so it can
+   *  share the same hook with `<StrategySection>`. The "Ask Cik Lay about
+   *  this" CTA stages a draft + advisory on the shared hook before the
+   *  panel auto-opens (see the `pendingDraft` effect below). */
+  chat: UseChatResult
 }
 
 // Cik Lay attention pulse cadence — keep these as named constants so the
@@ -52,7 +57,7 @@ const INITIAL_DELAY_MS = 800 // brief grace before the first pulse on mount
 const INITIAL_CHIPS = 4
 const FOLLOWUP_CHIPS = 4
 
-export function ResultsChatPanel({ evalId, matches }: Props) {
+export function ResultsChatPanel({ evalId, matches, chat }: Props) {
   const { t } = useTranslation()
   const [isOpen, setIsOpen] = useState(false)
   const [isModal, setIsModal] = useState(false)
@@ -67,8 +72,10 @@ export function ResultsChatPanel({ evalId, matches }: Props) {
   const [sessionNonce, setSessionNonce] = useState(0)
   const messagesEndRef = useRef<HTMLDivElement | null>(null)
   const inputRef = useRef<HTMLTextAreaElement | null>(null)
-
-  const chat = useChat(evalId)
+  // evalId no longer directly consumed here (it lives on the lifted hook in
+  // the parent), but kept on the prop signature for future telemetry +
+  // because the strategy-handoff context needs it to be paired with chat.
+  void evalId
 
   const qualifyingMatches = useMemo(() => matches.filter((m) => m.qualifies), [matches])
 
@@ -160,6 +167,23 @@ export function ResultsChatPanel({ evalId, matches }: Props) {
       inputRef.current?.focus()
     }
   }, [isOpen, isModal])
+
+  // Phase 11 Feature 2 — Strategy section handoff. When the strategy CTA
+  // stages a `pendingDraft` on the shared hook, auto-open this panel and
+  // prefill the textarea. `consumePendingDraft` clears the staging so the
+  // hook doesn't re-fire on every render. The lint disable matches the
+  // existing pattern in `use-agent-pipeline.ts` for cross-store cascades.
+  useEffect(() => {
+    if (chat.pendingDraft == null) return
+    const draftValue = chat.pendingDraft
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setDraft(draftValue)
+    setIsOpen(true)
+    setIsPulsing(false)
+    cooldownPendingRef.current = true
+    setCooldownNonce((n) => n + 1)
+    chat.consumePendingDraft()
+  }, [chat])
 
   const handleSend = useCallback(() => {
     const value = draft.trim()

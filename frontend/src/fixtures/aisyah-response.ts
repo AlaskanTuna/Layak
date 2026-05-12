@@ -394,9 +394,27 @@ const MOCK_TS = {
   extract: '2026-05-12T12:00:01Z',
   classify: '2026-05-12T12:00:02Z',
   match: '2026-05-12T12:00:04Z',
+  optimize_strategy: '2026-05-12T12:00:05Z',
   compute_upside: '2026-05-12T12:00:06Z',
   generate: '2026-05-12T12:00:09Z'
 } as const
+
+// Phase 11 Feature 2 — Aisyah trips the dependent-parent advisory because
+// her profile carries has_elderly_dependant=true on form_b. The demo
+// fixture's StrategyAdvice mirrors what the live optimizer would emit.
+const AISYAH_DEMO_ADVISORY = {
+  advice_id: 'demo-aisyah-001',
+  interaction_id: 'lhdn_dependent_parent_single_claimer',
+  severity: 'warn' as const,
+  headline: 'Coordinate the RM 1,500 dependent-parent relief with siblings',
+  rationale:
+    'Only one filer per parent can claim this relief. The sibling at the highest marginal tax bracket should claim — split the cash informally so the family captures the maximum benefit.',
+  citation: { pdf: 'pr-no-4-2024.pdf', section: '§5.2', page: 12 },
+  confidence: 0.86,
+  suggested_chat_prompt:
+    'Who in my family should claim the dependent-parent relief, and how do we coordinate it on the LHDN portal?',
+  applies_to_scheme_ids: ['lhdn_form_b']
+}
 
 export const AISYAH_MOCK_EVENTS: MockEvent[] = [
   { event: { type: 'step_started', step: 'extract' }, delayMs: 100 },
@@ -485,6 +503,40 @@ export const AISYAH_MOCK_EVENTS: MockEvent[] = [
         '  ✓ i_saraan rm=500 cite=i-saraan.pdf:p.3',
         '  · perkeso_sksps',
         '  latency_ms=540'
+      ]
+    },
+    delayMs: 20
+  },
+
+  { event: { type: 'step_started', step: 'optimize_strategy' }, delayMs: 150 },
+  {
+    event: {
+      type: 'step_result',
+      step: 'optimize_strategy',
+      data: { advisories: [AISYAH_DEMO_ADVISORY] }
+    },
+    delayMs: 600
+  },
+  {
+    event: {
+      type: 'narrative',
+      step: 'optimize_strategy',
+      headline: 'Looked for cross-scheme strategy notes',
+      data_point: '1 warn'
+    },
+    delayMs: 40
+  },
+  {
+    event: {
+      type: 'technical',
+      step: 'optimize_strategy',
+      timestamp: MOCK_TS.optimize_strategy,
+      log_lines: [
+        'tool=optimize_strategy (Gemini 2.5 Pro structured)',
+        '  rules_loaded=3  rules_triggered=1  advisories_emitted=1',
+        '  triggered=[lhdn_dependent_parent_single_claimer]',
+        '  ✓ lhdn_dependent_parent_single_claimer sev=warn conf=0.86 cite=pr-no-4-2024.pdf:§5.2:p12',
+        '  latency_ms=820'
       ]
     },
     delayMs: 20

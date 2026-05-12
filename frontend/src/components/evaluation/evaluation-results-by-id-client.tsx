@@ -14,6 +14,8 @@ import { EvaluationUpsideHero } from '@/components/evaluation/evaluation-upside-
 import { PipelineNarrative } from '@/components/evaluation/pipeline-narrative'
 import { RequiredContributionsCard } from '@/components/evaluation/required-contributions-card'
 import { ResultsChatPanel } from '@/components/evaluation/results-chat-panel'
+import { StrategySection } from '@/components/evaluation/strategy-section'
+import { useChat } from '@/hooks/use-chat'
 import { SchemeCardGrid } from '@/components/evaluation/scheme-card-grid'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
@@ -85,7 +87,9 @@ function docToPipelineState(doc: EvaluationDoc): PipelineState {
     // Legacy docs without these fields fall back to empty arrays; the
     // narrative component degrades to the old stepper-style UI in that case.
     narrativeEvents: doc.narrativeLog ?? [],
-    technicalEvents: doc.technicalLog ?? []
+    technicalEvents: doc.technicalLog ?? [],
+    // Phase 11 Feature 2 — replay persisted strategy advisories.
+    strategy: doc.strategy ?? []
   }
 }
 
@@ -101,6 +105,11 @@ export function EvaluationResultsByIdClient({ evalId }: { evalId: string }) {
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
   const pollHandleRef = useRef<ReturnType<typeof setInterval> | null>(null)
   const lastStatusRef = useRef<string | null>(null)
+  // Phase 11 Feature 2 — lifted chat hook. Called BEFORE the early returns
+  // below so it always runs (Rules of Hooks). Shared between the chat panel
+  // and the Strategy section's "Ask Cik Lay about this" CTA so the handoff
+  // stages a draft + advisory on the SAME hook instance the panel renders.
+  const chat = useChat(evalId)
 
   const fetchDoc = useCallback(async () => {
     try {
@@ -289,15 +298,22 @@ export function EvaluationResultsByIdClient({ evalId }: { evalId: string }) {
   const showSchemes = hasContent
   const showRequired = hasContent && hasRequiredContributions
   const showPreview = isComplete && hasQualifyingForPacket
+  // Phase 11 Feature 2 — Strategy section renders whenever the eval reached
+  // the optimize_strategy step, even when no advisories tripped (the empty
+  // state communicates "no conflicts detected").
+  const optimizerComplete = doc.stepStates.optimize_strategy === 'complete'
+  const showStrategy = isComplete && optimizerComplete
 
   const visibleSections: readonly TocSectionId[] = (() => {
     const ids: TocSectionId[] = []
     if (showOverview) ids.push('overview')
     if (showSchemes) ids.push('schemes')
+    if (showStrategy) ids.push('strategy')
     if (showRequired) ids.push('required')
     if (showPreview) ids.push('preview')
     return ids
   })()
+
 
   function handleStartAnother() {
     setDemoMode(false)
@@ -361,6 +377,18 @@ export function EvaluationResultsByIdClient({ evalId }: { evalId: string }) {
                 <SchemeCardGrid matches={doc.matches} />
               </section>
             )}
+            {showStrategy && (
+              <section
+                id="strategy"
+                aria-label={t('evaluation.results.toc.strategy')}
+                className="scroll-mt-28 lg:scroll-mt-20"
+              >
+                <StrategySection
+                  advisories={pipelineState.strategy}
+                  onAskCikLay={chat.handoffFromAdvice}
+                />
+              </section>
+            )}
             {showRequired && (
               <section
                 id="required"
@@ -405,7 +433,9 @@ export function EvaluationResultsByIdClient({ evalId }: { evalId: string }) {
       {/* Phase 10 — floating chatbot. Only available when the eval has at
           least one qualifying match (no chat without context). The panel
           uses fixed positioning, so it never affects the page layout above. */}
-      {isComplete && matchedCount > 0 && <ResultsChatPanel evalId={evalId} matches={doc.matches} />}
+      {isComplete && matchedCount > 0 && (
+        <ResultsChatPanel evalId={evalId} matches={doc.matches} chat={chat} />
+      )}
     </div>
   )
 }

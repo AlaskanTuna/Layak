@@ -37,6 +37,7 @@ from app.schema.locale import SupportedLanguage
 from app.schema.packet import Packet
 from app.schema.profile import HouseholdClassification, Profile
 from app.schema.scheme import SchemeMatch
+from app.schema.strategy import StrategyAdvice
 
 
 def _now_iso() -> str:
@@ -79,6 +80,9 @@ _HEADLINES: dict[tuple[Step, SupportedLanguage], str] = {
     ("match", "en"): "Matched against the federal scheme library",
     ("match", "ms"): "Memadankan dengan perpustakaan skim persekutuan",
     ("match", "zh"): "已对联邦计划库进行匹配",
+    ("optimize_strategy", "en"): "Looked for cross-scheme strategy notes",
+    ("optimize_strategy", "ms"): "Mencari nota strategi merentas skim",
+    ("optimize_strategy", "zh"): "已查找跨计划策略提示",
     ("compute_upside", "en"): "Calculated your annual upside",
     ("compute_upside", "ms"): "Mengira nilai tahunan anda",
     ("compute_upside", "zh"): "已计算您的年度收益",
@@ -295,3 +299,63 @@ def narrate_generate_technical(
     if latency_ms is not None:
         lines.append(f"  latency_ms={latency_ms}")
     return PipelineTechnicalEvent(step="generate", timestamp=_now_iso(), log_lines=lines)
+
+
+# ---------------------------------------------------------------------------
+# optimize_strategy step (Phase 11 Feature 2)
+# ---------------------------------------------------------------------------
+
+
+def narrate_optimize_strategy_lay(
+    advisories: list[StrategyAdvice],
+    *,
+    language: SupportedLanguage,
+) -> PipelineNarrativeEvent:
+    """Lay narration after the optimizer step.
+
+    Data point is the advisory count + severity mix (e.g. "1 warn"), or
+    "all clear" when no advisories tripped.
+    """
+    n = len(advisories)
+    if n == 0:
+        data_point = {"en": "all clear", "ms": "tiada konflik", "zh": "无冲突"}[language]
+    else:
+        # Severity mix surfaced as the data point — keeps it ≤ 40 chars
+        # even when 3 cards exist.
+        sev_counts: dict[str, int] = {}
+        for a in advisories:
+            sev_counts[a.severity] = sev_counts.get(a.severity, 0) + 1
+        parts = [f"{count} {sev}" for sev, count in sev_counts.items()]
+        data_point = ", ".join(parts)
+    return PipelineNarrativeEvent(
+        step="optimize_strategy",
+        headline=_headline("optimize_strategy", language),
+        data_point=data_point[:40],
+    )
+
+
+def narrate_optimize_strategy_technical(
+    advisories: list[StrategyAdvice],
+    *,
+    triggered_rule_ids: list[str] | None = None,
+    latency_ms: int | None = None,
+) -> PipelineTechnicalEvent:
+    """Developer transcript after the optimizer step.
+
+    Surfaces every triggered rule + each surviving advisory's id, severity,
+    confidence, and citation. Includes only enum-ish data — no free-text
+    PII from the user profile.
+    """
+    lines: list[str] = ["tool=optimize_strategy (Gemini 2.5 Pro structured)"]
+    triggered = triggered_rule_ids or []
+    lines.append(
+        f"  rules_loaded=3  rules_triggered={len(triggered)}  advisories_emitted={len(advisories)}"
+    )
+    if triggered:
+        lines.append("  triggered=[" + ", ".join(triggered) + "]")
+    for a in advisories:
+        cite = f"{a.citation.pdf}:{a.citation.section or ''}:p{a.citation.page or '-'}"
+        lines.append(f"  ✓ {a.interaction_id} sev={a.severity} conf={a.confidence:.2f} cite={cite}")
+    if latency_ms is not None:
+        lines.append(f"  latency_ms={latency_ms}")
+    return PipelineTechnicalEvent(step="optimize_strategy", timestamp=_now_iso(), log_lines=lines)

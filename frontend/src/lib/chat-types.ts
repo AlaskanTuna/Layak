@@ -7,7 +7,7 @@
  * pipes through `humanize_error` exactly like the pipeline's `ErrorEvent`).
  */
 
-import type { ErrorCategory } from '@/lib/agent-types'
+import type { ErrorCategory, StrategyAdvice } from '@/lib/agent-types'
 
 export type ChatRole = 'user' | 'model'
 
@@ -20,6 +20,8 @@ export type ChatRequest = {
   history: ChatTurn[]
   message: string
   language: 'en' | 'ms' | 'zh'
+  /** Phase 11 Feature 2 — optional advisory the user just clicked into. */
+  recent_advisory?: StrategyAdvice | null
 }
 
 export type ChatCitation = {

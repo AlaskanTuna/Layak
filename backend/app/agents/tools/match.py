@@ -8,12 +8,21 @@ list only surfaces the schemes the profile actually qualifies for.
 
 from __future__ import annotations
 
-from app.rules import budi95, i_saraan, jkm_bkk, jkm_warga_emas, lhdn_form_b, perkeso_sksps, str_2026
+from app.rules import (
+    budi95,
+    i_saraan,
+    jkm_bkk,
+    jkm_warga_emas,
+    lhdn_form_b,
+    mykasih,
+    perkeso_sksps,
+    str_2026,
+)
 from app.schema.locale import DEFAULT_LANGUAGE, SupportedLanguage
 from app.schema.profile import Profile
 from app.schema.scheme import SchemeMatch
 
-_RULES = (str_2026, jkm_warga_emas, jkm_bkk, lhdn_form_b, i_saraan, perkeso_sksps, budi95)
+_RULES = (str_2026, jkm_warga_emas, jkm_bkk, lhdn_form_b, i_saraan, perkeso_sksps, budi95, mykasih)
 
 
 async def match_schemes(

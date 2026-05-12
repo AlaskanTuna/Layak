@@ -28,7 +28,7 @@ export type SchemeId =
   | 'perkeso_sksps'
   | 'i_saraan'
   | 'budi95'
-  // `'mykasih'` ships in Phase 12 Feature 5 alongside its rule module + display name.
+  | 'mykasih'
 
 // `upside` stacks into the headline annual-relief total. `required_contribution`
 // (e.g. PERKESO SKSPS) surfaces a separate block — user pays money, not receives.

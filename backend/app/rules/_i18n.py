@@ -599,6 +599,75 @@ def _budi95_out_of_scope(language: SupportedLanguage, **v: Any) -> SchemeCopy:
 
 
 # ---------------------------------------------------------------------------
+# MyKasih (SARA RM100) — info-only one-off MyKad credit (Phase 12)
+# ---------------------------------------------------------------------------
+
+
+def _mykasih_qualify(language: SupportedLanguage, **v: Any) -> SchemeCopy:
+    age = v["age"]
+    amount = v["credit_amount_rm"]
+    if language == "ms":
+        return {
+            "summary": (
+                f"RM{amount:.0f} satu kali telah dikreditkan ke MyKad anda "
+                f"pada 9 Februari 2026 (SARA Untuk Semua via MyKasih)."
+            ),
+            "why_qualify": (
+                f"Anda berumur {age} (≥18) — semua warga Malaysia dewasa "
+                f"menerima RM{amount:.0f} kredit sekali ini secara automatik "
+                f"ke MyKad pada 9 Feb 2026. Boleh dibelanjakan di kedai "
+                f"peserta MyKasih untuk barangan keperluan asas. Tiada "
+                f"permohonan diperlukan. Klik 'Semak Baki' untuk melihat "
+                f"baki tersisa di portal rasmi MyKasih."
+            ),
+        }
+    if language == "zh":
+        return {
+            "summary": (
+                f"RM{amount:.0f} 一次性补助已于 2026 年 2 月 9 日记入您的 MyKad"
+                f"（SARA Untuk Semua via MyKasih）。"
+            ),
+            "why_qualify": (
+                f"您的年龄 {age} 岁（≥18）—— 所有成年马来西亚公民均于"
+                f" 2026 年 2 月 9 日自动获得 RM{amount:.0f} 一次性 MyKad 信用。"
+                f"可在 MyKasih 参与的零售店购买基本生活用品。无需申请。"
+                f"请点击「查询余额」前往 MyKasih 官方门户查看剩余余额。"
+            ),
+        }
+    return {
+        "summary": (
+            f"A one-off RM{amount:.0f} was credited to your MyKad on 9 Feb 2026 "
+            f"(SARA Untuk Semua via MyKasih)."
+        ),
+        "why_qualify": (
+            f"You're {age} (≥18) — every adult Malaysian received an automatic "
+            f"one-off RM{amount:.0f} MyKad credit on 9 Feb 2026. Spend at any "
+            f"MyKasih participating merchant for essential goods. No "
+            f"application required. Click 'Check your balance' to see your "
+            f"remaining balance on the official MyKasih portal."
+        ),
+    }
+
+
+def _mykasih_out_of_scope(language: SupportedLanguage, **v: Any) -> SchemeCopy:
+    reasons: list[str] = v["reasons"]
+    if language == "ms":
+        return {
+            "summary": "Belum layak untuk MyKasih SARA RM100.",
+            "why_qualify": "Di luar skop: " + "; ".join(reasons) + ".",
+        }
+    if language == "zh":
+        return {
+            "summary": "暂不符合 MyKasih SARA RM100 资格。",
+            "why_qualify": "不在受惠范围内：" + "；".join(reasons) + "。",
+        }
+    return {
+        "summary": "Not yet eligible for MyKasih SARA RM100.",
+        "why_qualify": "Out of scope: " + "; ".join(reasons) + ".",
+    }
+
+
+# ---------------------------------------------------------------------------
 # Reason fragments — rule modules pass localised reason strings into the
 # `out_of_scope` callables above. Keeping reason strings here (rather than
 # re-translating the full "Out of scope: X; Y." sentence inside every rule)
@@ -672,6 +741,12 @@ _REASON_FRAGMENTS: dict[str, dict[SupportedLanguage, str]] = {
         "en": "age {age} below the BUDI95 minimum of {min_age}",
         "ms": "umur {age} di bawah minimum BUDI95 iaitu {min_age}",
         "zh": "年龄 {age} 岁低于 BUDI95 的最低 {min_age} 岁",
+    },
+    # ---- MyKasih (SARA RM100) ----
+    "mykasih_age_below_min": {
+        "en": "age {age} below the MyKasih SARA minimum of {min_age}",
+        "ms": "umur {age} di bawah minimum MyKasih SARA iaitu {min_age}",
+        "zh": "年龄 {age} 岁低于 MyKasih SARA 的最低 {min_age} 岁",
     },
     # ---- PERKESO SKSPS ----
     "perkeso_sksps_not_gig": {
@@ -766,6 +841,7 @@ _CATALOG: dict[SchemeId, dict[Variant, Callable[..., SchemeCopy]]] = {
         "out_of_scope": _perkeso_sksps_out_of_scope,
     },
     "budi95": {"qualify": _budi95_qualify, "out_of_scope": _budi95_out_of_scope},
+    "mykasih": {"qualify": _mykasih_qualify, "out_of_scope": _mykasih_out_of_scope},
 }
 
 

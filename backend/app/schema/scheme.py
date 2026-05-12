@@ -19,6 +19,7 @@ SchemeId = Literal[
     "perkeso_sksps",
     "i_saraan",
     "budi95",
+    "mykasih",
 ]
 
 # `SchemeKind` taxonomy:

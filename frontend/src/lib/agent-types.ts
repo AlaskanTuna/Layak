@@ -27,12 +27,15 @@ export type SchemeId =
   | 'lhdn_form_be'
   | 'perkeso_sksps'
   | 'i_saraan'
+  // `'budi95'` + `'mykasih'` ship in Phase 12 Features 4 + 5 alongside the
+  // rule modules + their localised display names.
 
-// Upside schemes stack into the headline annual-relief total;
-// required_contribution schemes (e.g. PERKESO SKSPS) surface a separate
-// "Required contributions" block and are excluded from the upside total.
+// `upside` stacks into the headline annual-relief total. `required_contribution`
+// (e.g. PERKESO SKSPS) surfaces a separate block — user pays money, not receives.
+// `subsidy_credit` (Phase 12 — BUDI95, MyKasih) is info-only; doesn't stack
+// because Layak can't confirm remaining balance via any public API.
 // Keep in lockstep with backend `app/schema/scheme.py`.
-export type SchemeKind = 'upside' | 'required_contribution'
+export type SchemeKind = 'upside' | 'required_contribution' | 'subsidy_credit'
 
 export type Dependant = {
   relationship: Relationship
@@ -119,6 +122,12 @@ export type SchemeMatch = {
   /** Annual mandatory contribution the user PAYS under this scheme. Only set
    * when `kind === 'required_contribution'`. */
   annual_contribution_rm?: number | null
+  /** ISO-8601 date string (e.g. `"2026-12-31"`) when the scheme's benefit
+   * expires / is forfeited. Set on time-bound `subsidy_credit` schemes
+   * (MyKasih RM100 → `"2026-12-31"`); `null` for rolling / open-ended
+   * schemes (BUDI95 monthly quota; all `upside` and `required_contribution`
+   * rules). Frontend renders it in bold on the card. */
+  expires_at_iso?: string | null
 }
 
 export type PacketDraft = {

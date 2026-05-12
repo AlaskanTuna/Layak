@@ -120,12 +120,15 @@ async def compute_upside(
 ) -> ComputeUpsideResult:
     """Compute annual RM upside via Gemini-run Python (code_execution tool).
 
-    `kind="required_contribution"` matches are skipped here — they represent
-    money the user PAYS (e.g. PERKESO SKSPS mandatory contributions), not
-    upside. Filtering before prompt construction keeps them out of the
-    generated Python table; their `annual_rm` is already `0.0` so the final
-    sum is unaffected either way, but omitting them from the stdout table
-    avoids a misleading "PERKESO SKSPS ... 0" row.
+    Non-upside `kind` values are skipped here. `required_contribution`
+    matches represent money the user PAYS (e.g. PERKESO SKSPS mandatory
+    contributions). `subsidy_credit` matches (Phase 12 — BUDI95, MyKasih)
+    are info-only — Layak can't confirm remaining balance via any public
+    API, so they don't stack into the headline upside total. Filtering
+    before prompt construction keeps them out of the generated Python
+    table; their `annual_rm` is already `0.0` so the final sum is
+    unaffected either way, but omitting them avoids misleading "X ... 0"
+    rows in stdout.
 
     `language` swaps the printed header / total labels so the stdout table
     renders in the user's chosen language. Python identifiers and scheme_id

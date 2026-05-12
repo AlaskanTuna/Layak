@@ -122,6 +122,38 @@ export function DiscoveryQueueTable({ rows, onRefresh, totalCount }: Props) {
 
   return (
     <section className="flex flex-col gap-3">
+      {selected.size > 0 && (
+        <div className="flex items-center justify-end gap-2">
+          <span className="text-xs text-muted-foreground">
+            {t('admin.discovery.queue.selected', { count: selected.size })}
+          </span>
+          <Button
+            type="button"
+            size="sm"
+            variant="outline"
+            onClick={() => setSelected(new Set())}
+            disabled={deleting}
+          >
+            {t('common.button.cancel')}
+          </Button>
+          <Button
+            type="button"
+            size="sm"
+            variant="destructive"
+            onClick={handleDelete}
+            disabled={deleting}
+            className="gap-1.5"
+          >
+            {deleting ? (
+              <Loader2 className="size-3.5 animate-spin" aria-hidden />
+            ) : (
+              <Trash2 className="size-3.5" aria-hidden />
+            )}
+            {t('admin.discovery.queue.deleteAction', { count: selected.size })}
+          </Button>
+        </div>
+      )}
+
       {deleteError && (
         <p role="alert" className="text-xs text-destructive">
           {deleteError}
@@ -234,39 +266,6 @@ export function DiscoveryQueueTable({ rows, onRefresh, totalCount }: Props) {
           </p>
         )}
       </div>
-
-      {selected.size > 0 && (
-        <div className="sticky bottom-4 z-10 mt-2 flex items-center justify-end gap-2 rounded-full border border-foreground/10 bg-card/95 px-4 py-2 shadow-lg backdrop-blur-md">
-          <span className="text-xs text-muted-foreground">
-            {t('admin.discovery.queue.selected', { count: selected.size })}
-          </span>
-          <Button
-            type="button"
-            size="sm"
-            variant="outline"
-            onClick={() => setSelected(new Set())}
-            disabled={deleting}
-            className="rounded-full"
-          >
-            {t('common.button.cancel')}
-          </Button>
-          <Button
-            type="button"
-            size="sm"
-            variant="destructive"
-            onClick={handleDelete}
-            disabled={deleting}
-            className="gap-1.5 rounded-full"
-          >
-            {deleting ? (
-              <Loader2 className="size-3.5 animate-spin" aria-hidden />
-            ) : (
-              <Trash2 className="size-3.5" aria-hidden />
-            )}
-            {t('admin.discovery.queue.deleteAction', { count: selected.size })}
-          </Button>
-        </div>
-      )}
     </section>
   )
 }

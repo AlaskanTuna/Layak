@@ -1086,6 +1086,12 @@ Findings the audit flagged that were **not** acted on (cosmetic or external to P
 - Integrated PDPA Consent routing (`X-PDPA-Consent` header triggering on first app auth via `/api/quota`) within `backend/app/auth.py`.
   \n## 2026-04-26\n\n### Phase 5: Auth + Gateway + Marketing (P5T1)\n- Added simple, transparent pricing structure to `en.json` with Free and Pro tiers.\n- Scaffolded `frontend/src/components/landing/landing-pricing.tsx` implementing the Free/Pro split as seen in the SaaS pivot spec.\n- Integrated `LandingPricing` component into `frontend/src/app/pages/marketing/landing-page.tsx`.\n- Marked Phase 5 Task 1 (Landing Page rewrite) as complete in `docs/plan.md`.
 
+## [13/05/26] - Evaluation overview empty-state alignment polish
+
+- On `/dashboard/evaluation`, made the right-side `PIPELINE` rail align to the same top level as the empty history card whenever the fetched evaluations list is empty, instead of always inheriting the non-empty desktop offset.
+- Simplified the empty history card so `Run your first evaluation to populate this view.` now leads the card, `NO EVALUATIONS YET` sits beneath it, and the extra upload description plus first-evaluation CTA are removed.
+- Verified with targeted ESLint on the touched history components and a full `pnpm -C frontend build`.
+
 ## [24/04/26] - Results chatbot modal production glass fix
 
 - Traced the Cloud Run-only glass regression to the custom `.glass-panel` treatment: it looked fine in dev, but the optimized production CSS bundle was not reliably carrying that selector, so the chat shell fell back to a washed-out translucent look live.

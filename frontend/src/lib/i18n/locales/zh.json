@@ -996,12 +996,14 @@
   },
   "admin": {
     "discovery": {
-      "pageEyebrow": "管理员 / 审核",
+      "pageEyebrow": "发现",
       "pageTitle": "计划发现队列",
-      "pageDescription": "Layak 的发现代理监视政府公报来源，并在变更触达终端用户之前在此处提交比率或资格变化以供审核。",
+      "pageDescription": "先审核来源变更，再触达用户。",
       "triggerButton": "立即运行发现",
       "triggerRunning": "正在运行…",
+      "triggerSuccessTitle": "发现运行完成",
       "triggerSuccess": "已检查 {{checked}} 个来源，{{changed}} 个有变更，提取 {{extracted}} 个候选",
+      "triggerErrorTitle": "发现运行失败",
       "triggerError": "发现运行失败：{{message}}",
       "filters": {
         "all": "全部",

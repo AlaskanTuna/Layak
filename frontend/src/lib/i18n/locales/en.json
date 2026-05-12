@@ -1007,12 +1007,14 @@
   },
   "admin": {
     "discovery": {
-      "pageEyebrow": "Admin / Moderation",
+      "pageEyebrow": "Discovery",
       "pageTitle": "Scheme Discovery Queue",
-      "pageDescription": "Layak's discovery agent watches gazetted government sources and surfaces rate or eligibility changes here for review before they reach end users.",
+      "pageDescription": "Review source changes before they reach users.",
       "triggerButton": "Run discovery now",
       "triggerRunning": "Running…",
+      "triggerSuccessTitle": "Discovery run complete",
       "triggerSuccess": "{{checked}} sources checked, {{changed}} changed, {{extracted}} candidates extracted",
+      "triggerErrorTitle": "Discovery run failed",
       "triggerError": "Discovery run failed: {{message}}",
       "filters": {
         "all": "All",

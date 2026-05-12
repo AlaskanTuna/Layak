@@ -1195,3 +1195,9 @@ Findings the audit flagged that were **not** acted on (cosmetic or external to P
 - Pruned deprecated i18n keys from en/ms/zh: `schemes.stats.{inScope,coming}`, `schemes.sections.{inScopeTitle,comingTitle,comingCount}`, `schemes.coming.{myKasihDesc,eKasihDesc,saraDesc}`.
 - Rewrote `schemes.pageDescription` to drop the "Three more land in v2..." sentence; new copy emphasises citation provenance instead of forward-looking scope.
 - Verified pnpm lint clean, pnpm build clean across all 13 routes.
+
+## [13/05/26] - Discovery admin header and trigger feedback polish
+
+- Updated `/dashboard/discovery` header copy so the eyebrow reads "Discovery" and the description is a shorter one-liner.
+- Wired "Run discovery now" success and failure outcomes into the existing notification store with matching toast feedback and bell-popover entries.
+- Verified: targeted ESLint on `discovery-trigger.tsx` clean; `pnpm -C frontend build` clean.

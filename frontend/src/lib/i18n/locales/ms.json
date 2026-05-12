@@ -1007,12 +1007,14 @@
   },
   "admin": {
     "discovery": {
-      "pageEyebrow": "Admin / Moderasi",
+      "pageEyebrow": "Penemuan",
       "pageTitle": "Barisan Penemuan Skim",
-      "pageDescription": "Ejen penemuan Layak memantau sumber kerajaan rasmi dan memunculkan perubahan kadar atau kelayakan di sini untuk semakan sebelum sampai kepada pengguna.",
+      "pageDescription": "Semak perubahan sumber sebelum sampai kepada pengguna.",
       "triggerButton": "Jalankan penemuan sekarang",
       "triggerRunning": "Sedang dijalankan…",
+      "triggerSuccessTitle": "Penemuan selesai",
       "triggerSuccess": "{{checked}} sumber diperiksa, {{changed}} berubah, {{extracted}} calon diekstrak",
+      "triggerErrorTitle": "Penemuan gagal",
       "triggerError": "Penemuan gagal: {{message}}",
       "filters": {
         "all": "Semua",

@@ -52,6 +52,7 @@ from app.routes.evaluations import router as evaluations_router  # noqa: E402
 from app.routes.quota import router as quota_router  # noqa: E402
 from app.routes.schemes import router as schemes_router  # noqa: E402
 from app.routes.user import router as user_router  # noqa: E402
+from app.routes.what_if import router as what_if_router  # noqa: E402
 from app.schema.locale import SupportedLanguage  # noqa: E402
 from app.schema.manual_entry import DependantInput, ManualEntryPayload  # noqa: E402
 from app.services.evaluation_persistence import (  # noqa: E402
@@ -120,6 +121,7 @@ app.include_router(quota_router)
 app.include_router(user_router)
 app.include_router(admin_router)
 app.include_router(schemes_router)
+app.include_router(what_if_router)
 
 
 @app.get("/health")

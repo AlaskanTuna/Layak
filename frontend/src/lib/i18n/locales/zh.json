@@ -657,6 +657,29 @@
         "generate": "生成草稿"
       }
     },
+    "whatIf": {
+      "sectionTitle": "探索假设情景",
+      "sectionEyebrow": "调整输入",
+      "sectionDescription": "拖动任意滑块即可查看符合资格的计划如何变化。无需重新上传文件。",
+      "expand": "展开",
+      "collapse": "收起",
+      "resetAll": "全部重置",
+      "resetSlider": "重置为实际值",
+      "running": "正在重新计算…",
+      "rateLimited": "假设场景请求过多 —— 请 {{seconds}} 秒后重试。",
+      "errorGeneric": "无法运行假设场景，请重试。",
+      "sliderIncomeLabel": "月收入（RM）",
+      "sliderChildrenLabel": "18 岁以下子女",
+      "sliderElderlyLabel": "受抚养长辈",
+      "totalUpsideLabel": "假设场景年度合计",
+      "deltaChip": {
+        "gained": "新符合资格 · RM {{amount}}",
+        "lost": "不再符合 · 此前 RM {{amount}}",
+        "tier_changed": "{{note}}",
+        "amount_changed": "{{sign}}RM {{amount}}",
+        "unchanged": "无变化"
+      }
+    },
     "strategy": {
       "sectionTitle": "策略",
       "sectionEyebrow": "跨计划分析",

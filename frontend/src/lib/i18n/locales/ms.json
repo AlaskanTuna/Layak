@@ -668,6 +668,29 @@
         "generate": "Jana draf"
       }
     },
+    "whatIf": {
+      "sectionTitle": "Terokai senario apa-jika",
+      "sectionEyebrow": "Laraskan input",
+      "sectionDescription": "Tarik mana-mana penggelongsor untuk melihat bagaimana skim yang anda layak berubah. Tiada muat naik semula diperlukan.",
+      "expand": "Buka",
+      "collapse": "Tutup",
+      "resetAll": "Set semula semua",
+      "resetSlider": "Set semula kepada sebenar",
+      "running": "Mengira semula…",
+      "rateLimited": "Terlalu banyak panggilan apa-jika — cuba lagi dalam {{seconds}}s.",
+      "errorGeneric": "Tidak dapat menjalankan apa-jika. Sila cuba lagi.",
+      "sliderIncomeLabel": "Pendapatan bulanan (RM)",
+      "sliderChildrenLabel": "Kanak-kanak bawah 18",
+      "sliderElderlyLabel": "Warga emas tanggungan",
+      "totalUpsideLabel": "Jumlah apa-jika / tahun",
+      "deltaChip": {
+        "gained": "Layak baru · RM {{amount}}",
+        "lost": "Tidak lagi layak · dulu RM {{amount}}",
+        "tier_changed": "{{note}}",
+        "amount_changed": "{{sign}}RM {{amount}}",
+        "unchanged": "Tiada perubahan"
+      }
+    },
     "strategy": {
       "sectionTitle": "Strategi",
       "sectionEyebrow": "Analisis merentas skim",

@@ -4,11 +4,12 @@ import type { ReactNode } from 'react'
 import { Building2, Calendar, Layers, Tag } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 
-const STATS = [
-  { id: 'schemes', icon: Layers, accent: 'hibiscus', value: '6' },
-  { id: 'agencies', icon: Building2, accent: 'forest', value: '5' },
-  { id: 'categories', icon: Tag, accent: 'primary', value: '5' },
-  { id: 'year', icon: Calendar, accent: 'primary', value: '2026' }
+import { useLatestVerifiedAt } from '@/hooks/use-verified-schemes'
+
+const STATIC_STATS = [
+  { id: 'schemes', icon: Layers, accent: 'hibiscus', value: '8' },
+  { id: 'agencies', icon: Building2, accent: 'forest', value: '6' },
+  { id: 'categories', icon: Tag, accent: 'primary', value: '6' }
 ] as const
 
 type Accent = 'hibiscus' | 'forest' | 'primary'
@@ -19,14 +20,40 @@ const ACCENT: Record<Accent, string> = {
   primary: 'bg-[color:var(--primary)]/10 text-[color:var(--primary)]'
 }
 
+/** Format an ISO datetime string (e.g. "2026-05-13T17:30:00Z") as a
+ * locale-aware short date (e.g. "May 13, 2026"). Returns "—" on
+ * undefined/null/parse-fail so the tile renders a placeholder rather
+ * than crashing while the fetch resolves or before any admin action
+ * has stamped a verifiedAt. */
+function formatLatestUpdate(iso: string | null | undefined, locale: string): string {
+  if (!iso) return '—'
+  const parsed = new Date(iso)
+  if (Number.isNaN(parsed.getTime())) return '—'
+  const intlLocale = locale === 'ms' ? 'ms-MY' : locale === 'zh' ? 'zh-CN' : 'en-MY'
+  return new Intl.DateTimeFormat(intlLocale, {
+    day: 'numeric',
+    month: 'short',
+    year: 'numeric'
+  }).format(parsed)
+}
+
 export function SchemesStatsStrip() {
-  const { t } = useTranslation()
+  const { t, i18n } = useTranslation()
+  // Phase 12 — "Latest Update" derived from `max(verified_at)` across the
+  // `verified_schemes` collection. Auto-refreshes whenever an admin approves
+  // a new discovery candidate (Phase 11 Feature 1's `_finalize_approval`
+  // writes SERVER_TIMESTAMP). Day-1 seed via
+  // `scripts/seed_verified_schemes.py` stamps the locked schemes with the
+  // deploy date so the tile shows a real value before any admin action.
+  const latestVerifiedAt = useLatestVerifiedAt()
+  const latestUpdateValue = formatLatestUpdate(latestVerifiedAt, i18n.language)
+
   return (
     <section
       aria-label={t('schemes.stats.ariaLabel')}
       className="grid grid-cols-2 gap-3 sm:grid-cols-2 lg:grid-cols-4"
     >
-      {STATS.map((stat) => {
+      {STATIC_STATS.map((stat) => {
         const Icon = stat.icon
         return (
           <StatCard
@@ -38,6 +65,12 @@ export function SchemesStatsStrip() {
           />
         )
       })}
+      <StatCard
+        icon={<Calendar className="size-4" aria-hidden />}
+        label={t('schemes.stats.year')}
+        value={latestUpdateValue}
+        accent="primary"
+      />
     </section>
   )
 }

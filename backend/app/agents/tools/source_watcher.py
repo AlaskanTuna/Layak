@@ -41,6 +41,14 @@ _FETCH_TIMEOUT_SECONDS = 20.0
 _MAX_BYTES_PER_FETCH = 5 * 1024 * 1024  # 5 MiB cap per response
 _WHITESPACE_RE = re.compile(r"\s+")
 _HTML_TAG_RE = re.compile(r"<[^>]+>")
+# Strip structural chrome blocks (with content) before tag removal — otherwise
+# the entire page navigation, footer, scripts and styles get flattened into the
+# text the extractor sees, drowning out the actual scheme prose and producing
+# confidence < 0.3 on every Drupal/CMS gov page.
+_CHROME_BLOCK_RE = re.compile(
+    r"<(script|style|nav|header|footer|noscript|aside|form)\b[^>]*>.*?</\1>",
+    re.IGNORECASE | re.DOTALL,
+)
 
 
 def load_discovery_sources(path: Path | None = None) -> list[DiscoverySource]:
@@ -66,8 +74,14 @@ def load_discovery_sources(path: Path | None = None) -> list[DiscoverySource]:
 
 
 def _normalise_content(text: str) -> str:
-    """Reduce surface-level churn so a one-line whitespace change doesn't trip a diff."""
-    stripped_tags = _HTML_TAG_RE.sub(" ", text)
+    """Reduce surface-level churn so a one-line whitespace change doesn't trip a diff.
+
+    Also strips structural chrome (script/style/nav/header/footer/aside/form) with
+    their content before the generic tag-strip, so the extractor sees actual scheme
+    prose instead of menu items + script bodies.
+    """
+    stripped_chrome = _CHROME_BLOCK_RE.sub(" ", text)
+    stripped_tags = _HTML_TAG_RE.sub(" ", stripped_chrome)
     return _WHITESPACE_RE.sub(" ", stripped_tags).strip()
 
 

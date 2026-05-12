@@ -14,6 +14,21 @@ type Props = {
   /** Phase 11 Feature 3 — when present, render per-scheme delta chips
    *  below each card's footer. `null` while what-if hasn't been run. */
   deltas?: SchemeDelta[] | null
+  /** Filter to a single scheme kind. Defaults to `upside` so the legacy
+   *  call site (Eligible Schemes) keeps its meaning; pass `subsidy_credit`
+   *  to render the Subsidies section. */
+  kind?: 'upside' | 'subsidy_credit'
+  /** Toggle the SchemeVerifiedBadge under each card footer. Off on the
+   *  Eligible Schemes grid because the citation is already implied by the
+   *  scheme name; subsidies still surface the badge so the user trusts the
+   *  auto-credit claim. */
+  showVerifiedBadge?: boolean
+  /** Optional override for the section heading. Falls back to the i18n key
+   *  matching the resolved `kind`. */
+  heading?: string
+  /** When true, suppress the inner section heading so a parent can provide
+   *  its own. The matches-count chip is also suppressed. */
+  hideHeading?: boolean
 }
 
 
@@ -45,51 +60,55 @@ function formatExpiryDate(iso: string, locale: string): string {
   }).format(parsed)
 }
 
-export function SchemeCardGrid({ matches, deltas }: Props) {
+export function SchemeCardGrid({
+  matches,
+  deltas,
+  kind = 'upside',
+  showVerifiedBadge = true,
+  heading,
+  hideHeading = false
+}: Props) {
   const { t, i18n } = useTranslation()
   const deltaByScheme = new Map<string, SchemeDelta>()
   for (const d of deltas ?? []) {
     deltaByScheme.set(d.scheme_id, d)
   }
-  // Phase 12: surface both `upside` and `subsidy_credit` in the ranked grid.
-  // `required_contribution` entries (e.g. PERKESO SKSPS) still render
-  // separately in `<RequiredContributionsCard>` so RM amounts don't get
-  // visually confused with annual relief the user would receive. Sort:
-  // upside cards by annual_rm desc, then subsidy_credit (annual_rm=0,
-  // preserves backend match order).
+  // Phase 12: each call site renders a single kind so `Eligible Schemes`
+  // (upside) and `Subsidies` (subsidy_credit) can live in their own page
+  // subsections. `required_contribution` entries (e.g. PERKESO SKSPS) still
+  // render separately in `<RequiredContributionsCard>` so RM amounts don't
+  // get visually confused with annual relief the user would receive.
   const qualifying = matches
     .filter((m) => {
       if (!m.qualifies) return false
-      const kind = m.kind ?? 'upside'
-      return kind === 'upside' || kind === 'subsidy_credit'
+      const matchKind = (m.kind ?? 'upside') as 'upside' | 'subsidy_credit' | 'required_contribution'
+      return matchKind === kind
     })
     .slice()
-    .sort((a, b) => {
-      const kindRank = { upside: 0, subsidy_credit: 1 } as const
-      const aRank = kindRank[(a.kind ?? 'upside') as keyof typeof kindRank] ?? 99
-      const bRank = kindRank[(b.kind ?? 'upside') as keyof typeof kindRank] ?? 99
-      if (aRank !== bRank) return aRank - bRank
-      return b.annual_rm - a.annual_rm
-    })
+    .sort((a, b) => b.annual_rm - a.annual_rm)
 
   if (qualifying.length === 0) {
-    return (
-      <section className="paper-card rounded-[14px] p-6 text-center">
-        <p className="text-sm text-foreground/65">{t('evaluation.schemeCard.noMatches')}</p>
-      </section>
-    )
+    return null
   }
+
+  const sectionHeading =
+    heading ??
+    (kind === 'subsidy_credit'
+      ? t('evaluation.subsidies.title')
+      : t('evaluation.schemeCard.heading'))
 
   return (
     <section className="flex flex-col gap-4">
-      <div className="flex items-baseline justify-between">
-        <h2 className="font-heading text-lg font-semibold tracking-tight">{t('evaluation.schemeCard.heading')}</h2>
-        <span className="mono-caption text-foreground/55">
-          {qualifying.length === 1
-            ? t('evaluation.schemeCard.matchesSingular', { count: qualifying.length })
-            : t('evaluation.schemeCard.matchesPlural', { count: qualifying.length })}
-        </span>
-      </div>
+      {!hideHeading && (
+        <div className="flex items-baseline justify-between">
+          <h2 className="font-heading text-lg font-semibold tracking-tight">{sectionHeading}</h2>
+          <span className="mono-caption text-foreground/55">
+            {qualifying.length === 1
+              ? t('evaluation.schemeCard.matchesSingular', { count: qualifying.length })
+              : t('evaluation.schemeCard.matchesPlural', { count: qualifying.length })}
+          </span>
+        </div>
+      )}
       <ul className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
         {qualifying.map((match, index) => {
           const isSubsidy = (match.kind ?? 'upside') === 'subsidy_credit'
@@ -160,7 +179,7 @@ export function SchemeCardGrid({ matches, deltas }: Props) {
                         })}
                       </p>
                     )}
-                    <SchemeVerifiedBadge schemeId={match.scheme_id} />
+                    {showVerifiedBadge && <SchemeVerifiedBadge schemeId={match.scheme_id} />}
                   </div>
                   <Button
                     render={<a href={match.portal_url} target="_blank" rel="noopener noreferrer" />}
@@ -179,7 +198,7 @@ export function SchemeCardGrid({ matches, deltas }: Props) {
                     <p className="font-heading text-[15px] font-semibold tabular-nums text-foreground">
                       {formatRm(match.annual_rm)}
                     </p>
-                    <SchemeVerifiedBadge schemeId={match.scheme_id} />
+                    {showVerifiedBadge && <SchemeVerifiedBadge schemeId={match.scheme_id} />}
                   </div>
                   <Button
                     render={<a href={match.portal_url} target="_blank" rel="noopener noreferrer" />}

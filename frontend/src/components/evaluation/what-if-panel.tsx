@@ -119,12 +119,9 @@ export function WhatIfPanel({ evalId, baselineProfile, onResult }: Props) {
             className={cn('size-4 text-foreground/55 transition-transform', expanded && 'rotate-180')}
             aria-hidden
           />
-          <div className="flex flex-col">
-            <p className="mono-caption text-foreground/55">{t('evaluation.whatIf.sectionEyebrow')}</p>
-            <h2 className="font-heading text-xl font-semibold tracking-tight">
-              {t('evaluation.whatIf.sectionTitle')}
-            </h2>
-          </div>
+          <span className="font-heading text-base font-semibold tracking-tight">
+            {t('evaluation.whatIf.sectionTitle')}
+          </span>
         </button>
         {expanded && isDirty && (
           <Button type="button" variant="ghost" size="sm" onClick={resetAll} className="gap-1.5">

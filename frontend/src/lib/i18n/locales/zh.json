@@ -610,8 +610,10 @@
       "toc": {
         "overview": "概览",
         "schemes": "可申请方案",
-        "strategy": "策略",
+        "subsidies": "补贴",
         "required": "应缴贡献",
+        "strategy": "策略",
+        "whatIfs": "假设情景",
         "preview": "草稿预览"
       },
       "startAnother": "开始另一次评估",
@@ -679,7 +681,6 @@
     },
     "whatIf": {
       "sectionTitle": "探索假设情景",
-      "sectionEyebrow": "调整输入",
       "sectionDescription": "拖动任意滑块即可查看符合资格的计划如何变化。无需重新上传文件。",
       "expand": "展开",
       "collapse": "收起",
@@ -702,7 +703,6 @@
     },
     "strategy": {
       "sectionTitle": "策略",
-      "sectionEyebrow": "跨计划分析",
       "sectionDescription": "Layak 的优化器比较您匹配到的计划，并标记可协调的机会。",
       "emptyHeadline": "未发现跨计划冲突",
       "emptyDescription": "您匹配的计划未触发 Layak 关注的任何协调边缘情况。",
@@ -954,6 +954,11 @@
       "emptyList": "您首次评估完成后，计划匹配将在此显示。",
       "eligibleSchemesCount": "符合资格的计划（{{count}}）"
     },
+    "subsidies": {
+      "title": "补贴",
+      "description": "您可能已经有资格获得的政府补贴。这些补贴会通过相关机构的官方平台自动入账 —— Layak 不会代您申请。",
+      "empty": "没有匹配您档案的补贴方案。"
+    },
     "requiredContributions": {
       "heading": "强制性缴款",
       "intro": "您在这些计划下需要缴纳的强制性费用。",
@@ -973,6 +978,10 @@
       "error": "预览失败：{{message}}",
       "iframeTitle": "{{name}} 的在线预览",
       "downloadOne": "下载此 PDF"
+    },
+    "whatIfs": {
+      "sectionTitle": "假设情景",
+      "sectionDescription": "调整您的输入，看看符合的方案会如何变化。"
     },
     "packet": {
       "eyebrow": "申请包",

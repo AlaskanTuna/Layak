@@ -19,7 +19,6 @@ export function StrategySection({ advisories, onAskCikLay }: Props) {
   return (
     <section className="flex flex-col gap-4">
       <header className="flex flex-col gap-1">
-        <p className="mono-caption text-foreground/55">{t('evaluation.strategy.sectionEyebrow')}</p>
         <h2 className="font-heading text-xl font-semibold tracking-tight">
           {t('evaluation.strategy.sectionTitle')}
         </h2>

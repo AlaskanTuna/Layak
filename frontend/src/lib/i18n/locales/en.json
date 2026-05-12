@@ -610,20 +610,22 @@
       "toc": {
         "overview": "Overview",
         "schemes": "Eligible Schemes",
-        "strategy": "Strategy",
+        "subsidies": "Subsidies",
         "required": "Required Contributions",
+        "strategy": "Strategy",
+        "whatIfs": "What-Ifs",
         "preview": "Inline Preview"
       },
-      "startAnother": "Start another evaluation",
-      "viewDetailed": "View detailed results",
-      "backToEvaluations": "Back to evaluations",
+      "startAnother": "Start Another Evaluation",
+      "viewDetailed": "View Detailed Results",
+      "backToEvaluations": "Back to Evaluations",
       "loading": "Loading evaluation…",
       "notFoundTitle": "Evaluation not found",
       "notFoundBody": "We couldn't find this evaluation. It may have been deleted, or the link may be wrong.",
       "errorTitle": "Could not load evaluation",
       "errorUnexpected": "An unexpected error occurred.",
       "retry": "Retry",
-      "startNew": "Start a new evaluation",
+      "startNew": "Start a New Evaluation",
       "failedTitle": "Evaluation failed",
       "backendReturned": "Backend returned {{status}} {{statusText}}",
       "byIdEyebrow": "Evaluation",
@@ -637,15 +639,15 @@
         "description": "Start with the most important action, then work through the rest in order.",
         "reviewMatchesTitle": "Review Matched Schemes",
         "reviewMatchesBody": "See why each scheme matched before you act on anything.",
-        "reviewMatchesCta": "Review schemes",
+        "reviewMatchesCta": "Review Schemes",
         "reviewMatchesEmpty": "No qualifying schemes surfaced in this run.",
         "reviewPacketTitle": "Review or Download Your Draft Packet",
         "reviewPacketBody": "Open the packet section next so you can inspect or download the draft documents.",
-        "reviewPacketCta": "Go to draft packet",
+        "reviewPacketCta": "Go to Draft Packet",
         "reviewPacketEmpty": "A draft packet appears here only when a scheme qualifies.",
         "startAnotherTitle": "Start Another Evaluation",
         "startAnotherBody": "Run a fresh evaluation if you want to compare another profile or document set.",
-        "startAnotherCta": "Start another evaluation"
+        "startAnotherCta": "Start Another Evaluation"
       }
     },
     "intake": {
@@ -679,12 +681,11 @@
     },
     "whatIf": {
       "sectionTitle": "Explore what-if scenarios",
-      "sectionEyebrow": "Adjust the inputs",
       "sectionDescription": "Drag any slider to see how your eligible schemes shift. No re-upload required.",
       "expand": "Open",
       "collapse": "Close",
-      "resetAll": "Reset all",
-      "resetSlider": "Reset to my actual",
+      "resetAll": "Reset All",
+      "resetSlider": "Reset to My Actual",
       "running": "Recalculating…",
       "rateLimited": "Too many what-if calls — try again in {{seconds}}s.",
       "errorGeneric": "Couldn't run the what-if. Please try again.",
@@ -702,15 +703,14 @@
     },
     "strategy": {
       "sectionTitle": "Strategy",
-      "sectionEyebrow": "Cross-scheme analysis",
       "sectionDescription": "Layak's optimizer compares your matched schemes against each other and flags coordination opportunities.",
       "emptyHeadline": "No cross-scheme conflicts detected",
       "emptyDescription": "Your matched schemes don't stack into any of the coordination edge cases Layak watches for.",
-      "askCikLay": "Ask Cik Lay about this",
+      "askCikLay": "Ask Cik Lay About This",
       "citedPrefix": "Cited:",
       "severity": {
         "info": "Info",
-        "warn": "Heads up",
+        "warn": "Heads Up",
         "act": "Action"
       },
       "softSuggestion": "Layak isn't fully certain — worth asking Cik Lay."
@@ -947,12 +947,17 @@
       "categorySubsidy": "Subsidy",
       "subsidyAutoCredited": "Auto-credited to your MyKad",
       "subsidyInfo": "Subsidy info",
-      "checkBalance": "Check your balance",
+      "checkBalance": "Check Your Balance",
       "expiresOn": "Expires {{date}}",
       "perYearEst": "per year (est.)",
       "openAgencyPortal": "Open {{agency}} portal",
       "emptyList": "Scheme matches will appear here after your first evaluation completes.",
       "eligibleSchemesCount": "Eligible Schemes ({{count}})"
+    },
+    "subsidies": {
+      "title": "Subsidies",
+      "description": "Government subsidies you may already be entitled to. These auto-credit through agency portals — Layak doesn't apply on your behalf.",
+      "empty": "No subsidy programmes matched your profile."
     },
     "requiredContributions": {
       "heading": "Required Contributions",
@@ -973,6 +978,10 @@
       "error": "Preview Failed: {{message}}",
       "iframeTitle": "Inline Preview of {{name}}",
       "downloadOne": "Download this PDF"
+    },
+    "whatIfs": {
+      "sectionTitle": "What-Ifs",
+      "sectionDescription": "Adjust your inputs to see how the matched schemes would shift."
     },
     "packet": {
       "eyebrow": "Packet",

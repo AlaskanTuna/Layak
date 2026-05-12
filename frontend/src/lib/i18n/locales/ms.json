@@ -610,8 +610,10 @@
       "toc": {
         "overview": "Gambaran Keseluruhan",
         "schemes": "Skim Layak",
-        "strategy": "Strategi",
+        "subsidies": "Subsidi",
         "required": "Sumbangan Diperlukan",
+        "strategy": "Strategi",
+        "whatIfs": "Senario Bagaimana-Jika",
         "preview": "Pratonton"
       },
       "startAnother": "Mulakan penilaian lain",
@@ -679,7 +681,6 @@
     },
     "whatIf": {
       "sectionTitle": "Terokai senario apa-jika",
-      "sectionEyebrow": "Laraskan input",
       "sectionDescription": "Tarik mana-mana penggelongsor untuk melihat bagaimana skim yang anda layak berubah. Tiada muat naik semula diperlukan.",
       "expand": "Buka",
       "collapse": "Tutup",
@@ -702,7 +703,6 @@
     },
     "strategy": {
       "sectionTitle": "Strategi",
-      "sectionEyebrow": "Analisis merentas skim",
       "sectionDescription": "Pengoptimum Layak membandingkan skim yang dipadankan dan menandakan peluang koordinasi.",
       "emptyHeadline": "Tiada konflik merentas skim",
       "emptyDescription": "Skim anda tidak mencetus mana-mana kes koordinasi yang Layak pantau.",
@@ -954,6 +954,11 @@
       "emptyList": "Padanan skim akan muncul di sini selepas penilaian pertama anda selesai.",
       "eligibleSchemesCount": "Skim yang layak ({{count}})"
     },
+    "subsidies": {
+      "title": "Subsidi",
+      "description": "Subsidi kerajaan yang anda mungkin sudah berhak terima. Subsidi ini dikreditkan secara automatik melalui portal agensi — Layak tidak memohon bagi pihak anda.",
+      "empty": "Tiada program subsidi sepadan dengan profil anda."
+    },
     "requiredContributions": {
       "heading": "Caruman wajib",
       "intro": "Caruman wajib yang perlu anda bayar di bawah skim-skim ini.",
@@ -973,6 +978,10 @@
       "error": "Pratonton gagal: {{message}}",
       "iframeTitle": "Pratonton dalam talian {{name}}",
       "downloadOne": "Muat turun PDF ini"
+    },
+    "whatIfs": {
+      "sectionTitle": "Senario Bagaimana-Jika",
+      "sectionDescription": "Laraskan input anda untuk melihat bagaimana skim yang sepadan akan berubah."
     },
     "packet": {
       "eyebrow": "Pakej",

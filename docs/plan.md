@@ -1367,23 +1367,27 @@ _Frontend:_
 
 **Purpose/Issue:** Extend the existing pipeline SSE stream with two new event types per step — humanized lay narration + technical developer transcript — so the frontend can render the two-tier surface without breaking any existing consumer.
 
-- [ ] New Pydantic models `PipelineNarrativeEvent` (`type: Literal["narrative"]`, `step`, `headline` ≤ 80 chars, `data_point` ≤ 40 chars) and `PipelineTechnicalEvent` (`type: Literal["technical"]`, `step`, `timestamp` ISO-8601, `log_lines: list[str]`) added to `backend/app/schema/events.py`.
-- [ ] Each ADK tool wrapper (`extract_profile`, `classify_household`, `match_schemes`, `rank_schemes`, `optimize_strategy`, `compute_upside`, `generate_packet`) emits one `PipelineNarrativeEvent` and one `PipelineTechnicalEvent` on completion alongside the existing `step` event. Existing `step` and `done` events stay unchanged.
-- [ ] Lay narration text per tool keyed by `evaluation.narrative.<tool>.*` (en strings ship in this task; ms/zh land in Task 12).
-- [ ] Technical transcript per tool includes tool name, key inputs, key outputs, Vertex AI Search hit IDs + scores (when applicable), Code Execution stdout snippet (when applicable), latency ms. Never includes full IC numbers or full uploaded-doc payloads.
-- [ ] `backend/tests/test_pipeline_narrative.py` — every tool emits both event types; payload schema valid; sensitive-PII sanitisation asserted at both layers.
+- [x] New Pydantic models `PipelineNarrativeEvent` (`type: Literal["narrative"]`, `step`, `headline` ≤ 80 chars, `data_point` ≤ 40 chars, nullable) and `PipelineTechnicalEvent` (`type: Literal["technical"]`, `step`, `timestamp` ISO-8601 str, `log_lines: list[str]` 1–20) added to `backend/app/schema/events.py`. Both wired into the `AgentEvent` discriminated union.
+- [x] Each of the 5 pipeline steps (`extract`, `classify`, `match`, `compute_upside`, `generate`) emits one `PipelineNarrativeEvent` and one `PipelineTechnicalEvent` on completion alongside the existing `step_result` event. Per-step latency captured via `asyncio.get_event_loop().time()` deltas. `optimize_strategy` event integration lands with Feature 2 (Task 8); v1 has 5 steps, not 7 — ranking is implicit in `match_schemes`'s sort.
+- [x] Lay narration text emits in user's `language` directly from a static `_HEADLINES` catalog in `backend/app/agents/narration.py`. en/ms/zh ship with this task — the catalog is small enough that the Task 12 deferral is unnecessary.
+- [x] Technical transcript per tool includes tool name, key inputs, key outputs, Vertex citation (pdf:page) per match, Code Execution stdout first non-empty line + char counts, latency ms. NEVER includes raw IC numbers (only `***-**-{last4}` masked form), profile `name`, or `address`. Pydantic-enforced 20-line cap per event.
+- [x] `backend/tests/test_pipeline_narration.py` — 9 tests covering length contracts, PII redaction, localisation per (en/ms/zh) × 5 steps, match technical content, compute_upside stdout surfacing. `test_manual_entry.py` updated 11 → 21 events with new sequence assertion.
+- [x] Persistence layer (`backend/app/services/evaluation_persistence.py`) passes both new event types through to the client and appends to `narrativeLog`/`technicalLog` Firestore arrays via `ArrayUnion` for retrospective replay.
 
 ### 3. Feature: Two-tier reasoning surface — frontend `pipeline-narrative.tsx`
 
 **Purpose/Issue:** Replace the skinny `pipeline-stepper.tsx` progress bar with a two-tier UI: a lay-language narration card always visible, plus a collapsed-by-default developer transcript dropdown. On completion, the entire card collapses to a one-line summary on the persisted results page.
 
-- [ ] New `frontend/src/components/evaluation/pipeline-narrative.tsx` mounting `<NarrativeLayer />` (always visible — headline + data_point per `PipelineNarrativeEvent` with checkmark icons) and `<TechnicalLayer />` (shadcn `<Collapsible>` wrapping a monospaced terminal-styled body, default closed).
-- [ ] `frontend/src/hooks/use-agent-pipeline.ts` extended to accumulate `narrative_events` and `technical_events` arrays alongside existing step state.
-- [ ] All call-sites updated to use `pipeline-narrative.tsx`; delete `pipeline-stepper.tsx` and any unused exports.
-- [ ] Post-completion behaviour on `/dashboard/evaluation/results/[id]`: the narrative card collapses to a one-line summary (e.g. "Layak's pipeline completed in 8.2 seconds — show details ▾"); expanding shows both tiers as a retrospective.
-- [ ] Tier-1 narration localised en/ms/zh (Task 12); Tier-2 technical transcript stays English (developer audience).
-- [ ] Verify: `pnpm -C frontend lint` and `pnpm -C frontend build` clean.
-- [ ] Manual smoke (Aisyah sample): 4–6 lay narration lines, no jargon, no scheme IDs visible (scheme names only); expanded technical layer shows timestamps + tool names + Vertex hits with scores.
+- [x] New `frontend/src/components/evaluation/pipeline-narrative.tsx` mounting `<NarrativeLayer />` (always visible — headline + data_point per `PipelineNarrativeEvent` with checkmark icons) and `<TechnicalLayer />` (hand-rolled expand toggle with `aria-expanded`, monospaced `<pre>` with `tabIndex={0}` + `role="region"` for keyboard accessibility — shadcn `<Collapsible>` not yet installed, custom implementation matches paper-card design semantics).
+- [x] `frontend/src/hooks/use-agent-pipeline.ts` extended to accumulate `narrativeEvents` and `technicalEvents` arrays alongside existing step state. New reducer branches in `applyEvent` switch.
+- [x] All call-sites updated to use `pipeline-narrative.tsx` (`evaluation-upload-client.tsx`, `evaluation-results-by-id-client.tsx`); deleted `pipeline-stepper.tsx`.
+- [x] Post-completion behaviour on `/dashboard/evaluation/results/[id]`: the narrative card renders in `retrospective` mode — collapsed by default to a one-line summary ("Layak's pipeline completed across {{count}} steps.") with a chevron to expand into the full two-tier replay.
+- [x] Tier-1 narration ships en/ms/zh from the backend `_HEADLINES` catalog; Tier-2 technical transcript stays English.
+- [x] Mock fixture (`frontend/src/fixtures/aisyah-response.ts:AISYAH_MOCK_EVENTS`) extended with 5 narrative + 5 technical events so demo mode showcases the new UI rather than falling back to the legacy stepper rendering path.
+- [x] Type mirrors: `agent-types.ts` adds `PipelineNarrativeEvent`, `PipelineTechnicalEvent`, extends `AgentEvent` union + `EvaluationDoc` with optional `narrativeLog`/`technicalLog` (backward compat for pre-Feature 4 evals).
+- [x] i18n chrome keys in en/ms/zh: `evaluation.narrative.{showTechnical, hideTechnical, showDetails, collapse, summaryRunning, summaryDone, summaryError, technicalLogLabel}`.
+- [x] Verify: `pnpm -C frontend lint` clean. `tsc --noEmit` clean for all new files (pre-existing errors in `results-chat-panel.tsx` from missing `react-markdown` module unchanged). Backend 478/478 tests pass. Two parallel audit subagents found two fixes (pre keyboard accessibility + mock fixture coverage), both addressed.
+- [ ] Manual smoke (Aisyah sample): 5 lay narration lines (Read your documents → Drafted application packets), expanded technical layer shows timestamps + tool names + Vertex citations + Gemini code-execution stdout excerpt.
 
 ### 4. Feature: Discovery source allowlist + `source_watcher` + `extract_candidate` tools backend
 

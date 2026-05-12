@@ -4,12 +4,23 @@ Locked wire format:
 
     step_started  { "type": "step_started", "step": <Step> }
     step_result   { "type": "step_result",  "step": <Step>, "data": <StepData> }
+    narrative     { "type": "narrative",    "step": <Step>, "headline": str, "data_point": str|null }
+    technical     { "type": "technical",    "step": <Step>, "timestamp": str, "log_lines": [str] }
     done          { "type": "done",         "packet": <Packet> }
     error         { "type": "error",        "step": <Step|null>, "message": str }
 
 Step = extract | classify | match | compute_upside | generate.
 
 `data` payload varies per step — see the per-step result classes below.
+
+Phase 11 Feature 4 added the `narrative` + `technical` events. They are
+informational — existing consumers can ignore them safely because the
+discriminated-union dispatch is exhaustive only over the four legacy
+event types in the frontend's switch statement (default branch is a
+no-op pass-through). The five-step pipeline emits one narrative + one
+technical event after each `step_result` so the frontend two-tier
+reasoning surface can render lay narration + developer transcript
+without re-deriving content from the raw step payloads.
 """
 
 from __future__ import annotations
@@ -76,6 +87,50 @@ class StepResultEvent(BaseModel):
     data: StepData
 
 
+class PipelineNarrativeEvent(BaseModel):
+    """Lay-language tier of the two-tier reasoning surface.
+
+    Emitted once per pipeline step right after `StepResultEvent`. The
+    frontend renders these as always-visible checkmark lines. `headline`
+    is action-oriented prose; `data_point` is the single most useful
+    number or short label produced by the step, surfaced inline.
+
+    `headline` and `data_point` are pre-localised strings — the backend
+    knows the user's `language` at pipeline construction and emits the
+    right copy directly. The frontend never re-translates these fields.
+    """
+
+    model_config = ConfigDict(extra="forbid")
+
+    type: Literal["narrative"] = "narrative"
+    step: Step
+    headline: str = Field(min_length=1, max_length=80)
+    data_point: str | None = Field(default=None, max_length=40)
+
+
+class PipelineTechnicalEvent(BaseModel):
+    """Developer-grade tier of the two-tier reasoning surface.
+
+    Emitted once per pipeline step right after the matching
+    `PipelineNarrativeEvent`. The frontend renders these inside a
+    collapsed-by-default monospaced log card. `log_lines` is a 1–N list
+    of pre-formatted lines; the frontend joins them with newlines.
+
+    PII rules:
+      - NEVER includes raw IC numbers (use last-4 + masked prefix).
+      - NEVER includes raw uploaded-doc bytes / base64 payloads.
+      - Profile free-text fields (name, address) MUST be redacted or
+        omitted entirely.
+    """
+
+    model_config = ConfigDict(extra="forbid")
+
+    type: Literal["technical"] = "technical"
+    step: Step
+    timestamp: str = Field(min_length=1)  # ISO-8601 UTC
+    log_lines: list[str] = Field(min_length=1, max_length=20)
+
+
 class DoneEvent(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
@@ -114,6 +169,11 @@ class ErrorEvent(BaseModel):
 
 
 AgentEvent = Annotated[
-    StepStartedEvent | StepResultEvent | DoneEvent | ErrorEvent,
+    StepStartedEvent
+    | StepResultEvent
+    | PipelineNarrativeEvent
+    | PipelineTechnicalEvent
+    | DoneEvent
+    | ErrorEvent,
     Field(discriminator="type"),
 ]

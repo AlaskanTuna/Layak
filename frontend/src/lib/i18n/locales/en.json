@@ -581,6 +581,16 @@
         "generate": "Generate drafts"
       }
     },
+    "narrative": {
+      "showTechnical": "Show technical details",
+      "hideTechnical": "Hide technical details",
+      "showDetails": "Show details",
+      "collapse": "Collapse",
+      "summaryRunning": "Layak's pipeline is running…",
+      "summaryDone": "Layak's pipeline completed across {{count}} steps.",
+      "summaryError": "Layak's pipeline stopped early — see the error below.",
+      "technicalLogLabel": "Technical execution log"
+    },
     "upload": {
       "sectionIc": "MyKad (IC)",
       "hintIc": "Front of your Malaysian identity card, clearly showing your details.",

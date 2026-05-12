@@ -28,11 +28,13 @@ from collections.abc import AsyncIterator
 from typing import Any
 
 from fastapi import HTTPException, status
-from google.cloud.firestore_v1 import SERVER_TIMESTAMP
+from google.cloud.firestore_v1 import SERVER_TIMESTAMP, ArrayUnion
 
 from app.schema.events import (
     DoneEvent,
     ErrorEvent,
+    PipelineNarrativeEvent,
+    PipelineTechnicalEvent,
     StepResultEvent,
     StepStartedEvent,
 )
@@ -84,6 +86,11 @@ def create_running_evaluation(
         "matches": [],
         "totalAnnualRM": 0.0,
         "stepStates": dict(_INITIAL_STEP_STATES),
+        # Phase 11 Feature 4 — lay-tier + developer-tier event logs.
+        # `persist_event_stream` appends to these as events flow through so
+        # the results page can replay both tiers on deep-link or refresh.
+        "narrativeLog": [],
+        "technicalLog": [],
         "error": None,
     }
     try:
@@ -98,11 +105,25 @@ def create_running_evaluation(
 
 
 async def persist_event_stream(
-    events: AsyncIterator[StepStartedEvent | StepResultEvent | DoneEvent | ErrorEvent],
+    events: AsyncIterator[
+        StepStartedEvent
+        | StepResultEvent
+        | PipelineNarrativeEvent
+        | PipelineTechnicalEvent
+        | DoneEvent
+        | ErrorEvent
+    ],
     *,
     eval_id: str,
     doc_ref: Any,
-) -> AsyncIterator[StepStartedEvent | StepResultEvent | DoneEvent | ErrorEvent]:
+) -> AsyncIterator[
+    StepStartedEvent
+    | StepResultEvent
+    | PipelineNarrativeEvent
+    | PipelineTechnicalEvent
+    | DoneEvent
+    | ErrorEvent
+]:
     """Mirror every SSE event to Firestore and forward it to the client.
 
     Forwards events regardless of whether the Firestore write succeeds — the
@@ -131,12 +152,25 @@ async def persist_event_stream(
 
 
 def _mirror_to_firestore(  # noqa: PLR0912 — per-event-type dispatch is naturally wide.
-    event: StepStartedEvent | StepResultEvent | DoneEvent | ErrorEvent,
+    event: StepStartedEvent
+    | StepResultEvent
+    | PipelineNarrativeEvent
+    | PipelineTechnicalEvent
+    | DoneEvent
+    | ErrorEvent,
     doc_ref: Any,
 ) -> None:
     """Translate one SSE event into the Firestore update it implies."""
     if isinstance(event, StepStartedEvent):
         doc_ref.update({f"stepStates.{event.step}": "running"})
+        return
+
+    if isinstance(event, PipelineNarrativeEvent):
+        doc_ref.update({"narrativeLog": ArrayUnion([event.model_dump(mode="json")])})
+        return
+
+    if isinstance(event, PipelineTechnicalEvent):
+        doc_ref.update({"technicalLog": ArrayUnion([event.model_dump(mode="json")])})
         return
 
     if isinstance(event, StepResultEvent):

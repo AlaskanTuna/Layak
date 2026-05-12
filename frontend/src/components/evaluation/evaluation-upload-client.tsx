@@ -9,7 +9,7 @@ import { ErrorRecoveryCard } from '@/components/evaluation/error-recovery-card'
 import { type DemoPersona, useEvaluation } from '@/components/evaluation/evaluation-provider'
 import { type IntakeMode, IntakeModeToggle } from '@/components/evaluation/intake-mode-toggle'
 import { ManualEntryForm, type ManualEntryFormHandle } from '@/components/evaluation/manual-entry-form'
-import { PipelineStepper } from '@/components/evaluation/pipeline-stepper'
+import { PipelineNarrative } from '@/components/evaluation/pipeline-narrative'
 import { type SamplePersona, UploadWidget, type UploadSubmission } from '@/components/evaluation/upload-widget'
 import { PageHeading } from '@/components/layout/page-heading'
 import { UpgradeWaitlistModal } from '@/components/settings/upgrade-waitlist-modal'
@@ -293,7 +293,7 @@ export function EvaluationUploadClient() {
       )}
       {showStepper && (
         <>
-          <PipelineStepper state={state} labelOverrides={labelOverrides} />
+          <PipelineNarrative state={state} labelOverrides={labelOverrides} />
           {showError && (
             <ErrorRecoveryCard
               message={state.error ?? t('evaluation.unknownError')}

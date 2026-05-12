@@ -423,6 +423,62 @@ Each requirement below ties to one of the in-scope v1 and v2 deliverables. Accep
 - [ ] On the persisted results page, the narrative card renders in `retrospective` mode — collapsed to a one-line "Layak's pipeline completed across {{count}} steps." summary with a chevron to expand into the full two-tier replay.
 - [ ] Multilingual: lay narration ships in en/ms/zh from the backend `_HEADLINES` catalog; technical transcript stays English (developer audience).
 
+### FR-26 — BUDI95 RON95 petrol subsidy info-only card (Phase 12)
+
+**Description.** Adds the BUDI95 targeted petrol subsidy (active since 30 Sep 2025; RM1.99/L for eligible Malaysians vs market price; 14.8M users by Feb 2026) to the scheme library as a **`subsidy_credit`-kind, info-only** rule. Eligibility is age-gated only (`age ≥ 16`) — no licence question, no consumption slider, no API call. The card carries a "Check your balance" CTA that opens [budi95.gov.my](https://www.budi95.gov.my/) in a new tab. **The scheme does NOT stack into the headline upside total** because we cannot confirm the user's actual remaining quota without a backend API integration.
+
+**Acceptance criteria:**
+
+- [ ] `app/rules/budi95.py` exports `match(profile) -> SchemeMatch` with `kind="subsidy_credit"`, `annual_rm=0.0`, and `qualifies=True` iff `profile.age >= 16`.
+- [ ] At least three rule citations: eligibility (MOF 30 Sep 2025 press release), monthly quota cap (Maybank2u explainer), program reach (MOF Feb 2026 14.8M-users statement).
+- [ ] `generate_packet` produces no `PacketDraft` for this scheme — there's nothing to draft.
+- [ ] `compute_upside.total_annual_rm` is invariant whether or not BUDI95 qualifies (subsidy_credit kind is filtered from the sum).
+- [ ] The scheme card surfaces the official portal as a "Check your balance" CTA, not a "Start application" button.
+- [ ] Pytest guards: age 16 qualifies; age 15 doesn't; scheme contributes 0 to upside; no draft packet generated.
+
+### FR-27 — MyKasih (SARA RM100) info-only card (Phase 12)
+
+**Description.** Adds the SARA RM100 one-off MyKad credit (auto-loaded on 9 Feb 2026 to every Malaysian 18+ via the MyKasih platform) to the scheme library as a **`subsidy_credit`-kind, info-only** rule. The credit is **valid until 31 December 2026; unused balance is forfeited after that date** — surfaced prominently in bold on the card so users see the deadline. Eligibility is age-gated only (`age ≥ 18`). The card surfaces a "Check your balance" CTA pointing at [checkstatus.mykasih.net](https://checkstatus.mykasih.net/). **The scheme does NOT stack into the headline upside total** because the user may have already spent the credit, and we have no backend API to confirm remaining balance.
+
+**Naming decision.** Layak's user-facing label is "MyKasih" (more memorable and widely Googled by the public) even though the official program name is "SARA Untuk Semua" (Sumbangan Asas Rahmah) delivered via the MyKasih platform. The rule's eligibility blurb + citations explicitly reference "SARA Untuk Semua via MyKasih" so the grounding chain is precise — only the display label is shortened.
+
+**Acceptance criteria:**
+
+- [ ] `app/rules/mykasih.py` exports `match(profile) -> SchemeMatch` with `scheme_id="mykasih"`, `scheme_name="MyKasih"`, `kind="subsidy_credit"`, `annual_rm=0.0`, `expires_at_iso="2026-12-31"`, and `qualifies=True` iff `profile.age >= 18`.
+- [ ] At least four rule citations: eligibility (Malay Mail 5 Feb 2026 announcement), merchant network (MyKasih Foundation SARA page), expiry (SoyaCincau 9 Feb 2026 frozen-food article confirming 31 Dec 2026 forfeit), one-off nature (Edge Malaysia article).
+- [ ] `generate_packet` produces no `PacketDraft`.
+- [ ] `compute_upside.total_annual_rm` invariant w.r.t. this scheme.
+- [ ] The frontend card renders a bold "Expires 31 Dec 2026" line (i18n: en "Expires 31 Dec 2026" / ms "Tamat 31 Dis 2026" / zh "2026 年 12 月 31 日到期"), formatted via `Intl.DateTimeFormat`. The line uses the hibiscus accent colour so the deadline pops visually.
+- [ ] The card communicates the one-off / non-recurring nature so users don't carry RM100 into 2027 projections by default.
+- [ ] Display label across en/ms/zh is "MyKasih" (no translation — it's a brand name); the eligibility hint text explains the SARA programme it delivers.
+- [ ] Pytest guards: age 18 qualifies; age 17 doesn't; scheme contributes 0 to upside; no draft packet generated; `expires_at_iso == "2026-12-31"`; all four citations present.
+- [ ] Rule auto-retirement hook: when `today > expires_at_iso`, the rule surfaces as a stale-rule candidate in `/dashboard/discovery` for admin retirement (or admin re-approval if MOF announces a 2027 tranche before then).
+
+### FR-28 — Schemes-page "Latest Update" auto-derivation + day-1 seed (Phase 12)
+
+**Description.** Replaces the hardcoded `'2026'` in `SchemesStatsStrip` with a `max(verified_at)` derivation across the `verified_schemes` Firestore collection, formatted as "Mon DD, YYYY" via the user's locale. The value auto-refreshes whenever an admin approves a new discovery candidate. A one-time seed script populates `verifiedAt` for every locked scheme with the deploy date so the tile shows a real value before any admin action.
+
+**Acceptance criteria:**
+
+- [ ] `scripts/seed_verified_schemes.py` idempotently upserts `verifiedAt=SERVER_TIMESTAMP` for every scheme in the rule registry that doesn't already have one. Documented to run on first deploy and after locking new rules into the codebase.
+- [ ] `SchemesStatsStrip` lifts the "Latest Update" tile value from `GET /api/schemes/verified` (or a new `/api/schemes/stats` aggregator endpoint). Format: `Intl.DateTimeFormat(locale, { month: 'short', day: 'numeric', year: 'numeric' })`. ms/zh locales render their native month names.
+- [ ] When the admin approves a new discovery candidate via `/dashboard/discovery/[id]`, the next page load of `/dashboard/schemes` reflects the new max date with no redeploy required.
+- [ ] Fallback to `"—"` when the response is empty (shouldn't happen after seed, but defensive).
+
+### FR-29 — Manual-entry IC removal (Phase 12)
+
+**Description.** The manual-entry form drops the full-IC field (added in Phase 11 Task 13.5) and asks for `age` directly via a numeric input. The upload path is unchanged — Gemini OCR still extracts `ic_last6` from the uploaded MyKad image; that retention is the user's affirmative choice to upload an IC photo. The manual path now persists **zero IC information of any kind** — a strictly tighter PDPA posture than Phase 11 Task 13.5.
+
+**Acceptance criteria:**
+
+- [ ] `ManualEntryPayload.ic` (12-digit field added in 13.5) is removed; replaced with `age: int = Field(ge=0, le=130)`.
+- [ ] `build_profile_from_manual_entry` reads `payload.age` directly and emits `Profile(ic_last6=None, age=payload.age, ...)`. The `_parse_ic` helper + two-digit-year disambiguation logic from 13.5 are removed.
+- [ ] `Profile.ic_last6` becomes `str | None` (was required); upload path still sets it, manual path sets `None`.
+- [ ] Jinja packet templates render `"— (manual entry; IC not collected)"` (or i18n equivalent) when `profile.ic_last6` is `None`.
+- [ ] The frontend manual form drops the IC `Controller` block; adds a numeric `age` Input mirroring the dependant-age field; sample defaults use `age: 34` (Aisyah) / `age: 38` (Farhan).
+- [ ] Privacy-page copy: manual-entry path now described as "we collect your age and household composition; no IC information of any kind." Upload-path copy unchanged.
+- [ ] Backend `pytest` green after removing the four 13.5-era IC-parsing tests and adding `test_manual_profile_has_no_ic_last6`.
+
 ## 5. Non-Functional Requirements
 
 ### NFR-1 — Performance

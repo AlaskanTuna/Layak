@@ -1,5 +1,7 @@
 'use client'
 
+import { useTranslation } from 'react-i18next'
+
 const PACKETS = [
   {
     code: 'BK-01',
@@ -28,6 +30,7 @@ const PACKETS = [
 ]
 
 export function LandingPacketsPreview() {
+  const { t } = useTranslation()
   return (
     <section
       id="output"
@@ -47,19 +50,23 @@ export function LandingPacketsPreview() {
       <div className="relative mx-auto grid max-w-7xl gap-14 px-4 sm:px-6 lg:grid-cols-12 lg:gap-16">
         {/* Left — copy */}
         <div className="lg:col-span-5">
-          <div className="mono-caption text-[color:var(--hibiscus)]">03 — What you get</div>
+          <div className="mono-caption text-[color:var(--hibiscus)]">
+            {t('marketing.packetsPreview.eyebrow', '03 — What you get')}
+          </div>
           <h2 className="mt-4 font-heading text-4xl font-semibold leading-[1.04] tracking-[-0.02em] sm:text-5xl lg:text-[52px]">
-            Watermarked
+            {t('marketing.packetsPreview.headlineLine1', 'Watermarked')}
             <br />
             <span className="text-[color:color-mix(in_oklch,var(--paper)_55%,transparent)]">
-              draft packets,
+              {t('marketing.packetsPreview.headlineLine2', 'draft packets,')}
             </span>
             <br />
-            ready to lodge.
+            {t('marketing.packetsPreview.headlineLine3', 'ready to lodge.')}
           </h2>
           <p className="mt-6 max-w-md text-[15.5px] leading-[1.65] text-[color:color-mix(in_oklch,var(--paper)_72%,transparent)]">
-            Layak never submits on your behalf. You walk away with pre-filled, citation-rich PDFs —
-            review them, then lodge each one yourself via the agency portal.
+            {t(
+              'marketing.packetsPreview.description',
+              'Layak never submits on your behalf. You walk away with pre-filled, citation-rich PDFs — review them, then lodge each one yourself via the agency portal.'
+            )}
           </p>
 
           {/* Number callout */}

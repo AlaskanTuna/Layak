@@ -64,7 +64,7 @@ export function LandingHero() {
             <h1 className="font-display text-[42px] leading-[1.02] tracking-[-0.015em] text-balance text-foreground sm:text-[54px] md:text-[64px] lg:text-[68px]">
               {t('marketing.hero.headlinePart1', 'Know every Malaysian scheme')}{' '}
               <span className="relative inline-block whitespace-nowrap text-[color:var(--hibiscus)]">
-                you qualify for
+                {t('marketing.hero.headlineEmphasis', 'you qualify for')}
                 <svg
                   aria-hidden
                   viewBox="0 0 320 12"
@@ -81,7 +81,9 @@ export function LandingHero() {
                 </svg>
               </span>
               <br />
-              <span className="text-foreground/70">in three uploads.</span>
+              <span className="text-foreground/70">
+                {t('marketing.hero.headlineTail', 'in three uploads.')}
+              </span>
             </h1>
 
             <p className="mt-7 max-w-xl text-base leading-[1.65] text-foreground/72 sm:text-[17px]">

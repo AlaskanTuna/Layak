@@ -7,11 +7,20 @@ import { useTranslation } from 'react-i18next'
 
 import { Button } from '@/components/ui/button'
 
-const FAQS = [
+type FaqItem = {
+  docCode: string
+  question: string
+  body: string
+}
+
+/** Hard-coded English fallback for `marketing.cta.faqs`. i18next returns
+ *  this when the locale catalog hasn't loaded yet or the array key is
+ *  missing — keeps the FAQ deck deterministic on a cold mount. */
+const FAQS_FALLBACK: FaqItem[] = [
   {
     docCode: 'FAQ-01',
     question: 'Will Layak file my application with the agency?',
-    body: 'No. Every output is a draft watermarked “DRAFT — NOT SUBMITTED.” You review the packet, then lodge it yourself via LHDN, JKM, or the relevant agency portal. Layak never touches a government submission endpoint.'
+    body: 'No. Every output is a draft watermarked "DRAFT — NOT SUBMITTED." You review the packet, then lodge it yourself via LHDN, JKM, or the relevant agency portal. Layak never touches a government submission endpoint.'
   },
   {
     docCode: 'FAQ-02',
@@ -21,7 +30,7 @@ const FAQS = [
   {
     docCode: 'FAQ-03',
     question: 'What documents do I need to upload?',
-    body: 'Three: a MyKad (front side), one recent payslip or income screenshot, and one utility bill for proof of address. Synthetic samples work for testing — every demo asset carries a “SYNTHETIC — FOR DEMO ONLY” watermark.'
+    body: 'Three: a MyKad (front side), one recent payslip or income screenshot, and one utility bill for proof of address. Synthetic samples work for testing — every demo asset carries a "SYNTHETIC — FOR DEMO ONLY" watermark.'
   },
   {
     docCode: 'FAQ-04',
@@ -52,7 +61,9 @@ export function LandingCta() {
       <div className="mx-auto grid max-w-7xl gap-10 px-4 sm:px-6 lg:grid-cols-12 lg:gap-14">
         {/* Left — copy */}
         <div className="lg:col-span-7">
-          <div className="mono-caption text-[color:var(--hibiscus)]">05 — Take it for a spin</div>
+          <div className="mono-caption text-[color:var(--hibiscus)]">
+            {t('marketing.cta.eyebrow', '05 — Take it for a spin')}
+          </div>
           <h2 className="mt-4 font-heading text-4xl font-semibold leading-[1.04] tracking-[-0.02em] sm:text-5xl lg:text-[60px]">
             {t('marketing.cta.headline', 'Ready to see what you qualify for?')}
           </h2>
@@ -76,7 +87,7 @@ export function LandingCta() {
               href="#how-it-works"
               className="inline-flex items-center gap-1.5 text-sm font-medium text-foreground/75 underline decoration-foreground/25 decoration-2 underline-offset-[6px] transition-colors hover:text-foreground hover:decoration-[color:var(--hibiscus)]"
             >
-              See the pipeline
+              {t('marketing.cta.seePipeline', 'See the pipeline')}
               <ArrowRight className="size-3.5" aria-hidden />
             </Link>
           </div>
@@ -92,8 +103,18 @@ export function LandingCta() {
 }
 
 function FaqShuffleDeck() {
+  const { t } = useTranslation()
   const [active, setActive] = useState(0)
-  const total = FAQS.length
+  // i18next returns the array shape when `returnObjects: true`. If the
+  // catalog hasn't loaded yet (e.g. first paint), the typed default kicks
+  // in so the deck never renders empty. Cast guards against the runtime
+  // contract that t() returns string by default — the override is safe
+  // because the i18n catalog has been hand-validated to carry an array.
+  const faqs = (t('marketing.cta.faqs', {
+    returnObjects: true,
+    defaultValue: FAQS_FALLBACK
+  }) as FaqItem[]) || FAQS_FALLBACK
+  const total = faqs.length
 
   const next = () => setActive((i) => (i + 1) % total)
   const prev = () => setActive((i) => (i - 1 + total) % total)
@@ -102,12 +123,14 @@ function FaqShuffleDeck() {
     <div className="relative">
       {/* Header strip */}
       <div className="mb-3 flex items-center justify-between">
-        <span className="mono-caption text-foreground/55">Common questions · {String(active + 1).padStart(2, '0')} / {String(total).padStart(2, '0')}</span>
+        <span className="mono-caption text-foreground/55">
+          {t('marketing.cta.faqHeader', 'Common questions')} · {String(active + 1).padStart(2, '0')} / {String(total).padStart(2, '0')}
+        </span>
         <div className="flex items-center gap-1.5">
           <button
             type="button"
             onClick={prev}
-            aria-label="Previous question"
+            aria-label={t('common.aria.previousQuestion', 'Previous question')}
             className="grid size-8 cursor-pointer place-items-center rounded-full border border-foreground/15 bg-background text-foreground/70 transition-colors hover:border-foreground/35 hover:text-foreground"
           >
             <ArrowLeft className="size-3.5" aria-hidden />
@@ -115,7 +138,7 @@ function FaqShuffleDeck() {
           <button
             type="button"
             onClick={next}
-            aria-label="Next question"
+            aria-label={t('common.aria.nextQuestion', 'Next question')}
             className="grid size-8 cursor-pointer place-items-center rounded-full border border-foreground/15 bg-background text-foreground/70 transition-colors hover:border-foreground/35 hover:text-foreground"
           >
             <ArrowRight className="size-3.5" aria-hidden />
@@ -125,7 +148,7 @@ function FaqShuffleDeck() {
 
       {/* Card stack */}
       <div className="relative h-[320px] pt-4 sm:h-[300px]">
-        {FAQS.map((faq, i) => {
+        {faqs.map((faq, i) => {
           // offset = how many shuffles back from the top this card is
           const offset = (i - active + total) % total
           const isTop = offset === 0
@@ -182,12 +205,12 @@ function FaqShuffleDeck() {
 
       {/* Index dots */}
       <div className="mt-5 flex items-center justify-center gap-1.5">
-        {FAQS.map((_, i) => (
+        {faqs.map((_, i) => (
           <button
             key={i}
             type="button"
             onClick={() => setActive(i)}
-            aria-label={`Go to question ${i + 1}`}
+            aria-label={t('common.aria.goToQuestion', 'Go to question {{n}}', { n: i + 1 })}
             className={`h-1 cursor-pointer rounded-full transition-all duration-300 ${
               i === active ? 'w-8 bg-[color:var(--hibiscus)]' : 'w-3 bg-foreground/20 hover:bg-foreground/35'
             }`}

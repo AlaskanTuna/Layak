@@ -36,11 +36,15 @@ export function LandingPricing() {
         {/* Section header */}
         <div className="mb-14 grid gap-8 lg:grid-cols-12 lg:gap-14">
           <div className="lg:col-span-7">
-            <div className="mono-caption text-[color:var(--primary)]">04 — Pricing</div>
+            <div className="mono-caption text-[color:var(--primary)]">
+              {t('marketing.pricing.eyebrow', '04 — Pricing')}
+            </div>
             <h2 className="mt-4 font-heading text-4xl font-semibold leading-[1.04] tracking-[-0.02em] sm:text-5xl lg:text-[52px]">
-              Free for citizens.
+              {t('marketing.pricing.headlineLead', 'Free for citizens.')}
               <br />
-              <span className="text-foreground/55">Pro for everyone else.</span>
+              <span className="text-foreground/55">
+                {t('marketing.pricing.headlineTail', 'Pro for everyone else.')}
+              </span>
             </h2>
           </div>
           <div className="lg:col-span-5 lg:pt-6">

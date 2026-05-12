@@ -10,7 +10,10 @@
       "notifications": "通知",
       "notificationsUnread": "通知（{{count}} 条未读）",
       "dismissNotification": "关闭通知",
-      "clearField": "清空 {{fieldName}}"
+      "clearField": "清空 {{fieldName}}",
+      "previousQuestion": "上一题",
+      "nextQuestion": "下一题",
+      "goToQuestion": "跳到第 {{n}} 题"
     },
     "button": {
       "signIn": "登录",
@@ -188,17 +191,99 @@
   "marketing": {
     "hero": {
       "headlinePart1": "三次上传，",
-      "headlinePart2": "了解你符合资格的所有马来西亚政府计划。",
+      "headlineEmphasis": "了解你符合资格的",
+      "headlineTail": "马来西亚政府计划。",
       "description": "Layak 读取您的 MyKad、工资单和水电费账单，然后运行五步智能代理流程，将您与政府计划配对 —— STR、JKM Warga Emas、LHDN Form B 税务减免等。每个数字都附有出处引用。",
-      "getStarted": "立即开始"
+      "getStarted": "立即开始",
+      "metaFree": "免费 · 每日 5 次评估",
+      "metaDrafts": "仅生成草稿 · 由您提交",
+      "metaPdpa": "符合 PDPA · 身份证已遮蔽"
     },
     "cta": {
+      "eyebrow": "05 —— 立即试用",
       "headline": "准备好了解您符合哪些资格了吗？",
-      "description": "只需一次点击即可使用 Google 登录 —— 无需设置账户。三次上传，一份排序列表，三份草拟申请包。用时不到一分钟。"
+      "description": "只需一次点击即可使用 Google 登录 —— 无需设置账户。三次上传，一份排序列表，三份草拟申请包。用时不到一分钟。",
+      "seePipeline": "查看智能代理流程",
+      "faqHeader": "常见问题",
+      "faqs": [
+        {
+          "docCode": "FAQ-01",
+          "question": "Layak 会替我向相关机构提交申请吗？",
+          "body": "不会。每份输出都是带有「草稿 —— 未提交」水印的草稿。您审阅申请包后，自行通过 LHDN、JKM 或相关机构的门户提交。Layak 永远不会接触任何政府提交端点。"
+        },
+        {
+          "docCode": "FAQ-02",
+          "question": "Layak 目前覆盖哪些计划？",
+          "body": "STR 2026（家庭层级）、JKM Bantuan Warga Emas，以及五项 LHDN Form B 税务减免。语料库已提交至代码库，每个版本都会扩展 —— 覆盖说明会标注每条规则对应的评估年度。"
+        },
+        {
+          "docCode": "FAQ-03",
+          "question": "我需要上传哪些文件？",
+          "body": "三份：MyKad（正面）、一份近期工资单或收入截图，以及一份用于地址证明的水电费账单。合成样本可用于测试 —— 每个演示资产都带有「合成 —— 仅供演示」水印。"
+        },
+        {
+          "docCode": "FAQ-04",
+          "question": "我的个人数据有多安全？",
+          "body": "按设计符合 PDPA。完整身份证号码绝不持久化 —— 仅存储末四位。原始文件字节在单次请求中于内存中提取，结构化档案产生后立即丢弃。日志中没有原始文件。"
+        },
+        {
+          "docCode": "FAQ-05",
+          "question": "Layak 显示的数字有多准确？",
+          "body": "每个匹配都引用来源机构 PDF 的确切段落 —— 没有虚构的规则。机构对每份申请仍拥有最终裁定权；Layak 只是给出预估，让您知道哪些表格值得填报。"
+        },
+        {
+          "docCode": "FAQ-06",
+          "question": "整个流程需要多长时间？",
+          "body": "端到端不到一分钟。五个步骤 —— 提取、分类、匹配、计算、生成 —— 实时流式呈现到界面，让您看着代理推理，而不是盯着加载圈。"
+        }
+      ]
+    },
+    "pipeline": {
+      "eyebrow": "02 —— 工作原理",
+      "headlineLead": "五个步骤，实时呈现 ——",
+      "headlineTail": "您可以看到代理推理的全过程。",
+      "description": "Layak 不是黑箱。每一步都会将其推理过程回写到您的屏幕 —— 提取的档案、匹配的规则、执行计算的 Python，以及最终输出的 PDF。",
+      "steps": [
+        {
+          "label": "提取",
+          "title": "读取三份文件，\n抽取结构化档案。",
+          "body": "Gemini Vision 一次性打开您的 MyKad、工资单和水电费账单。仅末四位身份证号会显示，其余在内存中被遮蔽且永不写入日志。"
+        },
+        {
+          "label": "分类",
+          "title": "推导家庭规模、申报人，\n以及受抚养人数。",
+          "body": "人均月收入、Form B vs BE、18 岁以下儿童、60+ 老年受抚养人。分类器是您可审计的 Pydantic 架构，不是黑箱。"
+        },
+        {
+          "label": "匹配",
+          "title": "对照每一项已锁定的\n马来西亚计划。",
+          "body": "STR 2026 层级、JKM Warga Emas、五项 LHDN Form B 税务减免。每个匹配都引用机构 PDF 的确切段落 —— 没有虚构的规则。"
+        },
+        {
+          "label": "计算",
+          "title": "累加年度收益。\n展示运算过程。",
+          "body": "Gemini 编写一段 Python，在 Google 沙箱中运行，并将源代码和标准输出同时流式呈现到界面。可验证的算术，而不是一个最终数字。"
+        },
+        {
+          "label": "生成",
+          "title": "带水印的草拟申请包，\n随时可提交。",
+          "body": "WeasyPrint 为每个符合条件的计划渲染一份申请包 —— STR 用 BK-01，Warga Emas 用 JKM18，LHDN Form B 用减免摘要，等等。每页都印有 \"草稿 —— 未提交。\""
+        }
+      ]
+    },
+    "packetsPreview": {
+      "eyebrow": "03 —— 您将获得的成果",
+      "headlineLine1": "带水印的",
+      "headlineLine2": "草拟申请包，",
+      "headlineLine3": "随时可提交。",
+      "description": "Layak 绝不会代您提交。您带走的是预填、附引用的 PDF —— 审阅后，通过机构门户逐一自行提交。"
     },
     "pricing": {
       "title": "简单、透明的价格",
       "description": "免费开始追踪您的援助资格；需要更多功能时再升级到 Pro。",
+      "eyebrow": "04 —— 价格",
+      "headlineLead": "公民免费使用。",
+      "headlineTail": "其他人请选 Pro。",
       "waitlist": "等候名单",
       "freeTier": {
         "name": "免费版",

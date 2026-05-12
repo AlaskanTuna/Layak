@@ -10,7 +10,10 @@
       "notifications": "Pemberitahuan",
       "notificationsUnread": "Pemberitahuan ({{count}} belum dibaca)",
       "dismissNotification": "Tutup pemberitahuan",
-      "clearField": "Kosongkan {{fieldName}}"
+      "clearField": "Kosongkan {{fieldName}}",
+      "previousQuestion": "Soalan sebelumnya",
+      "nextQuestion": "Soalan seterusnya",
+      "goToQuestion": "Pergi ke soalan {{n}}"
     },
     "button": {
       "signIn": "Log Masuk",
@@ -188,17 +191,99 @@
   "marketing": {
     "hero": {
       "headlinePart1": "Ketahui setiap skim Malaysia",
-      "headlinePart2": "yang anda layak — dengan tiga muat naik.",
+      "headlineEmphasis": "yang anda layak",
+      "headlineTail": "dengan tiga muat naik.",
       "description": "Layak membaca MyKad, slip gaji, dan bil utiliti anda, kemudian menjalankan saluran ejen lima langkah untuk memadankan anda dengan skim kerajaan — STR, JKM Warga Emas, pelepasan LHDN Borang B, dan banyak lagi. Setiap nombor mempunyai rujukan sumber.",
-      "getStarted": "Mula Sekarang"
+      "getStarted": "Mula Sekarang",
+      "metaFree": "Percuma · 5 penilaian / hari",
+      "metaDrafts": "Draf sahaja · anda hantar",
+      "metaPdpa": "Patuh PDPA · IC disunting"
+    },
+    "pipeline": {
+      "eyebrow": "02 — Cara ia berfungsi",
+      "headlineLead": "Lima langkah, distrim secara langsung —",
+      "headlineTail": "anda lihat ejen menaakul.",
+      "description": "Layak bukan kotak hitam. Setiap langkah menulis kerjanya kembali ke skrin anda — profil yang diekstrak, peraturan yang dipadankan, Python yang melakukan pengiraan, dan PDF yang dihasilkan di hujung.",
+      "steps": [
+        {
+          "label": "Ekstrak",
+          "title": "Baca tiga dokumen,\ntarik profil berstruktur.",
+          "body": "Gemini Vision membuka MyKad, slip gaji, dan bil utiliti anda dalam satu pas. Hanya empat digit terakhir IC dipaparkan; selebihnya disunting dalam memori dan tidak pernah dilog."
+        },
+        {
+          "label": "Kelaskan",
+          "title": "Tentukan saiz isi rumah, pemfail,\ndan bilangan tanggungan.",
+          "body": "Pendapatan per kapita bulanan, Borang B vs BE, kanak-kanak bawah 18, warga emas 60+. Pengelas ialah skema Pydantic yang anda boleh audit, bukan kotak hitam."
+        },
+        {
+          "label": "Padan",
+          "title": "Semak setiap skim Malaysia\nyang dikunci.",
+          "body": "Peringkat STR 2026, JKM Warga Emas, lima pelepasan LHDN Borang B. Setiap padanan memetik petikan tepat daripada PDF agensi — tiada peraturan rekaan."
+        },
+        {
+          "label": "Kira",
+          "title": "Jumlahkan faedah tahunan.\nTunjukkan kerjanya.",
+          "body": "Gemini menulis cebisan Python, menjalankannya dalam kotak pasir Google, dan menstrim sumber + stdout ke UI. Aritmetik boleh disahkan, bukan satu nombor akhir."
+        },
+        {
+          "label": "Jana",
+          "title": "Pakej draf bertanda air,\nsedia diserahkan.",
+          "body": "WeasyPrint menghasilkan satu pakej untuk setiap skim yang layak — BK-01 untuk STR, JKM18 untuk Warga Emas, ringkasan pelepasan LHDN Borang B, dan seterusnya. Setiap halaman bertulis \"DRAF — BELUM DIHANTAR.\""
+        }
+      ]
+    },
+    "packetsPreview": {
+      "eyebrow": "03 — Apa yang anda dapat",
+      "headlineLine1": "Pakej draf",
+      "headlineLine2": "bertanda air,",
+      "headlineLine3": "sedia diserahkan.",
+      "description": "Layak tidak pernah menyerahkan permohonan bagi pihak anda. Anda pergi dengan PDF yang sudah diisi dan kaya dengan rujukan — semak, kemudian serahkan setiap satu sendiri melalui portal agensi."
     },
     "cta": {
+      "eyebrow": "05 — Cuba sekarang",
       "headline": "Sedia untuk melihat apa yang anda layak?",
-      "description": "Log masuk dengan Google dalam satu klik — tiada pendaftaran akaun diperlukan. Tiga muat naik, senarai tersusun, tiga pakej draf. Kurang daripada seminit."
+      "description": "Log masuk dengan Google dalam satu klik — tiada pendaftaran akaun diperlukan. Tiga muat naik, senarai tersusun, tiga pakej draf. Kurang daripada seminit.",
+      "seePipeline": "Lihat saluran agen",
+      "faqHeader": "Soalan lazim",
+      "faqs": [
+        {
+          "docCode": "FAQ-01",
+          "question": "Adakah Layak akan menghantar permohonan saya kepada agensi?",
+          "body": "Tidak. Setiap output adalah draf yang ditandakan \"DRAF — BELUM DIHANTAR.\" Anda semak pakej, kemudian serahkan sendiri melalui portal LHDN, JKM, atau agensi berkenaan. Layak tidak pernah menyentuh sebarang titik akhir penyerahan kerajaan."
+        },
+        {
+          "docCode": "FAQ-02",
+          "question": "Skim manakah yang Layak liputi hari ini?",
+          "body": "STR 2026 (peringkat isi rumah), Bantuan Warga Emas JKM, dan lima pelepasan LHDN Borang B. Korpus disimpan dalam repositori dan berkembang setiap keluaran — nota liputan menjejaki tahun taksiran setiap peraturan."
+        },
+        {
+          "docCode": "FAQ-03",
+          "question": "Dokumen apa yang perlu saya muat naik?",
+          "body": "Tiga: MyKad (sisi hadapan), satu slip gaji atau tangkap skrin pendapatan terkini, dan satu bil utiliti untuk bukti alamat. Sampel sintetik boleh digunakan untuk ujian — setiap aset demo membawa tanda air \"SINTETIK — UNTUK DEMO SAHAJA.\""
+        },
+        {
+          "docCode": "FAQ-04",
+          "question": "Sejauh manakah data peribadi saya selamat?",
+          "body": "Patuh PDPA secara reka bentuk. IC penuh tidak pernah disimpan — hanya empat digit terakhir. Bait fail asal diekstrak dalam memori dalam satu permintaan dan dibuang sebaik sahaja profil berstruktur dihasilkan. Tiada dokumen mentah dalam log."
+        },
+        {
+          "docCode": "FAQ-05",
+          "question": "Sejauh manakah ketepatan angka yang Layak tunjukkan?",
+          "body": "Setiap padanan memetik petikan tepat daripada PDF agensi sumber — tiada peraturan rekaan. Agensi masih membuat keputusan akhir untuk setiap permohonan; Layak menonjolkan anggaran supaya anda tahu borang mana yang berbaloi diisi."
+        },
+        {
+          "docCode": "FAQ-06",
+          "question": "Berapa lama keseluruhan saluran mengambil masa?",
+          "body": "Kurang daripada seminit dari hujung ke hujung. Lima langkah — ekstrak, kelas, padan, kira, jana — distrim secara langsung ke UI supaya anda menonton ejen menaakul, bukan menatap spinner."
+        }
+      ]
     },
     "pricing": {
       "title": "Harga mudah, telus",
       "description": "Mula menjejaki kelayakan bantuan anda secara percuma. Naik taraf ke Pro apabila anda perlukan lebih.",
+      "eyebrow": "04 — Harga",
+      "headlineLead": "Percuma untuk rakyat.",
+      "headlineTail": "Pro untuk yang lain.",
       "waitlist": "Senarai Menunggu",
       "freeTier": {
         "name": "Percuma",

@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useRef, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { Calculator, FileSearch, FileType, Network, ScanSearch, type LucideIcon } from 'lucide-react'
 
 type Step = {
@@ -13,57 +14,72 @@ type Step = {
   mock: () => React.ReactNode
 }
 
-const STEPS: Step[] = [
+type StepCopy = { label: string; title: string; body: string }
+
+/** English fallback used when the locale catalog isn't loaded yet OR a key
+ *  is missing. Tool names + icons + mock components stay in code because
+ *  they're product proper nouns (Gemini, Pydantic, WeasyPrint) and React
+ *  references, not translatable copy. */
+const STEPS_FALLBACK: StepCopy[] = [
   {
-    num: '01',
     label: 'Extract',
     title: 'Read three documents,\npull a structured profile.',
-    body: 'Gemini Vision opens your MyKad, payslip, and utility bill in one pass. Last four IC digits surface; the rest are redacted in-memory and never logged.',
-    tools: ['Gemini 3.1 Flash', 'Vision OCR'],
-    icon: FileSearch,
-    mock: ExtractMock
+    body: 'Gemini Vision opens your MyKad, payslip, and utility bill in one pass. Last four IC digits surface; the rest are redacted in-memory and never logged.'
   },
   {
-    num: '02',
     label: 'Classify',
     title: 'Derive household, filer,\nand dependant counts.',
-    body: 'Per-capita monthly income, Form B vs BE, children under 18, elderly dependants 60+. The classifier is a Pydantic schema you can audit, not a black box.',
-    tools: ['Python rules', 'Pydantic v2'],
-    icon: ScanSearch,
-    mock: ClassifyMock
+    body: 'Per-capita monthly income, Form B vs BE, children under 18, elderly dependants 60+. The classifier is a Pydantic schema you can audit, not a black box.'
   },
   {
-    num: '03',
     label: 'Match',
     title: 'Check against every locked\nMalaysian scheme.',
-    body: 'STR 2026 tiers, JKM Warga Emas, the five LHDN Form B reliefs. Each match cites the exact passage from the agency PDF — no hallucinated rules.',
-    tools: ['Vertex AI Search', 'Rule engine'],
-    icon: Network,
-    mock: MatchMock
+    body: 'STR 2026 tiers, JKM Warga Emas, the five LHDN Form B reliefs. Each match cites the exact passage from the agency PDF — no hallucinated rules.'
   },
   {
-    num: '04',
     label: 'Compute',
     title: 'Sum the annual upside.\nShow the working.',
-    body: 'Gemini writes a Python snippet, runs it in Google\'s sandbox, and streams both the source and stdout to the UI. Verifiable arithmetic, not a final number.',
-    tools: ['Gemini Code Execution', 'Python sandbox'],
-    icon: Calculator,
-    mock: ComputeMock
+    body: 'Gemini writes a Python snippet, runs it in Google\'s sandbox, and streams both the source and stdout to the UI. Verifiable arithmetic, not a final number.'
   },
   {
-    num: '05',
     label: 'Generate',
     title: 'Watermarked draft packets,\nready to lodge.',
-    body: 'WeasyPrint renders one packet per qualifying scheme — BK-01 for STR, JKM18 for Warga Emas, an LHDN Form B relief summary, and so on. Every page reads "DRAFT — NOT SUBMITTED."',
-    tools: ['WeasyPrint', 'Jinja2'],
-    icon: FileType,
-    mock: GenerateMock
+    body: 'WeasyPrint renders one packet per qualifying scheme — BK-01 for STR, JKM18 for Warga Emas, an LHDN Form B relief summary, and so on. Every page reads "DRAFT — NOT SUBMITTED."'
   }
 ]
 
+const STEP_TOOLS: string[][] = [
+  ['Gemini 3.1 Flash', 'Vision OCR'],
+  ['Python rules', 'Pydantic v2'],
+  ['Vertex AI Search', 'Rule engine'],
+  ['Gemini Code Execution', 'Python sandbox'],
+  ['WeasyPrint', 'Jinja2']
+]
+
+const STEP_ICONS: LucideIcon[] = [FileSearch, ScanSearch, Network, Calculator, FileType]
+const STEP_MOCKS: Array<() => React.ReactNode> = [ExtractMock, ClassifyMock, MatchMock, ComputeMock, GenerateMock]
+
 export function LandingPipeline() {
+  const { t } = useTranslation()
   const [active, setActive] = useState(0)
   const stepRefs = useRef<(HTMLElement | null)[]>([])
+
+  // Steps come from the i18n catalog; tool labels / icons / mock components
+  // stay in code because they're product proper nouns + React references.
+  const localisedSteps =
+    (t('marketing.pipeline.steps', {
+      returnObjects: true,
+      defaultValue: STEPS_FALLBACK
+    }) as StepCopy[]) || STEPS_FALLBACK
+  const STEPS: Step[] = localisedSteps.map((s, i) => ({
+    num: String(i + 1).padStart(2, '0'),
+    label: s.label,
+    title: s.title,
+    body: s.body,
+    tools: STEP_TOOLS[i] ?? [],
+    icon: STEP_ICONS[i] ?? FileSearch,
+    mock: STEP_MOCKS[i] ?? ExtractMock
+  }))
 
   useEffect(() => {
     const update = () => {
@@ -88,16 +104,21 @@ export function LandingPipeline() {
       <div className="mx-auto max-w-7xl px-4 sm:px-6">
         {/* Section header */}
         <div className="mb-14 max-w-2xl lg:mb-20">
-          <div className="mono-caption text-[color:var(--primary)]">02 — How it works</div>
+          <div className="mono-caption text-[color:var(--primary)]">
+            {t('marketing.pipeline.eyebrow', '02 — How it works')}
+          </div>
           <h2 className="mt-4 font-heading text-4xl font-semibold leading-[1.04] tracking-[-0.02em] sm:text-5xl lg:text-[56px]">
-            Five steps, streamed live —
+            {t('marketing.pipeline.headlineLead', 'Five steps, streamed live —')}
             <br />
-            <span className="text-foreground/55">so you watch the agent reason.</span>
+            <span className="text-foreground/55">
+              {t('marketing.pipeline.headlineTail', 'so you watch the agent reason.')}
+            </span>
           </h2>
           <p className="mt-5 max-w-xl text-base leading-[1.65] text-foreground/65 sm:text-[17px]">
-            Layak is not a black box. Every step writes its working back to your screen — the
-            extracted profile, the matched rules, the Python that does the math, the PDF that comes
-            out the other side.
+            {t(
+              'marketing.pipeline.description',
+              'Layak is not a black box. Every step writes its working back to your screen — the extracted profile, the matched rules, the Python that does the math, the PDF that comes out the other side.'
+            )}
           </p>
         </div>
 

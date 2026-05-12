@@ -932,6 +932,11 @@
       "estValue": "Est. Value",
       "startApp": "Apply",
       "categoryAssistance": "Assistance",
+      "categorySubsidy": "Subsidy",
+      "subsidyAutoCredited": "Auto-credited to your MyKad",
+      "subsidyInfo": "Subsidy info",
+      "checkBalance": "Check your balance",
+      "expiresOn": "Expires {{date}}",
       "perYearEst": "per year (est.)",
       "openAgencyPortal": "Open {{agency}} portal",
       "emptyList": "Scheme matches will appear here after your first evaluation completes.",
@@ -1150,7 +1155,9 @@
       "lhdn_form_b": "LHDN Form B — five YA2025 reliefs",
       "lhdn_form_be": "LHDN Form BE — five YA2025 reliefs",
       "perkeso_sksps": "PERKESO SKSPS — Self-Employed Social Security",
-      "i_saraan": "EPF i-Saraan — voluntary contribution government match"
+      "i_saraan": "EPF i-Saraan — voluntary contribution government match",
+      "budi95": "BUDI95 — RON95 petrol subsidy",
+      "mykasih": "MyKasih — SARA RM100 MyKad credit"
     }
   },
   "settings": {

@@ -932,6 +932,11 @@
       "estValue": "Anggaran Nilai",
       "startApp": "Mohon",
       "categoryAssistance": "Bantuan",
+      "categorySubsidy": "Subsidi",
+      "subsidyAutoCredited": "Dikredit secara automatik ke MyKad anda",
+      "subsidyInfo": "Maklumat subsidi",
+      "checkBalance": "Semak baki anda",
+      "expiresOn": "Tamat {{date}}",
       "perYearEst": "setahun (anggaran)",
       "openAgencyPortal": "Buka portal {{agency}}",
       "emptyList": "Padanan skim akan muncul di sini selepas penilaian pertama anda selesai.",
@@ -1150,7 +1155,9 @@
       "lhdn_form_b": "LHDN Form B — lima pelepasan YA2025",
       "lhdn_form_be": "LHDN Form BE — lima pelepasan YA2025",
       "perkeso_sksps": "PERKESO SKSPS — Jaminan Sosial Pekerja Sendiri",
-      "i_saraan": "EPF i-Saraan — padanan kerajaan untuk caruman sukarela"
+      "i_saraan": "EPF i-Saraan — padanan kerajaan untuk caruman sukarela",
+      "budi95": "BUDI95 — subsidi petrol RON95",
+      "mykasih": "MyKasih — kredit MyKad SARA RM100"
     }
   },
   "settings": {

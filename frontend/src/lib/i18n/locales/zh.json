@@ -921,6 +921,11 @@
       "estValue": "预估价值",
       "startApp": "申请",
       "categoryAssistance": "援助",
+      "categorySubsidy": "补贴",
+      "subsidyAutoCredited": "已自动记入您的 MyKad",
+      "subsidyInfo": "补贴信息",
+      "checkBalance": "查询余额",
+      "expiresOn": "{{date}} 到期",
       "perYearEst": "每年（预估）",
       "openAgencyPortal": "打开 {{agency}} 门户",
       "emptyList": "您首次评估完成后，计划匹配将在此显示。",
@@ -1139,7 +1144,9 @@
       "lhdn_form_b": "LHDN Form B — 五项 YA2025 税务减免",
       "lhdn_form_be": "LHDN Form BE — 五项 YA2025 税务减免",
       "perkeso_sksps": "PERKESO SKSPS — 自雇人士社会保障",
-      "i_saraan": "EPF i-Saraan — 自愿缴款政府配对"
+      "i_saraan": "EPF i-Saraan — 自愿缴款政府配对",
+      "budi95": "BUDI95 — RON95 汽油补贴",
+      "mykasih": "MyKasih — SARA RM100 MyKad 信用"
     }
   },
   "settings": {

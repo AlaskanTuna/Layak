@@ -1,6 +1,6 @@
 'use client'
 
-import { ArrowRight } from 'lucide-react'
+import { ArrowRight, ExternalLink } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 
 import { SchemeVerifiedBadge } from '@/components/schemes/scheme-verified-badge'
@@ -21,7 +21,8 @@ function formatRm(value: number): string {
   return `RM ${value.toLocaleString('en-MY', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
 }
 
-function categoryKeyFor(match: SchemeMatch): 'cashTransfer' | 'taxRelief' | 'welfare' | 'assistance' {
+function categoryKeyFor(match: SchemeMatch): 'cashTransfer' | 'taxRelief' | 'welfare' | 'subsidy' | 'assistance' {
+  if (match.kind === 'subsidy_credit') return 'subsidy'
   const agency = match.agency.toLowerCase()
   const id = match.scheme_id.toLowerCase()
   if (id.includes('str') || agency.includes('treasury')) return 'cashTransfer'
@@ -30,19 +31,46 @@ function categoryKeyFor(match: SchemeMatch): 'cashTransfer' | 'taxRelief' | 'wel
   return 'assistance'
 }
 
+/** Format an ISO date string (e.g. "2026-12-31") as a locale-aware short
+ * date (e.g. "Dec 31, 2026" / "31 Dis 2026" / "2026年12月31日"). Falls
+ * back to the raw ISO string if parsing fails. */
+function formatExpiryDate(iso: string, locale: string): string {
+  const parsed = new Date(iso + 'T00:00:00')
+  if (Number.isNaN(parsed.getTime())) return iso
+  const intlLocale = locale === 'ms' ? 'ms-MY' : locale === 'zh' ? 'zh-CN' : 'en-MY'
+  return new Intl.DateTimeFormat(intlLocale, {
+    day: 'numeric',
+    month: 'short',
+    year: 'numeric'
+  }).format(parsed)
+}
+
 export function SchemeCardGrid({ matches, deltas }: Props) {
-  const { t } = useTranslation()
+  const { t, i18n } = useTranslation()
   const deltaByScheme = new Map<string, SchemeDelta>()
   for (const d of deltas ?? []) {
     deltaByScheme.set(d.scheme_id, d)
   }
-  // Keep only upside schemes in the ranked grid. Required-contribution
-  // entries (e.g. PERKESO SKSPS) render separately in
-  // `<RequiredContributionsCard>` so their RM amounts don't get visually
-  // confused with annual relief the user would receive.
+  // Phase 12: surface both `upside` and `subsidy_credit` in the ranked grid.
+  // `required_contribution` entries (e.g. PERKESO SKSPS) still render
+  // separately in `<RequiredContributionsCard>` so RM amounts don't get
+  // visually confused with annual relief the user would receive. Sort:
+  // upside cards by annual_rm desc, then subsidy_credit (annual_rm=0,
+  // preserves backend match order).
   const qualifying = matches
-    .filter((m) => m.qualifies && (m.kind ?? 'upside') === 'upside')
-    .sort((a, b) => b.annual_rm - a.annual_rm)
+    .filter((m) => {
+      if (!m.qualifies) return false
+      const kind = m.kind ?? 'upside'
+      return kind === 'upside' || kind === 'subsidy_credit'
+    })
+    .slice()
+    .sort((a, b) => {
+      const kindRank = { upside: 0, subsidy_credit: 1 } as const
+      const aRank = kindRank[(a.kind ?? 'upside') as keyof typeof kindRank] ?? 99
+      const bRank = kindRank[(b.kind ?? 'upside') as keyof typeof kindRank] ?? 99
+      if (aRank !== bRank) return aRank - bRank
+      return b.annual_rm - a.annual_rm
+    })
 
   if (qualifying.length === 0) {
     return (
@@ -64,7 +92,9 @@ export function SchemeCardGrid({ matches, deltas }: Props) {
       </div>
       <ul className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
         {qualifying.map((match, index) => {
-          const isTop = index === 0
+          const isSubsidy = (match.kind ?? 'upside') === 'subsidy_credit'
+          // "Top match" badge only applies to the leading upside card.
+          const isTop = index === 0 && !isSubsidy
           const categoryKey = categoryKeyFor(match)
           const category =
             categoryKey === 'cashTransfer'
@@ -73,7 +103,9 @@ export function SchemeCardGrid({ matches, deltas }: Props) {
                 ? t('schemes.labels.taxRelief')
                 : categoryKey === 'welfare'
                   ? t('schemes.labels.welfare')
-                  : t('evaluation.schemeCard.categoryAssistance')
+                  : categoryKey === 'subsidy'
+                    ? t('evaluation.schemeCard.categorySubsidy')
+                    : t('evaluation.schemeCard.categoryAssistance')
           return (
             <li
               key={match.scheme_id}
@@ -84,7 +116,14 @@ export function SchemeCardGrid({ matches, deltas }: Props) {
             >
               <header className="flex flex-col gap-2">
                 <div className="flex items-center justify-between gap-2">
-                  <span className="mono-caption text-[color:var(--primary)]">{category}</span>
+                  <span
+                    className={cn(
+                      'mono-caption',
+                      isSubsidy ? 'text-[color:var(--hibiscus)]' : 'text-[color:var(--primary)]'
+                    )}
+                  >
+                    {category}
+                  </span>
                   {isTop && (
                     <span className="inline-flex items-center gap-1 rounded-full border border-[color:var(--forest)]/35 bg-[color:var(--forest)]/12 px-2 py-0.5 mono-caption text-[9.5px] text-[color:var(--forest)]">
                       <span className="size-1 rounded-full bg-[color:var(--forest)]" />
@@ -105,28 +144,58 @@ export function SchemeCardGrid({ matches, deltas }: Props) {
                 <p className="text-xs leading-[1.55] text-foreground/80">{match.why_qualify}</p>
               </div>
 
-              <footer className="flex items-end justify-between gap-3 border-t border-foreground/10 pt-3">
-                <div className="flex flex-col gap-1">
-                  <p className="mono-caption text-foreground/55">{t('evaluation.schemeCard.estValue')}</p>
-                  <p className="font-heading text-[15px] font-semibold tabular-nums text-foreground">
-                    {formatRm(match.annual_rm)}
-                  </p>
-                  <SchemeVerifiedBadge schemeId={match.scheme_id} />
-                </div>
-                <Button
-                  render={<a href={match.portal_url} target="_blank" rel="noopener noreferrer" />}
-                  size="sm"
-                  className={
-                    isTop
-                      ? 'rounded-full bg-[color:var(--hibiscus)] text-[color:var(--hibiscus-foreground)] hover:bg-[color:var(--hibiscus)]/92'
-                      : 'rounded-full'
-                  }
-                  variant={isTop ? 'default' : 'outline'}
-                >
-                  {t('evaluation.schemeCard.startApp')}
-                  <ArrowRight className="ml-1 size-3.5" aria-hidden />
-                </Button>
-              </footer>
+              {isSubsidy ? (
+                <footer className="flex items-end justify-between gap-3 border-t border-foreground/10 pt-3">
+                  <div className="flex flex-col gap-1">
+                    <p className="mono-caption text-foreground/55">
+                      {t('evaluation.schemeCard.subsidyInfo')}
+                    </p>
+                    <p className="text-xs leading-[1.4] text-foreground/80">
+                      {t('evaluation.schemeCard.subsidyAutoCredited')}
+                    </p>
+                    {match.expires_at_iso && (
+                      <p className="text-[12px] font-bold text-[color:var(--hibiscus)]">
+                        {t('evaluation.schemeCard.expiresOn', {
+                          date: formatExpiryDate(match.expires_at_iso, i18n.language)
+                        })}
+                      </p>
+                    )}
+                    <SchemeVerifiedBadge schemeId={match.scheme_id} />
+                  </div>
+                  <Button
+                    render={<a href={match.portal_url} target="_blank" rel="noopener noreferrer" />}
+                    size="sm"
+                    variant="outline"
+                    className="rounded-full border-[color:var(--hibiscus)]/55 hover:border-[color:var(--hibiscus)] hover:bg-[color:var(--hibiscus)]/8 dark:hover:bg-[color:var(--hibiscus)]/12"
+                  >
+                    {t('evaluation.schemeCard.checkBalance')}
+                    <ExternalLink className="ml-1 size-3.5 text-[color:var(--hibiscus)]" aria-hidden />
+                  </Button>
+                </footer>
+              ) : (
+                <footer className="flex items-end justify-between gap-3 border-t border-foreground/10 pt-3">
+                  <div className="flex flex-col gap-1">
+                    <p className="mono-caption text-foreground/55">{t('evaluation.schemeCard.estValue')}</p>
+                    <p className="font-heading text-[15px] font-semibold tabular-nums text-foreground">
+                      {formatRm(match.annual_rm)}
+                    </p>
+                    <SchemeVerifiedBadge schemeId={match.scheme_id} />
+                  </div>
+                  <Button
+                    render={<a href={match.portal_url} target="_blank" rel="noopener noreferrer" />}
+                    size="sm"
+                    className={
+                      isTop
+                        ? 'rounded-full bg-[color:var(--hibiscus)] text-[color:var(--hibiscus-foreground)] hover:bg-[color:var(--hibiscus)]/92'
+                        : 'rounded-full'
+                    }
+                    variant={isTop ? 'default' : 'outline'}
+                  >
+                    {t('evaluation.schemeCard.startApp')}
+                    <ArrowRight className="ml-1 size-3.5" aria-hidden />
+                  </Button>
+                </footer>
+              )}
 
               {/* Phase 11 Feature 3 — what-if delta chip under the footer.
                   Renders only when the user has dragged a slider and the

@@ -73,7 +73,21 @@ export function PageHeading({
           )}
           {children}
         </div>
-        {action && <div className="flex shrink-0 lg:pt-1">{action}</div>}
+        {action && (
+          // When an illustration is also present, the action lives in the same
+          // row but the illustration is absolutely positioned in the bottom-
+          // right corner. Add right margin proportional to the illustration's
+          // size (sm:size-36 = 144px, lg:size-44 = 176px) so the action stays
+          // clear of the artwork instead of stacking on top of it.
+          // `lg:self-center` overrides the parent's `lg:items-start` so a tall
+          // title block doesn't leave the action stranded at the top — it
+          // sits centered against the text column instead.
+          <div
+            className={`flex shrink-0 lg:self-center ${illustration ? 'sm:mr-40 lg:mr-52' : 'lg:pt-1'}`}
+          >
+            {action}
+          </div>
+        )}
       </div>
     </section>
   )

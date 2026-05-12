@@ -187,3 +187,9 @@ design-system/
 .agents/
 *.tsbuildinfo
 settings.local.json
+
+# Phase 11 discovery agent — engineer-track YAML manifests written on
+# admin approve. The directory and its .gitkeep stay tracked; the
+# manifests themselves are deliberately untracked.
+backend/data/discovered/*.yaml
+!backend/data/discovered/.gitkeep

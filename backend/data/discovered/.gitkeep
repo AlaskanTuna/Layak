@@ -1,0 +1,13 @@
+# Engineer-track artifacts from the agentic scheme discovery pipeline.
+#
+# When an admin approves a candidate in /admin/discovery, the route handler
+# serialises the SchemeCandidate to a YAML manifest in this directory. The
+# filename pattern is `<scheme_id-or-uuid8>-<YYYY-MM-DD>-<short_hash>.yaml`.
+#
+# Manifests are the canonical reference for the engineer who updates the
+# Pydantic rule module in backend/app/rules/ (or hand-codes a new rule when
+# the candidate has no matching scheme_id).
+#
+# This directory is intentionally tracked so the layout exists on a fresh
+# clone; the manifests themselves are deliberately gitignored so reviewer
+# triage activity does not bloat the repo.

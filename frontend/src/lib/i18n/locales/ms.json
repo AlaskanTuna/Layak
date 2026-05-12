@@ -28,6 +28,7 @@
       "dashboard": "Papan Pemuka",
       "evaluation": "Penilaian Saya",
       "schemes": "Skim",
+      "discovery": "Penemuan",
       "settings": "Tetapan"
     },
     "footer": {
@@ -344,18 +345,33 @@
     },
     "signIn": {
       "title": "Selamat Kembali",
-      "description": "Teruskan dengan akaun Google anda untuk ke papan pemuka.",
+      "description": "Log masuk dengan Google, e-mel, atau sebagai tetamu untuk ke papan pemuka.",
       "noAccountPrefix": "Tiada akaun?",
       "noAccountCta": "Daftar",
       "errorFailed": "Log masuk gagal. Sila cuba lagi.",
       "orDivider": "atau",
       "continueAsGuest": "Teruskan sebagai tetamu",
       "guestNotice": "Akaun demo dikongsi — sila jangan masukkan maklumat peribadi sebenar.",
-      "errorGuestFailed": "Log masuk tetamu gagal. Sila cuba lagi."
+      "errorGuestFailed": "Log masuk tetamu gagal. Sila cuba lagi.",
+      "tabGoogle": "Google",
+      "tabEmail": "E-mel",
+      "emailLabel": "E-mel",
+      "emailPlaceholder": "anda@contoh.com",
+      "passwordLabel": "Kata laluan",
+      "passwordPlaceholder": "Kata laluan anda",
+      "submit": "Log masuk",
+      "emailErrors": {
+        "invalidCredential": "E-mel atau kata laluan tidak betul.",
+        "userDisabled": "Akaun ini telah dinyahaktifkan.",
+        "tooManyRequests": "Terlalu banyak cubaan. Sila cuba lagi dalam beberapa minit.",
+        "userNotFound": "Tiada akaun ditemui untuk e-mel itu.",
+        "invalidEmail": "Sila masukkan alamat e-mel yang sah.",
+        "generic": "Log masuk gagal. Sila cuba lagi."
+      }
     },
     "signUp": {
       "title": "Cipta akaun anda",
-      "description": "Daftar dengan Google. Layak tidak pernah menghantar apa-apa bagi pihak anda — anda mengawal setiap pakej draf.",
+      "description": "Daftar dengan Google atau e-mel. Layak tidak pernah menghantar apa-apa bagi pihak anda — anda mengawal setiap pakej draf.",
       "consentPrefix": "Saya bersetuju Layak memproses dokumen yang saya muat naik (IC, slip gaji, bil utiliti) untuk memadankan skim kerajaan, mengikut",
       "consentPrivacy": "Dasar Privasi",
       "consentAnd": "dan",
@@ -363,7 +379,26 @@
       "consentSuffix": ".",
       "hasAccountPrefix": "Sudah ada akaun?",
       "hasAccountCta": "Log Masuk",
-      "errorFailed": "Pendaftaran gagal. Sila cuba lagi."
+      "errorFailed": "Pendaftaran gagal. Sila cuba lagi.",
+      "tabGoogle": "Google",
+      "tabEmail": "E-mel",
+      "displayNameLabel": "Nama",
+      "displayNamePlaceholder": "Nama anda",
+      "emailLabel": "E-mel",
+      "emailPlaceholder": "anda@contoh.com",
+      "passwordLabel": "Kata laluan",
+      "passwordPlaceholder": "Sekurang-kurangnya 8 aksara, dengan satu digit",
+      "passwordRulesHint": "Sekurang-kurangnya 8 aksara dengan satu digit.",
+      "passwordTooShort": "Kata laluan mestilah sekurang-kurangnya 8 aksara.",
+      "passwordNeedsDigit": "Kata laluan mesti mengandungi sekurang-kurangnya satu digit.",
+      "submit": "Cipta akaun",
+      "emailErrors": {
+        "emailAlreadyInUse": "Akaun dengan e-mel itu sudah wujud.",
+        "invalidEmail": "Sila masukkan alamat e-mel yang sah.",
+        "weakPassword": "Kata laluan terlalu lemah. Cuba yang lebih panjang.",
+        "operationNotAllowed": "Pendaftaran e-mel/kata laluan tidak diaktifkan. Hubungi sokongan.",
+        "generic": "Pendaftaran gagal. Sila cuba lagi."
+      }
     }
   },
   "dashboard": {
@@ -838,7 +873,84 @@
       "disclaimer": "Layak membantu anda memahami penilaian ini. Ia bukan peguam, penasihat cukai, atau perancang kewangan."
     }
   },
+  "admin": {
+    "discovery": {
+      "pageEyebrow": "Admin / Moderasi",
+      "pageTitle": "Barisan Penemuan Skim",
+      "pageDescription": "Ejen penemuan Layak memantau sumber kerajaan rasmi dan memunculkan perubahan kadar atau kelayakan di sini untuk semakan sebelum sampai kepada pengguna.",
+      "triggerButton": "Jalankan penemuan sekarang",
+      "triggerRunning": "Sedang dijalankan…",
+      "triggerSuccess": "{{checked}} sumber diperiksa, {{changed}} berubah, {{extracted}} calon diekstrak",
+      "triggerError": "Penemuan gagal: {{message}}",
+      "filters": {
+        "all": "Semua",
+        "pending": "Menunggu",
+        "approved": "Diluluskan",
+        "rejected": "Ditolak",
+        "changes_requested": "Perubahan diminta"
+      },
+      "queue": {
+        "title": "Barisan moderasi",
+        "empty": "Tiada calon padan dengan penapis ini.",
+        "loading": "Memuatkan barisan…",
+        "columns": {
+          "name": "Calon",
+          "agency": "Agensi",
+          "source": "Sumber",
+          "confidence": "Keyakinan",
+          "status": "Status",
+          "actions": "Tindakan"
+        },
+        "review": "Semak →",
+        "approve": "Luluskan",
+        "reject": "Tolak"
+      },
+      "health": {
+        "title": "Kesihatan pengesahan skim",
+        "subtitle": "Pengesahan terakhir berjaya untuk setiap skim daripada saluran penemuan.",
+        "empty": "Belum ada skim disahkan. Jalankan penemuan untuk mengisi senarai ini.",
+        "verifiedPrefix": "Sumber disahkan ",
+        "neverVerified": "Tidak pernah disahkan"
+      },
+      "detail": {
+        "backToQueue": "← Kembali ke barisan",
+        "headingNew": "Calon skim baharu",
+        "headingMatched": "Kemas kini untuk skim sedia ada",
+        "sectionCandidate": "Cadangan",
+        "sectionExisting": "Peraturan semasa",
+        "fields": {
+          "name": "Nama",
+          "agency": "Agensi",
+          "schemeId": "ID Skim",
+          "schemeIdUnmatched": "(tiada padanan — jurutera perlu mengekod tangan)",
+          "eligibilitySummary": "Ringkasan kelayakan",
+          "rateSummary": "Ringkasan kadar",
+          "citation": "Petikan sumber",
+          "sourceUrl": "URL Sumber",
+          "confidence": "Keyakinan AI",
+          "extractedAt": "Diekstrak",
+          "contentHash": "Cincang kandungan sumber"
+        },
+        "diffTitle": "Cadangan vs. semasa",
+        "diffEmpty": "Tiada peraturan sedia ada ditemui — ini ialah skim baharu. Meluluskan akan menulis manifes YAML untuk semakan jurutera sahaja.",
+        "actions": {
+          "approve": "Luluskan",
+          "reject": "Tolak",
+          "requestChanges": "Minta perubahan",
+          "notePlaceholder": "Nota admin (pilihan)…"
+        },
+        "actionSuccess": "Selesai. Status kini {{status}}.",
+        "actionError": "Tindakan gagal: {{message}}",
+        "manifestWritten": "Manifes YAML ditulis ke {{path}}"
+      }
+    }
+  },
   "schemes": {
+    "verifiedBadge": {
+      "labelWithDate": "Sumber disahkan {{date}}",
+      "labelNever": "Pengesahan sumber sedang menunggu",
+      "tooltip": "Ejen penemuan latar belakang Layak membaca semula sumber rasmi setiap 24 jam dan memunculkan sebarang perubahan kadar atau kelayakan kepada penyemak admin sebelum sampai kepada anda."
+    },
     "pageEyebrow": "Perpustakaan skim",
     "pageTitle": "Setiap skim Malaysia yang Layak pertimbangkan.",
     "pageDescription": "Skim persekutuan yang Layak pantau pada 2026.",

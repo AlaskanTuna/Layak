@@ -28,6 +28,7 @@
       "dashboard": "仪表板",
       "evaluation": "我的评估",
       "schemes": "计划",
+      "discovery": "发现",
       "settings": "设置"
     },
     "footer": {
@@ -333,18 +334,33 @@
     },
     "signIn": {
       "title": "欢迎回来",
-      "description": "使用您的 Google 账户继续进入仪表板。",
+      "description": "使用 Google、电子邮件或访客身份登录以进入仪表板。",
       "noAccountPrefix": "还没有账户？",
       "noAccountCta": "注册",
       "errorFailed": "登录失败。请重试。",
       "orDivider": "或",
       "continueAsGuest": "以访客身份继续",
       "guestNotice": "共享演示账户 —— 请勿输入真实的个人信息。",
-      "errorGuestFailed": "访客登录失败。请重试。"
+      "errorGuestFailed": "访客登录失败。请重试。",
+      "tabGoogle": "Google",
+      "tabEmail": "电子邮件",
+      "emailLabel": "电子邮件",
+      "emailPlaceholder": "you@example.com",
+      "passwordLabel": "密码",
+      "passwordPlaceholder": "您的密码",
+      "submit": "登录",
+      "emailErrors": {
+        "invalidCredential": "电子邮件或密码不正确。",
+        "userDisabled": "该账户已被停用。",
+        "tooManyRequests": "尝试次数过多。请几分钟后再试。",
+        "userNotFound": "未找到该电子邮件对应的账户。",
+        "invalidEmail": "请输入有效的电子邮件地址。",
+        "generic": "登录失败。请重试。"
+      }
     },
     "signUp": {
       "title": "创建您的账户",
-      "description": "使用 Google 注册。Layak 从不代您提交任何内容 —— 每份草拟申请包均由您掌控。",
+      "description": "使用 Google 或电子邮件注册。Layak 从不代您提交任何内容 —— 每份草拟申请包均由您掌控。",
       "consentPrefix": "我同意 Layak 依据以下文件处理我上传的文件（身份证、工资单、水电费账单）以配对政府计划：",
       "consentPrivacy": "隐私政策",
       "consentAnd": "及",
@@ -352,7 +368,26 @@
       "consentSuffix": "。",
       "hasAccountPrefix": "已有账户？",
       "hasAccountCta": "登录",
-      "errorFailed": "注册失败。请重试。"
+      "errorFailed": "注册失败。请重试。",
+      "tabGoogle": "Google",
+      "tabEmail": "电子邮件",
+      "displayNameLabel": "姓名",
+      "displayNamePlaceholder": "您的姓名",
+      "emailLabel": "电子邮件",
+      "emailPlaceholder": "you@example.com",
+      "passwordLabel": "密码",
+      "passwordPlaceholder": "至少 8 个字符，且包含一个数字",
+      "passwordRulesHint": "至少 8 个字符，且包含一个数字。",
+      "passwordTooShort": "密码至少需要 8 个字符。",
+      "passwordNeedsDigit": "密码至少需要包含一个数字。",
+      "submit": "创建账户",
+      "emailErrors": {
+        "emailAlreadyInUse": "该电子邮件已存在账户。",
+        "invalidEmail": "请输入有效的电子邮件地址。",
+        "weakPassword": "密码强度不足。请尝试更长的密码。",
+        "operationNotAllowed": "电子邮件/密码注册未启用。请联系支持团队。",
+        "generic": "注册失败。请重试。"
+      }
     }
   },
   "dashboard": {
@@ -827,7 +862,84 @@
       "disclaimer": "Layak 帮助您理解此评估。它不是律师、税务顾问或理财规划师。"
     }
   },
+  "admin": {
+    "discovery": {
+      "pageEyebrow": "管理员 / 审核",
+      "pageTitle": "计划发现队列",
+      "pageDescription": "Layak 的发现代理监视政府公报来源，并在变更触达终端用户之前在此处提交比率或资格变化以供审核。",
+      "triggerButton": "立即运行发现",
+      "triggerRunning": "正在运行…",
+      "triggerSuccess": "已检查 {{checked}} 个来源，{{changed}} 个有变更，提取 {{extracted}} 个候选",
+      "triggerError": "发现运行失败：{{message}}",
+      "filters": {
+        "all": "全部",
+        "pending": "待审",
+        "approved": "已批准",
+        "rejected": "已拒绝",
+        "changes_requested": "请求修改"
+      },
+      "queue": {
+        "title": "审核队列",
+        "empty": "没有候选符合此筛选。",
+        "loading": "正在加载队列…",
+        "columns": {
+          "name": "候选",
+          "agency": "机构",
+          "source": "来源",
+          "confidence": "置信度",
+          "status": "状态",
+          "actions": "操作"
+        },
+        "review": "审核 →",
+        "approve": "批准",
+        "reject": "拒绝"
+      },
+      "health": {
+        "title": "计划验证健康状况",
+        "subtitle": "发现管道针对每个计划的最近一次成功验证。",
+        "empty": "尚无已验证的计划。运行发现以填充此列表。",
+        "verifiedPrefix": "来源已验证于 ",
+        "neverVerified": "从未验证"
+      },
+      "detail": {
+        "backToQueue": "← 返回队列",
+        "headingNew": "新计划候选",
+        "headingMatched": "对现有计划的更新",
+        "sectionCandidate": "建议负载",
+        "sectionExisting": "当前规则",
+        "fields": {
+          "name": "名称",
+          "agency": "机构",
+          "schemeId": "计划 ID",
+          "schemeIdUnmatched": "（无匹配 —— 需要工程师手动编码）",
+          "eligibilitySummary": "资格摘要",
+          "rateSummary": "比率摘要",
+          "citation": "来源摘录",
+          "sourceUrl": "来源 URL",
+          "confidence": "AI 置信度",
+          "extractedAt": "提取于",
+          "contentHash": "来源内容哈希"
+        },
+        "diffTitle": "建议与当前",
+        "diffEmpty": "未找到现有规则 —— 这是一个全新计划。批准将写入仅供工程师审查的 YAML 清单。",
+        "actions": {
+          "approve": "批准",
+          "reject": "拒绝",
+          "requestChanges": "请求修改",
+          "notePlaceholder": "管理员备注（可选）…"
+        },
+        "actionSuccess": "完成。当前状态：{{status}}。",
+        "actionError": "操作失败：{{message}}",
+        "manifestWritten": "YAML 清单已写入 {{path}}"
+      }
+    }
+  },
   "schemes": {
+    "verifiedBadge": {
+      "labelWithDate": "来源已验证于 {{date}}",
+      "labelNever": "来源验证待处理",
+      "tooltip": "Layak 的后台发现代理每 24 小时重新读取一次政府公报来源，并在任何比率或资格变化触达您之前提交给管理员审核。"
+    },
     "pageEyebrow": "计划库",
     "pageTitle": "Layak 推理的每一项马来西亚计划。",
     "pageDescription": "Layak 在 2026 年关注的联邦计划。",

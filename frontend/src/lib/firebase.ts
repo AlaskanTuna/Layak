@@ -4,10 +4,13 @@ import { type FirebaseApp, getApp, getApps, initializeApp } from 'firebase/app'
 import {
   type Auth,
   GoogleAuthProvider,
+  createUserWithEmailAndPassword,
   getAuth,
   signOut as firebaseSignOut,
   signInWithCustomToken,
+  signInWithEmailAndPassword,
   signInWithPopup,
+  updateProfile,
   type User
 } from 'firebase/auth'
 
@@ -58,6 +61,19 @@ export async function signInWithGoogle(): Promise<User> {
   const provider = new GoogleAuthProvider()
   provider.setCustomParameters({ prompt: 'select_account' })
   const result = await signInWithPopup(getFirebaseAuth(), provider)
+  return result.user
+}
+
+export async function signInWithEmail(email: string, password: string): Promise<User> {
+  const result = await signInWithEmailAndPassword(getFirebaseAuth(), email, password)
+  return result.user
+}
+
+export async function signUpWithEmail(email: string, password: string, displayName?: string): Promise<User> {
+  const result = await createUserWithEmailAndPassword(getFirebaseAuth(), email, password)
+  if (displayName) {
+    await updateProfile(result.user, { displayName })
+  }
   return result.user
 }
 

@@ -28,6 +28,7 @@
       "dashboard": "Dashboard",
       "evaluation": "My Evaluations",
       "schemes": "Schemes",
+      "discovery": "Discovery",
       "settings": "Settings"
     },
     "footer": {
@@ -344,18 +345,33 @@
     },
     "signIn": {
       "title": "Welcome back",
-      "description": "Continue with your Google account to reach your dashboard.",
+      "description": "Sign in with Google, email, or as a guest to reach your dashboard.",
       "noAccountPrefix": "No account?",
       "noAccountCta": "Sign up",
       "errorFailed": "Sign-in failed. Please try again.",
       "orDivider": "or",
       "continueAsGuest": "Continue as guest",
       "guestNotice": "Shared demo account — please don't enter real personal information.",
-      "errorGuestFailed": "Guest sign-in failed. Please try again."
+      "errorGuestFailed": "Guest sign-in failed. Please try again.",
+      "tabGoogle": "Google",
+      "tabEmail": "Email",
+      "emailLabel": "Email",
+      "emailPlaceholder": "you@example.com",
+      "passwordLabel": "Password",
+      "passwordPlaceholder": "Your password",
+      "submit": "Sign in",
+      "emailErrors": {
+        "invalidCredential": "Incorrect email or password.",
+        "userDisabled": "This account has been disabled.",
+        "tooManyRequests": "Too many attempts. Try again in a few minutes.",
+        "userNotFound": "No account found for that email.",
+        "invalidEmail": "Please enter a valid email address.",
+        "generic": "Sign-in failed. Please try again."
+      }
     },
     "signUp": {
       "title": "Create your account",
-      "description": "Sign up with Google. Layak never submits anything on your behalf — you stay in control of every draft packet.",
+      "description": "Sign up with Google or email. Layak never submits anything on your behalf — you stay in control of every draft packet.",
       "consentPrefix": "I consent to Layak processing my uploaded documents (IC, payslip, utility bill) to match government schemes, per the",
       "consentPrivacy": "Privacy Policy",
       "consentAnd": "and",
@@ -363,7 +379,26 @@
       "consentSuffix": ".",
       "hasAccountPrefix": "Already have an account?",
       "hasAccountCta": "Sign In",
-      "errorFailed": "Sign-up failed. Please try again."
+      "errorFailed": "Sign-up failed. Please try again.",
+      "tabGoogle": "Google",
+      "tabEmail": "Email",
+      "displayNameLabel": "Name",
+      "displayNamePlaceholder": "Your name",
+      "emailLabel": "Email",
+      "emailPlaceholder": "you@example.com",
+      "passwordLabel": "Password",
+      "passwordPlaceholder": "At least 8 characters, with a digit",
+      "passwordRulesHint": "At least 8 characters with one digit.",
+      "passwordTooShort": "Password must be at least 8 characters.",
+      "passwordNeedsDigit": "Password must contain at least one digit.",
+      "submit": "Create account",
+      "emailErrors": {
+        "emailAlreadyInUse": "An account with that email already exists.",
+        "invalidEmail": "Please enter a valid email address.",
+        "weakPassword": "Password is too weak. Try a longer one.",
+        "operationNotAllowed": "Email/password sign-up isn't enabled. Contact support.",
+        "generic": "Sign-up failed. Please try again."
+      }
     }
   },
   "dashboard": {
@@ -838,7 +873,84 @@
       "disclaimer": "Layak helps you understand this evaluation. It is not a lawyer, tax adviser, or financial planner."
     }
   },
+  "admin": {
+    "discovery": {
+      "pageEyebrow": "Admin / Moderation",
+      "pageTitle": "Scheme Discovery Queue",
+      "pageDescription": "Layak's discovery agent watches gazetted government sources and surfaces rate or eligibility changes here for review before they reach end users.",
+      "triggerButton": "Run discovery now",
+      "triggerRunning": "Running…",
+      "triggerSuccess": "{{checked}} sources checked, {{changed}} changed, {{extracted}} candidates extracted",
+      "triggerError": "Discovery run failed: {{message}}",
+      "filters": {
+        "all": "All",
+        "pending": "Pending",
+        "approved": "Approved",
+        "rejected": "Rejected",
+        "changes_requested": "Changes requested"
+      },
+      "queue": {
+        "title": "Moderation queue",
+        "empty": "No candidates match this filter.",
+        "loading": "Loading queue…",
+        "columns": {
+          "name": "Candidate",
+          "agency": "Agency",
+          "source": "Source",
+          "confidence": "Confidence",
+          "status": "Status",
+          "actions": "Actions"
+        },
+        "review": "Review →",
+        "approve": "Approve",
+        "reject": "Reject"
+      },
+      "health": {
+        "title": "Scheme verification health",
+        "subtitle": "Last successful verification per scheme from the discovery pipeline.",
+        "empty": "No schemes verified yet. Trigger a discovery run to populate this list.",
+        "verifiedPrefix": "Source verified ",
+        "neverVerified": "Never verified"
+      },
+      "detail": {
+        "backToQueue": "← Back to queue",
+        "headingNew": "New scheme candidate",
+        "headingMatched": "Update to existing scheme",
+        "sectionCandidate": "Proposed payload",
+        "sectionExisting": "Current rule",
+        "fields": {
+          "name": "Name",
+          "agency": "Agency",
+          "schemeId": "Scheme ID",
+          "schemeIdUnmatched": "(no match — engineer hand-code required)",
+          "eligibilitySummary": "Eligibility summary",
+          "rateSummary": "Rate summary",
+          "citation": "Citation snippet",
+          "sourceUrl": "Source URL",
+          "confidence": "AI confidence",
+          "extractedAt": "Extracted",
+          "contentHash": "Source content hash"
+        },
+        "diffTitle": "Proposed vs. current",
+        "diffEmpty": "No existing rule found — this is a brand-new scheme. Approving will write a YAML manifest for engineer review only.",
+        "actions": {
+          "approve": "Approve",
+          "reject": "Reject",
+          "requestChanges": "Request changes",
+          "notePlaceholder": "Optional admin note…"
+        },
+        "actionSuccess": "Done. Status is now {{status}}.",
+        "actionError": "Action failed: {{message}}",
+        "manifestWritten": "YAML manifest written to {{path}}"
+      }
+    }
+  },
   "schemes": {
+    "verifiedBadge": {
+      "labelWithDate": "Source verified {{date}}",
+      "labelNever": "Source verification pending",
+      "tooltip": "Layak's background discovery agent re-reads the gazetted source every 24 hours and surfaces any rate or eligibility change to an admin reviewer before it reaches you."
+    },
     "pageEyebrow": "Scheme library",
     "pageTitle": "Every Malaysian scheme Layak reasons over.",
     "pageDescription": "The federal schemes Layak watches in 2026.",

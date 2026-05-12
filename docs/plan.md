@@ -1332,17 +1332,36 @@ _Frontend:_
 
 > Ships four production-grade features ahead of the 2026-05-16 (Sat) Open Category finals. In build order per spec §12: Two-Tier Reasoning Surface, Agentic Scheme Discovery + Admin Moderation, Cross-Scheme Strategy Optimizer + Cik Lay handoff, What-If Scenario Subsection on Results. Scope is HARD-LOCKED to these four — PDF Citation Viewer, Lifecycle Vigilance, Household Mode, Optimizer rule code-generation, open-web crawling, multi-reviewer admin workflow, and voice intake are explicitly deferred to v2 per spec §7. Full design: `docs/superpowers/specs/2026-05-12-phase-11-enhancements-design.md`.
 
-### 1. Feature: Auth role custom-claim bootstrap + admin route gating + TRD §1 statelessness correction
+> **2026-05-12 execution amendment:** PO chose to land Feature 1 (Agentic Scheme Discovery + Admin Moderation — tasks 1, 4, 5, 6, 7 below) BEFORE Feature 4 (Two-Tier Reasoning Surface — tasks 2, 3). Tasks 2 and 3 slide to after task 7 lands. Three scope cuts applied to keep Feature 1 within the timebox:
+>
+> - **Cloud Scheduler integration is deferred to v2** (was task 5 sub-bullet). v1 ships with the in-product `Trigger discovery now` admin button only; spec §11 open question #2 is decided as "manual-trigger only." Cron-runbook copy stays in the README but flagged as v2.
+> - **Side-by-side animated diff is simplified to a unified diff block** (was task 6). v1 renders the proposed vs. current eligibility/rate text in a single monospaced `<pre>` with `+`/`-` line prefixes; the rich side-by-side renderer is deferred.
+> - **Bootstrap admin-claim sync runs at warm-up + on first authenticated request per process**, not on every request (was task 1 sub-bullet). Idempotent guard via in-process set, no Firestore lookup per call.
+> - **Admin UI routes live under `/dashboard/discovery` instead of `/admin/discovery`** (spec §2.6 path correction). Sidebar surfaces a "Discovery" link below "Schemes" that only renders when `useAuth().role === 'admin'`. Pages are wrapped in `<AuthGuard requireRole="admin">` so non-admins who deep-link to the URL are redirected to `/dashboard`. Backend endpoints stay at `/api/admin/*` — admin-gated APIs are a separate concern from page paths.
+
+### 1a. Feature: Email/password authentication for sign-in + sign-up
+
+**Purpose/Issue:** Layak currently supports Google SSO only. The Phase 11 admin moderation surface requires a deterministic test-admin identity that judges and reviewers can sign in as without us granting Google-account access. Adding Firebase Email/Password as a parallel sign-in method keeps the existing SSO path and unblocks the admin allowlist in Task 1b.
+
+- [ ] Enable Firebase Email/Password sign-in provider in the Firebase console (one-time manual step; documented in `.env.example` + README deploy runbook).
+- [x] Extend the existing sign-in page with an email + password form alongside the existing Google SSO button: `signInWithEmailAndPassword(auth, email, password)` on submit; surface Firebase auth-error codes (`auth/invalid-credential`, `auth/user-disabled`, etc.) as inline localised errors.
+- [x] Add a sign-up surface (either tabbed on the existing sign-in page or a separate `/sign-up` route): `createUserWithEmailAndPassword(auth, email, password)`; on success, optional `updateProfile({ displayName })`; redirect to `/dashboard`.
+- [x] Password rules: client-side enforce ≥ 8 chars + at least one digit; Firebase enforces ≥ 6 server-side. No password-reset flow in v1 — flagged in v2 roadmap.
+- [x] i18n keys for the new copy land in en/ms/zh at this task (sign-in tab labels, password placeholder, error messages).
+- [x] Verify: `pnpm -C frontend lint` clean (full `next build` blocked by pre-existing missing module `react-markdown` + sandbox-blocked Google Fonts; `tsc --noEmit` clean for all new files).
+- [ ] Manual smoke: sign up new email → land on `/dashboard` with `users/{uid}` doc created on first authed call; sign out + sign back in → same uid.
+
+### 1b. Feature: Auth role custom-claim bootstrap + admin route gating + TRD §1 statelessness correction
 
 **Purpose/Issue:** Foundation for the admin moderation surface. Extends the existing Firebase Admin SDK auth (`backend/app/auth.py`) with a `role` custom claim derived from a bootstrap email allowlist; gates `/admin/*` routes server-side + client-side. Also corrects the existing TRD §1 "stateless" wording to honestly reflect the Firestore footprint already shipped + what Phase 11 adds.
 
-- [ ] New env var `LAYAK_ADMIN_EMAIL_ALLOWLIST` (comma-separated emails) read at backend cold-start; documented in `.env.example` and the Cloud Run deploy runbook section of the README.
-- [ ] On every authenticated request's first touch (or batched at `_init_firebase_admin` warm-up), ensure any user whose verified email matches the allowlist has `{role: 'admin'}` set via `fb_auth.set_custom_user_claims(uid, ...)`. Idempotent — skip when already set.
-- [ ] New helper `verify_admin_role(decoded_token) -> UserInfo` in `backend/app/auth.py` — raises 403 (localised via `humanize_error`) when `role != 'admin'`.
-- [ ] `frontend/src/lib/auth-context.tsx` exposes the `role` claim from the parsed ID token alongside `uid` and `email`.
-- [ ] `frontend/src/components/auth/auth-guard.tsx` extended with `requireRole?: 'admin'` prop; renders a redirect-to-`/dashboard` fallback when the claim is missing.
-- [ ] `docs/trd.md` §1 wording updated per spec §6.1: "Stateless with respect to user-uploaded source documents — uploaded MyKad / payslip / utility files are processed in-memory during the pipeline and never persisted. Evaluation results (matches, upside, draft packets) are persisted in Firestore under `evaluations/{evalId}` for history retrieval, chat context, and what-if re-runs. Admin/auth state and operational metadata also live in Firestore. Scheme rule code in `backend/app/rules/` remains the canonical source of truth for matching logic."
-- [ ] `backend/tests/test_auth.py` extended — bootstrap-allowlist matching, `verify_admin_role` 403 vs 200 paths.
+- [x] New env var `LAYAK_ADMIN_EMAIL_ALLOWLIST` (comma-separated emails) read at backend cold-start; documented in `.env.example`. README deploy runbook section update deferred to Task 12.
+- [x] On every authenticated request's first touch, ensure any user whose verified email matches the allowlist has `{role: 'admin'}` set via `fb_auth.set_custom_user_claims(uid, ...)`. Idempotent per process via in-memory cache (`_admin_promoted_uids`).
+- [x] New helpers `verify_admin_role(user) -> None` + `require_admin` dependency + `AdminUser` type alias in `backend/app/auth.py` — raises 403 when `role != 'admin'`.
+- [x] `frontend/src/lib/auth-context.tsx` exposes the `role` claim from the parsed ID token alongside `uid` and `email` (via `onIdTokenChanged`).
+- [x] `frontend/src/components/auth/auth-guard.tsx` extended with `requireRole?: 'admin'` prop; force-refreshes token once before redirect to handle the custom-claim propagation gap.
+- [ ] `docs/trd.md` §1 wording updated per spec §6.1 — deferred to Task 12 (i18n + docs sweep).
+- [x] `backend/tests/test_admin_auth.py` — bootstrap-allowlist matching, `verify_admin_role` 403 vs 200 paths.
 
 ### 2. Feature: Two-tier reasoning surface — backend SSE contract additions
 
@@ -1370,26 +1389,26 @@ _Frontend:_
 
 **Purpose/Issue:** The two ADK FunctionTools the DiscoveryAgent composes — fetch + hash + diff each allowlisted government URL, then run Gemini 2.5 Pro structured-output against any changed source to produce a `SchemeCandidate` record.
 
-- [ ] New `backend/app/data/discovery_sources.yaml` seeded with the 7 entries from spec §2.4 (`str_2026`, `bk_01`, `jkm_we`, `jkm_bkk`, `lhdn_form_b`, `i_saraan`, `sksps`) — each with `id`, `name`, `agency`, `url`, optional `content_selector`, `check_frequency_hours`.
-- [ ] New `backend/app/schema/discovery.py` — `SchemeCandidate` and `CandidateRecord` Pydantic v2 models per spec §2.9. `Citation` type imported from existing `backend/app/schema/scheme.py`.
-- [ ] New `backend/app/agents/tools/source_watcher.py` — `watch_sources(sources) -> list[ChangedSource]`: `httpx.AsyncClient` GET (30s timeout + retry), normalises text via the optional `content_selector` (falls through to full body), SHA-256 of normalised content, diffs against last-seen hash in `verified_schemes`, emits changed records.
-- [ ] New `backend/app/agents/tools/extract_candidate.py` — `extract_candidate(changed_source) -> SchemeCandidate`: Gemini 2.5 Pro `generate_content` with `response_schema=SchemeCandidate` enforcing structured output; required `citation` field non-null.
-- [ ] `backend/tests/test_source_watcher.py` — fixture URL, deterministic SHA-256, change-detection true/false matrix.
-- [ ] `backend/tests/test_extract_candidate.py` — against 2–3 ground-truth gov-PDF text snippets; asserts `SchemeCandidate` schema validity + citation present + confidence in `[0, 1]`.
+- [x] New `backend/app/data/discovery_sources.yaml` seeded with 7 entries — source IDs aligned to canonical `SchemeId` Literal (`str_2026`, `bk_01`, `jkm_warga_emas`, `jkm_bkk`, `lhdn_form_b`, `i_saraan`, `perkeso_sksps`) so watcher can use `source.id` directly as `verified_schemes` doc key.
+- [x] New `backend/app/schema/discovery.py` — `SchemeCandidate`, `CandidateRecord`, `DiscoverySource`, `ChangedSource`, `DiscoveryRunSummary`, `SourceCitation`. Narrower `SourceCitation` rather than reusing `RuleCitation` since live HTML pages have no stable page numbering.
+- [x] New `backend/app/agents/tools/source_watcher.py` — `watch_sources(db, sources)` async. Normalises HTML via tag-strip + whitespace collapse before hashing; 20s timeout + 5 MiB body cap; ignores cross-origin redirect chains by setting `follow_redirects=True` but with default same-scheme posture.
+- [x] New `backend/app/agents/tools/extract_candidate.py` — Gemini 2.5 Pro structured-output via `response_mime_type="application/json"` (not `response_schema=` — that path is unstable for nested Pydantic models in current SDK); confidence-gated drop at `< 0.5`.
+- [x] `backend/tests/test_discovery_schema.py` — schema validation + allowlist load + hash determinism (7 tests).
+- [ ] Full network-integration tests against fixture URL deferred (requires test-server harness; covered by manual smoke in Task 6).
 
 ### 5. Feature: `DiscoveryAgent` runner + Firestore collections + admin API endpoints
 
 **Purpose/Issue:** Compose the watcher + extractor tools into a long-running ADK agent that runs on Cloud Scheduler (or via an in-product manual button); persists candidates in Firestore; exposes admin-gated endpoints for queue, approve, request-changes, reject, and manual-trigger.
 
-- [ ] New `backend/app/agents/discovery_agent.py` exposing `run_discovery() -> RunSummary`: invokes watcher → extractor → writes one `CandidateRecord` per changed source to the `discovered_schemes` Firestore collection with status `pending`.
-- [ ] New Firestore collections per spec §6.2: `discovered_schemes` (admin read/write) and `verified_schemes` (public read; admin write). Document shapes per spec §2.9 / §2.7.
-- [ ] New `backend/app/routes/admin.py` with endpoints (all gated by `verify_admin_role`): `GET /api/admin/discovery/queue?status=...&cursor=...`, `GET /api/admin/discovery/{candidate_id}`, `POST /api/admin/discovery/{candidate_id}/approve`, `POST /api/admin/discovery/{candidate_id}/request-changes`, `POST /api/admin/discovery/{candidate_id}/reject`, `POST /api/admin/discovery/trigger`.
-- [ ] Cloud Scheduler integration: `POST /api/internal/discovery/cron` endpoint guarded by bearer token `LAYAK_DISCOVERY_CRON_TOKEN` (env var); cadence env var `LAYAK_DISCOVERY_INTERVAL_HOURS` (default 24); gcloud Scheduler provisioning commands documented in the README deploy runbook.
-- [ ] Approve handler — two-track per spec §2.7: (a) for _matched_ candidates (`scheme_id` resolves to existing rule), update `verified_schemes` Firestore doc; (b) for _all_ approved candidates, write a YAML manifest to `backend/data/discovered/<scheme_id-or-uuid>-<YYYY-MM-DD>-<short_hash>.yaml`.
-- [ ] Brand-new candidates (no matching `scheme_id`) do NOT appear in user evaluations until an engineer hand-codes a Pydantic rule module — the YAML manifest is the bridge artifact, per spec §2.7.
-- [ ] `backend/app/main.py` mounts the new admin router.
-- [ ] `backend/tests/test_admin_routes.py` — non-admin 403 on every `/api/admin/*` endpoint; admin 200; approve/reject/changes-requested lifecycle; manual-trigger flow; YAML manifest written on approve.
-- [ ] `backend/tests/test_discovery_pipeline.py` — end-to-end run against a fixture URL with a synthetic content-hash diff completes in under 5 min and lands in `discovered_schemes` with status `pending`.
+- [x] New `backend/app/agents/discovery_agent.py` exposing `run_discovery(db) -> DiscoveryRunSummary`: invokes watcher → extractor → writes one record per changed source to `discovered_schemes` with status `pending`.
+- [x] New Firestore collections: `discovered_schemes` (admin-only) and `verified_schemes` (public-read for the badge endpoint; admin-write).
+- [x] New `backend/app/routes/admin.py` with endpoints (all gated by `Depends(require_admin)`): `GET /api/admin/discovery/queue?status=...&limit=...`, `GET /api/admin/discovery/{candidate_id}`, `POST .../approve`, `POST .../reject`, `POST .../request-changes`, `POST /api/admin/discovery/trigger`, `GET /api/admin/schemes/health`.
+- [ ] Cloud Scheduler integration — deferred to v2 per the execution amendment above. v1 ships with manual-trigger only via the in-product "Run discovery now" button.
+- [x] Approve handler — two-track: (a) for matched candidates, `verified_schemes/{scheme_id}` doc upsert with `verifiedAt`, `sourceContentHash`, `lastKnownPayload`; (b) for ALL approved candidates, YAML manifest written to `backend/data/discovered/<scheme_id-or-uuid8>-<YYYY-MM-DD>-<short_hash>.yaml`.
+- [x] Brand-new candidates (no matching `scheme_id`) write only to the engineer-track YAML; they never propagate to `verified_schemes` and stay invisible to user evaluations until an engineer hand-codes the Pydantic rule.
+- [x] `backend/app/main.py` mounts the new admin router + new public `schemes` router.
+- [ ] Full route-level pytest with mocked Firestore deferred — covered by `test_admin_auth.py` (gating + role logic) and the smoke flow on the in-product admin UI.
+- [ ] Live network-integration test against a fixture URL deferred.
 
 ### 6. Feature: Admin UI frontend — `/admin/discovery` queue + candidate detail + diff view
 

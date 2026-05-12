@@ -3,6 +3,8 @@
 import { ArrowUpRight, Baby, Coins, HeartHandshake, PiggyBank, Scale, ShieldCheck, type LucideIcon } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 
+import { SchemeVerifiedBadge } from '@/components/schemes/scheme-verified-badge'
+
 type SchemeKind = 'upside' | 'required_contribution'
 
 type SchemeGroup = 'cashWelfare' | 'taxRetirement' | 'socialSecurity'
@@ -11,6 +13,11 @@ const GROUPS: readonly SchemeGroup[] = ['cashWelfare', 'taxRetirement', 'socialS
 
 type InScopeScheme = {
   id: string
+  // Backend `SchemeId` (snake_case) used to look up `verified_schemes/{id}`
+  // for the per-card "Source verified" badge. `lhdn-form-b-be` is bundled
+  // for layperson copy; the badge maps it to the canonical `lhdn_form_b`
+  // since that's the source of truth the discovery agent watches.
+  canonicalSchemeId: string
   group: SchemeGroup
   categoryKey: string
   icon: LucideIcon
@@ -32,6 +39,7 @@ type InScopeScheme = {
 const IN_SCOPE: InScopeScheme[] = [
   {
     id: 'str-2026',
+    canonicalSchemeId: 'str_2026',
     group: 'cashWelfare',
     categoryKey: 'schemes.labels.cashTransfer',
     icon: Coins,
@@ -44,6 +52,7 @@ const IN_SCOPE: InScopeScheme[] = [
   },
   {
     id: 'jkm-warga-emas',
+    canonicalSchemeId: 'jkm_warga_emas',
     group: 'cashWelfare',
     categoryKey: 'schemes.labels.welfare',
     icon: HeartHandshake,
@@ -56,6 +65,7 @@ const IN_SCOPE: InScopeScheme[] = [
   },
   {
     id: 'jkm-bkk',
+    canonicalSchemeId: 'jkm_bkk',
     group: 'cashWelfare',
     categoryKey: 'schemes.labels.welfare',
     icon: Baby,
@@ -68,6 +78,7 @@ const IN_SCOPE: InScopeScheme[] = [
   },
   {
     id: 'lhdn-form-b-be',
+    canonicalSchemeId: 'lhdn_form_b',
     group: 'taxRetirement',
     categoryKey: 'schemes.labels.taxRelief',
     icon: Scale,
@@ -80,6 +91,7 @@ const IN_SCOPE: InScopeScheme[] = [
   },
   {
     id: 'i-saraan',
+    canonicalSchemeId: 'i_saraan',
     group: 'taxRetirement',
     categoryKey: 'schemes.labels.retirement',
     icon: PiggyBank,
@@ -92,6 +104,7 @@ const IN_SCOPE: InScopeScheme[] = [
   },
   {
     id: 'perkeso-sksps',
+    canonicalSchemeId: 'perkeso_sksps',
     group: 'socialSecurity',
     categoryKey: 'schemes.labels.socialSecurity',
     icon: ShieldCheck,
@@ -149,17 +162,20 @@ function InScopeCard({ scheme }: { scheme: InScopeScheme }) {
           <span className="ml-1 text-xs font-normal text-foreground/55">{t('schemes.labels.perYear')}</span>
         </p>
       </div>
-      <div className="mt-auto flex items-center justify-between gap-3 border-t border-foreground/10 pt-4">
-        <span className="mono-caption text-foreground/55">{scheme.formLabel}</span>
-        <a
-          href={scheme.portalUrl}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="inline-flex items-center gap-1 text-xs font-medium text-[color:var(--hibiscus)] transition-colors hover:underline"
-        >
-          {t('schemes.labels.agencyPortal')}
-          <ArrowUpRight className="size-3.5" aria-hidden />
-        </a>
+      <div className="mt-auto flex flex-col gap-2 border-t border-foreground/10 pt-4">
+        <SchemeVerifiedBadge schemeId={scheme.canonicalSchemeId} />
+        <div className="flex items-center justify-between gap-3">
+          <span className="mono-caption text-foreground/55">{scheme.formLabel}</span>
+          <a
+            href={scheme.portalUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-1 text-xs font-medium text-[color:var(--hibiscus)] transition-colors hover:underline"
+          >
+            {t('schemes.labels.agencyPortal')}
+            <ArrowUpRight className="size-3.5" aria-hidden />
+          </a>
+        </div>
       </div>
     </article>
   )

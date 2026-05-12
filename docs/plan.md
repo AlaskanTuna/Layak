@@ -1250,14 +1250,9 @@ _Frontend:_
 
 ## Phase 10: Conversational Concierge (Results-Page Chatbot)
 
-> Adds a grounded, multilingual chatbot to the evaluation results page so a low-tech-literacy user (Aisyah's aunty/uncle persona) can ask follow-up questions about THEIR evaluation in plain language. The chatbot is hard-constrained to (a) the loaded `evaluations/{evalId}` doc context and (b) Vertex AI Search retrieval over the 9 scheme PDFs. NOT a general-purpose chatbot. Built on `chatbot` branch; surfaces only on `/dashboard/evaluation/results/[evalId]` as a floating panel.
-
 ### 1. Feature: Backend chat endpoint + Pydantic contract
 
-**Owner:** PO1.  
-**Depends on:** None.  
 **Purpose/Issue:** Land the SSE endpoint that the frontend chat panel will hit. Reuse the auth + rate-limit + Firestore-loading patterns already established by `intake` / `intake_manual`.
-**Implementation (PO1):**
 
 - [x] New module `backend/app/schema/chat.py` — Pydantic models: `ChatTurn` (role: Literal["user","model"], content: str), `ChatRequest` (history: list[ChatTurn], message: str, language: SupportedLanguage), `ChatTokenEvent` (type=Literal["token"], text), `ChatDoneEvent` (type=Literal["done"], message_id, citations: list[ChatCitation]), `ChatErrorEvent` (type=Literal["error"], category: ErrorCategory|None, message), `ChatCitation` (scheme_id|None, source_pdf|None, snippet).
 - [x] New route handler `POST /api/evaluations/{evalId}/chat` in a new `backend/app/routes/chat.py` (mounted from `app/main.py`). Verifies caller via `verify_firebase_id_token`, loads the eval doc via `db.collection("evaluations").document(evalId).get()`, returns 404 if missing and 403 if `eval.ownerUid != caller.uid`.
@@ -1266,10 +1261,7 @@ _Frontend:_
 
 ### 2. Feature: Hard-constrained system prompt (en/ms/zh) + eval-context injection
 
-**Owner:** PO1.  
-**Depends on:** Task 1.  
 **Purpose/Issue:** The chatbot must answer ONLY about the user's specific evaluation (with optional related-domain Q&A on Malaysian schemes). Hallucination control is the entire selling point.
-**Implementation (PO1):**
 
 - [x] New module `backend/app/agents/chat_prompt.py` exposing `build_system_instruction(eval_doc: dict, language: SupportedLanguage) -> str`.
 - [x] Per-language system prompt blocks (en/ms/zh) that hard-constrain: identity ("You are Layak, a helper for Malaysian social-assistance schemes"), scope (THIS eval's matches + related scheme Q&A — refuse off-topic), refusals (no legal/financial advice, no portal-submission promises, never solicit IC numbers or PII), citation rules (when referencing a qualifying scheme, cite `scheme_id` from eval matches verbatim), output format (concise, plain-language, register matches user's language).
@@ -1278,10 +1270,7 @@ _Frontend:_
 
 ### 3. Feature: Vertex AI Search grounding for chat retrieval
 
-**Owner:** PO1.  
-**Depends on:** Tasks 1, 2.  
 **Purpose/Issue:** Ground the chatbot on the live Discovery Engine data store so off-context-doc questions still resolve to a cited PDF passage instead of hallucinating.
-**Implementation (PO1):**
 
 - [x] Wire `google.genai.types.Tool(retrieval=Retrieval(vertex_ai_search=VertexAISearch(datastore=...)))` into the chat `generate_content_stream` call. Datastore name resolved via the existing `LAYAK_VERTEX_AI_SEARCH_*` env vars (`vertex_ai_search.py` carries the canonical resolver).
 - [x] Fail-open: if the retrieval Tool config raises (e.g. Discovery Engine unreachable), the chat call retries WITHOUT the tool and the response is flagged `grounding_unavailable` on the `ChatDoneEvent.citations` payload so the frontend can surface a "responses are not currently grounded on PDFs" caveat.
@@ -1289,10 +1278,7 @@ _Frontend:_
 
 ### 4. Feature: Five-layer guardrails (input + output validators + safety_settings + grounding + retry)
 
-**Owner:** PO1.  
-**Depends on:** Tasks 1, 2, 3.  
 **Purpose/Issue:** The chatbot is a new live AI surface — needs defence-in-depth so an off-topic / adversarial / quota-blip turn doesn't break the demo. Skip Model Armor for the demo; layer the free defences.
-**Implementation (PO1):**
 
 - [x] Input validator: `_validate_chat_input(message: str)` — rejects messages > 4000 chars; rejects regex-detected prompt-injection patterns ("ignore previous instructions", "you are now…", "system:" / "<system>" markers, jailbreak phrases). Rejection emits a `ChatErrorEvent(category="extract_validation", message=...)` localised via `humanize_error` and skips the Gemini call.
 - [x] Output validator: `_validate_chat_output(text, eval_matches)` — runs after the stream completes, asserts any cited `scheme_id` exists in the eval's matches list; if drift detected, logs a warning and strips the bad citation from the `ChatDoneEvent.citations` payload (keeps the response text unmodified to preserve the user's reading flow).
@@ -1302,10 +1288,7 @@ _Frontend:_
 
 ### 5. Feature: Backend chat tests
 
-**Owner:** PO1.  
-**Depends on:** Tasks 1–4.  
 **Purpose/Issue:** Lock the chat contract before the frontend integrates so the wire shape is stable.
-**Implementation (PO1):**
 
 - [x] `backend/tests/test_chat_prompt.py` — `build_system_instruction` per language × per persona context (Aisyah qualifying, all-out-of-scope), asserts: language-signature tokens present, scheme_ids from eval matches appear in the embedded digest, full IC number never appears, refusal rules are stated.
 - [x] `backend/tests/test_chat_routes.py` — endpoint tests with mocked Firestore + mocked `generate_content_stream`. Cases: 401 on missing token, 404 on missing eval, 403 on other-user eval, 200 on owner-issued request, prompt-injection input → ChatErrorEvent, off-topic message → model refusal handled, free-tier rate-limit triggers, citation drift on output → drift-stripped from event.
@@ -1313,10 +1296,7 @@ _Frontend:_
 
 ### 6. Feature: Frontend floating chat panel on results page
 
-**Owner:** PO1.  
-**Depends on:** Tasks 1–4 (does not block on Task 5).  
 **Purpose/Issue:** Surface the chatbot ONLY on `/dashboard/evaluation/results/[evalId]` without breaking the existing page layout. Floating action button → expanding drawer/modal.
-**Implementation (PO1):**
 
 - [x] New component `frontend/src/components/evaluation/results-chat-panel.tsx` — fixed-position floating action button (bottom-right, ~64×64, primary colour) with chat-bubble icon. Click expands to a drawer (desktop: bottom-right card ~400×640; mobile: full-screen drawer via shadcn `Sheet` or `Dialog` with `side="bottom"`).
 - [x] Mounted from `frontend/src/components/evaluation/evaluation-results-by-id-client.tsx` (or its parent) so it appears on every variant of the results page (live + persisted).
@@ -1326,10 +1306,7 @@ _Frontend:_
 
 ### 7. Feature: Frontend SSE consumer hook for chat
 
-**Owner:** PO1.  
-**Depends on:** Task 1, Task 6.  
 **Purpose/Issue:** Mirror the `use-agent-pipeline` SSE pattern so the chat surface follows the same conventions and shares error-recovery scaffolding.
-**Implementation (PO1):**
 
 - [x] New hook `frontend/src/hooks/use-chat.ts` exposing `{ messages, send, abort, isStreaming, errorCategory }`. Manages local conversation history; POSTs to `/api/evaluations/{evalId}/chat` with `{history, message, language}`; consumes SSE token events; surfaces `ErrorCategory`-keyed copy via the same i18n keys the recovery card uses.
 - [x] TypeScript types in `frontend/src/lib/agent-types.ts` (or a new `chat-types.ts`) mirror the backend Pydantic models.
@@ -1337,23 +1314,167 @@ _Frontend:_
 
 ### 8. Feature: i18n strings for the chat panel (en/ms/zh)
 
-**Owner:** PO1.  
-**Depends on:** Task 6.  
 **Purpose/Issue:** Every user-visible string in the new chat surface must localise alongside the rest of the app.
-**Implementation (PO1):**
 
 - [x] `frontend/src/lib/i18n/locales/{en,ms,zh}.json` — new `evaluation.chat.*` namespace covering: floating button aria-label, panel title, close button, send placeholder, empty-state body, suggested-question chip labels (parameterised on scheme_id where the chip is dynamic), abort button, "responses are not currently grounded on PDFs" caveat, error-state body per ErrorCategory.
 
 ### 9. Feature: Docs + progress log
 
-**Owner:** PO1.  
-**Depends on:** Tasks 1–8.  
 **Purpose/Issue:** Lock the new endpoint + UI surface into TRD so post-hackathon iteration doesn't re-discover the contract.
-**Implementation (PO1):**
 
 - [ ] `docs/trd.md` — new §5.7 (Conversational Concierge) describing the endpoint contract, eval-context injection, grounding wiring, guardrail layers, and SSE event shape. _(Deferred to Phase X submission polish — `docs/progress.md` Phase 10 entry + plan tasks above already capture the contract verbatim; a §5.7 rewrite duplicates that without adding new architectural truth.)_
 - [x] `docs/progress.md` — Phase 10 dated entry summarising the eight subtasks, demo-day risk assessment, and which guardrails were intentionally skipped (e.g. Model Armor).
 - [x] All Phase 10 plan checkboxes ticked.
+
+---
+
+## Phase 11: Production-Grade SaaS Enhancements
+
+> Ships four production-grade features ahead of the 2026-05-16 (Sat) Open Category finals. In build order per spec §12: Two-Tier Reasoning Surface, Agentic Scheme Discovery + Admin Moderation, Cross-Scheme Strategy Optimizer + Cik Lay handoff, What-If Scenario Subsection on Results. Scope is HARD-LOCKED to these four — PDF Citation Viewer, Lifecycle Vigilance, Household Mode, Optimizer rule code-generation, open-web crawling, multi-reviewer admin workflow, and voice intake are explicitly deferred to v2 per spec §7. Full design: `docs/superpowers/specs/2026-05-12-phase-11-enhancements-design.md`.
+
+### 1. Feature: Auth role custom-claim bootstrap + admin route gating + TRD §1 statelessness correction
+
+**Purpose/Issue:** Foundation for the admin moderation surface. Extends the existing Firebase Admin SDK auth (`backend/app/auth.py`) with a `role` custom claim derived from a bootstrap email allowlist; gates `/admin/*` routes server-side + client-side. Also corrects the existing TRD §1 "stateless" wording to honestly reflect the Firestore footprint already shipped + what Phase 11 adds.
+
+- [ ] New env var `LAYAK_ADMIN_EMAIL_ALLOWLIST` (comma-separated emails) read at backend cold-start; documented in `.env.example` and the Cloud Run deploy runbook section of the README.
+- [ ] On every authenticated request's first touch (or batched at `_init_firebase_admin` warm-up), ensure any user whose verified email matches the allowlist has `{role: 'admin'}` set via `fb_auth.set_custom_user_claims(uid, ...)`. Idempotent — skip when already set.
+- [ ] New helper `verify_admin_role(decoded_token) -> UserInfo` in `backend/app/auth.py` — raises 403 (localised via `humanize_error`) when `role != 'admin'`.
+- [ ] `frontend/src/lib/auth-context.tsx` exposes the `role` claim from the parsed ID token alongside `uid` and `email`.
+- [ ] `frontend/src/components/auth/auth-guard.tsx` extended with `requireRole?: 'admin'` prop; renders a redirect-to-`/dashboard` fallback when the claim is missing.
+- [ ] `docs/trd.md` §1 wording updated per spec §6.1: "Stateless with respect to user-uploaded source documents — uploaded MyKad / payslip / utility files are processed in-memory during the pipeline and never persisted. Evaluation results (matches, upside, draft packets) are persisted in Firestore under `evaluations/{evalId}` for history retrieval, chat context, and what-if re-runs. Admin/auth state and operational metadata also live in Firestore. Scheme rule code in `backend/app/rules/` remains the canonical source of truth for matching logic."
+- [ ] `backend/tests/test_auth.py` extended — bootstrap-allowlist matching, `verify_admin_role` 403 vs 200 paths.
+
+### 2. Feature: Two-tier reasoning surface — backend SSE contract additions
+
+**Purpose/Issue:** Extend the existing pipeline SSE stream with two new event types per step — humanized lay narration + technical developer transcript — so the frontend can render the two-tier surface without breaking any existing consumer.
+
+- [ ] New Pydantic models `PipelineNarrativeEvent` (`type: Literal["narrative"]`, `step`, `headline` ≤ 80 chars, `data_point` ≤ 40 chars) and `PipelineTechnicalEvent` (`type: Literal["technical"]`, `step`, `timestamp` ISO-8601, `log_lines: list[str]`) added to `backend/app/schema/events.py`.
+- [ ] Each ADK tool wrapper (`extract_profile`, `classify_household`, `match_schemes`, `rank_schemes`, `optimize_strategy`, `compute_upside`, `generate_packet`) emits one `PipelineNarrativeEvent` and one `PipelineTechnicalEvent` on completion alongside the existing `step` event. Existing `step` and `done` events stay unchanged.
+- [ ] Lay narration text per tool keyed by `evaluation.narrative.<tool>.*` (en strings ship in this task; ms/zh land in Task 12).
+- [ ] Technical transcript per tool includes tool name, key inputs, key outputs, Vertex AI Search hit IDs + scores (when applicable), Code Execution stdout snippet (when applicable), latency ms. Never includes full IC numbers or full uploaded-doc payloads.
+- [ ] `backend/tests/test_pipeline_narrative.py` — every tool emits both event types; payload schema valid; sensitive-PII sanitisation asserted at both layers.
+
+### 3. Feature: Two-tier reasoning surface — frontend `pipeline-narrative.tsx`
+
+**Purpose/Issue:** Replace the skinny `pipeline-stepper.tsx` progress bar with a two-tier UI: a lay-language narration card always visible, plus a collapsed-by-default developer transcript dropdown. On completion, the entire card collapses to a one-line summary on the persisted results page.
+
+- [ ] New `frontend/src/components/evaluation/pipeline-narrative.tsx` mounting `<NarrativeLayer />` (always visible — headline + data_point per `PipelineNarrativeEvent` with checkmark icons) and `<TechnicalLayer />` (shadcn `<Collapsible>` wrapping a monospaced terminal-styled body, default closed).
+- [ ] `frontend/src/hooks/use-agent-pipeline.ts` extended to accumulate `narrative_events` and `technical_events` arrays alongside existing step state.
+- [ ] All call-sites updated to use `pipeline-narrative.tsx`; delete `pipeline-stepper.tsx` and any unused exports.
+- [ ] Post-completion behaviour on `/dashboard/evaluation/results/[id]`: the narrative card collapses to a one-line summary (e.g. "Layak's pipeline completed in 8.2 seconds — show details ▾"); expanding shows both tiers as a retrospective.
+- [ ] Tier-1 narration localised en/ms/zh (Task 12); Tier-2 technical transcript stays English (developer audience).
+- [ ] Verify: `pnpm -C frontend lint` and `pnpm -C frontend build` clean.
+- [ ] Manual smoke (Aisyah sample): 4–6 lay narration lines, no jargon, no scheme IDs visible (scheme names only); expanded technical layer shows timestamps + tool names + Vertex hits with scores.
+
+### 4. Feature: Discovery source allowlist + `source_watcher` + `extract_candidate` tools backend
+
+**Purpose/Issue:** The two ADK FunctionTools the DiscoveryAgent composes — fetch + hash + diff each allowlisted government URL, then run Gemini 2.5 Pro structured-output against any changed source to produce a `SchemeCandidate` record.
+
+- [ ] New `backend/app/data/discovery_sources.yaml` seeded with the 7 entries from spec §2.4 (`str_2026`, `bk_01`, `jkm_we`, `jkm_bkk`, `lhdn_form_b`, `i_saraan`, `sksps`) — each with `id`, `name`, `agency`, `url`, optional `content_selector`, `check_frequency_hours`.
+- [ ] New `backend/app/schema/discovery.py` — `SchemeCandidate` and `CandidateRecord` Pydantic v2 models per spec §2.9. `Citation` type imported from existing `backend/app/schema/scheme.py`.
+- [ ] New `backend/app/agents/tools/source_watcher.py` — `watch_sources(sources) -> list[ChangedSource]`: `httpx.AsyncClient` GET (30s timeout + retry), normalises text via the optional `content_selector` (falls through to full body), SHA-256 of normalised content, diffs against last-seen hash in `verified_schemes`, emits changed records.
+- [ ] New `backend/app/agents/tools/extract_candidate.py` — `extract_candidate(changed_source) -> SchemeCandidate`: Gemini 2.5 Pro `generate_content` with `response_schema=SchemeCandidate` enforcing structured output; required `citation` field non-null.
+- [ ] `backend/tests/test_source_watcher.py` — fixture URL, deterministic SHA-256, change-detection true/false matrix.
+- [ ] `backend/tests/test_extract_candidate.py` — against 2–3 ground-truth gov-PDF text snippets; asserts `SchemeCandidate` schema validity + citation present + confidence in `[0, 1]`.
+
+### 5. Feature: `DiscoveryAgent` runner + Firestore collections + admin API endpoints
+
+**Purpose/Issue:** Compose the watcher + extractor tools into a long-running ADK agent that runs on Cloud Scheduler (or via an in-product manual button); persists candidates in Firestore; exposes admin-gated endpoints for queue, approve, request-changes, reject, and manual-trigger.
+
+- [ ] New `backend/app/agents/discovery_agent.py` exposing `run_discovery() -> RunSummary`: invokes watcher → extractor → writes one `CandidateRecord` per changed source to the `discovered_schemes` Firestore collection with status `pending`.
+- [ ] New Firestore collections per spec §6.2: `discovered_schemes` (admin read/write) and `verified_schemes` (public read; admin write). Document shapes per spec §2.9 / §2.7.
+- [ ] New `backend/app/routes/admin.py` with endpoints (all gated by `verify_admin_role`): `GET /api/admin/discovery/queue?status=...&cursor=...`, `GET /api/admin/discovery/{candidate_id}`, `POST /api/admin/discovery/{candidate_id}/approve`, `POST /api/admin/discovery/{candidate_id}/request-changes`, `POST /api/admin/discovery/{candidate_id}/reject`, `POST /api/admin/discovery/trigger`.
+- [ ] Cloud Scheduler integration: `POST /api/internal/discovery/cron` endpoint guarded by bearer token `LAYAK_DISCOVERY_CRON_TOKEN` (env var); cadence env var `LAYAK_DISCOVERY_INTERVAL_HOURS` (default 24); gcloud Scheduler provisioning commands documented in the README deploy runbook.
+- [ ] Approve handler — two-track per spec §2.7: (a) for _matched_ candidates (`scheme_id` resolves to existing rule), update `verified_schemes` Firestore doc; (b) for _all_ approved candidates, write a YAML manifest to `backend/data/discovered/<scheme_id-or-uuid>-<YYYY-MM-DD>-<short_hash>.yaml`.
+- [ ] Brand-new candidates (no matching `scheme_id`) do NOT appear in user evaluations until an engineer hand-codes a Pydantic rule module — the YAML manifest is the bridge artifact, per spec §2.7.
+- [ ] `backend/app/main.py` mounts the new admin router.
+- [ ] `backend/tests/test_admin_routes.py` — non-admin 403 on every `/api/admin/*` endpoint; admin 200; approve/reject/changes-requested lifecycle; manual-trigger flow; YAML manifest written on approve.
+- [ ] `backend/tests/test_discovery_pipeline.py` — end-to-end run against a fixture URL with a synthetic content-hash diff completes in under 5 min and lands in `discovered_schemes` with status `pending`.
+
+### 6. Feature: Admin UI frontend — `/admin/discovery` queue + candidate detail + diff view
+
+**Purpose/Issue:** Two new admin-gated routes that let a reviewer triage and approve discovered scheme candidates with a side-by-side diff against the current rule.
+
+- [ ] New `frontend/src/app/(app)/admin/layout.tsx` — wraps children in `<AuthGuard requireRole="admin">`.
+- [ ] New `frontend/src/app/(app)/admin/discovery/page.tsx` — queue view: paginated table (candidate id, source agency, candidate name, status badge, age, "Review →" CTA); filter chips (All / Pending / Approved / Rejected / Changes-Requested); inline Approve / Reject buttons per row; "Trigger discovery now" button.
+- [ ] New `frontend/src/app/(app)/admin/discovery/[id]/page.tsx` — candidate detail: left column structured fields (name, agency, eligibility summary, rate summary, citation snippet, source URL, AI confidence); right column side-by-side diff against the existing rule (markdown-style highlight) when `scheme_id` matches; approve / request-changes / reject actions each with an admin-note textarea.
+- [ ] New `frontend/src/components/admin/discovery-queue.tsx`, `frontend/src/components/admin/candidate-detail.tsx`, `frontend/src/components/admin/diff-view.tsx`.
+- [ ] New `frontend/src/hooks/use-discovery-admin.ts` — wraps the admin API endpoints using whichever data-fetching primitive the project already uses (SWR or react-query).
+- [ ] Non-admin users hitting any `/admin/*` route see no admin-route content and are redirected to `/dashboard`.
+- [ ] Verify: `pnpm -C frontend lint` and `pnpm -C frontend build` clean across all routes.
+- [ ] Manual smoke: bootstrap admin → trigger discovery → review candidate → approve → `verified_at` updates on the affected scheme card after page refresh.
+
+### 7. Feature: Scheme `verified_at` badge cross-app
+
+**Purpose/Issue:** Surface the platform's automated-verification signal to end users on every scheme card — both the Schemes overview page and the results page.
+
+- [ ] New `frontend/src/components/schemes/scheme-verified-badge.tsx` — renders "Source verified DD MMM YYYY via automated discovery" with a tooltip explaining what the badge means.
+- [ ] Public `GET /api/schemes` endpoint extended to join hardcoded rule data with `verified_schemes` Firestore lookup; response includes `verified_at` per scheme.
+- [ ] `frontend/src/components/schemes/schemes-overview.tsx` renders the badge under each scheme card.
+- [ ] `frontend/src/components/evaluation/scheme-card-grid.tsx` renders the badge inline within each card's existing footer on the results page.
+- [ ] Layout regression check at 375px viewport — badge must not push CTAs off-screen on the mobile scheme cards.
+- [ ] i18n keys `schemes.verifiedBadge.label` and `schemes.verifiedBadge.tooltip` for en/ms/zh land in Task 12.
+
+### 8. Feature: Cross-Scheme Optimizer — knowledge base + `StrategyAdvice` schema + `OptimizerAgent` tool + five-layer grounding
+
+**Purpose/Issue:** Layer strategic reasoning on top of eligibility matching. The Optimizer is structurally incapable of asserting ungrounded claims thanks to a five-layer stack: yaml registry, structured output, Vertex re-grounding, few-shot prompt, frontend confidence gating.
+
+- [ ] New `backend/app/data/scheme_interactions.yaml` with the 3 v1 hardcoded rules per spec §3.3: `lhdn_dependent_parent_single_claimer`, `i_saraan_liquidity_tradeoff`, `lhdn_spouse_relief_filing_status`. Each entry: `id`, `applies_to` (scheme ids), `trigger_conditions`, `rule`, `advice_template`, `severity` (`info|warn|act`), `citation` (`pdf`, `section`, `page`), `suggested_chat_prompt`.
+- [ ] New `backend/app/schema/strategy.py` — `StrategyAdvice` Pydantic v2 model per spec §3.6 with mandatory `interaction_id` (must exist in registry), `citation` (non-null), `confidence` (0–1), `severity`, `headline` ≤ 80 chars, `rationale` ≤ 280 chars, optional `suggested_chat_prompt`, `applies_to_scheme_ids`.
+- [ ] New `backend/app/agents/tools/optimize_strategy.py` — `optimize_strategy(matches: list[SchemeMatch], profile: Profile) -> list[StrategyAdvice]`: loads `scheme_interactions.yaml`; constructs Gemini 2.5 Pro request with `response_schema=list[StrategyAdvice]` + few-shot prompt block; validates each returned record's `interaction_id` against the registry (drop on mismatch); runs Vertex AI Search re-grounding on each citation `(pdf, page)` pair (drop on mismatch); returns survivors.
+- [ ] Hand-write 4–5 few-shot examples in `backend/app/agents/optimizer_prompt.py`: Aisyah-style input → expected output; cover at least one each of severity `info` / `warn` / `act`.
+- [ ] Insert `OptimizerAgent` step between `rank_schemes` and `generate_packet` in `backend/app/agents/root_agent.py`. SequentialAgent ordering otherwise preserved.
+- [ ] Optimizer output piped into both (a) the SSE pipeline events (so the frontend renders Strategy in real time) and (b) the persisted `evaluations/{evalId}` Firestore doc (so post-load chat + what-if can reference).
+- [ ] `backend/tests/test_strategy_optimizer.py` — Aisyah persona produces at least 1 advisory (`lhdn_dependent_parent_single_claimer` trips); all-clear profile produces no warning cards; mismatched `interaction_id` → card dropped; fabricated citation page → card dropped; `confidence < 0.5` → suppressed.
+- [ ] `backend/tests/test_scheme_interactions_yaml.py` — yaml loads cleanly; every entry has all required fields; every cited PDF exists in `backend/data/schemes/`.
+
+### 9. Feature: Strategy section frontend + Cik Lay handoff context augmentation
+
+**Purpose/Issue:** Render the OptimizerAgent's `StrategyAdvice` records as a new "Strategy" section on the results page, with a per-card `Ask Cik Lay about this` CTA that opens the existing results chatbot pre-loaded with the advisory's context and a sensible follow-up question.
+
+- [ ] New `frontend/src/components/evaluation/strategy-section.tsx` — section titled "Strategy"; mounted between the ranked scheme cards and the draft-packet preview on `/dashboard/evaluation/results/[id]`. Renders up to 3 `<StrategyCard />` instances.
+- [ ] New `frontend/src/components/evaluation/strategy-card.tsx` — severity icon (`info` blue dot / `warn` amber triangle / `act` green checkmark), headline (≤ 80 chars, font-medium), rationale paragraph (≤ 280 chars), citation footer (`Cited: <pdf> §<section> p.<page>`), right-aligned `Ask Cik Lay about this →` CTA only when `suggested_chat_prompt` is non-null.
+- [ ] Confidence-gated rendering rules per spec §3.5: `confidence >= 0.8` full card; `0.5 <= confidence < 0.8` soft-suggestion copy ("Layak isn't fully certain — worth asking Cik Lay") + force-show CTA; `confidence < 0.5` suppressed entirely.
+- [ ] `frontend/src/hooks/use-chat.ts` extended with `handoffFromAdvice(advice: StrategyAdvice) => void` method — opens the chat panel, injects the advisory into system context, pre-fills the input with `advice.suggested_chat_prompt`.
+- [ ] `backend/app/agents/chat_prompt.py:build_system_instruction` extended to accept an optional `recent_advisory: StrategyAdvice | None` arg that injects a "Recent advisory the user is asking about" block into the system prompt's context section.
+- [ ] `backend/app/routes/chat.py` `ChatRequest` schema extended with optional `recent_advisory` field; threaded through to `build_system_instruction`.
+- [ ] Phase 10 chatbot regression: existing five-layer guardrails (input validator, output validator, `safety_settings`, grounding, retry) remain unchanged. `backend/tests/test_chat_prompt.py` extended with the handoff-context augmentation case.
+
+### 10. Feature: What-if backend endpoint + `WhatIfRequest` / `WhatIfResponse` / `SchemeDelta` schemas
+
+**Purpose/Issue:** A lightweight partial-rerun endpoint that re-evaluates a user's profile with selective overrides and returns delta-annotated matches + refreshed strategy advisories without re-running extract or generate_packet steps.
+
+- [ ] New `backend/app/schema/what_if.py` — `WhatIfRequest` (`eval_id`, `overrides: dict[str, Any]`), `WhatIfResponse` (`total_annual_rm`, `matches`, `strategy`, `deltas`), `SchemeDelta` (`scheme_id`, `status: Literal["gained","lost","tier_changed","unchanged","amount_changed"]`, `baseline_annual_rm: float|None`, `new_annual_rm: float|None`, `delta_rm: float`, `note: str|None`) per spec §4.3.
+- [ ] New `backend/app/routes/what_if.py` — `POST /api/evaluations/{evalId}/what-if`: verify Firebase token (caller must own the eval), load the original eval from Firestore, apply overrides to a copy of the profile, run `classify_household → match_schemes → rank_schemes → optimize_strategy` only (skip `extract` and `generate_packet`), compute `SchemeDelta` records vs baseline matches.
+- [ ] Endpoint is stateless w.r.t. Firestore — does NOT persist the what-if response; the original evaluation remains the durable record.
+- [ ] Rate limit: free-tier callers gated by a new what-if-specific limit (5 per minute per user); not counted against the evaluation quota meter.
+- [ ] `backend/app/main.py` mounts the new what-if router.
+- [ ] `backend/tests/test_what_if.py` — what-if response vs original eval; idempotency on identical overrides; rate-limit triggers on the 6th call within 60s; `SchemeDelta.status` accuracy across `gained` / `lost` / `tier_changed` / `unchanged` / `amount_changed` scenarios; what-if does NOT write to Firestore.
+
+### 11. Feature: What-if frontend panel — sliders + animated upside + delta chips
+
+**Purpose/Issue:** Surface what-if exploration on the results page as a collapsed-by-default subsection between Strategy and the draft-packet preview, with three sliders, live re-computation, animated transitions on the upside hero, and per-card delta chips.
+
+- [ ] New `frontend/src/components/evaluation/what-if-panel.tsx` — collapsible section ("Explore what-if scenarios"), collapsed by default. Expanded: three sliders bound to `monthly_income_rm` (0–15000, step 100), `dependants_count` (0–6, step 1), `elderly_dependants_count` (0–4, step 1). Each slider has a current-value chip, a "Reset to my actual" button, and a "Reset all" link at the section header.
+- [ ] New `frontend/src/hooks/use-what-if.ts` — debounced (500ms) POST to `/api/evaluations/{evalId}/what-if`; exposes `{ runWhatIf, isInFlight, deltas, totalAnnualRm, strategy }`.
+- [ ] Animated upside hero number via CountUp (or equivalent already in deps) — no flash-of-old-value when transitioning.
+- [ ] Per-scheme delta chips render under each scheme card when what-if is active: `+RM 1,200`, `Tier 2 → Tier 1`, `No change`, `Now ineligible — RM <amount>`.
+- [ ] Scheme card reorder animation via Framer Motion `AnimatePresence` (or equivalent already in deps) when ranking changes.
+- [ ] Collapsing the section OR clicking "Reset all" reverts the page to baseline and clears all delta chips.
+- [ ] Strategy section auto-refreshes from the what-if response's `strategy` field when the new profile changes which interaction rules trip.
+- [ ] Verify: `pnpm -C frontend lint` and `pnpm -C frontend build` clean.
+- [ ] Manual smoke (Aisyah evaluation): drop income slider to RM 2,500 → upside hero animates to new total → BKK card pulses → STR delta chip shows tier change → "Reset all" restores baseline cleanly.
+
+### 12. Feature: i18n + docs + progress log
+
+**Purpose/Issue:** Translate every new user-visible string into en/ms/zh, lock the contracts into TRD / PRD, stamp the phase in `progress.md`, and ship the README updates judges will read.
+
+- [ ] `frontend/src/lib/i18n/locales/{en,ms,zh}.json` — new namespaces: `evaluation.strategy.*` (section title, severity labels, "Ask Cik Lay about this" CTA, citation prefix, soft-suggestion copy for confidence-gated cards), `evaluation.whatIf.*` (section title, three slider labels + units, reset-all label, delta chip variants, now-ineligible note), `evaluation.narrative.*` (per-tool lay narration strings for all seven tools), `admin.discovery.*` (queue title, filter chip labels, action button labels, diff view headings, admin-note placeholder, manual-trigger button label), `schemes.verifiedBadge.{label,tooltip}`.
+- [ ] `docs/trd.md` — new sections §5.8 (Agentic Discovery), §5.9 (Strategy Optimizer), §5.10 (What-If), §5.11 (Two-Tier Reasoning Surface) — each describing endpoint contract, data shapes, grounding / guardrails, and SSE event shape where relevant. §1 statelessness wording already corrected by Task 1.
+- [ ] `docs/prd.md` — append FR-11 (admin moderation), FR-12 (strategy advisories), FR-13 (what-if exploration), FR-14 (reasoning transparency); add NFR entries on admin role gating + optimizer five-layer grounding.
+- [ ] `docs/progress.md` — dated Phase 11 entry summarising the 12 subtasks, optimizer interaction rules shipped, demo-day risks taken, and which v2 items were deliberately deferred.
+- [ ] `README.md` — AI disclosure section (Claude Code / Codex / Copilot CLI usage); architecture diagram (render TRD ASCII to PNG and embed at top); deferred-to-v2 roadmap section explicitly listing the 7 items from spec §7.
+- [ ] All Phase 11 plan checkboxes ticked once implementation lands.
 
 ---
 

@@ -1017,6 +1017,21 @@
       "triggerSuccess": "{{checked}} sources checked, {{changed}} changed, {{extracted}} candidates extracted",
       "triggerErrorTitle": "Discovery Run Failed",
       "triggerError": "Discovery run failed: {{message}}",
+      "runPanel": {
+        "eyebrow": "Pipeline",
+        "title": "Discovery Run",
+        "description": "Re-fetch gazetted sources, diff content, and stage new candidates for moderation.",
+        "idleHint": "No runs yet this session.",
+        "elapsed": "Running… {{seconds}}s elapsed",
+        "lastRun": "Last run · {{relative}}",
+        "runAgain": "Run Again",
+        "tryAgain": "Try Again",
+        "kpi": {
+          "sourcesChecked": "Sources Checked",
+          "sourcesChanged": "Sources Changed",
+          "candidatesExtracted": "Candidates Extracted"
+        }
+      },
       "searchPlaceholder": "Search by name, agency, or source…",
       "confidence": {
         "band": {
@@ -1073,7 +1088,7 @@
         }
       },
       "detail": {
-        "backToQueue": "← Back to Queue",
+        "backToQueue": "Back to Queue",
         "headingNew": "New Scheme Candidate",
         "headingMatched": "Update to Existing Scheme",
         "sectionCandidate": "Proposed Payload",

@@ -1017,6 +1017,21 @@
       "triggerSuccess": "已检查 {{checked}} 个来源，{{changed}} 个有变更，提取 {{extracted}} 个候选",
       "triggerErrorTitle": "发现运行失败",
       "triggerError": "发现运行失败：{{message}}",
+      "runPanel": {
+        "eyebrow": "流程",
+        "title": "发现运行",
+        "description": "重新抓取公报来源、对比内容，并暂存新候选以供审核。",
+        "idleHint": "本次会话尚未运行。",
+        "elapsed": "正在运行… 已用 {{seconds}} 秒",
+        "lastRun": "最近运行 · {{relative}}",
+        "runAgain": "再次运行",
+        "tryAgain": "重试",
+        "kpi": {
+          "sourcesChecked": "已检查来源",
+          "sourcesChanged": "已变更来源",
+          "candidatesExtracted": "已提取候选"
+        }
+      },
       "searchPlaceholder": "按名称、机构或来源搜索…",
       "confidence": {
         "band": {
@@ -1073,7 +1088,7 @@
         }
       },
       "detail": {
-        "backToQueue": "← 返回队列",
+        "backToQueue": "返回队列",
         "headingNew": "新计划候选",
         "headingMatched": "对现有计划的更新",
         "sectionCandidate": "建议负载",

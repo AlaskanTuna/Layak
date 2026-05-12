@@ -1,7 +1,8 @@
 'use client'
 
+import Link from 'next/link'
 import { useCallback, useEffect, useState } from 'react'
-import { Loader2 } from 'lucide-react'
+import { ArrowLeft, Loader2 } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 
 import { AuthGuard } from '@/components/auth/auth-guard'
@@ -40,6 +41,14 @@ function DiscoveryDetailInner({ candidateId }: { candidateId: string }) {
 
   return (
     <div className="flex flex-col gap-6">
+      <Link
+        href="/dashboard/discovery"
+        className="mono-caption inline-flex w-fit items-center gap-1.5 text-foreground/60 transition-colors hover:text-foreground"
+      >
+        <ArrowLeft className="size-3.5" aria-hidden />
+        {t('admin.discovery.detail.backToQueue')}
+      </Link>
+
       {phase === 'loading' && (
         <div className="flex items-center gap-2 text-sm text-foreground/60">
           <Loader2 className="size-4 animate-spin" aria-hidden />

@@ -7,8 +7,7 @@ import { useTranslation } from 'react-i18next'
 import { AuthGuard } from '@/components/auth/auth-guard'
 import { DiscoveryFilterChips } from '@/components/admin/discovery-filter-chips'
 import { DiscoveryQueueTable } from '@/components/admin/discovery-queue-table'
-import { DiscoveryTrigger } from '@/components/admin/discovery-trigger'
-import { SchemeHealthCard } from '@/components/admin/scheme-health-card'
+import { DiscoveryRunPanel } from '@/components/admin/discovery-run-panel'
 import { PageHeading } from '@/components/layout/page-heading'
 import { Input } from '@/components/ui/input'
 import { fetchQueue, type CandidateRow, type QueueFilter } from '@/lib/admin-discovery'
@@ -93,10 +92,9 @@ function DiscoveryPageInner() {
         description={t('admin.discovery.pageDescription')}
         illustration="/dashboard/discovery.webp"
         illustrationClassName="sm:-bottom-2 lg:-bottom-4"
-        action={<DiscoveryTrigger onCompleted={reload} />}
       />
 
-      <SchemeHealthCard refreshKey={refreshKey} />
+      <DiscoveryRunPanel onCompleted={reload} />
 
       <section className="flex flex-col gap-4">
         <div className="flex flex-wrap items-center justify-between gap-3">

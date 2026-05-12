@@ -1017,6 +1017,21 @@
       "triggerSuccess": "{{checked}} sumber diperiksa, {{changed}} berubah, {{extracted}} calon diekstrak",
       "triggerErrorTitle": "Penemuan gagal",
       "triggerError": "Penemuan gagal: {{message}}",
+      "runPanel": {
+        "eyebrow": "Saluran",
+        "title": "Larian Penemuan",
+        "description": "Muat semula sumber bergazet, bandingkan kandungan, dan sediakan calon baharu untuk moderasi.",
+        "idleHint": "Tiada larian dalam sesi ini.",
+        "elapsed": "Sedang dijalankan… {{seconds}}s berlalu",
+        "lastRun": "Larian terakhir · {{relative}}",
+        "runAgain": "Jalankan Semula",
+        "tryAgain": "Cuba Lagi",
+        "kpi": {
+          "sourcesChecked": "Sumber Diperiksa",
+          "sourcesChanged": "Sumber Berubah",
+          "candidatesExtracted": "Calon Diekstrak"
+        }
+      },
       "searchPlaceholder": "Cari ikut nama, agensi, atau sumber…",
       "confidence": {
         "band": {
@@ -1073,7 +1088,7 @@
         }
       },
       "detail": {
-        "backToQueue": "← Kembali ke barisan",
+        "backToQueue": "Kembali ke barisan",
         "headingNew": "Calon skim baharu",
         "headingMatched": "Kemas kini untuk skim sedia ada",
         "sectionCandidate": "Cadangan",

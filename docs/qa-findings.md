@@ -24,6 +24,14 @@ Assumed profile for all cases:
 
 PERKESO SKSPS is not counted as upside. It should render as a required contribution: Plan 3 for RM2,800, and Plan 4 for the other threshold cases.
 
+## Test Outcome
+
+Overall extraction and downstream calculation are accurate for the noisy-income cases tested. The model extracted the intended income values closely enough for the rule engine to produce the expected scheme outcomes and annual-upside totals.
+
+All tested cases passed except the deliberate negative case where the final net income / net payout line was excluded from the document. In that condition, the extraction agent may treat the visible gross income as `monthly_income_rm` because the uploaded document no longer contains the final payout value it is expected to extract.
+
+This confirms the main calculation path is sound, and isolates the remaining issue to OCR/extraction behavior under missing-net-income documents.
+
 ## Why RM4,000 Beats RM2,800
 
 RM4,000/month has higher expected upside than RM2,800/month because Layak includes estimated LHDN tax relief savings. Both cases still qualify for STR, JKM Warga Emas, BKK, and i-Saraan, but the RM4,000 case has more taxable income for the same reliefs to reduce.

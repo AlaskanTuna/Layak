@@ -55,7 +55,7 @@ function DiscoveryPageInner() {
         title={t('admin.discovery.pageTitle')}
         description={t('admin.discovery.pageDescription')}
         illustration="/dashboard/discovery.webp"
-        illustrationClassName="sm:bottom-1 lg:bottom-2"
+        illustrationClassName="sm:-bottom-2 lg:-bottom-4"
         action={<DiscoveryTrigger onCompleted={reload} />}
       />
 

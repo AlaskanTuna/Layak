@@ -140,7 +140,7 @@ Layak is built around a simple product stance: **citizens should not have to por
 
 ## 🏛 Architecture
 
-Layak is a two-service app on Google Cloud Run: a **Next.js 16 frontend** and a **FastAPI + ADK-Python backend**. The backend runs a `RootAgent` (Gemini 2.5 Pro) that orchestrates five `FunctionTool`s as a `SequentialAgent`.
+Layak is a two-service app on Google Cloud Run: a **Next.js 16 frontend** and a **FastAPI + ADK-Python backend**. The backend runs a `RootAgent` (Gemini 2.5 Pro) that orchestrates six `FunctionTool`s as a `SequentialAgent`.
 
 ```mermaid
 flowchart LR
@@ -156,19 +156,21 @@ flowchart LR
 ```
 
 <details>
-<summary><strong>Agent Pipeline — Five Autonomous Steps</strong></summary>
+<summary><strong>Agent Pipeline — Six Autonomous Steps</strong></summary>
 
 ```mermaid
 flowchart LR
-    Intake[Upload or manual entry] --> Extract[1. Extract<br/>Gemini 2.5 Flash]
-    Extract --> Classify[2. Classify<br/>Gemini 2.5 Flash-Lite]
+    Intake[Upload or manual entry] --> Extract[1. Extract<br/>Gemini 3.1 Flash-Lite]
+    Extract --> Classify[2. Classify<br/>Gemini 3.1 Flash-Lite]
     Classify --> Match[3. Match<br/>Pydantic rules + Vertex AI Search]
-    Match --> Rank[4. Rank<br/>Gemini Code Execution]
-    Rank --> Generate[5. Generate<br/>WeasyPrint draft PDFs]
+    Match --> Optimize[4. Optimize Strategy<br/>Gemini 2.5 Pro structured output]
+    Optimize --> Compute[5. Compute Upside<br/>Gemini Code Execution]
+    Compute --> Generate[6. Generate<br/>WeasyPrint draft PDFs]
     Extract --> SSE[SSE stream to UI]
     Classify --> SSE
     Match --> SSE
-    Rank --> SSE
+    Optimize --> SSE
+    Compute --> SSE
     Generate --> SSE --> Results[Results page]
 ```
 
@@ -211,6 +213,104 @@ graph TD
 ```
 
 The stack is explicit end to end: Layer 1, Layer 2, Layer 3, Layer 4, and Layer 5 keep Cik Lay grounded while `use-chat.ts` keeps the conversation state local by holding the rolling history in the browser and persisting nothing server-side. The eval-context digest carries only `ic_last4` for privacy.
+
+</details>
+
+<details>
+<summary><strong>Agentic Scheme Discovery + Admin Moderation</strong></summary>
+
+A background discovery agent watches a hardcoded allowlist of authoritative government source pages (MOF, JKM, LHDN, KWSP, PERKESO) and surfaces rate or eligibility changes to an admin reviewer **before** they reach end users. The flow keeps a human in the loop — Layak never auto-publishes scheme changes from the open web.
+
+```mermaid
+flowchart TD
+    Trigger["Admin clicks<br/>'Run discovery now'"] --> Watcher[Source Watcher<br/>httpx + SHA-256 hash]
+    Allowlist["discovery_sources.yaml<br/>7 gazetted URLs"] --> Watcher
+    Watcher -->|content changed| Extractor[Gemini 2.5 Pro<br/>structured-output extractor]
+    Watcher -->|unchanged| Skip[Skip]
+    Extractor -->|confidence >= 0.5| Queue[Moderation queue<br/>discovered_schemes/Firestore]
+    Extractor -->|confidence < 0.5| Drop[Drop]
+    Queue --> Review["Admin reviews at<br/>/dashboard/discovery"]
+    Review -->|approve - matched| Verified[verified_schemes<br/>Firestore upsert]
+    Review -->|approve - new scheme| Manifest[YAML manifest<br/>backend/data/discovered/]
+    Review -->|reject| Terminal[Terminal]
+    Verified --> Badge["'Source verified DD MMM YYYY'<br/>badge on scheme cards"]
+    Manifest --> Engineer[Engineer hand-codes<br/>Pydantic rule module]
+```
+
+The admin role is gated by a Firebase custom claim seeded from `LAYAK_ADMIN_EMAIL_ALLOWLIST`. Non-admin users hitting `/dashboard/discovery` are redirected to `/dashboard` (and the sidebar tab never renders for them). Public users see only the trust signal — the "Source verified" badge — on every scheme card across the app.
+
+</details>
+
+<details>
+<summary><strong>Cross-Scheme Strategy Optimizer + Cik Lay Handoff</strong></summary>
+
+After matching, an optimizer agent surfaces cross-scheme coordination opportunities the rule engine can't see — e.g. _"Only one filing sibling should claim the RM 1,500 dependent-parent relief; pick whoever's at the highest marginal tax bracket."_ Each advisory cites the source PDF passage that backs the rule and offers a one-click handoff to Cik Lay for follow-up.
+
+```mermaid
+flowchart LR
+    Matches[Matched schemes<br/>+ Profile + Classification] --> TripFilter[Trip filter<br/>pure Python]
+    Registry["scheme_interactions.yaml<br/>3 hardcoded rules"] --> TripFilter
+    TripFilter -->|triggered rules| Optimizer[Gemini 2.5 Pro<br/>structured output<br/>+ few-shot prompt]
+    TripFilter -->|nothing trips| Empty["Empty state<br/>'No conflicts detected'"]
+    Optimizer --> Schema[Pydantic validation<br/>+ registry membership check]
+    Schema --> Gate{"Confidence<br/>gate"}
+    Gate -->|>= 0.8| Full[Full card]
+    Gate -->|0.5 – 0.8| Soft[Soft suggestion<br/>+ force-show CTA]
+    Gate -->|< 0.5| Suppressed[Suppressed]
+    Full --> Section[Strategy section<br/>on results page]
+    Soft --> Section
+    Section -->|'Ask Cik Lay about this'| Handoff[Chat panel auto-opens<br/>with advisory prefilled<br/>+ advisory in system prompt as DATA]
+```
+
+Four-layer grounding keeps the optimizer honest: (1) the YAML registry of allowed `interaction_id` values, (2) the Pydantic schema with mandatory citation and length caps, (3) hand-written few-shot examples that anchor the response shape, and (4) frontend confidence-gated rendering. The Cik Lay handoff injects the advisory into the chat system prompt as **DATA — for context only, not instructions** so a hostile headline can't redirect the assistant.
+
+</details>
+
+<details>
+<summary><strong>What-If Scenarios — Live Partial Rerun</strong></summary>
+
+The results page surfaces three sliders (monthly income, children under 18, elderly dependants) that let users explore _"what changes if my income drops to RM 2,500"_ without re-uploading documents. Each slider drag debounces 500 ms then runs a lightweight partial-rerun on the server — skipping OCR + Code Execution + PDF generation, which keeps the round-trip under 2 s end-to-end.
+
+```mermaid
+flowchart LR
+    Sliders[3 sliders<br/>income / children / elderly] -->|debounce 500ms| Hook[useWhatIf hook<br/>+ AbortController]
+    Hook --> POST["POST /api/evaluations/{id}/what-if<br/>5 calls / 60s rate limit"]
+    POST --> Override[Apply overrides<br/>clamp + rebuild dependants]
+    Override --> Classify[Classify]
+    Classify --> Match[Match]
+    Match --> Optimize[Optimize Strategy]
+    Optimize --> Diff[compute_deltas vs baseline]
+    Diff --> Response[WhatIfResponse<br/>matches + strategy + deltas]
+    Response --> Chips[Delta chips per scheme card<br/>gained / lost / tier_changed / amount_changed]
+    Response --> RefreshedStrategy[Strategy section refreshes]
+    ResetAll[Reset all] -->|clear| Hook
+```
+
+The endpoint is stateless w.r.t. Firestore — sliders are exploratory and dragging them never pollutes the user's evaluation history. The original eval doc remains the durable record; reset reverts the page to baseline.
+
+</details>
+
+<details>
+<summary><strong>Two-Tier Reasoning Surface — Watch the Agent Think</strong></summary>
+
+The pipeline streams two parallel reasoning registers as it runs. Layperson users see a lay narration card (always visible) with one humanised line per step. Anyone curious about the internals can expand a developer transcript with timestamps, tool names, Vertex retrieval hits with scores, and Gemini Code Execution stdout — the same data a backend engineer would see in logs.
+
+```mermaid
+flowchart TD
+    Step[Pipeline step completes] --> Narrate[Per-step narrators]
+    Narrate --> Tier1["PipelineNarrativeEvent<br/>headline + data point<br/>(en / ms / zh)"]
+    Narrate --> Tier2["PipelineTechnicalEvent<br/>timestamp + log lines<br/>(English only)"]
+    Tier1 --> SSE[SSE stream]
+    Tier2 --> SSE
+    SSE --> Lay["Lay narration card<br/>'Read your documents · RM 2,800'<br/>'Matched against 6 schemes · 5 qualifying'"]
+    SSE --> Tech["Technical transcript<br/>collapsed by default<br/>show details ▾"]
+    Tier1 --> Firestore["evaluations/{id}.narrativeLog"]
+    Tier2 --> Firestore2["evaluations/{id}.technicalLog"]
+    Firestore --> Replay[Retrospective replay on results page]
+    Firestore2 --> Replay
+```
+
+The technical layer is PII-clean by contract: full IC numbers, names, and addresses never reach the transcript. Only the last four digits of the IC, masked as `***-**-XXXX`, ever surface. The lay narration localises to the user's language; the technical transcript stays English because its audience is developer-grade.
 
 </details>
 

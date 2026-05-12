@@ -1075,7 +1075,8 @@
         },
         "actionSuccess": "Done. Status is now {{status}}.",
         "actionError": "Action failed: {{message}}",
-        "manifestWritten": "YAML manifest written to {{path}}"
+        "manifestReady": "Approved · YAML manifest persisted to candidate document",
+        "downloadManifest": "Download manifest"
       }
     }
   },

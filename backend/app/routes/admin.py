@@ -99,6 +99,7 @@ class ActionResponse(BaseModel):
     candidate_id: str
     status: CandidateStatus
     manifest_path: str | None = None
+    manifest_yaml: str | None = None
 
 
 class SchemeHealthRow(BaseModel):
@@ -165,13 +166,18 @@ def _row_from_doc(doc: Any) -> CandidateRow | None:
         return None
 
 
-def _write_manifest(candidate: SchemeCandidate) -> Path:
+def _write_manifest(candidate: SchemeCandidate) -> tuple[Path, str]:
     """Serialise the approved candidate to a YAML manifest.
 
     Filename: `<scheme_id-or-uuid>-<YYYY-MM-DD>-<short_hash>.yaml`. Output
     directory is created on first write. The manifest is the canonical
     reference for the engineer who hand-codes the Pydantic rule update
     (or new rule, when `scheme_id` is None).
+
+    Returns the local path (ephemeral on Cloud Run — survives only the
+    serving container's lifetime) AND the YAML string content so the caller
+    can persist it durably (e.g. on the Firestore candidate doc) before the
+    container recycles.
     """
     _DISCOVERED_YAML_DIR.mkdir(parents=True, exist_ok=True)
     short_hash = candidate.source_content_hash[:8]
@@ -179,11 +185,9 @@ def _write_manifest(candidate: SchemeCandidate) -> Path:
     stem = candidate.scheme_id or candidate.candidate_id[:8]
     path = _DISCOVERED_YAML_DIR / f"{stem}-{date_token}-{short_hash}.yaml"
     payload = candidate.model_dump(mode="json")
-    path.write_text(
-        yaml.safe_dump(payload, sort_keys=False, allow_unicode=True),
-        encoding="utf-8",
-    )
-    return path
+    yaml_content = yaml.safe_dump(payload, sort_keys=False, allow_unicode=True)
+    path.write_text(yaml_content, encoding="utf-8")
+    return path, yaml_content
 
 
 def _candidate_from_doc(doc: Any) -> SchemeCandidate:
@@ -282,7 +286,13 @@ async def approve_candidate(
     candidate_id: Annotated[str, PathParam(min_length=1)],
 ) -> ActionResponse:
     db, candidate = _transition(user, candidate_id, "approved", payload.note)
-    manifest_path = _write_manifest(candidate)
+    manifest_path, manifest_yaml = _write_manifest(candidate)
+    # Persist the manifest YAML onto the candidate doc so it survives the
+    # Cloud Run container recycle (the local file write above is ephemeral).
+    db.collection("discovered_schemes").document(candidate_id).set(
+        {"manifestYaml": manifest_yaml, "manifestApprovedAt": SERVER_TIMESTAMP},
+        merge=True,
+    )
     if candidate.scheme_id is not None:
         db.collection("verified_schemes").document(candidate.scheme_id).set(
             {
@@ -298,6 +308,7 @@ async def approve_candidate(
         candidate_id=candidate_id,
         status="approved",
         manifest_path=str(manifest_path.relative_to(manifest_path.parent.parent.parent)),
+        manifest_yaml=manifest_yaml,
     )
 
 

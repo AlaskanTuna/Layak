@@ -1064,7 +1064,8 @@
         },
         "actionSuccess": "完成。当前状态：{{status}}。",
         "actionError": "操作失败：{{message}}",
-        "manifestWritten": "YAML 清单已写入 {{path}}"
+        "manifestReady": "已批准 · YAML 清单已保存到候选文档",
+        "downloadManifest": "下载清单"
       }
     }
   },

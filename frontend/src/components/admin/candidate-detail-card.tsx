@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { Check, Loader2, RefreshCw, X } from 'lucide-react'
+import { Check, Download, Loader2, RefreshCw, X } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 
 import { CandidateStatusPill } from '@/components/admin/status-pill-status'
@@ -36,7 +36,7 @@ export function CandidateDetailCard({
   const [busy, setBusy] = useState<'approve' | 'reject' | 'changes' | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [status, setStatus] = useState(detail.status)
-  const [manifestPath, setManifestPath] = useState<string | null>(null)
+  const [manifestYaml, setManifestYaml] = useState<string | null>(null)
 
   const candidate = detail.candidate
   const matched = Boolean(candidate.scheme_id)
@@ -53,8 +53,8 @@ export function CandidateDetailCard({
             : requestChangesCandidate
       const res = await fn(candidate.candidate_id, note || undefined)
       setStatus(res.status)
-      if (res.manifest_path) {
-        setManifestPath(res.manifest_path)
+      if (res.manifest_yaml) {
+        setManifestYaml(res.manifest_yaml)
       }
       router.refresh()
     } catch (err) {
@@ -62,6 +62,20 @@ export function CandidateDetailCard({
     } finally {
       setBusy(null)
     }
+  }
+
+  function downloadManifest() {
+    if (!manifestYaml) return
+    const filename = `${candidate.scheme_id || candidate.candidate_id.slice(0, 8)}-manifest.yaml`
+    const blob = new Blob([manifestYaml], { type: 'text/yaml;charset=utf-8' })
+    const url = URL.createObjectURL(blob)
+    const anchor = document.createElement('a')
+    anchor.href = url
+    anchor.download = filename
+    document.body.appendChild(anchor)
+    anchor.click()
+    document.body.removeChild(anchor)
+    URL.revokeObjectURL(url)
   }
 
   return (
@@ -192,10 +206,20 @@ export function CandidateDetailCard({
             {t('admin.discovery.detail.actionError', { message: error })}
           </p>
         )}
-        {manifestPath && (
-          <p className="mono-caption text-foreground/60" role="status">
-            {t('admin.discovery.detail.manifestWritten', { path: manifestPath })}
-          </p>
+        {manifestYaml && (
+          <div className="flex flex-wrap items-center gap-2 text-sm text-foreground/70" role="status">
+            <span>{t('admin.discovery.detail.manifestReady')}</span>
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              onClick={downloadManifest}
+              className="gap-1.5 px-2"
+            >
+              <Download className="size-4" />
+              {t('admin.discovery.detail.downloadManifest')}
+            </Button>
+          </div>
         )}
       </section>
     </div>

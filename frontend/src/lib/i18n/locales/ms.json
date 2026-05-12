@@ -1075,7 +1075,8 @@
         },
         "actionSuccess": "Selesai. Status kini {{status}}.",
         "actionError": "Tindakan gagal: {{message}}",
-        "manifestWritten": "Manifes YAML ditulis ke {{path}}"
+        "manifestReady": "Diluluskan · Manifes YAML disimpan dalam dokumen calon",
+        "downloadManifest": "Muat turun manifes"
       }
     }
   },

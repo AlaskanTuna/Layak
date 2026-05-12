@@ -215,7 +215,7 @@ export function EvaluationUploadClient() {
                     type="button"
                     variant="outline"
                     disabled={samplesBusy}
-                    className="h-11 gap-2 border-[color:var(--hibiscus)]/55 px-5 text-sm font-medium hover:border-[color:var(--hibiscus)] hover:bg-[color:var(--hibiscus)]/8 dark:bg-card dark:hover:bg-[color:var(--hibiscus)]/12"
+                    className="h-11 gap-2 border-[color:var(--hibiscus)]/55 bg-card px-5 text-sm font-medium hover:border-[color:var(--hibiscus)] hover:bg-card dark:bg-card dark:hover:bg-card"
                   >
                     {samplesBusy ? (
                       <>

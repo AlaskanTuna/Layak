@@ -1086,6 +1086,11 @@ Findings the audit flagged that were **not** acted on (cosmetic or external to P
 - Integrated PDPA Consent routing (`X-PDPA-Consent` header triggering on first app auth via `/api/quota`) within `backend/app/auth.py`.
   \n## 2026-04-26\n\n### Phase 5: Auth + Gateway + Marketing (P5T1)\n- Added simple, transparent pricing structure to `en.json` with Free and Pro tiers.\n- Scaffolded `frontend/src/components/landing/landing-pricing.tsx` implementing the Free/Pro split as seen in the SaaS pivot spec.\n- Integrated `LandingPricing` component into `frontend/src/app/pages/marketing/landing-page.tsx`.\n- Marked Phase 5 Task 1 (Landing Page rewrite) as complete in `docs/plan.md`.
 
+## [13/05/26] - Upload sample button solid background fix
+
+- On `/dashboard/evaluation/upload`, changed the `Try Sample Data` action to use a solid `bg-card` surface in both light and dark themes so it no longer reads as a half-transparent outline button.
+- Verified with targeted ESLint on `evaluation-upload-client.tsx` and a full `pnpm -C frontend build`.
+
 ## [13/05/26] - Alert recovery button underline fix
 
 - Scanned the frontend error/recovery surfaces and traced the underlined CTA bug to the shared `AlertTitle` and `AlertDescription` typography rules, which were underlining every nested anchor, including button-rendered links.

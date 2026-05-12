@@ -36,8 +36,8 @@ from app.schema.discovery import ChangedSource, DiscoverySource
 _logger = logging.getLogger(__name__)
 
 _SOURCES_YAML = Path(__file__).resolve().parent.parent.parent / "data" / "discovery_sources.yaml"
-_USER_AGENT = "LayakDiscoveryBot/0.1 (+https://layak.tech/about)"
-_FETCH_TIMEOUT_SECONDS = 20.0
+_USER_AGENT = "Mozilla/5.0 (compatible; LayakDiscoveryBot/0.1; +https://layak.tech/about)"
+_FETCH_TIMEOUT_SECONDS = 45.0
 _MAX_BYTES_PER_FETCH = 5 * 1024 * 1024  # 5 MiB cap per response
 _WHITESPACE_RE = re.compile(r"\s+")
 _HTML_TAG_RE = re.compile(r"<[^>]+>")

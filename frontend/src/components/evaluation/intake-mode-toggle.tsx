@@ -1,9 +1,8 @@
 'use client'
 
-import { FileText, KeyboardIcon } from 'lucide-react'
+import { FileText, KeyboardIcon, type LucideIcon } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 
-import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
 
 export type IntakeMode = 'upload' | 'manual'
@@ -15,66 +14,73 @@ type Props = {
 }
 
 /**
- * Segmented toggle above the intake widgets.
+ * Newspaper-style section tabs above the intake widgets.
  *
- * Swaps between the three-document upload path (default, Gemini OCR) and the
- * privacy-first manual form (structured input, no OCR). The state is lifted to
- * the parent so the parent renders UploadWidget or ManualEntryForm.
+ * Centered text + icon labels with a 2px hibiscus underline on the active
+ * entry — picks up the editorial-civic identity of the rest of the app and
+ * shed the chunky segmented-control chrome that competed with the page
+ * heading directly above. A page-wide hairline underneath catches the
+ * active rule so it reads as a tab cutting into a section line, classic
+ * newspaper nav.
  */
 export function IntakeModeToggle({ value, onChange, disabled = false }: Props) {
   const { t } = useTranslation()
   return (
-    <div
-      role="radiogroup"
-      aria-label={t('evaluation.intake.aria')}
-      className="grid w-full grid-cols-2 gap-1 rounded-lg border border-border bg-muted/30 p-1.5"
-    >
-      <ToggleButton
-        icon={<FileText className="size-4" aria-hidden />}
-        label={t('evaluation.intake.upload')}
-        active={value === 'upload'}
-        disabled={disabled}
-        onClick={() => onChange('upload')}
-      />
-      <ToggleButton
-        icon={<KeyboardIcon className="size-4" aria-hidden />}
-        label={t('evaluation.intake.manual')}
-        active={value === 'manual'}
-        disabled={disabled}
-        onClick={() => onChange('manual')}
-      />
+    <div className="border-b border-foreground/10">
+      <div
+        role="radiogroup"
+        aria-label={t('evaluation.intake.aria')}
+        className="flex justify-center gap-10"
+      >
+        <ToggleTab
+          icon={FileText}
+          label={t('evaluation.intake.upload')}
+          active={value === 'upload'}
+          disabled={disabled}
+          onClick={() => onChange('upload')}
+        />
+        <ToggleTab
+          icon={KeyboardIcon}
+          label={t('evaluation.intake.manual')}
+          active={value === 'manual'}
+          disabled={disabled}
+          onClick={() => onChange('manual')}
+        />
+      </div>
     </div>
   )
 }
 
-function ToggleButton({
-  icon,
-  label,
-  active,
-  disabled,
-  onClick
-}: {
-  icon: React.ReactNode
+type ToggleTabProps = {
+  icon: LucideIcon
   label: string
   active: boolean
   disabled: boolean
   onClick: () => void
-}) {
+}
+
+function ToggleTab({ icon: Icon, label, active, disabled, onClick }: ToggleTabProps) {
   return (
-    <Button
+    <button
       type="button"
       role="radio"
       aria-checked={active}
-      variant={active ? 'default' : 'ghost'}
       disabled={disabled}
       onClick={onClick}
       className={cn(
-        'h-11 w-full gap-2 rounded-md text-[14px] font-medium',
-        !active && 'text-muted-foreground hover:text-foreground'
+        'group relative inline-flex cursor-pointer items-center gap-2 py-3 text-[13.5px] font-medium tracking-tight transition-colors',
+        active ? 'text-foreground' : 'text-foreground/55 hover:text-foreground',
+        disabled && 'pointer-events-none opacity-50'
       )}
     >
-      {icon}
+      <Icon className="size-4" aria-hidden />
       {label}
-    </Button>
+      {active && (
+        <span
+          aria-hidden
+          className="absolute -bottom-px left-0 right-0 h-[2px] rounded-full bg-[color:var(--hibiscus)]"
+        />
+      )}
+    </button>
   )
 }

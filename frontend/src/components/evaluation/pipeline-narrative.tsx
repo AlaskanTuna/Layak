@@ -213,17 +213,33 @@ function CyclingStatus({
   }, [items])
 
   const safeIdx = items.length > 0 ? idx % items.length : 0
-  const label = items[safeIdx] ?? ''
+  // Use the longest label as a layout placeholder so the row width is
+  // stable across a cycle — otherwise the row would shimmy as the label
+  // text length changes between status, headline, and data_point.
+  const placeholder = items.reduce((longest, item) => (item.length > longest.length ? item : longest), '')
   return (
     <span
-      key={`${label}-${safeIdx}`}
       className={cn(
-        'mono-caption cycle-fade ml-auto max-w-[200px] truncate text-right',
+        'relative ml-auto inline-flex min-h-[1em] max-w-[60%] sm:max-w-[320px] flex-shrink justify-end',
         status === 'pending' ? 'text-foreground/45' : 'text-foreground/65'
       )}
-      title={label}
     >
-      {label}
+      <span aria-hidden className="mono-caption invisible truncate uppercase">
+        {placeholder}
+      </span>
+      {items.map((item, i) => (
+        <span
+          key={i}
+          aria-hidden={i !== safeIdx}
+          className={cn(
+            'mono-caption absolute inset-0 truncate uppercase text-right transition-all duration-500 ease-out will-change-[opacity,transform]',
+            i === safeIdx ? 'opacity-100 translate-y-0' : 'pointer-events-none opacity-0 -translate-y-0.5'
+          )}
+          title={i === safeIdx ? item : undefined}
+        >
+          {item}
+        </span>
+      ))}
     </span>
   )
 }
@@ -249,11 +265,11 @@ function TechnicalLayer({ state }: { state: PipelineState }) {
       )}
       {(snippet || stdout) && (
         <div className="rounded-[8px] border border-foreground/15 bg-foreground/[0.04]">
-          <p className="mono-caption px-3 pt-2.5 text-[color:var(--primary)]">
+          <p className="mono-caption px-3 py-3 text-[color:var(--primary)]">
             {t('evaluation.narrative.codeExecutionTitle')}
           </p>
           {snippet && (
-            <div className="border-t border-foreground/10 px-3 pb-3 pt-2">
+            <div className="border-t border-foreground/10 px-3 pb-3 pt-2.5">
               <p className="mono-caption text-foreground/55">
                 {t('evaluation.narrative.codeExecutionSnippet')}
               </p>
@@ -263,7 +279,7 @@ function TechnicalLayer({ state }: { state: PipelineState }) {
             </div>
           )}
           {stdout && (
-            <div className="border-t border-foreground/10 px-3 pb-3 pt-2">
+            <div className="border-t border-foreground/10 px-3 pb-3 pt-2.5">
               <p className="mono-caption text-foreground/55">
                 {t('evaluation.narrative.codeExecutionStdout')}
               </p>

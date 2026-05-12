@@ -128,8 +128,8 @@ async def extract_candidate(changed: ChangedSource) -> SchemeCandidate | None:
         return None
 
     confidence = raw.get("confidence")
-    if not isinstance(confidence, (int, float)) or float(confidence) < 0.5:
-        _logger.info(
+    if not isinstance(confidence, (int, float)) or float(confidence) < 0.3:
+        _logger.warning(
             "extract_candidate dropped low-confidence candidate for %s (confidence=%s)",
             changed.source.id,
             confidence,

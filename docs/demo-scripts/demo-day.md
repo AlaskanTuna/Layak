@@ -2,7 +2,7 @@
 
 > **Duration:** 5 minutes presentation + 3 minutes Q&A session
 > **Members:** 3 (ZJ, LH, JS)
-> **Slides:**
+> **Slides:** `docs/demo-slides/layak-pitch-detch.html`
 
 ---
 

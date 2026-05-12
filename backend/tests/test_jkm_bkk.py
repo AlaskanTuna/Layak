@@ -72,7 +72,7 @@ def _profile(*, income: float, household_size: int, children: list[int], parents
         deps.extend(Dependant(relationship="parent", age=age) for age in parents)
     return Profile(
         name="Test",
-        ic_last4="9999",
+        ic_last6="089999",
         age=35,
         monthly_income_rm=income,
         household_size=household_size,
@@ -207,7 +207,7 @@ def test_generate_packet_template_map_has_jkm_bkk_entry() -> None:
     assert template == "jkm_bkk.html.jinja"
     # Filename carries "bkk" + the IC placeholder for uniqueness.
     assert "bkk" in filename.lower()
-    assert "{ic_last4}" in filename
+    assert "{ic_last6}" in filename
 
 
 @pytest.mark.asyncio

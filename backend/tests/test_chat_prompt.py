@@ -30,7 +30,7 @@ def _aisyah_eval_doc() -> dict[str, Any]:
         "profile": {
             "name": "AISYAH BINTI AHMAD",
             "age": 34,
-            "ic_last4": "4321",
+            "ic_last6": "064321",
             "monthly_income_rm": 2800.0,
             "household_size": 4,
             "form_type": "form_b",
@@ -83,7 +83,7 @@ _FULL_IC_RE = re.compile(r"\b\d{6}[\s-]?\d{2}[\s-]?\d{4}\b|\b\d{12}\b")
 @pytest.mark.parametrize("language", ["en", "ms", "zh"])
 def test_digest_never_emits_full_ic(language: str) -> None:
     """Even if a future schema regression smuggles `ic` onto the doc, the
-    digest renderer must filter it out — only `ic_last4` is allowed."""
+    digest renderer must filter it out — only `ic_last6` is allowed."""
     doc = _aisyah_eval_doc()
     # Hostile injection — pretend a future doc shape leaks the full IC.
     doc["profile"]["ic"] = "900324-06-4321"
@@ -92,15 +92,15 @@ def test_digest_never_emits_full_ic(language: str) -> None:
     assert _FULL_IC_RE.search(digest) is None, (
         f"Full IC leaked into {language} digest: {digest[:200]}"
     )
-    # ic_last4 should still be present.
-    assert "4321" in digest
+    # ic_last6 should still be present.
+    assert "064321" in digest
 
 
 @pytest.mark.parametrize("language", ["en", "ms", "zh"])
-def test_digest_handles_missing_ic_last4(language: str) -> None:
-    """Missing `ic_last4` shouldn't crash — line just omits the IC suffix."""
+def test_digest_handles_missing_ic_last6(language: str) -> None:
+    """Missing `ic_last6` shouldn't crash — line just omits the IC suffix."""
     doc = _aisyah_eval_doc()
-    doc["profile"].pop("ic_last4", None)
+    doc["profile"].pop("ic_last6", None)
     digest = render_eval_digest(doc, language=language)  # type: ignore[arg-type]
     assert digest  # still renders
 

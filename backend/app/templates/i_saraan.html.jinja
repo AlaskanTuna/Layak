@@ -10,8 +10,8 @@
     <div class="label">Name</div>
     <div class="value">{{ profile.name }}</div>
 
-    <div class="label">IC (last 4)</div>
-    <div class="value">••••-••-{{ profile.ic_last4 }}</div>
+    <div class="label">IC (last 6)</div>
+    <div class="value">••••••-{{ profile.ic_last6[:2] }}-{{ profile.ic_last6[2:] }}</div>
 
     <div class="label">Age</div>
     <div class="value">{{ profile.age }}</div>

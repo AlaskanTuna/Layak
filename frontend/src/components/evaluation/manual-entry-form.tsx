@@ -1,7 +1,7 @@
 'use client'
 
 import { zodResolver } from '@hookform/resolvers/zod'
-import { ArrowRight, CalendarIcon, Eraser } from 'lucide-react'
+import { ArrowRight, Eraser } from 'lucide-react'
 import { useImperativeHandle, useMemo } from 'react'
 import { Controller, type SubmitHandler, useForm, useWatch } from 'react-hook-form'
 import { useTranslation } from 'react-i18next'
@@ -10,7 +10,6 @@ import { z } from 'zod'
 import { DependantsFieldset, type DependantInputRow } from '@/components/evaluation/dependants-fieldset'
 import { SectionBadge } from '@/components/evaluation/section-badge'
 import { Button } from '@/components/ui/button'
-import { DatePicker } from '@/components/ui/date-picker'
 import { InfoTooltip } from '@/components/ui/info-tooltip'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -26,21 +25,16 @@ const SECTION_CLASS =
 
 const RELATIONSHIPS = ['child', 'parent', 'spouse', 'sibling', 'other'] as const satisfies readonly Relationship[]
 
-/** Insert dashes into a typed DOB so older users can type `20260421` and see
- * `2026-04-21` appear without hunting for the hyphen key. Also accepts a
- * pre-dashed input (strips and re-inserts) so the date-picker callback path
- * is idempotent. */
-function formatDateMask(raw: string): string {
-  const digits = raw.replace(/\D/g, '').slice(0, 8)
-  if (digits.length <= 4) return digits
-  if (digits.length <= 6) return `${digits.slice(0, 4)}-${digits.slice(4)}`
-  return `${digits.slice(0, 4)}-${digits.slice(4, 6)}-${digits.slice(6)}`
+/** Strip every non-digit char and cap at 12 so users can paste a dashed
+ * IC (`920324-06-4321`) and we still feed the backend a clean 12-digit
+ * string. Pydantic's `^\d{12}$` rejects dashes outright. */
+function formatIcMask(raw: string): string {
+  return raw.replace(/\D/g, '').slice(0, 12)
 }
 
 type FormValues = {
   name: string
-  date_of_birth: string
-  ic_last4: string
+  ic: string
   monthly_income_rm: number
   employment_type: 'gig' | 'salaried'
   address: string
@@ -51,44 +45,43 @@ type FormValues = {
 
 /**
  * Aisyah defaults for one-click pre-fill (parity with upload-path samples).
- * DOB 1992-03-24 derives age 34 against any 2026 reference date after 24 Mar.
+ * IC `920324064321` — YYMMDD 920324 → DOB 1992-03-24 (age 34 against any
+ * 2026 reference after 24 Mar), PB 06 (Pahang), serial 4321.
  */
 const AISYAH_DEFAULTS: FormValues = {
   name: 'Aisyah binti Ahmad',
-  date_of_birth: '1992-03-24',
-  ic_last4: '4321',
+  ic: '920324064321',
   monthly_income_rm: 2800,
   employment_type: 'gig',
   address: 'No. 42, Jalan IM 7/10, Bandar Indera Mahkota, 25200 Kuantan, Pahang',
   monthly_cost_rm: '95.40',
   monthly_kwh: '220',
   dependants: [
-    { relationship: 'child', age: 10, ic_last4: '' },
-    { relationship: 'child', age: 7, ic_last4: '' },
-    { relationship: 'parent', age: 70, ic_last4: '' }
+    { relationship: 'child', age: 10, ic_last6: '' },
+    { relationship: 'child', age: 7, ic_last6: '' },
+    { relationship: 'parent', age: 70, ic_last6: '' }
   ]
 }
 
 /**
  * Farhan defaults for one-click pre-fill — salaried-teacher counterpart to
  * Aisyah. Mirrors `frontend/src/lib/farhan-fixtures.ts` dependants so the
- * manual and upload paths produce equivalent profiles. DOB 1988-03-22 (from
- * the synthetic MyKad) derives age 38 against any 2026 reference date after
- * 22 Mar; gross monthly income is RM 4,180.50 (basic + allowances).
+ * manual and upload paths produce equivalent profiles. IC `880322065837`
+ * → DOB 1988-03-22 (age 38 against any 2026 reference after 22 Mar), PB
+ * 06, serial 5837. Gross monthly income is RM 4,180.50 (basic + allowances).
  */
 const FARHAN_DEFAULTS: FormValues = {
   name: 'Cikgu Farhan bin Mohd Yusof',
-  date_of_birth: '1988-03-22',
-  ic_last4: '5837',
+  ic: '880322065837',
   monthly_income_rm: 4180.5,
   employment_type: 'salaried',
   address: 'No. 24, Jalan Putera 3/2, Taman Putera Subang, 47600 Subang Jaya, Selangor',
   monthly_cost_rm: '152.40',
   monthly_kwh: '380',
   dependants: [
-    { relationship: 'spouse', age: 36, ic_last4: '' },
-    { relationship: 'child', age: 10, ic_last4: '' },
-    { relationship: 'child', age: 7, ic_last4: '' }
+    { relationship: 'spouse', age: 36, ic_last6: '' },
+    { relationship: 'child', age: 10, ic_last6: '' },
+    { relationship: 'child', age: 7, ic_last6: '' }
   ]
 }
 
@@ -103,8 +96,7 @@ export type ManualEntryFormHandle = {
 
 const EMPTY_DEFAULTS: FormValues = {
   name: '',
-  date_of_birth: '',
-  ic_last4: '',
+  ic: '',
   monthly_income_rm: 0,
   employment_type: 'gig',
   address: '',
@@ -136,40 +128,25 @@ export function ManualEntryForm({ onSubmit, onUseSamples, onClear, disabled = fa
     const dependantSchema = z.object({
       relationship: z.enum(RELATIONSHIPS),
       age: z.number().int().min(0).max(120),
-      ic_last4: z
+      ic_last6: z
         .string()
-        .refine((v) => v === '' || /^\d{4}$/.test(v), { message: t('evaluation.manual.zodIc4Digits') })
+        .refine((v) => v === '' || /^\d{6}$/.test(v), { message: t('evaluation.manual.zodIc6Digits') })
     })
 
     return z.object({
       name: z.string().trim().min(1, t('evaluation.manual.zodRequired')).max(200),
-      date_of_birth: z
+      ic: z
         .string()
-        .regex(/^\d{4}-\d{2}-\d{2}$/, t('evaluation.manual.zodDateFormat'))
+        .regex(/^\d{12}$/, t('evaluation.manual.zodIcDigits'))
         .superRefine((v, ctx) => {
-          const [y, m, d] = v.split('-').map(Number)
-          if (m < 1 || m > 12 || d < 1 || d > 31) {
-            ctx.addIssue({ code: z.ZodIssueCode.custom, message: t('evaluation.manual.zodNotRealDate') })
-            return
-          }
-          const parsed = new Date(v)
-          if (Number.isNaN(parsed.getTime())) {
-            ctx.addIssue({ code: z.ZodIssueCode.custom, message: t('evaluation.manual.zodNotRealDate') })
-            return
-          }
-          if (parsed.getUTCFullYear() !== y || parsed.getUTCMonth() + 1 !== m || parsed.getUTCDate() !== d) {
-            ctx.addIssue({ code: z.ZodIssueCode.custom, message: t('evaluation.manual.zodNotRealDate') })
-            return
-          }
-          if (y < 1900) {
-            ctx.addIssue({ code: z.ZodIssueCode.custom, message: t('evaluation.manual.zodYearMin') })
-            return
-          }
-          if (parsed > new Date()) {
-            ctx.addIssue({ code: z.ZodIssueCode.custom, message: t('evaluation.manual.zodPastDate') })
+          // Sanity-check the YYMMDD prefix here so the user sees the error
+          // inline rather than waiting for a 422 from the backend.
+          const mm = Number(v.slice(2, 4))
+          const dd = Number(v.slice(4, 6))
+          if (mm < 1 || mm > 12 || dd < 1 || dd > 31) {
+            ctx.addIssue({ code: z.ZodIssueCode.custom, message: t('evaluation.manual.zodIcNotRealDate') })
           }
         }),
-      ic_last4: z.string().regex(/^\d{4}$/, t('evaluation.manual.zodIc4Digits')),
       monthly_income_rm: z.number().min(0).max(1_000_000),
       employment_type: z.enum(['gig', 'salaried']),
       address: z.string().max(300),
@@ -196,8 +173,7 @@ export function ManualEntryForm({ onSubmit, onUseSamples, onClear, disabled = fa
   const submit: SubmitHandler<FormValues> = (values) => {
     const payload: ManualEntryPayload = {
       name: values.name.trim(),
-      date_of_birth: values.date_of_birth,
-      ic_last4: values.ic_last4,
+      ic: values.ic,
       monthly_income_rm: values.monthly_income_rm,
       employment_type: values.employment_type,
       address: values.address.trim().length > 0 ? values.address.trim() : null,
@@ -206,7 +182,7 @@ export function ManualEntryForm({ onSubmit, onUseSamples, onClear, disabled = fa
       dependants: values.dependants.map((d) => ({
         relationship: d.relationship,
         age: d.age,
-        ic_last4: d.ic_last4 === '' ? null : d.ic_last4
+        ic_last6: d.ic_last6 === '' ? null : d.ic_last6
       }))
     }
     onSubmit(payload)
@@ -241,59 +217,33 @@ export function ManualEntryForm({ onSubmit, onUseSamples, onClear, disabled = fa
           <Field label={t('evaluation.manual.nameLabel')} error={formState.errors.name?.message} htmlFor="mef-name">
             <Input id="mef-name" autoComplete="name" disabled={disabled} {...register('name')} />
           </Field>
-          <div className="grid gap-3 sm:grid-cols-2">
-            <Field
-              label={t('evaluation.manual.dobLabel')}
-              help={t('evaluation.manual.dobHelp')}
-              error={formState.errors.date_of_birth?.message}
-              htmlFor="mef-dob"
-            >
-              <Controller
-                control={control}
-                name="date_of_birth"
-                render={({ field }) => (
-                  <div className="flex gap-2">
-                    <Input
-                      id="mef-dob"
-                      type="text"
-                      inputMode="numeric"
-                      placeholder={t('evaluation.manual.dobPlaceholder')}
-                      autoComplete="bday"
-                      maxLength={10}
-                      disabled={disabled}
-                      value={field.value}
-                      onChange={(e) => field.onChange(formatDateMask(e.target.value))}
-                      onBlur={field.onBlur}
-                      className="flex-1"
-                    />
-                    <DatePicker
-                      value={/^\d{4}-\d{2}-\d{2}$/.test(field.value) ? field.value : ''}
-                      onChange={(next) => field.onChange(next)}
-                      disableFuture
-                      disabled={disabled}
-                      ariaLabel={t('evaluation.manual.dobAria')}
-                      triggerLabel={<CalendarIcon className="size-4" aria-hidden />}
-                    />
-                  </div>
-                )}
-              />
-            </Field>
-            <Field
-              label={t('evaluation.manual.icLabel')}
-              help={t('evaluation.manual.icHelp')}
-              error={formState.errors.ic_last4?.message}
-              htmlFor="mef-ic4"
-            >
-              <Input
-                id="mef-ic4"
-                inputMode="numeric"
-                maxLength={4}
-                autoComplete="off"
-                disabled={disabled}
-                {...register('ic_last4')}
-              />
-            </Field>
-          </div>
+          <Field
+            label={t('evaluation.manual.icLabel')}
+            help={t('evaluation.manual.icHelp')}
+            error={formState.errors.ic?.message}
+            htmlFor="mef-ic"
+          >
+            <Controller
+              control={control}
+              name="ic"
+              render={({ field }) => (
+                <Input
+                  id="mef-ic"
+                  inputMode="numeric"
+                  // Allow 14 chars typed (12 digits + 2 dashes) so a pasted
+                  // `YYMMDD-PP-####` survives the keystroke before the mask
+                  // strips it back to 12 raw digits.
+                  maxLength={14}
+                  autoComplete="off"
+                  placeholder={t('evaluation.manual.icPlaceholder')}
+                  disabled={disabled}
+                  value={field.value}
+                  onChange={(e) => field.onChange(formatIcMask(e.target.value))}
+                  onBlur={field.onBlur}
+                />
+              )}
+            />
+          </Field>
         </div>
       </section>
 

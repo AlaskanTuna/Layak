@@ -2,8 +2,10 @@
 
 Reads the three uploaded documents (IC, payslip / income proof, utility bill)
 with Gemini 2.5 Flash and returns a validated `Profile`. Privacy invariant:
-only `ic_last4` ever leaves the Gemini response — the instruction explicitly
-forbids emitting the full 12-digit IC number.
+only `ic_last6` ever leaves the Gemini response — the instruction explicitly
+forbids emitting the full 12-digit IC number. The 6-digit tail captures the
+place-of-birth code + serial (`PB-####`); combined with `date_of_birth` it
+lets future scheme integrations reconstruct the full IC at the boundary.
 """
 
 from __future__ import annotations
@@ -20,9 +22,10 @@ statement, and a utility bill. Extract the citizen's profile into the JSON
 schema provided.
 
 Rules (enforce strictly):
-- **Privacy**: return ONLY the last 4 digits of the IC in `ic_last4`. Do NOT
-  emit the full 12-digit IC anywhere. If the IC looks like `900324-06-4321`,
-  `ic_last4` must be `"4321"`.
+- **Privacy**: return ONLY the last 6 digits of the IC in `ic_last6` (the
+  place-of-birth code + serial number, with no internal dash). Do NOT emit
+  the full 12-digit IC anywhere. If the IC looks like `900324-06-4321`,
+  `ic_last6` must be `"064321"`.
 - `name` is the citizen's full name as it appears on the IC, uppercased.
 - `age` is derived from the IC prefix (`YYMMDD`) against today's date. If a
   date is ambiguous, prefer the older interpretation.
@@ -34,10 +37,10 @@ Rules (enforce strictly):
   household size, default to `1` and leave `dependants` empty.
 - `dependants` lists each child / parent / spouse / sibling / other in the
   household. Each entry contains EXACTLY these keys: `relationship` (one of
-  child, parent, spouse, sibling, other), `age` (integer). `ic_last4` is
-  optional (4-digit string). Do NOT include `name`, `gender`, `occupation`,
-  or any other field on a dependant — extra fields are silently dropped
-  and just waste output tokens.
+  child, parent, spouse, sibling, other), `age` (integer). `ic_last6` is
+  optional (6-digit string, place-of-birth + serial, no dash). Do NOT
+  include `name`, `gender`, `occupation`, or any other field on a dependant
+  — extra fields are silently dropped and just waste output tokens.
 - `household_flags`:
   - `has_children_under_18`: true if any dependant has relationship `child`
     and age < 18.
@@ -73,7 +76,7 @@ async def extract_profile(ic_bytes: bytes, payslip_bytes: bytes, utility_bytes: 
         utility_bytes: raw bytes of the utility bill (TNB).
 
     Returns:
-        Validated `Profile`. Full IC never appears; only `ic_last4`.
+        Validated `Profile`. Full IC never appears; only `ic_last6`.
     """
     client = get_client()
     # Default filename suffix = .pdf so detect_mime falls back to application/pdf

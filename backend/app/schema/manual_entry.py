@@ -8,11 +8,17 @@ shape is new.
 Sanitisation contract: see `app/schema/sanitize.py` — `name` and `address`
 are run through `sanitize_free_text` before reaching any Gemini prompt or
 WeasyPrint template.
+
+IC contract: the wire accepts a single 12-digit `ic` field
+(`YYMMDDPPNNNN`). `build_profile_from_manual_entry` derives the
+date-of-birth (and hence `age`) from the YYMMDD prefix and slices the
+last six digits (`PB####`) into `Profile.ic_last6`. The full IC is held
+in request-scope memory only — it never lands on the persisted Profile,
+the SSE stream, or any log line.
 """
 
 from __future__ import annotations
 
-from datetime import date
 from typing import Annotated
 
 from pydantic import AfterValidator, BaseModel, ConfigDict, Field
@@ -39,16 +45,17 @@ class DependantInput(BaseModel):
 
     relationship: Relationship
     age: int = Field(ge=0, le=130)
-    ic_last4: str | None = Field(default=None, pattern=r"^\d{4}$")
+    ic_last6: str | None = Field(default=None, pattern=r"^\d{6}$")
 
 
 class ManualEntryPayload(BaseModel):
     """The JSON body accepted by `POST /api/agent/intake_manual`.
 
     The payload deliberately omits fields that are either derived
-    (`household_size = 1 + len(dependants)`, `age = f(date_of_birth)`,
-    `household_flags`) or out of scope for manual entry (`form_type` is
-    mapped from the two-value `employment_type` on the wire).
+    (`household_size = 1 + len(dependants)`, `age` is parsed from the IC's
+    YYMMDD prefix, `household_flags`) or out of scope for manual entry
+    (`form_type` is mapped from the two-value `employment_type` on the
+    wire).
     """
 
     model_config = ConfigDict(extra="forbid")
@@ -57,8 +64,11 @@ class ManualEntryPayload(BaseModel):
     # empty post-clean string, so a name that's only whitespace or control
     # characters still 422s — belt-and-braces.
     name: _SanitisedName = Field(min_length=1, max_length=200)
-    date_of_birth: date
-    ic_last4: str = Field(pattern=r"^\d{4}$")
+    # Full 12-digit Malaysian IC. Layout: `YYMMDDPPNNNN`. The builder
+    # parses YYMMDD into a real date (with two-digit-year disambiguation)
+    # and slices `PPNNNN` into `Profile.ic_last6`. The full value is
+    # transient — never persisted, never logged.
+    ic: str = Field(pattern=r"^\d{12}$")
     monthly_income_rm: float = Field(ge=0, le=1_000_000)
     employment_type: str = Field(pattern=r"^(gig|salaried)$")
     # Address cap tightened from 500 → 300 to reduce prompt-token footprint.

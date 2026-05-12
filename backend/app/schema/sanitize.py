@@ -19,7 +19,7 @@ This module is the single place we scrub that content. Applied via Pydantic
 already-sanitised strings — no downstream call ever sees the raw value.
 
 Scope: ONLY free-form text fields (name, address). Numeric / enum / regex-
-gated fields (ic_last4, employment_type, monthly_income_rm, etc.) are already
+gated fields (ic_last6, employment_type, monthly_income_rm, etc.) are already
 safe because Pydantic rejects anything that isn't the exact shape.
 """
 

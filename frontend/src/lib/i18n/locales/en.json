@@ -299,7 +299,7 @@
         {
           "docCode": "FAQ-04",
           "question": "How safe is my personal data?",
-          "body": "PDPA-compliant by design. The full IC is never persisted — only the last four digits are stored. Original file bytes are extracted in-memory inside a single request and discarded once the structured profile is produced. No raw documents in logs."
+          "body": "Your uploaded documents are processed in memory inside a single request and discarded once the structured profile is produced. IC information used during the evaluation pipeline is disposed of after the process completes. We persist the structured profile in Firestore so the chatbot and draft packets can be regenerated on demand. No raw documents in logs."
         },
         {
           "docCode": "FAQ-05",
@@ -371,7 +371,7 @@
       "section1History": "<strong>Evaluation history</strong>: the structured profile we extracted from your documents and the schemes you matched against, persisted in Firestore so you can see your past runs.",
       "section1Consent": "<strong>Consent timestamp</strong> recorded when you tick the PDPA checkbox on sign-up.",
       "section2Title": "2. What we do not store",
-      "section2MyKad": "Your full MyKad number — we keep only the last four digits.",
+      "section2MyKad": "Your full MyKad number. IC information used during the evaluation pipeline is disposed of after the process completes.",
       "section2Files": "The original bytes of your uploaded files. Extraction runs in-memory inside a single request, and the raw files are discarded once the structured profile is produced.",
       "section2Logs": "IC numbers, authentication tokens, or document content in any log line.",
       "section3Title": "3. Why we collect it",
@@ -580,7 +580,7 @@
       "steps": {
         "extract": {
           "title": "Extract",
-          "body": "We read your MyKad, payslip and utility bill, pulling income, IC last-4, and household size."
+          "body": "We read your MyKad, payslip and utility bill, pulling income, IC last-6, and household size."
         },
         "match": {
           "title": "Match",
@@ -770,12 +770,9 @@
     "manual": {
       "identityTitle": "Identity",
       "nameLabel": "Full Name",
-      "dobLabel": "Date of Birth",
-      "dobHelp": "Just type the numbers — we fill in the dashes. Or use the calendar icon.",
-      "dobPlaceholder": "YYYY-MM-DD",
-      "dobAria": "Open date picker",
-      "icLabel": "IC Last 4 Digits",
-      "icHelp": "We only collect the last 4 digits — your full MyKad never leaves your device.",
+      "icLabel": "MyKad / IC Number",
+      "icHelp": "Your 12-digit IC. We derive your age from the YYMMDD prefix and keep only the last six digits afterwards — the full IC is disposed of once the pipeline completes.",
+      "icPlaceholder": "e.g. 920324064321",
       "incomeTitle": "Income",
       "incomeLabel": "Monthly Income (RM)",
       "incomeHelp": "Net payout for gig work, basic pay for salaried.",
@@ -797,11 +794,9 @@
       "clear": "Clear",
       "submit": "Generate Packet",
       "zodRequired": "Required",
-      "zodDateFormat": "Use YYYY-MM-DD",
-      "zodNotRealDate": "Not a real date",
-      "zodYearMin": "Year must be 1900 or later",
-      "zodPastDate": "Must be a past date",
-      "zodIc4Digits": "4 digits",
+      "zodIcDigits": "Must be exactly 12 digits",
+      "zodIcNotRealDate": "First 6 digits must be a real YYMMDD birthday",
+      "zodIc6Digits": "6 digits",
       "zodCostFormat": "Amount up to RM100,000 (e.g. 240 or 240.50)",
       "zodKwhFormat": "Whole number up to 10,000"
     },
@@ -866,7 +861,7 @@
       },
       "age": "Age",
       "agePlaceholder": "Age",
-      "icOptional": "IC Last 4 (Optional)",
+      "icOptional": "IC Last 6 (Optional)",
       "add": "Add Dependant",
       "removeAria": "Remove dependant {{index}}"
     },

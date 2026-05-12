@@ -3,7 +3,7 @@
 Gemini 2.5 Flash "helpfully" tags each dependant with the given name when
 the source document lists one (Farhan's payslip surfaces
 "Nurul Hidayah / Adam Hakim / Aleesya Sofea" under Ringkasan Isi Rumah).
-The rule engine only reads `relationship` + `age` + `ic_last4`, so the
+The rule engine only reads `relationship` + `age` + `ic_last6`, so the
 model is configured with `extra="ignore"` to silently drop anything else
 rather than fail the whole extract. This test locks that behaviour in.
 """

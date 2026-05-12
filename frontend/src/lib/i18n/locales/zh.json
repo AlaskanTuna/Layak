@@ -224,7 +224,7 @@
         {
           "docCode": "FAQ-04",
           "question": "我的个人数据有多安全？",
-          "body": "按设计符合 PDPA。完整身份证号码绝不持久化 —— 仅存储末四位。原始文件字节在单次请求中于内存中提取，结构化档案产生后立即丢弃。日志中没有原始文件。"
+          "body": "您上传的文件在单次请求中于内存中处理，结构化档案产生后即被丢弃。评估流程中使用的身份证信息在流程完成后即被处置。我们将结构化档案保存在 Firestore，以便聊天机器人和草稿包可按需重新生成。日志中没有原始文件。"
         },
         {
           "docCode": "FAQ-05",
@@ -360,7 +360,7 @@
       "section1History": "<strong>评估历史</strong>：我们从您的文件中提取的结构化档案以及您所配对的计划，存储在 Firestore 中以便您查看过往记录。",
       "section1Consent": "<strong>同意时间戳</strong>，在您注册时勾选 PDPA 复选框时记录。",
       "section2Title": "2. 我们不存储的资料",
-      "section2MyKad": "您的完整 MyKad 号码 —— 我们只保留最后四位数。",
+      "section2MyKad": "您的完整 MyKad 号码。评估流程中使用的身份证信息在流程完成后即被处置。",
       "section2Files": "您上传文件的原始字节。提取过程在单次请求内以内存方式运行，一旦生成结构化档案，原始文件即被丢弃。",
       "section2Logs": "任何日志行中的身份证号码、身份验证令牌或文件内容。",
       "section3Title": "3. 为何收集这些资料",
@@ -759,12 +759,9 @@
     "manual": {
       "identityTitle": "身份",
       "nameLabel": "全名",
-      "dobLabel": "出生日期",
-      "dobHelp": "直接输入数字即可 —— 我们会自动补上连字符。或使用日历图标。",
-      "dobPlaceholder": "YYYY-MM-DD",
-      "dobAria": "打开日期选择器",
-      "icLabel": "身份证末 4 位",
-      "icHelp": "我们只收集末 4 位 —— 您的完整 MyKad 绝不会离开您的设备。",
+      "icLabel": "MyKad / 身份证号码",
+      "icHelp": "您的 12 位身份证号。我们从 YYMMDD 前缀推算年龄，之后仅保留末六位 —— 完整身份证号在流程完成后即被处置。",
+      "icPlaceholder": "例如 920324064321",
       "incomeTitle": "收入",
       "incomeLabel": "月收入（RM）",
       "incomeHelp": "零工为净收入，受薪员工为基本工资。",
@@ -786,11 +783,9 @@
       "clear": "清除",
       "submit": "生成申请包",
       "zodRequired": "必填",
-      "zodDateFormat": "请使用 YYYY-MM-DD",
-      "zodNotRealDate": "不是有效日期",
-      "zodYearMin": "年份必须是 1900 或之后",
-      "zodPastDate": "必须是过去的日期",
-      "zodIc4Digits": "4 位数字",
+      "zodIcDigits": "必须正好 12 位数字",
+      "zodIcNotRealDate": "前 6 位必须是有效的 YYMMDD 出生日期",
+      "zodIc6Digits": "6 位数字",
       "zodCostFormat": "金额最高 RM100,000（例如 240 或 240.50）",
       "zodKwhFormat": "最高 10,000 的整数"
     },
@@ -855,7 +850,7 @@
       },
       "age": "年龄",
       "agePlaceholder": "年龄",
-      "icOptional": "身份证末 4 位（选填）",
+      "icOptional": "身份证末 6 位（选填）",
       "add": "添加受扶养人",
       "removeAria": "移除受扶养人 {{index}}"
     },

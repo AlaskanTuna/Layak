@@ -32,7 +32,7 @@ def _eval_doc(*, user_id: str = _OWNER_UID, status: str = "complete") -> dict[st
         "profile": {
             "name": "AISYAH",
             "age": 34,
-            "ic_last4": "4321",
+            "ic_last6": "064321",
             "monthly_income_rm": 2800.0,
             "household_size": 4,
             "form_type": "form_b",

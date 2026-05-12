@@ -276,7 +276,7 @@ function ExtractMock() {
         <pre className="mt-2 overflow-hidden font-mono text-[10.5px] leading-[1.55] text-[color:color-mix(in_oklch,var(--paper)_90%,transparent)]">
           <span className="text-[#7fc7a3]">{'{'}</span>
           {'\n  '}<span className="text-[#e6b380]">name</span>: <span className="text-[#a8d4f5]">{'"Aisyah …"'}</span>,
-          {'\n  '}<span className="text-[#e6b380]">ic_last4</span>: <span className="text-[#f5c98c]">3417</span>,
+          {'\n  '}<span className="text-[#e6b380]">ic_last6</span>: <span className="text-[#f5c98c]">063417</span>,
           {'\n  '}<span className="text-[#e6b380]">dob</span>: <span className="text-[#a8d4f5]">{'"1992-04-14"'}</span>,
           {'\n  '}<span className="text-[#e6b380]">state</span>: <span className="text-[#a8d4f5]">{'"PHG"'}</span>,
           {'\n  '}<span className="text-[#e6b380]">income_my</span>: <span className="text-[#f5c98c]">2840</span>,

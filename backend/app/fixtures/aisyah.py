@@ -20,7 +20,7 @@ from app.schema.scheme import SchemeMatch
 
 AISYAH_PROFILE = Profile(
     name="Aisyah binti Ahmad",
-    ic_last4="4321",
+    ic_last6="064321",
     age=34,
     monthly_income_rm=2800.0,
     household_size=4,

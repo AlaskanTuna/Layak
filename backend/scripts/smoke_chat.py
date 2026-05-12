@@ -77,7 +77,7 @@ def aisyah_eval_doc() -> dict[str, Any]:
         "profile": {
             "name": "AISYAH BINTI AHMAD",
             "age": 34,
-            "ic_last4": "4321",
+            "ic_last6": "064321",
             "monthly_income_rm": 2800.0,
             "household_size": 4,
             "form_type": "form_b",

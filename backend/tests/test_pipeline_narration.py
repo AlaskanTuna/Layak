@@ -158,7 +158,7 @@ def test_extract_technical_redacts_name_and_address():
     assert AISYAH_PROFILE.name not in blob, "Profile.name must NEVER appear in technical layer"
     if AISYAH_PROFILE.address:
         assert AISYAH_PROFILE.address not in blob
-    assert "***-**-" in blob  # masked ic_last4 only
+    assert "******-" in blob  # masked ic_last6 only
 
 
 def test_extract_technical_carries_only_masked_ic():
@@ -169,8 +169,9 @@ def test_extract_technical_carries_only_masked_ic():
 
     twelve_digit = re.compile(r"\b\d{12}\b")
     assert not twelve_digit.search(blob)
-    # Last-4 (masked) is OK.
-    assert AISYAH_PROFILE.ic_last4 in blob
+    # Last-6 (masked as `PB-####`) is OK.
+    expected = f"{AISYAH_PROFILE.ic_last6[:2]}-{AISYAH_PROFILE.ic_last6[2:]}"
+    assert expected in blob
 
 
 # ---------------------------------------------------------------------------

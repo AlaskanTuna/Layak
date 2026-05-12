@@ -19,7 +19,7 @@ constraints:
        multilingual register matches the user's chosen language.
 
 The eval-context digest is rendered server-side from the loaded
-`evaluations/{eval_id}` Firestore doc. Privacy invariant: only `ic_last4`
+`evaluations/{eval_id}` Firestore doc. Privacy invariant: only `ic_last6`
 ever appears in the digest — the full IC is never stored on the doc but
 this guarantees no future schema drift can leak it through.
 """
@@ -345,18 +345,18 @@ def _digest_label(language: SupportedLanguage) -> dict[str, str]:
 
 def _render_profile(profile: dict[str, Any], labels: dict[str, str]) -> list[str]:
     """Render the profile half of the digest. Privacy invariant: full IC
-    NEVER appears — only `ic_last4` (already 4-digit on the stored doc).
+    NEVER appears — only `ic_last6` (already 6-digit on the stored doc).
     Even if a future schema regression smuggled `ic` onto the doc, this
-    function ignores any field other than `ic_last4`."""
+    function ignores any field other than `ic_last6`."""
     lines: list[str] = []
     name = profile.get("name") or "(unnamed)"
     age = profile.get("age")
-    ic_last4 = profile.get("ic_last4")
+    ic_last6 = profile.get("ic_last6")
     you_line = f"- {labels['you']}: {name}"
     if isinstance(age, int):
         you_line += f", age {age}"
-    if isinstance(ic_last4, str) and ic_last4.isdigit() and len(ic_last4) == 4:
-        you_line += f" ({labels['ic_suffix']} {ic_last4})"
+    if isinstance(ic_last6, str) and ic_last6.isdigit() and len(ic_last6) == 6:
+        you_line += f" ({labels['ic_suffix']} {ic_last6})"
     lines.append(you_line)
 
     household_size = profile.get("household_size")

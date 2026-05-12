@@ -208,7 +208,7 @@
         {
           "label": "Ekstrak",
           "title": "Baca tiga dokumen,\ntarik profil berstruktur.",
-          "body": "Gemini Vision membuka MyKad, slip gaji, dan bil utiliti anda dalam satu pas. Hanya empat digit terakhir IC dipaparkan; selebihnya disunting dalam memori dan tidak pernah dilog."
+          "body": "Gemini Vision membuka MyKad, slip gaji, dan bil utiliti anda dalam satu pas. Hanya enam digit terakhir IC dipaparkan; selebihnya disunting dalam memori dan tidak pernah dilog."
         },
         {
           "label": "Kelaskan",
@@ -264,7 +264,7 @@
         {
           "docCode": "FAQ-04",
           "question": "Sejauh manakah data peribadi saya selamat?",
-          "body": "Patuh PDPA secara reka bentuk. IC penuh tidak pernah disimpan — hanya empat digit terakhir. Bait fail asal diekstrak dalam memori dalam satu permintaan dan dibuang sebaik sahaja profil berstruktur dihasilkan. Tiada dokumen mentah dalam log."
+          "body": "Dokumen yang anda muat naik diproses dalam memori dalam satu permintaan dan dibuang sebaik sahaja profil berstruktur dihasilkan. Maklumat IC yang digunakan semasa saluran penilaian dilupuskan selepas proses selesai. Profil berstruktur disimpan dalam Firestore supaya chatbot dan pakej draf boleh dijana semula bila diperlukan. Tiada dokumen mentah dalam log."
         },
         {
           "docCode": "FAQ-05",
@@ -371,7 +371,7 @@
       "section1History": "<strong>Sejarah penilaian</strong>: profil berstruktur yang kami ekstrak daripada dokumen anda dan skim yang dipadankan, disimpan di Firestore supaya anda dapat melihat larian lepas.",
       "section1Consent": "<strong>Cap waktu persetujuan</strong> direkodkan apabila anda menanda kotak PDPA semasa mendaftar.",
       "section2Title": "2. Apa yang kami tidak simpan",
-      "section2MyKad": "Nombor MyKad penuh anda — kami hanya menyimpan empat digit terakhir.",
+      "section2MyKad": "Nombor MyKad penuh anda. Maklumat IC yang digunakan semasa saluran penilaian dilupuskan selepas proses selesai.",
       "section2Files": "Bait asal fail yang anda muat naik. Pengekstrakan dijalankan dalam memori dalam satu permintaan, dan fail mentah dibuang sebaik sahaja profil berstruktur dihasilkan.",
       "section2Logs": "Nombor IC, token pengesahan, atau kandungan dokumen dalam mana-mana baris log.",
       "section3Title": "3. Kenapa kami mengumpulnya",
@@ -580,7 +580,7 @@
       "steps": {
         "extract": {
           "title": "Ekstrak",
-          "body": "Kami membaca MyKad, slip gaji dan bil utiliti anda — pendapatan, 4 digit IC akhir, saiz isi rumah."
+          "body": "Kami membaca MyKad, slip gaji dan bil utiliti anda — pendapatan, 6 digit IC akhir, saiz isi rumah."
         },
         "match": {
           "title": "Padan",
@@ -770,12 +770,9 @@
     "manual": {
       "identityTitle": "Identiti",
       "nameLabel": "Nama penuh",
-      "dobLabel": "Tarikh lahir",
-      "dobHelp": "Taip nombor sahaja — kami akan isi sempang. Atau gunakan ikon kalendar.",
-      "dobPlaceholder": "YYYY-MM-DD",
-      "dobAria": "Buka pemilih tarikh",
-      "icLabel": "4 digit akhir IC",
-      "icHelp": "Kami hanya mengumpul 4 digit akhir — MyKad penuh anda tidak pernah meninggalkan peranti anda.",
+      "icLabel": "Nombor MyKad / IC",
+      "icHelp": "12 digit IC anda. Kami menentukan umur daripada awalan YYMMDD dan menyimpan hanya enam digit terakhir selepas itu — IC penuh dilupuskan setelah saluran selesai.",
+      "icPlaceholder": "cth. 920324064321",
       "incomeTitle": "Pendapatan",
       "incomeLabel": "Pendapatan bulanan (RM)",
       "incomeHelp": "Bayaran bersih untuk kerja gig, gaji pokok untuk pekerja bergaji.",
@@ -797,11 +794,9 @@
       "clear": "Kosongkan",
       "submit": "Jana pakej",
       "zodRequired": "Wajib diisi",
-      "zodDateFormat": "Gunakan YYYY-MM-DD",
-      "zodNotRealDate": "Bukan tarikh yang sah",
-      "zodYearMin": "Tahun mesti 1900 atau lebih lewat",
-      "zodPastDate": "Mesti tarikh lepas",
-      "zodIc4Digits": "4 digit",
+      "zodIcDigits": "Mesti 12 digit",
+      "zodIcNotRealDate": "Enam digit pertama mesti tarikh lahir YYMMDD yang sah",
+      "zodIc6Digits": "6 digit",
       "zodCostFormat": "Jumlah sehingga RM100,000 (cth. 240 atau 240.50)",
       "zodKwhFormat": "Nombor bulat sehingga 10,000"
     },
@@ -866,7 +861,7 @@
       },
       "age": "Umur",
       "agePlaceholder": "Umur",
-      "icOptional": "4 digit akhir IC (pilihan)",
+      "icOptional": "6 digit akhir IC (pilihan)",
       "add": "Tambah tanggungan",
       "removeAria": "Alih keluar tanggungan {{index}}"
     },

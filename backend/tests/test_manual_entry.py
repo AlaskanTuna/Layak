@@ -33,8 +33,10 @@ from app.schema.profile import Dependant
 
 AISYAH_PAYLOAD_JSON = {
     "name": "Aisyah binti Ahmad",
-    "date_of_birth": "1992-03-24",
-    "ic_last4": "4321",
+    # Layout: YYMMDD=920324 (1992-03-24) | PP=06 (Pahang) | NNNN=4321.
+    # The builder derives `Profile.age` from YYMMDD and slices the last
+    # six (`064321`) into `Profile.ic_last6`.
+    "ic": "920324064321",
     "monthly_income_rm": 2800,
     "employment_type": "gig",
     "address": "No. 42, Jalan IM 7/10, Bandar Indera Mahkota, 25200 Kuantan, Pahang",
@@ -47,7 +49,7 @@ AISYAH_PAYLOAD_JSON = {
 
 
 # A reference date that makes Aisyah 34 (matches the fixture).
-# DOB 1992-03-24 + this reference → 34 years old.
+# IC YYMMDD = 920324 → DOB 1992-03-24; with this reference → 34 years old.
 _FIXED_TODAY = date(2026, 4, 21)
 
 
@@ -126,6 +128,41 @@ def test_aisyah_payload_builds_profile_equal_to_fixture() -> None:
     assert built == AISYAH_PROFILE
 
 
+def test_ic_parsed_into_age_and_last_six() -> None:
+    """Sanity check on the IC-derivation contract: full IC in, age + last-6 out."""
+    from app.agents.tools.build_profile import _parse_ic
+
+    dob, last6 = _parse_ic("920324064321", today=_FIXED_TODAY)
+    assert (dob.year, dob.month, dob.day) == (1992, 3, 24)
+    assert last6 == "064321"
+
+
+def test_two_digit_year_disambiguation_picks_19xx_for_older_bearers() -> None:
+    """A 92-prefixed IC against 2026 disambiguates to 1992, not 2092."""
+    from app.agents.tools.build_profile import _parse_ic
+
+    dob, _ = _parse_ic("920324064321", today=date(2026, 4, 21))
+    assert dob.year == 1992
+
+
+def test_two_digit_year_disambiguation_picks_20xx_for_younger_bearers() -> None:
+    """A 10-prefixed IC against 2026 disambiguates to 2010 (a 16-year-old), not 1910."""
+    from app.agents.tools.build_profile import _parse_ic
+
+    dob, _ = _parse_ic("100515081234", today=date(2026, 4, 21))
+    assert dob.year == 2010
+
+
+def test_full_ic_never_leaks_into_built_profile() -> None:
+    """Privacy invariant: the Profile carries `ic_last6` only — the full IC stays in
+    request-scope memory inside the builder."""
+    payload = ManualEntryPayload.model_validate(AISYAH_PAYLOAD_JSON)
+    built = build_profile_from_manual_entry(payload, today=_FIXED_TODAY)
+    blob = built.model_dump_json()
+    assert payload.ic not in blob  # full 12-digit IC must not appear
+    assert built.ic_last6 == "064321"
+
+
 def test_built_profile_drives_same_scheme_matches_as_fixture() -> None:
     """Feeding the built Profile into the rule engine produces the same matches."""
     payload = ManualEntryPayload.model_validate(AISYAH_PAYLOAD_JSON)
@@ -179,9 +216,24 @@ def test_validation_rejects_empty_name() -> None:
         ManualEntryPayload.model_validate({**AISYAH_PAYLOAD_JSON, "name": ""})
 
 
-def test_validation_rejects_non_4_digit_ic_last4() -> None:
+def test_validation_rejects_non_12_digit_ic() -> None:
     with pytest.raises(ValueError):
-        ManualEntryPayload.model_validate({**AISYAH_PAYLOAD_JSON, "ic_last4": "432"})
+        ManualEntryPayload.model_validate({**AISYAH_PAYLOAD_JSON, "ic": "0643"})
+
+
+def test_validation_rejects_dashed_ic() -> None:
+    """Pydantic's regex is strict 12 digits — frontend strips dashes before submit."""
+    with pytest.raises(ValueError):
+        ManualEntryPayload.model_validate({**AISYAH_PAYLOAD_JSON, "ic": "920324-06-4321"})
+
+
+def test_validation_rejects_impossible_ic_dob() -> None:
+    """`000231` is a syntactically valid 12-digit IC but Feb 31 is not a real date."""
+    from app.agents.tools.build_profile import _parse_ic
+
+    payload = ManualEntryPayload.model_validate({**AISYAH_PAYLOAD_JSON, "ic": "000231064321"})
+    with pytest.raises(ValueError, match="not a valid date"):
+        _parse_ic(payload.ic)
 
 
 def test_validation_rejects_negative_income() -> None:
@@ -359,7 +411,7 @@ def test_intake_manual_accepts_aisyah_and_streams_sse(
     technical_text = " ".join(extract_technical["log_lines"])
     assert "Aisyah" not in technical_text
     assert "Jalan IM" not in technical_text
-    assert "***-**-4321" in technical_text  # masked ic_last4 present
+    assert "******-06-4321" in technical_text  # masked ic_last6 present
     # Lay narration carries the rounded gross-pay as the data point.
     extract_narrative = parsed[2]
     assert extract_narrative["type"] == "narrative"

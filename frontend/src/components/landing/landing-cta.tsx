@@ -35,7 +35,7 @@ const FAQS_FALLBACK: FaqItem[] = [
   {
     docCode: 'FAQ-04',
     question: 'How safe is my personal data?',
-    body: 'PDPA-compliant by design. The full IC is never persisted — only the last four digits are stored. Original file bytes are extracted in-memory inside a single request and discarded once the structured profile is produced. No raw documents in logs.'
+    body: 'Your uploaded documents are processed in memory inside a single request and discarded once the structured profile is produced. IC information used during the evaluation pipeline is disposed of after the process completes. We persist the structured profile in Firestore so the chatbot and draft packets can be regenerated on demand. No raw documents in logs.'
   },
   {
     docCode: 'FAQ-05',

@@ -212,7 +212,7 @@ graph TD
     L5 --> Panel[Floating chat panel<br/>on results page]
 ```
 
-The stack is explicit end to end: Layer 1, Layer 2, Layer 3, Layer 4, and Layer 5 keep Cik Lay grounded while `use-chat.ts` keeps the conversation state local by holding the rolling history in the browser and persisting nothing server-side. The eval-context digest carries only `ic_last4` for privacy.
+The stack is explicit end to end: Layer 1, Layer 2, Layer 3, Layer 4, and Layer 5 keep Cik Lay grounded while `use-chat.ts` keeps the conversation state local by holding the rolling history in the browser and persisting nothing server-side. The eval-context digest carries only `ic_last6` for privacy.
 
 </details>
 
@@ -310,7 +310,7 @@ flowchart TD
     Firestore2 --> Replay
 ```
 
-The technical layer is PII-clean by contract: full IC numbers, names, and addresses never reach the transcript. Only the last four digits of the IC, masked as `***-**-XXXX`, ever surface. The lay narration localises to the user's language; the technical transcript stays English because its audience is developer-grade.
+The technical layer is PII-clean by contract: full IC numbers, names, and addresses never reach the transcript. Only the last six digits of the IC, masked as `******-PB-####`, ever surface. The lay narration localises to the user's language; the technical transcript stays English because its audience is developer-grade.
 
 </details>
 

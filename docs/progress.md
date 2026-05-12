@@ -4,6 +4,50 @@
 
 ---
 
+## [12/05/26] - Phase 11 Task 13.5: Intake-shape pivot — full IC replaces DOB + `ic_last6`
+
+Mid-session course correction on top of Task 13. The IC-tail-only intake from Task 13 had two latent problems: (1) asking the user for both DOB and IC-last-6 was redundant (the IC's first 6 digits ARE the DOB), and (2) the new "we dispose IC info after the pipeline" privacy copy wasn't accurate because `ic_last6` was still persisted on the eval doc. Switching the manual form to collect the full 12-digit IC fixes both: the server derives `age` from YYMMDD and slices `ic_last6` from the trailing 6 inside `build_profile_from_manual_entry`, then discards the 12-digit string. The Firestore profile still stores `ic_last6` + `age` (unchanged from Task 13) — but the user's actual full IC genuinely lives in request-scope memory only, which is what the copy claims.
+
+**Wire shape (the only API change).** `ManualEntryPayload` lost `date_of_birth: date` and `ic_last6: str`; gained `ic: str` validated as `^\d{12}$`. Pydantic rejects dashed input — the frontend strips dashes on every keystroke via a new `formatIcMask` helper (max-length 14 typed to allow paste of `920324-06-4321`, stored as `920324064321`).
+
+**Server-side derivation.** New `_parse_ic(ic, today=None) -> (date, str)` in `build_profile.py`. Two-digit-year disambiguation heuristic: `20YY` wins if it produces a non-future birthday for someone aged ≤ 120; otherwise `19YY`. So a 92-prefixed IC against today (May 2026) maps to 1992, but a 10-prefixed IC maps to 2010 (16-year-old). Impossible dates (e.g. Feb 31 from `000231...`) raise `ValueError` with a "not a valid date" message. Six new pytest cases cover the derivation contract end-to-end including the privacy invariant that the full 12-digit string never appears in `Profile.model_dump_json()`.
+
+**Frontend form simplification.** Identity section dropped from `name + DOB + ic_last6` (3 fields, 2-column grid for DOB+IC, a `DatePicker` calendar widget, a `formatDateMask` helper, and a 30-line Zod `superRefine` block validating real-date / future-date / minimum-year) to `name + ic` (2 fields, single full-width IC input). Net delete in the form file: ~60 LOC. Unused imports `CalendarIcon` and `DatePicker` removed. Sample personas: Aisyah `ic: '920324064321'`, Farhan `ic: '880322065837'`.
+
+**i18n cleanup.** Dropped 8 now-unused keys per locale (`dobLabel/Help/Placeholder/Aria`, `zodDateFormat/NotRealDate/YearMin/PastDate`) — that's 24 keys gone. Added `icPlaceholder`, `zodIcDigits`, `zodIcNotRealDate`. Reworded `icLabel` to "MyKad / IC Number" and `icHelp` to explicitly call out the YYMMDD→age derivation + the full-IC disposal. `zodIc6Digits` kept (still used by the dependant-row Zod, which keeps the optional 6-digit tail).
+
+**Privacy posture.** What the wire now carries: full 12-digit IC. What request-scope holds during the pipeline: full IC + derived DOB. What lands on `evaluations/{evalId}.profile`: `name`, `age`, `ic_last6`, income, household, address — never the full IC, never the YYMMDD prefix, never the derived `date_of_birth`. The "IC information disposed after the process completes" copy now matches reality for the field users care most about (their full IC). The `ic_last6` tail is still persisted (needed for chat handoff personalization + packet regeneration on deep-link); if we want a stricter posture later we can add a post-pipeline Firestore scrub, but Task 13 Open Follow-Up A is no longer load-bearing for honesty since the user's actual _full_ IC is now genuinely transient.
+
+**Future-phase architecture.** Task 13's Open Follow-Up B (MyKasih / BUDI95 needing full IC at scheme-check time) is resolved by re-prompting at the boundary rather than persisting. The intake widget built for Task 13.5 is reusable as-is for that future flow.
+
+**Verification.** Backend `pytest` → **517 passed**, 0 failed (was 511; +6 net IC-parsing tests). Frontend `npx tsc --noEmit` → zero errors in touched files (pre-existing unrelated errors in `results-chat-panel.tsx`, `app-toaster.tsx`, `toast.tsx` from missing npm packages — not our scope).
+
+---
+
+## [12/05/26] - Phase 11 Task 13: IC tail expansion (`ic_last4` → `ic_last6`)
+
+Future federal subsidy integrations (MyKasih, BUDI95) need enough IC tail to reconstruct the full IC at the boundary when combined with the user-supplied DOB. Malaysian IC layout is `YYMMDD-PB-####` — the first 6 are the birthday (recovered from `date_of_birth`), the last 6 are place-of-birth code (`PB`, 2 digits) + serial (`####`, 4 digits). Previous schema kept only the last 4 (serial alone) — enough for in-Layak draft packet identification but insufficient for live agency lookups.
+
+**Rename + regex tightening.** `Profile.ic_last4` + `Dependant.ic_last4` + `ManualEntryPayload.ic_last4` + `DependantInput.ic_last4` all renamed to `ic_last6`; Pydantic pattern moved from `^\d{4}$` to `^\d{6}$`. Privacy invariant docstring in `profile.py` updated to call out the PB+serial decomposition. The field rename was preferred over leaving the name `ic_last4` carrying 6 digits because the latter is a permanent footgun for future readers.
+
+**Mask format change.** `_mask_ic_last4 → _mask_ic_last6` in `narration.py`. Mask went from `***-**-####` (which didn't match real Malaysian IC structure) to `******-PB-####` (which does — only the YYMMDD birthday prefix is starred). The technical-tier event log now resembles a real masked MyKad for operator pattern-matching. The frontend two-tier reasoning surface inherits this automatically. Pytest assertion in `test_pipeline_narration.py` and `test_manual_entry.py` updated accordingly.
+
+**Templates.** All 7 Jinja templates (`_base`, `bk01`, `jkm18`, `jkm_bkk`, `lhdn`, `lhdn_be`, `i_saraan`, `perkeso_sksps`) render `••••••-{ic_last6[:2]}-{ic_last6[2:]}` and updated label copy (en: "Filer IC (last 6)" / ms: "Kad Pengenalan (6 akhir)" / zh: "申报人 IC（末 6 位）"). `jkm_bkk` dependant table also updated.
+
+**Fixture values.** Aisyah's tail went `"4321"` → `"064321"` (preserves the original `4321` serial with a `06` Pahang-coded PB prefix); Farhan's `"5837"` → `"065837"`. The `06` PB code keeps the synthetic profile consistent across backend `aisyah.py`, frontend `aisyah-response.ts`, manual-entry form defaults, and the `smoke_chat.py` script. Test-only fixture rows (`"0001"`, `"0010"`, `"9999"` etc.) gained `08` prefixes to land valid 6-digit shapes.
+
+**Frontend form mechanics.** `manual-entry-form.tsx` Zod refinements (`/^\d{6}$/`), `maxLength={6}`, field id `mef-ic6`, i18n key `zodIc4Digits → zodIc6Digits`. `dependants-fieldset.tsx` same `maxLength` bump. `upload-widget.tsx` submit mapping. `landing-pipeline.tsx` (the inline JSON sample shown in the marketing pipeline visualisation) updated to `ic_last6: 063417`.
+
+**i18n + privacy copy reframing.** Beyond the rote `4 → 6` swap, the FAQ-04 and `section2MyKad` strings were reworked per mid-task user feedback: the old framing claimed "we only store last X digits — your IC is safe", which is disingenuous once the stored tail is large enough that, combined with the in-flight DOB, reconstructs the full IC. New copy uses neutral, forward-compatible wording — "IC information used during the evaluation pipeline is disposed of after the process completes" — without making field-level claims that would break the moment MyKasih/BUDI95 integration ships. **Important caveat:** the current code persists `ic_last6` on the eval doc, so the new copy is not literally accurate yet (see Open Follow-Up A on plan.md Task 13).
+
+**Test suite.** 16 backend test files updated; all rename + fixture changes batch-applied with `replace_all` where safe and targeted edits elsewhere. `test_validation_rejects_non_4_digit_ic_last4 → _non_6_digit_ic_last6`; the explicit length-rejection test's invalid input went `"432"` (3 digits, rejecting under old 4-digit rule) → `"0643"` (4 digits, rejecting under new 6-digit rule). `test_error_humanization.py` synthetic Pydantic error string also bumped to `ic_last6=900324064321 not 6 digits` for symmetry. Final `git grep ic_last4` across the tree returns zero matches.
+
+**Docs.** `docs/trd.md` §4.6, §5.6 layer-3 invariant, §6 PII contract, §10 PDPA posture all reference `ic_last6` + the `******-PB-####` mask. `docs/prd.md` FR-3, FR-21, NFR-3 updated. `README.md` two references (eval-context digest invariant + two-tier reasoning PII clause) updated. Historical plan.md/progress.md entries describing earlier Phase 1/3/9 work intentionally left as-is — those tasks really did ship `ic_last4` at the time, and falsifying that history would obscure the actual migration this Task 13 records.
+
+**Open follow-ups (carried in plan.md Task 13).** (A) the privacy copy claim now exceeds what the code does — needs either a Firestore post-pipeline scrub of `profile.ic_last6` or a copy walk-back. (B) future-phase storage design decision for MyKasih/BUDI95 (re-prompt for DOB at scheme-check vs persist DOB alongside the tail). (C) `Dependant` uses `extra="ignore"` so legacy `ic_last4` keys on dependants silently get dropped to `null` rather than rejected — fine for an empty production DB, worth knowing if any seed docs exist.
+
+---
+
 ## [12/05/26] - Phase 11: production-grade SaaS enhancements (4 features + docs sweep)
 
 Phase 11 ships four production-grade features ahead of the 2026-05-16 Open Category finals. All four landed across five commits in a single session; backend test suite grew from 297 → 511 (+214 tests, all green). Subagent audits ran post-implementation on each feature in parallel — only two minor fixes flagged (keyboard a11y on the technical `<pre>`, demo fixture missing narrative events) and both addressed before commit.

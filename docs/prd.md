@@ -146,13 +146,13 @@ Each requirement below ties to one of the in-scope v1 and v2 deliverables. Accep
 
 ### FR-3 — Multimodal extraction into strict JSON profile
 
-**Description.** Gemini 2.5 Flash reads the three uploaded documents and produces a Pydantic-validated profile containing name, IC last-4, age, monthly income, dependants, and household composition flags.
+**Description.** Gemini 2.5 Flash reads the three uploaded documents and produces a Pydantic-validated profile containing name, IC last-6 (place-of-birth code + serial), age, monthly income, dependants, and household composition flags.
 
 **Acceptance criteria:**
 
 - [ ] Extraction completes in under 10 seconds for the Aisyah seed documents.
 - [ ] Output conforms to the `Profile` Pydantic schema (no extra fields, all required fields populated).
-- [ ] IC is stored as last-4-only; full IC is never logged or echoed.
+- [ ] IC is stored as last-6-only; full IC is never logged or echoed.
 - [ ] Extraction failure returns a structured error surface; the UI offers to retry or fall back to seed data.
 - [ ] Prompt and schema are versioned in source control.
 
@@ -357,9 +357,9 @@ Each requirement below ties to one of the in-scope v1 and v2 deliverables. Accep
 **Acceptance criteria:**
 
 - [ ] The intake page exposes a segmented toggle with "Upload documents" (default) and "Enter manually" options, visible on both the v1 landing and the v2 `/dashboard/evaluation/new` route.
-- [ ] The manual form has four sections — Identity (full name, date of birth, IC last-4), Income (monthly RM, employment type), Address (optional), Household (dynamic dependants list: relationship + age + optional IC last-4).
+- [ ] The manual form has four sections — Identity (full name, **full 12-digit IC**), Income (monthly RM, employment type), Address (optional), Household (dynamic dependants list: relationship + age + optional IC last-6).
 - [ ] Household size is derived server-side as `1 + len(dependants)` and never asked for directly.
-- [ ] No full IC number is transmitted on the wire — only `ic_last4` and `date_of_birth` are accepted as identity inputs.
+- [ ] The full 12-digit IC is accepted on the wire; the backend parses the YYMMDD prefix into `age` (server-side, MYT) and slices the trailing six digits into `Profile.ic_last6`. The full IC stays in request-scope memory only — never persisted to Firestore, never logged.
 - [ ] `employment_type` is a two-value input (`"gig"` or `"salaried"`) and maps server-side to `Profile.form_type` — `gig → form_b`, `salaried → form_be`.
 - [ ] `build_profile_from_manual_entry` applied to the Aisyah payload produces a `Profile` equal to `AISYAH_PROFILE` field-for-field, including `household_flags.income_band`. Feeding that built Profile through the rule engine produces `AISYAH_SCHEME_MATCHES` — the same ranked schemes and total RM upside the upload path produces.
 - [ ] Validation errors return HTTP 422 with field-level messages the form can bind to.
@@ -441,7 +441,7 @@ Each requirement below ties to one of the in-scope v1 and v2 deliverables. Accep
 
 - Raw uploaded documents are processed in-memory and are not intentionally persisted by the application after extraction completes.
 - Authenticated v2 flows persist user + evaluation records in Firestore (profile, classification, matches, upside trace, language, status) so history, results rehydration, quota enforcement, and PDPA export/delete can work.
-- IC numbers are surfaced and persisted as last-4-digits only; full IC numbers are never accepted in manual entry and must never be logged or written to Firestore.
+- IC numbers are surfaced and persisted as last-6-digits only (place-of-birth code + serial); full IC numbers are never accepted in manual entry and must never be logged or written to Firestore as a single field.
 - `.env` is git-ignored; `.env.example` is the only committed environment template.
 
 ### NFR-4 — Accessibility & responsiveness

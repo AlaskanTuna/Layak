@@ -1201,3 +1201,8 @@ Findings the audit flagged that were **not** acted on (cosmetic or external to P
 - Updated `/dashboard/discovery` header copy so the eyebrow reads "Discovery" and the description is a shorter one-liner.
 - Wired "Run discovery now" success and failure outcomes into the existing notification store with matching toast feedback and bell-popover entries.
 - Verified: targeted ESLint on `discovery-trigger.tsx` clean; `pnpm -C frontend build` clean.
+
+## [13/05/26] - Dashboard topcard action alignment
+
+- Updated the shared `PageHeading` topcard layout so dashboard action buttons align to the top-right of the card instead of vertically centering beside the title block.
+- Verified: targeted ESLint on `page-heading.tsx` clean; `pnpm -C frontend build` clean.

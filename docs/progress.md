@@ -1206,3 +1206,8 @@ Findings the audit flagged that were **not** acted on (cosmetic or external to P
 
 - Updated the shared `PageHeading` topcard layout so dashboard action buttons align to the top-right of the card instead of vertically centering beside the title block.
 - Verified: targeted ESLint on `page-heading.tsx` clean; `pnpm -C frontend build` clean.
+
+## [13/05/26] - Discovery topcard illustration
+
+- Added the new discovery dashboard illustration asset to `/dashboard/discovery` via the shared `PageHeading` illustration slot.
+- Verified: targeted ESLint on `discovery-page.tsx` clean; `pnpm -C frontend build` clean.

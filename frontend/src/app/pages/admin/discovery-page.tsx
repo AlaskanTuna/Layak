@@ -54,6 +54,7 @@ function DiscoveryPageInner() {
         eyebrow={t('admin.discovery.pageEyebrow')}
         title={t('admin.discovery.pageTitle')}
         description={t('admin.discovery.pageDescription')}
+        illustration="/dashboard/discovery.webp"
         action={<DiscoveryTrigger onCompleted={reload} />}
       />
 

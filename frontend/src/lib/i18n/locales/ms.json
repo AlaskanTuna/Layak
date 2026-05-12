@@ -581,6 +581,16 @@
         "generate": "Jana draf"
       }
     },
+    "narrative": {
+      "showTechnical": "Lihat butiran teknikal",
+      "hideTechnical": "Sembunyi butiran teknikal",
+      "showDetails": "Lihat butiran",
+      "collapse": "Tutup",
+      "summaryRunning": "Saluran Layak sedang berjalan…",
+      "summaryDone": "Saluran Layak telah selesai dalam {{count}} langkah.",
+      "summaryError": "Saluran Layak terhenti awal — lihat ralat di bawah.",
+      "technicalLogLabel": "Log pelaksanaan teknikal"
+    },
     "upload": {
       "sectionIc": "MyKad (IC)",
       "hintIc": "Bahagian hadapan kad pengenalan Malaysia anda, memaparkan butiran anda dengan jelas.",

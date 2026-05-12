@@ -11,7 +11,7 @@ import { ErrorRecoveryCard } from '@/components/evaluation/error-recovery-card'
 import { EvaluationResultsToc, type TocSectionId } from '@/components/evaluation/evaluation-results-toc'
 import { EvaluationSummaryCard } from '@/components/evaluation/evaluation-summary-card'
 import { EvaluationUpsideHero } from '@/components/evaluation/evaluation-upside-hero'
-import { PipelineStepper } from '@/components/evaluation/pipeline-stepper'
+import { PipelineNarrative } from '@/components/evaluation/pipeline-narrative'
 import { RequiredContributionsCard } from '@/components/evaluation/required-contributions-card'
 import { ResultsChatPanel } from '@/components/evaluation/results-chat-panel'
 import { SchemeCardGrid } from '@/components/evaluation/scheme-card-grid'
@@ -80,7 +80,12 @@ function docToPipelineState(doc: EvaluationDoc): PipelineState {
     evalId: null,
     quotaExceeded: null,
     error: doc.error?.message ?? null,
-    errorCategory: doc.error?.category ?? null
+    errorCategory: doc.error?.category ?? null,
+    // Phase 11 Feature 4 — replay the lay/dev tier events on persisted load.
+    // Legacy docs without these fields fall back to empty arrays; the
+    // narrative component degrades to the old stepper-style UI in that case.
+    narrativeEvents: doc.narrativeLog ?? [],
+    technicalEvents: doc.technicalLog ?? []
   }
 }
 
@@ -302,7 +307,10 @@ export function EvaluationResultsByIdClient({ evalId }: { evalId: string }) {
 
   return (
     <div className="flex flex-col gap-6">
-      {(isRunning || isError) && <PipelineStepper state={pipelineState} />}
+      {(isRunning || isError) && <PipelineNarrative state={pipelineState} />}
+      {!isRunning && !isError && pipelineState.narrativeEvents.length > 0 && (
+        <PipelineNarrative state={pipelineState} retrospective />
+      )}
 
       {isError && (
         // Category-tailored recovery on persisted errors. The original

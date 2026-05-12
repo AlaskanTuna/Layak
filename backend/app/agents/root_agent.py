@@ -24,6 +24,18 @@ from google.adk.agents import LlmAgent, SequentialAgent
 from google.adk.tools import FunctionTool
 
 from app.agents.gemini import humanize_error
+from app.agents.narration import (
+    narrate_classify_lay,
+    narrate_classify_technical,
+    narrate_compute_upside_lay,
+    narrate_compute_upside_technical,
+    narrate_extract_lay,
+    narrate_extract_technical,
+    narrate_generate_lay,
+    narrate_generate_technical,
+    narrate_match_lay,
+    narrate_match_technical,
+)
 from app.agents.tools.build_profile import derive_household_flags
 from app.agents.tools.classify import classify_household
 from app.agents.tools.compute_upside import compute_upside
@@ -37,6 +49,8 @@ from app.schema.events import (
     ExtractResult,
     GenerateResult,
     MatchResult,
+    PipelineNarrativeEvent,
+    PipelineTechnicalEvent,
     Step,
     StepResultEvent,
     StepStartedEvent,
@@ -110,7 +124,14 @@ async def stream_agent_events(
     prebuilt_profile: Profile | None = None,
     dependants_override: list[DependantInput] | None = None,
     language: SupportedLanguage = DEFAULT_LANGUAGE,
-) -> AsyncIterator[StepStartedEvent | StepResultEvent | DoneEvent | ErrorEvent]:
+) -> AsyncIterator[
+    StepStartedEvent
+    | StepResultEvent
+    | PipelineNarrativeEvent
+    | PipelineTechnicalEvent
+    | DoneEvent
+    | ErrorEvent
+]:
     """Stream the five-step pipeline as ordered SSE events.
 
     Two entry modes:
@@ -141,10 +162,13 @@ async def stream_agent_events(
         current_step = "extract"
         yield StepStartedEvent(step=current_step)
         await asyncio.sleep(_INTER_STEP_DELAY_S)
+        _t0 = asyncio.get_event_loop().time()
+        mime_types: dict[str, str] = {}
         if prebuilt_profile is not None:
             profile = prebuilt_profile
         else:
             assert uploads is not None  # narrowed by the XOR check above
+            mime_types = {slot: uploads[slot][0].split(".")[-1] for slot in ("ic", "payslip", "utility")}
             profile = await extract_profile(
                 uploads["ic"][1],
                 uploads["payslip"][1],
@@ -166,31 +190,54 @@ async def stream_agent_events(
                         ),
                     }
                 )
+        _extract_latency_ms = int((asyncio.get_event_loop().time() - _t0) * 1000)
         yield StepResultEvent(step=current_step, data=ExtractResult(profile=profile))
+        yield narrate_extract_lay(profile, language=language)
+        yield narrate_extract_technical(
+            profile,
+            mime_types=mime_types or None,
+            latency_ms=_extract_latency_ms,
+        )
 
         current_step = "classify"
         yield StepStartedEvent(step=current_step)
         await asyncio.sleep(_INTER_STEP_DELAY_S)
+        _t0 = asyncio.get_event_loop().time()
         classification = await classify_household(profile, language=language)
+        _classify_latency_ms = int((asyncio.get_event_loop().time() - _t0) * 1000)
         yield StepResultEvent(step=current_step, data=ClassifyResult(classification=classification))
+        yield narrate_classify_lay(classification, language=language)
+        yield narrate_classify_technical(classification, latency_ms=_classify_latency_ms)
 
         current_step = "match"
         yield StepStartedEvent(step=current_step)
         await asyncio.sleep(_INTER_STEP_DELAY_S)
+        _t0 = asyncio.get_event_loop().time()
         matches = await match_schemes(profile, language=language)
+        _match_latency_ms = int((asyncio.get_event_loop().time() - _t0) * 1000)
         yield StepResultEvent(step=current_step, data=MatchResult(matches=matches))
+        yield narrate_match_lay(matches, language=language)
+        yield narrate_match_technical(matches, latency_ms=_match_latency_ms)
 
         current_step = "compute_upside"
         yield StepStartedEvent(step=current_step)
         await asyncio.sleep(_INTER_STEP_DELAY_S)
+        _t0 = asyncio.get_event_loop().time()
         trace = await compute_upside(matches, language=language)
+        _upside_latency_ms = int((asyncio.get_event_loop().time() - _t0) * 1000)
         yield StepResultEvent(step=current_step, data=trace)
+        yield narrate_compute_upside_lay(trace, language=language)
+        yield narrate_compute_upside_technical(trace, latency_ms=_upside_latency_ms)
 
         current_step = "generate"
         yield StepStartedEvent(step=current_step)
         await asyncio.sleep(_INTER_STEP_DELAY_S)
+        _t0 = asyncio.get_event_loop().time()
         packet = await generate_packet(profile, matches, language=language)
+        _generate_latency_ms = int((asyncio.get_event_loop().time() - _t0) * 1000)
         yield StepResultEvent(step=current_step, data=GenerateResult(packet=packet))
+        yield narrate_generate_lay(packet, language=language)
+        yield narrate_generate_technical(packet, latency_ms=_generate_latency_ms)
 
         yield DoneEvent(packet=packet)
     except Exception as exc:  # noqa: BLE001 — surface every failure to the UI.

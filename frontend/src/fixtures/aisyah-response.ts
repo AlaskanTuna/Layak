@@ -388,14 +388,72 @@ export const AISYAH_PACKET: Packet = {
  */
 export type MockEvent = { event: AgentEvent; delayMs: number }
 
+// Phase 11 Feature 4 — synthetic timestamps in ascending order so the
+// technical layer's `[hh:mm:ss]` prefix reads naturally on demo playback.
+const MOCK_TS = {
+  extract: '2026-05-12T12:00:01Z',
+  classify: '2026-05-12T12:00:02Z',
+  match: '2026-05-12T12:00:04Z',
+  compute_upside: '2026-05-12T12:00:06Z',
+  generate: '2026-05-12T12:00:09Z'
+} as const
+
 export const AISYAH_MOCK_EVENTS: MockEvent[] = [
   { event: { type: 'step_started', step: 'extract' }, delayMs: 100 },
   { event: { type: 'step_result', step: 'extract', data: { profile: AISYAH_PROFILE } }, delayMs: 900 },
+  {
+    event: { type: 'narrative', step: 'extract', headline: 'Read your documents', data_point: 'RM 2,800' },
+    delayMs: 40
+  },
+  {
+    event: {
+      type: 'technical',
+      step: 'extract',
+      timestamp: MOCK_TS.extract,
+      log_lines: [
+        'tool=extract_profile',
+        '  uploads=ic:jpg payslip:pdf utility:pdf',
+        '  ic=***-**-4321',
+        '  monthly_income_rm=2800.0',
+        '  household_size=4',
+        '  dependants=3',
+        '  form_type=form_b',
+        '  latency_ms=820'
+      ]
+    },
+    delayMs: 20
+  },
 
   { event: { type: 'step_started', step: 'classify' }, delayMs: 150 },
   {
     event: { type: 'step_result', step: 'classify', data: { classification: AISYAH_CLASSIFICATION } },
     delayMs: 450
+  },
+  {
+    event: {
+      type: 'narrative',
+      step: 'classify',
+      headline: 'Worked out your household band',
+      data_point: 'b40_household_with_children'
+    },
+    delayMs: 40
+  },
+  {
+    event: {
+      type: 'technical',
+      step: 'classify',
+      timestamp: MOCK_TS.classify,
+      log_lines: [
+        'tool=classify_household',
+        '  income_band=b40_household_with_children',
+        '  per_capita_monthly_rm=700.0',
+        '  has_children_under_18=True',
+        '  has_elderly_dependant=True',
+        '  notes_count=4',
+        '  latency_ms=320'
+      ]
+    },
+    delayMs: 20
   },
 
   { event: { type: 'step_started', step: 'match' }, delayMs: 150 },
@@ -403,17 +461,97 @@ export const AISYAH_MOCK_EVENTS: MockEvent[] = [
     event: { type: 'step_result', step: 'match', data: { matches: AISYAH_SCHEME_MATCHES } },
     delayMs: 700
   },
+  {
+    event: {
+      type: 'narrative',
+      step: 'match',
+      headline: 'Matched against the federal scheme library',
+      data_point: '5 qualifying'
+    },
+    delayMs: 40
+  },
+  {
+    event: {
+      type: 'technical',
+      step: 'match',
+      timestamp: MOCK_TS.match,
+      log_lines: [
+        'tool=match_schemes',
+        '  rules_evaluated=6  qualifying=5',
+        '  ✓ str_2026 rm=2500 cite=risalah-str-2026.pdf:p.2',
+        '  ✓ jkm_warga_emas rm=6000 cite=jkm18.pdf:p.4',
+        '  ✓ jkm_bkk rm=3000 cite=jkm18.pdf:p.6',
+        '  ✓ lhdn_form_b rm=4500 cite=pr-no-4-2024.pdf:p.12',
+        '  ✓ i_saraan rm=500 cite=i-saraan.pdf:p.3',
+        '  · perkeso_sksps',
+        '  latency_ms=540'
+      ]
+    },
+    delayMs: 20
+  },
 
   { event: { type: 'step_started', step: 'compute_upside' }, delayMs: 150 },
   {
     event: { type: 'step_result', step: 'compute_upside', data: AISYAH_UPSIDE },
     delayMs: 700
   },
+  {
+    event: {
+      type: 'narrative',
+      step: 'compute_upside',
+      headline: 'Calculated your annual upside',
+      data_point: 'RM 16,500'
+    },
+    delayMs: 40
+  },
+  {
+    event: {
+      type: 'technical',
+      step: 'compute_upside',
+      timestamp: MOCK_TS.compute_upside,
+      log_lines: [
+        'tool=compute_upside (Gemini code_execution)',
+        '  total_annual_rm=16500.00',
+        '  python_snippet_chars=420  stdout_chars=180',
+        '  per_scheme=[str_2026=2500, jkm_warga_emas=6000, jkm_bkk=3000, lhdn_form_b=4500, i_saraan=500]',
+        '  stdout[0]=STR 2026: RM 2500',
+        '  latency_ms=2100'
+      ]
+    },
+    delayMs: 20
+  },
 
   { event: { type: 'step_started', step: 'generate' }, delayMs: 150 },
   {
     event: { type: 'step_result', step: 'generate', data: { packet: AISYAH_PACKET } },
     delayMs: 550
+  },
+  {
+    event: {
+      type: 'narrative',
+      step: 'generate',
+      headline: 'Drafted application packets',
+      data_point: '5 ready'
+    },
+    delayMs: 40
+  },
+  {
+    event: {
+      type: 'technical',
+      step: 'generate',
+      timestamp: MOCK_TS.generate,
+      log_lines: [
+        'tool=generate_packet (WeasyPrint + Jinja)',
+        '  drafts=5',
+        '  · str_2026 218.0KB',
+        '  · jkm_warga_emas 195.0KB',
+        '  · jkm_bkk 203.0KB',
+        '  · lhdn_form_b 251.0KB',
+        '  · i_saraan 187.0KB',
+        '  latency_ms=1500'
+      ]
+    },
+    delayMs: 20
   },
 
   { event: { type: 'done', packet: AISYAH_PACKET }, delayMs: 100 }

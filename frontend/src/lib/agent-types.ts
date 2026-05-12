@@ -145,6 +145,28 @@ export type StepResultEvent =
   | { type: 'step_result'; step: 'match'; data: MatchResult }
   | { type: 'step_result'; step: 'compute_upside'; data: ComputeUpsideResult }
   | { type: 'step_result'; step: 'generate'; data: GenerateResult }
+
+// Phase 11 Feature 4 — two-tier reasoning surface. The backend emits one
+// of each per pipeline step, right after the matching step_result.
+// Existing SSE consumers can ignore both safely (default branch in the
+// reducer is a no-op pass-through).
+export type PipelineNarrativeEvent = {
+  type: 'narrative'
+  step: Step
+  /** ≤ 80 chars; pre-localised by the backend in the user's language. */
+  headline: string
+  /** ≤ 40 chars; the single most useful number/label from this step. */
+  data_point: string | null
+}
+export type PipelineTechnicalEvent = {
+  type: 'technical'
+  step: Step
+  /** ISO-8601 UTC. */
+  timestamp: string
+  /** 1–20 monospaced lines. Always English (developer audience). */
+  log_lines: string[]
+}
+
 export type DoneEvent = { type: 'done'; packet: Packet; eval_id?: string | null }
 
 // SSE ErrorEvent.category mirrors backend
@@ -166,7 +188,13 @@ export type ErrorEvent = {
   eval_id?: string | null
 }
 
-export type AgentEvent = StepStartedEvent | StepResultEvent | DoneEvent | ErrorEvent
+export type AgentEvent =
+  | StepStartedEvent
+  | StepResultEvent
+  | PipelineNarrativeEvent
+  | PipelineTechnicalEvent
+  | DoneEvent
+  | ErrorEvent
 
 export const PIPELINE_STEPS: Step[] = ['extract', 'classify', 'match', 'compute_upside', 'generate']
 
@@ -216,6 +244,11 @@ export type EvaluationDoc = {
   upsideTrace: ComputeUpsideTrace | null
   stepStates: EvaluationStepStates
   error: EvaluationErrorDoc | null
+  /** Phase 11 Feature 4 — accumulated lay/dev tier event payloads.
+   * Optional so legacy evaluations created before the schema bump still
+   * deserialise; the frontend treats `undefined` as empty arrays. */
+  narrativeLog?: PipelineNarrativeEvent[]
+  technicalLog?: PipelineTechnicalEvent[]
 }
 
 export type EvaluationListItem = {

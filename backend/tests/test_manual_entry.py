@@ -323,17 +323,13 @@ def test_intake_manual_accepts_aisyah_and_streams_sse(
         assert resp.headers["content-type"].startswith("text/event-stream")
         events = [line for line in resp.iter_lines() if line.startswith("data:")]
 
-    # Full healthy stream: 5 × (step_started + step_result) + 1 done = 11 events.
-    assert len(events) == 11
+    # Full healthy stream (Phase 11 Feature 4): per step we now emit
+    # step_started → step_result → narrative → technical, then a final done.
+    # 5 steps × 4 + 1 done = 21 events.
+    assert len(events) == 21
     parsed = [json.loads(e[5:].strip()) for e in events]
-    assert [p.get("type") for p in parsed] == [
-        "step_started", "step_result",
-        "step_started", "step_result",
-        "step_started", "step_result",
-        "step_started", "step_result",
-        "step_started", "step_result",
-        "done",
-    ]
+    expected_per_step = ["step_started", "step_result", "narrative", "technical"]
+    assert [p.get("type") for p in parsed] == expected_per_step * 5 + ["done"]
     extract_result = parsed[1]
     assert extract_result["step"] == "extract"
     assert extract_result["data"]["profile"]["name"] == "Aisyah binti Ahmad"
@@ -347,3 +343,17 @@ def test_intake_manual_accepts_aisyah_and_streams_sse(
     # `build_profile_from_manual_entry` produced deterministically.
     assert extract_result["data"]["profile"]["form_type"] == "form_b"
     assert extract_result["data"]["profile"]["household_size"] == 4
+    # PII-sanitisation contract: the technical layer must NEVER carry the
+    # extracted profile's free-text name or address. Verifies the narration
+    # helper module's redaction rules (Phase 11 Feature 4).
+    extract_technical = parsed[3]
+    assert extract_technical["type"] == "technical"
+    assert extract_technical["step"] == "extract"
+    technical_text = " ".join(extract_technical["log_lines"])
+    assert "Aisyah" not in technical_text
+    assert "Jalan IM" not in technical_text
+    assert "***-**-4321" in technical_text  # masked ic_last4 present
+    # Lay narration carries the rounded gross-pay as the data point.
+    extract_narrative = parsed[2]
+    assert extract_narrative["type"] == "narrative"
+    assert extract_narrative["data_point"] == "RM 2,800"

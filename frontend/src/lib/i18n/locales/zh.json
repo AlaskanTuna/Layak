@@ -570,6 +570,16 @@
         "generate": "生成草稿"
       }
     },
+    "narrative": {
+      "showTechnical": "显示技术细节",
+      "hideTechnical": "隐藏技术细节",
+      "showDetails": "展开详情",
+      "collapse": "收起",
+      "summaryRunning": "Layak 的流程正在运行…",
+      "summaryDone": "Layak 的流程已完成共 {{count}} 个步骤。",
+      "summaryError": "Layak 的流程提前中止 —— 请查看下方错误。",
+      "technicalLogLabel": "技术执行日志"
+    },
     "upload": {
       "sectionIc": "MyKad（身份证）",
       "hintIc": "马来西亚身份证正面，清晰显示您的资料。",

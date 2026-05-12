@@ -14,6 +14,8 @@ import type {
   HouseholdClassification,
   ManualEntryPayload,
   Packet,
+  PipelineNarrativeEvent,
+  PipelineTechnicalEvent,
   Profile,
   RateLimitErrorBody,
   SchemeMatch,
@@ -44,6 +46,9 @@ export type PipelineState = {
    * not errored OR the error didn't match a known category. Drives the
    * category-tailored CTAs in `<ErrorRecoveryCard>`. */
   errorCategory: ErrorCategory | null
+  /** Phase 11 Feature 4 — accumulated lay/dev tier events in stream order. */
+  narrativeEvents: PipelineNarrativeEvent[]
+  technicalEvents: PipelineTechnicalEvent[]
 }
 
 export type StartOptions =
@@ -70,7 +75,9 @@ const INITIAL_STATE: PipelineState = {
   evalId: null,
   quotaExceeded: null,
   error: null,
-  errorCategory: null
+  errorCategory: null,
+  narrativeEvents: [],
+  technicalEvents: []
 }
 
 function shouldForceMock(): boolean {
@@ -105,6 +112,10 @@ export function applyEvent(prev: PipelineState, event: AgentEvent): PipelineStat
       if (event.step === 'generate') next.packet = event.data.packet
       return next
     }
+    case 'narrative':
+      return { ...prev, narrativeEvents: [...prev.narrativeEvents, event] }
+    case 'technical':
+      return { ...prev, technicalEvents: [...prev.technicalEvents, event] }
     case 'done':
       return {
         ...prev,

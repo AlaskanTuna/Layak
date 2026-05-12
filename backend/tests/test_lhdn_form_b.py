@@ -103,7 +103,6 @@ def test_no_parent_dependant_drops_parent_medical() -> None:
     """Profile without a parent dependant does not get the parent-medical relief."""
     p = Profile(
         name="No parent",
-        ic_last6="080010",
         age=30,
         monthly_income_rm=3000,
         household_size=1,
@@ -159,7 +158,6 @@ def test_form_be_filer_now_qualifies_with_form_be_scheme_id() -> None:
     """
     p = Profile(
         name="Form BE filer",
-        ic_last6="080003",
         age=30,
         monthly_income_rm=3000,
         household_size=1,

@@ -6,10 +6,10 @@
  * shape as the Aisyah loader so UploadWidget can dispatch on a persona id
  * without branching on the loader signature.
  *
- * Farhan is the Form BE (salaried teacher) demo persona — DOB 22/03/1988,
- * NRIC last 6 `065837`, spouse + two school-age children. Dependants are not
- * extractable from the MyKad / payslip / TNB documents, so they ship as
- * an explicit override the backend overlays on the OCR-extracted Profile.
+ * Farhan is the Form BE (salaried teacher) demo persona — age 38, spouse +
+ * two school-age children. Dependants are not extractable from the MyKad /
+ * payslip / TNB documents, so they ship as an explicit override the backend
+ * overlays on the OCR-extracted Profile.
  */
 
 import type { DependantInput } from '@/lib/agent-types'
@@ -27,9 +27,9 @@ const FIXTURE_FILES = {
 // school-age children. Ages kept in the 7-11 range so LHDN Form BE child
 // relief (#16a, under-18) fires twice.
 export const FARHAN_DEPENDANT_OVERRIDES: DependantInput[] = [
-  { relationship: 'spouse', age: 36, ic_last6: null },
-  { relationship: 'child', age: 10, ic_last6: null },
-  { relationship: 'child', age: 7, ic_last6: null }
+  { relationship: 'spouse', age: 36 },
+  { relationship: 'child', age: 10 },
+  { relationship: 'child', age: 7 }
 ]
 
 async function fetchAsFile(filename: string): Promise<File> {

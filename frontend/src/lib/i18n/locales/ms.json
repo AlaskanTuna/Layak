@@ -770,9 +770,9 @@
     "manual": {
       "identityTitle": "Identiti",
       "nameLabel": "Nama penuh",
-      "icLabel": "Nombor MyKad / IC",
-      "icHelp": "12 digit IC anda. Kami menentukan umur daripada awalan YYMMDD dan menyimpan hanya enam digit terakhir selepas itu — IC penuh dilupuskan setelah saluran selesai.",
-      "icPlaceholder": "cth. 920324064321",
+      "ageLabel": "Umur",
+      "ageHelp": "Umur anda dalam tahun penuh. Kami menggunakannya untuk menapis skim sensitif umur (cth. JKM Warga Emas 60+, BUDI95 16+, MyKasih SARA 18+).",
+      "agePlaceholder": "cth. 34",
       "incomeTitle": "Pendapatan",
       "incomeLabel": "Pendapatan bulanan (RM)",
       "incomeHelp": "Bayaran bersih untuk kerja gig, gaji pokok untuk pekerja bergaji.",
@@ -794,9 +794,7 @@
       "clear": "Kosongkan",
       "submit": "Jana pakej",
       "zodRequired": "Wajib diisi",
-      "zodIcDigits": "Mesti 12 digit",
-      "zodIcNotRealDate": "Enam digit pertama mesti tarikh lahir YYMMDD yang sah",
-      "zodIc6Digits": "6 digit",
+      "zodAgeRange": "Umur mesti antara 0 dan 130",
       "zodCostFormat": "Jumlah sehingga RM100,000 (cth. 240 atau 240.50)",
       "zodKwhFormat": "Nombor bulat sehingga 10,000"
     },
@@ -861,7 +859,6 @@
       },
       "age": "Umur",
       "agePlaceholder": "Umur",
-      "icOptional": "6 digit akhir IC (pilihan)",
       "add": "Tambah tanggungan",
       "removeAria": "Alih keluar tanggungan {{index}}"
     },

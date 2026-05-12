@@ -770,9 +770,9 @@
     "manual": {
       "identityTitle": "Identity",
       "nameLabel": "Full Name",
-      "icLabel": "MyKad / IC Number",
-      "icHelp": "Your 12-digit IC. We derive your age from the YYMMDD prefix and keep only the last six digits afterwards — the full IC is disposed of once the pipeline completes.",
-      "icPlaceholder": "e.g. 920324064321",
+      "ageLabel": "Age",
+      "ageHelp": "Your age in whole years. We use this to gate age-sensitive schemes (e.g. JKM Warga Emas at 60+, BUDI95 at 16+, MyKasih SARA at 18+).",
+      "agePlaceholder": "e.g. 34",
       "incomeTitle": "Income",
       "incomeLabel": "Monthly Income (RM)",
       "incomeHelp": "Net payout for gig work, basic pay for salaried.",
@@ -794,9 +794,7 @@
       "clear": "Clear",
       "submit": "Generate Packet",
       "zodRequired": "Required",
-      "zodIcDigits": "Must be exactly 12 digits",
-      "zodIcNotRealDate": "First 6 digits must be a real YYMMDD birthday",
-      "zodIc6Digits": "6 digits",
+      "zodAgeRange": "Age must be between 0 and 130",
       "zodCostFormat": "Amount up to RM100,000 (e.g. 240 or 240.50)",
       "zodKwhFormat": "Whole number up to 10,000"
     },
@@ -861,7 +859,6 @@
       },
       "age": "Age",
       "agePlaceholder": "Age",
-      "icOptional": "IC Last 6 (Optional)",
       "add": "Add Dependant",
       "removeAria": "Remove dependant {{index}}"
     },

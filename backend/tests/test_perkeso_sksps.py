@@ -69,7 +69,6 @@ def test_plan_schedule_matches_akta_789_jadual() -> None:
 def _profile(*, income: float, age: int = 35, form_type: str = "form_b") -> Profile:
     return Profile(
         name="Test",
-        ic_last6="089999",
         age=age,
         monthly_income_rm=income,
         household_size=1,
@@ -228,7 +227,7 @@ def test_generate_packet_template_map_has_sksps_entry() -> None:
     template, filename = _TEMPLATE_MAP["perkeso_sksps"]
     assert template == "perkeso_sksps.html.jinja"
     assert "sksps" in filename.lower()
-    assert "{ic_last6}" in filename
+    assert "{date}" in filename
 
 
 @pytest.mark.asyncio

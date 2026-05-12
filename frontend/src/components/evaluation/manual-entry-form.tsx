@@ -25,16 +25,9 @@ const SECTION_CLASS =
 
 const RELATIONSHIPS = ['child', 'parent', 'spouse', 'sibling', 'other'] as const satisfies readonly Relationship[]
 
-/** Strip every non-digit char and cap at 12 so users can paste a dashed
- * IC (`920324-06-4321`) and we still feed the backend a clean 12-digit
- * string. Pydantic's `^\d{12}$` rejects dashes outright. */
-function formatIcMask(raw: string): string {
-  return raw.replace(/\D/g, '').slice(0, 12)
-}
-
 type FormValues = {
   name: string
-  ic: string
+  age: number
   monthly_income_rm: number
   employment_type: 'gig' | 'salaried'
   address: string
@@ -45,43 +38,41 @@ type FormValues = {
 
 /**
  * Aisyah defaults for one-click pre-fill (parity with upload-path samples).
- * IC `920324064321` — YYMMDD 920324 → DOB 1992-03-24 (age 34 against any
- * 2026 reference after 24 Mar), PB 06 (Pahang), serial 4321.
+ * 34-year-old Grab driver in Kuantan.
  */
 const AISYAH_DEFAULTS: FormValues = {
   name: 'Aisyah binti Ahmad',
-  ic: '920324064321',
+  age: 34,
   monthly_income_rm: 2800,
   employment_type: 'gig',
   address: 'No. 42, Jalan IM 7/10, Bandar Indera Mahkota, 25200 Kuantan, Pahang',
   monthly_cost_rm: '95.40',
   monthly_kwh: '220',
   dependants: [
-    { relationship: 'child', age: 10, ic_last6: '' },
-    { relationship: 'child', age: 7, ic_last6: '' },
-    { relationship: 'parent', age: 70, ic_last6: '' }
+    { relationship: 'child', age: 10 },
+    { relationship: 'child', age: 7 },
+    { relationship: 'parent', age: 70 }
   ]
 }
 
 /**
  * Farhan defaults for one-click pre-fill — salaried-teacher counterpart to
  * Aisyah. Mirrors `frontend/src/lib/farhan-fixtures.ts` dependants so the
- * manual and upload paths produce equivalent profiles. IC `880322065837`
- * → DOB 1988-03-22 (age 38 against any 2026 reference after 22 Mar), PB
- * 06, serial 5837. Gross monthly income is RM 4,180.50 (basic + allowances).
+ * manual and upload paths produce equivalent profiles. 38-year-old salaried
+ * teacher in Subang Jaya. Gross monthly income RM 4,180.50 (basic + allowances).
  */
 const FARHAN_DEFAULTS: FormValues = {
   name: 'Cikgu Farhan bin Mohd Yusof',
-  ic: '880322065837',
+  age: 38,
   monthly_income_rm: 4180.5,
   employment_type: 'salaried',
   address: 'No. 24, Jalan Putera 3/2, Taman Putera Subang, 47600 Subang Jaya, Selangor',
   monthly_cost_rm: '152.40',
   monthly_kwh: '380',
   dependants: [
-    { relationship: 'spouse', age: 36, ic_last6: '' },
-    { relationship: 'child', age: 10, ic_last6: '' },
-    { relationship: 'child', age: 7, ic_last6: '' }
+    { relationship: 'spouse', age: 36 },
+    { relationship: 'child', age: 10 },
+    { relationship: 'child', age: 7 }
   ]
 }
 
@@ -96,7 +87,7 @@ export type ManualEntryFormHandle = {
 
 const EMPTY_DEFAULTS: FormValues = {
   name: '',
-  ic: '',
+  age: 0,
   monthly_income_rm: 0,
   employment_type: 'gig',
   address: '',
@@ -127,26 +118,16 @@ export function ManualEntryForm({ onSubmit, onUseSamples, onClear, disabled = fa
   const manualEntrySchema = useMemo(() => {
     const dependantSchema = z.object({
       relationship: z.enum(RELATIONSHIPS),
-      age: z.number().int().min(0).max(120),
-      ic_last6: z
-        .string()
-        .refine((v) => v === '' || /^\d{6}$/.test(v), { message: t('evaluation.manual.zodIc6Digits') })
+      age: z.number().int().min(0).max(120)
     })
 
     return z.object({
       name: z.string().trim().min(1, t('evaluation.manual.zodRequired')).max(200),
-      ic: z
-        .string()
-        .regex(/^\d{12}$/, t('evaluation.manual.zodIcDigits'))
-        .superRefine((v, ctx) => {
-          // Sanity-check the YYMMDD prefix here so the user sees the error
-          // inline rather than waiting for a 422 from the backend.
-          const mm = Number(v.slice(2, 4))
-          const dd = Number(v.slice(4, 6))
-          if (mm < 1 || mm > 12 || dd < 1 || dd > 31) {
-            ctx.addIssue({ code: z.ZodIssueCode.custom, message: t('evaluation.manual.zodIcNotRealDate') })
-          }
-        }),
+      age: z
+        .number({ message: t('evaluation.manual.zodRequired') })
+        .int()
+        .min(0, t('evaluation.manual.zodAgeRange'))
+        .max(130, t('evaluation.manual.zodAgeRange')),
       monthly_income_rm: z.number().min(0).max(1_000_000),
       employment_type: z.enum(['gig', 'salaried']),
       address: z.string().max(300),
@@ -173,7 +154,7 @@ export function ManualEntryForm({ onSubmit, onUseSamples, onClear, disabled = fa
   const submit: SubmitHandler<FormValues> = (values) => {
     const payload: ManualEntryPayload = {
       name: values.name.trim(),
-      ic: values.ic,
+      age: values.age,
       monthly_income_rm: values.monthly_income_rm,
       employment_type: values.employment_type,
       address: values.address.trim().length > 0 ? values.address.trim() : null,
@@ -181,8 +162,7 @@ export function ManualEntryForm({ onSubmit, onUseSamples, onClear, disabled = fa
       monthly_kwh: values.monthly_kwh === '' ? null : Number(values.monthly_kwh),
       dependants: values.dependants.map((d) => ({
         relationship: d.relationship,
-        age: d.age,
-        ic_last6: d.ic_last6 === '' ? null : d.ic_last6
+        age: d.age
       }))
     }
     onSubmit(payload)
@@ -218,30 +198,21 @@ export function ManualEntryForm({ onSubmit, onUseSamples, onClear, disabled = fa
             <Input id="mef-name" autoComplete="name" disabled={disabled} {...register('name')} />
           </Field>
           <Field
-            label={t('evaluation.manual.icLabel')}
-            help={t('evaluation.manual.icHelp')}
-            error={formState.errors.ic?.message}
-            htmlFor="mef-ic"
+            label={t('evaluation.manual.ageLabel')}
+            help={t('evaluation.manual.ageHelp')}
+            error={formState.errors.age?.message}
+            htmlFor="mef-age"
           >
-            <Controller
-              control={control}
-              name="ic"
-              render={({ field }) => (
-                <Input
-                  id="mef-ic"
-                  inputMode="numeric"
-                  // Allow 14 chars typed (12 digits + 2 dashes) so a pasted
-                  // `YYMMDD-PP-####` survives the keystroke before the mask
-                  // strips it back to 12 raw digits.
-                  maxLength={14}
-                  autoComplete="off"
-                  placeholder={t('evaluation.manual.icPlaceholder')}
-                  disabled={disabled}
-                  value={field.value}
-                  onChange={(e) => field.onChange(formatIcMask(e.target.value))}
-                  onBlur={field.onBlur}
-                />
-              )}
+            <Input
+              id="mef-age"
+              type="number"
+              inputMode="numeric"
+              min={0}
+              max={130}
+              autoComplete="off"
+              placeholder={t('evaluation.manual.agePlaceholder')}
+              disabled={disabled}
+              {...register('age', { valueAsNumber: true })}
             />
           </Field>
         </div>

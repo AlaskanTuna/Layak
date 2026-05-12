@@ -30,7 +30,6 @@ from app.services.what_if import (
 def _stub_profile() -> Profile:
     return Profile(
         name="Test Citizen",
-        ic_last6="089999",
         age=35,
         monthly_income_rm=3000.0,
         household_size=3,

@@ -30,7 +30,6 @@ def _aisyah_eval_doc() -> dict[str, Any]:
         "profile": {
             "name": "AISYAH BINTI AHMAD",
             "age": 34,
-            "ic_last6": "064321",
             "monthly_income_rm": 2800.0,
             "household_size": 4,
             "form_type": "form_b",
@@ -82,27 +81,23 @@ _FULL_IC_RE = re.compile(r"\b\d{6}[\s-]?\d{2}[\s-]?\d{4}\b|\b\d{12}\b")
 
 @pytest.mark.parametrize("language", ["en", "ms", "zh"])
 def test_digest_never_emits_full_ic(language: str) -> None:
-    """Even if a future schema regression smuggles `ic` onto the doc, the
-    digest renderer must filter it out — only `ic_last6` is allowed."""
+    """Phase 12: the stored profile no longer carries any IC field, and the
+    digest renderer reads only whitelisted keys. Even if a future schema
+    regression smuggles `ic` / `ic_last6` / `ic_full` onto the doc, none of
+    them survive into the digest."""
     doc = _aisyah_eval_doc()
-    # Hostile injection — pretend a future doc shape leaks the full IC.
+    # Hostile injection — pretend a future doc shape leaks IC information
+    # in three different shapes. None of them should reach the digest.
     doc["profile"]["ic"] = "900324-06-4321"
     doc["profile"]["ic_full"] = "900324064321"
+    doc["profile"]["ic_last6"] = "064321"
     digest = render_eval_digest(doc, language=language)  # type: ignore[arg-type]
     assert _FULL_IC_RE.search(digest) is None, (
         f"Full IC leaked into {language} digest: {digest[:200]}"
     )
-    # ic_last6 should still be present.
-    assert "064321" in digest
-
-
-@pytest.mark.parametrize("language", ["en", "ms", "zh"])
-def test_digest_handles_missing_ic_last6(language: str) -> None:
-    """Missing `ic_last6` shouldn't crash — line just omits the IC suffix."""
-    doc = _aisyah_eval_doc()
-    doc["profile"].pop("ic_last6", None)
-    digest = render_eval_digest(doc, language=language)  # type: ignore[arg-type]
-    assert digest  # still renders
+    # The 6-digit tail must NOT appear either — Phase 12 dropped all IC
+    # surfacing from the digest renderer.
+    assert "064321" not in digest
 
 
 # ---------------------------------------------------------------------------

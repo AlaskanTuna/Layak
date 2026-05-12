@@ -759,9 +759,9 @@
     "manual": {
       "identityTitle": "身份",
       "nameLabel": "全名",
-      "icLabel": "MyKad / 身份证号码",
-      "icHelp": "您的 12 位身份证号。我们从 YYMMDD 前缀推算年龄，之后仅保留末六位 —— 完整身份证号在流程完成后即被处置。",
-      "icPlaceholder": "例如 920324064321",
+      "ageLabel": "年龄",
+      "ageHelp": "您的年龄（以整年为单位）。我们用它来评估年龄相关的计划（例如 JKM Warga Emas 60+、BUDI95 16+、MyKasih SARA 18+）。",
+      "agePlaceholder": "例如 34",
       "incomeTitle": "收入",
       "incomeLabel": "月收入（RM）",
       "incomeHelp": "零工为净收入，受薪员工为基本工资。",
@@ -783,9 +783,7 @@
       "clear": "清除",
       "submit": "生成申请包",
       "zodRequired": "必填",
-      "zodIcDigits": "必须正好 12 位数字",
-      "zodIcNotRealDate": "前 6 位必须是有效的 YYMMDD 出生日期",
-      "zodIc6Digits": "6 位数字",
+      "zodAgeRange": "年龄必须在 0 到 130 之间",
       "zodCostFormat": "金额最高 RM100,000（例如 240 或 240.50）",
       "zodKwhFormat": "最高 10,000 的整数"
     },
@@ -850,7 +848,6 @@
       },
       "age": "年龄",
       "agePlaceholder": "年龄",
-      "icOptional": "身份证末 6 位（选填）",
       "add": "添加受扶养人",
       "removeAria": "移除受扶养人 {{index}}"
     },

@@ -31,11 +31,11 @@ from app.schema.profile import HouseholdFlags, Profile
 def _payload(**overrides: object) -> ManualEntryPayload:
     """Build a valid `ManualEntryPayload` with salaried defaults; overrides patch fields.
 
-    IC layout: 900514 (DOB 1990-05-14) + 08 (Selangor) + 1234 (serial).
+    Phase 12: manual-entry collects `age` directly, no IC field.
     """
     base: dict[str, object] = {
         "name": "Cikgu Farhan bin Ismail",
-        "ic": "900514081234",
+        "age": 35,
         "monthly_income_rm": 5200.0,
         "employment_type": "salaried",
         "address": "12 Jalan Kenanga, 43650 Bandar Baru Bangi, Selangor",
@@ -53,7 +53,6 @@ def _salaried_profile(monthly_income_rm: float = 5200.0) -> Profile:
     """
     return Profile(
         name="Cikgu Farhan bin Ismail",
-        ic_last6="081234",
         age=35,
         monthly_income_rm=monthly_income_rm,
         household_size=1,
@@ -103,7 +102,6 @@ def test_form_b_gig_filer_still_emits_lhdn_form_b_scheme_id() -> None:
     """Regression: gig (Form B) filer continues to emit the original scheme_id."""
     profile = Profile(
         name="Aisyah",
-        ic_last6="064321",
         age=34,
         monthly_income_rm=2800.0,
         household_size=1,
@@ -136,7 +134,6 @@ def test_form_b_citations_still_use_form_b_deadline() -> None:
     """Regression: Form B citations retain the 30 June 2026 deadline (not BE)."""
     profile = Profile(
         name="Aisyah",
-        ic_last6="064321",
         age=34,
         monthly_income_rm=2800.0,
         household_size=1,
@@ -177,7 +174,6 @@ def test_form_be_reliefs_equal_form_b_reliefs_for_same_profile_shape() -> None:
     """
     form_b_profile = Profile(
         name="Gig filer",
-        ic_last6="080001",
         age=35,
         monthly_income_rm=2800.0,
         household_size=1,

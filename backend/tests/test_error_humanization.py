@@ -70,7 +70,7 @@ def test_humanize_returns_friendly_copy_for_known_category() -> None:
 
 
 def test_humanize_falls_through_to_sanitize_on_unknown_error() -> None:
-    raw = "Pydantic ValidationError: ic_last6=900324064321 not 6 digits"
+    raw = "Pydantic ValidationError: monthly_income_rm=1234567890 outside [0, 1000000]"
     out = humanize_error_message(raw)
     # No category match — we get the digit-redacted, truncated raw.
     assert out == sanitize_error_message(raw)

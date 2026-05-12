@@ -10,7 +10,6 @@ def _stub_eval_doc() -> dict:
     return {
         "profile": {
             "name": "Aisyah binti Ahmad",
-            "ic_last6": "064321",
             "age": 34,
             "monthly_income_rm": 2800.0,
             "household_size": 4,

@@ -158,20 +158,24 @@ def test_extract_technical_redacts_name_and_address():
     assert AISYAH_PROFILE.name not in blob, "Profile.name must NEVER appear in technical layer"
     if AISYAH_PROFILE.address:
         assert AISYAH_PROFILE.address not in blob
-    assert "******-" in blob  # masked ic_last6 only
 
 
-def test_extract_technical_carries_only_masked_ic():
-    ev = narrate_extract_technical(AISYAH_PROFILE)
-    blob = " ".join(ev.log_lines)
-    # Specifically: NEVER include a 12-digit run.
+def test_extract_technical_carries_no_ic():
+    """Phase 12 PII contract: the technical-tier log carries NO IC information
+    of any kind — full, last-6, mask, anything. `Profile` no longer has an
+    `ic_last6` field, so there's nothing to surface."""
     import re
 
-    twelve_digit = re.compile(r"\b\d{12}\b")
-    assert not twelve_digit.search(blob)
-    # Last-6 (masked as `PB-####`) is OK.
-    expected = f"{AISYAH_PROFILE.ic_last6[:2]}-{AISYAH_PROFILE.ic_last6[2:]}"
-    assert expected in blob
+    ev = narrate_extract_technical(AISYAH_PROFILE)
+    blob = " ".join(ev.log_lines)
+    # No 12-digit run anywhere.
+    assert not re.search(r"\b\d{12}\b", blob)
+    # No 6-digit run anywhere either (rules out the pre-Phase-12 masked tail).
+    assert not re.search(r"\b\d{6}\b", blob)
+    # The mask-character sequence should also be absent — no `******-`
+    # placeholder line, no `***-**-` placeholder. The whole IC line is gone.
+    assert "******-" not in blob
+    assert "***-**-" not in blob
 
 
 # ---------------------------------------------------------------------------

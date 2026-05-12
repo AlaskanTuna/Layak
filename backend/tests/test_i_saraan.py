@@ -63,7 +63,6 @@ def _profile(*, age: int, form_type: FormType, income: float = 2800.0) -> Profil
     """Build a minimal test Profile. Other fields don't influence i-Saraan."""
     return Profile(
         name="Test Filer",
-        ic_last6="089999",
         age=age,
         monthly_income_rm=income,
         household_size=1,
@@ -153,7 +152,7 @@ def test_generate_packet_template_map_has_i_saraan_entry() -> None:
     template, filename = _TEMPLATE_MAP["i_saraan"]
     assert template == "i_saraan.html.jinja"
     assert "saraan" in filename.lower()
-    assert "{ic_last6}" in filename
+    assert "{date}" in filename
 
 
 @pytest.mark.asyncio

@@ -21,9 +21,9 @@ const FIXTURE_FILES = {
 } as const
 
 export const AISYAH_DEPENDANT_OVERRIDES: DependantInput[] = [
-  { relationship: 'child', age: 10, ic_last6: null },
-  { relationship: 'child', age: 7, ic_last6: null },
-  { relationship: 'parent', age: 70, ic_last6: null }
+  { relationship: 'child', age: 10 },
+  { relationship: 'child', age: 7 },
+  { relationship: 'parent', age: 70 }
 ]
 
 async function fetchAsFile(filename: string): Promise<File> {

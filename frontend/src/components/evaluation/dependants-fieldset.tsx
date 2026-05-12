@@ -9,13 +9,12 @@ import { Label } from '@/components/ui/label'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import type { Relationship } from '@/lib/agent-types'
 
-/** Row shape used by the controlled fieldset — `ic_last6` is a raw string so the
- * user's typed-but-incomplete "12" renders without flickering to null. The
- * parent converts empty strings to `null` (or to 6-digit strings) at submit time. */
+/** Row shape used by the controlled fieldset. Phase 12: dependant IC field
+ * dropped — none of the rules read it for eligibility, and the manual-entry
+ * path now collects no IC information of any kind. */
 export type DependantInputRow = {
   relationship: Relationship
   age: number
-  ic_last6: string
 }
 
 const RELATIONSHIPS: readonly Relationship[] = ['child', 'parent', 'spouse', 'sibling', 'other']
@@ -33,7 +32,7 @@ export function newEmptyDependant(): DependantInputRow {
   // `age: NaN` renders the input as empty; 0 is a valid age for a newborn
   // dependant so we can't use it as a "not-typed-yet" sentinel without
   // confusing the user into thinking the field was pre-filled.
-  return { relationship: 'child', age: Number.NaN, ic_last6: '' }
+  return { relationship: 'child', age: Number.NaN }
 }
 
 const MAX_AGE = 120
@@ -76,7 +75,7 @@ export function DependantsFieldset({ value, onChange, disabled = false, max = 15
         {value.map((row, index) => (
           <li
             key={index}
-            className="grid gap-2 rounded-md border border-border px-3 py-3 sm:grid-cols-[1fr_1fr_1fr_auto]"
+            className="grid gap-2 rounded-md border border-border px-3 py-3 sm:grid-cols-[1fr_1fr_auto]"
           >
             <div className="flex flex-col gap-1.5">
               <Label htmlFor={`dep-rel-${index}`}>{t('evaluation.dependants.relationship')}</Label>
@@ -109,17 +108,6 @@ export function DependantsFieldset({ value, onChange, disabled = false, max = 15
                 placeholder={t('evaluation.dependants.agePlaceholder')}
                 value={Number.isFinite(row.age) ? row.age : ''}
                 onChange={(e) => update(index, { age: clampAge(e.target.value) })}
-              />
-            </div>
-            <div className="flex flex-col gap-1.5">
-              <Label htmlFor={`dep-ic-${index}`}>{t('evaluation.dependants.icOptional')}</Label>
-              <Input
-                id={`dep-ic-${index}`}
-                inputMode="numeric"
-                maxLength={6}
-                disabled={disabled}
-                value={row.ic_last6}
-                onChange={(e) => update(index, { ic_last6: e.target.value })}
               />
             </div>
             <div className="flex items-end">

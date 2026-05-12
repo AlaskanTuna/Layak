@@ -37,7 +37,6 @@ export type SchemeKind = 'upside' | 'required_contribution'
 export type Dependant = {
   relationship: Relationship
   age: number
-  ic_last6: string | null
 }
 
 export type HouseholdFlags = {
@@ -48,7 +47,6 @@ export type HouseholdFlags = {
 
 export type Profile = {
   name: string
-  ic_last6: string
   age: number
   monthly_income_rm: number
   household_size: number
@@ -65,19 +63,16 @@ export type EmploymentType = 'gig' | 'salaried'
 export type DependantInput = {
   relationship: Relationship
   age: number
-  ic_last6: string | null
 }
 
 /** Body of `POST /api/agent/intake_manual` — manual-entry alternative to the three-document upload.
  *
- * The 12-digit `ic` carries everything the backend needs: the YYMMDD prefix
- * is parsed into a real date (and then `age`), and the trailing 6 digits
- * (`PB####`) become `Profile.ic_last6`. The full IC stays in request-scope
- * memory only — never persisted, never logged. */
+ * Phase 12: the manual-entry path collects `age` directly. No IC field of any
+ * kind on the wire; the persisted `Profile` carries no IC information either. */
 export type ManualEntryPayload = {
   name: string
-  /** 12-digit Malaysian IC, raw digits only — no dashes. */
-  ic: string
+  /** Age in whole years (0–130). */
+  age: number
   monthly_income_rm: number
   employment_type: EmploymentType
   address: string | null

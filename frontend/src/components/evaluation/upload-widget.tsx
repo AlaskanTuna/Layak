@@ -310,8 +310,7 @@ export function UploadWidget({ onSubmit, disabled = false, submitId }: Props) {
       },
       dependants: dependants.map((d) => ({
         relationship: d.relationship,
-        age: d.age,
-        ic_last6: d.ic_last6 === '' ? null : d.ic_last6
+        age: d.age
       }))
     })
   }

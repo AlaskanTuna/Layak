@@ -1,12 +1,10 @@
 """Pydantic models for the citizen profile extracted from uploaded documents.
 
-Privacy invariant: `ic_last6` is the ONLY representation of the citizen's IC that may
-appear in SSE payloads, logs, or draft PDFs. Full IC never leaves request-scope memory.
-
-The 6-digit tail covers the place-of-birth code + serial number (`PB-####`).
-Combined with the IC's first six digits (recoverable from `date_of_birth` as
-`YYMMDD`), this lets future scheme integrations reconstruct the full IC at
-the boundary without ever persisting it.
+Privacy invariant (Phase 12): NO IC information appears on `Profile`. The
+extract step processes the uploaded MyKad image transiently in Gemini's
+request-scope memory; once `Profile` is built, the only identity-related
+field is `age` (integer years). The manual-entry path likewise collects
+`age` directly and never asks for an IC.
 """
 
 from __future__ import annotations
@@ -30,15 +28,15 @@ class Dependant(BaseModel):
     # Gemini OCR (extract.py) "helpfully" tags each dependant with their given
     # name when the source document lists one (Farhan's payslip surfaces
     # "Nurul Hidayah / Adam Hakim / Aleesya Sofea"). The rule engine only
-    # reads `relationship` + `age` + `ic_last6`, so we silently drop anything
-    # else rather than fail the whole extract on an unused field. The prompt
-    # still asks Gemini to emit only the listed fields — this is defense in
-    # depth against model drift.
+    # reads `relationship` + `age`, so we silently drop anything else rather
+    # than fail the whole extract on an unused field. The prompt still asks
+    # Gemini to emit only the listed fields — this is defense in depth against
+    # model drift. Phase 12: dropped the optional `ic_last6` field entirely
+    # since no rule consumes it; legacy data is ignored via `extra="ignore"`.
     model_config = ConfigDict(extra="ignore")
 
     relationship: Relationship
     age: int = Field(ge=0, le=130)
-    ic_last6: str | None = Field(default=None, pattern=r"^\d{6}$")
 
 
 class HouseholdFlags(BaseModel):
@@ -53,7 +51,6 @@ class Profile(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
     name: str = Field(min_length=1)
-    ic_last6: str = Field(pattern=r"^\d{6}$")
     age: int = Field(ge=0, le=130)
     monthly_income_rm: float = Field(ge=0)
     household_size: int = Field(ge=1)

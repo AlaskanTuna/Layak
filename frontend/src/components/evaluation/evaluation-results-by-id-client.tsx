@@ -20,6 +20,7 @@ import { useChat } from '@/hooks/use-chat'
 import { SchemeCardGrid } from '@/components/evaluation/scheme-card-grid'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
+import { InfoTooltip } from '@/components/ui/info-tooltip'
 import type { PipelineState, StepStatus } from '@/hooks/use-agent-pipeline'
 import { useAuth } from '@/lib/auth-context'
 import { useEvaluation } from '@/components/evaluation/evaluation-provider'
@@ -388,7 +389,6 @@ export function EvaluationResultsByIdClient({ evalId }: { evalId: string }) {
                   matches={whatIfResult?.matches ?? doc.matches}
                   deltas={whatIfResult?.deltas ?? null}
                   kind="upside"
-                  showVerifiedBadge={false}
                 />
               </section>
             )}
@@ -398,11 +398,14 @@ export function EvaluationResultsByIdClient({ evalId }: { evalId: string }) {
                 aria-label={t('evaluation.results.toc.subsidies')}
                 className="flex scroll-mt-28 flex-col gap-3 lg:scroll-mt-20"
               >
-                <div className="flex flex-col gap-1">
+                <div className="flex items-center gap-2">
                   <h2 className="font-heading text-xl font-semibold tracking-tight">
                     {t('evaluation.subsidies.title')}
                   </h2>
-                  <p className="text-sm text-foreground/65">{t('evaluation.subsidies.description')}</p>
+                  <InfoTooltip
+                    content={t('evaluation.subsidies.description')}
+                    label={t('evaluation.subsidies.description')}
+                  />
                 </div>
                 <SchemeCardGrid
                   matches={whatIfResult?.matches ?? doc.matches}
@@ -439,11 +442,14 @@ export function EvaluationResultsByIdClient({ evalId }: { evalId: string }) {
                 aria-label={t('evaluation.results.toc.whatIfs')}
                 className="flex scroll-mt-28 flex-col gap-3 lg:scroll-mt-20"
               >
-                <div className="flex flex-col gap-1">
+                <div className="flex items-center gap-2">
                   <h2 className="font-heading text-xl font-semibold tracking-tight">
                     {t('evaluation.whatIfs.sectionTitle')}
                   </h2>
-                  <p className="text-sm text-foreground/65">{t('evaluation.whatIfs.sectionDescription')}</p>
+                  <InfoTooltip
+                    content={t('evaluation.whatIfs.sectionDescription')}
+                    label={t('evaluation.whatIfs.sectionDescription')}
+                  />
                 </div>
                 <WhatIfPanel
                   evalId={evalId}
@@ -465,7 +471,7 @@ export function EvaluationResultsByIdClient({ evalId }: { evalId: string }) {
               </section>
             )}
             {!isRunning && !isError && pipelineState.narrativeEvents.length > 0 && (
-              <PipelineNarrative state={pipelineState} />
+              <PipelineNarrative state={pipelineState} retrospective />
             )}
             {isComplete && (
               <div className="flex border-t border-foreground/10 pt-5">

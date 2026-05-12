@@ -3,7 +3,6 @@
 import { ArrowRight, ExternalLink } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 
-import { SchemeVerifiedBadge } from '@/components/schemes/scheme-verified-badge'
 import { Button } from '@/components/ui/button'
 import type { SchemeDelta, SchemeMatch } from '@/lib/agent-types'
 import { localisedSchemeName } from '@/lib/scheme-name'
@@ -18,17 +17,19 @@ type Props = {
    *  call site (Eligible Schemes) keeps its meaning; pass `subsidy_credit`
    *  to render the Subsidies section. */
   kind?: 'upside' | 'subsidy_credit'
-  /** Toggle the SchemeVerifiedBadge under each card footer. Off on the
-   *  Eligible Schemes grid because the citation is already implied by the
-   *  scheme name; subsidies still surface the badge so the user trusts the
-   *  auto-credit claim. */
-  showVerifiedBadge?: boolean
   /** Optional override for the section heading. Falls back to the i18n key
    *  matching the resolved `kind`. */
   heading?: string
   /** When true, suppress the inner section heading so a parent can provide
    *  its own. The matches-count chip is also suppressed. */
   hideHeading?: boolean
+}
+
+/** Strip backend-supplied multi-line whitespace so each card's body
+ *  collapses to a tight paragraph instead of inheriting trailing newlines
+ *  or padding from upstream prompt templates. */
+function tidyText(value: string): string {
+  return value.replace(/\s+/g, ' ').trim()
 }
 
 
@@ -64,7 +65,6 @@ export function SchemeCardGrid({
   matches,
   deltas,
   kind = 'upside',
-  showVerifiedBadge = true,
   heading,
   hideHeading = false
 }: Props) {
@@ -101,7 +101,7 @@ export function SchemeCardGrid({
     <section className="flex flex-col gap-4">
       {!hideHeading && (
         <div className="flex items-baseline justify-between">
-          <h2 className="font-heading text-lg font-semibold tracking-tight">{sectionHeading}</h2>
+          <h2 className="font-heading text-xl font-semibold tracking-tight">{sectionHeading}</h2>
           <span className="mono-caption text-foreground/55">
             {qualifying.length === 1
               ? t('evaluation.schemeCard.matchesSingular', { count: qualifying.length })
@@ -153,18 +153,18 @@ export function SchemeCardGrid({
                 <h3 className="font-heading text-base font-semibold tracking-tight">
                   {localisedSchemeName(t, match.scheme_id, match.scheme_name)}
                 </h3>
-                <p className="text-xs leading-relaxed text-foreground/65">{match.summary}</p>
+                <p className="text-xs leading-relaxed text-foreground/65">{tidyText(match.summary)}</p>
               </header>
 
-              <div className="flex flex-1 flex-col gap-1 rounded-md border border-foreground/8 bg-foreground/[0.025] p-3">
+              <div className="flex flex-col gap-1 rounded-md border border-foreground/8 bg-foreground/[0.025] p-3">
                 <p className="mono-caption text-foreground/55">
                   {t('evaluation.schemeCard.whyQualify')}
                 </p>
-                <p className="text-xs leading-[1.55] text-foreground/80">{match.why_qualify}</p>
+                <p className="text-xs leading-[1.55] text-foreground/80">{tidyText(match.why_qualify)}</p>
               </div>
 
               {isSubsidy ? (
-                <footer className="flex items-end justify-between gap-3 border-t border-foreground/10 pt-3">
+                <footer className="mt-auto flex items-end justify-between gap-3 border-t border-foreground/10 pt-3">
                   <div className="flex flex-col gap-1">
                     <p className="mono-caption text-foreground/55">
                       {t('evaluation.schemeCard.subsidyInfo')}
@@ -179,7 +179,6 @@ export function SchemeCardGrid({
                         })}
                       </p>
                     )}
-                    {showVerifiedBadge && <SchemeVerifiedBadge schemeId={match.scheme_id} />}
                   </div>
                   <Button
                     render={<a href={match.portal_url} target="_blank" rel="noopener noreferrer" />}
@@ -192,13 +191,12 @@ export function SchemeCardGrid({
                   </Button>
                 </footer>
               ) : (
-                <footer className="flex items-end justify-between gap-3 border-t border-foreground/10 pt-3">
+                <footer className="mt-auto flex items-end justify-between gap-3 border-t border-foreground/10 pt-3">
                   <div className="flex flex-col gap-1">
                     <p className="mono-caption text-foreground/55">{t('evaluation.schemeCard.estValue')}</p>
                     <p className="font-heading text-[15px] font-semibold tabular-nums text-foreground">
                       {formatRm(match.annual_rm)}
                     </p>
-                    {showVerifiedBadge && <SchemeVerifiedBadge schemeId={match.scheme_id} />}
                   </div>
                   <Button
                     render={<a href={match.portal_url} target="_blank" rel="noopener noreferrer" />}

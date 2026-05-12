@@ -3,6 +3,7 @@
 import { useTranslation } from 'react-i18next'
 
 import { StrategyCard } from '@/components/evaluation/strategy-card'
+import { InfoTooltip } from '@/components/ui/info-tooltip'
 import type { StrategyAdvice } from '@/lib/agent-types'
 
 type Props = {
@@ -15,14 +16,15 @@ export function StrategySection({ advisories, onAskCikLay }: Props) {
   // Hard cap at 3 cards per spec §3.7 — the backend already caps but we
   // defensively slice here in case a legacy persisted eval carried more.
   const visible = advisories.filter((a) => a.confidence >= 0.5).slice(0, 3)
+  const description = t('evaluation.strategy.sectionDescription')
 
   return (
     <section className="flex flex-col gap-4">
-      <header className="flex flex-col gap-1">
+      <header className="flex items-center gap-2">
         <h2 className="font-heading text-xl font-semibold tracking-tight">
           {t('evaluation.strategy.sectionTitle')}
         </h2>
-        <p className="text-sm text-foreground/65">{t('evaluation.strategy.sectionDescription')}</p>
+        <InfoTooltip content={description} label={description} />
       </header>
 
       {visible.length === 0 ? (

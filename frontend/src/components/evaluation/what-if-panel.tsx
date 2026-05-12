@@ -1,13 +1,12 @@
 'use client'
 
 import { useCallback, useEffect, useMemo, useState } from 'react'
-import { ChevronDown, Loader2, RotateCcw } from 'lucide-react'
+import { Loader2, RotateCcw } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 
 import { Button } from '@/components/ui/button'
 import { useWhatIf } from '@/hooks/use-what-if'
 import type { Profile, WhatIfRequest, WhatIfResponse } from '@/lib/agent-types'
-import { cn } from '@/lib/utils'
 
 type Props = {
   evalId: string
@@ -50,7 +49,6 @@ function formatRm(value: number): string {
 export function WhatIfPanel({ evalId, baselineProfile, onResult }: Props) {
   const { t } = useTranslation()
   const baseline = useMemo(() => deriveBaselineSliders(baselineProfile), [baselineProfile])
-  const [expanded, setExpanded] = useState(false)
   const [values, setValues] = useState<SliderInputs>(baseline)
   const whatIf = useWhatIf(evalId)
 
@@ -107,96 +105,76 @@ export function WhatIfPanel({ evalId, baselineProfile, onResult }: Props) {
   const isDirty = Object.keys(diffsFromBaseline).length > 0
 
   return (
-    <section className="paper-card flex flex-col gap-3 rounded-[16px] p-5">
-      <header className="flex items-center justify-between gap-3">
-        <button
-          type="button"
-          onClick={() => setExpanded((v) => !v)}
-          aria-expanded={expanded}
-          className="group flex flex-1 items-center gap-3 text-left"
-        >
-          <ChevronDown
-            className={cn('size-4 text-foreground/55 transition-transform', expanded && 'rotate-180')}
-            aria-hidden
-          />
-          <span className="font-heading text-base font-semibold tracking-tight">
-            {t('evaluation.whatIf.sectionTitle')}
-          </span>
-        </button>
-        {expanded && isDirty && (
+    <section className="paper-card flex flex-col gap-4 rounded-[16px] p-5">
+      {isDirty && (
+        <div className="flex justify-end">
           <Button type="button" variant="ghost" size="sm" onClick={resetAll} className="gap-1.5">
             <RotateCcw className="size-3.5" aria-hidden />
             {t('evaluation.whatIf.resetAll')}
           </Button>
-        )}
-      </header>
-
-      {expanded && (
-        <>
-          <p className="text-sm text-foreground/65">{t('evaluation.whatIf.sectionDescription')}</p>
-
-          <div className="mt-2 grid grid-cols-1 gap-5 sm:grid-cols-3">
-            <SliderField
-              label={t('evaluation.whatIf.sliderIncomeLabel')}
-              value={values.monthly_income_rm}
-              baseline={baseline.monthly_income_rm}
-              range={SLIDER_RANGES.monthly_income_rm}
-              format={(v) => formatRm(v)}
-              onChange={(v) => setValues((prev) => ({ ...prev, monthly_income_rm: v }))}
-              onReset={() => resetSlider('monthly_income_rm')}
-              resetLabel={t('evaluation.whatIf.resetSlider')}
-            />
-            <SliderField
-              label={t('evaluation.whatIf.sliderChildrenLabel')}
-              value={values.dependants_count}
-              baseline={baseline.dependants_count}
-              range={SLIDER_RANGES.dependants_count}
-              format={(v) => String(v)}
-              onChange={(v) => setValues((prev) => ({ ...prev, dependants_count: v }))}
-              onReset={() => resetSlider('dependants_count')}
-              resetLabel={t('evaluation.whatIf.resetSlider')}
-            />
-            <SliderField
-              label={t('evaluation.whatIf.sliderElderlyLabel')}
-              value={values.elderly_dependants_count}
-              baseline={baseline.elderly_dependants_count}
-              range={SLIDER_RANGES.elderly_dependants_count}
-              format={(v) => String(v)}
-              onChange={(v) => setValues((prev) => ({ ...prev, elderly_dependants_count: v }))}
-              onReset={() => resetSlider('elderly_dependants_count')}
-              resetLabel={t('evaluation.whatIf.resetSlider')}
-            />
-          </div>
-
-          <footer className="mt-2 flex flex-col gap-2 border-t border-foreground/10 pt-3 sm:flex-row sm:items-center sm:justify-between">
-            <div className="flex items-center gap-3 text-sm">
-              {whatIf.phase === 'debouncing' || whatIf.phase === 'in-flight' ? (
-                <>
-                  <Loader2 className="size-3.5 animate-spin text-foreground/55" aria-hidden />
-                  <span className="mono-caption text-foreground/55">
-                    {t('evaluation.whatIf.running')}
-                  </span>
-                </>
-              ) : whatIf.phase === 'rate-limited' ? (
-                <span className="mono-caption text-amber-700 dark:text-amber-400">
-                  {t('evaluation.whatIf.rateLimited', { seconds: whatIf.retryAfterSeconds ?? 60 })}
-                </span>
-              ) : whatIf.phase === 'error' ? (
-                <span className="mono-caption text-destructive">
-                  {t('evaluation.whatIf.errorGeneric')}
-                </span>
-              ) : whatIf.data ? (
-                <span className="mono-caption text-foreground/55">
-                  {t('evaluation.whatIf.totalUpsideLabel')}:{' '}
-                  <span className="font-mono tabular-nums text-foreground">
-                    {formatRm(whatIf.data.total_annual_rm)}
-                  </span>
-                </span>
-              ) : null}
-            </div>
-          </footer>
-        </>
+        </div>
       )}
+
+      <div className="grid grid-cols-1 gap-5 sm:grid-cols-3">
+        <SliderField
+          label={t('evaluation.whatIf.sliderIncomeLabel')}
+          value={values.monthly_income_rm}
+          baseline={baseline.monthly_income_rm}
+          range={SLIDER_RANGES.monthly_income_rm}
+          format={(v) => formatRm(v)}
+          onChange={(v) => setValues((prev) => ({ ...prev, monthly_income_rm: v }))}
+          onReset={() => resetSlider('monthly_income_rm')}
+          resetLabel={t('evaluation.whatIf.resetSlider')}
+        />
+        <SliderField
+          label={t('evaluation.whatIf.sliderChildrenLabel')}
+          value={values.dependants_count}
+          baseline={baseline.dependants_count}
+          range={SLIDER_RANGES.dependants_count}
+          format={(v) => String(v)}
+          onChange={(v) => setValues((prev) => ({ ...prev, dependants_count: v }))}
+          onReset={() => resetSlider('dependants_count')}
+          resetLabel={t('evaluation.whatIf.resetSlider')}
+        />
+        <SliderField
+          label={t('evaluation.whatIf.sliderElderlyLabel')}
+          value={values.elderly_dependants_count}
+          baseline={baseline.elderly_dependants_count}
+          range={SLIDER_RANGES.elderly_dependants_count}
+          format={(v) => String(v)}
+          onChange={(v) => setValues((prev) => ({ ...prev, elderly_dependants_count: v }))}
+          onReset={() => resetSlider('elderly_dependants_count')}
+          resetLabel={t('evaluation.whatIf.resetSlider')}
+        />
+      </div>
+
+      <footer className="flex flex-col gap-2 border-t border-foreground/10 pt-3 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex items-center gap-3 text-sm">
+          {whatIf.phase === 'debouncing' || whatIf.phase === 'in-flight' ? (
+            <>
+              <Loader2 className="size-3.5 animate-spin text-foreground/55" aria-hidden />
+              <span className="mono-caption text-foreground/55">
+                {t('evaluation.whatIf.running')}
+              </span>
+            </>
+          ) : whatIf.phase === 'rate-limited' ? (
+            <span className="mono-caption text-amber-700 dark:text-amber-400">
+              {t('evaluation.whatIf.rateLimited', { seconds: whatIf.retryAfterSeconds ?? 60 })}
+            </span>
+          ) : whatIf.phase === 'error' ? (
+            <span className="mono-caption text-destructive">
+              {t('evaluation.whatIf.errorGeneric')}
+            </span>
+          ) : whatIf.data ? (
+            <span className="mono-caption text-foreground/55">
+              {t('evaluation.whatIf.totalUpsideLabel')}:{' '}
+              <span className="font-mono tabular-nums text-foreground">
+                {formatRm(whatIf.data.total_annual_rm)}
+              </span>
+            </span>
+          ) : null}
+        </div>
+      </footer>
     </section>
   )
 }

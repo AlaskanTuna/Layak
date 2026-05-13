@@ -32,8 +32,6 @@ import type { DependantInput, ManualEntryPayload, Step } from '@/lib/agent-types
 import type { UploadFiles } from '@/components/evaluation/upload-widget'
 import { cn } from '@/lib/utils'
 
-// Per-persona fixture loader table. Keeps the dispatch branchless in the
-// upload handler — add another persona by adding another entry here.
 const PERSONA_LOADERS: Record<SamplePersona, { load: () => Promise<UploadFiles>; dependants: DependantInput[] }> = {
   aisyah: { load: loadAisyahFixtureFiles, dependants: AISYAH_DEPENDANT_OVERRIDES },
   farhan: { load: loadFarhanFixtureFiles, dependants: FARHAN_DEPENDANT_OVERRIDES }
@@ -44,18 +42,12 @@ export function EvaluationUploadClient() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const { state, start, reset, setDemoMode, acknowledgeQuotaExceeded } = useEvaluation()
-  // Modal open state is derived directly from `state.quotaExceeded` —
-  // dismissing the modal calls `acknowledgeQuotaExceeded()` which clears
-  // it on the pipeline side, naturally closing the modal. Avoids the
-  // React 19 set-state-in-effect lint and the cascade-render risk.
+  // Derived (not effect-synced) so dismissing the modal clears via the pipeline side and avoids the
+  // React 19 set-state-in-effect lint.
   const waitlistOpen = state.quotaExceeded != null
   const initialMode: IntakeMode = searchParams?.get('mode') === 'manual' ? 'manual' : 'upload'
   const [mode, setMode] = useState<IntakeMode>(initialMode)
-  // Per-tab demo persona — when the user clicks a "Use <persona> sample data"
-  // button on a tab, we remember that choice on that tab so switching tabs
-  // doesn't show a stale demo banner for a tab with no demo state. The active
-  // tab's persona is mirrored to the global `demoPersona` that drives the
-  // banner. Manual Entry only has an Aisyah sample, so its slot is narrower.
+  // Per-tab persona so switching tabs doesn't carry a stale demo banner over.
   const [demoByTab, setDemoByTab] = useState<Record<IntakeMode, DemoPersona | null>>({
     upload: null,
     manual: null
@@ -63,9 +55,7 @@ export function EvaluationUploadClient() {
 
   useEffect(() => {
     if (state.phase === 'done') {
-      // Real + manual intake stamp `evalId` from the SSE done event; mock
-      // mode (dev escape hatch) leaves it null and falls back to the
-      // in-memory results route.
+      // Mock mode leaves evalId null and falls back to the in-memory results route.
       const next = state.evalId ? `/dashboard/evaluation/results/${state.evalId}` : '/dashboard/evaluation/results'
       router.push(next)
     }
@@ -76,10 +66,7 @@ export function EvaluationUploadClient() {
     setDemoMode(demoByTab[next] ?? false)
   }
 
-  // Retain the last submission so the recovery card's Retry CTA can
-  // replay the same pipeline on a transient failure (service_unavailable
-  // / deadline_exceeded). `null` means there's nothing to retry (e.g.
-  // just after `reset()` or before any submit).
+  // Retained so the recovery card's Retry CTA can replay on a transient failure.
   const lastSubmissionRef = useRef<
     | { kind: 'real'; files: UploadFiles; dependants: DependantInput[] }
     | { kind: 'manual'; payload: ManualEntryPayload }
@@ -109,10 +96,7 @@ export function EvaluationUploadClient() {
     setDemoByTab((prev) => ({ ...prev, upload: persona }))
     setDemoMode(persona)
     setSampleLoadError(null)
-    // Dev escape hatch — when NEXT_PUBLIC_USE_MOCK_SSE=1 the pipeline replays
-    // canned events (Aisyah-shaped) regardless of persona; skip the fetch
-    // entirely. The mock pipeline doesn't know about Farhan and would
-    // desync, so only honour mock mode for Aisyah.
+    // Mock pipeline is Aisyah-shaped only — Farhan would desync, so gate the dev hatch on persona.
     const useMock =
       behavior === 'run' &&
       persona === 'aisyah' && process.env.NODE_ENV !== 'production' && process.env.NEXT_PUBLIC_USE_MOCK_SSE === '1'
@@ -140,16 +124,11 @@ export function EvaluationUploadClient() {
   }
 
   function handleUseSamplesManual(persona: DemoPersona) {
-    // Inside the manual form — the form itself has already reset to the
-    // chosen persona's values. Mark the manual tab with the matching persona
-    // so switching to upload clears the banner and switching back restores
-    // the right copy ("gig driver Aisyah" vs "salaried teacher Farhan").
     setDemoByTab((prev) => ({ ...prev, manual: persona }))
     setDemoMode(persona)
   }
 
   function handleClearManual() {
-    // User wiped the manual form — demo banner should drop if it was up.
     setDemoByTab((prev) => ({ ...prev, manual: null }))
     if (mode === 'manual') setDemoMode(false)
   }
@@ -163,9 +142,6 @@ export function EvaluationUploadClient() {
   }
 
   function handleRetry() {
-    // Transient-error replay. No submission retained means there's nothing
-    // to retry — the button wouldn't render in that case (the recovery card
-    // only wires Retry when `onRetry` is defined), but we guard here too.
     const last = lastSubmissionRef.current
     if (!last) return
     if (last.kind === 'real') {
@@ -176,8 +152,6 @@ export function EvaluationUploadClient() {
   }
 
   function handleSwitchToManual() {
-    // Quota-exhausted recovery — drop the failed pipeline state and flip
-    // the user into Manual Entry mode where the OCR step is synthetic.
     setDemoByTab((prev) => ({ ...prev, upload: null }))
     setDemoMode(false)
     setMode('manual')
@@ -195,9 +169,6 @@ export function EvaluationUploadClient() {
   }
 
   const samplesBusy = loadingPersona !== null
-  // Header dropdown is visible whenever we're on the intake screen. Dispatch
-  // splits by tab: upload tab loads fixture files into the pipeline, manual
-  // tab calls the form's imperative `applySample` to prefill fields.
   const showSampleAction = showIntake
   const uploadWidgetRef = useRef<UploadWidgetHandle | null>(null)
   const manualFormRef = useRef<ManualEntryFormHandle | null>(null)
@@ -267,10 +238,8 @@ export function EvaluationUploadClient() {
           <div id="tour-upload-mode" className="scroll-mt-24 rounded-lg">
             <IntakeModeToggle value={mode} onChange={handleModeChange} />
           </div>
-          {/* Both widgets stay mounted so partial form state survives a tab switch.
-              The `tour-upload-form` / `tour-upload-submit` IDs migrate to whichever
-              wrapper is active so the help tour anchors to a visible element instead
-              of the hidden one (which has a 0×0 bbox and breaks Base UI positioning). */}
+          {/* Both widgets stay mounted so partial form state survives tab switch;
+              tour IDs migrate to the active wrapper so anchors aren't 0x0 (Base UI breaks otherwise). */}
           <div
             id={mode === 'upload' ? 'tour-upload-form' : undefined}
             className={cn('scroll-mt-24 rounded-[14px]', mode !== 'upload' && 'hidden')}
@@ -309,16 +278,9 @@ export function EvaluationUploadClient() {
             <ErrorRecoveryCard
               message={state.error ?? t('evaluation.unknownError')}
               category={state.errorCategory}
-              // "Use samples" falls back to the upload path with the default
-              // Aisyah persona; on a quota-exhausted error the card prefers
-              // the Manual Entry CTA instead because the upload path would
-              // 429 the same way. Farhan is only reachable from the idle
-              // intake screen to keep the recovery card single-action.
+              // Defaults to Aisyah; on a quota-exhausted error the card prefers Manual Entry instead.
               onUseSamples={() => handleUseSamplesUpload('aisyah', 'run')}
               onReset={handleReset}
-              // Retry is always wired — an error event implies a prior
-              // submit, which always populated `lastSubmissionRef`. The
-              // handler no-ops defensively if the ref was cleared mid-stream.
               onRetry={handleRetry}
               onSwitchToManual={handleSwitchToManual}
             />

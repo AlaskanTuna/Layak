@@ -1,26 +1,3 @@
-"""PDPA endpoints — export + delete the caller's data.
-
-Users exercise their PDPA 2010 access-and-deletion rights here:
-
-    GET    /api/user/export  — JSON attachment of `users/{uid}` + all `evaluations`
-    DELETE /api/user         — cascade-delete all evaluations, the user doc, and the
-                               Firebase Auth record
-
-Both endpoints are authed via `CurrentUser`; only the caller's own data is
-touched. No admin-impersonation path is exposed here — tier flips live outside
-the product (gcloud / one-off script).
-
-Delete ordering:
-    1. Firestore batch: delete every `evaluations/{evalId}` where
-       userId == uid, then `users/{uid}`.
-    2. `firebase_admin.auth.delete_user(uid)` — revokes the Auth record.
-
-If step 2 fails after step 1 succeeded, the caller keeps an Auth session but
-the `users/{uid}` doc is gone; `auth.py::_upsert_user_doc` will lazy-create a
-fresh empty one on next authed request. The cascade is one-way, so a
-half-success still honours the deletion intent.
-"""
-
 from __future__ import annotations
 
 import json
@@ -40,16 +17,11 @@ _logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/api/user", tags=["user"])
 
-# Firestore batch.commit() caps at 500 ops per batch. For free-tier users the
-# cap of 5 evaluations / 24h + prune means delete is well under this, but the
-# batch loop below still chunks so a Pro user with months of history can be
-# removed without special casing.
-_BATCH_MAX_OPS = 450  # leave headroom for the final user-doc delete
+# Firestore batch.commit() caps at 500 ops; leave headroom for the final user-doc delete.
+_BATCH_MAX_OPS = 450
 
 
 class _UserMeResponse(BaseModel):
-    """Shape returned by `GET /api/user/me`."""
-
     model_config = ConfigDict(extra="forbid")
 
     uid: str
@@ -62,12 +34,7 @@ class _UserMeResponse(BaseModel):
 
 
 class _PreferencesPatch(BaseModel):
-    """Body for `PATCH /api/user/preferences`.
-
-    Only `language` is settable right now. Extra keys rejected so a client
-    typo (`"lang": "ms"`) 422s loudly instead of silently no-op'ing.
-    """
-
+    # extra="forbid" so a typo like {"lang": "ms"} 422s instead of silently no-op'ing.
     model_config = ConfigDict(extra="forbid")
 
     language: SupportedLanguage
@@ -75,13 +42,6 @@ class _PreferencesPatch(BaseModel):
 
 @router.get("/me")
 async def get_user_me(user: CurrentUser) -> _UserMeResponse:
-    """Return the caller's persisted profile — lets the frontend hydrate its
-    UI language from the server-stored preference on every login, so a user
-    who picks Bahasa Malaysia on device A sees it immediately on device B.
-
-    `language` is always present (`current_user` coerces unknown / missing
-    values to `"en"`). The fields mirror `UserDoc` minus the timestamps.
-    """
     return _UserMeResponse(
         uid=user.uid,
         email=user.email,
@@ -95,13 +55,6 @@ async def get_user_me(user: CurrentUser) -> _UserMeResponse:
 
 @router.patch("/preferences", status_code=status.HTTP_204_NO_CONTENT)
 async def patch_user_preferences(payload: _PreferencesPatch, user: CurrentUser) -> Response:
-    """Update a caller's persisted preferences.
-
-    Right now the only preference is `language`, but the shape leaves room
-    for future fields (e.g. notification toggles) without a second endpoint.
-    Returns 204 with an empty body — the client already has the value it
-    just wrote.
-    """
     db = get_firestore()
     db.collection("users").document(user.uid).update({"language": payload.language})
     return Response(status_code=status.HTTP_204_NO_CONTENT)
@@ -109,22 +62,7 @@ async def patch_user_preferences(payload: _PreferencesPatch, user: CurrentUser) 
 
 @router.get("/export")
 async def export_user_data(user: CurrentUser) -> Response:
-    """PDPA §26 data-subject access — hand the caller a JSON bundle of everything
-    the backend knows about them.
-
-    Shape:
-        {
-          "uid": "<firebase uid>",
-          "exportedAt": "<ISO-8601 UTC>",
-          "schemaVersion": 1,
-          "user": { ... users/{uid} doc ... } | null,
-          "evaluations": [ { "id": "<evalId>", ...doc... }, ... ]
-        }
-
-    Returned as `application/json` with a `Content-Disposition: attachment`
-    header so the browser saves rather than renders. `Cache-Control: no-store`
-    because the body is personal data.
-    """
+    # PDPA §26 data-subject access. Cache-Control: no-store because the body is personal data.
     db = get_firestore()
     user_ref = db.collection("users").document(user.uid)
     user_snap = user_ref.get()
@@ -165,18 +103,7 @@ async def export_user_data(user: CurrentUser) -> Response:
 
 @router.delete("", status_code=status.HTTP_204_NO_CONTENT)
 async def delete_user_account(user: CurrentUser) -> Response:
-    """PDPA §34 right-to-erasure — cascade-delete the caller's Firestore data
-    and Firebase Auth record.
-
-    Firestore writes are batched; the Auth delete runs after. A failure at the
-    Auth step is logged but surfaces as 500 to the client so the frontend can
-    retry (the Firestore delete has already succeeded). Ordering is deliberate:
-    wiping data first and revoking Auth second means a partial failure never
-    leaves the user with a locked-out session AND live records.
-
-    The shared demo guest account is protected — deleting it would wipe the
-    public-access demo for every other judge. Guests get a 403.
-    """
+    # PDPA §34 right-to-erasure. Firestore first, then Auth — partial failure never strands records.
     if is_guest(user.uid):
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
@@ -195,8 +122,7 @@ async def delete_user_account(user: CurrentUser) -> Response:
     try:
         fb_auth.delete_user(user.uid)
     except fb_auth.UserNotFoundError:
-        # Auth side already gone (maybe a prior partial-success retry) —
-        # Firestore cleanup still landed, treat the delete as complete.
+        # Idempotent on prior partial-success retry — Firestore cleanup already landed.
         _logger.info("Firebase user %s already removed; Firestore was cleaned up", user.uid)
     except Exception as exc:  # noqa: BLE001
         _logger.exception("Firebase Auth delete failed for uid=%s", user.uid)
@@ -209,11 +135,6 @@ async def delete_user_account(user: CurrentUser) -> Response:
 
 
 def _cascade_delete_firestore(db: Any, uid: str) -> None:
-    """Delete every `evaluations/{evalId}` where userId == uid, then `users/{uid}`.
-
-    Runs in batches of `_BATCH_MAX_OPS` so a Pro user with hundreds of evals
-    still completes under Firestore's 500-ops-per-batch cap.
-    """
     eval_query = db.collection("evaluations").where("userId", "==", uid)
     batch = db.batch()
     ops_in_batch = 0
@@ -229,12 +150,7 @@ def _cascade_delete_firestore(db: Any, uid: str) -> None:
 
 
 def _serialise_doc(data: dict[str, Any]) -> dict[str, Any]:
-    """Convert Firestore-returned fields to JSON-serialisable primitives.
-
-    The Admin SDK returns `DatetimeWithNanoseconds` for timestamp fields —
-    those quack like `datetime` and serialise via `.isoformat()`. Everything
-    else passes through unchanged; nested dicts / lists recurse.
-    """
+    # Firestore Admin SDK returns DatetimeWithNanoseconds — duck-types as datetime.
     return {key: _serialise_value(value) for key, value in data.items()}
 
 

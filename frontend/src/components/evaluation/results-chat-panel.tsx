@@ -23,37 +23,18 @@ import { type UseChatResult } from '@/hooks/use-chat'
 
 const CIK_LAY_ICON = '/chatbot/cik-lay-icon.webp'
 
-/**
- * Phase 10 — floating chatbot panel for `/dashboard/evaluation/results/[id]`.
- *
- * Surfaces only when an evaluation is complete + has at least one qualifying
- * match (no chat without context). Floating action button → expanding card
- * (desktop bottom-right, mobile near-fullscreen) using fixed-position only,
- * so the page tree underneath isn't rearranged. The expand button promotes
- * the card to a centred modal with a blurred backdrop; click outside closes
- * both the modal and the panel itself.
- */
-
 type Props = {
   evalId: string
   matches: SchemeMatch[]
-  /** Phase 11 Feature 2 — the parent owns the `useChat` instance so it can
-   *  share the same hook with `<StrategySection>`. The "Ask Cik Lay about
-   *  this" CTA stages a draft + advisory on the shared hook before the
-   *  panel auto-opens (see the `pendingDraft` effect below). */
+  // Parent owns the hook so StrategySection's "Ask Cik Lay" CTA can stage a draft on the same instance.
   chat: UseChatResult
 }
 
-// Cik Lay attention pulse cadence — keep these as named constants so the
-// scheduling state machine reads cleanly. Click handler swaps the next
-// scheduled wait for `CLICK_COOLDOWN_MS` to give the user breathing room.
-const PULSE_DURATION_MS = 10_000 // pulse softly for 10s
-const IDLE_DURATION_MS = 60_000 // wait 1 min between pulse bursts
-const CLICK_COOLDOWN_MS = 180_000 // 3 min quiet after the user opens the panel
-const INITIAL_DELAY_MS = 800 // brief grace before the first pulse on mount
+const PULSE_DURATION_MS = 10_000
+const IDLE_DURATION_MS = 60_000
+const CLICK_COOLDOWN_MS = 180_000
+const INITIAL_DELAY_MS = 800
 
-// How many chips to show at most. Pools below are larger so each session /
-// turn picks a fresh subset.
 const INITIAL_CHIPS = 4
 const FOLLOWUP_CHIPS = 4
 
@@ -63,18 +44,11 @@ export function ResultsChatPanel({ evalId, matches, chat }: Props) {
   const [isModal, setIsModal] = useState(false)
   const [draft, setDraft] = useState('')
   const [isPulsing, setIsPulsing] = useState(false)
-  // Bumped by `handleOpenPanel` to re-arm the pulse effect with the
-  // 3-min cooldown delay instead of the standard 60s idle.
   const [cooldownNonce, setCooldownNonce] = useState(0)
   const cooldownPendingRef = useRef(false)
-  // Bumped on `chat.reset()` so the stable per-session random pick of
-  // initial suggestions re-rolls without drifting on every render.
   const [sessionNonce, setSessionNonce] = useState(0)
   const messagesEndRef = useRef<HTMLDivElement | null>(null)
   const inputRef = useRef<HTMLTextAreaElement | null>(null)
-  // evalId no longer directly consumed here (it lives on the lifted hook in
-  // the parent), but kept on the prop signature for future telemetry +
-  // because the strategy-handoff context needs it to be paired with chat.
   void evalId
 
   const qualifyingMatches = useMemo(() => matches.filter((m) => m.qualifies), [matches])
@@ -83,8 +57,6 @@ export function ResultsChatPanel({ evalId, matches, chat }: Props) {
     () => buildInitialSuggestionPool(qualifyingMatches, t),
     [qualifyingMatches, t]
   )
-  // Stable per-session pick — re-rolls only when the session nonce bumps
-  // (panel opens fresh after a reset).
   const suggestions = useMemo(
     () => pickRandom(initialPool, INITIAL_CHIPS),
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -107,9 +79,7 @@ export function ResultsChatPanel({ evalId, matches, chat }: Props) {
     [followUpPool, followUpKey, showFollowUps]
   )
 
-  // Soft-pulse cadence: pulse for 10s → idle for 60s → pulse for 10s → …
-  // When the user opens the panel, `cooldownPendingRef` flips and the next
-  // re-arm starts after `CLICK_COOLDOWN_MS` instead of `INITIAL_DELAY_MS`.
+  // Pulse 10s → idle 60s → repeat. Opening the panel re-arms with CLICK_COOLDOWN_MS instead.
   useEffect(() => {
     let cancelled = false
     let timer = 0
@@ -154,25 +124,18 @@ export function ResultsChatPanel({ evalId, matches, chat }: Props) {
     setSessionNonce((n) => n + 1)
   }, [chat])
 
-  // Auto-scroll the message list to the latest token as it streams in.
   useEffect(() => {
     if (!isOpen) return
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth', block: 'end' })
   }, [isOpen, chat.messages])
 
-  // Focus the textarea when the panel opens (desktop ergonomic — first-time
-  // open on mobile may pop the keyboard, which is fine).
   useEffect(() => {
     if (isOpen) {
       inputRef.current?.focus()
     }
   }, [isOpen, isModal])
 
-  // Phase 11 Feature 2 — Strategy section handoff. When the strategy CTA
-  // stages a `pendingDraft` on the shared hook, auto-open this panel and
-  // prefill the textarea. `consumePendingDraft` clears the staging so the
-  // hook doesn't re-fire on every render. The lint disable matches the
-  // existing pattern in `use-agent-pipeline.ts` for cross-store cascades.
+  // Strategy CTA handoff: consume the staged draft from the shared chat hook.
   useEffect(() => {
     if (chat.pendingDraft == null) return
     const draftValue = chat.pendingDraft
@@ -210,9 +173,6 @@ export function ResultsChatPanel({ evalId, matches, chat }: Props) {
     [chat]
   )
 
-  // Wrapper geometry depends on whether we're floating bottom-right or
-  // promoted to a centred modal. In both cases the panel itself stays the
-  // same component — only the surrounding chrome changes.
   const wrapperClass = isModal
     ? 'fixed inset-0 z-50 flex items-center justify-center bg-black/25 backdrop-blur-md dark:bg-black/55'
     : 'fixed inset-0 z-50 flex items-end justify-center bg-black/40 backdrop-blur-sm sm:inset-auto sm:right-6 sm:bottom-6 sm:bg-transparent sm:backdrop-blur-none'
@@ -249,13 +209,10 @@ export function ResultsChatPanel({ evalId, matches, chat }: Props) {
           aria-label={t('evaluation.chat.title')}
           className={wrapperClass}
           onClick={(e) => {
-            // Click outside the inner panel closes everything — works for
-            // both the mobile bottom-sheet backdrop and the modal mode.
             if (e.target === e.currentTarget) handleClosePanel()
           }}
         >
           <div className={panelClass}>
-            {/* Header */}
             <header className="relative flex items-center justify-between gap-2 border-b border-foreground/10 bg-foreground/[0.025] px-4 py-3.5 backdrop-blur-md backdrop-saturate-150">
               <span
                 aria-hidden
@@ -315,9 +272,7 @@ export function ResultsChatPanel({ evalId, matches, chat }: Props) {
               </div>
             </header>
 
-            {/* Message scroller — `min-h-0` is the classic flexbox + overflow
-                fix so the area always fills available height regardless of
-                content length (chip clicks → fewer items → don't shrink). */}
+            {/* min-h-0 is the flexbox + overflow fix to keep this area filling available height. */}
             <div className="flex-1 min-h-0 space-y-3 overflow-y-auto px-4 py-4">
               {chat.messages.length === 0 && (
                 <div className="rounded-[12px] border border-dashed border-foreground/20 bg-foreground/[0.04] px-3.5 py-3 text-sm text-foreground/72 backdrop-blur-md backdrop-saturate-150">
@@ -358,8 +313,6 @@ export function ResultsChatPanel({ evalId, matches, chat }: Props) {
               <div ref={messagesEndRef} />
             </div>
 
-            {/* Composer — `items-stretch` + matched heights keep textarea +
-                send button visually consistent at all times. */}
             <footer className="border-t border-foreground/10 bg-foreground/[0.025] px-3 py-3 backdrop-blur-md backdrop-saturate-150">
               {chat.pendingScenarioContext && (
                 <p className="mono-caption mb-2 text-[color:var(--primary)]">
@@ -442,9 +395,7 @@ function SuggestionsBlock({
   )
 }
 
-// Markdown component overrides — tight spacing for chat bubbles. Headings
-// are intentionally downsized to inline-bold rather than block headings
-// because Cik Lay's prompt forbids H1/H2 anyway.
+// Headings rendered inline-bold because Cik Lay's prompt forbids H1/H2.
 const MARKDOWN_COMPONENTS: Components = {
   p: ({ children }) => <p className="my-1.5 first:mt-0 last:mb-0 leading-[1.55]">{children}</p>,
   strong: ({ children }) => <strong className="font-semibold">{children}</strong>,
@@ -557,31 +508,14 @@ function ChatBubble({ message }: { message: ChatMessage }) {
   )
 }
 
-/**
- * Strip the `[scheme:xxx]` markers from rendered text — they're machine
- * markers consumed by the citation extractor, not human-readable.
- *
- * Also repair two recurring Gemini emphasis defects:
- *  1. Whitespace inside emphasis runs (`**PERKESO SKSPS **`). CommonMark's
- *     strict flanking rules treat those as plain text, so bold/italic
- *     silently disappears. Normalize `** word **`, `**word **`, and
- *     `** word**` back to `**word**`. Applies to single-star italics too.
- *  2. Single-star close before a label colon (`**STR 2026 :*Apply…`). The
- *     model occasionally drops one asterisk on the closer, leaving an
- *     unbalanced bold run that prints literal `**` and the dangling `*`
- *     in the bubble. Repair to `**STR 2026:** Apply…`. The trailing
- *     negative lookahead `(?!\*)` guards against eating a legitimate
- *     `**X:**Y` close.
- */
+// Strips [scheme:xxx] markers and repairs two recurring Gemini emphasis defects:
+// whitespace inside ** runs (CommonMark flanking strips them) and single-asterisk
+// closes before a colon. The cap + terminator exclusion confines the flanking
+// regexes to single-phrase typos so they don't bold prose between adjacent runs.
 function cleanInlineCitations(text: string): string {
   return text
     .replace(/\s*\[\s*scheme\s*:\s*[a-z0-9_]+\s*\]\s*/gi, ' ')
     .replace(/\*\*([^*\n]+?)\s*:\s*\*(?!\*)/g, '**$1:** ')
-    // Flanking-repair regexes: only operate on short phrase content with no
-    // sentence terminators (`.!?`). Otherwise they happily match across two
-    // adjacent runs (`** B. **` between `**A:**` and `**C:**`) and "bold"
-    // the prose between them. The cap + terminator exclusion confines them
-    // to single-phrase typos like `**word **` / `** word**` / `** word **`.
     .replace(/(\*{1,2})\s+([^*.!?\n]{1,80}?)\s+\1/g, '$1$2$1')
     .replace(/(\*{1,2})([^*.!?\s\n][^*.!?\n]{0,80}?)\s+\1/g, '$1$2$1')
     .replace(/(\*{1,2})\s+([^*.!?\n]{1,80}?[^*\s\n])\1/g, '$1$2$1')
@@ -589,11 +523,6 @@ function cleanInlineCitations(text: string): string {
     .trim()
 }
 
-/**
- * Pick `n` items pseudo-randomly from a pool. Fisher-Yates shuffle on a copy.
- * Returns the entire pool if `n >= pool.length`, otherwise the first n
- * elements after shuffling.
- */
 function pickRandom<T>(pool: T[], n: number): T[] {
   if (n >= pool.length) return pool.slice()
   const arr = pool.slice()
@@ -604,11 +533,6 @@ function pickRandom<T>(pool: T[], n: number): T[] {
   return arr.slice(0, n)
 }
 
-/**
- * 8-prompt session-opening pool. Eval-context-aware: the "why qualify"
- * prompt name-checks the user's top match, the "compare" prompt only
- * surfaces with 2+ matches.
- */
 function buildInitialSuggestionPool(
   matches: SchemeMatch[],
   t: (key: string, opts?: Record<string, string | number>) => string
@@ -646,11 +570,6 @@ function buildInitialSuggestionPool(
   return pool
 }
 
-/**
- * 12-prompt follow-up pool surfaced after each completed assistant message.
- * Generic enough to make sense after almost any reply — re-randomised on
- * every new model turn so the user keeps seeing fresh angles.
- */
 function buildFollowUpPool(
   t: (key: string, opts?: Record<string, string | number>) => string
 ): string[] {

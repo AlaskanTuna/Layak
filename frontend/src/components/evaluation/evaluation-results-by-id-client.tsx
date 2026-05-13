@@ -47,22 +47,12 @@ function mapStepState(state: EvaluationStepState): StepStatus {
   return state
 }
 
-/**
- * Adapt the Firestore-stored EvaluationDoc into the same `PipelineState`
- * shape the streaming `PipelineStepper` already consumes. That way the
- * stepper component (and downstream UI) doesn't need a second renderer
- * for the persisted path.
- */
 function docToPipelineState(doc: EvaluationDoc): PipelineState {
   const stepStates = Object.fromEntries(
     PIPELINE_STEPS.map((step) => [step, mapStepState(doc.stepStates[step] ?? 'pending')])
   ) as Record<Step, StepStatus>
 
-  // The persistence layer mirrors the compute_upside trace so the panel
-  // rebuilds verbatim after a refresh / deep link. Pre-trace evaluations
-  // (written before the field landed) fall back to deriving the per-scheme
-  // breakdown from `matches` so the meter still has totals — but the Python
-  // snippet + stdout will be empty and the CodeExecutionPanel will hide.
+  // Pre-trace docs (written before upsideTrace landed) fall back to deriving per-scheme totals from matches.
   const upside: ComputeUpsideResult | null =
     doc.stepStates.compute_upside === 'complete'
       ? {
@@ -87,12 +77,8 @@ function docToPipelineState(doc: EvaluationDoc): PipelineState {
     quotaExceeded: null,
     error: doc.error?.message ?? null,
     errorCategory: doc.error?.category ?? null,
-    // Phase 11 Feature 4 — replay the lay/dev tier events on persisted load.
-    // Legacy docs without these fields fall back to empty arrays; the
-    // narrative component degrades to the old stepper-style UI in that case.
     narrativeEvents: doc.narrativeLog ?? [],
     technicalEvents: doc.technicalLog ?? [],
-    // Phase 11 Feature 2 — replay persisted strategy advisories.
     strategy: doc.strategy ?? []
   }
 }
@@ -109,13 +95,9 @@ export function EvaluationResultsByIdClient({ evalId }: { evalId: string }) {
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
   const pollHandleRef = useRef<ReturnType<typeof setInterval> | null>(null)
   const lastStatusRef = useRef<string | null>(null)
-  // Phase 11 Feature 2 — lifted chat hook. Called BEFORE the early returns
-  // below so it always runs (Rules of Hooks). Shared between the chat panel
-  // and the Strategy section's "Ask Cik Lay about this" CTA so the handoff
-  // stages a draft + advisory on the SAME hook instance the panel renders.
+  // Lifted above the early returns so it always runs (Rules of Hooks);
+  // shared with StrategySection so its CTA can stage on the same instance.
   const chat = useChat(evalId)
-  // Phase 11 Feature 3 — latest what-if rerun. When non-null, scheme cards
-  // render delta chips and the upside hero swaps to `total_annual_rm`.
   const [whatIfPreview, setWhatIfPreview] = useState<{
     result: WhatIfResponse
     context: ChatScenarioContext
@@ -151,19 +133,12 @@ export function EvaluationResultsByIdClient({ evalId }: { evalId: string }) {
     }
   }, [evalId, t])
 
-  // Initial hydrate — runs after Firebase auth resolves so authedFetch can
-  // attach the Bearer token. AuthGuard upstream already guarantees `user`
-  // is set, but useAuth's `loading` flag protects the first render.
-  // setState lands AFTER the await resolves; the lint rule's strict reading
-  // covers a synchronous-setState-in-effect pattern that this code doesn't
-  // hit, but the rule still trips on the call graph — silenced inline.
   useEffect(() => {
     if (authLoading || !user) return
     // eslint-disable-next-line react-hooks/set-state-in-effect
     void fetchDoc()
   }, [authLoading, user, fetchDoc])
 
-  // Poll while running. Stops on `complete` / `error` / `not_found`.
   useEffect(() => {
     if (phase !== 'ready' || !doc || doc.status !== 'running') return
     pollHandleRef.current = setInterval(() => {
@@ -182,11 +157,7 @@ export function EvaluationResultsByIdClient({ evalId }: { evalId: string }) {
     const prev = lastStatusRef.current
     lastStatusRef.current = doc.status
     if (prev === doc.status) return
-    // Only fire on a real transition FROM 'running' to a terminal state —
-    // i.e. the user was actively watching the pipeline finish in this session.
-    // When navigating into a historical (already-complete) eval from the
-    // history table, `prev` is `null` so we skip the emit; the streaming
-    // path's bell entry already captured the original completion at the time.
+    // Only fire on a live 'running' → terminal transition — historical loads start at prev=null.
     if (prev !== 'running') return
 
     if (doc.status === 'complete') {
@@ -223,9 +194,7 @@ export function EvaluationResultsByIdClient({ evalId }: { evalId: string }) {
 
   useEffect(
     () => () => {
-      // The evaluation provider is shared across the whole
-      // `/dashboard/evaluation/*` subtree. Clear any completed/demo state when
-      // the user leaves results so upload/history pages don't inherit it.
+      // Provider is shared across /dashboard/evaluation/* — clear so upload/history don't inherit demo state.
       setDemoMode(false)
       reset()
     },
@@ -296,20 +265,13 @@ export function EvaluationResultsByIdClient({ evalId }: { evalId: string }) {
   const isComplete = doc.status === 'complete'
   const isError = doc.status === 'error'
 
-  // `totalAnnualRM` remains upside-only, but the hero copy should reflect the
-  // full matched set the user sees on the page, including required-
-  // contribution items surfaced in the separate card below.
   const displayedMatches = whatIfResult?.matches ?? doc.matches
   const matchedCount = displayedMatches.filter((m) => m.qualifies).length
   const totalAnnualRm = whatIfResult?.total_annual_rm ?? doc.totalAnnualRM ?? 0
   const hasChatContext = doc.matches.some((m) => m.qualifies) || whatIfResult !== null
   const hasContent = isComplete || (isRunning && doc.matches.length > 0)
 
-  // Derive section presence from the *actual* data the children will render.
-  // The cards below all self-hide on empty inputs (RequiredContributionsCard
-  // and DraftPacketPreview return null when their filtered slice is empty);
-  // mirroring that here keeps the TOC truthful and prevents dangling anchors
-  // that scroll to nothing.
+  // Mirror each child's self-hide logic so the TOC doesn't produce anchors that scroll to nothing.
   const hasRequiredContributions = doc.matches.some((m) => m.qualifies && m.kind === 'required_contribution')
   const hasSubsidies = doc.matches.some((m) => m.qualifies && m.kind === 'subsidy_credit')
   const hasUpsideMatches = doc.matches.some((m) => m.qualifies && (m.kind ?? 'upside') === 'upside')
@@ -320,15 +282,11 @@ export function EvaluationResultsByIdClient({ evalId }: { evalId: string }) {
   const showSubsidies = hasContent && hasSubsidies
   const showRequired = hasContent && hasRequiredContributions
   const showPreview = isComplete && hasQualifyingForPacket
-  // Phase 11 Feature 2 — Strategy section renders whenever the eval reached
-  // the optimize_strategy step, even when no advisories tripped (the empty
-  // state communicates "no conflicts detected").
+  // Renders whenever optimize_strategy completed — empty state communicates "no conflicts detected".
   const optimizerComplete = doc.stepStates.optimize_strategy === 'complete'
   const showStrategy = isComplete && optimizerComplete
   const showWhatIfs = isComplete && Boolean(doc.profile)
 
-  // Page order matches the spec: Overview → Eligible Schemes → Subsidies →
-  // Required Contributions → Strategy → What-Ifs → Inline Preview.
   const visibleSections: readonly TocSectionId[] = (() => {
     const ids: TocSectionId[] = []
     if (showOverview) ids.push('overview')
@@ -353,13 +311,7 @@ export function EvaluationResultsByIdClient({ evalId }: { evalId: string }) {
       {(isRunning || isError) && <PipelineNarrative state={pipelineState} />}
 
       {isError && (
-        // Category-tailored recovery on persisted errors. The original
-        // files + dependants aren't retained server-side, so Retry isn't
-        // meaningful here; omitted `onRetry` tells the card to drop the
-        // Retry CTA entirely. The remaining CTAs (manual, samples,
-        // settings, reset) all route back to the upload page where the
-        // user picks a fresh submission — category still drives which of
-        // those CTAs renders.
+        // No Retry CTA: original files + dependants aren't retained server-side, so replay isn't meaningful.
         <ErrorRecoveryCard
           message={doc.error?.message ?? t('evaluation.unknownError')}
           category={doc.error?.category ?? null}
@@ -513,9 +465,6 @@ export function EvaluationResultsByIdClient({ evalId }: { evalId: string }) {
         </div>
       )}
 
-      {/* Phase 10 — floating chatbot. Only available when the eval has at
-          least one qualifying match (no chat without context). The panel
-          uses fixed positioning, so it never affects the page layout above. */}
       {isComplete && hasChatContext && (
         <ResultsChatPanel evalId={evalId} matches={displayedMatches} chat={chat} />
       )}

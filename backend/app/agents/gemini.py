@@ -1,43 +1,5 @@
-"""Shared Gemini client setup — Vertex AI mode.
-
-The AI Studio API key keeps silently demoting the project from Tier 1 to
-Free tier even with billing active. Vertex AI uses the GCP project's IAM +
-billing directly, bypasses the AI Studio key tier-management bug, and
-properly draws on the project's Google Cloud Credit.
-
-Auth flow:
-    Local dev: `gcloud auth application-default login` once. The SDK picks up
-        Application Default Credentials automatically.
-    Cloud Run: the service account attached to `layak-backend` is the
-        runtime identity. It needs `roles/aiplatform.user` (or anything that
-        grants `aiplatform.endpoints.predict`); the project default Compute SA
-        already inherits this via `roles/editor`.
-
-Configuration:
-    `GOOGLE_CLOUD_PROJECT`  — required. The GCP project ID for billing/quota.
-    `GOOGLE_CLOUD_LOCATION` — optional. The Vertex AI region. Defaults to
-                              `asia-southeast1` so requests stay co-located
-                              with the Cloud Run service.
-
-Model routing (per-step assignment):
-    FAST_MODEL      — Gemini 3.1 Flash-Lite — multimodal extract (OCR).
-    WORKER_MODEL    — Gemini 3.1 Flash-Lite — structured classify.
-    HEAVY_MODEL     — Gemini 2.5 Pro — compute_upside (code_execution tool).
-                      `gemini-3.1-flash-lite` availability confirmed via
-                      `backend/scripts/probe_gemini_3_1_flash_lite.py`:
-                      both `response_mime_type=application/json` and
-                      multimodal image input work against the canonical
-                      `gemini-3.1-flash-lite` ID in the `global` location.
-    ORCHESTRATOR    — Gemini 2.5 Pro   — reserved for an optional ADK orchestrator
-                      runner cutover; not currently invoked by the manual
-                      `stream_agent_events` loop.
-
-Region pinning: `asia-southeast1` only publishes a subset of the publisher
-catalogue, while `global` resolves the full matrix. The `_DEFAULT_LOCATION`
-flips to `global` so a single Vertex AI endpoint serves the entire
-pipeline. Cloud Run service stays in `asia-southeast1` for co-location with
-the user-facing frontend.
-"""
+# Vertex AI mode (not AI Studio) — AI Studio API key silently demotes billing tier.
+# Location pinned to "global" because asia-southeast1 only publishes a subset of the model catalogue.
 
 from __future__ import annotations
 
@@ -58,9 +20,7 @@ from app.schema.locale import DEFAULT_LANGUAGE, SupportedLanguage
 
 _log = logging.getLogger(__name__)
 
-# Error-recovery category slugs surfaced on the SSE `ErrorEvent.category` so
-# the frontend can render category-aware CTAs without substring-matching the
-# humanised message. `None` (unknown) triggers the generic "start over" card.
+# Surfaced on SSE ErrorEvent.category so the frontend can render category-aware CTAs.
 ErrorCategory = Literal[
     "quota_exhausted",
     "service_unavailable",
@@ -70,10 +30,7 @@ ErrorCategory = Literal[
 ]
 
 
-# Per-language instruction block interpolated into worker-model prompts
-# (classify, compute_upside). The three values use the same Dewan / 普通话
-# registers as `frontend/src/lib/i18n/locales/*.json` so prompt output reads
-# consistently with the UI chrome around it.
+# Register choice (Dewan / 普通话) mirrors frontend/src/lib/i18n/locales/*.json.
 LANGUAGE_INSTRUCTION_BLOCK: dict[SupportedLanguage, str] = {
     "en": "Respond in plain English.",
     "ms": (
@@ -86,9 +43,6 @@ LANGUAGE_INSTRUCTION_BLOCK: dict[SupportedLanguage, str] = {
     ),
 }
 
-# Per-step model assignment — overridable via `LAYAK_*` env vars (see
-# `app.config.getenv` and `.env.example`). Resolved at module import; Cloud
-# Run env-var injection or `.env` overrides win over these literal defaults.
 FAST_MODEL = getenv("LAYAK_FAST_MODEL", "gemini-3.1-flash-lite")
 WORKER_MODEL = getenv("LAYAK_WORKER_MODEL", "gemini-3.1-flash-lite")
 HEAVY_MODEL = getenv("LAYAK_HEAVY_MODEL", "gemini-2.5-pro")
@@ -105,12 +59,7 @@ _DOTENV_CANDIDATES = (
 
 
 def _load_var_from_dotenv(key: str) -> str | None:
-    """Read `key=value` for the given key from the first dotenv we find.
-
-    Used as a fallback for local dev — uvicorn started outside `pnpm dev`
-    won't have the parent shell's env. Production never hits this path because
-    Cloud Run injects env vars at deploy time.
-    """
+    # Local-dev fallback for uvicorn started outside `pnpm dev`; Cloud Run never hits this.
     prefix = f"{key}="
     for candidate in _DOTENV_CANDIDATES:
         if not candidate.is_file():
@@ -145,16 +94,6 @@ def _resolve_location() -> str:
 
 @lru_cache(maxsize=1)
 def get_client() -> genai.Client:
-    """Return a cached `google.genai.Client` bound to the project's Vertex AI.
-
-    Credentials resolve through Application Default Credentials — locally via
-    `gcloud auth application-default login`, on Cloud Run via the attached
-    service account.
-
-    Raises:
-        RuntimeError: if `GOOGLE_CLOUD_PROJECT` isn't reachable from env or
-            the dotenv fallback.
-    """
     return genai.Client(
         vertexai=True,
         project=_resolve_project(),
@@ -162,13 +101,7 @@ def get_client() -> genai.Client:
     )
 
 
-# Retry knobs — overridable via `LAYAK_*` env vars (see `app.config.getenv`).
-# Default 2 retries (3 total attempts) with a 2.0 s base. Exponential backoff
-# with full jitter rescues the common case observed during the 3-concurrent
-# smoke test: a Vertex AI Flash-Lite per-minute quota dip on classify that
-# clears within seconds. Anything beyond 3 attempts pushes the SSE pipeline
-# past a comfortable 60 s budget and starts blocking client perception of
-# progress, so cap defensively rather than waiting out a true outage.
+# 3 total attempts (2 retries) caps worst-case latency around the SSE 60s budget.
 _RETRY_MAX_RETRIES = getenv_int("LAYAK_GEMINI_MAX_RETRIES", 2)
 try:
     _RETRY_BASE_DELAY_S = float(getenv("LAYAK_GEMINI_BASE_DELAY_SECONDS", "2.0"))
@@ -177,17 +110,7 @@ except ValueError:
 
 
 def _is_retryable_api_error(exc: BaseException) -> bool:
-    """Return True for transient Vertex AI errors worth a retry.
-
-    Two paths:
-      1. Typed `google.genai.errors.APIError` — definitive. The status code
-         tells us exactly what happened, and we trust it without falling back
-         to string parsing (a 400 whose body happens to mention "quota" must
-         NOT be retried — the request itself is malformed).
-      2. Untyped `Exception` whose `str()` carries the magic words — string
-         fallback. Defends against transport wrappers (httpx pool errors,
-         aiohttp timeouts) that swallow the typed APIError.
-    """
+    # Prefer the typed APIError code; string fallback defends against transport wrappers that swallow it.
     if isinstance(exc, genai_errors.APIError):
         code = getattr(exc, "code", None)
         if code == 429:
@@ -205,20 +128,7 @@ def generate_with_retry(
     max_retries: int | None = None,
     base_delay_seconds: float | None = None,
 ) -> Any:
-    """Call `client.models.generate_content` with exponential-backoff retry.
-
-    Retries only on transient Vertex AI failures (HTTP 429 / 5xx). Permission
-    errors, bad-request validation errors, and Pydantic schema drift on the
-    response all re-raise immediately so the caller's SSE error path can
-    surface a category-tailored CTA without the user waiting through pointless
-    retry windows.
-
-    Backoff uses *full jitter* — `random.uniform(0, base * 2**attempt)` —
-    so concurrent callers that all 429 don't synchronously retry on the
-    exact same wall-clock tick. With defaults (2 retries, 2.0 s base) the
-    worst-case added latency is ~6 s before re-raising; a single retry
-    typically rescues a per-minute quota blip in <3 s.
-    """
+    # Full jitter so concurrent 429s don't synchronously retry on the same tick.
     retries = _RETRY_MAX_RETRIES if max_retries is None else max_retries
     base = _RETRY_BASE_DELAY_S if base_delay_seconds is None else base_delay_seconds
     attempt = 0
@@ -244,12 +154,7 @@ _FENCE_RE = re.compile(r"^\s*```(?:json)?\s*\n(.*?)\n```\s*$", re.DOTALL | re.IG
 
 
 def strip_json_fences(text: str) -> str:
-    """Remove Markdown ```json ... ``` fences from a Gemini response if present.
-
-    Gemini with `response_mime_type="application/json"` almost always returns bare
-    JSON, but occasional drift puts fences around the object. This strips them so
-    `Model.model_validate_json()` sees the raw JSON.
-    """
+    # Gemini occasionally emits ```json fences despite response_mime_type=application/json.
     stripped = text.strip()
     m = _FENCE_RE.match(stripped)
     if m:
@@ -257,32 +162,18 @@ def strip_json_fences(text: str) -> str:
     return stripped
 
 
-# Match either a raw 5+-digit run OR a MyKad-formatted IC with dash/space
-# separators (`900324-06-4321`, `900324 06 4321`). Ordered so the dashed form
-# wins: otherwise a naive `\d{5,}` would only redact `900324` and leave `4321`.
+# Dashed MyKad form first — otherwise \d{5,} would only redact the first chunk.
 _DIGIT_RUN_RE = re.compile(r"\b\d{6}[\s-]?\d{2}[\s-]?\d{4}\b|\b\d{5,}\b")
 
 
 def sanitize_error_message(message: str, max_len: int = 240) -> str:
-    """Redact anything that looks like a long digit run (IC numbers, phone numbers)
-    from an error message before it crosses the SSE boundary.
-
-    Pydantic `ValidationError.__str__` can embed the offending input — if Gemini
-    hallucinates a 12-digit MyKad IC into a field that fails validation, the raw
-    IC would otherwise stream to the browser. Both the raw 12-digit form and the
-    dashed `YYMMDD-PB-####` form get replaced with `[redacted]`. Also truncates
-    to `max_len` characters so a verbose stack trace doesn't flood the UI.
-    """
+    # Pydantic ValidationError embeds the offending input — redact ICs before SSE.
     redacted = _DIGIT_RUN_RE.sub("[redacted]", message)
     if len(redacted) > max_len:
         redacted = redacted[: max_len - 1] + "…"
     return redacted
 
 
-# Friendly copy keyed off (language, upstream error category). The category
-# slug flows to the frontend on the SSE error event so the UI can surface
-# category-aware CTAs (e.g. "Try Manual Entry" only when OCR is rate-limited);
-# only the human-readable `message` localises.
 ERROR_CATEGORY_MESSAGES: dict[SupportedLanguage, dict[ErrorCategory, str]] = {
     "en": {
         "quota_exhausted": (
@@ -353,17 +244,7 @@ ERROR_CATEGORY_MESSAGES: dict[SupportedLanguage, dict[ErrorCategory, str]] = {
 
 
 def categorize_error_message(raw: str) -> ErrorCategory | None:
-    """Return a `ERROR_CATEGORY_MESSAGES` slug for known upstream errors, or `None`.
-
-    Pure string matching — the google-genai SDK doesn't expose a stable error
-    code object across versions, so we sniff the formatted exception text.
-    Each branch is intentionally conservative: only flag errors whose user-
-    facing remediation differs from the default "something broke" path.
-
-    Both google.genai's `ClientError: 429 RESOURCE_EXHAUSTED` form and
-    google.api_core's `ResourceExhausted` (no underscore) class-name form
-    are matched — the SDK serialises differently across paths.
-    """
+    # String-match because google-genai exposes no stable error-code object across versions.
     lowered = raw.lower()
     if (
         "429" in raw
@@ -389,8 +270,6 @@ def categorize_error_message(raw: str) -> ErrorCategory | None:
         or "unauthenticated" in lowered
     ):
         return "permission_denied"
-    # Pydantic schema drift on Gemini's structured output. Surface a clearer
-    # remediation than the raw `1 validation error for Profile ...` string.
     if "validationerror" in lowered and ("profile" in lowered or "extract" in lowered):
         return "extract_validation"
     return None
@@ -402,13 +281,6 @@ def humanize_error_message(
     *,
     language: SupportedLanguage = DEFAULT_LANGUAGE,
 ) -> str:
-    """User-facing copy for an upstream pipeline error.
-
-    For known categories returns the static remediation copy in the user's
-    language — those strings carry no PII so digit redaction is unnecessary.
-    For everything else falls through to `sanitize_error_message` so unknown
-    errors still get IC redaction + truncation before reaching the UI.
-    """
     category = categorize_error_message(raw)
     if category is not None:
         catalog = ERROR_CATEGORY_MESSAGES.get(language) or ERROR_CATEGORY_MESSAGES["en"]
@@ -422,17 +294,6 @@ def humanize_error(
     *,
     language: SupportedLanguage = DEFAULT_LANGUAGE,
 ) -> tuple[str, ErrorCategory | None]:
-    """Pair of `(user-facing message, category slug)` for an upstream error.
-
-    Convenience for callers that need both halves at once — the orchestrator
-    emits the pair onto the SSE `ErrorEvent` so the frontend renders
-    category-tailored CTAs. Categories that don't match a known pattern return
-    `(sanitized_raw, None)`; the frontend treats `None` as the generic "start
-    over" branch.
-
-    The human-readable message tracks `language`; the category slug stays
-    language-neutral (the frontend keys its CTAs off it).
-    """
     category = categorize_error_message(raw)
     if category is not None:
         catalog = ERROR_CATEGORY_MESSAGES.get(language) or ERROR_CATEGORY_MESSAGES["en"]
@@ -441,7 +302,6 @@ def humanize_error(
 
 
 def detect_mime(filename: str, data: bytes) -> str:
-    """Infer a MIME type from file magic bytes with filename-extension fallback."""
     if data.startswith(b"%PDF-"):
         return "application/pdf"
     if data.startswith(b"\xff\xd8\xff"):

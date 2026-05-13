@@ -1222,3 +1222,8 @@ Findings the audit flagged that were **not** acted on (cosmetic or external to P
 
 - Fixed the landing-page marketing header so the logo text plus language/theme icon controls use the theme foreground immediately in light mode instead of fading from white as the page scrolls.
 - Verified: targeted ESLint on `marketing-header.tsx` clean; `pnpm -C frontend build` clean.
+
+## [13/05/26] - Discovery pipeline metric glass pass
+
+- Updated the `/dashboard/discovery` Pipeline card metrics to use translucent blurred KPI surfaces with a subtle inset highlight.
+- Verified: targeted ESLint on `discovery-run-panel.tsx` clean; `pnpm -C frontend build` clean.

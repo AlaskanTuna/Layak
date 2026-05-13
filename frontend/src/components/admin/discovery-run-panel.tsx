@@ -189,7 +189,7 @@ export function DiscoveryRunPanel({ onCompleted }: { onCompleted: () => void }) 
 
 function Kpi({ label, value }: { label: string; value: number }) {
   return (
-    <div className="flex flex-col gap-1 rounded-[10px] border border-foreground/10 bg-card/40 px-4 py-3">
+    <div className="flex flex-col gap-1 rounded-[10px] border border-foreground/10 bg-card/45 px-4 py-3 shadow-[inset_0_1px_0_color-mix(in_oklch,white_38%,transparent),0_12px_30px_-24px_rgb(15_23_42/0.35)] backdrop-blur-md dark:bg-card/30">
       <span className="font-mono text-2xl font-semibold tabular-nums text-foreground">{value}</span>
       <span className="mono-caption text-foreground/55">{label}</span>
     </div>

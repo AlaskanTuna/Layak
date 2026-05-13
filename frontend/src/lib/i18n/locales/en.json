@@ -37,7 +37,9 @@
     "footer": {
       "copyright": "© 2026 Layak",
       "contact": "Contact Us",
-      "howItWorks": "How it Works"
+      "howItWorks": "How it Works",
+      "privacy": "Privacy Policy",
+      "terms": "Terms & Conditions"
     },
     "notifications": {
       "title": "Notifications",
@@ -430,7 +432,7 @@
     },
     "signIn": {
       "title": "Welcome back",
-      "description": "Sign in with Google, email, or as a guest to reach your dashboard.",
+      "description": "Sign in to pick up where you left off.",
       "noAccountPrefix": "No account?",
       "noAccountCta": "Sign up",
       "errorFailed": "Sign-in failed. Please try again.",
@@ -456,7 +458,7 @@
     },
     "signUp": {
       "title": "Create your account",
-      "description": "Sign up with Google or email. Layak never submits anything on your behalf — you stay in control of every draft packet.",
+      "description": "Layak only creates drafts. You stay in control.",
       "consentPrefix": "I consent to Layak processing my uploaded documents (IC, payslip, utility bill) to match government schemes, per the",
       "consentPrivacy": "Privacy Policy",
       "consentAnd": "and",
@@ -484,7 +486,18 @@
         "operationNotAllowed": "Email/password sign-up isn't enabled. Contact support.",
         "generic": "Sign-up failed. Please try again."
       }
-    }
+    },
+    "context": {
+      "heading": "See what financial help you qualify for.",
+      "body": "Upload three documents and get a personalised list of Malaysian government schemes you can apply for, in minutes.",
+      "bullets": {
+        "free": "Free to use",
+        "drafts": "Drafts only — you stay in control",
+        "trilingual": "Available in English, Bahasa Melayu, and 中文"
+      },
+      "mobileStrip": "Free · Drafts only · Trilingual"
+    },
+    "tabsAriaLabel": "Sign-in method"
   },
   "dashboard": {
     "hero": {

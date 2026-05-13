@@ -56,60 +56,71 @@ export function SignInForm() {
   const busy = pending !== null || loading
 
   return (
-    <div className="flex w-full flex-col justify-center space-y-6 sm:w-100">
-      <div className="flex flex-col space-y-2 text-center">
-        <h1 className="font-heading text-3xl font-semibold tracking-tight">{t('auth.signIn.title')}</h1>
-        <p className="text-sm text-muted-foreground">{t('auth.signIn.description')}</p>
-      </div>
+    <div className="flex w-full flex-col gap-5">
+      <p className="mono-caption text-center text-foreground/55 lg:hidden" aria-hidden>
+        {t('auth.context.mobileStrip')}
+      </p>
 
-      <Tabs defaultValue="google" className="w-full">
-        <TabsList className="grid w-full grid-cols-2">
-          <TabsTrigger value="google">{t('auth.signIn.tabGoogle')}</TabsTrigger>
-          <TabsTrigger value="email">{t('auth.signIn.tabEmail')}</TabsTrigger>
-        </TabsList>
-
-        <TabsContent value="google" className="mt-4 grid gap-4">
-          <Button type="button" size="lg" onClick={handleGoogle} disabled={busy} className="w-full text-base h-12">
-            {pending === 'google' ? (
-              <Loader2 className="mr-2 size-5 animate-spin" aria-hidden />
-            ) : (
-              <GoogleIcon className="mr-2 size-5" />
-            )}
-            {t('common.button.continueWithGoogle')}
-            <ArrowRight className="ml-2 size-5 opacity-70" aria-hidden />
-          </Button>
-        </TabsContent>
-
-        <TabsContent value="email" className="mt-4">
-          <EmailSignInForm onSuccess={() => router.replace('/dashboard')} disabled={busy} />
-        </TabsContent>
-      </Tabs>
-
-      <div className="flex items-center gap-3 text-[11px] uppercase tracking-[0.16em] text-muted-foreground">
-        <span aria-hidden className="h-px flex-1 bg-border" />
-        {t('auth.signIn.orDivider')}
-        <span aria-hidden className="h-px flex-1 bg-border" />
-      </div>
-
-      <Button
-        type="button"
-        size="lg"
-        variant="outline"
-        onClick={handleGuest}
-        disabled={busy}
-        className="w-full text-base h-12"
-      >
-        {pending === 'guest' && <Loader2 className="mr-2 size-5 animate-spin" aria-hidden />}
-        {t('auth.signIn.continueAsGuest')}
-      </Button>
-
-      {error && (
-        <div className="rounded-md bg-destructive/15 p-3 text-sm text-destructive" role="alert">
-          {error}
+      <div className="paper-card flex flex-col gap-6 rounded-[20px] p-7 sm:p-9">
+        <div className="flex flex-col items-center gap-2 text-center">
+          <h1 className="font-heading text-3xl font-semibold tracking-tight">
+            {t('auth.signIn.title')}
+          </h1>
+          <p className="max-w-[40ch] text-sm leading-relaxed text-muted-foreground">
+            {t('auth.signIn.description')}
+          </p>
         </div>
-      )}
 
-      <p className="px-8 text-center text-sm text-muted-foreground">
+        <Tabs defaultValue="google" className="w-full" aria-label={t('auth.tabsAriaLabel')}>
+          <TabsList className="grid w-full grid-cols-2">
+            <TabsTrigger value="google">{t('auth.signIn.tabGoogle')}</TabsTrigger>
+            <TabsTrigger value="email">{t('auth.signIn.tabEmail')}</TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="google" className="mt-4">
+            <Button
+              type="button"
+              size="lg"
+              onClick={handleGoogle}
+              disabled={busy}
+              className="h-12 w-full bg-[color:var(--hibiscus)] text-base text-[color:var(--hibiscus-foreground)] hover:bg-[color:var(--hibiscus)]/92"
+            >
+              {pending === 'google' ? (
+                <Loader2 className="mr-2 size-5 animate-spin" aria-hidden />
+              ) : (
+                <GoogleIcon className="mr-2 size-5" />
+              )}
+              {t('common.button.continueWithGoogle')}
+              <ArrowRight className="ml-2 size-5 opacity-70" aria-hidden />
+            </Button>
+          </TabsContent>
+
+          <TabsContent value="email" className="mt-4">
+            <EmailSignInForm onSuccess={() => router.replace('/dashboard')} disabled={busy} />
+          </TabsContent>
+        </Tabs>
+
+        <div className="flex justify-center">
+          <button
+            type="button"
+            onClick={handleGuest}
+            disabled={busy}
+            className="inline-flex items-center gap-1.5 rounded-md px-2 py-1 text-sm font-medium text-foreground/65 transition-colors hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring/50 focus-visible:outline-none disabled:opacity-50"
+          >
+            {pending === 'guest' && <Loader2 className="size-4 animate-spin" aria-hidden />}
+            {t('auth.signIn.continueAsGuest')}
+            <ArrowRight className="size-4 opacity-70" aria-hidden />
+          </button>
+        </div>
+
+        {error && (
+          <div className="rounded-md bg-destructive/15 p-3 text-sm text-destructive" role="alert">
+            {error}
+          </div>
+        )}
+      </div>
+
+      <p className="text-center text-sm text-muted-foreground">
         {t('auth.signIn.noAccountPrefix')}{' '}
         <Link href="/sign-up" className="font-medium text-primary underline-offset-4 hover:underline">
           {t('auth.signIn.noAccountCta')}

@@ -21,6 +21,18 @@ export function Footer() {
         <Link href="/#how-it-works" className="transition-colors hover:text-foreground">
           {t('common.footer.howItWorks')}
         </Link>
+        <span aria-hidden className="opacity-40">
+          ·
+        </span>
+        <Link href="/privacy" className="transition-colors hover:text-foreground">
+          {t('common.footer.privacy')}
+        </Link>
+        <span aria-hidden className="opacity-40">
+          ·
+        </span>
+        <Link href="/terms" className="transition-colors hover:text-foreground">
+          {t('common.footer.terms')}
+        </Link>
       </div>
     </footer>
   )

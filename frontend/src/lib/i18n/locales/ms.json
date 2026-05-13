@@ -37,7 +37,9 @@
     "footer": {
       "copyright": "© 2026 Layak",
       "contact": "Hubungi Kami",
-      "howItWorks": "Cara ia berfungsi"
+      "howItWorks": "Cara ia berfungsi",
+      "privacy": "Dasar Privasi",
+      "terms": "Terma & Syarat"
     },
     "notifications": {
       "title": "Pemberitahuan",
@@ -430,7 +432,7 @@
     },
     "signIn": {
       "title": "Selamat Kembali",
-      "description": "Log masuk dengan Google, e-mel, atau sebagai tetamu untuk ke papan pemuka.",
+      "description": "Log masuk untuk sambung semula.",
       "noAccountPrefix": "Tiada akaun?",
       "noAccountCta": "Daftar",
       "errorFailed": "Log masuk gagal. Sila cuba lagi.",
@@ -456,7 +458,7 @@
     },
     "signUp": {
       "title": "Cipta akaun anda",
-      "description": "Daftar dengan Google atau e-mel. Layak tidak pernah menghantar apa-apa bagi pihak anda — anda mengawal setiap pakej draf.",
+      "description": "Layak hanya menjana draf. Anda yang mengawal.",
       "consentPrefix": "Saya bersetuju Layak memproses dokumen yang saya muat naik (IC, slip gaji, bil utiliti) untuk memadankan skim kerajaan, mengikut",
       "consentPrivacy": "Dasar Privasi",
       "consentAnd": "dan",
@@ -484,7 +486,18 @@
         "operationNotAllowed": "Pendaftaran e-mel/kata laluan tidak diaktifkan. Hubungi sokongan.",
         "generic": "Pendaftaran gagal. Sila cuba lagi."
       }
-    }
+    },
+    "context": {
+      "heading": "Lihat bantuan kewangan yang anda layak.",
+      "body": "Muat naik tiga dokumen dan dapatkan senarai skim kerajaan Malaysia yang boleh anda mohon, dalam beberapa minit.",
+      "bullets": {
+        "free": "Percuma untuk digunakan",
+        "drafts": "Hanya draf — anda yang mengawal",
+        "trilingual": "Tersedia dalam Bahasa Inggeris, Bahasa Melayu, dan 中文"
+      },
+      "mobileStrip": "Percuma · Hanya draf · Tiga bahasa"
+    },
+    "tabsAriaLabel": "Kaedah log masuk"
   },
   "dashboard": {
     "hero": {

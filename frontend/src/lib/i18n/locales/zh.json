@@ -37,7 +37,9 @@
     "footer": {
       "copyright": "© 2026 Layak",
       "contact": "联系我们",
-      "howItWorks": "运作原理"
+      "howItWorks": "运作原理",
+      "privacy": "隐私政策",
+      "terms": "使用条款"
     },
     "notifications": {
       "title": "通知",
@@ -430,7 +432,7 @@
     },
     "signIn": {
       "title": "欢迎回来",
-      "description": "使用 Google、电子邮件或访客身份登录以进入仪表板。",
+      "description": "登录以继续您之前的进度。",
       "noAccountPrefix": "还没有账户？",
       "noAccountCta": "注册",
       "errorFailed": "登录失败。请重试。",
@@ -456,7 +458,7 @@
     },
     "signUp": {
       "title": "创建您的账户",
-      "description": "使用 Google 或电子邮件注册。Layak 从不代您提交任何内容 —— 每份草拟申请包均由您掌控。",
+      "description": "Layak 只生成草稿，主导权始终在您手中。",
       "consentPrefix": "我同意 Layak 依据以下文件处理我上传的文件（身份证、工资单、水电费账单）以配对政府计划：",
       "consentPrivacy": "隐私政策",
       "consentAnd": "及",
@@ -484,7 +486,18 @@
         "operationNotAllowed": "电子邮件/密码注册未启用。请联系支持团队。",
         "generic": "注册失败。请重试。"
       }
-    }
+    },
+    "context": {
+      "heading": "看看您符合哪些财务援助。",
+      "body": "上传三份文件，几分钟内即可获得您可申请的马来西亚政府计划个性化清单。",
+      "bullets": {
+        "free": "免费使用",
+        "drafts": "仅生成草稿 —— 主导权在您",
+        "trilingual": "支持英文、马来文与中文"
+      },
+      "mobileStrip": "免费 · 仅草稿 · 三语"
+    },
+    "tabsAriaLabel": "登录方式"
   },
   "dashboard": {
     "hero": {

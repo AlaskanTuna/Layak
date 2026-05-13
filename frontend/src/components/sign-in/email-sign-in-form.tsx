@@ -81,7 +81,12 @@ export function EmailSignInForm({ onSuccess, disabled }: { onSuccess: () => void
           disabled={busy}
         />
       </div>
-      <Button type="submit" size="lg" disabled={busy || !email || !password} className="w-full text-base h-12">
+      <Button
+        type="submit"
+        size="lg"
+        disabled={busy || !email || !password}
+        className="h-12 w-full bg-[color:var(--hibiscus)] text-base text-[color:var(--hibiscus-foreground)] hover:bg-[color:var(--hibiscus)]/92"
+      >
         {pending && <Loader2 className="mr-2 size-5 animate-spin" aria-hidden />}
         {t('auth.signIn.submit')}
       </Button>

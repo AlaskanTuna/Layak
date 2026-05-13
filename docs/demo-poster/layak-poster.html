@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Layak — A3 Booth Poster</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Abril+Fatface&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  @page { size: A3 portrait; margin: 0; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { width: 297mm; height: 420mm; margin: 0; padding: 0; background: #000; color: #efe5d2; font-family: 'Inter', -apple-system, sans-serif; -webkit-font-smoothing: antialiased; overflow: hidden; }
+  .poster {
+    width: 297mm; height: 420mm; padding: 26mm 15mm 26mm;
+    background: #000;
+    position: relative; overflow: hidden;
+    display: grid; grid-template-rows: 72mm 54mm 6mm 86mm 68mm 1fr; row-gap: 7mm;
+  }
+  .poster > * { position: relative; z-index: 1; }
+  .poster > .spacer { background: transparent; }
+
+  .mono { font-family: 'JetBrains Mono', ui-monospace, monospace; letter-spacing: 0.08em; text-transform: uppercase; }
+  .serif { font-family: 'Abril Fatface', serif; font-weight: 400; }
+  .muted { color: #9a8e7a; }
+  .dim   { color: #6f6557; }
+  .coral { color: #eb5874; }
+  .teal  { color: #6bbdc0; }
+  .gold  { color: #c7a169; }
+
+  /* ROW A — meta bar */
+  .meta { display: flex; align-items: center; justify-content: space-between; }
+  .brand { display: flex; align-items: baseline; gap: 5mm; }
+  .brand .mark { width: 7mm; height: 7mm; border-radius: 1.4mm; background: linear-gradient(135deg, #6bbdc0, #c7a169); display: inline-block; }
+  .brand .mark-row { display: flex; align-items: center; gap: 3mm; }
+  .brand .name { font-family: 'Abril Fatface', serif; font-size: 13pt; color: #efe5d2; letter-spacing: -0.5px; }
+  .brand .tag { font-size: 7.5pt; color: #9a8e7a; }
+  .chips { display: flex; gap: 2.5mm; align-items: center; }
+  .chip { padding: 1.6mm 3.2mm; border-radius: 2mm; font-family: 'JetBrains Mono', monospace; font-size: 7.5pt; letter-spacing: 0.1em; text-transform: uppercase; }
+  .chip-primary { background: #6bbdc0; color: #0e0c09; font-weight: 600; }
+  .chip-outline { border: 0.4mm solid #5e564a; color: #c8bca4; }
+  .chip-amber   { background: rgba(199,161,105,0.12); color: #c7a169; border: 0.4mm solid rgba(199,161,105,0.4); }
+
+  /* ROW B — hero */
+  .hero { display: grid; grid-template-columns: 1.45fr 1fr; column-gap: 12mm; align-items: start; }
+  .hero h1 { font-family: 'Abril Fatface', serif; font-size: 124pt; line-height: 1.0; color: #efe5d2; letter-spacing: -2.5px; margin: 0 0 5mm; padding: 0; }
+  .hero h1 .dot { color: #6bbdc0; }
+  .hero .lede { font-size: 12pt; line-height: 1.45; color: #c8bca4; max-width: 130mm; margin-top: 6mm; }
+  .hero .lede .hl { color: #efe5d2; font-weight: 500; }
+  .hero .problem { padding-top: 4mm; }
+  .hero .problem-eyebrow { font-size: 7.5pt; color: #eb5874; margin-bottom: 4mm; }
+  .hero .brand-row { display: flex; align-items: center; gap: 6mm; margin-bottom: 5mm; }
+  .hero .brand-row img { width: 26mm; height: 26mm; border-radius: 4mm; box-shadow: 0 1mm 4mm rgba(0,0,0,0.35); flex: 0 0 auto; }
+  .hero .brand-row h1 { margin: 0; line-height: 0.92; }
+  .hero .problem-pull { font-family: 'Abril Fatface', serif; font-size: 24pt; line-height: 1.12; color: #efe5d2; letter-spacing: -0.3px; }
+  .hero .problem-pull .big-coral { color: #eb5874; }
+  .hero .problem-pull .big-teal { color: #6bbdc0; }
+  .hero .problem-body { font-size: 10pt; line-height: 1.5; color: #968a76; margin-top: 4mm; }
+
+  /* ROW C — stat band */
+  .stats { display: grid; grid-template-columns: 1.65fr 1fr 1fr 1fr; column-gap: 4mm; align-items: stretch; }
+  .stat-card { padding: 6mm 6mm 5mm; border-radius: 2.5mm; background: #14110c; border: 0.3mm solid rgba(231,212,170,0.06); display: flex; flex-direction: column; justify-content: space-between; }
+  .stat-hero { background: linear-gradient(135deg, #1a1610 0%, #14110c 60%); border-left: 1.2mm solid #6bbdc0; }
+  .stat-hero .label { font-size: 9pt; color: #6bbdc0; letter-spacing: 0.16em; }
+  .stat-hero .num { font-family: 'Abril Fatface', serif; font-size: 64pt; line-height: 0.92; color: #efe5d2; letter-spacing: -1px; margin-top: 3mm; }
+  .stat-hero .num .unit { font-size: 22pt; color: #c7a169; vertical-align: super; margin-left: 2mm; letter-spacing: 0; }
+  .stat-hero .sub { font-size: 9.5pt; color: #9a8e7a; margin-top: 2mm; line-height: 1.4; }
+  .stat-card .top { display: flex; align-items: baseline; gap: 2mm; }
+  .stat-card .n { font-family: 'Abril Fatface', serif; font-size: 44pt; line-height: 1; color: #efe5d2; letter-spacing: -0.5px; }
+  .stat-card .n.coral { color: #eb5874; }
+  .stat-card .n.gold  { color: #c7a169; }
+  .stat-card .u { font-size: 10pt; color: #9a8e7a; letter-spacing: 0.04em; }
+  .stat-card .label { font-size: 8pt; color: #c8bca4; letter-spacing: 0.14em; margin-top: 3mm; }
+  .stat-card .desc { font-size: 9.5pt; line-height: 1.4; color: #807464; margin-top: 1.5mm; }
+
+  /* ROW D — Aisyah persona */
+  .persona { padding: 6mm 7mm; border-radius: 2.5mm; background: #14110c; border: 0.3mm solid rgba(231,212,170,0.06); border-left: 1.2mm solid #c7a169; display: grid; grid-template-columns: 1.85fr 1fr 1fr 1fr; column-gap: 5mm; row-gap: 0; }
+  .persona .lead .eb { font-size: 7.5pt; color: #c7a169; letter-spacing: 0.16em; }
+  .persona .lead .name { font-family: 'Abril Fatface', serif; font-size: 22pt; color: #efe5d2; line-height: 1.05; margin-top: 1.5mm; letter-spacing: -0.3px; }
+  .persona .lead .body { font-size: 9pt; color: #a99b85; margin-top: 2mm; line-height: 1.35; }
+  .persona .lead .body b { color: #efe5d2; font-weight: 500; }
+  .persona .field .eb { font-size: 7pt; color: #6f6557; letter-spacing: 0.16em; }
+  .persona .field .val { font-family: 'Abril Fatface', serif; font-size: 20pt; color: #efe5d2; line-height: 1.05; margin-top: 1.5mm; }
+  .persona .field .val.coral { color: #eb5874; }
+  .persona .field .val.teal { color: #6bbdc0; }
+  .persona .field .val.gold { color: #c7a169; }
+  .persona .field .desc { font-size: 8.5pt; color: #807464; margin-top: 1mm; line-height: 1.4; }
+  .scheme-row { grid-column: 1 / -1; display: grid; grid-template-columns: 1fr 1fr; gap: 4mm; margin-top: 4mm; padding-top: 4mm; border-top: 0.2mm dashed rgba(231,212,170,0.13); }
+  .scheme { padding: 3.5mm 4mm; background: rgba(255,255,255,0.02); border-radius: 1.5mm; display: flex; justify-content: space-between; align-items: center; }
+  .scheme .tag { font-size: 7pt; color: #c7a169; letter-spacing: 0.16em; }
+  .scheme .name { font-family: 'Abril Fatface', serif; font-size: 13pt; color: #efe5d2; line-height: 1.1; margin-top: 1mm; }
+  .scheme .why { font-size: 8.5pt; color: #807464; margin-top: 1mm; }
+  .scheme .amt { font-family: 'Abril Fatface', serif; font-size: 22pt; color: #efe5d2; }
+  .scheme .amt .pre { font-size: 9pt; color: #6f6557; letter-spacing: 0.06em; margin-right: 1.5mm; vertical-align: middle; }
+  .scheme .amt .per { font-size: 8pt; color: #6f6557; letter-spacing: 0.06em; margin-left: 1mm; vertical-align: middle; }
+
+  /* ROW E — pipeline */
+  .pipe-head { display: flex; align-items: baseline; justify-content: space-between; }
+  .pipe-head h2 { font-family: 'Abril Fatface', serif; font-size: 26pt; color: #efe5d2; letter-spacing: -0.3px; line-height: 1.05; }
+  .pipe-head h2 em { font-style: italic; color: #6bbdc0; font-family: 'Abril Fatface', serif; }
+  .pipe-head .note { font-size: 9.5pt; color: #968a76; max-width: 110mm; text-align: right; line-height: 1.45; }
+  .pipe { display: grid; grid-template-columns: repeat(5, 1fr); column-gap: 4mm; margin-top: 4mm; }
+  .step { padding: 6mm 5.5mm 5mm; background: #14110c; border-radius: 2mm; border: 0.3mm solid rgba(231,212,170,0.06); display: flex; flex-direction: column; }
+  .step .num { font-family: 'JetBrains Mono', monospace; font-size: 8pt; color: #6f6557; letter-spacing: 0.16em; }
+  .step .name { font-family: 'Abril Fatface', serif; font-size: 22pt; color: #efe5d2; line-height: 1; margin-top: 2.5mm; }
+  .step .body { font-size: 9pt; color: #a99b85; line-height: 1.4; margin-top: 3mm; flex-grow: 1; }
+  .step .agent { font-family: 'JetBrains Mono', monospace; font-size: 7.5pt; color: #6bbdc0; letter-spacing: 0.16em; margin-top: 4mm; padding-top: 3mm; border-top: 0.2mm solid rgba(107,189,192,0.18); }
+
+  /* ROW F — output preview */
+  .out { display: grid; grid-template-columns: 1fr 1.18fr; column-gap: 6mm; overflow: hidden; }
+  .out-card { padding: 5mm 6mm 5mm; background: #14110c; border-radius: 2.5mm; border: 0.3mm solid rgba(231,212,170,0.06); display: flex; flex-direction: column; overflow: hidden; }
+  .out-card h3 { font-family: 'Abril Fatface', serif; font-size: 17pt; color: #efe5d2; line-height: 1.1; letter-spacing: -0.2px; }
+  .out-card h3 em { font-style: italic; color: #c7a169; }
+  .out-card .badge { display: inline-block; align-self: flex-start; padding: 1.4mm 2.8mm; border: 0.4mm solid #eb5874; border-radius: 1.4mm; font-family: 'JetBrains Mono', monospace; font-size: 7.5pt; color: #eb5874; letter-spacing: 0.14em; }
+  .out-card .row { display: flex; justify-content: space-between; align-items: center; padding: 2.5mm 0; border-bottom: 0.2mm dashed rgba(231,212,170,0.1); }
+  .out-card .row:last-child { border-bottom: none; }
+  .out-card .pdf-mock { flex-grow: 1; background: linear-gradient(180deg, rgba(255,255,255,0.04) 0%, rgba(255,255,255,0.01) 100%); border: 0.3mm solid rgba(231,212,170,0.1); border-radius: 1.5mm; padding: 4mm; display: flex; flex-direction: column; gap: 1.5mm; }
+  .shots { display: grid; grid-template-columns: 1fr 1fr; column-gap: 4mm; row-gap: 1.5mm; flex-grow: 1; align-content: start; margin-top: 1mm; }
+  .shot-img { width: 100%; aspect-ratio: 1.5 / 1; object-fit: cover; object-position: top center; border-radius: 1.5mm; border: 0.3mm solid rgba(231,212,170,0.18); display: block; background: #1a1610; }
+  .shot-cap { font-family: 'JetBrains Mono', monospace; font-size: 7pt; color: #c8bca4; letter-spacing: 0.12em; text-transform: uppercase; text-align: center; margin-bottom: 2mm; }
+  .shot-cap .n { color: #6bbdc0; margin-right: 1mm; }
+  .out-card .pdf-mock .doc-bar { display: flex; align-items: center; justify-content: space-between; padding-bottom: 2.5mm; border-bottom: 0.15mm solid rgba(231,212,170,0.08); margin-bottom: 1mm; }
+  .out-card .pdf-mock .doc-title { font-family: 'Abril Fatface', serif; font-size: 10pt; color: #efe5d2; }
+  .out-card .pdf-mock .ln { height: 1mm; background: rgba(231,212,170,0.1); border-radius: 0.5mm; }
+  .out-card .pdf-mock .ln.s { width: 70%; }
+  .out-card .pdf-mock .ln.m { width: 85%; }
+  .out-card .pdf-mock .ln.l { width: 100%; }
+  .out-card .pdf-mock .watermark { position: absolute; transform: rotate(-12deg); color: rgba(235,88,116,0.18); font-family: 'JetBrains Mono', monospace; font-size: 14pt; letter-spacing: 0.2em; }
+  .out-card .pdf-mock { position: relative; }
+  .out-card .panel { background: rgba(255,255,255,0.02); border-radius: 1.5mm; padding: 2.5mm 3.5mm; margin-top: 2mm; display: flex; justify-content: space-between; align-items: center; }
+  .out-card .row-name { font-family: 'Abril Fatface', serif; font-size: 13pt; color: #efe5d2; margin-top: 1mm; line-height: 1.1; }
+  .out-card .row-why { font-size: 8.5pt; color: #807464; margin-top: 0.6mm; line-height: 1.35; }
+  .out-card .row-amt { font-family: 'Abril Fatface', serif; font-size: 20pt; color: #efe5d2; text-align: right; white-space: nowrap; }
+  /* ROW G — SDG / Track / QR footer */
+  .foot { display: grid; grid-template-columns: 1.35fr 1fr 0.7fr; column-gap: 8mm; align-items: stretch; align-self: end; padding-top: 4mm; border-top: 0.2mm solid rgba(231,212,170,0.13); }
+  .foot .col-head { font-family: 'JetBrains Mono', monospace; font-size: 7pt; color: #6f6557; letter-spacing: 0.18em; margin-bottom: 3mm; }
+  .sdgs { display: flex; gap: 3mm; align-items: stretch; }
+  .sdg { flex: 1; padding: 4mm 4mm 4mm; border-radius: 1.5mm; color: #fff; min-height: 30mm; display: flex; flex-direction: column; justify-content: space-between; }
+  .sdg .n { font-family: 'Abril Fatface', serif; font-size: 28pt; line-height: 1; }
+  .sdg .l { font-size: 8.5pt; line-height: 1.25; font-weight: 600; letter-spacing: 0.02em; text-transform: uppercase; }
+  .sdg-1  { background: #E5243B; }
+  .sdg-10 { background: #DD1367; }
+  .sdg-16 { background: #00689D; }
+  .track-pill { padding: 4mm 4.5mm; border-radius: 2mm; border: 0.4mm solid rgba(107,189,192,0.5); background: rgba(107,189,192,0.06); }
+  .track-pill .l1 { font-family: 'JetBrains Mono', monospace; font-size: 7.5pt; color: #6bbdc0; letter-spacing: 0.18em; }
+  .track-pill .l2 { font-family: 'Abril Fatface', serif; font-size: 17pt; color: #efe5d2; line-height: 1.1; margin-top: 1mm; }
+  .track-pill .l3 { font-family: 'JetBrains Mono', monospace; font-size: 7.5pt; color: #c8bca4; letter-spacing: 0.14em; margin-top: 2mm; }
+  .track-meta { display: flex; gap: 2.5mm; margin-top: 3mm; flex-wrap: wrap; }
+  .track-meta .pill { padding: 1.4mm 2.6mm; border-radius: 1.4mm; background: rgba(231,212,170,0.05); border: 0.3mm solid rgba(231,212,170,0.15); font-family: 'JetBrains Mono', monospace; font-size: 7pt; color: #c8bca4; letter-spacing: 0.14em; }
+  .qr-box { background: #eee6d4; padding: 2mm; border-radius: 2mm; display: flex; flex-direction: column; align-items: center; width: 34mm; }
+  .qr-box img { width: 100%; aspect-ratio: 1; display: block; }
+  .qr-col { display: flex; flex-direction: column; align-items: flex-end; }
+  .qr-label { font-family: 'JetBrains Mono', monospace; font-size: 7.5pt; color: #6bbdc0; letter-spacing: 0.16em; margin-top: 2mm; text-align: center; }
+  .qr-url   { font-family: 'JetBrains Mono', monospace; font-size: 6.5pt; color: #6f6557; letter-spacing: 0.04em; text-align: center; margin-top: 0.5mm; }
+
+  .signoff { position: absolute; left: 13mm; right: 13mm; bottom: 4mm; display: flex; justify-content: space-between; font-family: 'JetBrains Mono', monospace; font-size: 6.5pt; color: #5e564a; letter-spacing: 0.14em; }
+</style>
+</head>
+<body>
+<div class="poster">
+
+  <!-- ROW B — hero -->
+  <div class="hero">
+    <div>
+      <div class="brand-row">
+        <img src="layak-logo.png" alt="Layak logo"/>
+        <h1>Layak<span class="dot">.</span></h1>
+      </div>
+      <p class="lede">One upload of your <span class="hl">MyKad, payslip &amp; bill</span> &mdash; ranked Malaysian aid you actually qualify for, with every ringgit cited from the source rule.</p>
+    </div>
+    <div class="problem">
+      <div class="mono problem-eyebrow">The Problem</div>
+      <div class="problem-pull"><span class="big-coral">167</span> schemes scattered across <span class="big-teal">17</span> agencies &mdash; citizens don't know what they qualify for.</div>
+      <div class="problem-body">Malaysia's social-assistance landscape is fragmented across STR, JKM, LHDN, PERKESO, EPF and more. Discovery and application costs kill take-up. A <em>layak</em> ("eligible") citizen gives up before reaching the form.</div>
+    </div>
+  </div>
+
+  <!-- ROW C — stat band, hero-first -->
+  <div class="stats">
+    <div class="stat-card stat-hero">
+      <div class="label mono">Up to · typical household</div>
+      <div class="num">RM&nbsp;7,650<span class="unit">/year</span></div>
+      <div class="sub">Annual relief surfaced per low-income Form B household &mdash; cited rule-by-rule, never hallucinated.</div>
+    </div>
+    <div class="stat-card">
+      <div class="top"><span class="n">3</span><span class="u">docs</span></div>
+      <div class="label mono">Three uploads</div>
+      <div class="desc">MyKad · Payslip · Utility bill &mdash; photo or PDF.</div>
+    </div>
+    <div class="stat-card">
+      <div class="top"><span class="n teal">5</span><span class="u teal">steps</span></div>
+      <div class="label mono">Agentic pipeline</div>
+      <div class="desc">Extract → Classify → Match → Compute → Generate.</div>
+    </div>
+    <div class="stat-card">
+      <div class="top"><span class="n gold">0</span><span class="u">hallucinations</span></div>
+      <div class="label mono">Every number cited</div>
+      <div class="desc">Each rule cites the source PDF and page number.</div>
+    </div>
+  </div>
+
+  <div class="spacer"></div>
+
+  <!-- ROW E — pipeline -->
+  <div>
+    <div class="pipe-head">
+      <h2>The pipeline.<br><em>Five autonomous steps.</em></h2>
+      <div class="note">Orchestrated by an ADK <span class="mono" style="color:#c8bca4">RootAgent</span> on Gemini 2.5 Pro &mdash; every step a tool with bounded responsibility, every number cited.</div>
+    </div>
+    <div class="pipe">
+      <div class="step">
+        <div class="num">01</div>
+        <div class="name">Extract</div>
+        <div class="body">Read every page of MyKad, payslip and utility bill via Gemini 2.5 Flash multimodal &mdash; typed fields, no OCR brittleness.</div>
+        <div class="agent">→ ExtractorAgent</div>
+      </div>
+      <div class="step">
+        <div class="num">02</div>
+        <div class="name">Classify</div>
+        <div class="body">Derive household income band, form type (B / BE), dependants, and senior-care exposure from the typed fields.</div>
+        <div class="agent">→ ClassifierAgent</div>
+      </div>
+      <div class="step">
+        <div class="num">03</div>
+        <div class="name">Match</div>
+        <div class="body">Score against three locked 2026 rule sets: STR cash transfer, JKM Warga Emas / Kanak-Kanak, LHDN Form B reliefs.</div>
+        <div class="agent">→ MatcherAgent</div>
+      </div>
+      <div class="step">
+        <div class="num">04</div>
+        <div class="name">Compute</div>
+        <div class="body">Annual RM upside via on-stage Code Execution &mdash; Python arithmetic the judge can audit, not an LLM guess.</div>
+        <div class="agent">→ ComputeAgent</div>
+      </div>
+      <div class="step">
+        <div class="num">05</div>
+        <div class="name">Generate</div>
+        <div class="body">Pre-filled PDF packets watermarked <span style="color:#eb5874">DRAFT &mdash; NOT SUBMITTED</span>. Citizen reviews &amp; submits via the agency portal.</div>
+        <div class="agent">→ PacketAgent</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ROW F — output preview -->
+  <div class="out">
+    <div class="out-card">
+      <div style="margin-bottom: 3mm">
+        <h3>What Layak <em>surfaces</em>.</h3>
+      </div>
+      <div class="row">
+        <div>
+          <div class="mono" style="font-size:7pt; color:#c7a169; letter-spacing:0.16em">JKM</div>
+          <div class="row-name">Warga Emas &mdash; dependent elderly</div>
+          <div class="row-why">Per-capita RM 700 below food-PLI &middot; JKM 1B uplift.</div>
+        </div>
+        <div class="row-amt"><span class="mono" style="font-size:7.5pt; color:#6f6557; margin-right:1.2mm">RM</span>7,200</div>
+      </div>
+      <div class="row">
+        <div>
+          <div class="mono" style="font-size:7pt; color:#c7a169; letter-spacing:0.16em">STR &middot; BK-01</div>
+          <div class="row-name">STR 2026 &mdash; with-children tier</div>
+          <div class="row-why">RM 2.5&ndash;5k band, 1&ndash;2 children bucket.</div>
+        </div>
+        <div class="row-amt"><span class="mono" style="font-size:7.5pt; color:#6f6557; margin-right:1.2mm">RM</span>450</div>
+      </div>
+      <div class="panel">
+        <div class="mono" style="font-size:7pt; color:#6f6557; letter-spacing:0.16em">Total &middot; cited from 3 source PDFs</div>
+        <div style="font-family:'Abril Fatface',serif; font-size:18pt; color:#c7a169"><span class="mono" style="font-size:7.5pt; color:#6f6557; margin-right:1.2mm">RM</span>7,650<span class="mono" style="font-size:7.5pt; color:#6f6557; margin-left:1.2mm">/ yr</span></div>
+      </div>
+    </div>
+    <div class="out-card">
+      <div style="display:flex; justify-content: space-between; align-items: flex-start; gap:4mm; margin-bottom: 3mm">
+        <h3>The <em>live</em> citizen flow.</h3>
+        <span class="mono" style="font-size:7pt; color:#6bbdc0; letter-spacing:0.16em">layak.tech</span>
+      </div>
+      <div class="shots">
+        <div>
+          <div class="shot-cap"><span class="n">01</span> Upload &middot; three documents</div>
+          <img class="shot-img" src="screenshots/01-intake-crop.jpg" alt="Intake — upload three documents"/>
+        </div>
+        <div>
+          <div class="shot-cap"><span class="n">02</span> Results &middot; ranked &amp; cited</div>
+          <img class="shot-img" src="screenshots/02-results-crop.jpg" alt="Results — ranked eligible schemes"/>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ROW G — SDG / Track / QR footer -->
+  <div class="foot">
+    <div>
+      <div class="col-head">UN Sustainable Development Goals</div>
+      <div class="sdgs">
+        <div class="sdg sdg-1">
+          <div class="n">01</div>
+          <div class="l">No<br>Poverty</div>
+        </div>
+        <div class="sdg sdg-10">
+          <div class="n">10</div>
+          <div class="l">Reduced<br>Inequalities</div>
+        </div>
+        <div class="sdg sdg-16">
+          <div class="n">16</div>
+          <div class="l">Peace · Justice · Strong&nbsp;Institutions</div>
+        </div>
+      </div>
+    </div>
+    <div>
+      <div class="col-head">Competition</div>
+      <div class="track-pill">
+        <div class="l1">Track 2 &middot; Open Category</div>
+        <div class="l2">Citizens First &middot; GovTech &amp; Digital Services</div>
+        <div class="l3">Project 2030 &middot; MyAI Future Hackathon</div>
+      </div>
+    </div>
+    <div>
+      <div class="col-head">Live demo</div>
+      <div class="qr-box"><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAeAAAAHgAQMAAABHGizWAAAABlBMVEXu5tQUEQ2xzIuNAAAACXBIWXMAAA7EAAAOxAGVKw4bAAAB5klEQVR4nO3cQZLCIBCF4VguXM4R5igeLRwtR/EIs8zCChN4dACNzrgKSf2vyioVviw70ES7jhBCCCGkkXz5Mvf5m5OfNOS9TeqrSTcwGNwq/lnen2d8nken+QJLhN0y6RsMBh8WX+KsMeIuwVhNSnyNXw9gMHg/2IrBJBriwGDwPnHISbd3TQCDwbvCFhWDqdy7f7rSB4PB+8VlMo6VRC/37x4gGAzeFL9KWhnk1vwnAYPBm+BcDMa4a1eq3rrKwTCv9cPrBgaDD4kDH9PGP2/6i/i4yg84BAwGN45zqmNza8y7tHNXMfAvagkYDN4cqy2vcmDFwPvq2LxPVx7i8HNPHwwGN4OVzE/WW9eAsFtKwVobDwwGHwOPqZbkSrKsDXSJd9t+MBjcEA7H5hdvnbh7wp1BvetjGVhb6YPB4KZwvdIvnonLu3fRkPfbBDAYvDnOuWuhnvbvD/iaLgAGg4+HH6O2fIxRFz9dvf+DgsHgjfHaM65LKRDXMdu7Nh4YDG4E179BKTrrdmN3cTDAoasDBoOPhbXSf/q1eebKeiUBg8ENY7HqmE3H5hYwGLwbHFLc2u3mbrf39bY8GAxuBFtKnIqBcJ8uM3TPx2xgMPgouMzKv0fkB94tYDC4UUwIIYQQsuf8Aujs6SsGXJOHAAAAAElFTkSuQmCC" alt="QR code to live Layak demo"/></div>
+    </div>
+  </div>
+
+</div>
+</body>
+</html>

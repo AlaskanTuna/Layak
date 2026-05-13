@@ -6,6 +6,7 @@ import { Loader2 } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 
 import { Button } from '@/components/ui/button'
+import { Checkbox } from '@/components/ui/checkbox'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 
@@ -34,6 +35,7 @@ export function EmailSignInForm({ onSuccess, disabled }: { onSuccess: () => void
   const { t } = useTranslation()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  const [remember, setRemember] = useState(true)
   const [pending, setPending] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
@@ -42,7 +44,7 @@ export function EmailSignInForm({ onSuccess, disabled }: { onSuccess: () => void
     setError(null)
     setPending(true)
     try {
-      await signInWithEmail(email.trim(), password)
+      await signInWithEmail(email.trim(), password, remember)
       onSuccess()
     } catch (err) {
       setPending(false)
@@ -81,6 +83,15 @@ export function EmailSignInForm({ onSuccess, disabled }: { onSuccess: () => void
           disabled={busy}
         />
       </div>
+      <label className="flex cursor-pointer items-center gap-2.5 text-sm text-foreground/80 select-none">
+        <Checkbox
+          checked={remember}
+          onCheckedChange={(next) => setRemember(next === true)}
+          disabled={busy}
+          aria-describedby="signin-remember-help"
+        />
+        <span id="signin-remember-help">{t('auth.signIn.rememberMe')}</span>
+      </label>
       <Button
         type="submit"
         size="lg"

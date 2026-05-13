@@ -446,6 +446,7 @@
       "emailPlaceholder": "you@example.com",
       "passwordLabel": "Password",
       "passwordPlaceholder": "Your password",
+      "rememberMe": "Remember me on this device",
       "submit": "Sign in",
       "emailErrors": {
         "invalidCredential": "Incorrect email or password.",

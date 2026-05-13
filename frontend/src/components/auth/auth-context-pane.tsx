@@ -26,7 +26,7 @@ export function AuthContextPane() {
           <li key={key} className="flex items-start gap-3 text-[14px] leading-snug text-foreground/80">
             <span
               aria-hidden
-              className="mt-0.5 inline-flex size-5 shrink-0 items-center justify-center rounded-full bg-[color:var(--hibiscus)]/14 text-[color:var(--hibiscus)]"
+              className="mt-0.5 inline-flex size-5 shrink-0 items-center justify-center rounded-full bg-[color:var(--primary)]/14 text-[color:var(--primary)]"
             >
               <Check className="size-3" strokeWidth={2.5} />
             </span>

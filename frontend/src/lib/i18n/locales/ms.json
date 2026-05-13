@@ -446,6 +446,7 @@
       "emailPlaceholder": "anda@contoh.com",
       "passwordLabel": "Kata laluan",
       "passwordPlaceholder": "Kata laluan anda",
+      "rememberMe": "Ingat saya pada peranti ini",
       "submit": "Log masuk",
       "emailErrors": {
         "invalidCredential": "E-mel atau kata laluan tidak betul.",

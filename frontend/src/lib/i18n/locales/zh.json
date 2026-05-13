@@ -446,6 +446,7 @@
       "emailPlaceholder": "you@example.com",
       "passwordLabel": "密码",
       "passwordPlaceholder": "您的密码",
+      "rememberMe": "在此设备上记住我",
       "submit": "登录",
       "emailErrors": {
         "invalidCredential": "电子邮件或密码不正确。",

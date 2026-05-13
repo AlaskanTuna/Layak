@@ -4,9 +4,12 @@ import { type FirebaseApp, getApp, getApps, initializeApp } from 'firebase/app'
 import {
   type Auth,
   GoogleAuthProvider,
+  browserLocalPersistence,
+  browserSessionPersistence,
   createUserWithEmailAndPassword,
   getAuth,
   signOut as firebaseSignOut,
+  setPersistence,
   signInWithCustomToken,
   signInWithEmailAndPassword,
   signInWithPopup,
@@ -64,8 +67,19 @@ export async function signInWithGoogle(): Promise<User> {
   return result.user
 }
 
-export async function signInWithEmail(email: string, password: string): Promise<User> {
-  const result = await signInWithEmailAndPassword(getFirebaseAuth(), email, password)
+export async function signInWithEmail(
+  email: string,
+  password: string,
+  remember: boolean = true
+): Promise<User> {
+  const auth = getFirebaseAuth()
+  // Firebase ignores `setPersistence` if it can't write to the chosen store
+  // (private-mode Safari, strict ITP) — failing here would block the whole
+  // sign-in, so let it fall through silently and continue with the default.
+  await setPersistence(auth, remember ? browserLocalPersistence : browserSessionPersistence).catch(
+    () => undefined
+  )
+  const result = await signInWithEmailAndPassword(auth, email, password)
   return result.user
 }
 

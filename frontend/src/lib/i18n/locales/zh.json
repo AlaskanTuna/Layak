@@ -892,6 +892,7 @@
       "incomeOptional": "月收入（选填）",
       "incomePlaceholder": "RM / 月",
       "incomeUnder18": "18 岁以下",
+      "spouseLimitNote": "手动输入在同一共同家庭中最多支持四位配偶。请先移除一位或多位配偶再继续。",
       "multiSpouseNote": "此处列出的多位配偶会被视为同一共同家庭，用于家庭收入和人均收入检查。如果他们分开居住，请为每个家庭分别进行评估。",
       "add": "添加受扶养人",
       "removeAria": "移除受扶养人 {{index}}"

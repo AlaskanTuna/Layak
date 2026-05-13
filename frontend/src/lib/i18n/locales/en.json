@@ -892,6 +892,7 @@
       "incomeOptional": "Monthly Income (Optional)",
       "incomePlaceholder": "RM / month",
       "incomeUnder18": "Under 18",
+      "spouseLimitNote": "Manual entry supports up to four spouse rows in one shared household. Remove one or more spouse rows before continuing.",
       "multiSpouseNote": "Multiple spouses listed here are treated as one shared household for household-income and per-capita checks. If they live separately, run a separate evaluation for each household.",
       "add": "Add Dependant",
       "removeAria": "Remove dependant {{index}}"

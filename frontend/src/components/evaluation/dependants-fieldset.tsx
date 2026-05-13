@@ -151,6 +151,11 @@ export function DependantsFieldset({ value, onChange, disabled = false, max = 15
           </li>
         ))}
       </ul>
+      {spouseCount > 4 && (
+        <p className="rounded-md border border-destructive/35 bg-destructive/10 px-3 py-2 text-xs leading-relaxed text-destructive">
+          {t('evaluation.dependants.spouseLimitNote')}
+        </p>
+      )}
       {spouseCount > 1 && (
         <p className="rounded-md border border-amber-500/30 bg-amber-500/10 px-3 py-2 text-xs leading-relaxed text-foreground/75">
           {t('evaluation.dependants.multiSpouseNote')}

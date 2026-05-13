@@ -892,6 +892,7 @@
       "incomeOptional": "Pendapatan bulanan (pilihan)",
       "incomePlaceholder": "RM / bulan",
       "incomeUnder18": "Bawah 18",
+      "spouseLimitNote": "Kemasukan manual menyokong maksimum empat baris pasangan dalam satu isi rumah bersama. Alih keluar satu atau lebih baris pasangan sebelum meneruskan.",
       "multiSpouseNote": "Beberapa pasangan yang disenaraikan di sini dianggap sebagai satu isi rumah bersama untuk semakan pendapatan isi rumah dan per kapita. Jika mereka tinggal berasingan, jalankan penilaian berasingan bagi setiap isi rumah.",
       "add": "Tambah tanggungan",
       "removeAria": "Alih keluar tanggungan {{index}}"

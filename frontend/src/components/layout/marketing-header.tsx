@@ -36,13 +36,12 @@ export function MarketingHeader() {
   const surfaceStrength = 30 + scrollProgress * 55
   const borderStrength = scrollProgress * 40
   const shadowStrength = scrollProgress * 12
-  const textMix = 90 - scrollProgress * 90
 
   return (
     <header
       className="fixed inset-x-0 top-0 z-50 h-[var(--topbar-height)] border-b transition-[background-color,border-color,box-shadow,color,backdrop-filter] duration-150"
       style={{
-        color: `color-mix(in oklch, white ${textMix}%, var(--foreground))`,
+        color: 'var(--foreground)',
         backgroundColor:
           scrollProgress === 0
             ? 'transparent'

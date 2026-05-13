@@ -1217,3 +1217,8 @@ Findings the audit flagged that were **not** acted on (cosmetic or external to P
 
 - Added the new discovery dashboard illustration asset to `/dashboard/discovery` via the shared `PageHeading` illustration slot.
 - Verified: targeted ESLint on `discovery-page.tsx` clean; `pnpm -C frontend build` clean.
+
+## [13/05/26] - Landing header light-theme icon contrast
+
+- Fixed the landing-page marketing header so the logo text plus language/theme icon controls use the theme foreground immediately in light mode instead of fading from white as the page scrolls.
+- Verified: targeted ESLint on `marketing-header.tsx` clean; `pnpm -C frontend build` clean.

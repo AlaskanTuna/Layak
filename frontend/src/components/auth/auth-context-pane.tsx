@@ -10,13 +10,13 @@ export function AuthContextPane() {
   return (
     <aside
       aria-label={t('auth.context.heading')}
-      className="paper-card hidden h-full flex-col justify-center gap-7 rounded-[20px] p-9 lg:flex"
+      className="paper-card hidden h-full flex-col justify-center gap-6 rounded-[20px] p-8 lg:flex"
     >
-      <div className="flex flex-col gap-3">
-        <h2 className="font-heading text-[28px] font-semibold leading-[1.15] tracking-tight text-foreground">
+      <div className="flex flex-col gap-2.5">
+        <h2 className="font-heading text-[26px] font-semibold leading-[1.15] tracking-tight text-foreground">
           {t('auth.context.heading')}
         </h2>
-        <p className="max-w-[38ch] text-[14.5px] leading-relaxed text-foreground/70">
+        <p className="max-w-[38ch] text-[14px] leading-relaxed text-foreground/70">
           {t('auth.context.body')}
         </p>
       </div>

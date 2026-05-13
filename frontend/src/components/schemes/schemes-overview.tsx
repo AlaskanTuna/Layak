@@ -149,9 +149,7 @@ function InScopeCard({ scheme }: { scheme: InScopeScheme }) {
           {!isContribution && (
             <span className="text-sm font-normal text-foreground/55">{t('schemes.labels.upTo')} </span>
           )}
-          {isContribution && (
-            <span className="text-sm font-normal text-foreground/55">{t('schemes.labels.rm')} </span>
-          )}
+          {isContribution && <span className="text-sm font-normal text-foreground/55">{t('schemes.labels.rm')} </span>}
           <span
             className={`text-xl font-semibold ${
               isContribution ? 'text-amber-700 dark:text-amber-400' : 'text-[color:var(--hibiscus)]'

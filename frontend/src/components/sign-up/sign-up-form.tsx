@@ -58,12 +58,8 @@ export function SignUpForm() {
 
       <div className="paper-card flex flex-col gap-6 rounded-[20px] p-7 sm:p-9">
         <div className="flex flex-col items-center gap-2 text-center">
-          <h1 className="font-heading text-3xl font-semibold tracking-tight">
-            {t('auth.signUp.title')}
-          </h1>
-          <p className="max-w-[40ch] text-sm leading-relaxed text-muted-foreground">
-            {t('auth.signUp.description')}
-          </p>
+          <h1 className="font-heading text-3xl font-semibold tracking-tight">{t('auth.signUp.title')}</h1>
+          <p className="max-w-[40ch] text-sm leading-relaxed text-muted-foreground">{t('auth.signUp.description')}</p>
         </div>
 
         <Tabs defaultValue="google" className="w-full" aria-label={t('auth.tabsAriaLabel')}>

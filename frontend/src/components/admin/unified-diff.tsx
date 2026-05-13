@@ -41,10 +41,7 @@ export function UnifiedDiff({ fields }: { fields: DiffField[] }) {
           const proposed = f.proposed.trim()
           const unchanged = current === proposed
           return (
-            <li
-              key={`${f.label}-${idx}`}
-              className="border-b border-foreground/5 px-4 py-3 last:border-b-0"
-            >
+            <li key={`${f.label}-${idx}`} className="border-b border-foreground/5 px-4 py-3 last:border-b-0">
               <p className="mono-caption mb-1 text-foreground/55">{f.label}</p>
               {unchanged ? (
                 <pre className="overflow-x-auto whitespace-pre-wrap break-words text-foreground/80">

@@ -40,9 +40,7 @@ export function HowLayakEvaluatesRail() {
       />
       <div className="relative flex flex-col gap-1">
         <p className="mono-caption text-foreground/55">{t('evaluation.evaluatesRail.eyebrow')}</p>
-        <h2 className="font-heading text-lg font-semibold tracking-tight">
-          {t('evaluation.evaluatesRail.title')}
-        </h2>
+        <h2 className="font-heading text-lg font-semibold tracking-tight">{t('evaluation.evaluatesRail.title')}</h2>
       </div>
 
       <ol className="relative flex flex-col gap-4">

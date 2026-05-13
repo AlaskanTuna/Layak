@@ -25,11 +25,6 @@ export function AppToaster() {
   if (!mounted) return null
 
   return (
-    <Toaster
-      position="bottom-center"
-      gutter={10}
-      containerStyle={{ bottom: 24 }}
-      toastOptions={{ duration: 4000 }}
-    />
+    <Toaster position="bottom-center" gutter={10} containerStyle={{ bottom: 24 }} toastOptions={{ duration: 4000 }} />
   )
 }

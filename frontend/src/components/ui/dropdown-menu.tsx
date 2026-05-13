@@ -65,7 +65,10 @@ function DropdownMenuLabel({ className, ...props }: React.ComponentProps<'div'>)
   return (
     <div
       data-slot="dropdown-menu-label"
-      className={cn('px-2.5 py-1.5 text-[11px] font-medium uppercase tracking-[0.14em] text-muted-foreground', className)}
+      className={cn(
+        'px-2.5 py-1.5 text-[11px] font-medium uppercase tracking-[0.14em] text-muted-foreground',
+        className
+      )}
       {...props}
     />
   )

@@ -21,9 +21,7 @@ export function StrategySection({ advisories, onAskCikLay }: Props) {
   return (
     <section className="flex flex-col gap-4">
       <header className="flex items-center gap-2">
-        <h2 className="font-heading text-xl font-semibold tracking-tight">
-          {t('evaluation.strategy.sectionTitle')}
-        </h2>
+        <h2 className="font-heading text-xl font-semibold tracking-tight">{t('evaluation.strategy.sectionTitle')}</h2>
         <InfoTooltip content={description} label={description} />
       </header>
 

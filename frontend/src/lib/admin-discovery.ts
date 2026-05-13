@@ -130,10 +130,7 @@ export async function rejectCandidate(candidateId: string, note?: string): Promi
   return jsonOrThrow<ActionResponse>(res)
 }
 
-export async function requestChangesCandidate(
-  candidateId: string,
-  note?: string
-): Promise<ActionResponse> {
+export async function requestChangesCandidate(candidateId: string, note?: string): Promise<ActionResponse> {
   const res = await authedFetch(`${backendBase()}/api/admin/discovery/${candidateId}/request-changes`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },

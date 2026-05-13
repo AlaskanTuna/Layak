@@ -63,9 +63,7 @@ export function EvaluationSummaryCard({ evalId }: { evalId: string }) {
           <span className="flex size-7 items-center justify-center rounded-md bg-[color:var(--hibiscus)]/10 text-[color:var(--hibiscus)]">
             <Sparkles className="size-3.5" aria-hidden />
           </span>
-          <h3 className="font-heading text-base font-semibold tracking-tight">
-            {t('evaluation.summary.title')}
-          </h3>
+          <h3 className="font-heading text-base font-semibold tracking-tight">{t('evaluation.summary.title')}</h3>
         </div>
         <span className="mono-caption text-foreground/45">{t('evaluation.summary.aiBadge')}</span>
       </div>

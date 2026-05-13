@@ -42,10 +42,7 @@ export function DiscoveryFilterChips({ active, onChange, counts }: Props) {
               <span>{t(`admin.discovery.filters.${f}`)}</span>
               {count !== undefined && (
                 <span
-                  className={cn(
-                    'mono-caption tabular-nums',
-                    isActive ? 'text-foreground/60' : 'text-foreground/45'
-                  )}
+                  className={cn('mono-caption tabular-nums', isActive ? 'text-foreground/60' : 'text-foreground/45')}
                 >
                   {count}
                 </span>

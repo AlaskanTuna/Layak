@@ -7,12 +7,7 @@
  * pipes through `humanize_error` exactly like the pipeline's `ErrorEvent`).
  */
 
-import type {
-  ErrorCategory,
-  StrategyAdvice,
-  WhatIfRequest,
-  WhatIfResponse
-} from '@/lib/agent-types'
+import type { ErrorCategory, StrategyAdvice, WhatIfRequest, WhatIfResponse } from '@/lib/agent-types'
 
 export type ChatRole = 'user' | 'model'
 

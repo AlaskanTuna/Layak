@@ -212,56 +212,59 @@ export function useAgentPipeline(): {
     })
   }, [cleanup])
 
-  const streamFromResponse = useCallback((controller: AbortController, request: () => Promise<Response>) => {
-    ;(async () => {
-      try {
-        const res = await request()
-        // Surface 429 as a structured quota state without ever entering
-        // `streaming`. The upload client opens the waitlist modal off
-        // `state.quotaExceeded`.
-        if (res.status === 429) {
-          const body = (await res.json().catch(() => null)) as RateLimitErrorBody | null
-          const fallback: RateLimitErrorBody = {
-            error: 'rate_limit',
-            tier: 'free',
-            limit: 5,
-            windowHours: 24,
-            resetAt: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
-            message: 'Free-tier evaluation quota reached.'
+  const streamFromResponse = useCallback(
+    (controller: AbortController, request: () => Promise<Response>) => {
+      ;(async () => {
+        try {
+          const res = await request()
+          // Surface 429 as a structured quota state without ever entering
+          // `streaming`. The upload client opens the waitlist modal off
+          // `state.quotaExceeded`.
+          if (res.status === 429) {
+            const body = (await res.json().catch(() => null)) as RateLimitErrorBody | null
+            const fallback: RateLimitErrorBody = {
+              error: 'rate_limit',
+              tier: 'free',
+              limit: 5,
+              windowHours: 24,
+              resetAt: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
+              message: 'Free-tier evaluation quota reached.'
+            }
+            setState(() => ({ ...INITIAL_STATE, quotaExceeded: body ?? fallback }))
+            const usedBody = body ?? fallback
+            const resetHours = Math.max(1, Math.round((new Date(usedBody.resetAt).getTime() - Date.now()) / 3_600_000))
+            notificationStore.notify({
+              title: t('common.notifications.events.quotaExceeded.title'),
+              description: t('common.notifications.events.quotaExceeded.body', { hours: resetHours }),
+              severity: 'error',
+              toast: true,
+              groupKey: 'quota-exceeded'
+            })
+            return
           }
-          setState(() => ({ ...INITIAL_STATE, quotaExceeded: body ?? fallback }))
-          const usedBody = body ?? fallback
-          const resetHours = Math.max(1, Math.round((new Date(usedBody.resetAt).getTime() - Date.now()) / 3_600_000))
-          notificationStore.notify({
-            title: t('common.notifications.events.quotaExceeded.title'),
-            description: t('common.notifications.events.quotaExceeded.body', { hours: resetHours }),
-            severity: 'error',
-            toast: true,
-            groupKey: 'quota-exceeded'
-          })
-          return
+          if (!res.ok || !res.body) {
+            throw new Error(`Backend returned ${res.status} ${res.statusText}`)
+          }
+          for await (const event of parseSseStream(res.body)) {
+            setState((prev) => applyEvent(prev, event))
+          }
+        } catch (err) {
+          if (controller.signal.aborted) return
+          const message = err instanceof Error ? err.message : String(err)
+          setState((prev) => ({
+            ...prev,
+            phase: 'error',
+            error: message,
+            // Network-layer failure — no backend category reached us, so the
+            // recovery card falls back to its generic "start over" branch.
+            errorCategory: null,
+            stepStates: markFirstActiveStepErrored(prev.stepStates)
+          }))
         }
-        if (!res.ok || !res.body) {
-          throw new Error(`Backend returned ${res.status} ${res.statusText}`)
-        }
-        for await (const event of parseSseStream(res.body)) {
-          setState((prev) => applyEvent(prev, event))
-        }
-      } catch (err) {
-        if (controller.signal.aborted) return
-        const message = err instanceof Error ? err.message : String(err)
-        setState((prev) => ({
-          ...prev,
-          phase: 'error',
-          error: message,
-          // Network-layer failure — no backend category reached us, so the
-          // recovery card falls back to its generic "start over" branch.
-          errorCategory: null,
-          stepStates: markFirstActiveStepErrored(prev.stepStates)
-        }))
-      }
-    })()
-  }, [t])
+      })()
+    },
+    [t]
+  )
 
   const startReal = useCallback(
     (files: UploadFiles, dependants: DependantInput[] | undefined) => {

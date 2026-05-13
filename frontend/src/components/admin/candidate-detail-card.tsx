@@ -10,12 +10,7 @@ import { ConfidenceMeter } from '@/components/admin/confidence-meter'
 import { UnifiedDiff } from '@/components/admin/unified-diff'
 import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
-import {
-  approveCandidate,
-  rejectCandidate,
-  requestChangesCandidate,
-  type CandidateDetail
-} from '@/lib/admin-discovery'
+import { approveCandidate, rejectCandidate, requestChangesCandidate, type CandidateDetail } from '@/lib/admin-discovery'
 import { notificationStore } from '@/lib/notification-store'
 
 type ExistingRule = {
@@ -74,11 +69,7 @@ export function CandidateDetailCard({
     setError(null)
     try {
       const fn =
-        action === 'approve'
-          ? approveCandidate
-          : action === 'reject'
-            ? rejectCandidate
-            : requestChangesCandidate
+        action === 'approve' ? approveCandidate : action === 'reject' ? rejectCandidate : requestChangesCandidate
       const res = await fn(candidate.candidate_id, note || undefined)
       setStatus(res.status)
       if (res.manifest_yaml) {
@@ -151,9 +142,7 @@ export function CandidateDetailCard({
           </SectionBlock>
 
           <SectionBlock label={t('admin.discovery.detail.fields.rateSummary')}>
-            <p className="whitespace-pre-wrap text-sm leading-[1.65] text-foreground/85">
-              {candidate.rate_summary}
-            </p>
+            <p className="whitespace-pre-wrap text-sm leading-[1.65] text-foreground/85">{candidate.rate_summary}</p>
           </SectionBlock>
 
           <SectionBlock label={t('admin.discovery.detail.fields.citation')}>
@@ -176,9 +165,7 @@ export function CandidateDetailCard({
               type="button"
               variant="outline"
               size="sm"
-              render={
-                <a href={candidate.source_url} target="_blank" rel="noopener noreferrer" />
-              }
+              render={<a href={candidate.source_url} target="_blank" rel="noopener noreferrer" />}
               className="justify-between gap-2 rounded-full"
             >
               <span className="truncate text-left">{candidate.source_url.replace(/^https?:\/\//, '')}</span>
@@ -277,15 +264,12 @@ export function CandidateDetailCard({
           </p>
         )}
         {manifestYaml && (
-          <div className="flex flex-wrap items-center gap-2 rounded-[10px] border border-foreground/10 bg-card/40 px-3 py-2 text-sm text-foreground/70" role="status">
+          <div
+            className="flex flex-wrap items-center gap-2 rounded-[10px] border border-foreground/10 bg-card/40 px-3 py-2 text-sm text-foreground/70"
+            role="status"
+          >
             <span>{t('admin.discovery.detail.manifestReady')}</span>
-            <Button
-              type="button"
-              variant="ghost"
-              size="sm"
-              onClick={downloadManifest}
-              className="gap-1.5 px-2"
-            >
+            <Button type="button" variant="ghost" size="sm" onClick={downloadManifest} className="gap-1.5 px-2">
               <Download className="size-4" />
               {t('admin.discovery.detail.downloadManifest')}
             </Button>

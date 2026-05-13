@@ -28,12 +28,8 @@ export function DashboardHero({ name }: Props) {
     setTimeOfDay(getTimeOfDay())
   }, [])
 
-  const greeting = name
-    ? t(`dashboard.hero.${timeOfDay}WithName`, { name })
-    : t(`dashboard.hero.${timeOfDay}`)
+  const greeting = name ? t(`dashboard.hero.${timeOfDay}WithName`, { name }) : t(`dashboard.hero.${timeOfDay}`)
   const subtitle = t(`dashboard.hero.subtitle.${timeOfDay}`)
 
-  return (
-    <PageHeading eyebrow={t('dashboard.hero.eyebrow')} title={greeting} description={subtitle} />
-  )
+  return <PageHeading eyebrow={t('dashboard.hero.eyebrow')} title={greeting} description={subtitle} />
 }

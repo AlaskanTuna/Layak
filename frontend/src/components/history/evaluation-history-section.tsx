@@ -115,10 +115,7 @@ export function EvaluationHistorySection() {
         </div>
         <div
           id="tour-evaluation-rail"
-          className={cn(
-            'min-w-0 scroll-mt-24 rounded-[18px]',
-            items.length > 0 && 'lg:mt-10'
-          )}
+          className={cn('min-w-0 scroll-mt-24 rounded-[18px]', items.length > 0 && 'lg:mt-10')}
         >
           <HowLayakEvaluatesRail />
         </div>

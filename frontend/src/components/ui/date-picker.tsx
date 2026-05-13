@@ -50,11 +50,7 @@ function parseISO(value: string): Date | null {
   if (!/^\d{4}-\d{2}-\d{2}$/.test(value)) return null
   const [y, m, d] = value.split('-').map(Number)
   const date = new Date(Date.UTC(y, m - 1, d))
-  if (
-    date.getUTCFullYear() !== y ||
-    date.getUTCMonth() + 1 !== m ||
-    date.getUTCDate() !== d
-  ) {
+  if (date.getUTCFullYear() !== y || date.getUTCMonth() + 1 !== m || date.getUTCDate() !== d) {
     return null
   }
   return date
@@ -188,11 +184,7 @@ export function DatePicker({
 
         <div className="mt-2 grid grid-cols-7 gap-0.5">
           {WEEKDAYS.map((d) => (
-            <div
-              key={d}
-              className="mono-caption flex h-7 items-center justify-center text-foreground/45"
-              aria-hidden
-            >
+            <div key={d} className="mono-caption flex h-7 items-center justify-center text-foreground/45" aria-hidden>
               {d.slice(0, 2)}
             </div>
           ))}
@@ -200,8 +192,7 @@ export function DatePicker({
             const isOutside = date.getUTCMonth() !== month
             const isSelected = parsed != null && date.getTime() === parsed.getTime()
             const isToday = date.getTime() === today.getTime()
-            const isDisabled =
-              (disableFuture && date > today) || date.getUTCFullYear() < minYear
+            const isDisabled = (disableFuture && date > today) || date.getUTCFullYear() < minYear
             return (
               <button
                 key={toISO(date)}

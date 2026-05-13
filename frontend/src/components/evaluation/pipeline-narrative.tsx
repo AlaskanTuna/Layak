@@ -61,9 +61,7 @@ export function PipelineNarrative({ state, labelOverrides, retrospective }: Prop
         : t('evaluation.narrative.summaryRunning')
 
   const hasTechnical =
-    state.technicalEvents.length > 0 ||
-    Boolean(state.upside?.python_snippet) ||
-    Boolean(state.upside?.stdout)
+    state.technicalEvents.length > 0 || Boolean(state.upside?.python_snippet) || Boolean(state.upside?.stdout)
 
   // Retrospective + collapsed → one-line summary with a chevron to expand.
   if (retrospective && collapsed) {
@@ -145,7 +143,12 @@ export function PipelineNarrative({ state, labelOverrides, retrospective }: Prop
               >
                 {labelFor(step)}
               </span>
-              <CyclingStatus status={status} statusLabel={statusLabel} narrative={narrative} activeLabel={labelFor(step)} />
+              <CyclingStatus
+                status={status}
+                statusLabel={statusLabel}
+                narrative={narrative}
+                activeLabel={labelFor(step)}
+              />
             </li>
           )
         })}
@@ -161,10 +164,7 @@ export function PipelineNarrative({ state, labelOverrides, retrospective }: Prop
           >
             <Terminal className="size-3.5" aria-hidden />
             {showTechnical ? t('evaluation.narrative.hideTechnical') : t('evaluation.narrative.showTechnical')}
-            <ChevronDown
-              className={cn('size-3.5 transition-transform', showTechnical && 'rotate-180')}
-              aria-hidden
-            />
+            <ChevronDown className={cn('size-3.5 transition-transform', showTechnical && 'rotate-180')} aria-hidden />
           </button>
           {showTechnical && <TechnicalLayer state={state} />}
         </div>
@@ -272,9 +272,7 @@ function TechnicalLayer({ state }: { state: PipelineState }) {
           </p>
           {snippet && (
             <div className="border-t border-foreground/10 px-3 pb-3 pt-2.5">
-              <p className="mono-caption text-foreground/55">
-                {t('evaluation.narrative.codeExecutionSnippet')}
-              </p>
+              <p className="mono-caption text-foreground/55">{t('evaluation.narrative.codeExecutionSnippet')}</p>
               <pre className="mt-1.5 overflow-x-auto font-mono text-[12px] leading-relaxed text-foreground/85">
                 {snippet}
               </pre>
@@ -282,9 +280,7 @@ function TechnicalLayer({ state }: { state: PipelineState }) {
           )}
           {stdout && (
             <div className="border-t border-foreground/10 px-3 pb-3 pt-2.5">
-              <p className="mono-caption text-foreground/55">
-                {t('evaluation.narrative.codeExecutionStdout')}
-              </p>
+              <p className="mono-caption text-foreground/55">{t('evaluation.narrative.codeExecutionStdout')}</p>
               <pre className="mt-1.5 overflow-x-auto whitespace-pre-wrap font-mono text-[12px] leading-relaxed text-[color:var(--forest)]">
                 {stdout}
               </pre>

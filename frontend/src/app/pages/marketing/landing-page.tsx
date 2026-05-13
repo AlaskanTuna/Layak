@@ -52,9 +52,7 @@ export function MarketingLandingPage() {
         aria-label={t('common.scrollToTop', 'Scroll to top')}
         onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
         className={`fixed bottom-7 left-1/2 z-40 inline-flex h-11 w-11 -translate-x-1/2 items-center justify-center rounded-full border border-foreground/10 bg-background/85 text-foreground shadow-[0_18px_44px_-18px_color-mix(in_oklch,var(--ink)_45%,transparent)] backdrop-blur-md transition-all duration-300 hover:bg-background ${
-          scrolled
-            ? 'translate-y-0 opacity-100'
-            : 'pointer-events-none translate-y-3 opacity-0'
+          scrolled ? 'translate-y-0 opacity-100' : 'pointer-events-none translate-y-3 opacity-0'
         }`}
       >
         <ChevronUp className="size-5" aria-hidden />

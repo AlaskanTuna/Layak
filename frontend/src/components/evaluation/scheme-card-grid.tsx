@@ -32,7 +32,6 @@ function tidyText(value: string): string {
   return value.replace(/\s+/g, ' ').trim()
 }
 
-
 function formatRm(value: number): string {
   return `RM ${value.toLocaleString('en-MY', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
 }
@@ -61,13 +60,7 @@ function formatExpiryDate(iso: string, locale: string): string {
   }).format(parsed)
 }
 
-export function SchemeCardGrid({
-  matches,
-  deltas,
-  kind = 'upside',
-  heading,
-  hideHeading = false
-}: Props) {
+export function SchemeCardGrid({ matches, deltas, kind = 'upside', heading, hideHeading = false }: Props) {
   const { t, i18n } = useTranslation()
   const deltaByScheme = new Map<string, SchemeDelta>()
   for (const d of deltas ?? []) {
@@ -92,10 +85,7 @@ export function SchemeCardGrid({
   }
 
   const sectionHeading =
-    heading ??
-    (kind === 'subsidy_credit'
-      ? t('evaluation.subsidies.title')
-      : t('evaluation.schemeCard.heading'))
+    heading ?? (kind === 'subsidy_credit' ? t('evaluation.subsidies.title') : t('evaluation.schemeCard.heading'))
 
   return (
     <section className="flex flex-col gap-4">
@@ -157,18 +147,14 @@ export function SchemeCardGrid({
               </header>
 
               <div className="flex flex-col gap-1 rounded-md border border-foreground/8 bg-foreground/[0.025] p-3">
-                <p className="mono-caption text-foreground/55">
-                  {t('evaluation.schemeCard.whyQualify')}
-                </p>
+                <p className="mono-caption text-foreground/55">{t('evaluation.schemeCard.whyQualify')}</p>
                 <p className="text-xs leading-[1.55] text-foreground/80">{tidyText(match.why_qualify)}</p>
               </div>
 
               {isSubsidy ? (
                 <footer className="mt-auto flex items-end justify-between gap-3 border-t border-foreground/10 pt-3">
                   <div className="flex flex-col gap-1">
-                    <p className="mono-caption text-foreground/55">
-                      {t('evaluation.schemeCard.subsidyInfo')}
-                    </p>
+                    <p className="mono-caption text-foreground/55">{t('evaluation.schemeCard.subsidyInfo')}</p>
                     <p className="text-xs leading-[1.4] text-foreground/80">
                       {t('evaluation.schemeCard.subsidyAutoCredited')}
                     </p>
@@ -226,13 +212,7 @@ export function SchemeCardGrid({
   )
 }
 
-function DeltaChip({
-  delta,
-  t
-}: {
-  delta: SchemeDelta | undefined
-  t: ReturnType<typeof useTranslation>['t']
-}) {
+function DeltaChip({ delta, t }: { delta: SchemeDelta | undefined; t: ReturnType<typeof useTranslation>['t'] }) {
   if (!delta || delta.status === 'unchanged') return null
   const tone =
     delta.status === 'lost'

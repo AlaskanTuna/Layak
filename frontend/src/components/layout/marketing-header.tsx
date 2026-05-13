@@ -47,9 +47,7 @@ export function MarketingHeader() {
             ? 'transparent'
             : `color-mix(in oklch, var(--background) ${surfaceStrength}%, transparent)`,
         borderColor:
-          scrollProgress === 0
-            ? 'transparent'
-            : `color-mix(in oklch, var(--border) ${borderStrength}%, transparent)`,
+          scrollProgress === 0 ? 'transparent' : `color-mix(in oklch, var(--border) ${borderStrength}%, transparent)`,
         boxShadow:
           scrollProgress === 0
             ? 'none'
@@ -61,9 +59,7 @@ export function MarketingHeader() {
       <div className="mx-auto flex h-full max-w-7xl items-center justify-between px-4 sm:px-6">
         <Link href="/" className="flex items-center gap-2.5" aria-label={t('common.aria.layakHome')}>
           <BrandMark />
-          <span className="font-sans text-[17px] font-semibold tracking-tight text-inherit">
-            {t('common.brand')}
-          </span>
+          <span className="font-sans text-[17px] font-semibold tracking-tight text-inherit">{t('common.brand')}</span>
         </Link>
         <nav className="flex items-center gap-1">
           <LanguageToggle />

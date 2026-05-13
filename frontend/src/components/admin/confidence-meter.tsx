@@ -46,10 +46,7 @@ export function ConfidenceMeter({
     >
       <div className="flex gap-0.5" aria-hidden>
         {Array.from({ length: 4 }).map((_, i) => (
-          <span
-            key={i}
-            className={cn('h-1.5 w-3 rounded-sm', i < filled ? SEGMENT_COLOR[band] : 'bg-foreground/10')}
-          />
+          <span key={i} className={cn('h-1.5 w-3 rounded-sm', i < filled ? SEGMENT_COLOR[band] : 'bg-foreground/10')} />
         ))}
       </div>
       <span className="font-mono text-[12px] tabular-nums text-foreground/80">{pct}%</span>

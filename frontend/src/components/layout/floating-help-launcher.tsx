@@ -152,7 +152,6 @@ export function FloatingHelpLauncher() {
     }
     const el = document.getElementById(currentStep.target)
     if (!el) {
-
       setAnchorEl(null)
       return
     }
@@ -188,16 +187,8 @@ export function FloatingHelpLauncher() {
 
   // Pick which content to render: tour step or static fallback card.
   const Icon = currentStep?.icon ?? config.fallback?.icon ?? CircleHelp
-  const title = currentStep
-    ? t(currentStep.i18nTitle)
-    : config.fallback
-      ? t(config.fallback.i18nTitle)
-      : ''
-  const body = currentStep
-    ? t(currentStep.i18nBody)
-    : config.fallback
-      ? t(config.fallback.i18nBody)
-      : ''
+  const title = currentStep ? t(currentStep.i18nTitle) : config.fallback ? t(config.fallback.i18nTitle) : ''
+  const body = currentStep ? t(currentStep.i18nBody) : config.fallback ? t(config.fallback.i18nBody) : ''
 
   return (
     <Popover open={open} onOpenChange={handleOpenChange}>

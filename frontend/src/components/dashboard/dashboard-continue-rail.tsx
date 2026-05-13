@@ -103,7 +103,11 @@ export function DashboardContinueRail({ items, phase, errorMessage, onRetry }: P
       </div>
 
       {phase === 'loading' && (
-        <div className="relative flex items-center gap-2 text-sm text-muted-foreground" role="status" aria-live="polite">
+        <div
+          className="relative flex items-center gap-2 text-sm text-muted-foreground"
+          role="status"
+          aria-live="polite"
+        >
           <Loader2 className="size-4 animate-spin" aria-hidden />
           {t('dashboard.continue.loading')}
         </div>

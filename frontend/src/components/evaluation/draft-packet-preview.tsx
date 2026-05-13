@@ -234,13 +234,7 @@ export function DraftPacketPreview({ evalId, matches }: Props) {
         })}
       </div>
       <div className="mt-4 flex flex-col gap-3">
-        <Button
-          type="button"
-          onClick={handleDownloadZip}
-          disabled={zipBusy}
-          size="lg"
-          className="w-full sm:w-auto"
-        >
+        <Button type="button" onClick={handleDownloadZip} disabled={zipBusy} size="lg" className="w-full sm:w-auto">
           {zipBusy ? (
             <>
               <Loader2 className="mr-1.5 size-4 animate-spin" aria-hidden />

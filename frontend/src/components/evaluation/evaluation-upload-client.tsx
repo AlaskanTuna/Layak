@@ -99,7 +99,9 @@ export function EvaluationUploadClient() {
     // Mock pipeline is Aisyah-shaped only — Farhan would desync, so gate the dev hatch on persona.
     const useMock =
       behavior === 'run' &&
-      persona === 'aisyah' && process.env.NODE_ENV !== 'production' && process.env.NEXT_PUBLIC_USE_MOCK_SSE === '1'
+      persona === 'aisyah' &&
+      process.env.NODE_ENV !== 'production' &&
+      process.env.NEXT_PUBLIC_USE_MOCK_SSE === '1'
     if (useMock) {
       start({ mode: 'mock' })
       return

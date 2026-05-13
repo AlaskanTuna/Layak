@@ -25,9 +25,7 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
       <main className="relative z-10 flex min-h-[calc(100svh-var(--topbar-height))] flex-col items-center justify-center bg-background px-4 py-8 sm:py-10 lg:px-8 lg:py-12">
         <div className="grid w-full max-w-5xl items-stretch gap-7 lg:grid-cols-[minmax(0,1fr)_minmax(0,460px)] lg:gap-10">
           <AuthContextPane />
-          <div className="mx-auto flex w-full max-w-[440px] flex-col justify-center">
-            {children}
-          </div>
+          <div className="mx-auto flex w-full max-w-[440px] flex-col justify-center">{children}</div>
         </div>
       </main>
       <Footer sticky />

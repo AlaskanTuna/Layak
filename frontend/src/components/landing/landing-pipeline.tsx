@@ -39,7 +39,7 @@ const STEPS_FALLBACK: StepCopy[] = [
   {
     label: 'Compute',
     title: 'Sum the annual upside.\nShow the working.',
-    body: 'Gemini writes a Python snippet, runs it in Google\'s sandbox, and streams both the source and stdout to the UI. Verifiable arithmetic, not a final number.'
+    body: "Gemini writes a Python snippet, runs it in Google's sandbox, and streams both the source and stdout to the UI. Verifiable arithmetic, not a final number."
   },
   {
     label: 'Generate',
@@ -137,9 +137,7 @@ export function LandingPipeline() {
                         stepRefs.current[i] = el
                       }}
                       className={`group border-t py-9 transition-colors duration-300 ${
-                        isActive
-                          ? 'border-[color:var(--hibiscus)]/45'
-                          : 'border-foreground/12'
+                        isActive ? 'border-[color:var(--hibiscus)]/45' : 'border-foreground/12'
                       }`}
                     >
                       <div className="flex items-center gap-3">
@@ -164,9 +162,7 @@ export function LandingPipeline() {
                       >
                         {step.title}
                       </h3>
-                      <p className="mt-4 max-w-md text-[15px] leading-[1.65] text-foreground/65">
-                        {step.body}
-                      </p>
+                      <p className="mt-4 max-w-md text-[15px] leading-[1.65] text-foreground/65">{step.body}</p>
                       <div className="mt-5 flex flex-wrap gap-2">
                         {step.tools.map((tool) => (
                           <span
@@ -210,9 +206,7 @@ export function LandingPipeline() {
                   <span
                     key={i}
                     className={`h-1 rounded-full transition-all duration-300 ${
-                      i === active
-                        ? 'w-10 bg-[color:var(--hibiscus)]'
-                        : 'w-5 bg-foreground/15'
+                      i === active ? 'w-10 bg-[color:var(--hibiscus)]' : 'w-5 bg-foreground/15'
                     }`}
                   />
                 ))}
@@ -250,9 +244,7 @@ function ExtractMock() {
       <div className="flex flex-col rounded-lg bg-gradient-to-br from-[#1d4d8f] via-[#246db8] to-[#0c2d52] p-3 text-white shadow-inner">
         <div className="flex items-start justify-between">
           <span className="mono-caption text-[9px] text-white/80">MyKad · Synthetic</span>
-          <span className="mono-caption rounded bg-white/12 px-1.5 py-0.5 text-[8px] text-white/85">
-            DEMO
-          </span>
+          <span className="mono-caption rounded bg-white/12 px-1.5 py-0.5 text-[8px] text-white/85">DEMO</span>
         </div>
         <div className="mt-2 grid grid-cols-[44px_1fr] gap-2">
           <div className="size-11 rounded bg-white/15" />
@@ -275,13 +267,15 @@ function ExtractMock() {
         </div>
         <pre className="mt-2 overflow-hidden font-mono text-[10.5px] leading-[1.55] text-[color:color-mix(in_oklch,var(--paper)_90%,transparent)]">
           <span className="text-[#7fc7a3]">{'{'}</span>
-          {'\n  '}<span className="text-[#e6b380]">name</span>: <span className="text-[#a8d4f5]">{'"Aisyah …"'}</span>,
-          {'\n  '}<span className="text-[#e6b380]">age</span>: <span className="text-[#f5c98c]">34</span>,
-          {'\n  '}<span className="text-[#e6b380]">state</span>: <span className="text-[#a8d4f5]">{'"PHG"'}</span>,
-          {'\n  '}<span className="text-[#e6b380]">income_my</span>: <span className="text-[#f5c98c]">2840</span>,
-          {'\n  '}<span className="text-[#e6b380]">household</span>: <span className="text-[#f5c98c]">4</span>,
-          {'\n  '}<span className="text-[#e6b380]">filer</span>: <span className="text-[#a8d4f5]">{'"B"'}</span>
-          {'\n'}<span className="text-[#7fc7a3]">{'}'}</span>
+          {'\n  '}
+          <span className="text-[#e6b380]">name</span>: <span className="text-[#a8d4f5]">{'"Aisyah …"'}</span>,{'\n  '}
+          <span className="text-[#e6b380]">age</span>: <span className="text-[#f5c98c]">34</span>,{'\n  '}
+          <span className="text-[#e6b380]">state</span>: <span className="text-[#a8d4f5]">{'"PHG"'}</span>,{'\n  '}
+          <span className="text-[#e6b380]">income_my</span>: <span className="text-[#f5c98c]">2840</span>,{'\n  '}
+          <span className="text-[#e6b380]">household</span>: <span className="text-[#f5c98c]">4</span>,{'\n  '}
+          <span className="text-[#e6b380]">filer</span>: <span className="text-[#a8d4f5]">{'"B"'}</span>
+          {'\n'}
+          <span className="text-[#7fc7a3]">{'}'}</span>
         </pre>
         <div className="mt-auto flex items-center gap-2 border-t border-[color:color-mix(in_oklch,var(--paper)_12%,transparent)]/40 pt-2">
           <span className="size-1.5 rounded-full bg-[color:var(--forest)]" />
@@ -423,7 +417,9 @@ function MatchMock() {
             </div>
           </div>
           <div className="text-right">
-            <div className={`font-mono text-[12px] tabular-nums ${m.qualifies ? '' : 'text-[color:color-mix(in_oklch,var(--paper)_45%,transparent)]'}`}>
+            <div
+              className={`font-mono text-[12px] tabular-nums ${m.qualifies ? '' : 'text-[color:color-mix(in_oklch,var(--paper)_45%,transparent)]'}`}
+            >
               {m.amount}
             </div>
             <div className="mono-caption mt-0.5 text-[9px] text-[color:color-mix(in_oklch,var(--paper)_55%,transparent)]">
@@ -445,13 +441,20 @@ function ComputeMock() {
         </div>
         <pre className="mt-3 overflow-hidden font-mono text-[10.5px] leading-[1.6] text-[color:color-mix(in_oklch,var(--paper)_92%,transparent)]">
           <span className="text-[#c39bd3]">def</span> <span className="text-[#a8d4f5]">total_upside</span>(matches):
-          {'\n  '}return <span className="text-[#7fc7a3]">sum</span>(m.amount <span className="text-[#c39bd3]">for</span> m <span className="text-[#c39bd3]">in</span> matches)
-          {'\n\n'}matches = [
-          {'\n  '}<span className="text-[#a8d4f5]">Match</span>(<span className="text-[#e6b380]">{'"STR 2026"'}</span>, <span className="text-[#f5c98c]">1200</span>),
-          {'\n  '}<span className="text-[#a8d4f5]">Match</span>(<span className="text-[#e6b380]">{'"JKM"'}</span>,      <span className="text-[#f5c98c]">6000</span>),
-          {'\n  '}<span className="text-[#a8d4f5]">Match</span>(<span className="text-[#e6b380]">{'"LHDN B"'}</span>,   <span className="text-[#f5c98c]">5108</span>),
-          {'\n'}]
-          {'\n'}<span className="text-[#7fc7a3]">print</span>(<span className="text-[#e6b380]">{'f"RM {total_upside(matches):,}"'}</span>)
+          {'\n  '}return <span className="text-[#7fc7a3]">sum</span>(m.amount{' '}
+          <span className="text-[#c39bd3]">for</span> m <span className="text-[#c39bd3]">in</span> matches)
+          {'\n\n'}matches = [{'\n  '}
+          <span className="text-[#a8d4f5]">Match</span>(<span className="text-[#e6b380]">{'"STR 2026"'}</span>,{' '}
+          <span className="text-[#f5c98c]">1200</span>),
+          {'\n  '}
+          <span className="text-[#a8d4f5]">Match</span>(<span className="text-[#e6b380]">{'"JKM"'}</span>,{' '}
+          <span className="text-[#f5c98c]">6000</span>),
+          {'\n  '}
+          <span className="text-[#a8d4f5]">Match</span>(<span className="text-[#e6b380]">{'"LHDN B"'}</span>,{' '}
+          <span className="text-[#f5c98c]">5108</span>),
+          {'\n'}]{'\n'}
+          <span className="text-[#7fc7a3]">print</span>(
+          <span className="text-[#e6b380]">{'f"RM {total_upside(matches):,}"'}</span>)
         </pre>
       </div>
       <div className="border-t border-[color:color-mix(in_oklch,var(--paper)_12%,transparent)]/30 bg-[color:color-mix(in_oklch,var(--paper)_4%,transparent)] p-4">

@@ -81,18 +81,12 @@ export function useWhatIf(evalId: string): UseWhatIfResult {
           signal: controller.signal
         })
           .then(async (strategyRes) => {
-            if (
-              generation !== requestGenerationRef.current ||
-              controller.signal.aborted ||
-              !strategyRes.ok
-            ) {
+            if (generation !== requestGenerationRef.current || controller.signal.aborted || !strategyRes.ok) {
               return
             }
             const strategyBody = (await strategyRes.json()) as { strategy?: WhatIfResponse['strategy'] }
             if (generation !== requestGenerationRef.current || controller.signal.aborted) return
-            setData((current) =>
-              current === null ? current : { ...current, strategy: strategyBody.strategy ?? [] }
-            )
+            setData((current) => (current === null ? current : { ...current, strategy: strategyBody.strategy ?? [] }))
           })
           .catch(() => {
             // Strategy enrichment is optional; the deterministic preview remains valid.

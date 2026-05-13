@@ -118,9 +118,7 @@ export function DiscoveryRunPanel({ onCompleted }: { onCompleted: () => void }) 
             <h2 className="font-heading text-xl font-semibold tracking-tight sm:text-2xl">
               {t('admin.discovery.runPanel.title')}
             </h2>
-            <p className="text-[14px] leading-[1.6] text-foreground/68">
-              {t('admin.discovery.runPanel.description')}
-            </p>
+            <p className="text-[14px] leading-[1.6] text-foreground/68">{t('admin.discovery.runPanel.description')}</p>
           </div>
           <Button
             type="button"
@@ -155,18 +153,9 @@ export function DiscoveryRunPanel({ onCompleted }: { onCompleted: () => void }) 
         {phase === 'done' && summary && (
           <div className="flex flex-col gap-3">
             <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
-              <Kpi
-                label={t('admin.discovery.runPanel.kpi.sourcesChecked')}
-                value={summary.sources_checked}
-              />
-              <Kpi
-                label={t('admin.discovery.runPanel.kpi.sourcesChanged')}
-                value={summary.sources_changed}
-              />
-              <Kpi
-                label={t('admin.discovery.runPanel.kpi.candidatesExtracted')}
-                value={summary.candidates_extracted}
-              />
+              <Kpi label={t('admin.discovery.runPanel.kpi.sourcesChecked')} value={summary.sources_checked} />
+              <Kpi label={t('admin.discovery.runPanel.kpi.sourcesChanged')} value={summary.sources_changed} />
+              <Kpi label={t('admin.discovery.runPanel.kpi.candidatesExtracted')} value={summary.candidates_extracted} />
             </div>
             {completedAt && (
               <p className="mono-caption text-foreground/55">
@@ -177,7 +166,10 @@ export function DiscoveryRunPanel({ onCompleted }: { onCompleted: () => void }) 
         )}
 
         {phase === 'error' && error && (
-          <div className="flex items-start gap-2 rounded-[10px] border border-destructive/30 bg-destructive/10 p-3 text-sm text-destructive" role="alert">
+          <div
+            className="flex items-start gap-2 rounded-[10px] border border-destructive/30 bg-destructive/10 p-3 text-sm text-destructive"
+            role="alert"
+          >
             <AlertTriangle className="mt-0.5 size-4 shrink-0" aria-hidden />
             <span>{t('admin.discovery.triggerError', { message: error })}</span>
           </div>

@@ -13,14 +13,14 @@ Assumed profile for all cases:
 
 ## Expected Upside
 
-| Test case | Intended extracted income | STR | JKM Warga Emas | BKK | LHDN | i-Saraan | Expected annual upside |
-| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
-| Baseline clean | RM2,800 | RM450 | RM7,200 | RM3,600 | RM558.00 | RM500 | RM12,308.00 |
-| Gross-vs-net, JKM pass | RM4,944 | RM450 | RM7,200 | RM0 | RM2,111.24 | RM500 | RM10,261.24 |
-| Just-over JKM fail | RM4,945 | RM450 | RM0 | RM0 | RM2,112.20 | RM500 | RM3,062.20 |
-| BKK boundary pass | RM4,000 | RM450 | RM7,200 | RM3,600 | RM1,255.00 | RM500 | RM13,005.00 |
-| BKK just-fail | RM4,001 | RM450 | RM7,200 | RM0 | RM1,255.60 | RM500 | RM9,405.60 |
-| STR cliff fail | RM5,001 | RM0 | RM0 | RM0 | RM2,165.96 | RM500 | RM2,665.96 |
+| Test case              | Intended extracted income |   STR | JKM Warga Emas |     BKK |       LHDN | i-Saraan | Expected annual upside |
+| ---------------------- | ------------------------: | ----: | -------------: | ------: | ---------: | -------: | ---------------------: |
+| Baseline clean         |                   RM2,800 | RM450 |        RM7,200 | RM3,600 |   RM558.00 |    RM500 |            RM12,308.00 |
+| Gross-vs-net, JKM pass |                   RM4,944 | RM450 |        RM7,200 |     RM0 | RM2,111.24 |    RM500 |            RM10,261.24 |
+| Just-over JKM fail     |                   RM4,945 | RM450 |            RM0 |     RM0 | RM2,112.20 |    RM500 |             RM3,062.20 |
+| BKK boundary pass      |                   RM4,000 | RM450 |        RM7,200 | RM3,600 | RM1,255.00 |    RM500 |            RM13,005.00 |
+| BKK just-fail          |                   RM4,001 | RM450 |        RM7,200 |     RM0 | RM1,255.60 |    RM500 |             RM9,405.60 |
+| STR cliff fail         |                   RM5,001 |   RM0 |            RM0 |     RM0 | RM2,165.96 |    RM500 |             RM2,665.96 |
 
 PERKESO SKSPS is not counted as upside. It should render as a required contribution: Plan 3 for RM2,800, and Plan 4 for the other threshold cases.
 

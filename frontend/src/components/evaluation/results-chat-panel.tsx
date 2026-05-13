@@ -3,16 +3,7 @@
 import Image from 'next/image'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import {
-  AlertCircle,
-  Loader2,
-  Maximize2,
-  Minimize2,
-  RotateCcw,
-  Send,
-  Sparkles,
-  X
-} from 'lucide-react'
+import { AlertCircle, Loader2, Maximize2, Minimize2, RotateCcw, Send, Sparkles, X } from 'lucide-react'
 import ReactMarkdown, { type Components } from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 
@@ -53,10 +44,7 @@ export function ResultsChatPanel({ evalId, matches, chat }: Props) {
 
   const qualifyingMatches = useMemo(() => matches.filter((m) => m.qualifies), [matches])
 
-  const initialPool = useMemo(
-    () => buildInitialSuggestionPool(qualifyingMatches, t),
-    [qualifyingMatches, t]
-  )
+  const initialPool = useMemo(() => buildInitialSuggestionPool(qualifyingMatches, t), [qualifyingMatches, t])
   const suggestions = useMemo(
     () => pickRandom(initialPool, INITIAL_CHIPS),
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -67,11 +55,7 @@ export function ResultsChatPanel({ evalId, matches, chat }: Props) {
   const lastMessage = chat.messages[chat.messages.length - 1] ?? null
   const showInitial = chat.messages.length === 0 && suggestions.length > 0
   const showFollowUps =
-    !showInitial &&
-    !!lastMessage &&
-    lastMessage.role === 'model' &&
-    !lastMessage.streaming &&
-    !chat.isStreaming
+    !showInitial && !!lastMessage && lastMessage.role === 'model' && !lastMessage.streaming && !chat.isStreaming
   const followUpKey = lastMessage?.id ?? 'none'
   const followUps = useMemo(
     () => (showFollowUps ? pickRandom(followUpPool, FOLLOWUP_CHIPS) : []),
@@ -220,13 +204,7 @@ export function ResultsChatPanel({ evalId, matches, chat }: Props) {
               />
               <div className="flex items-center gap-3">
                 <span className="inline-flex size-10 shrink-0 items-center justify-center overflow-hidden rounded-full border border-[color:var(--hibiscus)]/25 bg-[color:var(--paper)]">
-                  <Image
-                    src={CIK_LAY_ICON}
-                    alt="Cik Lay"
-                    width={40}
-                    height={40}
-                    className="size-10 object-cover"
-                  />
+                  <Image src={CIK_LAY_ICON} alt="Cik Lay" width={40} height={40} className="size-10 object-cover" />
                 </span>
                 <div className="flex flex-col">
                   <span className="mono-caption text-[color:var(--hibiscus)]">Cik Lay · Pegawai Skim</span>
@@ -251,7 +229,11 @@ export function ResultsChatPanel({ evalId, matches, chat }: Props) {
                 <button
                   type="button"
                   onClick={() => setIsModal((v) => !v)}
-                  aria-label={isModal ? t('evaluation.chat.collapse', 'Collapse to side panel') : t('evaluation.chat.expand', 'Expand to centre modal')}
+                  aria-label={
+                    isModal
+                      ? t('evaluation.chat.collapse', 'Collapse to side panel')
+                      : t('evaluation.chat.expand', 'Expand to centre modal')
+                  }
                   title={isModal ? t('evaluation.chat.collapse', 'Collapse') : t('evaluation.chat.expand', 'Expand')}
                   className="inline-flex h-8 w-8 cursor-pointer items-center justify-center rounded-md text-foreground/60 transition hover:bg-foreground/[0.05] hover:text-foreground focus:outline-none focus:ring-2 focus:ring-ring"
                 >
@@ -315,9 +297,7 @@ export function ResultsChatPanel({ evalId, matches, chat }: Props) {
 
             <footer className="border-t border-foreground/10 bg-foreground/[0.025] px-3 py-3 backdrop-blur-md backdrop-saturate-150">
               {chat.pendingScenarioContext && (
-                <p className="mono-caption mb-2 text-[color:var(--primary)]">
-                  {t('evaluation.chat.scenarioQueued')}
-                </p>
+                <p className="mono-caption mb-2 text-[color:var(--primary)]">{t('evaluation.chat.scenarioQueued')}</p>
               )}
               <div className="flex items-stretch gap-2">
                 <textarea
@@ -412,9 +392,7 @@ const MARKDOWN_COMPONENTS: Components = {
         </pre>
       )
     }
-    return (
-      <code className="rounded bg-foreground/[0.08] px-1 py-0.5 font-mono text-[12px]">{children}</code>
-    )
+    return <code className="rounded bg-foreground/[0.08] px-1 py-0.5 font-mono text-[12px]">{children}</code>
   },
   a: ({ children, href }) => (
     <a
@@ -430,18 +408,14 @@ const MARKDOWN_COMPONENTS: Components = {
   h2: ({ children }) => <p className="mt-1.5 mb-1 font-semibold">{children}</p>,
   h3: ({ children }) => <p className="mt-1.5 mb-1 font-semibold">{children}</p>,
   blockquote: ({ children }) => (
-    <blockquote className="my-1.5 border-l-2 border-foreground/20 pl-3 text-foreground/75">
-      {children}
-    </blockquote>
+    <blockquote className="my-1.5 border-l-2 border-foreground/20 pl-3 text-foreground/75">{children}</blockquote>
   ),
   table: ({ children }) => (
     <div className="my-2 overflow-x-auto">
       <table className="w-full text-[12.5px]">{children}</table>
     </div>
   ),
-  th: ({ children }) => (
-    <th className="border-b border-foreground/15 px-2 py-1 text-left font-semibold">{children}</th>
-  ),
+  th: ({ children }) => <th className="border-b border-foreground/15 px-2 py-1 text-left font-semibold">{children}</th>,
   td: ({ children }) => <td className="border-b border-foreground/8 px-2 py-1">{children}</td>
 }
 
@@ -499,9 +473,7 @@ function ChatBubble({ message }: { message: ChatMessage }) {
           </div>
         )}
         {!isUser && message.groundingUnavailable && !message.streaming && (
-          <p className="mono-caption mt-2 italic text-foreground/55">
-            {t('evaluation.chat.groundingUnavailable')}
-          </p>
+          <p className="mono-caption mt-2 italic text-foreground/55">{t('evaluation.chat.groundingUnavailable')}</p>
         )}
       </div>
     </div>
@@ -570,9 +542,7 @@ function buildInitialSuggestionPool(
   return pool
 }
 
-function buildFollowUpPool(
-  t: (key: string, opts?: Record<string, string | number>) => string
-): string[] {
+function buildFollowUpPool(t: (key: string, opts?: Record<string, string | number>) => string): string[] {
   return [
     t('evaluation.chat.followUps.tellMore', { defaultValue: 'Tell me more about this scheme.' }),
     t('evaluation.chat.followUps.eligibility', { defaultValue: 'What is the eligibility criteria?' }),

@@ -2,19 +2,7 @@
 
 import { useCallback, useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
-import {
-  AlertTriangle,
-  Crown,
-  Download,
-  Loader2,
-  LogOut,
-  Mail,
-  Monitor,
-  Moon,
-  Sun,
-  Trash2,
-  Zap
-} from 'lucide-react'
+import { AlertTriangle, Crown, Download, Loader2, LogOut, Mail, Monitor, Moon, Sun, Trash2, Zap } from 'lucide-react'
 import { useTheme } from 'next-themes'
 import { useTranslation } from 'react-i18next'
 
@@ -319,7 +307,7 @@ function ThemePicker() {
     setMounted(true)
   }, [])
 
-  const current = mounted ? theme ?? 'system' : 'system'
+  const current = mounted ? (theme ?? 'system') : 'system'
 
   return (
     <div role="radiogroup" aria-label={t('settings.appearance.title')} className="grid grid-cols-3 gap-2">
@@ -341,17 +329,11 @@ function ThemePicker() {
             )}
           >
             <Icon
-              className={cn(
-                'size-4 transition-colors',
-                active ? 'text-[color:var(--hibiscus)]' : 'text-foreground/55'
-              )}
+              className={cn('size-4 transition-colors', active ? 'text-[color:var(--hibiscus)]' : 'text-foreground/55')}
               aria-hidden
             />
             <p
-              className={cn(
-                'text-sm font-medium transition-colors',
-                active ? 'text-foreground' : 'text-foreground/75'
-              )}
+              className={cn('text-sm font-medium transition-colors', active ? 'text-foreground' : 'text-foreground/75')}
             >
               {t(`settings.appearance.${option.i18nKey}.label`)}
             </p>

@@ -4,13 +4,7 @@ import { useCallback, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import type { ErrorCategory, StrategyAdvice } from '@/lib/agent-types'
-import type {
-  ChatEvent,
-  ChatMessage,
-  ChatRequest,
-  ChatScenarioContext,
-  ChatTurn
-} from '@/lib/chat-types'
+import type { ChatEvent, ChatMessage, ChatRequest, ChatScenarioContext, ChatTurn } from '@/lib/chat-types'
 import { authedFetch } from '@/lib/firebase'
 
 /**
@@ -61,10 +55,7 @@ function localId(): string {
 
 export type UseChatResult = {
   messages: ChatMessage[]
-  send: (
-    message: string,
-    opts?: { advisory?: StrategyAdvice; scenarioContext?: ChatScenarioContext | null }
-  ) => void
+  send: (message: string, opts?: { advisory?: StrategyAdvice; scenarioContext?: ChatScenarioContext | null }) => void
   abort: () => void
   reset: () => void
   isStreaming: boolean
@@ -120,10 +111,7 @@ export function useChat(evalId: string): UseChatResult {
   }, [cleanup])
 
   const send = useCallback(
-    (
-      message: string,
-      opts?: { advisory?: StrategyAdvice; scenarioContext?: ChatScenarioContext | null }
-    ) => {
+    (message: string, opts?: { advisory?: StrategyAdvice; scenarioContext?: ChatScenarioContext | null }) => {
       const trimmed = message.trim()
       if (!trimmed || isStreaming) return
 
@@ -227,14 +215,11 @@ export function useChat(evalId: string): UseChatResult {
     [evalId, i18n.language, isStreaming, messages, pendingAdvisory, pendingScenarioContext]
   )
 
-  const handoffFromAdvice = useCallback(
-    (advice: StrategyAdvice, scenarioContext?: ChatScenarioContext | null) => {
-      setPendingDraft(advice.suggested_chat_prompt ?? advice.headline)
-      setPendingAdvisory(advice)
-      setPendingScenarioContext(scenarioContext ?? null)
-    },
-    []
-  )
+  const handoffFromAdvice = useCallback((advice: StrategyAdvice, scenarioContext?: ChatScenarioContext | null) => {
+    setPendingDraft(advice.suggested_chat_prompt ?? advice.headline)
+    setPendingAdvisory(advice)
+    setPendingScenarioContext(scenarioContext ?? null)
+  }, [])
 
   const handoffFromScenario = useCallback((scenarioContext: ChatScenarioContext, draft: string) => {
     setPendingDraft(draft)

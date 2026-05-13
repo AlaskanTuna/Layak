@@ -98,11 +98,12 @@ function DiscoveryPageInner() {
 
       <section className="flex flex-col gap-4">
         <div className="flex flex-wrap items-center justify-between gap-3">
-          <h2 className="font-heading text-xl font-semibold tracking-tight">
-            {t('admin.discovery.queue.title')}
-          </h2>
+          <h2 className="font-heading text-xl font-semibold tracking-tight">{t('admin.discovery.queue.title')}</h2>
           <div className="relative w-full max-w-sm sm:w-auto">
-            <Search className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-foreground/45" aria-hidden />
+            <Search
+              className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-foreground/45"
+              aria-hidden
+            />
             <Input
               type="search"
               value={search}
@@ -127,9 +128,7 @@ function DiscoveryPageInner() {
             {error}
           </p>
         )}
-        {phase === 'ready' && (
-          <DiscoveryQueueTable rows={visibleRows} totalCount={rows.length} onRefresh={reload} />
-        )}
+        {phase === 'ready' && <DiscoveryQueueTable rows={visibleRows} totalCount={rows.length} onRefresh={reload} />}
       </section>
     </div>
   )

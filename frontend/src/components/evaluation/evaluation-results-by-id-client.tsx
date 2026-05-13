@@ -103,12 +103,9 @@ export function EvaluationResultsByIdClient({ evalId }: { evalId: string }) {
     context: ChatScenarioContext
   } | null>(null)
   const whatIfResult = whatIfPreview?.result ?? null
-  const handleWhatIfResult = useCallback(
-    (result: WhatIfResponse | null, context: ChatScenarioContext | null) => {
-      setWhatIfPreview(result && context ? { result, context } : null)
-    },
-    []
-  )
+  const handleWhatIfResult = useCallback((result: WhatIfResponse | null, context: ChatScenarioContext | null) => {
+    setWhatIfPreview(result && context ? { result, context } : null)
+  }, [])
 
   const fetchDoc = useCallback(async () => {
     try {
@@ -299,7 +296,6 @@ export function EvaluationResultsByIdClient({ evalId }: { evalId: string }) {
     return ids
   })()
 
-
   function handleStartAnother() {
     setDemoMode(false)
     reset()
@@ -402,9 +398,7 @@ export function EvaluationResultsByIdClient({ evalId }: { evalId: string }) {
               >
                 <StrategySection
                   advisories={whatIfResult?.strategy ?? pipelineState.strategy}
-                  onAskCikLay={(advice) =>
-                    chat.handoffFromAdvice(advice, whatIfPreview?.context ?? null)
-                  }
+                  onAskCikLay={(advice) => chat.handoffFromAdvice(advice, whatIfPreview?.context ?? null)}
                 />
               </section>
             )}
@@ -465,9 +459,7 @@ export function EvaluationResultsByIdClient({ evalId }: { evalId: string }) {
         </div>
       )}
 
-      {isComplete && hasChatContext && (
-        <ResultsChatPanel evalId={evalId} matches={displayedMatches} chat={chat} />
-      )}
+      {isComplete && hasChatContext && <ResultsChatPanel evalId={evalId} matches={displayedMatches} chat={chat} />}
     </div>
   )
 }

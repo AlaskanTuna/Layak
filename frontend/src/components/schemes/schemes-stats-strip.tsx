@@ -55,10 +55,7 @@ export function SchemesStatsStrip() {
   const latestUpdateValue = formatLatestUpdate(latestVerifiedAt, i18n.language)
 
   return (
-    <section
-      aria-label={t('schemes.stats.ariaLabel')}
-      className="grid grid-cols-2 gap-3 sm:grid-cols-2 lg:grid-cols-4"
-    >
+    <section aria-label={t('schemes.stats.ariaLabel')} className="grid grid-cols-2 gap-3 sm:grid-cols-2 lg:grid-cols-4">
       {STATIC_STATS.map((stat) => {
         const Icon = stat.icon
         return (

@@ -5,15 +5,7 @@ import { useTranslation } from 'react-i18next'
 
 import { cn } from '@/lib/utils'
 
-export const TOC_SECTIONS = [
-  'overview',
-  'schemes',
-  'subsidies',
-  'required',
-  'strategy',
-  'whatIfs',
-  'preview'
-] as const
+export const TOC_SECTIONS = ['overview', 'schemes', 'subsidies', 'required', 'strategy', 'whatIfs', 'preview'] as const
 export type TocSectionId = (typeof TOC_SECTIONS)[number]
 
 type Props = {
@@ -212,9 +204,7 @@ export function EvaluationResultsToc({ visibleSections }: Props) {
                     aria-current={active ? 'true' : undefined}
                     className={cn(
                       'relative block py-1.5 pl-3 text-sm leading-snug transition-colors',
-                      active
-                        ? 'font-medium text-foreground'
-                        : 'text-foreground/55 hover:text-foreground/85'
+                      active ? 'font-medium text-foreground' : 'text-foreground/55 hover:text-foreground/85'
                     )}
                   >
                     {active && (

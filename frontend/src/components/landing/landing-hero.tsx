@@ -81,9 +81,7 @@ export function LandingHero() {
                 </svg>
               </span>
               <br />
-              <span className="text-foreground/70">
-                {t('marketing.hero.headlineTail', 'in three uploads.')}
-              </span>
+              <span className="text-foreground/70">{t('marketing.hero.headlineTail', 'in three uploads.')}</span>
             </h1>
 
             <p className="mt-7 max-w-xl text-base leading-[1.65] text-foreground/72 sm:text-[17px]">
@@ -125,4 +123,3 @@ function MetaItem({ icon, label }: { icon: React.ReactNode; label: string }) {
     </div>
   )
 }
-

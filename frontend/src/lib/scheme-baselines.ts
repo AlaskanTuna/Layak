@@ -53,7 +53,8 @@ export const SCHEME_BASELINES: Record<string, SchemeBaseline> = {
   lhdn_form_be: {
     name: 'LHDN Form BE — YA2025 salaried reliefs',
     agency: 'LHDN (HASiL)',
-    eligibility_summary: 'Salaried filers (PCB withheld); five core reliefs (personal, EPF, lifestyle, parental, medical).',
+    eligibility_summary:
+      'Salaried filers (PCB withheld); five core reliefs (personal, EPF, lifestyle, parental, medical).',
     rate_summary: 'Up to RM 9,000 personal + bracketed reliefs per Public Ruling 4/2024.'
   },
   perkeso_sksps: {

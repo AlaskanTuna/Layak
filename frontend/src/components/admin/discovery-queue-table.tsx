@@ -47,10 +47,7 @@ export function DiscoveryQueueTable({ rows, onRefresh, totalCount }: Props) {
   const allSelected = sortedRows.length > 0 && sortedRows.every((row) => selected.has(row.candidate_id))
   const someSelected = sortedRows.some((row) => selected.has(row.candidate_id))
 
-  const selectedRows = useMemo(
-    () => sortedRows.filter((row) => selected.has(row.candidate_id)),
-    [sortedRows, selected]
-  )
+  const selectedRows = useMemo(() => sortedRows.filter((row) => selected.has(row.candidate_id)), [sortedRows, selected])
 
   function toggleOne(candidateId: string, checked: boolean) {
     setSelected((prev) => {
@@ -127,13 +124,7 @@ export function DiscoveryQueueTable({ rows, onRefresh, totalCount }: Props) {
           <span className="text-xs text-muted-foreground">
             {t('admin.discovery.queue.selected', { count: selected.size })}
           </span>
-          <Button
-            type="button"
-            size="sm"
-            variant="outline"
-            onClick={() => setSelected(new Set())}
-            disabled={deleting}
-          >
+          <Button type="button" size="sm" variant="outline" onClick={() => setSelected(new Set())} disabled={deleting}>
             {t('common.button.cancel')}
           </Button>
           <Button

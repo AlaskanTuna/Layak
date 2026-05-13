@@ -65,10 +65,7 @@ export function LandingPricing() {
             tag="Free"
             tagTone="primary"
             title={t('marketing.pricing.freeTier.name', 'Free')}
-            description={t(
-              'marketing.pricing.freeTier.description',
-              'For individuals exploring their eligibility.'
-            )}
+            description={t('marketing.pricing.freeTier.description', 'For individuals exploring their eligibility.')}
             price={t('marketing.pricing.freeTier.price', 'RM 0')}
             period={t('marketing.pricing.freeTier.period', 'forever')}
             features={freeFeatures}
@@ -89,10 +86,7 @@ export function LandingPricing() {
             tag={t('marketing.pricing.waitlist', 'Waitlist')}
             tagTone="hibiscus"
             title={t('marketing.pricing.proTier.name', 'Pro')}
-            description={t(
-              'marketing.pricing.proTier.description',
-              'For high-volume users and agencies.'
-            )}
+            description={t('marketing.pricing.proTier.description', 'For high-volume users and agencies.')}
             price={t('marketing.pricing.proTier.price', 'RM 15')}
             period={t('marketing.pricing.proTier.period', 'month')}
             features={proFeatures}

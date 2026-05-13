@@ -198,7 +198,8 @@ function UploadSlotCard({ spec, state, inputId, disabled, inputRef, onChange, on
           htmlFor={inputId}
           className={cn(
             'flex min-h-[110px] cursor-pointer flex-col items-center justify-center gap-2 rounded-lg border border-dashed border-foreground/15 bg-foreground/[0.02] px-6 py-6 text-center transition-colors hover:border-[color:var(--hibiscus)]/45 hover:bg-[color:var(--hibiscus)]/[0.03] sm:min-h-[130px] sm:py-7',
-            error && 'border-[color:var(--hibiscus)]/55 bg-[color:var(--hibiscus)]/[0.06] hover:border-[color:var(--hibiscus)]/70',
+            error &&
+              'border-[color:var(--hibiscus)]/55 bg-[color:var(--hibiscus)]/[0.06] hover:border-[color:var(--hibiscus)]/70',
             disabled && 'pointer-events-none opacity-50'
           )}
         >
@@ -267,8 +268,7 @@ export function UploadWidget({ onSubmit, disabled = false, submitId, ref }: Prop
           sampleDependants.map((dependant) => ({
             relationship: dependant.relationship,
             age: dependant.age,
-            monthly_income_rm:
-              dependant.monthly_income_rm == null ? '' : String(dependant.monthly_income_rm)
+            monthly_income_rm: dependant.monthly_income_rm == null ? '' : String(dependant.monthly_income_rm)
           }))
         )
         setShowHousehold(true)

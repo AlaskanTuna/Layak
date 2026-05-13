@@ -11,13 +11,7 @@ export type IncomeBand = 'b40_hardcore' | 'b40_household' | 'b40_household_with_
 
 export type Relationship = 'child' | 'parent' | 'spouse' | 'sibling' | 'grandparent' | 'other'
 
-export type Step =
-  | 'extract'
-  | 'classify'
-  | 'match'
-  | 'optimize_strategy'
-  | 'compute_upside'
-  | 'generate'
+export type Step = 'extract' | 'classify' | 'match' | 'optimize_strategy' | 'compute_upside' | 'generate'
 
 export type SchemeId =
   | 'str_2026'

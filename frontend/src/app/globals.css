@@ -324,11 +324,7 @@
       `-webkit-` variant, which Chromium then ignores in some configs.
       Letting Lightning CSS auto-prefix via browserslist is the safer path. */
 .glass-card-paper {
-  background: linear-gradient(
-    135deg,
-    oklch(0.98 0.012 82 / 0.55),
-    oklch(0.98 0.012 82 / 0.32)
-  );
+  background: linear-gradient(135deg, oklch(0.98 0.012 82 / 0.55), oklch(0.98 0.012 82 / 0.32));
   backdrop-filter: blur(28px) saturate(170%);
   border: 0;
   box-shadow:
@@ -336,11 +332,7 @@
     0 10px 30px -16px rgb(20 18 12 / 0.18);
 }
 .dark .glass-card-paper {
-  background: linear-gradient(
-    135deg,
-    oklch(0.2 0 0 / 0.5),
-    oklch(0.2 0 0 / 0.28)
-  );
+  background: linear-gradient(135deg, oklch(0.2 0 0 / 0.5), oklch(0.2 0 0 / 0.28));
   box-shadow:
     0 30px 70px -28px rgb(0 0 0 / 0.55),
     0 10px 30px -16px rgb(0 0 0 / 0.35);
@@ -419,14 +411,20 @@
 
 /* Marquee for the trust band */
 @keyframes marquee-scroll {
-  from { transform: translateX(0); }
-  to   { transform: translateX(-50%); }
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
 }
 .marquee-track {
   animation: marquee-scroll 38s linear infinite;
   will-change: transform;
 }
-.marquee-track:hover { animation-play-state: paused; }
+.marquee-track:hover {
+  animation-play-state: paused;
+}
 
 /* Cik Lay attention pulse — kitchen-sink visible. A thick hibiscus ring
    ripples outward from the button's edge, the button itself swells +18%
@@ -495,22 +493,44 @@
 
 /* Staggered editorial entrance */
 @keyframes fade-rise {
-  from { opacity: 0; transform: translateY(14px); }
-  to   { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 .fade-rise {
   animation: fade-rise 720ms cubic-bezier(0.2, 0.7, 0.1, 1) both;
 }
-.fade-rise-delay-1 { animation-delay: 80ms; }
-.fade-rise-delay-2 { animation-delay: 160ms; }
-.fade-rise-delay-3 { animation-delay: 240ms; }
-.fade-rise-delay-4 { animation-delay: 320ms; }
-.fade-rise-delay-5 { animation-delay: 400ms; }
+.fade-rise-delay-1 {
+  animation-delay: 80ms;
+}
+.fade-rise-delay-2 {
+  animation-delay: 160ms;
+}
+.fade-rise-delay-3 {
+  animation-delay: 240ms;
+}
+.fade-rise-delay-4 {
+  animation-delay: 320ms;
+}
+.fade-rise-delay-5 {
+  animation-delay: 400ms;
+}
 
 /* Cross-fade for cycling pipeline-narrative status labels */
 @keyframes cycle-fade {
-  0%   { opacity: 0; transform: translateY(-2px); }
-  100% { opacity: 1; transform: translateY(0); }
+  0% {
+    opacity: 0;
+    transform: translateY(-2px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 .cycle-fade {
   animation: cycle-fade 320ms ease-out both;
@@ -566,16 +586,8 @@
 .glass-grid-panel {
   background-color: color-mix(in oklch, var(--paper) 92%, transparent);
   background-image:
-    linear-gradient(
-      to right,
-      color-mix(in oklch, var(--ink) 7%, transparent) 1px,
-      transparent 1px
-    ),
-    linear-gradient(
-      to bottom,
-      color-mix(in oklch, var(--ink) 7%, transparent) 1px,
-      transparent 1px
-    ),
+    linear-gradient(to right, color-mix(in oklch, var(--ink) 7%, transparent) 1px, transparent 1px),
+    linear-gradient(to bottom, color-mix(in oklch, var(--ink) 7%, transparent) 1px, transparent 1px),
     linear-gradient(
       135deg,
       color-mix(in oklch, var(--paper) 28%, transparent),
@@ -595,16 +607,8 @@
 .dark .glass-grid-panel {
   background-color: color-mix(in oklch, var(--card) 82%, transparent);
   background-image:
-    linear-gradient(
-      to right,
-      color-mix(in oklch, white 5%, transparent) 1px,
-      transparent 1px
-    ),
-    linear-gradient(
-      to bottom,
-      color-mix(in oklch, white 5%, transparent) 1px,
-      transparent 1px
-    ),
+    linear-gradient(to right, color-mix(in oklch, white 5%, transparent) 1px, transparent 1px),
+    linear-gradient(to bottom, color-mix(in oklch, white 5%, transparent) 1px, transparent 1px),
     linear-gradient(
       135deg,
       color-mix(in oklch, var(--card) 30%, transparent),
@@ -619,9 +623,11 @@
 
 /* Pipeline mock browser chrome */
 .mock-chrome {
-  background: linear-gradient(180deg,
+  background: linear-gradient(
+    180deg,
     color-mix(in oklch, var(--ink) 88%, transparent) 0%,
-    color-mix(in oklch, var(--ink) 84%, transparent) 100%);
+    color-mix(in oklch, var(--ink) 84%, transparent) 100%
+  );
   color: color-mix(in oklch, var(--paper) 90%, transparent);
   border: 1px solid color-mix(in oklch, var(--ink) 70%, transparent);
   border-radius: 12px;
@@ -629,8 +635,12 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .marquee-track { animation: none; }
-  .fade-rise { animation: none; opacity: 1; transform: none; }
+  .marquee-track {
+    animation: none;
+  }
+  .fade-rise {
+    animation: none;
+    opacity: 1;
+    transform: none;
+  }
 }
-
-

@@ -51,10 +51,7 @@ export function StrategyCard({ advice, onAskCikLay }: Props) {
 
   return (
     <article
-      className={cn(
-        'paper-card flex flex-col gap-3 rounded-[16px] border p-5',
-        SEVERITY_BORDER[advice.severity]
-      )}
+      className={cn('paper-card flex flex-col gap-3 rounded-[16px] border p-5', SEVERITY_BORDER[advice.severity])}
     >
       <header className="flex items-start gap-3">
         <Icon className={cn('mt-0.5 size-4 shrink-0', SEVERITY_TINT[advice.severity])} aria-hidden />
@@ -62,9 +59,7 @@ export function StrategyCard({ advice, onAskCikLay }: Props) {
           <p className={cn('mono-caption', SEVERITY_TINT[advice.severity])}>
             {t(`evaluation.strategy.severity.${advice.severity}`)}
           </p>
-          <h3 className="font-heading text-[15.5px] font-semibold tracking-tight text-foreground">
-            {advice.headline}
-          </h3>
+          <h3 className="font-heading text-[15.5px] font-semibold tracking-tight text-foreground">{advice.headline}</h3>
         </div>
       </header>
       <p className="text-[14px] leading-[1.55] text-foreground/75">{advice.rationale}</p>

@@ -42,9 +42,17 @@ function deriveBaselineSliders(profile: Profile): SliderInputs {
     (d) => (d.relationship === 'parent' || d.relationship === 'grandparent') && d.age >= 60
   ).length
   return {
-    monthly_income_rm: clamp(profile.monthly_income_rm, SLIDER_RANGES.monthly_income_rm.min, SLIDER_RANGES.monthly_income_rm.max),
+    monthly_income_rm: clamp(
+      profile.monthly_income_rm,
+      SLIDER_RANGES.monthly_income_rm.min,
+      SLIDER_RANGES.monthly_income_rm.max
+    ),
     dependants_count: clamp(children, SLIDER_RANGES.dependants_count.min, SLIDER_RANGES.dependants_count.max),
-    elderly_dependants_count: clamp(elderly, SLIDER_RANGES.elderly_dependants_count.min, SLIDER_RANGES.elderly_dependants_count.max)
+    elderly_dependants_count: clamp(
+      elderly,
+      SLIDER_RANGES.elderly_dependants_count.min,
+      SLIDER_RANGES.elderly_dependants_count.max
+    )
   }
 }
 
@@ -102,11 +110,7 @@ export function WhatIfPanel({ evalId, baselineProfile, onResult, onAskCikLay }: 
   useEffect(() => {
     if (whatIf.phase === 'ready' && whatIf.data && scenarioContext) {
       onResult(whatIf.data, scenarioContext)
-    } else if (
-      whatIf.phase === 'idle' ||
-      whatIf.phase === 'rate-limited' ||
-      whatIf.phase === 'error'
-    ) {
+    } else if (whatIf.phase === 'idle' || whatIf.phase === 'rate-limited' || whatIf.phase === 'error') {
       onResult(null, null)
     }
   }, [whatIf.phase, whatIf.data, onResult, scenarioContext])
@@ -176,9 +180,7 @@ export function WhatIfPanel({ evalId, baselineProfile, onResult, onAskCikLay }: 
 
       {suggestions.length > 0 && (
         <div className="flex flex-col gap-2 border-t border-foreground/10 pt-3">
-          <span className="mono-caption text-foreground/55">
-            {t('evaluation.chat.suggestionsLabel')}
-          </span>
+          <span className="mono-caption text-foreground/55">{t('evaluation.chat.suggestionsLabel')}</span>
           <div className="flex flex-wrap gap-2">
             {suggestions.slice(0, 3).map((suggestion) => (
               <Button
@@ -186,12 +188,7 @@ export function WhatIfPanel({ evalId, baselineProfile, onResult, onAskCikLay }: 
                 type="button"
                 variant="outline"
                 size="sm"
-                onClick={() =>
-                  applySuggestion(
-                    suggestion.field,
-                    suggestion.suggested_value
-                  )
-                }
+                onClick={() => applySuggestion(suggestion.field, suggestion.suggested_value)}
                 className="h-auto rounded-full px-3 py-1.5 text-left text-xs"
               >
                 {suggestion.label}
@@ -206,24 +203,18 @@ export function WhatIfPanel({ evalId, baselineProfile, onResult, onAskCikLay }: 
           {whatIf.phase === 'debouncing' || whatIf.phase === 'in-flight' ? (
             <>
               <Loader2 className="size-3.5 animate-spin text-foreground/55" aria-hidden />
-              <span className="mono-caption text-foreground/55">
-                {t('evaluation.whatIf.running')}
-              </span>
+              <span className="mono-caption text-foreground/55">{t('evaluation.whatIf.running')}</span>
             </>
           ) : whatIf.phase === 'rate-limited' ? (
             <span className="mono-caption text-amber-700 dark:text-amber-400">
               {t('evaluation.whatIf.rateLimited', { seconds: whatIf.retryAfterSeconds ?? 60 })}
             </span>
           ) : whatIf.phase === 'error' ? (
-            <span className="mono-caption text-destructive">
-              {t('evaluation.whatIf.errorGeneric')}
-            </span>
+            <span className="mono-caption text-destructive">{t('evaluation.whatIf.errorGeneric')}</span>
           ) : whatIf.data ? (
             <span className="mono-caption text-foreground/55">
               {t('evaluation.whatIf.totalUpsideLabel')}:{' '}
-              <span className="font-mono tabular-nums text-foreground">
-                {formatRm(whatIf.data.total_annual_rm)}
-              </span>
+              <span className="font-mono tabular-nums text-foreground">{formatRm(whatIf.data.total_annual_rm)}</span>
             </span>
           ) : null}
         </div>
@@ -280,9 +271,7 @@ function SliderField({
       </div>
       <div className="flex items-baseline gap-2">
         <span className="font-mono text-[15px] tabular-nums text-foreground">{format(value)}</span>
-        {isDirty && (
-          <span className="mono-caption text-foreground/40">{format(baseline)} ↓</span>
-        )}
+        {isDirty && <span className="mono-caption text-foreground/40">{format(baseline)} ↓</span>}
       </div>
       <input
         type="range"

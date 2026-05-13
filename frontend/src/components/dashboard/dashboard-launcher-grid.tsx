@@ -102,9 +102,7 @@ export function DashboardLauncherGrid() {
               />
 
               <div className="relative flex items-start gap-3">
-                <span
-                  className={`flex size-11 items-center justify-center rounded-md ${ACCENT[tile.accent]}`}
-                >
+                <span className={`flex size-11 items-center justify-center rounded-md ${ACCENT[tile.accent]}`}>
                   <Icon className="size-5" aria-hidden />
                 </span>
                 <ArrowUpRight
@@ -121,11 +119,7 @@ export function DashboardLauncherGrid() {
                 >
                   {t(`dashboard.launcher.${tile.i18nKey}.title`)}
                 </h2>
-                <p
-                  className={`leading-relaxed text-foreground/65 ${
-                    isHero ? 'text-sm' : 'text-base sm:text-sm'
-                  }`}
-                >
+                <p className={`leading-relaxed text-foreground/65 ${isHero ? 'text-sm' : 'text-base sm:text-sm'}`}>
                   {t(`dashboard.launcher.${tile.i18nKey}.description`)}
                 </p>
               </div>

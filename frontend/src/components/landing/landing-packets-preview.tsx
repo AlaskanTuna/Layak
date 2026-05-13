@@ -77,9 +77,7 @@ export function LandingPacketsPreview() {
             <div className="mt-2 flex items-baseline gap-3">
               <span className="display-numeral text-[88px] text-[color:var(--paper)]">12,308</span>
               <div>
-                <div className="mono-caption text-[color:color-mix(in_oklch,var(--paper)_70%,transparent)]">
-                  MYR
-                </div>
+                <div className="mono-caption text-[color:color-mix(in_oklch,var(--paper)_70%,transparent)]">MYR</div>
                 <div className="mono-caption text-[color:var(--forest)]">+ matched schemes</div>
               </div>
             </div>
@@ -127,9 +125,7 @@ function PacketCard({
       </div>
 
       {/* Title */}
-      <div className="mt-3 font-heading text-[15px] font-semibold leading-tight text-[color:var(--ink)]">
-        {title}
-      </div>
+      <div className="mt-3 font-heading text-[15px] font-semibold leading-tight text-[color:var(--ink)]">{title}</div>
       <div className="mt-1.5 text-[11px] leading-[1.4] text-[color:var(--ink)]/60">{body}</div>
 
       {/* Faux content blocks */}

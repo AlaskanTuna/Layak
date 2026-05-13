@@ -20,10 +20,16 @@ import type { ManualEntryPayload, Relationship } from '@/lib/agent-types'
 // Editorial paper surface for form sections — replaces the legacy shadcn Card
 // shell with the design system's `paper-card`. `overflow-visible` is required
 // so the InfoTooltip pop-out clears the card edge.
-const SECTION_CLASS =
-  'paper-card flex min-h-[180px] flex-col gap-5 overflow-visible rounded-[14px] p-5 sm:p-6'
+const SECTION_CLASS = 'paper-card flex min-h-[180px] flex-col gap-5 overflow-visible rounded-[14px] p-5 sm:p-6'
 
-const RELATIONSHIPS = ['child', 'parent', 'spouse', 'sibling', 'grandparent', 'other'] as const satisfies readonly Relationship[]
+const RELATIONSHIPS = [
+  'child',
+  'parent',
+  'spouse',
+  'sibling',
+  'grandparent',
+  'other'
+] as const satisfies readonly Relationship[]
 
 type FormValues = {
   name: string
@@ -116,21 +122,23 @@ export function ManualEntryForm({ onSubmit, onUseSamples, onClear, disabled = fa
   // the `t` dependency re-builds after a language switch so existing error
   // messages pick up the new locale on the next validation pass.
   const manualEntrySchema = useMemo(() => {
-    const dependantSchema = z.object({
-      relationship: z.enum(RELATIONSHIPS),
-      age: z.number().int().min(0).max(120),
-      monthly_income_rm: z.string().refine((v) => v === '' || (/^\d+(\.\d{1,2})?$/.test(v) && Number(v) <= 1000000), {
-        message: t('evaluation.manual.zodIncomeFormat')
-      })
-    }).superRefine((v, ctx) => {
-      if (v.age < 18 && v.monthly_income_rm !== '') {
-        ctx.addIssue({
-          code: z.ZodIssueCode.custom,
-          path: ['monthly_income_rm'],
-          message: t('evaluation.manual.zodAdultIncomeOnly')
+    const dependantSchema = z
+      .object({
+        relationship: z.enum(RELATIONSHIPS),
+        age: z.number().int().min(0).max(120),
+        monthly_income_rm: z.string().refine((v) => v === '' || (/^\d+(\.\d{1,2})?$/.test(v) && Number(v) <= 1000000), {
+          message: t('evaluation.manual.zodIncomeFormat')
         })
-      }
-    })
+      })
+      .superRefine((v, ctx) => {
+        if (v.age < 18 && v.monthly_income_rm !== '') {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            path: ['monthly_income_rm'],
+            message: t('evaluation.manual.zodAdultIncomeOnly')
+          })
+        }
+      })
 
     return z.object({
       name: z.string().trim().min(1, t('evaluation.manual.zodRequired')).max(200),
@@ -148,14 +156,17 @@ export function ManualEntryForm({ onSubmit, onUseSamples, onClear, disabled = fa
       monthly_kwh: z.string().refine((v) => v === '' || (/^\d+$/.test(v) && Number(v) <= 10000), {
         message: t('evaluation.manual.zodKwhFormat')
       }),
-      dependants: z.array(dependantSchema).max(15).superRefine((rows, ctx) => {
-        if (rows.filter((row) => row.relationship === 'spouse').length > 4) {
-          ctx.addIssue({
-            code: z.ZodIssueCode.custom,
-            message: t('evaluation.manual.zodSpouseLimit')
-          })
-        }
-      })
+      dependants: z
+        .array(dependantSchema)
+        .max(15)
+        .superRefine((rows, ctx) => {
+          if (rows.filter((row) => row.relationship === 'spouse').length > 4) {
+            ctx.addIssue({
+              code: z.ZodIssueCode.custom,
+              message: t('evaluation.manual.zodSpouseLimit')
+            })
+          }
+        })
     })
   }, [t])
 
@@ -435,4 +446,3 @@ function LabelRow({ htmlFor, label, tooltip }: { htmlFor?: string; label: string
     </div>
   )
 }
-

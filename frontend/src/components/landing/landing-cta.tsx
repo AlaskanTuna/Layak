@@ -110,10 +110,11 @@ function FaqShuffleDeck() {
   // in so the deck never renders empty. Cast guards against the runtime
   // contract that t() returns string by default — the override is safe
   // because the i18n catalog has been hand-validated to carry an array.
-  const faqs = (t('marketing.cta.faqs', {
-    returnObjects: true,
-    defaultValue: FAQS_FALLBACK
-  }) as FaqItem[]) || FAQS_FALLBACK
+  const faqs =
+    (t('marketing.cta.faqs', {
+      returnObjects: true,
+      defaultValue: FAQS_FALLBACK
+    }) as FaqItem[]) || FAQS_FALLBACK
   const total = faqs.length
 
   const next = () => setActive((i) => (i + 1) % total)
@@ -124,7 +125,8 @@ function FaqShuffleDeck() {
       {/* Header strip */}
       <div className="mb-3 flex items-center justify-between">
         <span className="mono-caption text-foreground/55">
-          {t('marketing.cta.faqHeader', 'Common questions')} · {String(active + 1).padStart(2, '0')} / {String(total).padStart(2, '0')}
+          {t('marketing.cta.faqHeader', 'Common questions')} · {String(active + 1).padStart(2, '0')} /{' '}
+          {String(total).padStart(2, '0')}
         </span>
         <div className="flex items-center gap-1.5">
           <button
@@ -170,7 +172,9 @@ function FaqShuffleDeck() {
               tabIndex={isTop ? 0 : -1}
               aria-hidden={!isTop}
               className={`paper-card absolute inset-x-0 left-0 right-0 top-0 cursor-pointer rounded-[18px] p-6 text-left transition-all duration-500 ease-[cubic-bezier(0.2,0.7,0.1,1)] ${
-                isTop ? 'hover:shadow-[0_36px_80px_-30px_color-mix(in_oklch,var(--ink)_36%,transparent)]' : 'pointer-events-none'
+                isTop
+                  ? 'hover:shadow-[0_36px_80px_-30px_color-mix(in_oklch,var(--ink)_36%,transparent)]'
+                  : 'pointer-events-none'
               }`}
               style={{
                 background: 'var(--paper)',

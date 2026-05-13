@@ -16,9 +16,7 @@ export function AuthContextPane() {
         <h2 className="font-heading text-[26px] font-semibold leading-[1.15] tracking-tight text-foreground">
           {t('auth.context.heading')}
         </h2>
-        <p className="max-w-[38ch] text-[14px] leading-relaxed text-foreground/70">
-          {t('auth.context.body')}
-        </p>
+        <p className="max-w-[38ch] text-[14px] leading-relaxed text-foreground/70">{t('auth.context.body')}</p>
       </div>
 
       <ul className="flex flex-col gap-3">

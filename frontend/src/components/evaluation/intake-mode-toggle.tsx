@@ -27,11 +27,7 @@ export function IntakeModeToggle({ value, onChange, disabled = false }: Props) {
   const { t } = useTranslation()
   return (
     <div className="border-b border-foreground/10">
-      <div
-        role="radiogroup"
-        aria-label={t('evaluation.intake.aria')}
-        className="flex justify-center gap-10"
-      >
+      <div role="radiogroup" aria-label={t('evaluation.intake.aria')} className="flex justify-center gap-10">
         <ToggleTab
           icon={FileText}
           label={t('evaluation.intake.upload')}

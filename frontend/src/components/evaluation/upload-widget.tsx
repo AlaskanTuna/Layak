@@ -4,6 +4,7 @@ import { useId, useImperativeHandle, useRef, useState } from 'react'
 import {
   ArrowRight,
   ChevronDown,
+  Eraser,
   Eye,
   FileText,
   IdCard,
@@ -31,10 +32,12 @@ const MAX_FILE_BYTES = 10 * 1024 * 1024
 const ACCEPTED_MIME_TYPES = new Set(['image/jpeg', 'image/png', 'application/pdf'])
 const IMAGE_MIME_TYPES = new Set(['image/jpeg', 'image/png'])
 const ACCEPT_ATTR = 'image/jpeg,image/png,application/pdf'
+const MAX_SPOUSE_ROWS = 4
 
 export type UploadSlot = 'ic' | 'payslip' | 'utility'
 
 export type UploadFiles = Record<UploadSlot, File>
+const UPLOAD_SLOTS: readonly UploadSlot[] = ['ic', 'payslip', 'utility']
 
 /** Shape the upload widget yields on submit. Dependants are optional — an
  * empty list is submitted as an empty array and the backend treats it as
@@ -124,6 +127,15 @@ type Props = {
   /** Optional id applied to the submit button — used by the help tour to anchor a step on it. */
   submitId?: string
   ref?: React.Ref<UploadWidgetHandle>
+}
+
+function hasValidDependants(rows: DependantInputRow[]): boolean {
+  return rows.every((row) => {
+    if (!Number.isInteger(row.age) || row.age < 0 || row.age > 120) return false
+    if (row.monthly_income_rm === '') return true
+    if (row.age < 18) return false
+    return /^\d+(\.\d{1,2})?$/.test(row.monthly_income_rm) && Number(row.monthly_income_rm) <= 1_000_000
+  })
 }
 
 export type UploadWidgetHandle = {
@@ -278,9 +290,9 @@ export function UploadWidget({ onSubmit, disabled = false, submitId, ref }: Prop
     []
   )
 
-  const canSubmit = (['ic', 'payslip', 'utility'] as const).every(
-    (s) => state[s].file !== null && state[s].error === null
-  )
+  const filesReady = UPLOAD_SLOTS.every((s) => state[s].file !== null && state[s].error === null)
+  const spouseCount = dependants.filter((row) => row.relationship === 'spouse').length
+  const canSubmit = filesReady && spouseCount <= MAX_SPOUSE_ROWS && hasValidDependants(dependants)
 
   function commitFile(slot: UploadSlot, file: File) {
     setState((prev) => ({ ...prev, [slot]: { file, error: null } }))
@@ -327,6 +339,21 @@ export function UploadWidget({ onSubmit, disabled = false, submitId, ref }: Prop
     setState((prev) => ({ ...prev, [slot]: { file: null, error: null } }))
     const el = inputRefs.current[slot]
     if (el) el.value = ''
+  }
+
+  function handleClearAll() {
+    setState({
+      ic: { file: null, error: null },
+      payslip: { file: null, error: null },
+      utility: { file: null, error: null }
+    })
+    setDependants([])
+    setShowHousehold(false)
+    setPendingCrop(null)
+    UPLOAD_SLOTS.forEach((slot) => {
+      const el = inputRefs.current[slot]
+      if (el) el.value = ''
+    })
   }
 
   function handleSubmit() {
@@ -424,21 +451,34 @@ export function UploadWidget({ onSubmit, disabled = false, submitId, ref }: Prop
       <div className="flex flex-col gap-3 border-t border-foreground/10 pt-5 sm:flex-row sm:items-center sm:justify-between">
         <span className="mono-caption text-foreground/55">
           {t('evaluation.upload.readyCount', {
-            ready: (['ic', 'payslip', 'utility'] as const).filter((s) => state[s].file !== null).length,
+            ready: UPLOAD_SLOTS.filter((s) => state[s].file !== null).length,
             total: 3
           })}
         </span>
-        <Button
-          id={submitId}
-          type="button"
-          onClick={handleSubmit}
-          disabled={disabled || !canSubmit}
-          size="lg"
-          className="rounded-full bg-[color:var(--hibiscus)] px-6 text-[color:var(--hibiscus-foreground)] hover:bg-[color:var(--hibiscus)]/92"
-        >
-          {t('evaluation.upload.continue')}
-          <ArrowRight className="ml-1.5 size-4" aria-hidden />
-        </Button>
+        <div className="flex flex-col items-start gap-3 sm:flex-row sm:items-center">
+          <Button
+            type="button"
+            variant="ghost"
+            size="sm"
+            disabled={disabled}
+            onClick={handleClearAll}
+            className="gap-1.5 text-muted-foreground hover:text-foreground"
+          >
+            <Eraser className="size-4" aria-hidden />
+            {t('evaluation.manual.clear')}
+          </Button>
+          <Button
+            id={submitId}
+            type="button"
+            onClick={handleSubmit}
+            disabled={disabled || !canSubmit}
+            size="lg"
+            className="rounded-full bg-[color:var(--hibiscus)] px-6 text-[color:var(--hibiscus-foreground)] hover:bg-[color:var(--hibiscus)]/92"
+          >
+            {t('evaluation.upload.continue')}
+            <ArrowRight className="ml-1.5 size-4" aria-hidden />
+          </Button>
+        </div>
       </div>
 
       <CropPreviewModal

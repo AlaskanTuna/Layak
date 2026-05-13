@@ -74,8 +74,8 @@ def _scheme_context(
         (d for d in dependants if d.relationship == "parent" and d.age >= 60),
         None,
     )
-    per_capita = profile.monthly_income_rm / max(profile.household_size, 1)
-    annual_income = profile.monthly_income_rm * 12
+    per_capita = profile.household_income_rm / max(profile.household_size, 1)
+    annual_income = profile.applicant_income_rm * 12
 
     # LHDN-specific relief derivations (other templates simply ignore these keys).
     has_parent = any(d.relationship == "parent" for d in dependants)

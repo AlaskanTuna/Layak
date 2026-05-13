@@ -33,7 +33,7 @@
     <div class="value">Pekerja Sendiri / Gig (Form B)</div>
 
     <div class="label">Pendapatan Bulanan Diisytihar</div>
-    <div class="value">RM {{ '{:,.2f}'.format(profile.monthly_income_rm) }}</div>
+    <div class="value">RM {{ '{:,.2f}'.format(profile.applicant_income_rm) }}</div>
 
     {% if profile.address %}
     <div class="label">Alamat Surat-menyurat</div>
@@ -55,9 +55,9 @@
     </thead>
     <tbody>
       {% set selected_plan = None %}
-      {% if profile.monthly_income_rm <= 1050 %}{% set selected_plan = 1 %}
-      {% elif profile.monthly_income_rm <= 1550 %}{% set selected_plan = 2 %}
-      {% elif profile.monthly_income_rm <= 2950 %}{% set selected_plan = 3 %}
+      {% if profile.applicant_income_rm <= 1050 %}{% set selected_plan = 1 %}
+      {% elif profile.applicant_income_rm <= 1550 %}{% set selected_plan = 2 %}
+      {% elif profile.applicant_income_rm <= 2950 %}{% set selected_plan = 3 %}
       {% else %}{% set selected_plan = 4 %}{% endif %}
       <tr {% if selected_plan == 1 %}class="total"{% endif %}>
         <td>Plan 1{% if selected_plan == 1 %} ←{% endif %}</td>

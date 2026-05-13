@@ -103,7 +103,8 @@ def match(
     elderly_parents = [
         d for d in profile.dependants if d.relationship == "parent" and d.age >= WARGA_EMAS_AGE_THRESHOLD
     ]
-    per_capita = profile.monthly_income_rm / max(profile.household_size, 1)
+    household_income_rm = profile.household_income_rm
+    per_capita = household_income_rm / max(profile.household_size, 1)
     qualifies = bool(elderly_parents) and per_capita <= FOOD_PLI_RM
 
     cites = _citations()
@@ -152,7 +153,7 @@ def match(
         eldest_age=eldest.age,
         monthly_rm=WARGA_EMAS_MONTHLY_RM,
         fallback_monthly_rm=WARGA_EMAS_FALLBACK_MONTHLY_RM,
-        monthly_income_rm=profile.monthly_income_rm,
+        monthly_income_rm=household_income_rm,
         household_size=profile.household_size,
     )
     return SchemeMatch(

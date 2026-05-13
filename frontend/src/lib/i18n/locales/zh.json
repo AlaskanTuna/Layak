@@ -791,6 +791,9 @@
       "zodYearMin": "年份必须是 1900 或之后",
       "zodPastDate": "必须是过去的日期",
       "zodIc4Digits": "4 位数字",
+      "zodIncomeFormat": "金额最高 RM1,000,000（例如 2400 或 2400.50）",
+      "zodAdultIncomeOnly": "仅收集成年家庭成员的收入",
+      "zodSpouseLimit": "同一共同家庭最多可列出四位配偶",
       "zodCostFormat": "金额最高 RM100,000（例如 240 或 240.50）",
       "zodKwhFormat": "最高 10,000 的整数"
     },
@@ -856,6 +859,10 @@
       "age": "年龄",
       "agePlaceholder": "年龄",
       "icOptional": "身份证末 4 位（选填）",
+      "incomeOptional": "月收入（选填）",
+      "incomePlaceholder": "RM / 月",
+      "incomeUnder18": "18 岁以下",
+      "multiSpouseNote": "此处列出的多位配偶会被视为同一共同家庭，用于家庭收入和人均收入检查。如果他们分开居住，请为每个家庭分别进行评估。",
       "add": "添加受扶养人",
       "removeAria": "移除受扶养人 {{index}}"
     },

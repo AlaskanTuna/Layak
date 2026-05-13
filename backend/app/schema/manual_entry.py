@@ -15,7 +15,7 @@ from __future__ import annotations
 from datetime import date
 from typing import Annotated
 
-from pydantic import AfterValidator, BaseModel, ConfigDict, Field
+from pydantic import AfterValidator, BaseModel, ConfigDict, Field, model_validator
 
 from app.schema.profile import Relationship
 from app.schema.sanitize import sanitize_address, sanitize_name
@@ -40,6 +40,13 @@ class DependantInput(BaseModel):
     relationship: Relationship
     age: int = Field(ge=0, le=130)
     ic_last4: str | None = Field(default=None, pattern=r"^\d{4}$")
+    monthly_income_rm: float | None = Field(default=None, ge=0, le=1_000_000)
+
+    @model_validator(mode="after")
+    def _adult_income_only(self) -> "DependantInput":
+        if self.monthly_income_rm is not None and self.age < 18:
+            raise ValueError("dependant monthly_income_rm is accepted only for adult household members")
+        return self
 
 
 class ManualEntryPayload(BaseModel):
@@ -71,3 +78,10 @@ class ManualEntryPayload(BaseModel):
     # Monthly electricity consumption in kWh from the utility bill. Optional.
     monthly_kwh: int | None = Field(default=None, ge=0, le=10_000)
     dependants: list[DependantInput] = Field(default_factory=list, max_length=15)
+
+    @model_validator(mode="after")
+    def _cap_spouse_rows(self) -> "ManualEntryPayload":
+        spouse_count = sum(1 for d in self.dependants if d.relationship == "spouse")
+        if spouse_count > 4:
+            raise ValueError("manual entry supports at most four spouse rows in one shared household")
+        return self

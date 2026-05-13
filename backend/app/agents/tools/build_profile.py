@@ -74,6 +74,8 @@ def build_profile_from_manual_entry(
 ) -> Profile:
     """Deterministic ManualEntryPayload → Profile mapper (no Gemini call)."""
     dependants = [Dependant(**d.model_dump()) for d in payload.dependants]
+    adult_household_income_rm = sum(d.monthly_income_rm or 0.0 for d in dependants if d.age >= 18)
+    household_monthly_income_rm = payload.monthly_income_rm + adult_household_income_rm
     return Profile(
         # Preserve user casing; AISYAH_PROFILE stores the name in mixed case, and
         # changing the fixture would ripple through the demo UI. Extract still
@@ -82,10 +84,12 @@ def build_profile_from_manual_entry(
         name=payload.name.strip(),
         ic_last4=payload.ic_last4,
         age=_age_from_dob(payload.date_of_birth, today=today),
-        monthly_income_rm=payload.monthly_income_rm,
+        monthly_income_rm=household_monthly_income_rm,
+        applicant_monthly_income_rm=payload.monthly_income_rm,
+        household_monthly_income_rm=household_monthly_income_rm,
         household_size=1 + len(dependants),
         dependants=dependants,
-        household_flags=derive_household_flags(payload.monthly_income_rm, dependants),
+        household_flags=derive_household_flags(household_monthly_income_rm, dependants),
         form_type="form_b" if payload.employment_type == "gig" else "form_be",
         address=payload.address,
         monthly_cost_rm=payload.monthly_cost_rm,

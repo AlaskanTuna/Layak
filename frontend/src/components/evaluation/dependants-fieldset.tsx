@@ -16,6 +16,7 @@ export type DependantInputRow = {
   relationship: Relationship
   age: number
   ic_last4: string
+  monthly_income_rm: string
 }
 
 const RELATIONSHIPS: readonly Relationship[] = ['child', 'parent', 'spouse', 'sibling', 'other']
@@ -33,7 +34,7 @@ export function newEmptyDependant(): DependantInputRow {
   // `age: NaN` renders the input as empty; 0 is a valid age for a newborn
   // dependant so we can't use it as a "not-typed-yet" sentinel without
   // confusing the user into thinking the field was pre-filled.
-  return { relationship: 'child', age: Number.NaN, ic_last4: '' }
+  return { relationship: 'child', age: Number.NaN, ic_last4: '', monthly_income_rm: '' }
 }
 
 const MAX_AGE = 120
@@ -57,6 +58,7 @@ export function DependantsFieldset({ value, onChange, disabled = false, max = 15
 
   const count = value.length
   const householdSize = 1 + count
+  const spouseCount = value.filter((row) => row.relationship === 'spouse').length
   const pluralLabel =
     count === 1 ? t('evaluation.dependants.dependantSingular') : t('evaluation.dependants.dependantPlural')
 
@@ -76,7 +78,7 @@ export function DependantsFieldset({ value, onChange, disabled = false, max = 15
         {value.map((row, index) => (
           <li
             key={index}
-            className="grid gap-2 rounded-md border border-border px-3 py-3 sm:grid-cols-[1fr_1fr_1fr_auto]"
+            className="grid gap-2 rounded-md border border-border px-3 py-3 sm:grid-cols-[1fr_0.75fr_1fr_1fr_auto]"
           >
             <div className="flex flex-col gap-1.5">
               <Label htmlFor={`dep-rel-${index}`}>{t('evaluation.dependants.relationship')}</Label>
@@ -108,7 +110,13 @@ export function DependantsFieldset({ value, onChange, disabled = false, max = 15
                 disabled={disabled}
                 placeholder={t('evaluation.dependants.agePlaceholder')}
                 value={Number.isFinite(row.age) ? row.age : ''}
-                onChange={(e) => update(index, { age: clampAge(e.target.value) })}
+                onChange={(e) => {
+                  const nextAge = clampAge(e.target.value)
+                  update(index, {
+                    age: nextAge,
+                    ...(Number.isFinite(nextAge) && nextAge < 18 ? { monthly_income_rm: '' } : {})
+                  })
+                }}
               />
             </div>
             <div className="flex flex-col gap-1.5">
@@ -120,6 +128,24 @@ export function DependantsFieldset({ value, onChange, disabled = false, max = 15
                 disabled={disabled}
                 value={row.ic_last4}
                 onChange={(e) => update(index, { ic_last4: e.target.value })}
+              />
+            </div>
+            <div className="flex flex-col gap-1.5">
+              <Label htmlFor={`dep-income-${index}`}>{t('evaluation.dependants.incomeOptional')}</Label>
+              <Input
+                id={`dep-income-${index}`}
+                type="number"
+                inputMode="decimal"
+                min={0}
+                step="0.01"
+                disabled={disabled || !Number.isFinite(row.age) || row.age < 18}
+                placeholder={
+                  Number.isFinite(row.age) && row.age >= 18
+                    ? t('evaluation.dependants.incomePlaceholder')
+                    : t('evaluation.dependants.incomeUnder18')
+                }
+                value={row.monthly_income_rm}
+                onChange={(e) => update(index, { monthly_income_rm: e.target.value })}
               />
             </div>
             <div className="flex items-end">
@@ -137,6 +163,11 @@ export function DependantsFieldset({ value, onChange, disabled = false, max = 15
           </li>
         ))}
       </ul>
+      {spouseCount > 1 && (
+        <p className="rounded-md border border-amber-500/30 bg-amber-500/10 px-3 py-2 text-xs leading-relaxed text-foreground/75">
+          {t('evaluation.dependants.multiSpouseNote')}
+        </p>
+      )}
       <Button
         type="button"
         variant="outline"

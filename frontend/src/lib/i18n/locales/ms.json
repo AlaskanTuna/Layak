@@ -802,6 +802,9 @@
       "zodYearMin": "Tahun mesti 1900 atau lebih lewat",
       "zodPastDate": "Mesti tarikh lepas",
       "zodIc4Digits": "4 digit",
+      "zodIncomeFormat": "Jumlah sehingga RM1,000,000 (cth. 2400 atau 2400.50)",
+      "zodAdultIncomeOnly": "Pendapatan hanya dikutip untuk ahli isi rumah dewasa",
+      "zodSpouseLimit": "Gunakan maksimum empat baris pasangan dalam satu isi rumah bersama",
       "zodCostFormat": "Jumlah sehingga RM100,000 (cth. 240 atau 240.50)",
       "zodKwhFormat": "Nombor bulat sehingga 10,000"
     },
@@ -867,6 +870,10 @@
       "age": "Umur",
       "agePlaceholder": "Umur",
       "icOptional": "4 digit akhir IC (pilihan)",
+      "incomeOptional": "Pendapatan bulanan (pilihan)",
+      "incomePlaceholder": "RM / bulan",
+      "incomeUnder18": "Bawah 18",
+      "multiSpouseNote": "Beberapa pasangan yang disenaraikan di sini dianggap sebagai satu isi rumah bersama untuk semakan pendapatan isi rumah dan per kapita. Jika mereka tinggal berasingan, jalankan penilaian berasingan bagi setiap isi rumah.",
       "add": "Tambah tanggungan",
       "removeAria": "Alih keluar tanggungan {{index}}"
     },

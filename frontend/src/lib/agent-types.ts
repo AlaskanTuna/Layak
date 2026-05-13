@@ -38,6 +38,7 @@ export type Dependant = {
   relationship: Relationship
   age: number
   ic_last4: string | null
+  monthly_income_rm?: number | null
 }
 
 export type HouseholdFlags = {
@@ -51,6 +52,8 @@ export type Profile = {
   ic_last4: string
   age: number
   monthly_income_rm: number
+  applicant_monthly_income_rm?: number | null
+  household_monthly_income_rm?: number | null
   household_size: number
   dependants: Dependant[]
   household_flags: HouseholdFlags
@@ -66,6 +69,7 @@ export type DependantInput = {
   relationship: Relationship
   age: number
   ic_last4: string | null
+  monthly_income_rm?: number | null
 }
 
 /** Body of `POST /api/agent/intake_manual` — manual-entry alternative to the three-document upload. */

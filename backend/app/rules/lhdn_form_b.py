@@ -255,7 +255,7 @@ def match(
 
     reliefs = _applicable_reliefs(profile)
     total_relief = sum(reliefs.values())
-    annual_income = profile.monthly_income_rm * 12
+    annual_income = profile.applicant_income_rm * 12
 
     tax_before = _malaysia_tax_ya2025(annual_income)
     tax_after = _malaysia_tax_ya2025(max(0.0, annual_income - total_relief))

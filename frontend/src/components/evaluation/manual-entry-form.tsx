@@ -63,9 +63,9 @@ const AISYAH_DEFAULTS: FormValues = {
   monthly_cost_rm: '95.40',
   monthly_kwh: '220',
   dependants: [
-    { relationship: 'child', age: 10, ic_last4: '' },
-    { relationship: 'child', age: 7, ic_last4: '' },
-    { relationship: 'parent', age: 70, ic_last4: '' }
+    { relationship: 'child', age: 10, ic_last4: '', monthly_income_rm: '' },
+    { relationship: 'child', age: 7, ic_last4: '', monthly_income_rm: '' },
+    { relationship: 'parent', age: 70, ic_last4: '', monthly_income_rm: '' }
   ]
 }
 
@@ -86,9 +86,9 @@ const FARHAN_DEFAULTS: FormValues = {
   monthly_cost_rm: '152.40',
   monthly_kwh: '380',
   dependants: [
-    { relationship: 'spouse', age: 36, ic_last4: '' },
-    { relationship: 'child', age: 10, ic_last4: '' },
-    { relationship: 'child', age: 7, ic_last4: '' }
+    { relationship: 'spouse', age: 36, ic_last4: '', monthly_income_rm: '' },
+    { relationship: 'child', age: 10, ic_last4: '', monthly_income_rm: '' },
+    { relationship: 'child', age: 7, ic_last4: '', monthly_income_rm: '' }
   ]
 }
 
@@ -138,7 +138,18 @@ export function ManualEntryForm({ onSubmit, onUseSamples, onClear, disabled = fa
       age: z.number().int().min(0).max(120),
       ic_last4: z
         .string()
-        .refine((v) => v === '' || /^\d{4}$/.test(v), { message: t('evaluation.manual.zodIc4Digits') })
+        .refine((v) => v === '' || /^\d{4}$/.test(v), { message: t('evaluation.manual.zodIc4Digits') }),
+      monthly_income_rm: z.string().refine((v) => v === '' || (/^\d+(\.\d{1,2})?$/.test(v) && Number(v) <= 1000000), {
+        message: t('evaluation.manual.zodIncomeFormat')
+      })
+    }).superRefine((v, ctx) => {
+      if (v.age < 18 && v.monthly_income_rm !== '') {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ['monthly_income_rm'],
+          message: t('evaluation.manual.zodAdultIncomeOnly')
+        })
+      }
     })
 
     return z.object({
@@ -179,7 +190,14 @@ export function ManualEntryForm({ onSubmit, onUseSamples, onClear, disabled = fa
       monthly_kwh: z.string().refine((v) => v === '' || (/^\d+$/.test(v) && Number(v) <= 10000), {
         message: t('evaluation.manual.zodKwhFormat')
       }),
-      dependants: z.array(dependantSchema).max(15)
+      dependants: z.array(dependantSchema).max(15).superRefine((rows, ctx) => {
+        if (rows.filter((row) => row.relationship === 'spouse').length > 4) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            message: t('evaluation.manual.zodSpouseLimit')
+          })
+        }
+      })
     })
   }, [t])
 
@@ -206,7 +224,8 @@ export function ManualEntryForm({ onSubmit, onUseSamples, onClear, disabled = fa
       dependants: values.dependants.map((d) => ({
         relationship: d.relationship,
         age: d.age,
-        ic_last4: d.ic_last4 === '' ? null : d.ic_last4
+        ic_last4: d.ic_last4 === '' ? null : d.ic_last4,
+        monthly_income_rm: d.monthly_income_rm === '' ? null : Number(d.monthly_income_rm)
       }))
     }
     onSubmit(payload)
@@ -419,6 +438,11 @@ export function ManualEntryForm({ onSubmit, onUseSamples, onClear, disabled = fa
               />
             )}
           />
+          {formState.errors.dependants?.message && (
+            <p className="mt-2 text-xs text-destructive" role="alert">
+              {formState.errors.dependants.message}
+            </p>
+          )}
         </div>
       </section>
 

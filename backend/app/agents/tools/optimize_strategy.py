@@ -98,7 +98,7 @@ def _rule_trips(
         advisory; the reviewer can edit the YAML to narrow if a real signal
         appears in `Profile`).
       - `matched_scheme: X` trips only when X is in the qualifying matches.
-      - `max_monthly_income_rm: N` trips when `profile.monthly_income_rm <= N`.
+      - `max_monthly_income_rm: N` trips when applicant income <= N.
     """
     for key, expected in rule.trigger_conditions.items():
         if key == "has_elderly_dependant":
@@ -114,7 +114,7 @@ def _rule_trips(
             if str(expected) not in matched_ids:
                 return False
         elif key == "max_monthly_income_rm":
-            if profile.monthly_income_rm > float(expected):  # type: ignore[arg-type]
+            if profile.applicant_income_rm > float(expected):  # type: ignore[arg-type]
                 return False
         elif key == "filer_has_siblings_filing_taxes":
             # `unknown` → always trip; v1 has no profile signal for siblings,

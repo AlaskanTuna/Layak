@@ -1514,6 +1514,20 @@ _Frontend:_
 
 ---
 
+### 13. Feature: Manual-entry adult household income split
+
+**Purpose/Issue:** `Profile.monthly_income_rm` was overloaded: STR/JKM rules need total household income, while LHDN/PERKESO/i-Saraan should read the applicant's income only. QA also recorded a spouse-income gap in `docs/qa-findings.md`. This task makes one manual-entry submission represent one shared household, adds optional income for adult household members, and keeps multi-spouse households explicit without treating marriage structure as a disqualifier.
+
+- [x] Backend schema: `Dependant` / `DependantInput` gained optional `monthly_income_rm`; `Profile` gained `applicant_monthly_income_rm` and `household_monthly_income_rm` while preserving `monthly_income_rm` as the backward-compatible household-total alias.
+- [x] Backend validation: dependant income is accepted only for adult rows (`age >= 18`); manual entry supports at most four spouse rows in one shared household.
+- [x] Manual profile builder: applicant income stays as the main Income-section value; adult household-member income is summed into `household_monthly_income_rm`; `household_flags.income_band` is derived from household total.
+- [x] Rule routing: STR + JKM Warga Emas + JKM BKK read household income/per-capita; LHDN Form B/BE + PERKESO SKSPS + i-Saraan/strategy income gates read applicant income.
+- [x] Frontend household rows: adult rows expose an optional monthly-income input; under-18 rows hide/disable it. When more than one spouse is listed, a neutral note appears explaining that multiple spouses are treated as one shared household for household-income and per-capita checks, and separate residences should be evaluated separately.
+- [x] i18n: added en/ms/zh copy for adult member income, under-18 placeholder, spouse-limit validation, and the multi-spouse shared-household note.
+- [x] Regression tests: manual-entry tests cover adult spouse income rolling into household total, applicant-only LHDN arithmetic remaining stable, under-18 income rejection, and spouse-count cap.
+
+---
+
 ## Phase X: Submission Package
 
 > Covers the final submission artifacts. Keep it simple and complete.

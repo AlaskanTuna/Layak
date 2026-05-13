@@ -145,7 +145,8 @@ def match(
     """
     children_under_18 = sum(1 for d in profile.dependants if d.relationship == "child" and d.age < 18)
     bucket = _child_bucket(children_under_18)
-    band = _income_band(profile.monthly_income_rm)
+    household_income_rm = profile.household_income_rm
+    band = _income_band(household_income_rm)
 
     cites = _citations()
 
@@ -158,7 +159,7 @@ def match(
                 out_of_scope_reason(
                     "str_income_above_ceiling",
                     language,
-                    income=profile.monthly_income_rm,
+                    income=household_income_rm,
                 )
             )
         copy = scheme_copy("str_2026", "out_of_scope", language, reasons=reasons)
@@ -183,7 +184,7 @@ def match(
         bucket=bucket,
         annual_rm=annual_rm,
         children=children_under_18,
-        income=profile.monthly_income_rm,
+        income=household_income_rm,
     )
     return SchemeMatch(
         scheme_id="str_2026",

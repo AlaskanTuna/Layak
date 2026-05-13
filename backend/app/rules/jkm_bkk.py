@@ -124,7 +124,8 @@ def match(
     cites = _citations()
 
     qualifying_children = _qualifying_children(profile)
-    per_capita = profile.monthly_income_rm / max(profile.household_size, 1)
+    household_income_rm = profile.household_income_rm
+    per_capita = household_income_rm / max(profile.household_size, 1)
     qualifies = len(qualifying_children) > 0 and per_capita <= PER_CAPITA_THRESHOLD_RM
 
     if not qualifies:
@@ -191,7 +192,7 @@ def match(
         cap_note=cap_note,
         capped_monthly=capped_monthly,
         annual_rm=annual_rm,
-        monthly_income_rm=profile.monthly_income_rm,
+        monthly_income_rm=household_income_rm,
         household_size=profile.household_size,
     )
     return SchemeMatch(

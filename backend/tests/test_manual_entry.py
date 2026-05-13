@@ -163,6 +163,39 @@ def test_household_size_equals_one_plus_dependants() -> None:
     assert built.household_size == 1
 
 
+def test_adult_household_income_rolls_into_household_total_only() -> None:
+    payload = ManualEntryPayload.model_validate(
+        {
+            **AISYAH_PAYLOAD_JSON,
+            "monthly_income_rm": 8000,
+            "dependants": [
+                {"relationship": "spouse", "age": 34, "monthly_income_rm": 6000},
+                {"relationship": "spouse", "age": 31, "monthly_income_rm": 0},
+                {"relationship": "child", "age": 8},
+                {"relationship": "child", "age": 6},
+                {"relationship": "child", "age": 7},
+                {"relationship": "child", "age": 5},
+            ],
+        }
+    )
+    built = build_profile_from_manual_entry(payload, today=_FIXED_TODAY)
+
+    assert built.applicant_income_rm == 8000
+    assert built.household_income_rm == 14000
+    assert built.monthly_income_rm == 14000
+    assert built.household_size == 7
+    assert built.household_flags.income_band == "t20"
+
+    # STR/JKM see household income; applicant-only schemes still see the filer.
+    assert str_2026.match(built).qualifies is False
+    assert jkm_bkk.match(built).qualifies is False
+    lhdn_match = lhdn_form_b.match(built)
+    assert lhdn_match.qualifies is True
+    assert lhdn_match.annual_rm == lhdn_form_b.match(
+        built.model_copy(update={"monthly_income_rm": 8000, "household_monthly_income_rm": 8000})
+    ).annual_rm
+
+
 def test_address_is_optional() -> None:
     body = {**AISYAH_PAYLOAD_JSON}
     del body["address"]
@@ -187,6 +220,26 @@ def test_validation_rejects_non_4_digit_ic_last4() -> None:
 def test_validation_rejects_negative_income() -> None:
     with pytest.raises(ValueError):
         ManualEntryPayload.model_validate({**AISYAH_PAYLOAD_JSON, "monthly_income_rm": -1})
+
+
+def test_validation_rejects_under_18_dependant_income() -> None:
+    with pytest.raises(ValueError):
+        ManualEntryPayload.model_validate(
+            {
+                **AISYAH_PAYLOAD_JSON,
+                "dependants": [{"relationship": "child", "age": 17, "monthly_income_rm": 500}],
+            }
+        )
+
+
+def test_validation_rejects_more_than_four_spouses() -> None:
+    with pytest.raises(ValueError):
+        ManualEntryPayload.model_validate(
+            {
+                **AISYAH_PAYLOAD_JSON,
+                "dependants": [{"relationship": "spouse", "age": 30 + i} for i in range(5)],
+            }
+        )
 
 
 def test_validation_rejects_unknown_employment_type() -> None:

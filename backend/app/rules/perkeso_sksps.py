@@ -173,7 +173,8 @@ def match(
             annual_contribution_rm=None,
         )
 
-    plan = _plan_for_income(profile.monthly_income_rm)
+    applicant_income_rm = profile.applicant_income_rm
+    plan = _plan_for_income(applicant_income_rm)
     ceiling_note = sksps_ceiling_note(
         income_ceiling_rm=plan.income_ceiling_rm,
         highest_finite_ceiling_rm=_PLANS[-2].income_ceiling_rm or 0.0,
@@ -189,7 +190,7 @@ def match(
         annual_rm=plan.annual_rm,
         ceiling_note=ceiling_note,
         age=profile.age,
-        monthly_income_rm=profile.monthly_income_rm,
+        monthly_income_rm=applicant_income_rm,
         portal_url=_PORTAL_URL,
     )
     return SchemeMatch(

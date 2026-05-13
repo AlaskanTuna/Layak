@@ -8,7 +8,7 @@ from __future__ import annotations
 
 from typing import Literal
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field, model_validator
 
 FormType = Literal["form_b", "form_be"]
 IncomeBand = Literal[
@@ -34,6 +34,10 @@ class Dependant(BaseModel):
     relationship: Relationship
     age: int = Field(ge=0, le=130)
     ic_last4: str | None = Field(default=None, pattern=r"^\d{4}$")
+    # Optional monthly income for adult household members. Manual entry hides
+    # this for under-18 rows; backend validation lives on ManualEntryPayload so
+    # OCR/historical profiles without the field remain accepted.
+    monthly_income_rm: float | None = Field(default=None, ge=0, le=1_000_000)
 
 
 class HouseholdFlags(BaseModel):
@@ -50,7 +54,13 @@ class Profile(BaseModel):
     name: str = Field(min_length=1)
     ic_last4: str = Field(pattern=r"^\d{4}$")
     age: int = Field(ge=0, le=130)
+    # Back-compat field used by older persisted results and existing frontend
+    # surfaces. Going forward this is the total household monthly income.
     monthly_income_rm: float = Field(ge=0)
+    # Explicit split so applicant-only schemes (LHDN/PERKESO/i-Saraan) do not
+    # accidentally read spouse or other adult household income.
+    applicant_monthly_income_rm: float | None = Field(default=None, ge=0)
+    household_monthly_income_rm: float | None = Field(default=None, ge=0)
     household_size: int = Field(ge=1)
     dependants: list[Dependant] = Field(default_factory=list)
     household_flags: HouseholdFlags
@@ -70,6 +80,24 @@ class Profile(BaseModel):
     # `Profile` so the OCR path and manual path can both populate it without
     # another schema migration when the rule lands.
     monthly_kwh: int | None = Field(default=None, ge=0, le=10_000)
+
+    @model_validator(mode="after")
+    def _normalise_income_split(self) -> "Profile":
+        if self.applicant_monthly_income_rm is None:
+            self.applicant_monthly_income_rm = self.monthly_income_rm
+        if self.household_monthly_income_rm is None:
+            self.household_monthly_income_rm = self.monthly_income_rm
+        return self
+
+    @property
+    def applicant_income_rm(self) -> float:
+        """Applicant-only monthly income, falling back for legacy profiles."""
+        return self.applicant_monthly_income_rm if self.applicant_monthly_income_rm is not None else self.monthly_income_rm
+
+    @property
+    def household_income_rm(self) -> float:
+        """Total household monthly income, falling back for legacy profiles."""
+        return self.household_monthly_income_rm if self.household_monthly_income_rm is not None else self.monthly_income_rm
 
 
 class HouseholdClassification(BaseModel):

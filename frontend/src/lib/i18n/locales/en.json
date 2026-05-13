@@ -802,6 +802,9 @@
       "zodYearMin": "Year must be 1900 or later",
       "zodPastDate": "Must be a past date",
       "zodIc4Digits": "4 digits",
+      "zodIncomeFormat": "Amount up to RM1,000,000 (e.g. 2400 or 2400.50)",
+      "zodAdultIncomeOnly": "Income is only collected for adult household members",
+      "zodSpouseLimit": "Use at most four spouse rows in one shared household",
       "zodCostFormat": "Amount up to RM100,000 (e.g. 240 or 240.50)",
       "zodKwhFormat": "Whole number up to 10,000"
     },
@@ -867,6 +870,10 @@
       "age": "Age",
       "agePlaceholder": "Age",
       "icOptional": "IC Last 4 (Optional)",
+      "incomeOptional": "Monthly Income (Optional)",
+      "incomePlaceholder": "RM / month",
+      "incomeUnder18": "Under 18",
+      "multiSpouseNote": "Multiple spouses listed here are treated as one shared household for household-income and per-capita checks. If they live separately, run a separate evaluation for each household.",
       "add": "Add Dependant",
       "removeAria": "Remove dependant {{index}}"
     },

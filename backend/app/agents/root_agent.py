@@ -178,6 +178,13 @@ async def stream_agent_events(
                 uploads["payslip"][1],
                 uploads["utility"][1],
             )
+            if profile.applicant_monthly_income_rm is None or profile.household_monthly_income_rm is None:
+                profile = profile.model_copy(
+                    update={
+                        "applicant_monthly_income_rm": profile.applicant_income_rm,
+                        "household_monthly_income_rm": profile.household_income_rm,
+                    }
+                )
             # Hybrid path: MyKad / payslip / utility bill don't disclose
             # household composition, so the frontend may supply a dependants
             # list alongside the uploads. Overlay it on the extracted profile
@@ -185,12 +192,19 @@ async def stream_agent_events(
             # income_band reflects the new `has_children_under_18` value.
             if dependants_override is not None:
                 overlay_dependants = [Dependant(**d.model_dump()) for d in dependants_override]
+                applicant_income_rm = profile.applicant_income_rm
+                household_income_rm = applicant_income_rm + sum(
+                    d.monthly_income_rm or 0.0 for d in overlay_dependants if d.age >= 18
+                )
                 profile = profile.model_copy(
                     update={
+                        "monthly_income_rm": household_income_rm,
+                        "applicant_monthly_income_rm": applicant_income_rm,
+                        "household_monthly_income_rm": household_income_rm,
                         "dependants": overlay_dependants,
                         "household_size": 1 + len(overlay_dependants),
                         "household_flags": derive_household_flags(
-                            profile.monthly_income_rm, overlay_dependants
+                            household_income_rm, overlay_dependants
                         ),
                     }
                 )

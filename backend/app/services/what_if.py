@@ -148,6 +148,7 @@ def apply_overrides(profile: Profile, overrides: dict[str, Any]) -> Profile:
     return profile.model_copy(
         update={
             "monthly_income_rm": new_income,
+            "household_monthly_income_rm": new_income,
             "dependants": new_dependants,
             "household_size": 1 + len(new_dependants),
             "household_flags": new_flags,

@@ -313,7 +313,7 @@ export function EvaluationResultsByIdClient({ evalId }: { evalId: string }) {
   const hasRequiredContributions = doc.matches.some((m) => m.qualifies && m.kind === 'required_contribution')
   const hasSubsidies = doc.matches.some((m) => m.qualifies && m.kind === 'subsidy_credit')
   const hasUpsideMatches = doc.matches.some((m) => m.qualifies && (m.kind ?? 'upside') === 'upside')
-  const hasQualifyingForPacket = doc.matches.some((m) => m.qualifies)
+  const hasQualifyingForPacket = doc.matches.some((m) => m.qualifies && m.kind !== 'subsidy_credit')
 
   const showOverview = hasContent
   const showSchemes = hasContent && (hasUpsideMatches || !isComplete)

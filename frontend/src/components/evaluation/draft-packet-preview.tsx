@@ -52,11 +52,10 @@ export function DraftPacketPreview({ evalId, matches }: Props) {
   const [zipError, setZipError] = useState<string | null>(null)
   const blobUrlsRef = useRef<string[]>([])
 
-  // Surface every qualifying scheme — including `required_contribution`
-  // forms (e.g. PERKESO SKSPS). The ZIP packet below ships PDFs for the same
-  // set; filtering by `kind === 'upside'` here previously produced a 5-vs-6
-  // mismatch where the contribution form was downloadable but unpreviewable.
-  const qualifying = matches.filter((m) => m.qualifies)
+  // Surface every qualifying packet-producing scheme, including
+  // `required_contribution` forms (e.g. PERKESO SKSPS). Subsidy credits are
+  // info-only and intentionally have no draft packet.
+  const qualifying = matches.filter((m) => m.qualifies && m.kind !== 'subsidy_credit')
 
   useEffect(() => {
     const ref = blobUrlsRef

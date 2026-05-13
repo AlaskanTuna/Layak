@@ -43,7 +43,7 @@ class DependantInput(BaseModel):
     monthly_income_rm: float | None = Field(default=None, ge=0, le=1_000_000)
 
     @model_validator(mode="after")
-    def _adult_income_only(self) -> "DependantInput":
+    def _adult_income_only(self) -> DependantInput:
         if self.monthly_income_rm is not None and self.age < 18:
             raise ValueError("dependant monthly_income_rm is accepted only for adult household members")
         return self
@@ -80,7 +80,7 @@ class ManualEntryPayload(BaseModel):
     dependants: list[DependantInput] = Field(default_factory=list, max_length=15)
 
     @model_validator(mode="after")
-    def _cap_spouse_rows(self) -> "ManualEntryPayload":
+    def _cap_spouse_rows(self) -> ManualEntryPayload:
         spouse_count = sum(1 for d in self.dependants if d.relationship == "spouse")
         if spouse_count > 4:
             raise ValueError("manual entry supports at most four spouse rows in one shared household")

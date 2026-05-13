@@ -95,23 +95,25 @@ def match(
     """Match a profile against JKM Warga Emas on behalf of an elderly dependent.
 
     Qualifies when:
-      - The profile has at least one dependant with `relationship == "parent"` and
-        age ≥ WARGA_EMAS_AGE_THRESHOLD (60 years).
+      - The profile has at least one dependant with relationship `parent` or
+        `grandparent` and age ≥ WARGA_EMAS_AGE_THRESHOLD (60 years).
       - Per-capita monthly household income (`monthly_income_rm / household_size`)
         is ≤ FOOD_PLI_RM (RM1,236, DOSM 2024).
     """
-    elderly_parents = [
-        d for d in profile.dependants if d.relationship == "parent" and d.age >= WARGA_EMAS_AGE_THRESHOLD
+    elderly_dependants = [
+        d
+        for d in profile.dependants
+        if d.relationship in ("parent", "grandparent") and d.age >= WARGA_EMAS_AGE_THRESHOLD
     ]
     household_income_rm = profile.household_income_rm
     per_capita = household_income_rm / max(profile.household_size, 1)
-    qualifies = bool(elderly_parents) and per_capita <= FOOD_PLI_RM
+    qualifies = bool(elderly_dependants) and per_capita <= FOOD_PLI_RM
 
     cites = _citations()
 
     if not qualifies:
         reasons: list[str] = []
-        if not elderly_parents:
+        if not elderly_dependants:
             reasons.append(
                 out_of_scope_reason(
                     "jkm_warga_emas_no_elderly_parent",
@@ -142,7 +144,7 @@ def match(
         )
 
     annual_rm = WARGA_EMAS_MONTHLY_RM * 12
-    eldest = max(elderly_parents, key=lambda d: d.age)
+    eldest = max(elderly_dependants, key=lambda d: d.age)
 
     copy = scheme_copy(
         "jkm_warga_emas",

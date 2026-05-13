@@ -34,8 +34,12 @@ function clamp(v: number, min: number, max: number): number {
 }
 
 function deriveBaselineSliders(profile: Profile): SliderInputs {
-  const children = profile.dependants.filter((d) => d.relationship === 'child').length
-  const elderly = profile.dependants.filter((d) => d.relationship === 'parent').length
+  const children = profile.dependants.filter(
+    (d) => (d.relationship === 'child' || d.relationship === 'sibling') && d.age < 18
+  ).length
+  const elderly = profile.dependants.filter(
+    (d) => (d.relationship === 'parent' || d.relationship === 'grandparent') && d.age >= 60
+  ).length
   return {
     monthly_income_rm: clamp(profile.monthly_income_rm, SLIDER_RANGES.monthly_income_rm.min, SLIDER_RANGES.monthly_income_rm.max),
     dependants_count: clamp(children, SLIDER_RANGES.dependants_count.min, SLIDER_RANGES.dependants_count.max),

@@ -19,7 +19,7 @@ export type DependantInputRow = {
   monthly_income_rm: string
 }
 
-const RELATIONSHIPS: readonly Relationship[] = ['child', 'parent', 'spouse', 'sibling', 'other']
+const RELATIONSHIPS: readonly Relationship[] = ['child', 'parent', 'spouse', 'sibling', 'grandparent', 'other']
 
 type Props = {
   value: DependantInputRow[]

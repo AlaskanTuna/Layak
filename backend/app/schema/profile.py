@@ -18,7 +18,7 @@ IncomeBand = Literal[
     "m40",
     "t20",
 ]
-Relationship = Literal["child", "parent", "spouse", "sibling", "other"]
+Relationship = Literal["child", "parent", "spouse", "sibling", "grandparent", "other"]
 
 
 class Dependant(BaseModel):
@@ -82,7 +82,7 @@ class Profile(BaseModel):
     monthly_kwh: int | None = Field(default=None, ge=0, le=10_000)
 
     @model_validator(mode="after")
-    def _normalise_income_split(self) -> "Profile":
+    def _normalise_income_split(self) -> Profile:
         if self.applicant_monthly_income_rm is None:
             self.applicant_monthly_income_rm = self.monthly_income_rm
         if self.household_monthly_income_rm is None:
@@ -92,12 +92,20 @@ class Profile(BaseModel):
     @property
     def applicant_income_rm(self) -> float:
         """Applicant-only monthly income, falling back for legacy profiles."""
-        return self.applicant_monthly_income_rm if self.applicant_monthly_income_rm is not None else self.monthly_income_rm
+        return (
+            self.applicant_monthly_income_rm
+            if self.applicant_monthly_income_rm is not None
+            else self.monthly_income_rm
+        )
 
     @property
     def household_income_rm(self) -> float:
         """Total household monthly income, falling back for legacy profiles."""
-        return self.household_monthly_income_rm if self.household_monthly_income_rm is not None else self.monthly_income_rm
+        return (
+            self.household_monthly_income_rm
+            if self.household_monthly_income_rm is not None
+            else self.monthly_income_rm
+        )
 
 
 class HouseholdClassification(BaseModel):

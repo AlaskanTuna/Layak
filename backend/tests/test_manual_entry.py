@@ -95,9 +95,19 @@ def test_derive_household_flags_child_18_is_not_under_18() -> None:
     assert flags.has_children_under_18 is False
 
 
+def test_derive_household_flags_sibling_under_18_counts_as_child_care_recipient() -> None:
+    flags = derive_household_flags(3000.0, [Dependant(relationship="sibling", age=10)])
+    assert flags.has_children_under_18 is True
+
+
 def test_derive_household_flags_parent_under_60_is_not_elderly() -> None:
     flags = derive_household_flags(3000.0, [Dependant(relationship="parent", age=59)])
     assert flags.has_elderly_dependant is False
+
+
+def test_derive_household_flags_grandparent_60_plus_counts_as_elderly_dependant() -> None:
+    flags = derive_household_flags(3000.0, [Dependant(relationship="grandparent", age=70)])
+    assert flags.has_elderly_dependant is True
 
 
 # --- _age_from_dob --------------------------------------------------------
@@ -261,6 +271,87 @@ def test_validation_rejects_over_15_dependants() -> None:
 def test_dependant_input_rejects_bad_relationship() -> None:
     with pytest.raises(ValueError):
         DependantInput.model_validate({"relationship": "cousin", "age": 20})
+
+
+def test_dependant_input_accepts_grandparent_relationship() -> None:
+    row = DependantInput.model_validate({"relationship": "grandparent", "age": 70})
+    assert row.relationship == "grandparent"
+
+
+def test_bkk_counts_under_18_sibling_as_child_care_recipient() -> None:
+    payload = ManualEntryPayload.model_validate(
+        {
+            **AISYAH_PAYLOAD_JSON,
+            "monthly_income_rm": 1200,
+            "dependants": [{"relationship": "sibling", "age": 10}],
+        }
+    )
+    profile = build_profile_from_manual_entry(payload, today=_FIXED_TODAY)
+    assert jkm_bkk.match(profile).qualifies is True
+
+
+def test_bkk_does_not_count_18_year_old_sibling() -> None:
+    payload = ManualEntryPayload.model_validate(
+        {
+            **AISYAH_PAYLOAD_JSON,
+            "monthly_income_rm": 1200,
+            "dependants": [{"relationship": "sibling", "age": 18}],
+        }
+    )
+    profile = build_profile_from_manual_entry(payload, today=_FIXED_TODAY)
+    assert jkm_bkk.match(profile).qualifies is False
+
+
+def test_jkm_warga_emas_counts_grandparent_60_plus() -> None:
+    payload = ManualEntryPayload.model_validate(
+        {
+            **AISYAH_PAYLOAD_JSON,
+            "monthly_income_rm": 1200,
+            "dependants": [{"relationship": "grandparent", "age": 70}],
+        }
+    )
+    profile = build_profile_from_manual_entry(payload, today=_FIXED_TODAY)
+    assert jkm_warga_emas.match(profile).qualifies is True
+
+
+def test_jkm_warga_emas_does_not_count_grandparent_under_60() -> None:
+    payload = ManualEntryPayload.model_validate(
+        {
+            **AISYAH_PAYLOAD_JSON,
+            "monthly_income_rm": 1200,
+            "dependants": [{"relationship": "grandparent", "age": 59}],
+        }
+    )
+    profile = build_profile_from_manual_entry(payload, today=_FIXED_TODAY)
+    assert jkm_warga_emas.match(profile).qualifies is False
+
+
+def test_lhdn_parent_medical_remains_parent_only_for_grandparent() -> None:
+    parent_payload = ManualEntryPayload.model_validate(
+        {**AISYAH_PAYLOAD_JSON, "dependants": [{"relationship": "parent", "age": 70}]}
+    )
+    grandparent_payload = ManualEntryPayload.model_validate(
+        {**AISYAH_PAYLOAD_JSON, "dependants": [{"relationship": "grandparent", "age": 70}]}
+    )
+    parent_profile = build_profile_from_manual_entry(parent_payload, today=_FIXED_TODAY)
+    grandparent_profile = build_profile_from_manual_entry(grandparent_payload, today=_FIXED_TODAY)
+
+    assert lhdn_form_b.match(parent_profile).annual_rm > lhdn_form_b.match(grandparent_profile).annual_rm
+
+
+def test_lhdn_and_str_child_buckets_remain_child_only_for_sibling() -> None:
+    child_payload = ManualEntryPayload.model_validate(
+        {**AISYAH_PAYLOAD_JSON, "dependants": [{"relationship": "child", "age": 10}]}
+    )
+    sibling_payload = ManualEntryPayload.model_validate(
+        {**AISYAH_PAYLOAD_JSON, "dependants": [{"relationship": "sibling", "age": 10}]}
+    )
+    child_profile = build_profile_from_manual_entry(child_payload, today=_FIXED_TODAY)
+    sibling_profile = build_profile_from_manual_entry(sibling_payload, today=_FIXED_TODAY)
+
+    assert str_2026.match(child_profile).qualifies is True
+    assert str_2026.match(sibling_profile).qualifies is False
+    assert lhdn_form_b.match(child_profile).annual_rm > lhdn_form_b.match(sibling_profile).annual_rm
 
 
 # --- /api/agent/intake_manual route --------------------------------------

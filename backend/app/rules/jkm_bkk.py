@@ -16,7 +16,8 @@ documents these rates verbatim under "BANTUAN BULANAN — BANTUAN KANAK-KANAK
 (BKK)".
 
 Qualifying criteria:
-    - At least one dependant has `relationship == "child"` and `age < 18`.
+    - At least one child-care dependant has relationship `child` or `sibling`
+      and `age < 18`.
     - Per-capita monthly household income ≤ RM1,000 (commonly-cited BKK means
       test, tighter than Warga Emas's food-PLI threshold since BKK is a direct
       cash transfer).
@@ -96,11 +97,11 @@ def _citations() -> list[RuleCitation]:
 
 
 def _qualifying_children(profile: Profile) -> list[Dependant]:
-    """Return the list of child dependants under 18, in input order."""
+    """Return BKK child-care recipients under 18, in input order."""
     return [
         d
         for d in profile.dependants
-        if d.relationship == "child" and d.age < CHILD_AGE_THRESHOLD
+        if d.relationship in ("child", "sibling") and d.age < CHILD_AGE_THRESHOLD
     ]
 
 

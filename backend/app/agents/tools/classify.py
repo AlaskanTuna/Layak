@@ -23,8 +23,8 @@ _INSTRUCTION = """
 You are the `classify_household` agent. Given the Profile JSON below, produce
 a HouseholdClassification JSON covering:
 
-- `has_children_under_18`: true iff any dependant is relationship=child and age < 18.
-- `has_elderly_dependant`: true iff any dependant is relationship=parent and age >= 60.
+- `has_children_under_18`: true iff any dependant is relationship=child or relationship=sibling and age < 18.
+- `has_elderly_dependant`: true iff any dependant is relationship=parent or relationship=grandparent and age >= 60.
 - `income_band`: one of `b40_hardcore` (<RM1,500), `b40_household` (RM1,500-2,500),
   `b40_household_with_children` (RM2,501-5,000 with children under 18), `m40` (RM5,001-10,000),
   `t20` (>RM10,000).
@@ -35,8 +35,8 @@ a HouseholdClassification JSON covering:
   income, filer category (Form B for self-employed / gig, Form BE for salaried
   — mirror the Profile's `form_type` value verbatim — the tokens `Form B` and
   `Form BE` stay in Latin script across all languages), and any distinctive
-  dependant pattern (e.g. "Two children under 18 in household" or "One
-  elderly parent dependent, age 70").
+  dependant pattern (e.g. "Two child-care recipients under 18 in household"
+  or "One elderly parent/grandparent dependent, age 70").
 
   {language_instruction}
 

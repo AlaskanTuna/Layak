@@ -855,7 +855,7 @@
       }
     },
     "dependants": {
-      "description": "Tambah semua orang lain yang berkongsi isi rumah anda. Anak di bawah 18 tahun dan ibu bapa berumur 60+ membuka skim khusus. Saiz isi rumah: {{size}} (anda + {{count}} {{plural}}).",
+      "description": "Tambah semua orang lain yang berkongsi isi rumah anda. Anak atau adik-beradik di bawah 18 tahun dan ibu bapa atau datuk/nenek berumur 60+ membuka skim khusus. Saiz isi rumah: {{size}} (anda + {{count}} {{plural}}).",
       "dependantSingular": "tanggungan",
       "dependantPlural": "tanggungan",
       "empty": "Belum ada tanggungan. Klik \"Tambah tanggungan\" untuk menyenaraikan setiap ahli isi rumah.",
@@ -865,6 +865,7 @@
         "parent": "Ibu bapa",
         "spouse": "Pasangan",
         "sibling": "Adik-beradik",
+        "grandparent": "Datuk/nenek",
         "other": "Lain-lain"
       },
       "age": "Umur",

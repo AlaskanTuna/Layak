@@ -38,7 +38,7 @@
 <section>
   <h2>Bahagian II — Maklumat Kanak-Kanak (Penerima)</h2>
   {% set qualifying_children = [] %}
-  {% for d in dependants if d.relationship == 'child' and d.age < 18 %}
+  {% for d in dependants if d.relationship in ['child', 'sibling'] and d.age < 18 %}
     {% set _ = qualifying_children.append(d) %}
   {% endfor %}
   {% if qualifying_children %}

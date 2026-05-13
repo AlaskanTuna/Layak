@@ -1528,6 +1528,21 @@ _Frontend:_
 
 ---
 
+### 14. Feature: Household relationship-derived scheme roles
+
+**Purpose/Issue:** Manual entry previously forced users to mislabel caregiving households: younger siblings had to be entered as `child` to trigger BKK, while grandparents had to be entered as `parent` to trigger Warga Emas. Keep relationship labels semantically honest and derive scheme roles separately.
+
+- [x] Add `grandparent` as a first-class dependant relationship in backend and frontend contracts.
+- [x] Update manual-entry relationship options and en/ms/zh labels.
+- [x] BKK counts under-18 `child` and `sibling` dependants as child-care recipients.
+- [x] JKM Warga Emas counts age-60+ `parent` and `grandparent` dependants as elderly-care recipients.
+- [x] LHDN parent medical relief remains parent-only; STR and LHDN child buckets remain child-only in this pass.
+- [x] Household flags now reflect the derived BKK/Warga Emas roles.
+- [x] TRD records both the adult-income split and the relationship-vs-scheme-role derivation, including the future BKK 16-17 work/schooling-status field.
+- [x] Regression tests cover sibling BKK, grandparent Warga Emas, and non-expansion of STR/LHDN reliefs.
+
+---
+
 ## Phase X: Submission Package
 
 > Covers the final submission artifacts. Keep it simple and complete.

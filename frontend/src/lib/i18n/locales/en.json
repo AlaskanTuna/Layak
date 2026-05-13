@@ -855,7 +855,7 @@
       }
     },
     "dependants": {
-      "description": "Add everyone else who shares your household. Children under 18 and parents aged 60+ unlock specific schemes. Household size: {{size}} (you + {{count}} {{plural}}).",
+      "description": "Add everyone else who shares your household. Children or siblings under 18 and parents or grandparents aged 60+ unlock specific schemes. Household size: {{size}} (you + {{count}} {{plural}}).",
       "dependantSingular": "dependant",
       "dependantPlural": "dependants",
       "empty": "No dependants yet. Click \"Add dependant\" to list each household member.",
@@ -865,6 +865,7 @@
         "parent": "Parent",
         "spouse": "Spouse",
         "sibling": "Sibling",
+        "grandparent": "Grandparent",
         "other": "Other"
       },
       "age": "Age",

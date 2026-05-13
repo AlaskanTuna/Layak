@@ -24,7 +24,7 @@ import type { ManualEntryPayload, Relationship } from '@/lib/agent-types'
 const SECTION_CLASS =
   'paper-card flex min-h-[180px] flex-col gap-5 overflow-visible rounded-[14px] p-5 sm:p-6'
 
-const RELATIONSHIPS = ['child', 'parent', 'spouse', 'sibling', 'other'] as const satisfies readonly Relationship[]
+const RELATIONSHIPS = ['child', 'parent', 'spouse', 'sibling', 'grandparent', 'other'] as const satisfies readonly Relationship[]
 
 /** Insert dashes into a typed DOB so older users can type `20260421` and see
  * `2026-04-21` appear without hunting for the hyphen key. Also accepts a

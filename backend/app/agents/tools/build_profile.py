@@ -44,8 +44,12 @@ def derive_household_flags(
     dependants: list[Dependant],
 ) -> HouseholdFlags:
     """Pure-Python reimplementation of the extract prompt's household_flags logic."""
-    has_children_under_18 = any(d.relationship == "child" and d.age < 18 for d in dependants)
-    has_elderly_dependant = any(d.relationship == "parent" and d.age >= 60 for d in dependants)
+    has_children_under_18 = any(
+        d.relationship in ("child", "sibling") and d.age < 18 for d in dependants
+    )
+    has_elderly_dependant = any(
+        d.relationship in ("parent", "grandparent") and d.age >= 60 for d in dependants
+    )
     return HouseholdFlags(
         has_children_under_18=has_children_under_18,
         has_elderly_dependant=has_elderly_dependant,

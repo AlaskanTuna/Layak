@@ -7,8 +7,8 @@ match list. Stateless w.r.t. Firestore.
 
 Three sliders mapped to overrides (spec §4.2):
   monthly_income_rm        float ∈ [0, 15_000]
-  dependants_count         int ∈ [0, 6]   (children under 18)
-  elderly_dependants_count int ∈ [0, 4]   (parents 60+)
+  dependants_count         int ∈ [0, 6]   (child-care recipients under 18)
+  elderly_dependants_count int ∈ [0, 4]   (elderly-care recipients 60+)
 
 Rate limit (spec §4.5): 5 calls / minute / uid for free tier. Pro
 tier bypasses. Counter lives in-memory per process — sufficient for
@@ -88,22 +88,26 @@ def _build_dependants(
     Spec §4.2 sliders only adjust counts — not per-dependant ages or IC
     fragments. We re-synthesize with archetypal ages (child=10,
     parent=70) which are what the rule engines actually gate on. Other
-    relationship types from the original profile (spouse, sibling) are
+    relationship types from the original profile (spouse, other) are
     preserved.
     """
     if children_override is None and elderly_override is None:
         return existing
-    preserved = [d for d in existing if d.relationship not in ("child", "parent")]
+    preserved = [
+        d
+        for d in existing
+        if d.relationship not in ("child", "sibling", "parent", "grandparent")
+    ]
     children: list[Dependant] = []
     if children_override is not None:
         children = [Dependant(relationship="child", age=10) for _ in range(children_override)]
     else:
-        children = [d for d in existing if d.relationship == "child"]
+        children = [d for d in existing if d.relationship in ("child", "sibling")]
     parents: list[Dependant] = []
     if elderly_override is not None:
         parents = [Dependant(relationship="parent", age=70) for _ in range(elderly_override)]
     else:
-        parents = [d for d in existing if d.relationship == "parent"]
+        parents = [d for d in existing if d.relationship in ("parent", "grandparent")]
     return preserved + children + parents
 
 

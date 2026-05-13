@@ -70,8 +70,11 @@ def _scheme_context(
     """Build the per-scheme Jinja context with derived fields every template needs."""
     dependants = list(profile.dependants)
     children_under_18 = sum(1 for d in dependants if d.relationship == "child" and d.age < 18)
+    bkk_child_recipients_under_18 = sum(
+        1 for d in dependants if d.relationship in ("child", "sibling") and d.age < 18
+    )
     elderly = next(
-        (d for d in dependants if d.relationship == "parent" and d.age >= 60),
+        (d for d in dependants if d.relationship in ("parent", "grandparent") and d.age >= 60),
         None,
     )
     per_capita = profile.household_income_rm / max(profile.household_size, 1)
@@ -91,6 +94,7 @@ def _scheme_context(
         "match": match,
         "dependants": dependants,
         "children_under_18": children_under_18,
+        "bkk_child_recipients_under_18": bkk_child_recipients_under_18,
         "elderly": elderly,
         "per_capita": per_capita,
         "annual_income": annual_income,

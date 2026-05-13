@@ -371,6 +371,17 @@ Replaces the thin `pipeline-stepper.tsx` progress bar with a paper-card surface 
 - **persistence.** `evaluation_persistence._mirror_to_firestore` appends both event types to `evaluations/{evalId}.narrativeLog` and `.technicalLog` Firestore arrays via `ArrayUnion`, so the results page replays both tiers on deep-link / refresh.
 - **frontend.** `pipeline-narrative.tsx` mounts `<NarrativeLayer />` (always visible — headline + data_point per event with checkmark icons) and `<TechnicalLayer />` (a `<pre>` with `tabIndex={0}` + `role="region"` wrapped behind an `aria-expanded` toggle). On the persisted results page, the panel renders in `retrospective` mode — collapsed by default to a one-line "Layak's pipeline completed across {{count}} steps." summary that expands on click. Tier-1 lay text reads from the backend-emitted strings (already localised); Tier-2 stays English (developer audience).
 
+### 5.11 Household modelling: income split + relationship-derived scheme roles
+
+Manual entry now separates household composition facts from scheme-specific roles so users do not need to mislabel relatives to surface the right schemes.
+
+- **income split.** `Profile.monthly_income_rm` remains the backward-compatible household-total alias for older callers and persisted docs. New code should read `profile.household_income_rm` / `household_monthly_income_rm` for STR, JKM, per-capita checks, and household income bands. Applicant-only schemes read `profile.applicant_income_rm` / `applicant_monthly_income_rm`, so adult spouse or household-member income does not inflate LHDN, PERKESO, i-Saraan, or strategy income gates.
+- **dependant income.** `Dependant.monthly_income_rm` / `DependantInput.monthly_income_rm` is optional and accepted only for adult rows (`age >= 18`). Manual entry sums adult dependant income into `household_monthly_income_rm`; under-18 rows hide/clear the field. Manual entry supports up to four spouse rows in one shared household and treats them as one household for per-capita checks.
+- **relationship vocabulary.** User-entered dependant relationship is `child | parent | spouse | sibling | grandparent | other`. Relationship is descriptive input, not a direct scheme role.
+- **scheme-role derivation.** BKK child-care recipients are dependants with age `<18` and relationship `child | sibling`. JKM Warga Emas elderly-care recipients are dependants with age `>=60` and relationship `parent | grandparent`. LHDN parent medical relief remains strict parent-only (`relationship == "parent"`). LHDN child relief and STR child buckets remain strict child-only in this pass.
+- **household flags.** `has_children_under_18` follows the BKK-style child-care role (`child | sibling`, age `<18`) because it drives low-income household classification. `has_elderly_dependant` follows the Warga Emas-style elderly-care role (`parent | grandparent`, age `>=60`).
+- **future BKK precision.** JKM BKK also has a status exclusion for children aged 16-17 who work full-time and are not schooling. Layak does not model that field yet. A future upgrade may add an optional "working full-time and not schooling" checkbox shown only for BKK-relevant rows aged 16-17; do not add the field until the UI, schema, copy, tests, and provenance text can ship together.
+
 ## 6. External Dependencies
 
 ### 6.1 Government source PDFs (cached in-repo under `backend/data/schemes/`)

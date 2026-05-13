@@ -4,6 +4,12 @@
 
 ---
 
+## [12/05/26] - Household modelling: adult income split + caregiving roles
+
+Recorded the manual-entry household modelling work in `docs/trd.md` so future agents do not have to infer it from staged code. `monthly_income_rm` is now documented as the backward-compatible household-total alias, with applicant-only schemes reading `applicant_income_rm` and household/per-capita schemes reading `household_income_rm`. Added the minimal caregiving-role fix: `grandparent` is a real relationship; BKK counts under-18 `child | sibling`; JKM Warga Emas counts age-60+ `parent | grandparent`; LHDN parent medical, LHDN child relief, and STR child buckets stay strict. The BKK 16-17 full-time-working/not-schooling exclusion is documented as future scope, not implemented.
+
+---
+
 ## [12/05/26] - Phase 11: production-grade SaaS enhancements (4 features + docs sweep)
 
 Phase 11 ships four production-grade features ahead of the 2026-05-16 Open Category finals. All four landed across five commits in a single session; backend test suite grew from 297 → 511 (+214 tests, all green). Subagent audits ran post-implementation on each feature in parallel — only two minor fixes flagged (keyboard a11y on the technical `<pre>`, demo fixture missing narrative events) and both addressed before commit.

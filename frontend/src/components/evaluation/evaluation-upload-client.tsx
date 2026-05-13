@@ -10,7 +10,12 @@ import { type DemoPersona, useEvaluation } from '@/components/evaluation/evaluat
 import { type IntakeMode, IntakeModeToggle } from '@/components/evaluation/intake-mode-toggle'
 import { ManualEntryForm, type ManualEntryFormHandle } from '@/components/evaluation/manual-entry-form'
 import { PipelineNarrative } from '@/components/evaluation/pipeline-narrative'
-import { type SamplePersona, UploadWidget, type UploadSubmission } from '@/components/evaluation/upload-widget'
+import {
+  type SamplePersona,
+  UploadWidget,
+  type UploadSubmission,
+  type UploadWidgetHandle
+} from '@/components/evaluation/upload-widget'
 import { PageHeading } from '@/components/layout/page-heading'
 import { UpgradeWaitlistModal } from '@/components/settings/upgrade-waitlist-modal'
 import { Button } from '@/components/ui/button'
@@ -100,7 +105,7 @@ export function EvaluationUploadClient() {
   const [loadingPersona, setLoadingPersona] = useState<SamplePersona | null>(null)
   const [sampleLoadError, setSampleLoadError] = useState<string | null>(null)
 
-  async function handleUseSamplesUpload(persona: SamplePersona) {
+  async function handleUseSamplesUpload(persona: SamplePersona, behavior: 'prefill' | 'run' = 'prefill') {
     setDemoByTab((prev) => ({ ...prev, upload: persona }))
     setDemoMode(persona)
     setSampleLoadError(null)
@@ -109,6 +114,7 @@ export function EvaluationUploadClient() {
     // entirely. The mock pipeline doesn't know about Farhan and would
     // desync, so only honour mock mode for Aisyah.
     const useMock =
+      behavior === 'run' &&
       persona === 'aisyah' && process.env.NODE_ENV !== 'production' && process.env.NEXT_PUBLIC_USE_MOCK_SSE === '1'
     if (useMock) {
       start({ mode: 'mock' })
@@ -118,8 +124,12 @@ export function EvaluationUploadClient() {
     setLoadingPersona(persona)
     try {
       const files = await load()
-      lastSubmissionRef.current = { kind: 'real', files, dependants }
-      start({ mode: 'real', files, dependants })
+      if (behavior === 'run') {
+        lastSubmissionRef.current = { kind: 'real', files, dependants }
+        start({ mode: 'real', files, dependants })
+      } else {
+        uploadWidgetRef.current?.applySample(files, dependants)
+      }
     } catch (err) {
       setSampleLoadError(err instanceof Error ? err.message : String(err))
       setDemoMode(false)
@@ -189,6 +199,7 @@ export function EvaluationUploadClient() {
   // splits by tab: upload tab loads fixture files into the pipeline, manual
   // tab calls the form's imperative `applySample` to prefill fields.
   const showSampleAction = showIntake
+  const uploadWidgetRef = useRef<UploadWidgetHandle | null>(null)
   const manualFormRef = useRef<ManualEntryFormHandle | null>(null)
 
   function handleSampleSelect(persona: SamplePersona) {
@@ -266,6 +277,7 @@ export function EvaluationUploadClient() {
             aria-hidden={mode !== 'upload'}
           >
             <UploadWidget
+              ref={uploadWidgetRef}
               onSubmit={handleSubmitUpload}
               submitId={mode === 'upload' ? 'tour-upload-submit' : undefined}
             />
@@ -302,7 +314,7 @@ export function EvaluationUploadClient() {
               // the Manual Entry CTA instead because the upload path would
               // 429 the same way. Farhan is only reachable from the idle
               // intake screen to keep the recovery card single-action.
-              onUseSamples={() => handleUseSamplesUpload('aisyah')}
+              onUseSamples={() => handleUseSamplesUpload('aisyah', 'run')}
               onReset={handleReset}
               // Retry is always wired — an error event implies a prior
               // submit, which always populated `lastSubmissionRef`. The

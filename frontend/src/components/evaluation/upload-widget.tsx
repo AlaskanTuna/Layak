@@ -1,6 +1,6 @@
 'use client'
 
-import { useId, useRef, useState } from 'react'
+import { useId, useImperativeHandle, useRef, useState } from 'react'
 import {
   ArrowRight,
   ChevronDown,
@@ -123,6 +123,11 @@ type Props = {
   disabled?: boolean
   /** Optional id applied to the submit button — used by the help tour to anchor a step on it. */
   submitId?: string
+  ref?: React.Ref<UploadWidgetHandle>
+}
+
+export type UploadWidgetHandle = {
+  applySample: (files: UploadFiles, dependants: DependantInput[]) => void
 }
 
 type SlotProps = {
@@ -228,7 +233,7 @@ function UploadSlotCard({ spec, state, inputId, disabled, inputRef, onChange, on
   )
 }
 
-export function UploadWidget({ onSubmit, disabled = false, submitId }: Props) {
+export function UploadWidget({ onSubmit, disabled = false, submitId, ref }: Props) {
   const { t } = useTranslation()
   const reactId = useId()
   const [showHousehold, setShowHousehold] = useState(false)
@@ -248,6 +253,30 @@ export function UploadWidget({ onSubmit, disabled = false, submitId }: Props) {
   // pair so the slot's `state.file` is only populated AFTER the user
   // confirms (or is bypassed for PDFs entirely).
   const [pendingCrop, setPendingCrop] = useState<{ slot: UploadSlot; file: File } | null>(null)
+
+  useImperativeHandle(
+    ref,
+    () => ({
+      applySample: (files: UploadFiles, sampleDependants: DependantInput[]) => {
+        setState({
+          ic: { file: files.ic, error: null },
+          payslip: { file: files.payslip, error: null },
+          utility: { file: files.utility, error: null }
+        })
+        setDependants(
+          sampleDependants.map((dependant) => ({
+            relationship: dependant.relationship,
+            age: dependant.age,
+            monthly_income_rm:
+              dependant.monthly_income_rm == null ? '' : String(dependant.monthly_income_rm)
+          }))
+        )
+        setShowHousehold(true)
+        setPendingCrop(null)
+      }
+    }),
+    []
+  )
 
   const canSubmit = (['ic', 'payslip', 'utility'] as const).every(
     (s) => state[s].file !== null && state[s].error === null

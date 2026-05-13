@@ -1,7 +1,7 @@
 'use client'
 
 import { zodResolver } from '@hookform/resolvers/zod'
-import { AlertTriangle, ArrowRight, Eraser } from 'lucide-react'
+import { ArrowRight, Eraser } from 'lucide-react'
 import { useImperativeHandle, useMemo } from 'react'
 import { Controller, type SubmitHandler, useForm, useWatch } from 'react-hook-form'
 import { useTranslation } from 'react-i18next'
@@ -9,7 +9,6 @@ import { z } from 'zod'
 
 import { DependantsFieldset, type DependantInputRow } from '@/components/evaluation/dependants-fieldset'
 import { SectionBadge } from '@/components/evaluation/section-badge'
-import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
 import { InfoTooltip } from '@/components/ui/info-tooltip'
 import { Input } from '@/components/ui/input'
@@ -163,9 +162,10 @@ export function ManualEntryForm({ onSubmit, onUseSamples, onClear, disabled = fa
   const form = useForm<FormValues>({
     resolver: zodResolver(manualEntrySchema),
     defaultValues: EMPTY_DEFAULTS,
-    mode: 'onBlur'
+    mode: 'onChange',
+    reValidateMode: 'onChange'
   })
-  const { register, handleSubmit, control, formState, reset } = form
+  const { register, handleSubmit, control, formState, reset, trigger } = form
   // `useWatch` is the memo-safe alternative to `form.watch()` — the React Compiler
   // plugin flags `watch()` because it can't reliably cache its result.
   const watchedDependants = (useWatch({ control, name: 'dependants' }) ?? []) as DependantInputRow[]
@@ -198,10 +198,11 @@ export function ManualEntryForm({ onSubmit, onUseSamples, onClear, disabled = fa
     () => ({
       applySample: (persona: ManualSamplePersona) => {
         reset(persona === 'aisyah' ? AISYAH_DEFAULTS : FARHAN_DEFAULTS)
+        void trigger()
         onUseSamples(persona)
       }
     }),
-    [reset, onUseSamples]
+    [reset, trigger, onUseSamples]
   )
 
   const handleClearInline = () => {
@@ -360,12 +361,6 @@ export function ManualEntryForm({ onSubmit, onUseSamples, onClear, disabled = fa
               />
             )}
           />
-          {formState.errors.dependants?.message && (
-            <Alert variant="destructive" className="mt-3">
-              <AlertTriangle className="size-4" aria-hidden />
-              <AlertDescription>{formState.errors.dependants.message}</AlertDescription>
-            </Alert>
-          )}
         </div>
       </section>
 
@@ -385,7 +380,7 @@ export function ManualEntryForm({ onSubmit, onUseSamples, onClear, disabled = fa
           id={submitId}
           type="submit"
           size="lg"
-          disabled={disabled || formState.isSubmitting}
+          disabled={disabled || formState.isSubmitting || !formState.isValid}
           className="rounded-full bg-[color:var(--hibiscus)] px-6 text-[color:var(--hibiscus-foreground)] hover:bg-[color:var(--hibiscus)]/92"
         >
           {t('evaluation.upload.continue')}

@@ -230,15 +230,17 @@ Each requirement below ties to one of the in-scope v1 and v2 deliverables. Accep
 
 ### FR-10 — Sample-data demo-mode fallback
 
-**Description.** Visible sample-data buttons load hardcoded persona fixtures so the five-step pipeline can still execute visibly on stage if live extraction misbehaves or when the team wants to demo both Form B and Form BE paths.
+**Description.** Visible sample-data buttons load hardcoded persona fixtures so either intake path can be prefilled quickly for demos, retries, or comparison between Form B and Form BE households. Prefill and evaluation are intentionally separate: the user reviews the populated intake surface, then starts the pipeline with Continue.
 
 **Acceptance criteria:**
 
-- [ ] A single click replaces the uploaded documents with either the Aisyah or Farhan fixtures and triggers the pipeline.
+- [ ] In Upload mode, one click fills the IC, payslip, and utility slots with either the Aisyah or Farhan fixtures, loads that persona's visible dependant rows, expands the household section, and shows the DEMO MODE banner without starting evaluation.
+- [ ] In Manual Entry mode, one click fills the structured form with either the Aisyah or Farhan fixture values and shows the DEMO MODE banner without starting evaluation.
+- [ ] Continue is the sole user action that starts an evaluation after a sample prefill on either intake path.
 - [ ] Seed fixtures reside at `frontend/public/fixtures/` and are loaded through the committed frontend helpers in `frontend/src/lib/aisyah-fixtures.ts` and `frontend/src/lib/farhan-fixtures.ts`.
 - [ ] The seed run produces the same ranked-scheme list and total RM upside as the equivalent live-extraction or manual-entry path for the same persona.
 - [ ] The UI surface labels seed-mode runs with a "DEMO MODE" banner.
-- [ ] Demo mode is idempotent — repeat clicks produce the same result.
+- [ ] Demo mode is idempotent — repeat clicks produce the same prefill state and the same evaluation result after Continue.
 
 ### FR-11 — Google OAuth sign-in
 
@@ -352,18 +354,20 @@ Each requirement below ties to one of the in-scope v1 and v2 deliverables. Accep
 
 ### FR-21 — Manual Entry Mode (privacy alternative to document upload)
 
-**Description.** An intake-page toggle lets users replace the three document uploads with a structured form that collects the same fields the OCR step would produce. Users who are unwilling to hand their MyKad / payslip / utility bill to an LLM can type the information instead, and the five-step pipeline runs unchanged from classify onward. Design spec: `docs/superpowers/specs/2026-04-21-manual-entry-mode-design.md`.
+**Description.** An intake-page toggle lets users replace the three document uploads with a structured form that collects the same eligibility-driving fields without accepting any MyKad digits. Users who are unwilling to hand their MyKad / payslip / utility bill to an LLM can type the information instead, and the five-step pipeline runs unchanged from classify onward. Design spec: `docs/superpowers/specs/2026-04-21-manual-entry-mode-design.md`.
 
 **Acceptance criteria:**
 
 - [ ] The intake page exposes a segmented toggle with "Upload documents" (default) and "Enter manually" options, visible on both the v1 landing and the v2 `/dashboard/evaluation/new` route.
-- [ ] The manual form has four sections — Identity (full name, **full 12-digit IC**), Income (monthly RM, employment type), Address (optional), Household (dynamic dependants list: relationship + age + optional IC last-6).
+- [ ] The manual form has four sections — Identity (full name, age), Income (monthly RM, employment type), Address (optional), Household (dynamic dependants list: relationship + age + optional adult monthly income).
 - [ ] Household size is derived server-side as `1 + len(dependants)` and never asked for directly.
-- [ ] The full 12-digit IC is accepted on the wire; the backend parses the YYMMDD prefix into `age` (server-side, MYT) and slices the trailing six digits into `Profile.ic_last6`. The full IC stays in request-scope memory only — never persisted to Firestore, never logged.
+- [ ] Manual Entry never accepts a full IC or an IC suffix. The backend receives age directly and builds a `Profile` with `ic_last6 = None` for this path.
 - [ ] `employment_type` is a two-value input (`"gig"` or `"salaried"`) and maps server-side to `Profile.form_type` — `gig → form_b`, `salaried → form_be`.
 - [ ] `build_profile_from_manual_entry` applied to the Aisyah payload produces a `Profile` equal to `AISYAH_PROFILE` field-for-field, including `household_flags.income_band`. Feeding that built Profile through the rule engine produces `AISYAH_SCHEME_MATCHES` — the same ranked schemes and total RM upside the upload path produces.
 - [ ] Validation errors return HTTP 422 with field-level messages the form can bind to.
 - [ ] Sample-persona actions in manual mode pre-fill every form field with the Aisyah or Farhan fixture values and are idempotent on repeat clicks.
+- [ ] Manual Continue remains disabled until the form is submission-ready: required fields are valid, dependant rows are valid, and spouse count is `<= 4`.
+- [ ] Multi-spouse guidance stays live in the Household editor; `>1` spouses shows the shared-household note, while `>4` spouses shows the destructive cap note and keeps Continue unavailable.
 - [ ] `?mode=manual` query parameter preloads the manual tab on first paint.
 - [ ] The stepper still shows all five steps; the `extract` step label reads "Profile prepared" in manual mode.
 - [ ] The manual path follows the same authenticated policy as `/api/agent/intake`; there is no manual-entry bypass.
@@ -611,6 +615,6 @@ The demo still wins on the "Chat → Action" rubric provided steps 1–5 of the 
 - **Demo documents are synthetic.** MyKad, payslip, and utility-bill specimens used in the demo are fully fictional. Every synthetic MyKad carries a prominent "SYNTHETIC — FOR DEMO ONLY" watermark, uses a fictional IC number, and does not replicate holographic or chip elements (which would cross into forgery under the Penal Code and PDPA 2010 / National Registration Regulations 1990).
 - **Eligibility results are estimates.** Computations use Budget-2026-gazetted rates as of 20 April 2026. The final legal determination rests with the relevant agency on application. Layak is not an official government service and is not affiliated with any Malaysian ministry.
 - **Rule-engine scope is narrow.** Only the three locked schemes and five locked LHDN reliefs are encoded in v1. The UI greys out the long tail of schemes explicitly as "Checking… (v2)" rather than hiding them.
-- **Document upload has a known limitation.** MyKad, payslip, and utility-bill scans do not disclose household composition — the OCR pipeline cannot extract dependant information from them. Users with children, an elderly parent, or other dependants must use the **Enter manually** intake mode (FR-21) to get a complete eligibility check; the upload-only path returns a single-person household by default and silently under-matches schemes that depend on dependants (JKM Warga Emas, LHDN child relief, LHDN parent medical relief). The intake-page copy flags this; a future release may add a hybrid "upload + supplemental questions" flow.
+- **Document upload has a known limitation.** MyKad, payslip, and utility-bill scans do not disclose household composition — the OCR pipeline cannot infer dependant rows from the files alone. The Upload intake therefore includes a supplemental Household editor that rides along with the multipart submission; leaving it empty still under-matches schemes that depend on dependants (JKM Warga Emas, LHDN child relief, LHDN parent medical relief). Sample personas prefill that Household editor so the demo path visibly models the full household before Continue starts evaluation.
 - **v2 persists evaluation results (profile summary, scheme matches, total RM upside) to Firestore; original uploaded documents remain discarded after extraction; the packet watermark posture is unchanged.**
 - **AI disclosure.** The README declares that this project was built with Claude Code (Anthropic) as the primary agentic coding assistant, per hackathon Rules §4.2. All AI-generated code is reviewed by human developers before commit.

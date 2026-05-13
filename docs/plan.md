@@ -1762,7 +1762,7 @@ that says "auto-credited / use at the pump; check balance at …".
       from `--hibiscus`). - No annual_rm value displayed prominently (it's `0.0`; would mislead).
       Replace with a "Subsidy info" or "Auto-credited" label. - **A bold expiry line** when `match.expires_at_iso` is set, formatted
       as "**Expires 31 Dec 2026**" via `Intl.DateTimeFormat(locale, { day:
-  'numeric', month: 'short', year: 'numeric' })`. The expiry line uses
+'numeric', month: 'short', year: 'numeric' })`. The expiry line uses
       the hibiscus colour (the page's accent) so it pops against the card.
       MyKasih is the first scheme with a hard expiry — BUDI95 has a rolling
       monthly quota with no calendar expiry, so its `expires_at_iso` stays
@@ -1895,6 +1895,19 @@ year: 'numeric' })`. Fallback to `"—"` if response is empty (shouldn't
 - [x] Household flags now reflect the derived BKK/Warga Emas roles.
 - [x] TRD records both the adult-income split and the relationship-vs-scheme-role derivation, including the future BKK 16-17 work/schooling-status field.
 - [x] Regression tests cover sibling BKK, grandparent Warga Emas, and non-expansion of STR/LHDN reliefs.
+
+---
+
+### 15. Feature: Intake readiness alignment and upload sample prefill
+
+**Purpose/Issue:** Upload and Manual Entry had diverged: Manual could be clicked before the payload was viable, while Upload sample personas immediately started evaluation before users could review the populated intake state. This pass makes Continue the shared submit boundary and keeps sample actions as prefill-only helpers.
+
+- [x] Manual Continue stays disabled until required fields, dependant rows, and the `<= 4` spouse cap are all valid.
+- [x] Manual Entry removes the post-submit dependant alert and keeps spouse feedback in the live Household editor instead.
+- [x] Upload samples now prefill the IC, payslip, and utility slots without launching evaluation.
+- [x] Upload samples populate visible dependant rows from persona fixtures, auto-expand the Household section, and preserve the demo banner state.
+- [x] Continue remains the only action that starts a new upload-path evaluation; existing retry/recovery flows remain unchanged after a run has genuinely started.
+- [x] `docs/prd.md` and `docs/trd.md` now describe the readiness-gated intake behavior and the prefill-only sample contract.
 
 ---
 

@@ -97,6 +97,15 @@ _QUALIFY_VARS: dict[str, dict[str, object]] = {
         "monthly_income_rm": 1400.0,
         "portal_url": "https://www.perkeso.gov.my",
     },
+    "budi95": {
+        "age": 34,
+        "subsidised_price_rm": 1.99,
+        "monthly_quota_l": 300,
+    },
+    "mykasih": {
+        "age": 34,
+        "credit_amount_rm": 100.0,
+    },
 }
 
 _OUT_OF_SCOPE_VARS: dict[str, dict[str, object]] = {
@@ -108,6 +117,8 @@ _OUT_OF_SCOPE_VARS: dict[str, dict[str, object]] = {
     "lhdn_form_be": {"total_relief": 22500.0, "annual_income": 10000.0},
     "i_saraan": {"reasons": ["age 70 outside the i-Saraan window (18-60)"]},
     "perkeso_sksps": {"reasons": ["applicant age 70 outside the Akta 789 window"]},
+    "budi95": {"reasons": ["age 14 below the BUDI95 minimum of 16"]},
+    "mykasih": {"reasons": ["age 16 below the MyKasih SARA minimum of 18"]},
 }
 
 

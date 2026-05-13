@@ -35,7 +35,7 @@ const FAQS_FALLBACK: FaqItem[] = [
   {
     docCode: 'FAQ-04',
     question: 'How safe is my personal data?',
-    body: 'PDPA-compliant by design. The full IC is never persisted — only the last four digits are stored. Original file bytes are extracted in-memory inside a single request and discarded once the structured profile is produced. No raw documents in logs.'
+    body: 'Manual-entry users supply only age, income, household composition, and address — Layak collects no IC information at all. Upload-path users have their MyKad image processed transiently by Gemini in request-scope memory; no IC information is retained on the persisted profile. The structured profile we keep in Firestore drives chat handoff and packet regeneration. No raw documents in logs.'
   },
   {
     docCode: 'FAQ-05',

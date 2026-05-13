@@ -26,14 +26,13 @@ import type {
 
 export const AISYAH_PROFILE: Profile = {
   name: 'Aisyah binti Ahmad',
-  ic_last4: '4321',
   age: 34,
   monthly_income_rm: 2800,
   household_size: 4,
   dependants: [
-    { relationship: 'child', age: 10, ic_last4: null },
-    { relationship: 'child', age: 7, ic_last4: null },
-    { relationship: 'parent', age: 70, ic_last4: null }
+    { relationship: 'child', age: 10 },
+    { relationship: 'child', age: 7 },
+    { relationship: 'parent', age: 70 }
   ],
   household_flags: {
     has_children_under_18: true,

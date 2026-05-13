@@ -20,6 +20,7 @@ import { useChat } from '@/hooks/use-chat'
 import { SchemeCardGrid } from '@/components/evaluation/scheme-card-grid'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
+import { InfoTooltip } from '@/components/ui/info-tooltip'
 import type { PipelineState, StepStatus } from '@/hooks/use-agent-pipeline'
 import { useAuth } from '@/lib/auth-context'
 import { useEvaluation } from '@/components/evaluation/evaluation-provider'
@@ -297,10 +298,13 @@ export function EvaluationResultsByIdClient({ evalId }: { evalId: string }) {
   // mirroring that here keeps the TOC truthful and prevents dangling anchors
   // that scroll to nothing.
   const hasRequiredContributions = doc.matches.some((m) => m.qualifies && m.kind === 'required_contribution')
+  const hasSubsidies = doc.matches.some((m) => m.qualifies && m.kind === 'subsidy_credit')
+  const hasUpsideMatches = doc.matches.some((m) => m.qualifies && (m.kind ?? 'upside') === 'upside')
   const hasQualifyingForPacket = doc.matches.some((m) => m.qualifies)
 
   const showOverview = hasContent
-  const showSchemes = hasContent
+  const showSchemes = hasContent && (hasUpsideMatches || !isComplete)
+  const showSubsidies = hasContent && hasSubsidies
   const showRequired = hasContent && hasRequiredContributions
   const showPreview = isComplete && hasQualifyingForPacket
   // Phase 11 Feature 2 — Strategy section renders whenever the eval reached
@@ -308,13 +312,18 @@ export function EvaluationResultsByIdClient({ evalId }: { evalId: string }) {
   // state communicates "no conflicts detected").
   const optimizerComplete = doc.stepStates.optimize_strategy === 'complete'
   const showStrategy = isComplete && optimizerComplete
+  const showWhatIfs = isComplete && Boolean(doc.profile)
 
+  // Page order matches the spec: Overview → Eligible Schemes → Subsidies →
+  // Required Contributions → Strategy → What-Ifs → Inline Preview.
   const visibleSections: readonly TocSectionId[] = (() => {
     const ids: TocSectionId[] = []
     if (showOverview) ids.push('overview')
     if (showSchemes) ids.push('schemes')
-    if (showStrategy) ids.push('strategy')
+    if (showSubsidies) ids.push('subsidies')
     if (showRequired) ids.push('required')
+    if (showStrategy) ids.push('strategy')
+    if (showWhatIfs) ids.push('whatIfs')
     if (showPreview) ids.push('preview')
     return ids
   })()
@@ -329,9 +338,6 @@ export function EvaluationResultsByIdClient({ evalId }: { evalId: string }) {
   return (
     <div className="flex flex-col gap-6">
       {(isRunning || isError) && <PipelineNarrative state={pipelineState} />}
-      {!isRunning && !isError && pipelineState.narrativeEvents.length > 0 && (
-        <PipelineNarrative state={pipelineState} retrospective />
-      )}
 
       {isError && (
         // Category-tailored recovery on persisted errors. The original
@@ -382,7 +388,40 @@ export function EvaluationResultsByIdClient({ evalId }: { evalId: string }) {
                 <SchemeCardGrid
                   matches={whatIfResult?.matches ?? doc.matches}
                   deltas={whatIfResult?.deltas ?? null}
+                  kind="upside"
                 />
+              </section>
+            )}
+            {showSubsidies && (
+              <section
+                id="subsidies"
+                aria-label={t('evaluation.results.toc.subsidies')}
+                className="flex scroll-mt-28 flex-col gap-3 lg:scroll-mt-20"
+              >
+                <div className="flex items-center gap-2">
+                  <h2 className="font-heading text-xl font-semibold tracking-tight">
+                    {t('evaluation.subsidies.title')}
+                  </h2>
+                  <InfoTooltip
+                    content={t('evaluation.subsidies.description')}
+                    label={t('evaluation.subsidies.description')}
+                  />
+                </div>
+                <SchemeCardGrid
+                  matches={whatIfResult?.matches ?? doc.matches}
+                  deltas={whatIfResult?.deltas ?? null}
+                  kind="subsidy_credit"
+                  hideHeading
+                />
+              </section>
+            )}
+            {showRequired && (
+              <section
+                id="required"
+                aria-label={t('evaluation.results.toc.required')}
+                className="scroll-mt-28 lg:scroll-mt-20"
+              >
+                <RequiredContributionsCard matches={doc.matches} />
               </section>
             )}
             {showStrategy && (
@@ -397,23 +436,28 @@ export function EvaluationResultsByIdClient({ evalId }: { evalId: string }) {
                 />
               </section>
             )}
-            {isComplete && doc.profile && (
-              <WhatIfPanel
-                evalId={evalId}
-                baselineProfile={doc.profile}
-                onResult={setWhatIfResult}
-              />
-            )}
-            {showRequired && (
+            {showWhatIfs && doc.profile && (
               <section
-                id="required"
-                aria-label={t('evaluation.results.toc.required')}
-                className="scroll-mt-28 lg:scroll-mt-20"
+                id="whatIfs"
+                aria-label={t('evaluation.results.toc.whatIfs')}
+                className="flex scroll-mt-28 flex-col gap-3 lg:scroll-mt-20"
               >
-                <RequiredContributionsCard matches={doc.matches} />
+                <div className="flex items-center gap-2">
+                  <h2 className="font-heading text-xl font-semibold tracking-tight">
+                    {t('evaluation.whatIfs.sectionTitle')}
+                  </h2>
+                  <InfoTooltip
+                    content={t('evaluation.whatIfs.sectionDescription')}
+                    label={t('evaluation.whatIfs.sectionDescription')}
+                  />
+                </div>
+                <WhatIfPanel
+                  evalId={evalId}
+                  baselineProfile={doc.profile}
+                  onResult={setWhatIfResult}
+                />
               </section>
             )}
-
             {showPreview && (
               <section
                 id="preview"
@@ -425,6 +469,9 @@ export function EvaluationResultsByIdClient({ evalId }: { evalId: string }) {
                 </h2>
                 <DraftPacketPreview evalId={evalId} matches={doc.matches} />
               </section>
+            )}
+            {!isRunning && !isError && pipelineState.narrativeEvents.length > 0 && (
+              <PipelineNarrative state={pipelineState} retrospective />
             )}
             {isComplete && (
               <div className="flex border-t border-foreground/10 pt-5">

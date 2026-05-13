@@ -14,9 +14,11 @@ from typing import Literal
 
 from pydantic import BaseModel, ConfigDict, Field
 
+from app.schema.events import PipelineNarrativeEvent, PipelineTechnicalEvent
 from app.schema.locale import DEFAULT_LANGUAGE, SupportedLanguage
 from app.schema.profile import HouseholdClassification, Profile
 from app.schema.scheme import SchemeMatch
+from app.schema.strategy import StrategyAdvice
 
 EvaluationStatus = Literal["running", "complete", "error"]
 Tier = Literal["free", "pro"]
@@ -26,6 +28,7 @@ PIPELINE_STEP_KEYS: tuple[str, ...] = (
     "extract",
     "classify",
     "match",
+    "optimize_strategy",
     "compute_upside",
     "generate",
 )
@@ -44,6 +47,11 @@ class UserDoc(BaseModel):
     # `language` field; readers default to `"en"` so missing-field docs
     # validate without a backfill.
     language: SupportedLanguage = DEFAULT_LANGUAGE
+    # RBAC role for admin-gated routes. Sign-ups default to "user". Admins
+    # are set by direct Firestore write (seed script or Firebase Console).
+    # Legacy docs without the field are backfilled to "user" on first authed
+    # touch by `app.auth._upsert_user_doc`.
+    role: Literal["user", "admin"] = "user"
     createdAt: datetime | None = None  # noqa: N815 — SERVER_TIMESTAMP resolves async
     lastLoginAt: datetime | None = None  # noqa: N815
     pdpaConsentAt: datetime | None = None  # noqa: N815
@@ -59,7 +67,7 @@ class EvaluationError(BaseModel):
 
 
 class StepStates(BaseModel):
-    """The five pipeline steps' per-step state, mirrored on the Firestore doc.
+    """The six pipeline steps' per-step state, mirrored on the Firestore doc.
 
     Each key moves through `pending → running → complete` (or `error` for the
     failing step). The frontend stepper reads these to drive its pill UI.
@@ -70,6 +78,7 @@ class StepStates(BaseModel):
     extract: StepState = "pending"
     classify: StepState = "pending"
     match: StepState = "pending"
+    optimize_strategy: StepState = "pending"
     compute_upside: StepState = "pending"
     generate: StepState = "pending"
 
@@ -116,4 +125,7 @@ class EvaluationDoc(BaseModel):
     totalAnnualRM: float = Field(default=0.0, ge=0)  # noqa: N815
     upsideTrace: ComputeUpsideTrace | None = None  # noqa: N815
     stepStates: StepStates = Field(default_factory=StepStates)  # noqa: N815
+    strategy: list[StrategyAdvice] = Field(default_factory=list)
+    narrativeLog: list[PipelineNarrativeEvent] = Field(default_factory=list)  # noqa: N815
+    technicalLog: list[PipelineTechnicalEvent] = Field(default_factory=list)  # noqa: N815
     error: EvaluationError | None = None

@@ -1,9 +1,11 @@
 """`extract_profile` — Gemini 2.5 Flash multimodal.
 
 Reads the three uploaded documents (IC, payslip / income proof, utility bill)
-with Gemini 2.5 Flash and returns a validated `Profile`. Privacy invariant:
-only `ic_last4` ever leaves the Gemini response — the instruction explicitly
-forbids emitting the full 12-digit IC number.
+with Gemini 2.5 Flash and returns a validated `Profile`. Privacy invariant
+(Phase 12): NO IC information is returned in the structured output. The
+instruction explicitly forbids emitting the IC number — the model derives
+`age` from the IC's YYMMDD prefix in its own working memory and returns only
+the integer. The MyKad image bytes never persist past this request.
 """
 
 from __future__ import annotations
@@ -20,9 +22,10 @@ statement, and a utility bill. Extract the citizen's profile into the JSON
 schema provided.
 
 Rules (enforce strictly):
-- **Privacy**: return ONLY the last 4 digits of the IC in `ic_last4`. Do NOT
-  emit the full 12-digit IC anywhere. If the IC looks like `900324-06-4321`,
-  `ic_last4` must be `"4321"`.
+- **Privacy**: do NOT emit the IC number anywhere in your response — not the
+  full 12 digits, not a tail, not the place-of-birth code, nothing. Derive
+  `age` from the IC's YYMMDD prefix in your own working memory and return
+  only the integer.
 - `name` is the citizen's full name as it appears on the IC, uppercased.
 - `age` is derived from the IC prefix (`YYMMDD`) against today's date. If a
   date is ambiguous, prefer the older interpretation.
@@ -34,15 +37,14 @@ Rules (enforce strictly):
   household size, default to `1` and leave `dependants` empty.
 - `dependants` lists each child / parent / spouse / sibling / grandparent / other in the
   household. Each entry contains EXACTLY these keys: `relationship` (one of
-  child, parent, spouse, sibling, grandparent, other), `age` (integer). `ic_last4` is
-  optional (4-digit string). Do NOT include `name`, `gender`, `occupation`,
-  or any other field on a dependant — extra fields are silently dropped
-  and just waste output tokens.
+  child, parent, spouse, sibling, grandparent, other), `age` (integer). Do NOT include
+  `name`, `gender`, `ic`, `occupation`, or any other field on a dependant —
+  extra fields are silently dropped and just waste output tokens.
 - `household_flags`:
   - `has_children_under_18`: true if any dependant has relationship `child`
-    or `sibling` and age < 18.
+    and age < 18.
   - `has_elderly_dependant`: true if any dependant has relationship `parent`
-    or `grandparent` and age >= 60.
+    and age >= 60.
   - `income_band`: one of
     `b40_hardcore` (monthly < RM1,500),
     `b40_household` (RM1,500 – RM2,500),
@@ -73,7 +75,7 @@ async def extract_profile(ic_bytes: bytes, payslip_bytes: bytes, utility_bytes: 
         utility_bytes: raw bytes of the utility bill (TNB).
 
     Returns:
-        Validated `Profile`. Full IC never appears; only `ic_last4`.
+        Validated `Profile`. NO IC information is retained — only `age`.
     """
     client = get_client()
     # Default filename suffix = .pdf so detect_mime falls back to application/pdf

@@ -55,3 +55,33 @@ export function useVerifiedAt(schemeId: string | null | undefined): string | nul
 
   return state
 }
+
+/** Phase 12 — returns the most-recent `verified_at` across the entire
+ * `verified_schemes` collection, used by the schemes-page "Latest Update"
+ * stats tile. Tri-state: undefined = loading, null = collection empty
+ * (shouldn't happen post-seed), string = ISO timestamp. */
+export function useLatestVerifiedAt(): string | null | undefined {
+  const [state, setState] = useState<string | null | undefined>(undefined)
+
+  useEffect(() => {
+    const signal = { cancelled: false }
+    if (cached === null) {
+      cached = loadVerifiedMap().catch(() => new Map<string, string | null>())
+    }
+    void cached.then((map) => {
+      if (signal.cancelled) return
+      let latest: string | null = null
+      for (const value of map.values()) {
+        if (value && (latest === null || value > latest)) {
+          latest = value
+        }
+      }
+      setState(latest)
+    })
+    return () => {
+      signal.cancelled = true
+    }
+  }, [])
+
+  return state
+}

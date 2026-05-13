@@ -56,6 +56,7 @@ export type ActionResponse = {
   candidate_id: string
   status: CandidateStatus
   manifest_path: string | null
+  manifest_yaml: string | null
 }
 
 export type DiscoveryRunSummary = {
@@ -139,6 +140,15 @@ export async function requestChangesCandidate(
     body: JSON.stringify({ note: note ?? null })
   })
   return jsonOrThrow<ActionResponse>(res)
+}
+
+export async function deleteCandidate(candidateId: string): Promise<void> {
+  const res = await authedFetch(`${backendBase()}/api/admin/discovery/${candidateId}`, {
+    method: 'DELETE'
+  })
+  if (!res.ok) {
+    throw new Error(`${candidateId}: ${res.status} ${res.statusText}`)
+  }
 }
 
 export async function fetchSchemeHealth(): Promise<SchemeHealthResponse> {

@@ -37,7 +37,9 @@
     "footer": {
       "copyright": "© 2026 Layak",
       "contact": "Hubungi Kami",
-      "howItWorks": "Cara ia berfungsi"
+      "howItWorks": "Cara ia berfungsi",
+      "privacy": "Dasar Privasi",
+      "terms": "Terma & Syarat"
     },
     "notifications": {
       "title": "Pemberitahuan",
@@ -208,7 +210,7 @@
         {
           "label": "Ekstrak",
           "title": "Baca tiga dokumen,\ntarik profil berstruktur.",
-          "body": "Gemini Vision membuka MyKad, slip gaji, dan bil utiliti anda dalam satu pas. Hanya empat digit terakhir IC dipaparkan; selebihnya disunting dalam memori dan tidak pernah dilog."
+          "body": "Gemini Vision membuka MyKad, slip gaji, dan bil utiliti anda dalam satu pas. Hanya enam digit terakhir IC dipaparkan; selebihnya disunting dalam memori dan tidak pernah dilog."
         },
         {
           "label": "Kelaskan",
@@ -264,7 +266,7 @@
         {
           "docCode": "FAQ-04",
           "question": "Sejauh manakah data peribadi saya selamat?",
-          "body": "Patuh PDPA secara reka bentuk. IC penuh tidak pernah disimpan — hanya empat digit terakhir. Bait fail asal diekstrak dalam memori dalam satu permintaan dan dibuang sebaik sahaja profil berstruktur dihasilkan. Tiada dokumen mentah dalam log."
+          "body": "Pengguna laluan manual memberikan hanya umur, pendapatan, susunan isi rumah, dan alamat — Layak tidak mengumpul sebarang maklumat IC pada laluan ini. Pengguna laluan muat naik mempunyai imej MyKad diproses sementara oleh Gemini dalam memori permintaan; tiada maklumat IC dikekalkan pada profil berstruktur. Profil berstruktur disimpan dalam Firestore untuk chatbot + penjanaan semula pakej. Tiada dokumen mentah dalam log."
         },
         {
           "docCode": "FAQ-05",
@@ -371,7 +373,7 @@
       "section1History": "<strong>Sejarah penilaian</strong>: profil berstruktur yang kami ekstrak daripada dokumen anda dan skim yang dipadankan, disimpan di Firestore supaya anda dapat melihat larian lepas.",
       "section1Consent": "<strong>Cap waktu persetujuan</strong> direkodkan apabila anda menanda kotak PDPA semasa mendaftar.",
       "section2Title": "2. Apa yang kami tidak simpan",
-      "section2MyKad": "Nombor MyKad penuh anda — kami hanya menyimpan empat digit terakhir.",
+      "section2MyKad": "Nombor MyKad penuh anda, dan sebarang ekor IC. Profil yang disimpan tidak membawa sebarang maklumat IC; laluan masukan manual tidak meminta IC sama sekali.",
       "section2Files": "Bait asal fail yang anda muat naik. Pengekstrakan dijalankan dalam memori dalam satu permintaan, dan fail mentah dibuang sebaik sahaja profil berstruktur dihasilkan.",
       "section2Logs": "Nombor IC, token pengesahan, atau kandungan dokumen dalam mana-mana baris log.",
       "section3Title": "3. Kenapa kami mengumpulnya",
@@ -430,7 +432,7 @@
     },
     "signIn": {
       "title": "Selamat Kembali",
-      "description": "Log masuk dengan Google, e-mel, atau sebagai tetamu untuk ke papan pemuka.",
+      "description": "Log masuk untuk sambung semula.",
       "noAccountPrefix": "Tiada akaun?",
       "noAccountCta": "Daftar",
       "errorFailed": "Log masuk gagal. Sila cuba lagi.",
@@ -444,6 +446,7 @@
       "emailPlaceholder": "anda@contoh.com",
       "passwordLabel": "Kata laluan",
       "passwordPlaceholder": "Kata laluan anda",
+      "rememberMe": "Ingat saya pada peranti ini",
       "submit": "Log masuk",
       "emailErrors": {
         "invalidCredential": "E-mel atau kata laluan tidak betul.",
@@ -456,7 +459,7 @@
     },
     "signUp": {
       "title": "Cipta akaun anda",
-      "description": "Daftar dengan Google atau e-mel. Layak tidak pernah menghantar apa-apa bagi pihak anda — anda mengawal setiap pakej draf.",
+      "description": "Layak hanya menjana draf. Anda yang mengawal.",
       "consentPrefix": "Saya bersetuju Layak memproses dokumen yang saya muat naik (IC, slip gaji, bil utiliti) untuk memadankan skim kerajaan, mengikut",
       "consentPrivacy": "Dasar Privasi",
       "consentAnd": "dan",
@@ -484,7 +487,18 @@
         "operationNotAllowed": "Pendaftaran e-mel/kata laluan tidak diaktifkan. Hubungi sokongan.",
         "generic": "Pendaftaran gagal. Sila cuba lagi."
       }
-    }
+    },
+    "context": {
+      "heading": "Lihat bantuan kewangan yang anda layak.",
+      "body": "Muat naik tiga dokumen dan dapatkan senarai skim kerajaan Malaysia yang boleh anda mohon, dalam beberapa minit.",
+      "bullets": {
+        "free": "Percuma untuk digunakan",
+        "drafts": "Hanya draf — anda yang mengawal",
+        "trilingual": "Tersedia dalam Bahasa Inggeris, Bahasa Melayu, dan 中文"
+      },
+      "mobileStrip": "Percuma · Hanya draf · Tiga bahasa"
+    },
+    "tabsAriaLabel": "Kaedah log masuk"
   },
   "dashboard": {
     "hero": {
@@ -560,6 +574,7 @@
       "upload": "Muat Naik",
       "results": "Keputusan",
       "schemes": "Skim",
+      "discovery": "Penemuan",
       "settings": "Tetapan",
       "signIn": "Log masuk",
       "signUp": "Daftar"
@@ -580,15 +595,23 @@
       "steps": {
         "extract": {
           "title": "Ekstrak",
-          "body": "Kami membaca MyKad, slip gaji dan bil utiliti anda — pendapatan, 4 digit IC akhir, saiz isi rumah."
+          "body": "Baca dokumen anda dan keluarkan profil berstruktur."
+        },
+        "classify": {
+          "title": "Kelaskan",
+          "body": "Terbitkan kelompok isi rumah, jenis pemfail, dan bilangan tanggungan."
         },
         "match": {
           "title": "Padan",
-          "body": "Profil anda dinilai terhadap setiap skim 2026 — kelompok isi rumah, umur, jenis pekerjaan, tanggungan."
+          "body": "Nilai profil anda terhadap setiap skim 2026 yang dikunci."
+        },
+        "compute": {
+          "title": "Kira",
+          "body": "Jumlahkan pelepasan tahunan dengan Python yang dijalankan oleh Gemini."
         },
         "generate": {
           "title": "Hasilkan",
-          "body": "Pakej draf permohonan dihasilkan sebagai PDF yang anda boleh hantar kepada agensi berkenaan."
+          "body": "Hasilkan pakej draf bertanda air yang boleh anda hantar sendiri."
         }
       }
     },
@@ -601,8 +624,10 @@
       "toc": {
         "overview": "Gambaran Keseluruhan",
         "schemes": "Skim Layak",
-        "strategy": "Strategi",
+        "subsidies": "Subsidi",
         "required": "Sumbangan Diperlukan",
+        "strategy": "Strategi",
+        "whatIfs": "Senario Bagaimana-Jika",
         "preview": "Pratonton"
       },
       "startAnother": "Mulakan penilaian lain",
@@ -670,7 +695,6 @@
     },
     "whatIf": {
       "sectionTitle": "Terokai senario apa-jika",
-      "sectionEyebrow": "Laraskan input",
       "sectionDescription": "Tarik mana-mana penggelongsor untuk melihat bagaimana skim yang anda layak berubah. Tiada muat naik semula diperlukan.",
       "expand": "Buka",
       "collapse": "Tutup",
@@ -693,7 +717,6 @@
     },
     "strategy": {
       "sectionTitle": "Strategi",
-      "sectionEyebrow": "Analisis merentas skim",
       "sectionDescription": "Pengoptimum Layak membandingkan skim yang dipadankan dan menandakan peluang koordinasi.",
       "emptyHeadline": "Tiada konflik merentas skim",
       "emptyDescription": "Skim anda tidak mencetus mana-mana kes koordinasi yang Layak pantau.",
@@ -714,7 +737,10 @@
       "summaryRunning": "Saluran Layak sedang berjalan…",
       "summaryDone": "Saluran Layak telah selesai dalam {{count}} langkah.",
       "summaryError": "Saluran Layak terhenti awal — lihat ralat di bawah.",
-      "technicalLogLabel": "Log pelaksanaan teknikal"
+      "technicalLogLabel": "Log pelaksanaan teknikal",
+      "codeExecutionTitle": "Pelaksanaan Kod Gemini",
+      "codeExecutionSnippet": "python_snippet",
+      "codeExecutionStdout": "stdout"
     },
     "upload": {
       "sectionIc": "MyKad (IC)",
@@ -770,12 +796,9 @@
     "manual": {
       "identityTitle": "Identiti",
       "nameLabel": "Nama penuh",
-      "dobLabel": "Tarikh lahir",
-      "dobHelp": "Taip nombor sahaja — kami akan isi sempang. Atau gunakan ikon kalendar.",
-      "dobPlaceholder": "YYYY-MM-DD",
-      "dobAria": "Buka pemilih tarikh",
-      "icLabel": "4 digit akhir IC",
-      "icHelp": "Kami hanya mengumpul 4 digit akhir — MyKad penuh anda tidak pernah meninggalkan peranti anda.",
+      "ageLabel": "Umur",
+      "ageHelp": "Umur anda dalam tahun penuh. Kami menggunakannya untuk menapis skim sensitif umur (cth. JKM Warga Emas 60+, BUDI95 16+, MyKasih SARA 18+).",
+      "agePlaceholder": "cth. 34",
       "incomeTitle": "Pendapatan",
       "incomeLabel": "Pendapatan bulanan (RM)",
       "incomeHelp": "Bayaran bersih untuk kerja gig, gaji pokok untuk pekerja bergaji.",
@@ -797,11 +820,7 @@
       "clear": "Kosongkan",
       "submit": "Jana pakej",
       "zodRequired": "Wajib diisi",
-      "zodDateFormat": "Gunakan YYYY-MM-DD",
-      "zodNotRealDate": "Bukan tarikh yang sah",
-      "zodYearMin": "Tahun mesti 1900 atau lebih lewat",
-      "zodPastDate": "Mesti tarikh lepas",
-      "zodIc4Digits": "4 digit",
+      "zodAgeRange": "Umur mesti antara 0 dan 130",
       "zodIncomeFormat": "Jumlah sehingga RM1,000,000 (cth. 2400 atau 2400.50)",
       "zodAdultIncomeOnly": "Pendapatan hanya dikutip untuk ahli isi rumah dewasa",
       "zodSpouseLimit": "Gunakan maksimum empat baris pasangan dalam satu isi rumah bersama",
@@ -870,7 +889,6 @@
       },
       "age": "Umur",
       "agePlaceholder": "Umur",
-      "icOptional": "4 digit akhir IC (pilihan)",
       "incomeOptional": "Pendapatan bulanan (pilihan)",
       "incomePlaceholder": "RM / bulan",
       "incomeUnder18": "Bawah 18",
@@ -948,10 +966,20 @@
       "estValue": "Anggaran Nilai",
       "startApp": "Mohon",
       "categoryAssistance": "Bantuan",
+      "categorySubsidy": "Subsidi",
+      "subsidyAutoCredited": "Dikredit secara automatik ke MyKad anda",
+      "subsidyInfo": "Maklumat subsidi",
+      "checkBalance": "Semak baki anda",
+      "expiresOn": "Tamat {{date}}",
       "perYearEst": "setahun (anggaran)",
       "openAgencyPortal": "Buka portal {{agency}}",
       "emptyList": "Padanan skim akan muncul di sini selepas penilaian pertama anda selesai.",
       "eligibleSchemesCount": "Skim yang layak ({{count}})"
+    },
+    "subsidies": {
+      "title": "Subsidi",
+      "description": "Subsidi kerajaan yang anda mungkin sudah berhak terima. Subsidi ini dikreditkan secara automatik melalui portal agensi — Layak tidak memohon bagi pihak anda.",
+      "empty": "Tiada program subsidi sepadan dengan profil anda."
     },
     "requiredContributions": {
       "heading": "Caruman wajib",
@@ -972,6 +1000,10 @@
       "error": "Pratonton gagal: {{message}}",
       "iframeTitle": "Pratonton dalam talian {{name}}",
       "downloadOne": "Muat turun PDF ini"
+    },
+    "whatIfs": {
+      "sectionTitle": "Senario Bagaimana-Jika",
+      "sectionDescription": "Laraskan input anda untuk melihat bagaimana skim yang sepadan akan berubah."
     },
     "packet": {
       "eyebrow": "Pakej",
@@ -1018,13 +1050,38 @@
   },
   "admin": {
     "discovery": {
-      "pageEyebrow": "Admin / Moderasi",
+      "pageEyebrow": "Penemuan",
       "pageTitle": "Barisan Penemuan Skim",
-      "pageDescription": "Ejen penemuan Layak memantau sumber kerajaan rasmi dan memunculkan perubahan kadar atau kelayakan di sini untuk semakan sebelum sampai kepada pengguna.",
+      "pageDescription": "Semak perubahan sumber sebelum sampai kepada pengguna.",
       "triggerButton": "Jalankan penemuan sekarang",
       "triggerRunning": "Sedang dijalankan…",
+      "triggerSuccessTitle": "Penemuan selesai",
       "triggerSuccess": "{{checked}} sumber diperiksa, {{changed}} berubah, {{extracted}} calon diekstrak",
+      "triggerErrorTitle": "Penemuan gagal",
       "triggerError": "Penemuan gagal: {{message}}",
+      "runPanel": {
+        "eyebrow": "Saluran",
+        "title": "Larian Penemuan",
+        "description": "Muat semula sumber bergazet, bandingkan kandungan, dan sediakan calon baharu untuk moderasi.",
+        "idleHint": "Tiada larian dalam sesi ini.",
+        "elapsed": "Sedang dijalankan… {{seconds}}s berlalu",
+        "lastRun": "Larian terakhir · {{relative}}",
+        "runAgain": "Jalankan Semula",
+        "tryAgain": "Cuba Lagi",
+        "kpi": {
+          "sourcesChecked": "Sumber Diperiksa",
+          "sourcesChanged": "Sumber Berubah",
+          "candidatesExtracted": "Calon Diekstrak"
+        }
+      },
+      "searchPlaceholder": "Cari ikut nama, agensi, atau sumber…",
+      "confidence": {
+        "band": {
+          "high": "melebihi ambang",
+          "mid": "perlu disemak",
+          "low": "keyakinan rendah"
+        }
+      },
       "filters": {
         "all": "Semua",
         "pending": "Menunggu",
@@ -1044,19 +1101,36 @@
           "status": "Status",
           "actions": "Tindakan"
         },
-        "review": "Semak →",
+        "review": "Semak",
         "approve": "Luluskan",
-        "reject": "Tolak"
+        "reject": "Tolak",
+        "selected": "{{count}} dipilih",
+        "selectedSummary": "{{count}} calon ditandakan untuk dipadam.",
+        "deleteAction": "Padam {{count}}",
+        "deleteConfirm": "Padam {{count}} calon dari baris gilir? Tindakan ini tidak boleh diundur.",
+        "deletePartialFailure": "{{deleted}} daripada {{total}} dipadam; {{failed}} gagal.",
+        "selectRowAria": "Pilih calon {{name}}",
+        "selectPageAria": "Pilih semua calon",
+        "deselectPageAria": "Nyahpilih semua calon",
+        "paginationSummary": "Menunjukkan {{shown}} daripada {{total}}",
+        "sortAria": "Susun ikut {{column}}"
       },
       "health": {
         "title": "Kesihatan pengesahan skim",
         "subtitle": "Pengesahan terakhir berjaya untuk setiap skim daripada saluran penemuan.",
         "empty": "Belum ada skim disahkan. Jalankan penemuan untuk mengisi senarai ini.",
-        "verifiedPrefix": "Sumber disahkan ",
-        "neverVerified": "Tidak pernah disahkan"
+        "verifiedPrefix": "Disahkan ",
+        "neverVerified": "Tidak pernah disahkan",
+        "countSummary": "{{healthy}} sihat · {{stale}} lama",
+        "dotAria": {
+          "healthy": "Disahkan dalam tempoh 7 hari yang lalu",
+          "stale": "Disahkan lebih 30 hari yang lalu",
+          "aging": "Disahkan dalam tempoh 30 hari yang lalu",
+          "never": "Tidak pernah disahkan"
+        }
       },
       "detail": {
-        "backToQueue": "← Kembali ke barisan",
+        "backToQueue": "Kembali ke barisan",
         "headingNew": "Calon skim baharu",
         "headingMatched": "Kemas kini untuk skim sedia ada",
         "sectionCandidate": "Cadangan",
@@ -1084,7 +1158,40 @@
         },
         "actionSuccess": "Selesai. Status kini {{status}}.",
         "actionError": "Tindakan gagal: {{message}}",
-        "manifestWritten": "Manifes YAML ditulis ke {{path}}"
+        "manifestReady": "Diluluskan · Manifes YAML disimpan dalam dokumen calon",
+        "downloadManifest": "Muat turun manifes",
+        "metaLine": "{{agency}} · {{scheme}} · Diekstrak {{extracted}}",
+        "metaLineUnmatched": "{{agency}} · Tiada padanan · Diekstrak {{extracted}}",
+        "note": "Nota moderator",
+        "openSource": "Buka sumber",
+        "copyHashAria": "Salin cincang kandungan",
+        "copyHashSuccess": "Cincang disalin",
+        "newScheme": {
+          "title": "Skim baharu",
+          "body": "Tiada peraturan sedia ada — manifes akan dirangka untuk semakan jurutera."
+        },
+        "decisionTitle": "Keputusan"
+      },
+      "notify": {
+        "approve": {
+          "title": "Calon diluluskan",
+          "body": "{{name}} ditandakan sebagai disahkan."
+        },
+        "reject": {
+          "title": "Calon ditolak",
+          "body": "{{name}} dipindah ke Ditolak."
+        },
+        "changes": {
+          "title": "Permohonan perubahan",
+          "body": "{{name}} dipindah ke Perubahan Dipohon."
+        },
+        "deleteSuccess": {
+          "title": "Calon dipadam",
+          "body": "{{count}} calon dibuang dari baris gilir."
+        },
+        "deleteFailure": {
+          "title": "Padam gagal"
+        }
       }
     }
   },
@@ -1166,7 +1273,9 @@
       "lhdn_form_b": "LHDN Form B — lima pelepasan YA2025",
       "lhdn_form_be": "LHDN Form BE — lima pelepasan YA2025",
       "perkeso_sksps": "PERKESO SKSPS — Jaminan Sosial Pekerja Sendiri",
-      "i_saraan": "EPF i-Saraan — padanan kerajaan untuk caruman sukarela"
+      "i_saraan": "EPF i-Saraan — padanan kerajaan untuk caruman sukarela",
+      "budi95": "BUDI95 — subsidi petrol RON95",
+      "mykasih": "MyKasih — kredit MyKad SARA RM100"
     }
   },
   "settings": {

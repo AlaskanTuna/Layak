@@ -24,14 +24,7 @@
 - id: str_2026
   name: STR 2026 Bantuan Sara Hidup
   agency: MOF
-  url: https://belanjawan.mof.gov.my/sumbangan-tunai-rahmah-str
-  content_selector: null
-  check_frequency_hours: 24
-
-- id: bk_01
-  name: BK-01 Bantuan Kanak-Kanak
-  agency: MOF
-  url: https://www.hasil.gov.my/en/individual/individual-life-cycle/family/child-relief
+  url: https://manfaat.mof.gov.my/b2026/individu/str2026
   content_selector: null
   check_frequency_hours: 24
 
@@ -52,7 +45,7 @@
 - id: lhdn_form_b
   name: LHDN Form B reliefs (Public Ruling 4/2024)
   agency: LHDN
-  url: https://www.hasil.gov.my/en/individual/individual-life-cycle/employment/personal-income-tax-relief/
+  url: https://www.hasil.gov.my/en/individual/individual-life-cycle/income-declaration/tax-reliefs/
   content_selector: null
   check_frequency_hours: 24
 
@@ -66,6 +59,6 @@
 - id: perkeso_sksps
   name: PERKESO SKSPS Self-Employment Social Security
   agency: PERKESO
-  url: https://www.perkeso.gov.my/en/our-services/protection/self-employment-social-security-scheme.html
+  url: https://www.perkeso.gov.my/en/our-services/protection/self-employed.html
   content_selector: null
   check_frequency_hours: 24

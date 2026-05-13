@@ -1,7 +1,7 @@
 'use client'
 
 import { zodResolver } from '@hookform/resolvers/zod'
-import { ArrowRight, CalendarIcon, Eraser } from 'lucide-react'
+import { ArrowRight, Eraser } from 'lucide-react'
 import { useImperativeHandle, useMemo } from 'react'
 import { Controller, type SubmitHandler, useForm, useWatch } from 'react-hook-form'
 import { useTranslation } from 'react-i18next'
@@ -10,7 +10,6 @@ import { z } from 'zod'
 import { DependantsFieldset, type DependantInputRow } from '@/components/evaluation/dependants-fieldset'
 import { SectionBadge } from '@/components/evaluation/section-badge'
 import { Button } from '@/components/ui/button'
-import { DatePicker } from '@/components/ui/date-picker'
 import { InfoTooltip } from '@/components/ui/info-tooltip'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -26,21 +25,9 @@ const SECTION_CLASS =
 
 const RELATIONSHIPS = ['child', 'parent', 'spouse', 'sibling', 'grandparent', 'other'] as const satisfies readonly Relationship[]
 
-/** Insert dashes into a typed DOB so older users can type `20260421` and see
- * `2026-04-21` appear without hunting for the hyphen key. Also accepts a
- * pre-dashed input (strips and re-inserts) so the date-picker callback path
- * is idempotent. */
-function formatDateMask(raw: string): string {
-  const digits = raw.replace(/\D/g, '').slice(0, 8)
-  if (digits.length <= 4) return digits
-  if (digits.length <= 6) return `${digits.slice(0, 4)}-${digits.slice(4)}`
-  return `${digits.slice(0, 4)}-${digits.slice(4, 6)}-${digits.slice(6)}`
-}
-
 type FormValues = {
   name: string
-  date_of_birth: string
-  ic_last4: string
+  age: number
   monthly_income_rm: number
   employment_type: 'gig' | 'salaried'
   address: string
@@ -51,44 +38,41 @@ type FormValues = {
 
 /**
  * Aisyah defaults for one-click pre-fill (parity with upload-path samples).
- * DOB 1992-03-24 derives age 34 against any 2026 reference date after 24 Mar.
+ * 34-year-old Grab driver in Kuantan.
  */
 const AISYAH_DEFAULTS: FormValues = {
   name: 'Aisyah binti Ahmad',
-  date_of_birth: '1992-03-24',
-  ic_last4: '4321',
+  age: 34,
   monthly_income_rm: 2800,
   employment_type: 'gig',
   address: 'No. 42, Jalan IM 7/10, Bandar Indera Mahkota, 25200 Kuantan, Pahang',
   monthly_cost_rm: '95.40',
   monthly_kwh: '220',
   dependants: [
-    { relationship: 'child', age: 10, ic_last4: '', monthly_income_rm: '' },
-    { relationship: 'child', age: 7, ic_last4: '', monthly_income_rm: '' },
-    { relationship: 'parent', age: 70, ic_last4: '', monthly_income_rm: '' }
+    { relationship: 'child', age: 10, monthly_income_rm: '' },
+    { relationship: 'child', age: 7, monthly_income_rm: '' },
+    { relationship: 'parent', age: 70, monthly_income_rm: '' }
   ]
 }
 
 /**
  * Farhan defaults for one-click pre-fill — salaried-teacher counterpart to
  * Aisyah. Mirrors `frontend/src/lib/farhan-fixtures.ts` dependants so the
- * manual and upload paths produce equivalent profiles. DOB 1988-03-22 (from
- * the synthetic MyKad) derives age 38 against any 2026 reference date after
- * 22 Mar; gross monthly income is RM 4,180.50 (basic + allowances).
+ * manual and upload paths produce equivalent profiles. 38-year-old salaried
+ * teacher in Subang Jaya. Gross monthly income RM 4,180.50 (basic + allowances).
  */
 const FARHAN_DEFAULTS: FormValues = {
   name: 'Cikgu Farhan bin Mohd Yusof',
-  date_of_birth: '1988-03-22',
-  ic_last4: '5837',
+  age: 38,
   monthly_income_rm: 4180.5,
   employment_type: 'salaried',
   address: 'No. 24, Jalan Putera 3/2, Taman Putera Subang, 47600 Subang Jaya, Selangor',
   monthly_cost_rm: '152.40',
   monthly_kwh: '380',
   dependants: [
-    { relationship: 'spouse', age: 36, ic_last4: '', monthly_income_rm: '' },
-    { relationship: 'child', age: 10, ic_last4: '', monthly_income_rm: '' },
-    { relationship: 'child', age: 7, ic_last4: '', monthly_income_rm: '' }
+    { relationship: 'spouse', age: 36, monthly_income_rm: '' },
+    { relationship: 'child', age: 10, monthly_income_rm: '' },
+    { relationship: 'child', age: 7, monthly_income_rm: '' }
   ]
 }
 
@@ -103,8 +87,7 @@ export type ManualEntryFormHandle = {
 
 const EMPTY_DEFAULTS: FormValues = {
   name: '',
-  date_of_birth: '',
-  ic_last4: '',
+  age: 0,
   monthly_income_rm: 0,
   employment_type: 'gig',
   address: '',
@@ -136,9 +119,6 @@ export function ManualEntryForm({ onSubmit, onUseSamples, onClear, disabled = fa
     const dependantSchema = z.object({
       relationship: z.enum(RELATIONSHIPS),
       age: z.number().int().min(0).max(120),
-      ic_last4: z
-        .string()
-        .refine((v) => v === '' || /^\d{4}$/.test(v), { message: t('evaluation.manual.zodIc4Digits') }),
       monthly_income_rm: z.string().refine((v) => v === '' || (/^\d+(\.\d{1,2})?$/.test(v) && Number(v) <= 1000000), {
         message: t('evaluation.manual.zodIncomeFormat')
       })
@@ -154,33 +134,11 @@ export function ManualEntryForm({ onSubmit, onUseSamples, onClear, disabled = fa
 
     return z.object({
       name: z.string().trim().min(1, t('evaluation.manual.zodRequired')).max(200),
-      date_of_birth: z
-        .string()
-        .regex(/^\d{4}-\d{2}-\d{2}$/, t('evaluation.manual.zodDateFormat'))
-        .superRefine((v, ctx) => {
-          const [y, m, d] = v.split('-').map(Number)
-          if (m < 1 || m > 12 || d < 1 || d > 31) {
-            ctx.addIssue({ code: z.ZodIssueCode.custom, message: t('evaluation.manual.zodNotRealDate') })
-            return
-          }
-          const parsed = new Date(v)
-          if (Number.isNaN(parsed.getTime())) {
-            ctx.addIssue({ code: z.ZodIssueCode.custom, message: t('evaluation.manual.zodNotRealDate') })
-            return
-          }
-          if (parsed.getUTCFullYear() !== y || parsed.getUTCMonth() + 1 !== m || parsed.getUTCDate() !== d) {
-            ctx.addIssue({ code: z.ZodIssueCode.custom, message: t('evaluation.manual.zodNotRealDate') })
-            return
-          }
-          if (y < 1900) {
-            ctx.addIssue({ code: z.ZodIssueCode.custom, message: t('evaluation.manual.zodYearMin') })
-            return
-          }
-          if (parsed > new Date()) {
-            ctx.addIssue({ code: z.ZodIssueCode.custom, message: t('evaluation.manual.zodPastDate') })
-          }
-        }),
-      ic_last4: z.string().regex(/^\d{4}$/, t('evaluation.manual.zodIc4Digits')),
+      age: z
+        .number({ message: t('evaluation.manual.zodRequired') })
+        .int()
+        .min(0, t('evaluation.manual.zodAgeRange'))
+        .max(130, t('evaluation.manual.zodAgeRange')),
       monthly_income_rm: z.number().min(0).max(1_000_000),
       employment_type: z.enum(['gig', 'salaried']),
       address: z.string().max(300),
@@ -214,8 +172,7 @@ export function ManualEntryForm({ onSubmit, onUseSamples, onClear, disabled = fa
   const submit: SubmitHandler<FormValues> = (values) => {
     const payload: ManualEntryPayload = {
       name: values.name.trim(),
-      date_of_birth: values.date_of_birth,
-      ic_last4: values.ic_last4,
+      age: values.age,
       monthly_income_rm: values.monthly_income_rm,
       employment_type: values.employment_type,
       address: values.address.trim().length > 0 ? values.address.trim() : null,
@@ -224,7 +181,6 @@ export function ManualEntryForm({ onSubmit, onUseSamples, onClear, disabled = fa
       dependants: values.dependants.map((d) => ({
         relationship: d.relationship,
         age: d.age,
-        ic_last4: d.ic_last4 === '' ? null : d.ic_last4,
         monthly_income_rm: d.monthly_income_rm === '' ? null : Number(d.monthly_income_rm)
       }))
     }
@@ -260,59 +216,24 @@ export function ManualEntryForm({ onSubmit, onUseSamples, onClear, disabled = fa
           <Field label={t('evaluation.manual.nameLabel')} error={formState.errors.name?.message} htmlFor="mef-name">
             <Input id="mef-name" autoComplete="name" disabled={disabled} {...register('name')} />
           </Field>
-          <div className="grid gap-3 sm:grid-cols-2">
-            <Field
-              label={t('evaluation.manual.dobLabel')}
-              help={t('evaluation.manual.dobHelp')}
-              error={formState.errors.date_of_birth?.message}
-              htmlFor="mef-dob"
-            >
-              <Controller
-                control={control}
-                name="date_of_birth"
-                render={({ field }) => (
-                  <div className="flex gap-2">
-                    <Input
-                      id="mef-dob"
-                      type="text"
-                      inputMode="numeric"
-                      placeholder={t('evaluation.manual.dobPlaceholder')}
-                      autoComplete="bday"
-                      maxLength={10}
-                      disabled={disabled}
-                      value={field.value}
-                      onChange={(e) => field.onChange(formatDateMask(e.target.value))}
-                      onBlur={field.onBlur}
-                      className="flex-1"
-                    />
-                    <DatePicker
-                      value={/^\d{4}-\d{2}-\d{2}$/.test(field.value) ? field.value : ''}
-                      onChange={(next) => field.onChange(next)}
-                      disableFuture
-                      disabled={disabled}
-                      ariaLabel={t('evaluation.manual.dobAria')}
-                      triggerLabel={<CalendarIcon className="size-4" aria-hidden />}
-                    />
-                  </div>
-                )}
-              />
-            </Field>
-            <Field
-              label={t('evaluation.manual.icLabel')}
-              help={t('evaluation.manual.icHelp')}
-              error={formState.errors.ic_last4?.message}
-              htmlFor="mef-ic4"
-            >
-              <Input
-                id="mef-ic4"
-                inputMode="numeric"
-                maxLength={4}
-                autoComplete="off"
-                disabled={disabled}
-                {...register('ic_last4')}
-              />
-            </Field>
-          </div>
+          <Field
+            label={t('evaluation.manual.ageLabel')}
+            help={t('evaluation.manual.ageHelp')}
+            error={formState.errors.age?.message}
+            htmlFor="mef-age"
+          >
+            <Input
+              id="mef-age"
+              type="number"
+              inputMode="numeric"
+              min={0}
+              max={130}
+              autoComplete="off"
+              placeholder={t('evaluation.manual.agePlaceholder')}
+              disabled={disabled}
+              {...register('age', { valueAsNumber: true })}
+            />
+          </Field>
         </div>
       </section>
 
@@ -438,11 +359,6 @@ export function ManualEntryForm({ onSubmit, onUseSamples, onClear, disabled = fa
               />
             )}
           />
-          {formState.errors.dependants?.message && (
-            <p className="mt-2 text-xs text-destructive" role="alert">
-              {formState.errors.dependants.message}
-            </p>
-          )}
         </div>
       </section>
 

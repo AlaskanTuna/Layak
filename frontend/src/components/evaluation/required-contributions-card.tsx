@@ -33,7 +33,7 @@ export function RequiredContributionsCard({ matches }: Props) {
   return (
     <section className="flex flex-col gap-4">
       <div className="flex items-baseline justify-between gap-3">
-        <h2 className="font-heading text-lg font-semibold tracking-tight">
+        <h2 className="font-heading text-xl font-semibold tracking-tight">
           {t('evaluation.requiredContributions.heading')}
         </h2>
         <span className="mono-caption text-foreground/55">

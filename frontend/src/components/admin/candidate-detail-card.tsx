@@ -2,10 +2,11 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { Check, Loader2, RefreshCw, X } from 'lucide-react'
+import { ArrowUpRight, Check, Copy, Download, Loader2, Quote, RefreshCw, X } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 
 import { CandidateStatusPill } from '@/components/admin/status-pill-status'
+import { ConfidenceMeter } from '@/components/admin/confidence-meter'
 import { UnifiedDiff } from '@/components/admin/unified-diff'
 import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
@@ -15,12 +16,28 @@ import {
   requestChangesCandidate,
   type CandidateDetail
 } from '@/lib/admin-discovery'
+import { notificationStore } from '@/lib/notification-store'
 
 type ExistingRule = {
   name: string
   agency: string
   eligibility_summary: string
   rate_summary: string
+}
+
+function formatRelative(iso: string | null | undefined): string {
+  if (!iso) return ''
+  const ms = Date.now() - new Date(iso).getTime()
+  if (Number.isNaN(ms) || ms < 0) return ''
+  const minutes = Math.floor(ms / 60000)
+  if (minutes < 1) return 'just now'
+  if (minutes < 60) return `${minutes} min ago`
+  const hours = Math.floor(minutes / 60)
+  if (hours < 24) return `${hours} h ago`
+  const days = Math.floor(hours / 24)
+  if (days < 30) return `${days} d ago`
+  const months = Math.floor(days / 30)
+  return `${months} mo ago`
 }
 
 export function CandidateDetailCard({
@@ -36,10 +53,21 @@ export function CandidateDetailCard({
   const [busy, setBusy] = useState<'approve' | 'reject' | 'changes' | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [status, setStatus] = useState(detail.status)
-  const [manifestPath, setManifestPath] = useState<string | null>(null)
+  const [manifestYaml, setManifestYaml] = useState<string | null>(null)
 
   const candidate = detail.candidate
   const matched = Boolean(candidate.scheme_id)
+  const relative = formatRelative(candidate.extracted_at)
+  const metaLine = matched
+    ? t('admin.discovery.detail.metaLine', {
+        agency: candidate.agency,
+        scheme: candidate.scheme_id,
+        extracted: relative
+      })
+    : t('admin.discovery.detail.metaLineUnmatched', {
+        agency: candidate.agency,
+        extracted: relative
+      })
 
   async function run(action: 'approve' | 'reject' | 'changes') {
     setBusy(action)
@@ -53,9 +81,17 @@ export function CandidateDetailCard({
             : requestChangesCandidate
       const res = await fn(candidate.candidate_id, note || undefined)
       setStatus(res.status)
-      if (res.manifest_path) {
-        setManifestPath(res.manifest_path)
+      if (res.manifest_yaml) {
+        setManifestYaml(res.manifest_yaml)
       }
+      const notifyKey = action === 'approve' ? 'approve' : action === 'reject' ? 'reject' : 'changes'
+      const severity = action === 'approve' ? 'success' : action === 'reject' ? 'error' : 'info'
+      notificationStore.notify({
+        title: t(`admin.discovery.notify.${notifyKey}.title`),
+        description: t(`admin.discovery.notify.${notifyKey}.body`, { name: candidate.name }),
+        severity,
+        toast: true
+      })
       router.refresh()
     } catch (err) {
       setError(err instanceof Error ? err.message : String(err))
@@ -64,69 +100,117 @@ export function CandidateDetailCard({
     }
   }
 
+  function downloadManifest() {
+    if (!manifestYaml) return
+    const filename = `${candidate.scheme_id || candidate.candidate_id.slice(0, 8)}-manifest.yaml`
+    const blob = new Blob([manifestYaml], { type: 'text/yaml;charset=utf-8' })
+    const url = URL.createObjectURL(blob)
+    const anchor = document.createElement('a')
+    anchor.href = url
+    anchor.download = filename
+    document.body.appendChild(anchor)
+    anchor.click()
+    document.body.removeChild(anchor)
+    URL.revokeObjectURL(url)
+  }
+
+  async function copyHash() {
+    try {
+      await navigator.clipboard.writeText(candidate.source_content_hash)
+      notificationStore.notify({
+        title: t('admin.discovery.detail.copyHashSuccess'),
+        description: candidate.source_content_hash.slice(0, 16) + '…',
+        severity: 'info',
+        toast: true,
+        groupKey: 'discovery-copy-hash'
+      })
+    } catch {
+      /* clipboard denied — silent fail */
+    }
+  }
+
   return (
     <div className="flex flex-col gap-6">
-      <section className="paper-card flex flex-col gap-4 rounded-[16px] p-6">
-        <header className="flex flex-wrap items-start justify-between gap-3">
-          <div>
-            <p className="mono-caption text-foreground/55">
-              {matched ? t('admin.discovery.detail.headingMatched') : t('admin.discovery.detail.headingNew')}
-            </p>
-            <h2 className="font-heading text-2xl font-semibold tracking-tight">{candidate.name}</h2>
-          </div>
-          <CandidateStatusPill status={status} />
-        </header>
-
-        <dl className="grid grid-cols-1 gap-x-6 gap-y-3 text-sm sm:grid-cols-2">
-          <Field label={t('admin.discovery.detail.fields.agency')} value={candidate.agency} />
-          <Field
-            label={t('admin.discovery.detail.fields.schemeId')}
-            value={candidate.scheme_id ?? t('admin.discovery.detail.fields.schemeIdUnmatched')}
-          />
-          <Field
-            label={t('admin.discovery.detail.fields.confidence')}
-            value={`${Math.round(candidate.confidence * 100)}%`}
-          />
-          <Field
-            label={t('admin.discovery.detail.fields.extractedAt')}
-            value={new Date(candidate.extracted_at).toLocaleString()}
-          />
-          <Field
-            label={t('admin.discovery.detail.fields.sourceUrl')}
-            value={
-              <a
-                href={candidate.source_url}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-[color:var(--primary)] hover:underline"
-              >
-                {candidate.source_url}
-              </a>
-            }
-            full
-          />
-          <Field
-            label={t('admin.discovery.detail.fields.contentHash')}
-            value={<code className="font-mono text-xs">{candidate.source_content_hash.slice(0, 16)}…</code>}
-            full
-          />
-        </dl>
-
-        <div className="grid grid-cols-1 gap-3">
-          <FieldLong
-            label={t('admin.discovery.detail.fields.eligibilitySummary')}
-            value={candidate.eligibility_summary}
-          />
-          <FieldLong label={t('admin.discovery.detail.fields.rateSummary')} value={candidate.rate_summary} />
-          <FieldLong
-            label={t('admin.discovery.detail.fields.citation')}
-            value={candidate.citation.snippet}
-            mono
-          />
+      <header className="paper-card flex flex-wrap items-start justify-between gap-4 rounded-[16px] p-6">
+        <div className="flex min-w-0 flex-col gap-1.5">
+          <p className="mono-caption text-foreground/55">
+            {matched ? t('admin.discovery.detail.headingMatched') : t('admin.discovery.detail.headingNew')}
+          </p>
+          <h2 className="font-heading text-2xl font-semibold tracking-tight">{candidate.name}</h2>
+          <p className="mono-caption text-foreground/55">{metaLine}</p>
         </div>
-      </section>
+        <CandidateStatusPill status={status} />
+      </header>
 
-      {existingRule ? (
+      <div className="grid gap-6 lg:grid-cols-[minmax(0,2fr)_minmax(0,1fr)]">
+        <div className="flex flex-col gap-5">
+          <SectionBlock label={t('admin.discovery.detail.fields.eligibilitySummary')}>
+            <p className="whitespace-pre-wrap text-sm leading-[1.65] text-foreground/85">
+              {candidate.eligibility_summary}
+            </p>
+          </SectionBlock>
+
+          <SectionBlock label={t('admin.discovery.detail.fields.rateSummary')}>
+            <p className="whitespace-pre-wrap text-sm leading-[1.65] text-foreground/85">
+              {candidate.rate_summary}
+            </p>
+          </SectionBlock>
+
+          <SectionBlock label={t('admin.discovery.detail.fields.citation')}>
+            <blockquote className="relative rounded-[10px] border-l-[3px] border-[color:var(--hibiscus)]/70 bg-card/40 pl-4 pr-3 py-3 font-mono text-[13px] leading-[1.6] text-foreground/85">
+              <Quote className="absolute right-3 top-3 size-3.5 text-foreground/25" aria-hidden />
+              <span className="whitespace-pre-wrap">{candidate.citation.snippet}</span>
+            </blockquote>
+          </SectionBlock>
+        </div>
+
+        <aside className="paper-card flex h-fit flex-col gap-5 rounded-[16px] p-5 lg:sticky lg:top-24">
+          <div className="flex flex-col gap-1.5">
+            <p className="mono-caption text-foreground/55">{t('admin.discovery.detail.fields.confidence')}</p>
+            <ConfidenceMeter confidence={candidate.confidence} showLabel />
+          </div>
+
+          <div className="flex flex-col gap-1.5">
+            <p className="mono-caption text-foreground/55">{t('admin.discovery.detail.fields.sourceUrl')}</p>
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              render={
+                <a href={candidate.source_url} target="_blank" rel="noopener noreferrer" />
+              }
+              className="justify-between gap-2 rounded-full"
+            >
+              <span className="truncate text-left">{candidate.source_url.replace(/^https?:\/\//, '')}</span>
+              <ArrowUpRight className="size-3.5 shrink-0" aria-hidden />
+            </Button>
+          </div>
+
+          <div className="flex flex-col gap-1.5">
+            <p className="mono-caption text-foreground/55">{t('admin.discovery.detail.fields.contentHash')}</p>
+            <button
+              type="button"
+              onClick={copyHash}
+              aria-label={t('admin.discovery.detail.copyHashAria')}
+              className="group flex cursor-pointer items-center justify-between gap-2 rounded-[8px] border border-foreground/10 bg-card/40 px-3 py-2 font-mono text-[12px] text-foreground/75 transition-colors hover:border-foreground/20 hover:text-foreground"
+            >
+              <span className="truncate">{candidate.source_content_hash.slice(0, 24)}…</span>
+              <Copy className="size-3.5 shrink-0 opacity-50 group-hover:opacity-100" aria-hidden />
+            </button>
+          </div>
+
+          {!existingRule && (
+            <div className="border-t border-foreground/10 pt-4">
+              <p className="mono-caption text-[color:var(--hibiscus)]">{t('admin.discovery.detail.newScheme.title')}</p>
+              <p className="mt-1 text-[13px] leading-relaxed text-foreground/70">
+                {t('admin.discovery.detail.newScheme.body')}
+              </p>
+            </div>
+          )}
+        </aside>
+      </div>
+
+      {existingRule && (
         <UnifiedDiff
           fields={[
             { label: t('admin.discovery.detail.fields.name'), current: existingRule.name, proposed: candidate.name },
@@ -147,21 +231,20 @@ export function CandidateDetailCard({
             }
           ]}
         />
-      ) : (
-        <p className="rounded-[12px] border border-foreground/10 bg-card/40 p-4 text-sm text-foreground/60">
-          {t('admin.discovery.detail.diffEmpty')}
-        </p>
       )}
 
-      <section className="paper-card flex flex-col gap-3 rounded-[16px] p-6">
-        <Textarea
-          value={note}
-          onChange={(e) => setNote(e.target.value)}
-          placeholder={t('admin.discovery.detail.actions.notePlaceholder')}
-          rows={3}
-          maxLength={2000}
-        />
-        <div className="flex flex-wrap items-center gap-2">
+      <section className="paper-card flex flex-col gap-4 rounded-[16px] p-6">
+        <div className="flex flex-col gap-2">
+          <p className="mono-caption text-foreground/55">{t('admin.discovery.detail.note')}</p>
+          <Textarea
+            value={note}
+            onChange={(e) => setNote(e.target.value)}
+            placeholder={t('admin.discovery.detail.actions.notePlaceholder')}
+            rows={3}
+            maxLength={2000}
+          />
+        </div>
+        <div className="flex flex-wrap items-center gap-2 border-t border-foreground/10 pt-4">
           <Button type="button" onClick={() => run('approve')} disabled={busy !== null} className="gap-2">
             {busy === 'approve' ? <Loader2 className="size-4 animate-spin" /> : <Check className="size-4" />}
             {t('admin.discovery.detail.actions.approve')}
@@ -176,6 +259,7 @@ export function CandidateDetailCard({
             {busy === 'changes' ? <Loader2 className="size-4 animate-spin" /> : <RefreshCw className="size-4" />}
             {t('admin.discovery.detail.actions.requestChanges')}
           </Button>
+          <span className="flex-1" />
           <Button
             type="button"
             variant="ghost"
@@ -192,40 +276,31 @@ export function CandidateDetailCard({
             {t('admin.discovery.detail.actionError', { message: error })}
           </p>
         )}
-        {manifestPath && (
-          <p className="mono-caption text-foreground/60" role="status">
-            {t('admin.discovery.detail.manifestWritten', { path: manifestPath })}
-          </p>
+        {manifestYaml && (
+          <div className="flex flex-wrap items-center gap-2 rounded-[10px] border border-foreground/10 bg-card/40 px-3 py-2 text-sm text-foreground/70" role="status">
+            <span>{t('admin.discovery.detail.manifestReady')}</span>
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              onClick={downloadManifest}
+              className="gap-1.5 px-2"
+            >
+              <Download className="size-4" />
+              {t('admin.discovery.detail.downloadManifest')}
+            </Button>
+          </div>
         )}
       </section>
     </div>
   )
 }
 
-function Field({
-  label,
-  value,
-  full
-}: {
-  label: string
-  value: React.ReactNode
-  full?: boolean
-}) {
+function SectionBlock({ label, children }: { label: string; children: React.ReactNode }) {
   return (
-    <div className={full ? 'sm:col-span-2' : ''}>
-      <dt className="mono-caption text-foreground/55">{label}</dt>
-      <dd className="mt-0.5 text-foreground/85">{value}</dd>
-    </div>
-  )
-}
-
-function FieldLong({ label, value, mono }: { label: string; value: string; mono?: boolean }) {
-  return (
-    <div className="flex flex-col gap-1">
+    <section className="paper-card flex flex-col gap-2.5 rounded-[14px] p-5">
       <p className="mono-caption text-foreground/55">{label}</p>
-      <p className={`whitespace-pre-wrap text-sm text-foreground/85 ${mono ? 'font-mono text-[13px]' : ''}`}>
-        {value}
-      </p>
-    </div>
+      {children}
+    </section>
   )
 }

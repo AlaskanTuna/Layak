@@ -37,7 +37,9 @@
     "footer": {
       "copyright": "© 2026 Layak",
       "contact": "Contact Us",
-      "howItWorks": "How it Works"
+      "howItWorks": "How it Works",
+      "privacy": "Privacy Policy",
+      "terms": "Terms & Conditions"
     },
     "notifications": {
       "title": "Notifications",
@@ -299,7 +301,7 @@
         {
           "docCode": "FAQ-04",
           "question": "How safe is my personal data?",
-          "body": "PDPA-compliant by design. The full IC is never persisted — only the last four digits are stored. Original file bytes are extracted in-memory inside a single request and discarded once the structured profile is produced. No raw documents in logs."
+          "body": "Manual-entry users supply only age, income, household composition, and address — Layak collects no IC information at all on this path. Upload-path users have their MyKad image processed transiently by Gemini in request-scope memory; no IC information is retained on the persisted profile. The structured profile we keep in Firestore drives chat handoff and packet regeneration. No raw documents in logs."
         },
         {
           "docCode": "FAQ-05",
@@ -371,7 +373,7 @@
       "section1History": "<strong>Evaluation history</strong>: the structured profile we extracted from your documents and the schemes you matched against, persisted in Firestore so you can see your past runs.",
       "section1Consent": "<strong>Consent timestamp</strong> recorded when you tick the PDPA checkbox on sign-up.",
       "section2Title": "2. What we do not store",
-      "section2MyKad": "Your full MyKad number — we keep only the last four digits.",
+      "section2MyKad": "Your full MyKad number, and any IC tail. The persisted profile carries no IC information of any kind; the manual-entry path doesn't even ask for it.",
       "section2Files": "The original bytes of your uploaded files. Extraction runs in-memory inside a single request, and the raw files are discarded once the structured profile is produced.",
       "section2Logs": "IC numbers, authentication tokens, or document content in any log line.",
       "section3Title": "3. Why we collect it",
@@ -430,7 +432,7 @@
     },
     "signIn": {
       "title": "Welcome back",
-      "description": "Sign in with Google, email, or as a guest to reach your dashboard.",
+      "description": "Sign in to pick up where you left off.",
       "noAccountPrefix": "No account?",
       "noAccountCta": "Sign up",
       "errorFailed": "Sign-in failed. Please try again.",
@@ -444,6 +446,7 @@
       "emailPlaceholder": "you@example.com",
       "passwordLabel": "Password",
       "passwordPlaceholder": "Your password",
+      "rememberMe": "Remember me on this device",
       "submit": "Sign in",
       "emailErrors": {
         "invalidCredential": "Incorrect email or password.",
@@ -456,7 +459,7 @@
     },
     "signUp": {
       "title": "Create your account",
-      "description": "Sign up with Google or email. Layak never submits anything on your behalf — you stay in control of every draft packet.",
+      "description": "Layak only creates drafts. You stay in control.",
       "consentPrefix": "I consent to Layak processing my uploaded documents (IC, payslip, utility bill) to match government schemes, per the",
       "consentPrivacy": "Privacy Policy",
       "consentAnd": "and",
@@ -484,7 +487,18 @@
         "operationNotAllowed": "Email/password sign-up isn't enabled. Contact support.",
         "generic": "Sign-up failed. Please try again."
       }
-    }
+    },
+    "context": {
+      "heading": "See what financial help you qualify for.",
+      "body": "Upload three documents and get a personalised list of Malaysian government schemes you can apply for, in minutes.",
+      "bullets": {
+        "free": "Free to use",
+        "drafts": "Drafts only — you stay in control",
+        "trilingual": "Available in English, Bahasa Melayu, and 中文"
+      },
+      "mobileStrip": "Free · Drafts only · Trilingual"
+    },
+    "tabsAriaLabel": "Sign-in method"
   },
   "dashboard": {
     "hero": {
@@ -560,6 +574,7 @@
       "upload": "Upload",
       "results": "Results",
       "schemes": "Schemes",
+      "discovery": "Discovery",
       "settings": "Settings",
       "signIn": "Sign In",
       "signUp": "Sign Up"
@@ -580,15 +595,23 @@
       "steps": {
         "extract": {
           "title": "Extract",
-          "body": "We read your MyKad, payslip and utility bill, pulling income, IC last-4, and household size."
+          "body": "Read your documents and pull out the structured profile."
+        },
+        "classify": {
+          "title": "Classify",
+          "body": "Derive household band, filer type, and dependant counts."
         },
         "match": {
           "title": "Match",
-          "body": "Your profile is scored against every 2026 scheme — household tier, age, employment type, dependants."
+          "body": "Score your profile against every locked 2026 scheme."
+        },
+        "compute": {
+          "title": "Compute",
+          "body": "Sum the annual upside with Gemini-run Python."
         },
         "generate": {
           "title": "Generate",
-          "body": "Draft application packets are produced as PDFs you can lodge with the relevant agencies."
+          "body": "Produce watermarked draft packets you can lodge yourself."
         }
       }
     },
@@ -601,20 +624,22 @@
       "toc": {
         "overview": "Overview",
         "schemes": "Eligible Schemes",
-        "strategy": "Strategy",
+        "subsidies": "Subsidies",
         "required": "Required Contributions",
+        "strategy": "Strategy",
+        "whatIfs": "What-Ifs",
         "preview": "Inline Preview"
       },
-      "startAnother": "Start another evaluation",
-      "viewDetailed": "View detailed results",
-      "backToEvaluations": "Back to evaluations",
+      "startAnother": "Start Another Evaluation",
+      "viewDetailed": "View Detailed Results",
+      "backToEvaluations": "Back to Evaluations",
       "loading": "Loading evaluation…",
       "notFoundTitle": "Evaluation not found",
       "notFoundBody": "We couldn't find this evaluation. It may have been deleted, or the link may be wrong.",
       "errorTitle": "Could not load evaluation",
       "errorUnexpected": "An unexpected error occurred.",
       "retry": "Retry",
-      "startNew": "Start a new evaluation",
+      "startNew": "Start a New Evaluation",
       "failedTitle": "Evaluation failed",
       "backendReturned": "Backend returned {{status}} {{statusText}}",
       "byIdEyebrow": "Evaluation",
@@ -628,15 +653,15 @@
         "description": "Start with the most important action, then work through the rest in order.",
         "reviewMatchesTitle": "Review Matched Schemes",
         "reviewMatchesBody": "See why each scheme matched before you act on anything.",
-        "reviewMatchesCta": "Review schemes",
+        "reviewMatchesCta": "Review Schemes",
         "reviewMatchesEmpty": "No qualifying schemes surfaced in this run.",
         "reviewPacketTitle": "Review or Download Your Draft Packet",
         "reviewPacketBody": "Open the packet section next so you can inspect or download the draft documents.",
-        "reviewPacketCta": "Go to draft packet",
+        "reviewPacketCta": "Go to Draft Packet",
         "reviewPacketEmpty": "A draft packet appears here only when a scheme qualifies.",
         "startAnotherTitle": "Start Another Evaluation",
         "startAnotherBody": "Run a fresh evaluation if you want to compare another profile or document set.",
-        "startAnotherCta": "Start another evaluation"
+        "startAnotherCta": "Start Another Evaluation"
       }
     },
     "intake": {
@@ -670,12 +695,11 @@
     },
     "whatIf": {
       "sectionTitle": "Explore what-if scenarios",
-      "sectionEyebrow": "Adjust the inputs",
       "sectionDescription": "Drag any slider to see how your eligible schemes shift. No re-upload required.",
       "expand": "Open",
       "collapse": "Close",
-      "resetAll": "Reset all",
-      "resetSlider": "Reset to my actual",
+      "resetAll": "Reset All",
+      "resetSlider": "Reset to My Actual",
       "running": "Recalculating…",
       "rateLimited": "Too many what-if calls — try again in {{seconds}}s.",
       "errorGeneric": "Couldn't run the what-if. Please try again.",
@@ -693,15 +717,14 @@
     },
     "strategy": {
       "sectionTitle": "Strategy",
-      "sectionEyebrow": "Cross-scheme analysis",
       "sectionDescription": "Layak's optimizer compares your matched schemes against each other and flags coordination opportunities.",
       "emptyHeadline": "No cross-scheme conflicts detected",
       "emptyDescription": "Your matched schemes don't stack into any of the coordination edge cases Layak watches for.",
-      "askCikLay": "Ask Cik Lay about this",
+      "askCikLay": "Ask Cik Lay About This",
       "citedPrefix": "Cited:",
       "severity": {
         "info": "Info",
-        "warn": "Heads up",
+        "warn": "Heads Up",
         "act": "Action"
       },
       "softSuggestion": "Layak isn't fully certain — worth asking Cik Lay."
@@ -714,7 +737,10 @@
       "summaryRunning": "Layak's pipeline is running…",
       "summaryDone": "Layak's pipeline completed across {{count}} steps.",
       "summaryError": "Layak's pipeline stopped early — see the error below.",
-      "technicalLogLabel": "Technical execution log"
+      "technicalLogLabel": "Technical execution log",
+      "codeExecutionTitle": "Gemini Code Execution",
+      "codeExecutionSnippet": "python_snippet",
+      "codeExecutionStdout": "stdout"
     },
     "upload": {
       "sectionIc": "MyKad (IC)",
@@ -770,12 +796,9 @@
     "manual": {
       "identityTitle": "Identity",
       "nameLabel": "Full Name",
-      "dobLabel": "Date of Birth",
-      "dobHelp": "Just type the numbers — we fill in the dashes. Or use the calendar icon.",
-      "dobPlaceholder": "YYYY-MM-DD",
-      "dobAria": "Open date picker",
-      "icLabel": "IC Last 4 Digits",
-      "icHelp": "We only collect the last 4 digits — your full MyKad never leaves your device.",
+      "ageLabel": "Age",
+      "ageHelp": "Your age in whole years. We use this to gate age-sensitive schemes (e.g. JKM Warga Emas at 60+, BUDI95 at 16+, MyKasih SARA at 18+).",
+      "agePlaceholder": "e.g. 34",
       "incomeTitle": "Income",
       "incomeLabel": "Monthly Income (RM)",
       "incomeHelp": "Net payout for gig work, basic pay for salaried.",
@@ -797,11 +820,7 @@
       "clear": "Clear",
       "submit": "Generate Packet",
       "zodRequired": "Required",
-      "zodDateFormat": "Use YYYY-MM-DD",
-      "zodNotRealDate": "Not a real date",
-      "zodYearMin": "Year must be 1900 or later",
-      "zodPastDate": "Must be a past date",
-      "zodIc4Digits": "4 digits",
+      "zodAgeRange": "Age must be between 0 and 130",
       "zodIncomeFormat": "Amount up to RM1,000,000 (e.g. 2400 or 2400.50)",
       "zodAdultIncomeOnly": "Income is only collected for adult household members",
       "zodSpouseLimit": "Use at most four spouse rows in one shared household",
@@ -870,7 +889,6 @@
       },
       "age": "Age",
       "agePlaceholder": "Age",
-      "icOptional": "IC Last 4 (Optional)",
       "incomeOptional": "Monthly Income (Optional)",
       "incomePlaceholder": "RM / month",
       "incomeUnder18": "Under 18",
@@ -948,10 +966,20 @@
       "estValue": "Est. Value",
       "startApp": "Apply",
       "categoryAssistance": "Assistance",
+      "categorySubsidy": "Subsidy",
+      "subsidyAutoCredited": "Auto-credited to your MyKad",
+      "subsidyInfo": "Subsidy info",
+      "checkBalance": "Check Your Balance",
+      "expiresOn": "Expires {{date}}",
       "perYearEst": "per year (est.)",
       "openAgencyPortal": "Open {{agency}} portal",
       "emptyList": "Scheme matches will appear here after your first evaluation completes.",
       "eligibleSchemesCount": "Eligible Schemes ({{count}})"
+    },
+    "subsidies": {
+      "title": "Subsidies",
+      "description": "Government subsidies you may already be entitled to. These auto-credit through agency portals — Layak doesn't apply on your behalf.",
+      "empty": "No subsidy programmes matched your profile."
     },
     "requiredContributions": {
       "heading": "Required Contributions",
@@ -972,6 +1000,10 @@
       "error": "Preview Failed: {{message}}",
       "iframeTitle": "Inline Preview of {{name}}",
       "downloadOne": "Download this PDF"
+    },
+    "whatIfs": {
+      "sectionTitle": "What-Ifs",
+      "sectionDescription": "Adjust your inputs to see how the matched schemes would shift."
     },
     "packet": {
       "eyebrow": "Packet",
@@ -1018,22 +1050,47 @@
   },
   "admin": {
     "discovery": {
-      "pageEyebrow": "Admin / Moderation",
+      "pageEyebrow": "Discovery",
       "pageTitle": "Scheme Discovery Queue",
-      "pageDescription": "Layak's discovery agent watches gazetted government sources and surfaces rate or eligibility changes here for review before they reach end users.",
-      "triggerButton": "Run discovery now",
+      "pageDescription": "Review source changes before they reach users.",
+      "triggerButton": "Run Discovery Now",
       "triggerRunning": "Running…",
+      "triggerSuccessTitle": "Discovery Run Complete",
       "triggerSuccess": "{{checked}} sources checked, {{changed}} changed, {{extracted}} candidates extracted",
+      "triggerErrorTitle": "Discovery Run Failed",
       "triggerError": "Discovery run failed: {{message}}",
+      "runPanel": {
+        "eyebrow": "Pipeline",
+        "title": "Discovery Run",
+        "description": "Re-fetch gazetted sources, diff content, and stage new candidates for moderation.",
+        "idleHint": "No runs yet this session.",
+        "elapsed": "Running… {{seconds}}s elapsed",
+        "lastRun": "Last run · {{relative}}",
+        "runAgain": "Run Again",
+        "tryAgain": "Try Again",
+        "kpi": {
+          "sourcesChecked": "Sources Checked",
+          "sourcesChanged": "Sources Changed",
+          "candidatesExtracted": "Candidates Extracted"
+        }
+      },
+      "searchPlaceholder": "Search by name, agency, or source…",
+      "confidence": {
+        "band": {
+          "high": "above threshold",
+          "mid": "needs review",
+          "low": "low confidence"
+        }
+      },
       "filters": {
         "all": "All",
         "pending": "Pending",
         "approved": "Approved",
         "rejected": "Rejected",
-        "changes_requested": "Changes requested"
+        "changes_requested": "Changes Requested"
       },
       "queue": {
-        "title": "Moderation queue",
+        "title": "Moderation Queue",
         "empty": "No candidates match this filter.",
         "loading": "Loading queue…",
         "columns": {
@@ -1044,47 +1101,97 @@
           "status": "Status",
           "actions": "Actions"
         },
-        "review": "Review →",
+        "review": "Review",
         "approve": "Approve",
-        "reject": "Reject"
+        "reject": "Reject",
+        "selected": "{{count}} selected",
+        "selectedSummary": "{{count}} candidate(s) staged for deletion.",
+        "deleteAction": "Delete {{count}}",
+        "deleteConfirm": "Delete {{count}} candidate(s) from the queue? This cannot be undone.",
+        "deletePartialFailure": "Deleted {{deleted}} of {{total}}; {{failed}} failed.",
+        "selectRowAria": "Select candidate {{name}}",
+        "selectPageAria": "Select all candidates",
+        "deselectPageAria": "Deselect all candidates",
+        "paginationSummary": "Showing {{shown}} of {{total}}",
+        "sortAria": "Sort by {{column}}"
       },
       "health": {
-        "title": "Scheme verification health",
+        "title": "Scheme Verification Health",
         "subtitle": "Last successful verification per scheme from the discovery pipeline.",
         "empty": "No schemes verified yet. Trigger a discovery run to populate this list.",
-        "verifiedPrefix": "Source verified ",
-        "neverVerified": "Never verified"
+        "verifiedPrefix": "Verified ",
+        "neverVerified": "Never verified",
+        "countSummary": "{{healthy}} healthy · {{stale}} stale",
+        "dotAria": {
+          "healthy": "Verified within the last 7 days",
+          "stale": "Verified over 30 days ago",
+          "aging": "Verified within the last 30 days",
+          "never": "Never verified"
+        }
       },
       "detail": {
-        "backToQueue": "← Back to queue",
-        "headingNew": "New scheme candidate",
-        "headingMatched": "Update to existing scheme",
-        "sectionCandidate": "Proposed payload",
-        "sectionExisting": "Current rule",
+        "backToQueue": "Back to Queue",
+        "headingNew": "New Scheme Candidate",
+        "headingMatched": "Update to Existing Scheme",
+        "sectionCandidate": "Proposed Payload",
+        "sectionExisting": "Current Rule",
         "fields": {
           "name": "Name",
           "agency": "Agency",
           "schemeId": "Scheme ID",
           "schemeIdUnmatched": "(no match — engineer hand-code required)",
-          "eligibilitySummary": "Eligibility summary",
-          "rateSummary": "Rate summary",
-          "citation": "Citation snippet",
+          "eligibilitySummary": "Eligibility Summary",
+          "rateSummary": "Rate Summary",
+          "citation": "Citation Snippet",
           "sourceUrl": "Source URL",
-          "confidence": "AI confidence",
+          "confidence": "AI Confidence",
           "extractedAt": "Extracted",
-          "contentHash": "Source content hash"
+          "contentHash": "Source Content Hash"
         },
-        "diffTitle": "Proposed vs. current",
+        "diffTitle": "Proposed vs. Current",
         "diffEmpty": "No existing rule found — this is a brand-new scheme. Approving will write a YAML manifest for engineer review only.",
         "actions": {
           "approve": "Approve",
           "reject": "Reject",
-          "requestChanges": "Request changes",
+          "requestChanges": "Request Changes",
           "notePlaceholder": "Optional admin note…"
         },
         "actionSuccess": "Done. Status is now {{status}}.",
         "actionError": "Action failed: {{message}}",
-        "manifestWritten": "YAML manifest written to {{path}}"
+        "manifestReady": "Approved · YAML manifest persisted to candidate document",
+        "downloadManifest": "Download Manifest",
+        "metaLine": "{{agency}} · {{scheme}} · Extracted {{extracted}}",
+        "metaLineUnmatched": "{{agency}} · No match · Extracted {{extracted}}",
+        "note": "Moderator Note",
+        "openSource": "Open Source",
+        "copyHashAria": "Copy content hash",
+        "copyHashSuccess": "Hash copied",
+        "newScheme": {
+          "title": "New Scheme",
+          "body": "No existing rule — manifest will be drafted for engineer review."
+        },
+        "decisionTitle": "Decision"
+      },
+      "notify": {
+        "approve": {
+          "title": "Candidate Approved",
+          "body": "{{name}} marked verified."
+        },
+        "reject": {
+          "title": "Candidate Rejected",
+          "body": "{{name}} moved to Rejected."
+        },
+        "changes": {
+          "title": "Changes Requested",
+          "body": "{{name}} moved to Changes Requested."
+        },
+        "deleteSuccess": {
+          "title": "Candidates Deleted",
+          "body": "{{count}} candidate(s) removed from the queue."
+        },
+        "deleteFailure": {
+          "title": "Delete Failed"
+        }
       }
     }
   },
@@ -1166,7 +1273,9 @@
       "lhdn_form_b": "LHDN Form B — five YA2025 reliefs",
       "lhdn_form_be": "LHDN Form BE — five YA2025 reliefs",
       "perkeso_sksps": "PERKESO SKSPS — Self-Employed Social Security",
-      "i_saraan": "EPF i-Saraan — voluntary contribution government match"
+      "i_saraan": "EPF i-Saraan — voluntary contribution government match",
+      "budi95": "BUDI95 — RON95 petrol subsidy",
+      "mykasih": "MyKasih — SARA RM100 MyKad credit"
     }
   },
   "settings": {

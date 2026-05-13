@@ -18,16 +18,23 @@ SchemeId = Literal[
     "lhdn_form_be",
     "perkeso_sksps",
     "i_saraan",
+    "budi95",
+    "mykasih",
 ]
 
-# `SchemeKind` splits upside schemes (user RECEIVES money, annual_rm sums
-# into the headline upside total) from required-contribution schemes (user
-# PAYS money — e.g. PERKESO SKSPS mandatory social-security contributions).
-# Required contributions render in a separate UI block so they don't
-# misleadingly stack into the "annual relief" total. Defaults to `"upside"`
-# so every legacy rule keeps its existing semantics without touching each
-# match() call site.
-SchemeKind = Literal["upside", "required_contribution"]
+# `SchemeKind` taxonomy:
+# - `upside`: user RECEIVES money; `annual_rm` sums into the headline upside
+#   total. Default so every legacy rule keeps its existing semantics.
+# - `required_contribution`: user PAYS money (e.g. PERKESO SKSPS mandatory
+#   self-employed social-security contributions). Renders in a separate UI
+#   block so it doesn't misleadingly stack into "annual relief" totals.
+# - `subsidy_credit` (Phase 12): user holds a subsidy / MyKad credit (BUDI95
+#   RON95 quota, MyKasih SARA RM100). Info-only — does NOT stack into the
+#   headline upside total because Layak can't confirm remaining balance via
+#   any public API (`compute_upside` filters on `kind == "upside"`).
+#   `annual_rm` is conventionally `0.0` for these schemes. Optional
+#   `expires_at_iso` carries the forfeit date for time-bound credits.
+SchemeKind = Literal["upside", "required_contribution", "subsidy_credit"]
 
 
 class RuleCitation(BaseModel):
@@ -59,3 +66,10 @@ class SchemeMatch(BaseModel):
     # when `kind == "required_contribution"`. The frontend renders this in the
     # "Required contributions" block instead of stacking it into the upside.
     annual_contribution_rm: float | None = Field(default=None, ge=0)
+    # ISO-8601 date string (e.g. "2026-12-31") when the scheme's benefit
+    # expires / is forfeited. Set on time-bound `subsidy_credit` schemes
+    # (MyKasih RM100 → "2026-12-31"); `None` for rolling / open-ended schemes
+    # (BUDI95 monthly quota; all `upside` and `required_contribution` rules).
+    # The frontend renders this in bold on the card so users see the deadline
+    # at a glance.
+    expires_at_iso: str | None = Field(default=None)

@@ -7,6 +7,12 @@ prompt in `backend/app/agents/tools/extract.py:42-47`; if that prompt changes,
 this function must change in the same direction or the manual and upload paths
 will produce drifting `Profile.household_flags.income_band` values for the
 same inputs.
+
+IC handling (Phase 12): the manual-entry path does not collect any IC
+information. The wire carries `age` directly as an integer. The built
+`Profile.ic_last6` is `None` on this path. The upload path is unchanged —
+Gemini OCR still extracts `ic_last6` from the MyKad image and populates
+the field.
 """
 
 from __future__ import annotations
@@ -60,6 +66,11 @@ def derive_household_flags(
 def _age_from_dob(dob: date, today: date | None = None) -> int:
     """Whole years between DOB and today, clamped at 0.
 
+    Retained for the OCR / upload path: `extract.py` may still surface a DOB
+    if Gemini parses one from the MyKad image, and tests construct DOBs to
+    pin specific ages. The manual-entry path does NOT call this — age is
+    accepted directly from the user.
+
     `today` is injectable for deterministic tests; production callers pass
     `date.today()` implicitly. The MYT timezone assumption is documented in
     the design spec §3.4 — at the single-day granularity of age-in-years,
@@ -76,7 +87,16 @@ def build_profile_from_manual_entry(
     *,
     today: date | None = None,
 ) -> Profile:
-    """Deterministic ManualEntryPayload → Profile mapper (no Gemini call)."""
+    """Deterministic ManualEntryPayload → Profile mapper (no Gemini call).
+
+    Phase 12: the manual-entry path no longer collects an IC. `Profile.ic_last6`
+    is set to `None` on this path; templates + chat-prompt digest handle the
+    None case via existing guards. `today` is retained as a kwarg for backward
+    compatibility with tests that pin a reference date for deterministic
+    `_age_from_dob` calls — it has no effect on this path because age is
+    user-supplied.
+    """
+    _ = today  # kept for backward-compat in test call sites
     dependants = [Dependant(**d.model_dump()) for d in payload.dependants]
     adult_household_income_rm = sum(d.monthly_income_rm or 0.0 for d in dependants if d.age >= 18)
     household_monthly_income_rm = payload.monthly_income_rm + adult_household_income_rm
@@ -86,8 +106,7 @@ def build_profile_from_manual_entry(
         # uppercases per its prompt, so the two paths produce names of identical
         # identity-semantics but different presentation — acceptable for v1.
         name=payload.name.strip(),
-        ic_last4=payload.ic_last4,
-        age=_age_from_dob(payload.date_of_birth, today=today),
+        age=payload.age,
         monthly_income_rm=household_monthly_income_rm,
         applicant_monthly_income_rm=payload.monthly_income_rm,
         household_monthly_income_rm=household_monthly_income_rm,

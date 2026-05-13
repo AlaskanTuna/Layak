@@ -19,9 +19,11 @@ constraints:
        multilingual register matches the user's chosen language.
 
 The eval-context digest is rendered server-side from the loaded
-`evaluations/{eval_id}` Firestore doc. Privacy invariant: only `ic_last4`
-ever appears in the digest — the full IC is never stored on the doc but
-this guarantees no future schema drift can leak it through.
+`evaluations/{eval_id}` Firestore doc. Privacy invariant (Phase 12): NO IC
+information appears in the digest — the stored profile carries no IC field
+of any kind, and the digest renderer reads only whitelisted fields so a
+future schema regression that smuggled `ic` back onto the doc couldn't
+leak it through this code path.
 """
 
 from __future__ import annotations
@@ -305,7 +307,6 @@ def _digest_label(language: SupportedLanguage) -> dict[str, str]:
             "total": "Total annual upside",
             "draft": "Drafts ready",
             "no_drafts": "No drafts generated",
-            "ic_suffix": "IC ends in",
         },
         "ms": {
             "you": "Anda (pemohon)",
@@ -321,7 +322,6 @@ def _digest_label(language: SupportedLanguage) -> dict[str, str]:
             "total": "Jumlah manfaat tahunan",
             "draft": "Draf siap",
             "no_drafts": "Tiada draf dijana",
-            "ic_suffix": "IC berakhir dengan",
         },
         "zh": {
             "you": "您（申请人）",
@@ -337,26 +337,24 @@ def _digest_label(language: SupportedLanguage) -> dict[str, str]:
             "total": "年度总收益",
             "draft": "草稿已就绪",
             "no_drafts": "未生成草稿",
-            "ic_suffix": "身份证末位",
         },
     }
     return catalogs.get(language) or catalogs["en"]
 
 
 def _render_profile(profile: dict[str, Any], labels: dict[str, str]) -> list[str]:
-    """Render the profile half of the digest. Privacy invariant: full IC
-    NEVER appears — only `ic_last4` (already 4-digit on the stored doc).
-    Even if a future schema regression smuggled `ic` onto the doc, this
-    function ignores any field other than `ic_last4`."""
+    """Render the profile half of the digest. Privacy invariant (Phase 12):
+    NO IC information appears — the stored doc no longer carries any IC field.
+    Defense-in-depth: this function reads only the whitelisted fields
+    (`name`, `age`, `household_size`, etc.) and silently ignores any other
+    keys, so a future schema regression that smuggled `ic` back onto the doc
+    couldn't leak it through this code path."""
     lines: list[str] = []
     name = profile.get("name") or "(unnamed)"
     age = profile.get("age")
-    ic_last4 = profile.get("ic_last4")
     you_line = f"- {labels['you']}: {name}"
     if isinstance(age, int):
         you_line += f", age {age}"
-    if isinstance(ic_last4, str) and ic_last4.isdigit() and len(ic_last4) == 4:
-        you_line += f" ({labels['ic_suffix']} {ic_last4})"
     lines.append(you_line)
 
     household_size = profile.get("household_size")

@@ -11,8 +11,10 @@ most useful number for the step). The technical tier is developer-grade —
 1-N preformatted log lines including timestamps, model latencies, Vertex
 hit scores, and Code Execution stdout.
 
-PII contract:
-  - Technical lines NEVER include raw IC numbers (last-4 + mask only).
+PII contract (Phase 12):
+  - `Profile` carries NO IC information of any kind, so the technical log
+    can't accidentally surface it. Removed the `_mask_ic_last6` helper and
+    the `ic=` log line in `narrate_extract_technical`.
   - Technical lines NEVER include raw uploaded-doc bytes/base64.
   - Profile free-text fields (`name`, `address`) MUST be redacted or
     omitted.
@@ -42,20 +44,6 @@ from app.schema.strategy import StrategyAdvice
 
 def _now_iso() -> str:
     return datetime.now(UTC).isoformat(timespec="seconds")
-
-
-def _mask_ic_last4(ic_last4: str | None) -> str:
-    """Format the Profile's already-redacted last-4 as `***-**-1234`.
-
-    The extract step never persists the full IC into `Profile` (only the
-    last 4 digits) — this is the project's privacy contract. We surface
-    it in the masked form so the technical log resembles a real IC for
-    operator pattern-matching while never carrying more than the same
-    4 digits the rest of the pipeline already has.
-    """
-    if not ic_last4 or len(ic_last4) != 4 or not ic_last4.isdigit():
-        return "***-**-****"
-    return f"***-**-{ic_last4}"
 
 
 def _format_rm(value: float) -> str:
@@ -128,7 +116,6 @@ def narrate_extract_technical(
     lines: list[str] = ["tool=extract_profile"]
     if mime_types:
         lines.append("  uploads=" + " ".join(f"{slot}:{mime}" for slot, mime in mime_types.items()))
-    lines.append(f"  ic={_mask_ic_last4(profile.ic_last4)}")
     lines.append(f"  monthly_income_rm={profile.monthly_income_rm}")
     lines.append(f"  household_size={profile.household_size}")
     lines.append(f"  dependants={len(profile.dependants)}")

@@ -27,17 +27,19 @@ export type SchemeId =
   | 'lhdn_form_be'
   | 'perkeso_sksps'
   | 'i_saraan'
+  | 'budi95'
+  | 'mykasih'
 
-// Upside schemes stack into the headline annual-relief total;
-// required_contribution schemes (e.g. PERKESO SKSPS) surface a separate
-// "Required contributions" block and are excluded from the upside total.
+// `upside` stacks into the headline annual-relief total. `required_contribution`
+// (e.g. PERKESO SKSPS) surfaces a separate block — user pays money, not receives.
+// `subsidy_credit` (Phase 12 — BUDI95, MyKasih) is info-only; doesn't stack
+// because Layak can't confirm remaining balance via any public API.
 // Keep in lockstep with backend `app/schema/scheme.py`.
-export type SchemeKind = 'upside' | 'required_contribution'
+export type SchemeKind = 'upside' | 'required_contribution' | 'subsidy_credit'
 
 export type Dependant = {
   relationship: Relationship
   age: number
-  ic_last4: string | null
   monthly_income_rm?: number | null
 }
 
@@ -49,7 +51,6 @@ export type HouseholdFlags = {
 
 export type Profile = {
   name: string
-  ic_last4: string
   age: number
   monthly_income_rm: number
   applicant_monthly_income_rm?: number | null
@@ -68,16 +69,17 @@ export type EmploymentType = 'gig' | 'salaried'
 export type DependantInput = {
   relationship: Relationship
   age: number
-  ic_last4: string | null
   monthly_income_rm?: number | null
 }
 
-/** Body of `POST /api/agent/intake_manual` — manual-entry alternative to the three-document upload. */
+/** Body of `POST /api/agent/intake_manual` — manual-entry alternative to the three-document upload.
+ *
+ * Phase 12: the manual-entry path collects `age` directly. No IC field of any
+ * kind on the wire; the persisted `Profile` carries no IC information either. */
 export type ManualEntryPayload = {
   name: string
-  /** ISO-8601 `YYYY-MM-DD`. */
-  date_of_birth: string
-  ic_last4: string
+  /** Age in whole years (0–130). */
+  age: number
   monthly_income_rm: number
   employment_type: EmploymentType
   address: string | null
@@ -124,6 +126,12 @@ export type SchemeMatch = {
   /** Annual mandatory contribution the user PAYS under this scheme. Only set
    * when `kind === 'required_contribution'`. */
   annual_contribution_rm?: number | null
+  /** ISO-8601 date string (e.g. `"2026-12-31"`) when the scheme's benefit
+   * expires / is forfeited. Set on time-bound `subsidy_credit` schemes
+   * (MyKasih RM100 → `"2026-12-31"`); `null` for rolling / open-ended
+   * schemes (BUDI95 monthly quota; all `upside` and `required_contribution`
+   * rules). Frontend renders it in bold on the card. */
+  expires_at_iso?: string | null
 }
 
 export type PacketDraft = {

@@ -33,8 +33,9 @@ from app.schema.profile import Dependant
 
 AISYAH_PAYLOAD_JSON = {
     "name": "Aisyah binti Ahmad",
-    "date_of_birth": "1992-03-24",
-    "ic_last4": "4321",
+    # Phase 12: the manual-entry path collects `age` directly. No IC field of
+    # any kind on the wire.
+    "age": 34,
     "monthly_income_rm": 2800,
     "employment_type": "gig",
     "address": "No. 42, Jalan IM 7/10, Bandar Indera Mahkota, 25200 Kuantan, Pahang",
@@ -46,8 +47,9 @@ AISYAH_PAYLOAD_JSON = {
 }
 
 
-# A reference date that makes Aisyah 34 (matches the fixture).
-# DOB 1992-03-24 + this reference → 34 years old.
+# Retained for tests that pin a reference date for the `_age_from_dob` helper
+# (used only on the upload / OCR path now). The manual-entry path does not
+# call `_age_from_dob` — `payload.age` is the source of truth.
 _FIXED_TODAY = date(2026, 4, 21)
 
 
@@ -136,6 +138,21 @@ def test_aisyah_payload_builds_profile_equal_to_fixture() -> None:
     assert built == AISYAH_PROFILE
 
 
+def test_manual_profile_carries_no_ic_information() -> None:
+    """Phase 12 privacy invariant: the manual-entry path collects no IC field
+    of any kind, and the built Profile has no `ic_last6` attribute either."""
+    payload = ManualEntryPayload.model_validate(AISYAH_PAYLOAD_JSON)
+    built = build_profile_from_manual_entry(payload, today=_FIXED_TODAY)
+    blob = built.model_dump_json()
+    # No IC-shaped digit runs anywhere on the serialised profile.
+    import re
+
+    assert not re.search(r"\b\d{12}\b", blob)
+    assert not re.search(r"\b\d{6}\b", blob)
+    # And `Profile` has no `ic_last6` attribute / field anymore.
+    assert not hasattr(built, "ic_last6")
+
+
 def test_built_profile_drives_same_scheme_matches_as_fixture() -> None:
     """Feeding the built Profile into the rule engine produces the same matches."""
     payload = ManualEntryPayload.model_validate(AISYAH_PAYLOAD_JSON)
@@ -222,9 +239,22 @@ def test_validation_rejects_empty_name() -> None:
         ManualEntryPayload.model_validate({**AISYAH_PAYLOAD_JSON, "name": ""})
 
 
-def test_validation_rejects_non_4_digit_ic_last4() -> None:
+def test_validation_rejects_out_of_range_age() -> None:
+    """Age must be in [0, 130]."""
     with pytest.raises(ValueError):
-        ManualEntryPayload.model_validate({**AISYAH_PAYLOAD_JSON, "ic_last4": "432"})
+        ManualEntryPayload.model_validate({**AISYAH_PAYLOAD_JSON, "age": -1})
+    with pytest.raises(ValueError):
+        ManualEntryPayload.model_validate({**AISYAH_PAYLOAD_JSON, "age": 131})
+
+
+def test_validation_rejects_ic_field_on_wire() -> None:
+    """Phase 12: `ic` is no longer a valid field on the wire — `extra="forbid"`
+    rejects it, preventing accidental client-side regressions from re-introducing
+    IC collection."""
+    with pytest.raises(ValueError):
+        ManualEntryPayload.model_validate({**AISYAH_PAYLOAD_JSON, "ic": "920324064321"})
+    with pytest.raises(ValueError):
+        ManualEntryPayload.model_validate({**AISYAH_PAYLOAD_JSON, "ic_last6": "064321"})
 
 
 def test_validation_rejects_negative_income() -> None:
@@ -503,7 +533,11 @@ def test_intake_manual_accepts_aisyah_and_streams_sse(
     technical_text = " ".join(extract_technical["log_lines"])
     assert "Aisyah" not in technical_text
     assert "Jalan IM" not in technical_text
-    assert "***-**-4321" in technical_text  # masked ic_last4 present
+    # Phase 12: the technical layer should carry NO IC information at all
+    # (Profile no longer has an IC field; the narration module dropped the
+    # `ic=` line).
+    assert "******-" not in technical_text
+    assert "***-**-" not in technical_text
     # Lay narration carries the rounded gross-pay as the data point.
     extract_narrative = parsed[2]
     assert extract_narrative["type"] == "narrative"

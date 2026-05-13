@@ -19,9 +19,6 @@
     <div class="label">Nama Pemohon</div>
     <div class="value">{{ profile.name }}</div>
 
-    <div class="label">Kad Pengenalan (4 akhir)</div>
-    <div class="value">••••-••-{{ profile.ic_last4 }}</div>
-
     <div class="label">Hubungan dengan Penerima</div>
     <div class="value">Ibu/Bapa atau Penjaga sah kepada kanak-kanak</div>
 
@@ -48,7 +45,6 @@
         <th>Bil.</th>
         <th>Hubungan</th>
         <th class="num">Umur</th>
-        <th>IC (4 akhir)</th>
       </tr>
     </thead>
     <tbody>
@@ -57,7 +53,6 @@
         <td class="num">{{ loop.index }}</td>
         <td>{{ child.relationship | title }}</td>
         <td class="num">{{ child.age }} tahun</td>
-        <td>{% if child.ic_last4 %}••••-••-{{ child.ic_last4 }}{% else %}—{% endif %}</td>
       </tr>
       {% endfor %}
     </tbody>

@@ -121,7 +121,7 @@ export function EmailSignUpForm({
         type="submit"
         size="lg"
         disabled={!consent || busy || !email || !password}
-        className="w-full text-base h-12"
+        className="h-12 w-full bg-[color:var(--hibiscus)] text-base text-[color:var(--hibiscus-foreground)] hover:bg-[color:var(--hibiscus)]/92"
       >
         {pending && <Loader2 className="mr-2 size-5 animate-spin" aria-hidden />}
         {t('auth.signUp.submit')}

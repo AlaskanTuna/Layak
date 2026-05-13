@@ -129,15 +129,8 @@ export function EvaluationHistoryTable({ items, onRefresh }: Props) {
   if (items.length === 0) {
     return (
       <div className="paper-card flex flex-col items-center gap-3 rounded-[16px] px-6 py-12 text-center sm:py-16">
-        <p className="mono-caption text-foreground/55">{t('evaluation.history.emptyEyebrow')}</p>
         <h3 className="font-heading text-lg font-semibold tracking-tight">{t('evaluation.history.emptyTitle')}</h3>
-        <p className="max-w-sm text-sm text-muted-foreground">{t('evaluation.history.emptyBody')}</p>
-        <div className="mt-2 flex">
-          <Button render={<Link href="/dashboard/evaluation/upload" />}>
-            {t('evaluation.history.emptyCta')}
-            <ArrowRight className="ml-1.5 size-4" aria-hidden />
-          </Button>
-        </div>
+        <p className="mono-caption text-foreground/55">{t('evaluation.history.emptyEyebrow')}</p>
       </div>
     )
   }

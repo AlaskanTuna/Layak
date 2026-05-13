@@ -73,7 +73,7 @@ export function PageHeading({
           )}
           {children}
         </div>
-        {action && <div className="flex shrink-0 lg:pt-1">{action}</div>}
+        {action && <div className="z-10 flex shrink-0 self-start">{action}</div>}
       </div>
     </section>
   )

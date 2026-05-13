@@ -240,8 +240,7 @@ def test_intake_manual_route_returns_429_when_at_cap(monkeypatch: pytest.MonkeyP
         headers={"Authorization": "Bearer valid"},
         json={
             "name": "Aisyah",
-            "date_of_birth": "1992-03-24",
-            "ic_last4": "4321",
+            "age": 34,
             "monthly_income_rm": 2800,
             "employment_type": "gig",
             "address": None,

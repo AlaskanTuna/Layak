@@ -12,6 +12,7 @@ import { Button } from '@/components/ui/button'
 import type { EvaluationListItem, EvaluationListResponse } from '@/lib/agent-types'
 import { useAuth } from '@/lib/auth-context'
 import { authedFetch } from '@/lib/firebase'
+import { cn } from '@/lib/utils'
 
 /**
  * Wrapper that fetches `GET /api/evaluations?limit=50` once (the backend's
@@ -112,7 +113,13 @@ export function EvaluationHistorySection() {
         <div id="tour-evaluation-history" className="min-w-0 scroll-mt-24 rounded-[14px]">
           <EvaluationHistoryTable items={items} onRefresh={fetchHistory} />
         </div>
-        <div id="tour-evaluation-rail" className="min-w-0 scroll-mt-24 rounded-[18px] lg:mt-10">
+        <div
+          id="tour-evaluation-rail"
+          className={cn(
+            'min-w-0 scroll-mt-24 rounded-[18px]',
+            items.length > 0 && 'lg:mt-10'
+          )}
+        >
           <HowLayakEvaluatesRail />
         </div>
       </div>

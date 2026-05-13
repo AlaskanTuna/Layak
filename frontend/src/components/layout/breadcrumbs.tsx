@@ -13,6 +13,7 @@ const LABEL_KEYS: Record<string, string> = {
   upload: 'dashboard.breadcrumb.upload',
   results: 'dashboard.breadcrumb.results',
   schemes: 'dashboard.breadcrumb.schemes',
+  discovery: 'dashboard.breadcrumb.discovery',
   settings: 'dashboard.breadcrumb.settings',
   'sign-in': 'dashboard.breadcrumb.signIn',
   'sign-up': 'dashboard.breadcrumb.signUp'
@@ -37,9 +38,10 @@ export function Breadcrumbs() {
   if (segments.length === 0) return null
 
   const crumbs = segments.reduce<Array<{ label: string; href: string }>>((acc, segment, index) => {
-    // `/dashboard/evaluation/results/[id]` should keep the stable
-    // "Results" breadcrumb label and never expose the Firestore id.
-    if (segments[index - 1] === 'results') return acc
+    // Suppress dynamic ID segments: keep parent label as the leaf for
+    // /results/[id] and /discovery/[id] routes.
+    const previous = segments[index - 1]
+    if (previous === 'results' || previous === 'discovery') return acc
 
     acc.push({
       label: toLabel(segment, index),

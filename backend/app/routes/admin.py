@@ -29,10 +29,10 @@ from __future__ import annotations
 import logging
 from datetime import UTC, datetime
 from pathlib import Path
-from typing import Annotated, Any, Literal
+from typing import Annotated, Any, Literal, get_args
 
 import yaml
-from fastapi import APIRouter, BackgroundTasks, HTTPException, Query, status
+from fastapi import APIRouter, BackgroundTasks, HTTPException, Query, Response, status
 from fastapi import Path as PathParam
 from google.cloud.firestore_v1 import SERVER_TIMESTAMP  # type: ignore[attr-defined, unused-ignore]
 from pydantic import BaseModel, ConfigDict, Field
@@ -40,12 +40,18 @@ from pydantic import BaseModel, ConfigDict, Field
 from app.agents.discovery_agent import run_discovery
 from app.auth import AdminUser, get_firestore
 from app.schema.discovery import CandidateStatus, DiscoveryRunSummary, SchemeCandidate
+from app.schema.scheme import SchemeId
 
 _logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/api/admin", tags=["admin"])
 
 _DISCOVERED_YAML_DIR = Path(__file__).resolve().parent.parent.parent / "data" / "discovered"
+
+# Canonical scheme ids the badge mechanism can write against. Sourced from
+# `SchemeId` so any new scheme added to the Literal lights up the verified
+# badge automatically — no duplicate list to drift.
+_CANONICAL_SCHEME_IDS: frozenset[str] = frozenset(get_args(SchemeId))
 
 
 # ---------------------------------------------------------------------------
@@ -99,6 +105,7 @@ class ActionResponse(BaseModel):
     candidate_id: str
     status: CandidateStatus
     manifest_path: str | None = None
+    manifest_yaml: str | None = None
 
 
 class SchemeHealthRow(BaseModel):
@@ -165,13 +172,18 @@ def _row_from_doc(doc: Any) -> CandidateRow | None:
         return None
 
 
-def _write_manifest(candidate: SchemeCandidate) -> Path:
+def _write_manifest(candidate: SchemeCandidate) -> tuple[Path, str]:
     """Serialise the approved candidate to a YAML manifest.
 
     Filename: `<scheme_id-or-uuid>-<YYYY-MM-DD>-<short_hash>.yaml`. Output
     directory is created on first write. The manifest is the canonical
     reference for the engineer who hand-codes the Pydantic rule update
     (or new rule, when `scheme_id` is None).
+
+    Returns the local path (ephemeral on Cloud Run — survives only the
+    serving container's lifetime) AND the YAML string content so the caller
+    can persist it durably (e.g. on the Firestore candidate doc) before the
+    container recycles.
     """
     _DISCOVERED_YAML_DIR.mkdir(parents=True, exist_ok=True)
     short_hash = candidate.source_content_hash[:8]
@@ -179,11 +191,9 @@ def _write_manifest(candidate: SchemeCandidate) -> Path:
     stem = candidate.scheme_id or candidate.candidate_id[:8]
     path = _DISCOVERED_YAML_DIR / f"{stem}-{date_token}-{short_hash}.yaml"
     payload = candidate.model_dump(mode="json")
-    path.write_text(
-        yaml.safe_dump(payload, sort_keys=False, allow_unicode=True),
-        encoding="utf-8",
-    )
-    return path
+    yaml_content = yaml.safe_dump(payload, sort_keys=False, allow_unicode=True)
+    path.write_text(yaml_content, encoding="utf-8")
+    return path, yaml_content
 
 
 def _candidate_from_doc(doc: Any) -> SchemeCandidate:
@@ -282,11 +292,24 @@ async def approve_candidate(
     candidate_id: Annotated[str, PathParam(min_length=1)],
 ) -> ActionResponse:
     db, candidate = _transition(user, candidate_id, "approved", payload.note)
-    manifest_path = _write_manifest(candidate)
-    if candidate.scheme_id is not None:
-        db.collection("verified_schemes").document(candidate.scheme_id).set(
+    manifest_path, manifest_yaml = _write_manifest(candidate)
+    # Persist the manifest YAML onto the candidate doc so it survives the
+    # Cloud Run container recycle (the local file write above is ephemeral).
+    db.collection("discovered_schemes").document(candidate_id).set(
+        {"manifestYaml": manifest_yaml, "manifestApprovedAt": SERVER_TIMESTAMP},
+        merge=True,
+    )
+    # Heal legacy rows: candidates extracted before the canonical-preference
+    # fix landed in extract_candidate persisted with scheme_id=None even when
+    # source.id was itself a canonical SchemeId (e.g. lhdn_form_b). Fall back
+    # to source_id here so re-approving those rows still updates the badge.
+    resolved_scheme_id = candidate.scheme_id
+    if resolved_scheme_id is None and candidate.source_id in _CANONICAL_SCHEME_IDS:
+        resolved_scheme_id = candidate.source_id
+    if resolved_scheme_id is not None:
+        db.collection("verified_schemes").document(resolved_scheme_id).set(
             {
-                "schemeId": candidate.scheme_id,
+                "schemeId": resolved_scheme_id,
                 "verifiedAt": SERVER_TIMESTAMP,
                 "sourceContentHash": candidate.source_content_hash,
                 "lastKnownPayload": candidate.model_dump(mode="json"),
@@ -298,6 +321,7 @@ async def approve_candidate(
         candidate_id=candidate_id,
         status="approved",
         manifest_path=str(manifest_path.relative_to(manifest_path.parent.parent.parent)),
+        manifest_yaml=manifest_yaml,
     )
 
 
@@ -319,6 +343,29 @@ async def request_changes_candidate(
 ) -> ActionResponse:
     _transition(user, candidate_id, "changes_requested", payload.note)
     return ActionResponse(candidate_id=candidate_id, status="changes_requested")
+
+
+@router.delete("/discovery/{candidate_id}", status_code=status.HTTP_204_NO_CONTENT)
+async def delete_candidate(
+    _admin: AdminUser,
+    candidate_id: Annotated[str, PathParam(min_length=1)],
+) -> Response:
+    """Remove a candidate from the moderation queue.
+
+    Used by the admin UI's bulk-delete action. 204 on success even when the
+    doc doesn't exist — idempotent so concurrent reviewers don't 404 each
+    other when both delete the same row.
+    """
+    db = get_firestore()
+    try:
+        db.collection("discovered_schemes").document(candidate_id).delete()
+    except Exception as exc:  # noqa: BLE001 — surface as 503 so the client can retry.
+        _logger.exception("Failed to delete discovered_schemes/%s", candidate_id)
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail="Failed to delete candidate",
+        ) from exc
+    return Response(status_code=status.HTTP_204_NO_CONTENT)
 
 
 @router.post("/discovery/trigger", response_model=DiscoveryRunSummary)

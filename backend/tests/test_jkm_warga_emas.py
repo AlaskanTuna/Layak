@@ -63,7 +63,6 @@ def _profile(income: float, household_size: int, parent_age: int | None) -> Prof
         dependants.append(Dependant(relationship="parent", age=parent_age))
     return Profile(
         name="Test",
-        ic_last4="0002",
         age=40,
         monthly_income_rm=income,
         household_size=household_size,

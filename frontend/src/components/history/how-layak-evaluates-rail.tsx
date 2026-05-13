@@ -1,23 +1,24 @@
 'use client'
 
-import { FileCheck, FileSearch, Sparkles, type LucideIcon } from 'lucide-react'
+import { Calculator, FileCheck, FileSearch, Network, ScanSearch, type LucideIcon } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 
 type Step = {
-  id: 'extract' | 'match' | 'generate'
+  id: 'extract' | 'classify' | 'match' | 'compute' | 'generate'
   icon: LucideIcon
 }
 
 const STEPS: readonly Step[] = [
   { id: 'extract', icon: FileSearch },
-  { id: 'match', icon: Sparkles },
+  { id: 'classify', icon: ScanSearch },
+  { id: 'match', icon: Network },
+  { id: 'compute', icon: Calculator },
   { id: 'generate', icon: FileCheck }
 ]
 
 /**
- * Three-step explainer rail mirrored after SolarSim's `/projects` "How it
- * works" pattern. Folds the five-step pipeline (extract → classify → match →
- * rank → generate) into three reader-friendly buckets for the history page.
+ * Five-step explainer rail mirroring the landing page pipeline:
+ * extract → classify → match → compute → generate. One-liner bodies.
  */
 export function HowLayakEvaluatesRail() {
   const { t } = useTranslation()

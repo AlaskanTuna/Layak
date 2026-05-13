@@ -31,11 +31,9 @@ const SEVERITY_BORDER = {
 } as const
 
 function formatCitation(advice: StrategyAdvice): string {
-  const c = advice.citation
-  const parts = [c.pdf]
-  if (c.section) parts.push(c.section)
-  if (c.page != null) parts.push(`p.${c.page}`)
-  return parts.join(' ')
+  // Per UX revamp: cite the scheme file name only — drop section + page so
+  // the strategy card's footer stays short and reads at a glance.
+  return advice.citation.pdf
 }
 
 export function StrategyCard({ advice, onAskCikLay }: Props) {

@@ -1,10 +1,9 @@
 'use client'
 
-import { useEffect, useState } from 'react'
 import Link from 'next/link'
+import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
-import { cn } from '@/lib/utils'
 import { useAuth } from '@/lib/auth-context'
 import { BrandMark } from '@/components/layout/brand-mark'
 import { LanguageToggle } from '@/components/layout/language-toggle'
@@ -14,37 +13,56 @@ import { Button } from '@/components/ui/button'
 export function MarketingHeader() {
   const { t } = useTranslation()
   const { user, loading } = useAuth()
-  const [isScrolled, setIsScrolled] = useState(false)
-
-  useEffect(() => {
-    const handleScroll = () => {
-      setIsScrolled(window.scrollY > 20)
-    }
-    window.addEventListener('scroll', handleScroll, { passive: true })
-    handleScroll()
-    return () => window.removeEventListener('scroll', handleScroll)
-  }, [])
+  const [scrollProgress, setScrollProgress] = useState(0)
 
   const ctaHref = user ? '/dashboard' : '/sign-in'
   const ctaLabel = loading
-    ? ' '
+    ? ' '
     : user
       ? t('marketing.hero.goToDashboard', 'Go to Dashboard')
       : t('marketing.hero.getStarted', 'Get Started')
 
+  useEffect(() => {
+    const updateScrollProgress = () => {
+      const next = Math.min(Math.max(window.scrollY / 180, 0), 1)
+      setScrollProgress(next)
+    }
+
+    updateScrollProgress()
+    window.addEventListener('scroll', updateScrollProgress, { passive: true })
+    return () => window.removeEventListener('scroll', updateScrollProgress)
+  }, [])
+
+  const surfaceStrength = 30 + scrollProgress * 55
+  const borderStrength = scrollProgress * 40
+  const shadowStrength = scrollProgress * 12
+  const textMix = 90 - scrollProgress * 90
+
   return (
     <header
-      className={cn(
-        'fixed inset-x-0 top-0 z-50 h-[var(--topbar-height)] transition-all duration-300',
-        isScrolled
-          ? 'border-b border-border/40 bg-background/85 backdrop-blur-md text-foreground'
-          : 'border-b border-transparent bg-transparent text-foreground'
-      )}
+      className="fixed inset-x-0 top-0 z-50 h-[var(--topbar-height)] border-b transition-[background-color,border-color,box-shadow,color,backdrop-filter] duration-150"
+      style={{
+        color: `color-mix(in oklch, white ${textMix}%, var(--foreground))`,
+        backgroundColor:
+          scrollProgress === 0
+            ? 'transparent'
+            : `color-mix(in oklch, var(--background) ${surfaceStrength}%, transparent)`,
+        borderColor:
+          scrollProgress === 0
+            ? 'transparent'
+            : `color-mix(in oklch, var(--border) ${borderStrength}%, transparent)`,
+        boxShadow:
+          scrollProgress === 0
+            ? 'none'
+            : `0 18px 44px -28px color-mix(in oklch, black ${shadowStrength}%, transparent)`,
+        backdropFilter: `blur(${scrollProgress * 12}px)`,
+        WebkitBackdropFilter: `blur(${scrollProgress * 12}px)`
+      }}
     >
       <div className="mx-auto flex h-full max-w-7xl items-center justify-between px-4 sm:px-6">
         <Link href="/" className="flex items-center gap-2.5" aria-label={t('common.aria.layakHome')}>
           <BrandMark />
-          <span className="font-sans text-[17px] font-semibold tracking-tight text-foreground">
+          <span className="font-sans text-[17px] font-semibold tracking-tight text-inherit">
             {t('common.brand')}
           </span>
         </Link>

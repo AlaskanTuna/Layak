@@ -37,7 +37,9 @@
     "footer": {
       "copyright": "© 2026 Layak",
       "contact": "联系我们",
-      "howItWorks": "运作原理"
+      "howItWorks": "运作原理",
+      "privacy": "隐私政策",
+      "terms": "使用条款"
     },
     "notifications": {
       "title": "通知",
@@ -224,7 +226,7 @@
         {
           "docCode": "FAQ-04",
           "question": "我的个人数据有多安全？",
-          "body": "按设计符合 PDPA。完整身份证号码绝不持久化 —— 仅存储末四位。原始文件字节在单次请求中于内存中提取，结构化档案产生后立即丢弃。日志中没有原始文件。"
+          "body": "手动录入路径的用户仅提交年龄、收入、家庭构成和地址 —— Layak 不在此路径收集任何身份证信息。上传路径的用户的 MyKad 图像由 Gemini 在请求作用域内存中临时处理；持久化档案不保留任何身份证信息。结构化档案保存在 Firestore 中，供聊天机器人和草稿包重新生成使用。日志中没有原始文件。"
         },
         {
           "docCode": "FAQ-05",
@@ -291,7 +293,12 @@
         "price": "RM 0",
         "period": "永久免费",
         "cta": "立即开始",
-        "features": ["每 24 小时 5 次评估", "30 天评估历史", "可使用 STR、JKM、LHDN 等计划", "带水印的草稿申请包"]
+        "features": [
+          "每 24 小时 5 次评估",
+          "30 天评估历史",
+          "可使用 STR、JKM、LHDN 等计划",
+          "带水印的草稿申请包"
+        ]
       },
       "proTier": {
         "name": "Pro 版",
@@ -299,7 +306,13 @@
         "price": "RM 15",
         "period": "每月",
         "cta": "加入等候名单",
-        "features": ["无限次评估", "无限评估历史", "优先处理队列", "导出所有历史记录为 CSV", "优先体验新上线的计划"]
+        "features": [
+          "无限次评估",
+          "无限评估历史",
+          "优先处理队列",
+          "导出所有历史记录为 CSV",
+          "优先体验新上线的计划"
+        ]
       }
     },
     "features": {
@@ -360,7 +373,7 @@
       "section1History": "<strong>评估历史</strong>：我们从您的文件中提取的结构化档案以及您所配对的计划，存储在 Firestore 中以便您查看过往记录。",
       "section1Consent": "<strong>同意时间戳</strong>，在您注册时勾选 PDPA 复选框时记录。",
       "section2Title": "2. 我们不存储的资料",
-      "section2MyKad": "您的完整 MyKad 号码 —— 我们只保留最后四位数。",
+      "section2MyKad": "您的完整 MyKad 号码以及任何身份证末位。持久化档案不包含任何身份证信息；手动录入路径根本不会询问身份证。",
       "section2Files": "您上传文件的原始字节。提取过程在单次请求内以内存方式运行，一旦生成结构化档案，原始文件即被丢弃。",
       "section2Logs": "任何日志行中的身份证号码、身份验证令牌或文件内容。",
       "section3Title": "3. 为何收集这些资料",
@@ -419,7 +432,7 @@
     },
     "signIn": {
       "title": "欢迎回来",
-      "description": "使用 Google、电子邮件或访客身份登录以进入仪表板。",
+      "description": "登录以继续您之前的进度。",
       "noAccountPrefix": "还没有账户？",
       "noAccountCta": "注册",
       "errorFailed": "登录失败。请重试。",
@@ -433,6 +446,7 @@
       "emailPlaceholder": "you@example.com",
       "passwordLabel": "密码",
       "passwordPlaceholder": "您的密码",
+      "rememberMe": "在此设备上记住我",
       "submit": "登录",
       "emailErrors": {
         "invalidCredential": "电子邮件或密码不正确。",
@@ -445,7 +459,7 @@
     },
     "signUp": {
       "title": "创建您的账户",
-      "description": "使用 Google 或电子邮件注册。Layak 从不代您提交任何内容 —— 每份草拟申请包均由您掌控。",
+      "description": "Layak 只生成草稿，主导权始终在您手中。",
       "consentPrefix": "我同意 Layak 依据以下文件处理我上传的文件（身份证、工资单、水电费账单）以配对政府计划：",
       "consentPrivacy": "隐私政策",
       "consentAnd": "及",
@@ -473,7 +487,18 @@
         "operationNotAllowed": "电子邮件/密码注册未启用。请联系支持团队。",
         "generic": "注册失败。请重试。"
       }
-    }
+    },
+    "context": {
+      "heading": "看看您符合哪些财务援助。",
+      "body": "上传三份文件，几分钟内即可获得您可申请的马来西亚政府计划个性化清单。",
+      "bullets": {
+        "free": "免费使用",
+        "drafts": "仅生成草稿 —— 主导权在您",
+        "trilingual": "支持英文、马来文与中文"
+      },
+      "mobileStrip": "免费 · 仅草稿 · 三语"
+    },
+    "tabsAriaLabel": "登录方式"
   },
   "dashboard": {
     "hero": {
@@ -549,6 +574,7 @@
       "upload": "上传",
       "results": "结果",
       "schemes": "计划",
+      "discovery": "发现",
       "settings": "设置",
       "signIn": "登录",
       "signUp": "注册"
@@ -569,15 +595,23 @@
       "steps": {
         "extract": {
           "title": "提取",
-          "body": "读取您的 MyKad、薪资单与水电账单，整理出收入、IC 末四位以及家庭规模。"
+          "body": "读取您的文件并整理出结构化档案。"
+        },
+        "classify": {
+          "title": "分类",
+          "body": "推导出家庭层级、申报人类型与受抚养人数。"
         },
         "match": {
           "title": "匹配",
-          "body": "您的档案会与每一项 2026 年方案对比 —— 家庭层级、年龄、就业类型、受抚养人。"
+          "body": "将您的档案对照每一项 2026 锁定方案。"
+        },
+        "compute": {
+          "title": "计算",
+          "body": "用 Gemini 运行 Python 汇总年度减免。"
         },
         "generate": {
           "title": "生成",
-          "body": "生成可直接提交给相关机构的申请草稿 PDF 包。"
+          "body": "生成可由您亲自提交的水印草稿包。"
         }
       }
     },
@@ -590,8 +624,10 @@
       "toc": {
         "overview": "概览",
         "schemes": "可申请方案",
-        "strategy": "策略",
+        "subsidies": "补贴",
         "required": "应缴贡献",
+        "strategy": "策略",
+        "whatIfs": "假设情景",
         "preview": "草稿预览"
       },
       "startAnother": "开始另一次评估",
@@ -659,7 +695,6 @@
     },
     "whatIf": {
       "sectionTitle": "探索假设情景",
-      "sectionEyebrow": "调整输入",
       "sectionDescription": "拖动任意滑块即可查看符合资格的计划如何变化。无需重新上传文件。",
       "expand": "展开",
       "collapse": "收起",
@@ -682,7 +717,6 @@
     },
     "strategy": {
       "sectionTitle": "策略",
-      "sectionEyebrow": "跨计划分析",
       "sectionDescription": "Layak 的优化器比较您匹配到的计划，并标记可协调的机会。",
       "emptyHeadline": "未发现跨计划冲突",
       "emptyDescription": "您匹配的计划未触发 Layak 关注的任何协调边缘情况。",
@@ -703,7 +737,10 @@
       "summaryRunning": "Layak 的流程正在运行…",
       "summaryDone": "Layak 的流程已完成共 {{count}} 个步骤。",
       "summaryError": "Layak 的流程提前中止 —— 请查看下方错误。",
-      "technicalLogLabel": "技术执行日志"
+      "technicalLogLabel": "技术执行日志",
+      "codeExecutionTitle": "Gemini 代码执行",
+      "codeExecutionSnippet": "python_snippet",
+      "codeExecutionStdout": "stdout"
     },
     "upload": {
       "sectionIc": "MyKad（身份证）",
@@ -759,12 +796,9 @@
     "manual": {
       "identityTitle": "身份",
       "nameLabel": "全名",
-      "dobLabel": "出生日期",
-      "dobHelp": "直接输入数字即可 —— 我们会自动补上连字符。或使用日历图标。",
-      "dobPlaceholder": "YYYY-MM-DD",
-      "dobAria": "打开日期选择器",
-      "icLabel": "身份证末 4 位",
-      "icHelp": "我们只收集末 4 位 —— 您的完整 MyKad 绝不会离开您的设备。",
+      "ageLabel": "年龄",
+      "ageHelp": "您的年龄（以整年为单位）。我们用它来评估年龄相关的计划（例如 JKM Warga Emas 60+、BUDI95 16+、MyKasih SARA 18+）。",
+      "agePlaceholder": "例如 34",
       "incomeTitle": "收入",
       "incomeLabel": "月收入（RM）",
       "incomeHelp": "零工为净收入，受薪员工为基本工资。",
@@ -786,11 +820,7 @@
       "clear": "清除",
       "submit": "生成申请包",
       "zodRequired": "必填",
-      "zodDateFormat": "请使用 YYYY-MM-DD",
-      "zodNotRealDate": "不是有效日期",
-      "zodYearMin": "年份必须是 1900 或之后",
-      "zodPastDate": "必须是过去的日期",
-      "zodIc4Digits": "4 位数字",
+      "zodAgeRange": "年龄必须在 0 到 130 之间",
       "zodIncomeFormat": "金额最高 RM1,000,000（例如 2400 或 2400.50）",
       "zodAdultIncomeOnly": "仅收集成年家庭成员的收入",
       "zodSpouseLimit": "同一共同家庭最多可列出四位配偶",
@@ -844,7 +874,7 @@
       }
     },
     "dependants": {
-      "description": "添加与您共同居住的所有其他成员。18 岁以下子女和 60 岁以上父母可解锁特定计划。家庭规模：{{size}}（您 + {{count}} 位{{plural}}）。",
+      "description": "添加与您共同居住的所有其他成员。18 岁以下子女或兄弟姐妹，以及 60 岁以上父母或祖父母/外祖父母，可解锁特定计划。家庭规模：{{size}}（您 + {{count}} 位{{plural}}）。",
       "dependantSingular": "受扶养人",
       "dependantPlural": "受扶养人",
       "empty": "尚无受扶养人。点击「添加受扶养人」以列出每位家庭成员。",
@@ -859,7 +889,6 @@
       },
       "age": "年龄",
       "agePlaceholder": "年龄",
-      "icOptional": "身份证末 4 位（选填）",
       "incomeOptional": "月收入（选填）",
       "incomePlaceholder": "RM / 月",
       "incomeUnder18": "18 岁以下",
@@ -937,10 +966,20 @@
       "estValue": "预估价值",
       "startApp": "申请",
       "categoryAssistance": "援助",
+      "categorySubsidy": "补贴",
+      "subsidyAutoCredited": "已自动记入您的 MyKad",
+      "subsidyInfo": "补贴信息",
+      "checkBalance": "查询余额",
+      "expiresOn": "{{date}} 到期",
       "perYearEst": "每年（预估）",
       "openAgencyPortal": "打开 {{agency}} 门户",
       "emptyList": "您首次评估完成后，计划匹配将在此显示。",
       "eligibleSchemesCount": "符合资格的计划（{{count}}）"
+    },
+    "subsidies": {
+      "title": "补贴",
+      "description": "您可能已经有资格获得的政府补贴。这些补贴会通过相关机构的官方平台自动入账 —— Layak 不会代您申请。",
+      "empty": "没有匹配您档案的补贴方案。"
     },
     "requiredContributions": {
       "heading": "强制性缴款",
@@ -961,6 +1000,10 @@
       "error": "预览失败：{{message}}",
       "iframeTitle": "{{name}} 的在线预览",
       "downloadOne": "下载此 PDF"
+    },
+    "whatIfs": {
+      "sectionTitle": "假设情景",
+      "sectionDescription": "调整您的输入，看看符合的方案会如何变化。"
     },
     "packet": {
       "eyebrow": "申请包",
@@ -1007,13 +1050,38 @@
   },
   "admin": {
     "discovery": {
-      "pageEyebrow": "管理员 / 审核",
+      "pageEyebrow": "发现",
       "pageTitle": "计划发现队列",
-      "pageDescription": "Layak 的发现代理监视政府公报来源，并在变更触达终端用户之前在此处提交比率或资格变化以供审核。",
+      "pageDescription": "先审核来源变更，再触达用户。",
       "triggerButton": "立即运行发现",
       "triggerRunning": "正在运行…",
+      "triggerSuccessTitle": "发现运行完成",
       "triggerSuccess": "已检查 {{checked}} 个来源，{{changed}} 个有变更，提取 {{extracted}} 个候选",
+      "triggerErrorTitle": "发现运行失败",
       "triggerError": "发现运行失败：{{message}}",
+      "runPanel": {
+        "eyebrow": "流程",
+        "title": "发现运行",
+        "description": "重新抓取公报来源、对比内容，并暂存新候选以供审核。",
+        "idleHint": "本次会话尚未运行。",
+        "elapsed": "正在运行… 已用 {{seconds}} 秒",
+        "lastRun": "最近运行 · {{relative}}",
+        "runAgain": "再次运行",
+        "tryAgain": "重试",
+        "kpi": {
+          "sourcesChecked": "已检查来源",
+          "sourcesChanged": "已变更来源",
+          "candidatesExtracted": "已提取候选"
+        }
+      },
+      "searchPlaceholder": "按名称、机构或来源搜索…",
+      "confidence": {
+        "band": {
+          "high": "超过阈值",
+          "mid": "需要审核",
+          "low": "置信度低"
+        }
+      },
       "filters": {
         "all": "全部",
         "pending": "待审",
@@ -1033,19 +1101,36 @@
           "status": "状态",
           "actions": "操作"
         },
-        "review": "审核 →",
+        "review": "审核",
         "approve": "批准",
-        "reject": "拒绝"
+        "reject": "拒绝",
+        "selected": "已选 {{count}} 项",
+        "selectedSummary": "{{count}} 个候选项已标记待删除。",
+        "deleteAction": "删除 {{count}} 项",
+        "deleteConfirm": "确定从队列删除 {{count}} 个候选项？此操作无法撤销。",
+        "deletePartialFailure": "已删除 {{total}} 项中的 {{deleted}} 项；{{failed}} 项失败。",
+        "selectRowAria": "选择候选项 {{name}}",
+        "selectPageAria": "选择全部候选项",
+        "deselectPageAria": "取消选择全部候选项",
+        "paginationSummary": "显示 {{shown}} / {{total}}",
+        "sortAria": "按 {{column}} 排序"
       },
       "health": {
         "title": "计划验证健康状况",
         "subtitle": "发现管道针对每个计划的最近一次成功验证。",
         "empty": "尚无已验证的计划。运行发现以填充此列表。",
-        "verifiedPrefix": "来源已验证于 ",
-        "neverVerified": "从未验证"
+        "verifiedPrefix": "已验证 ",
+        "neverVerified": "从未验证",
+        "countSummary": "{{healthy}} 个健康 · {{stale}} 个陈旧",
+        "dotAria": {
+          "healthy": "近 7 天内验证",
+          "stale": "超过 30 天前验证",
+          "aging": "近 30 天内验证",
+          "never": "从未验证"
+        }
       },
       "detail": {
-        "backToQueue": "← 返回队列",
+        "backToQueue": "返回队列",
         "headingNew": "新计划候选",
         "headingMatched": "对现有计划的更新",
         "sectionCandidate": "建议负载",
@@ -1073,7 +1158,40 @@
         },
         "actionSuccess": "完成。当前状态：{{status}}。",
         "actionError": "操作失败：{{message}}",
-        "manifestWritten": "YAML 清单已写入 {{path}}"
+        "manifestReady": "已批准 · YAML 清单已保存到候选文档",
+        "downloadManifest": "下载清单",
+        "metaLine": "{{agency}} · {{scheme}} · 提取于 {{extracted}}",
+        "metaLineUnmatched": "{{agency}} · 无匹配 · 提取于 {{extracted}}",
+        "note": "审核人备注",
+        "openSource": "打开来源",
+        "copyHashAria": "复制内容哈希",
+        "copyHashSuccess": "已复制哈希",
+        "newScheme": {
+          "title": "新计划",
+          "body": "未找到现有规则 —— 将为工程师审查起草清单。"
+        },
+        "decisionTitle": "决定"
+      },
+      "notify": {
+        "approve": {
+          "title": "候选项已批准",
+          "body": "{{name}} 已标记为已验证。"
+        },
+        "reject": {
+          "title": "候选项已拒绝",
+          "body": "{{name}} 已移至已拒绝。"
+        },
+        "changes": {
+          "title": "已请求更改",
+          "body": "{{name}} 已移至请求更改。"
+        },
+        "deleteSuccess": {
+          "title": "候选项已删除",
+          "body": "{{count}} 个候选项已从队列中移除。"
+        },
+        "deleteFailure": {
+          "title": "删除失败"
+        }
       }
     }
   },
@@ -1155,7 +1273,9 @@
       "lhdn_form_b": "LHDN Form B — 五项 YA2025 税务减免",
       "lhdn_form_be": "LHDN Form BE — 五项 YA2025 税务减免",
       "perkeso_sksps": "PERKESO SKSPS — 自雇人士社会保障",
-      "i_saraan": "EPF i-Saraan — 自愿缴款政府配对"
+      "i_saraan": "EPF i-Saraan — 自愿缴款政府配对",
+      "budi95": "BUDI95 — RON95 汽油补贴",
+      "mykasih": "MyKasih — SARA RM100 MyKad 信用"
     }
   },
   "settings": {

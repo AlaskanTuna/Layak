@@ -1,9 +1,8 @@
 'use client'
 
-import { ArrowRight } from 'lucide-react'
+import { ArrowRight, ExternalLink } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 
-import { SchemeVerifiedBadge } from '@/components/schemes/scheme-verified-badge'
 import { Button } from '@/components/ui/button'
 import type { SchemeDelta, SchemeMatch } from '@/lib/agent-types'
 import { localisedSchemeName } from '@/lib/scheme-name'
@@ -14,6 +13,23 @@ type Props = {
   /** Phase 11 Feature 3 — when present, render per-scheme delta chips
    *  below each card's footer. `null` while what-if hasn't been run. */
   deltas?: SchemeDelta[] | null
+  /** Filter to a single scheme kind. Defaults to `upside` so the legacy
+   *  call site (Eligible Schemes) keeps its meaning; pass `subsidy_credit`
+   *  to render the Subsidies section. */
+  kind?: 'upside' | 'subsidy_credit'
+  /** Optional override for the section heading. Falls back to the i18n key
+   *  matching the resolved `kind`. */
+  heading?: string
+  /** When true, suppress the inner section heading so a parent can provide
+   *  its own. The matches-count chip is also suppressed. */
+  hideHeading?: boolean
+}
+
+/** Strip backend-supplied multi-line whitespace so each card's body
+ *  collapses to a tight paragraph instead of inheriting trailing newlines
+ *  or padding from upstream prompt templates. */
+function tidyText(value: string): string {
+  return value.replace(/\s+/g, ' ').trim()
 }
 
 
@@ -21,7 +37,8 @@ function formatRm(value: number): string {
   return `RM ${value.toLocaleString('en-MY', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
 }
 
-function categoryKeyFor(match: SchemeMatch): 'cashTransfer' | 'taxRelief' | 'welfare' | 'assistance' {
+function categoryKeyFor(match: SchemeMatch): 'cashTransfer' | 'taxRelief' | 'welfare' | 'subsidy' | 'assistance' {
+  if (match.kind === 'subsidy_credit') return 'subsidy'
   const agency = match.agency.toLowerCase()
   const id = match.scheme_id.toLowerCase()
   if (id.includes('str') || agency.includes('treasury')) return 'cashTransfer'
@@ -30,41 +47,73 @@ function categoryKeyFor(match: SchemeMatch): 'cashTransfer' | 'taxRelief' | 'wel
   return 'assistance'
 }
 
-export function SchemeCardGrid({ matches, deltas }: Props) {
-  const { t } = useTranslation()
+/** Format an ISO date string (e.g. "2026-12-31") as a locale-aware short
+ * date (e.g. "Dec 31, 2026" / "31 Dis 2026" / "2026年12月31日"). Falls
+ * back to the raw ISO string if parsing fails. */
+function formatExpiryDate(iso: string, locale: string): string {
+  const parsed = new Date(iso + 'T00:00:00')
+  if (Number.isNaN(parsed.getTime())) return iso
+  const intlLocale = locale === 'ms' ? 'ms-MY' : locale === 'zh' ? 'zh-CN' : 'en-MY'
+  return new Intl.DateTimeFormat(intlLocale, {
+    day: 'numeric',
+    month: 'short',
+    year: 'numeric'
+  }).format(parsed)
+}
+
+export function SchemeCardGrid({
+  matches,
+  deltas,
+  kind = 'upside',
+  heading,
+  hideHeading = false
+}: Props) {
+  const { t, i18n } = useTranslation()
   const deltaByScheme = new Map<string, SchemeDelta>()
   for (const d of deltas ?? []) {
     deltaByScheme.set(d.scheme_id, d)
   }
-  // Keep only upside schemes in the ranked grid. Required-contribution
-  // entries (e.g. PERKESO SKSPS) render separately in
-  // `<RequiredContributionsCard>` so their RM amounts don't get visually
-  // confused with annual relief the user would receive.
+  // Phase 12: each call site renders a single kind so `Eligible Schemes`
+  // (upside) and `Subsidies` (subsidy_credit) can live in their own page
+  // subsections. `required_contribution` entries (e.g. PERKESO SKSPS) still
+  // render separately in `<RequiredContributionsCard>` so RM amounts don't
+  // get visually confused with annual relief the user would receive.
   const qualifying = matches
-    .filter((m) => m.qualifies && (m.kind ?? 'upside') === 'upside')
+    .filter((m) => {
+      if (!m.qualifies) return false
+      const matchKind = (m.kind ?? 'upside') as 'upside' | 'subsidy_credit' | 'required_contribution'
+      return matchKind === kind
+    })
+    .slice()
     .sort((a, b) => b.annual_rm - a.annual_rm)
 
   if (qualifying.length === 0) {
-    return (
-      <section className="paper-card rounded-[14px] p-6 text-center">
-        <p className="text-sm text-foreground/65">{t('evaluation.schemeCard.noMatches')}</p>
-      </section>
-    )
+    return null
   }
+
+  const sectionHeading =
+    heading ??
+    (kind === 'subsidy_credit'
+      ? t('evaluation.subsidies.title')
+      : t('evaluation.schemeCard.heading'))
 
   return (
     <section className="flex flex-col gap-4">
-      <div className="flex items-baseline justify-between">
-        <h2 className="font-heading text-lg font-semibold tracking-tight">{t('evaluation.schemeCard.heading')}</h2>
-        <span className="mono-caption text-foreground/55">
-          {qualifying.length === 1
-            ? t('evaluation.schemeCard.matchesSingular', { count: qualifying.length })
-            : t('evaluation.schemeCard.matchesPlural', { count: qualifying.length })}
-        </span>
-      </div>
+      {!hideHeading && (
+        <div className="flex items-baseline justify-between">
+          <h2 className="font-heading text-xl font-semibold tracking-tight">{sectionHeading}</h2>
+          <span className="mono-caption text-foreground/55">
+            {qualifying.length === 1
+              ? t('evaluation.schemeCard.matchesSingular', { count: qualifying.length })
+              : t('evaluation.schemeCard.matchesPlural', { count: qualifying.length })}
+          </span>
+        </div>
+      )}
       <ul className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
         {qualifying.map((match, index) => {
-          const isTop = index === 0
+          const isSubsidy = (match.kind ?? 'upside') === 'subsidy_credit'
+          // "Top match" badge only applies to the leading upside card.
+          const isTop = index === 0 && !isSubsidy
           const categoryKey = categoryKeyFor(match)
           const category =
             categoryKey === 'cashTransfer'
@@ -73,7 +122,9 @@ export function SchemeCardGrid({ matches, deltas }: Props) {
                 ? t('schemes.labels.taxRelief')
                 : categoryKey === 'welfare'
                   ? t('schemes.labels.welfare')
-                  : t('evaluation.schemeCard.categoryAssistance')
+                  : categoryKey === 'subsidy'
+                    ? t('evaluation.schemeCard.categorySubsidy')
+                    : t('evaluation.schemeCard.categoryAssistance')
           return (
             <li
               key={match.scheme_id}
@@ -84,7 +135,14 @@ export function SchemeCardGrid({ matches, deltas }: Props) {
             >
               <header className="flex flex-col gap-2">
                 <div className="flex items-center justify-between gap-2">
-                  <span className="mono-caption text-[color:var(--primary)]">{category}</span>
+                  <span
+                    className={cn(
+                      'mono-caption',
+                      isSubsidy ? 'text-[color:var(--hibiscus)]' : 'text-[color:var(--primary)]'
+                    )}
+                  >
+                    {category}
+                  </span>
                   {isTop && (
                     <span className="inline-flex items-center gap-1 rounded-full border border-[color:var(--forest)]/35 bg-[color:var(--forest)]/12 px-2 py-0.5 mono-caption text-[9.5px] text-[color:var(--forest)]">
                       <span className="size-1 rounded-full bg-[color:var(--forest)]" />
@@ -95,38 +153,66 @@ export function SchemeCardGrid({ matches, deltas }: Props) {
                 <h3 className="font-heading text-base font-semibold tracking-tight">
                   {localisedSchemeName(t, match.scheme_id, match.scheme_name)}
                 </h3>
-                <p className="text-xs leading-relaxed text-foreground/65">{match.summary}</p>
+                <p className="text-xs leading-relaxed text-foreground/65">{tidyText(match.summary)}</p>
               </header>
 
-              <div className="flex flex-1 flex-col gap-1 rounded-md border border-foreground/8 bg-foreground/[0.025] p-3">
+              <div className="flex flex-col gap-1 rounded-md border border-foreground/8 bg-foreground/[0.025] p-3">
                 <p className="mono-caption text-foreground/55">
                   {t('evaluation.schemeCard.whyQualify')}
                 </p>
-                <p className="text-xs leading-[1.55] text-foreground/80">{match.why_qualify}</p>
+                <p className="text-xs leading-[1.55] text-foreground/80">{tidyText(match.why_qualify)}</p>
               </div>
 
-              <footer className="flex items-end justify-between gap-3 border-t border-foreground/10 pt-3">
-                <div className="flex flex-col gap-1">
-                  <p className="mono-caption text-foreground/55">{t('evaluation.schemeCard.estValue')}</p>
-                  <p className="font-heading text-[15px] font-semibold tabular-nums text-foreground">
-                    {formatRm(match.annual_rm)}
-                  </p>
-                  <SchemeVerifiedBadge schemeId={match.scheme_id} />
-                </div>
-                <Button
-                  render={<a href={match.portal_url} target="_blank" rel="noopener noreferrer" />}
-                  size="sm"
-                  className={
-                    isTop
-                      ? 'rounded-full bg-[color:var(--hibiscus)] text-[color:var(--hibiscus-foreground)] hover:bg-[color:var(--hibiscus)]/92'
-                      : 'rounded-full'
-                  }
-                  variant={isTop ? 'default' : 'outline'}
-                >
-                  {t('evaluation.schemeCard.startApp')}
-                  <ArrowRight className="ml-1 size-3.5" aria-hidden />
-                </Button>
-              </footer>
+              {isSubsidy ? (
+                <footer className="mt-auto flex items-end justify-between gap-3 border-t border-foreground/10 pt-3">
+                  <div className="flex flex-col gap-1">
+                    <p className="mono-caption text-foreground/55">
+                      {t('evaluation.schemeCard.subsidyInfo')}
+                    </p>
+                    <p className="text-xs leading-[1.4] text-foreground/80">
+                      {t('evaluation.schemeCard.subsidyAutoCredited')}
+                    </p>
+                    {match.expires_at_iso && (
+                      <p className="text-[12px] font-bold text-[color:var(--hibiscus)]">
+                        {t('evaluation.schemeCard.expiresOn', {
+                          date: formatExpiryDate(match.expires_at_iso, i18n.language)
+                        })}
+                      </p>
+                    )}
+                  </div>
+                  <Button
+                    render={<a href={match.portal_url} target="_blank" rel="noopener noreferrer" />}
+                    size="sm"
+                    variant="outline"
+                    className="rounded-full border-[color:var(--hibiscus)]/55 hover:border-[color:var(--hibiscus)] hover:bg-[color:var(--hibiscus)]/8 dark:hover:bg-[color:var(--hibiscus)]/12"
+                  >
+                    {t('evaluation.schemeCard.checkBalance')}
+                    <ExternalLink className="ml-1 size-3.5 text-[color:var(--hibiscus)]" aria-hidden />
+                  </Button>
+                </footer>
+              ) : (
+                <footer className="mt-auto flex items-end justify-between gap-3 border-t border-foreground/10 pt-3">
+                  <div className="flex flex-col gap-1">
+                    <p className="mono-caption text-foreground/55">{t('evaluation.schemeCard.estValue')}</p>
+                    <p className="font-heading text-[15px] font-semibold tabular-nums text-foreground">
+                      {formatRm(match.annual_rm)}
+                    </p>
+                  </div>
+                  <Button
+                    render={<a href={match.portal_url} target="_blank" rel="noopener noreferrer" />}
+                    size="sm"
+                    className={
+                      isTop
+                        ? 'rounded-full bg-[color:var(--hibiscus)] text-[color:var(--hibiscus-foreground)] hover:bg-[color:var(--hibiscus)]/92'
+                        : 'rounded-full'
+                    }
+                    variant={isTop ? 'default' : 'outline'}
+                  >
+                    {t('evaluation.schemeCard.startApp')}
+                    <ArrowRight className="ml-1 size-3.5" aria-hidden />
+                  </Button>
+                </footer>
+              )}
 
               {/* Phase 11 Feature 3 — what-if delta chip under the footer.
                   Renders only when the user has dragged a slider and the

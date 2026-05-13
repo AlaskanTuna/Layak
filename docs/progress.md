@@ -10,6 +10,110 @@ Recorded the manual-entry household modelling work in `docs/trd.md` so future ag
 
 ---
 
+## [13/05/26] - Phase 12 SHIPPED: BUDI95 + MyKasih cards + IC removal + stats-strip auto-derive
+
+Phase 12 landed as 7 implementation commits on top of the planning commit `ba4f67a`. Direction held to the locked design: info-only subsidy cards (no API calls, no user inputs beyond what we already collect), tighter PDPA posture via full IC removal, schemes-page Latest Update now lives.
+
+**Commits (in order).**
+
+- `0bd9a59` `feat(phase12): drop IC field from manual entry + remove ic_last6 from entire codebase` — 45 files, +233/-390. Schema removal (`Profile`, `Dependant`, `ManualEntryPayload`, `DependantInput` all lose `ic_last6`). Gemini extract prompt no longer asks for it. `_mask_ic_last6` deleted from `narration.py`; `_render_profile` digest line + `ic_suffix` label dropped from `chat_prompt.py`. 7 Jinja templates lose their IC display row entirely; `_base.html.jinja` "Filer IC (last 6)" header replaced with "Filer: {name}". Generate-packet filenames switch from `{ic_last6}.pdf` to `{date}.pdf`. 16 test files updated. Frontend types + form + fixtures + i18n all swept. Net result: zero ic_last6 references in live code (only intentional defense-in-depth assertions in privacy tests).
+- `c17cebe` `feat(phase12): SchemeKind gains subsidy_credit + SchemeMatch.expires_at_iso` — schema foundation. `SchemeKind = upside | required_contribution | subsidy_credit`. New optional `expires_at_iso: str | None`. `compute_upside` filters on `kind == "upside"` (Phase 11 behaviour preserved).
+- `b2044f7` `feat(phase12): BUDI95 info-only subsidy_credit rule` — `app/rules/budi95.py`, eligibility `age >= 16`, `annual_rm = 0.0`, 3 citations (MOF + Maybank2u + Feb 2026 reach). Match-sort pivot: 2-tier `kind != "upside"` → 3-tier `upside → subsidy_credit → required_contribution`.
+- `7080712` `feat(phase12): MyKasih (SARA RM100) info-only subsidy_credit rule` — `app/rules/mykasih.py`, eligibility `age >= 18`, `annual_rm = 0.0`, **`expires_at_iso = "2026-12-31"`** (the bold expiry line is the load-bearing user-facing piece). Display label "MyKasih"; citations preserve official "SARA Untuk Semua via MyKasih" wording. 4 citations.
+- `f816b95` `feat(phase12): subsidy_credit card UX (bold expiry + Check Balance CTA)` — `SchemeCardGrid` learns a second card variant for `kind === 'subsidy_credit'`: hibiscus "Subsidy" eyebrow, "Auto-credited to your MyKad" info line replacing the RM `estValue`, bold hibiscus "Expires {date}" line driven by `expires_at_iso` via `Intl.DateTimeFormat`, outline "Check your balance" CTA with ExternalLink icon opening the official portal in a new tab. Top-match badge skipped on subsidy cards. New scheme_id display-name mappings + new i18n keys for the card chrome.
+- `b076ef9` `feat(phase12): schemes-stats-strip auto-derive + day-1 seed script` — `SchemesStatsStrip` swaps hardcoded `'2026'` for `useLatestVerifiedAt()` fetching `/api/schemes/verified` and computing `max(verified_at)`. Static counts updated: schemes 6 → 8. Date formatted locale-aware via `Intl.DateTimeFormat` (`May 13, 2026` / `13 Mei 2026` / `2026年5月13日`). New `scripts/seed_verified_schemes.py` idempotently stamps every locked scheme in `SchemeId` Literal with `SERVER_TIMESTAMP` so the tile renders a real date on day-1 of deploy.
+
+**Tests.** Backend: 554 green (was 510 pre-Phase-12). New: `test_budi95.py` (6), `test_mykasih.py` (9). Existing-test updates: 16 files for IC removal, `test_perkeso_sksps.py` sort-order pivot to expect BUDI95+MyKasih between upside and SKSPS, `test_rule_copy_coverage.py` adds budi95+mykasih to `_QUALIFY_VARS`+`_OUT_OF_SCOPE_VARS` and the i18n catalog parametrizes over both new schemes across en/ms/zh. Frontend: `npx tsc --noEmit` clean for every touched file across all 7 commits.
+
+**Naming + expiry verification.** Verified before code: "MyKasih" is the user-facing label (more memorable + widely Googled than the official program name "SARA Untuk Semua"); the 9 Feb 2026 RM100 tranche **expires 31 December 2026, unused balance forfeited**, confirmed across SoyaCincau + Reeracoen + thesmartlocal.my. The expiry surfaces in bold hibiscus on the MyKasih card so users see the deadline at a glance.
+
+**No-API-research finding (locked in TRD §5.11).** 10 search angles confirmed no public developer API exists for BUDI95 or MyKasih balance lookup. All "third-party MyKasih checker" sites are cosmetic redirect wrappers — `mykasih.my` explicitly disclaims it. Layak ships the same redirect-wrapper pattern but with substance (age-gated eligibility + portal CTA). Web-scraping path explicitly rejected (ToS risk, fragility).
+
+**Open design questions parked for future phases.** SARA RM100 recurrence + auto-retirement (nightly job checks `today > expires_at_iso`), BUDI95 targeting changes (discovery agent already polls budimadani.gov.my), agency-count semantics (BUDI95 operator + MyKasih Foundation either count as separate or roll under MOF — went with 6 in the stats strip).
+
+**README + privacy copy.** README headline "5+1" → "5+2+1" (upside + subsidy-credit + contribution). Architecture diagram label "Matched against 6 schemes" → "8 schemes". FAQ-04 + privacy-page `section2MyKad` rewritten to reflect zero-IC-on-manual-path / transient-only on upload-path. Landing CTA FAQ matched. All 37 unticked checkboxes in plan.md Phase 12 flipped to `[x]`.
+
+---
+
+## [13/05/26] - Phase 12 brainstorm: BUDI95 + MyKasih SARA info-only cards + manual-entry IC removal (planning only)
+
+Scoping session for the next scheme-library expansion. Two highest-reach Malaysian schemes that aren't yet in Layak's rule engine: **BUDI95** (RON95 petrol subsidy, 14.8M users by Feb 2026, RM1.99/L for eligible Malaysians) and **MyKasih SARA RM100** (one-off MyKad credit, every adult Malaysian, 9 Feb 2026). Plus two ops follow-ups bundled into the same phase: dropping the full-IC field from manual entry, and replacing the schemes-page "Latest Update" hardcoded `'2026'` with a real `max(verified_at)` derivation.
+
+**Locked-in research finding: no public API for either scheme.** Did the thorough check across 10 distinct angles before committing to the design direction.
+
+- `budi95.gov.my` / `budimadani.gov.my` — consumer eligibility check only; no documented API.
+- `checkstatus.mykasih.net` / `app.mykasih.net` — consumer balance check only; no developer surface.
+- `api.data.gov.my` (Malaysia's official open API platform) — confirmed exists, hosts GTFS / weather / OpenDOSM / data catalogue. **No subsidy-by-IC endpoint, by design** — personal subsidy data isn't open data.
+- MyGDX catalogue — has IC-based endpoints (JKM disability status, JPN identity verification, JPJ vehicle/driving record) but **no BUDI95 / SARA endpoints**, and it's agency-to-agency anyway, not third-party.
+- MyDigital ID developer portal — exists; is used for BUDI95 transaction-history login per official docs; but no documented OAuth scope grants third parties access to subsidy balance.
+- PADU (Pangkalan Data Utama, Ministry of Economy) — central database aggregating LHDN/KWSP/JPJ data. Third-party developer data-sharing applications reviewed in 60 working days, agency-to-agency only.
+- eKasih portal (icu.gov.my) — public IC status check via web form, no developer API.
+- GitHub: `site:github.com BUDI95` and `site:github.com mykasih` — **zero results.** No community-built API client or scraper.
+- Setel / TNG / Shell App / CaltexGo — all integrate via bilateral commercial partnerships with the BUDI95 operator. Closed APIs.
+- The "third-party MyKasih checker" sites (`mykasih.my`, `ecentral.my`, `bantuanonline.my`, `logmasuk.my`) — fetched HTML on all four. **All cosmetic redirect wrappers**, not API clients. `mykasih.my` literally has its own disclaimer text: _"Semakan dibuat melalui Portal Rasmi MyKasih. Maklumat anda selamat & tidak disimpan di laman ini"_ — verification is done through the official portal, your info is not stored on this site. They validate IC format client-side, then redirect to `checkstatus.mykasih.net`. Nobody is actually proxying the lookup.
+
+**Implication.** The SDK-style integration the user initially wanted (call an API with the user's IC, get back balance + expiry + eligibility) is not buildable for a third-party app today. The only paths are: (a) headless-browser scraping (ToS violation + fragility, would invite a C&D), (b) future MyDigital ID OAuth integration once MAMPU publishes BUDI95/SARA scopes, or (c) direct partnership with MyKasih Foundation. All three are out of hackathon scope.
+
+**Architecture lock (after multi-round user feedback).** Layak ships the redirect-wrapper pattern — same low-risk profile as `mykasih.my`, but with substance: eligibility derived from `profile.age` we already collect, scheme card explains the program, "Check your balance" CTA opens the official portal in a new tab. Neither BUDI95 nor SARA stacks into the headline upside total — `annual_rm = 0.0` on both, `compute_upside` filters on `kind == "upside"`. Discovery agent already polls source pages periodically; once budimadani.gov.my + sara.gov.my get into its allowlist, program-level constants (RM1.99 / 300 L / RM100) refresh on cadence.
+
+**Bundled: manual-entry IC removal (FR-29).** Phase 11 Task 13.5 had the manual path collect a full 12-digit IC to derive `age` + `ic_last6` server-side. Realisation while scoping Phase 12: NONE of the rules — existing six + the two new info cards — actually read `ic_last6` for eligibility. They read `age` + `monthly_income_rm` + `household_flags`. The IC was only persisted for chat-personalisation ("IC ends in 064321") and the masked IC line in PDF packets — both nice-to-haves, not load-bearing. Trading them for "manual path persists ZERO IC information of any kind" is a strictly tighter PDPA posture. The upload path keeps `ic_last6` (Gemini OCR retains it from the uploaded MyKad image; user's affirmative choice to share). Phase 12 makes `ManualEntryPayload.ic` → `ManualEntryPayload.age: int`, makes `Profile.ic_last6: str | None`, and adds Jinja-template + narration None-guards.
+
+**Bundled: schemes-page Latest Update auto-derivation + day-1 seed.** Hardcoded `'2026'` → real `max(verified_at)` formatted "May 13, 2026" via `Intl.DateTimeFormat`. Wiring already exists from Phase 11 Feature 1 (`_finalize_approval` writes SERVER_TIMESTAMP on admin approve; `GET /api/schemes/verified` returns the list). New work is a `scripts/seed_verified_schemes.py` that stamps every locked scheme with the deploy date so the tile shows a real value before any admin discovery action.
+
+**Files touched in this planning round (no code yet).** `docs/plan.md` Phase 12 (8 features + open design questions), `docs/prd.md` (FR-26 BUDI95, FR-27 MyKasih, FR-28 stats auto-derive + seed, FR-29 manual-entry IC removal), `docs/trd.md` §5.11 (Subsidy-Card Scheme Integration + the 10-angle no-API finding recorded for posterity), this progress entry. Implementation lands in its own commit cycle.
+
+**Naming decision for the SARA RM100 scheme.** Verified May 2026: the official program name is "SARA Untuk Semua" (Sumbangan Asas Rahmah), delivered via the MyKasih platform operated by MyKasih Foundation. Public usage mixes both terms roughly equally — Google returns articles titled both "SARA RM100" and "MyKasih RM100" for the same scheme. Layak's user-facing label is **"MyKasih"** (more memorable, what the public types into Google), scheme_id is `mykasih`. The rule's eligibility blurb + citations still reference "SARA Untuk Semua via MyKasih" so the grounding chain is precise — only the display label is shortened. Locked.
+
+**Expiry-date decision.** The 9 Feb 2026 MyKasih RM100 tranche is **valid until 31 December 2026; unused balance is forfeited after that date**. Confirmed via [SoyaCincau 9 Feb 2026 frozen-food article](https://soyacincau.com/2026/02/09/sara-2026-rm100-credit-applicable-for-frozen-goods/), [Reeracoen 2026 update](https://www.reeracoen.com.my/articles/mykasih-rm100-sara-aid-malaysia-2026), [thesmartlocal.my SARA RM100 guide](https://thesmartlocal.my/rm100-sara-cash-aid/). Layak surfaces this prominently in bold (hibiscus accent) on the card so users see the deadline at a glance. New optional field `SchemeMatch.expires_at_iso: str | None` lets the frontend render the bold "Expires 31 Dec 2026" line locale-aware via `Intl.DateTimeFormat`. The rule auto-retires after 31 Dec 2026 via a nightly job that compares `today` against `expires_at_iso`.
+
+**Three open design questions carried into implementation.** (1) MyKasih recurrence + auto-retirement — the 9 Feb 2026 tranche is one-off and expires 31 Dec 2026; after that date the rule should auto-retire (or be admin-re-approved with a new expiry if MOF announces a 2027 tranche). (2) BUDI95 targeting changes — [May 2026 reports](https://autobuzz.my/2026/05/11/govt-finalising-targeted-budi95-plan-no-more-fuel-subsidies-for-the-rich/) note MOF finalising a more targeted BUDI95 that may exclude top earners; discovery agent's `source_watcher` is already polling budimadani.gov.my so this gets caught automatically. (3) Agency count on the stats strip — going from 5 to 6 needs confirmation; is the BUDI95 operator the same MOF entity that runs STR 2026, or distinct? Is MyKasih Foundation a separate agency or rolled under MOF?
+
+---
+
+## [12/05/26] - Phase 11 Task 13.5: Intake-shape pivot — full IC replaces DOB + `ic_last6`
+
+Mid-session course correction on top of Task 13. The IC-tail-only intake from Task 13 had two latent problems: (1) asking the user for both DOB and IC-last-6 was redundant (the IC's first 6 digits ARE the DOB), and (2) the new "we dispose IC info after the pipeline" privacy copy wasn't accurate because `ic_last6` was still persisted on the eval doc. Switching the manual form to collect the full 12-digit IC fixes both: the server derives `age` from YYMMDD and slices `ic_last6` from the trailing 6 inside `build_profile_from_manual_entry`, then discards the 12-digit string. The Firestore profile still stores `ic_last6` + `age` (unchanged from Task 13) — but the user's actual full IC genuinely lives in request-scope memory only, which is what the copy claims.
+
+**Wire shape (the only API change).** `ManualEntryPayload` lost `date_of_birth: date` and `ic_last6: str`; gained `ic: str` validated as `^\d{12}$`. Pydantic rejects dashed input — the frontend strips dashes on every keystroke via a new `formatIcMask` helper (max-length 14 typed to allow paste of `920324-06-4321`, stored as `920324064321`).
+
+**Server-side derivation.** New `_parse_ic(ic, today=None) -> (date, str)` in `build_profile.py`. Two-digit-year disambiguation heuristic: `20YY` wins if it produces a non-future birthday for someone aged ≤ 120; otherwise `19YY`. So a 92-prefixed IC against today (May 2026) maps to 1992, but a 10-prefixed IC maps to 2010 (16-year-old). Impossible dates (e.g. Feb 31 from `000231...`) raise `ValueError` with a "not a valid date" message. Six new pytest cases cover the derivation contract end-to-end including the privacy invariant that the full 12-digit string never appears in `Profile.model_dump_json()`.
+
+**Frontend form simplification.** Identity section dropped from `name + DOB + ic_last6` (3 fields, 2-column grid for DOB+IC, a `DatePicker` calendar widget, a `formatDateMask` helper, and a 30-line Zod `superRefine` block validating real-date / future-date / minimum-year) to `name + ic` (2 fields, single full-width IC input). Net delete in the form file: ~60 LOC. Unused imports `CalendarIcon` and `DatePicker` removed. Sample personas: Aisyah `ic: '920324064321'`, Farhan `ic: '880322065837'`.
+
+**i18n cleanup.** Dropped 8 now-unused keys per locale (`dobLabel/Help/Placeholder/Aria`, `zodDateFormat/NotRealDate/YearMin/PastDate`) — that's 24 keys gone. Added `icPlaceholder`, `zodIcDigits`, `zodIcNotRealDate`. Reworded `icLabel` to "MyKad / IC Number" and `icHelp` to explicitly call out the YYMMDD→age derivation + the full-IC disposal. `zodIc6Digits` kept (still used by the dependant-row Zod, which keeps the optional 6-digit tail).
+
+**Privacy posture.** What the wire now carries: full 12-digit IC. What request-scope holds during the pipeline: full IC + derived DOB. What lands on `evaluations/{evalId}.profile`: `name`, `age`, `ic_last6`, income, household, address — never the full IC, never the YYMMDD prefix, never the derived `date_of_birth`. The "IC information disposed after the process completes" copy now matches reality for the field users care most about (their full IC). The `ic_last6` tail is still persisted (needed for chat handoff personalization + packet regeneration on deep-link); if we want a stricter posture later we can add a post-pipeline Firestore scrub, but Task 13 Open Follow-Up A is no longer load-bearing for honesty since the user's actual _full_ IC is now genuinely transient.
+
+**Future-phase architecture.** Task 13's Open Follow-Up B (MyKasih / BUDI95 needing full IC at scheme-check time) is resolved by re-prompting at the boundary rather than persisting. The intake widget built for Task 13.5 is reusable as-is for that future flow.
+
+**Verification.** Backend `pytest` → **517 passed**, 0 failed (was 511; +6 net IC-parsing tests). Frontend `npx tsc --noEmit` → zero errors in touched files (pre-existing unrelated errors in `results-chat-panel.tsx`, `app-toaster.tsx`, `toast.tsx` from missing npm packages — not our scope).
+
+---
+
+## [12/05/26] - Phase 11 Task 13: IC tail expansion (`ic_last4` → `ic_last6`)
+
+Future federal subsidy integrations (MyKasih, BUDI95) need enough IC tail to reconstruct the full IC at the boundary when combined with the user-supplied DOB. Malaysian IC layout is `YYMMDD-PB-####` — the first 6 are the birthday (recovered from `date_of_birth`), the last 6 are place-of-birth code (`PB`, 2 digits) + serial (`####`, 4 digits). Previous schema kept only the last 4 (serial alone) — enough for in-Layak draft packet identification but insufficient for live agency lookups.
+
+**Rename + regex tightening.** `Profile.ic_last4` + `Dependant.ic_last4` + `ManualEntryPayload.ic_last4` + `DependantInput.ic_last4` all renamed to `ic_last6`; Pydantic pattern moved from `^\d{4}$` to `^\d{6}$`. Privacy invariant docstring in `profile.py` updated to call out the PB+serial decomposition. The field rename was preferred over leaving the name `ic_last4` carrying 6 digits because the latter is a permanent footgun for future readers.
+
+**Mask format change.** `_mask_ic_last4 → _mask_ic_last6` in `narration.py`. Mask went from `***-**-####` (which didn't match real Malaysian IC structure) to `******-PB-####` (which does — only the YYMMDD birthday prefix is starred). The technical-tier event log now resembles a real masked MyKad for operator pattern-matching. The frontend two-tier reasoning surface inherits this automatically. Pytest assertion in `test_pipeline_narration.py` and `test_manual_entry.py` updated accordingly.
+
+**Templates.** All 7 Jinja templates (`_base`, `bk01`, `jkm18`, `jkm_bkk`, `lhdn`, `lhdn_be`, `i_saraan`, `perkeso_sksps`) render `••••••-{ic_last6[:2]}-{ic_last6[2:]}` and updated label copy (en: "Filer IC (last 6)" / ms: "Kad Pengenalan (6 akhir)" / zh: "申报人 IC（末 6 位）"). `jkm_bkk` dependant table also updated.
+
+**Fixture values.** Aisyah's tail went `"4321"` → `"064321"` (preserves the original `4321` serial with a `06` Pahang-coded PB prefix); Farhan's `"5837"` → `"065837"`. The `06` PB code keeps the synthetic profile consistent across backend `aisyah.py`, frontend `aisyah-response.ts`, manual-entry form defaults, and the `smoke_chat.py` script. Test-only fixture rows (`"0001"`, `"0010"`, `"9999"` etc.) gained `08` prefixes to land valid 6-digit shapes.
+
+**Frontend form mechanics.** `manual-entry-form.tsx` Zod refinements (`/^\d{6}$/`), `maxLength={6}`, field id `mef-ic6`, i18n key `zodIc4Digits → zodIc6Digits`. `dependants-fieldset.tsx` same `maxLength` bump. `upload-widget.tsx` submit mapping. `landing-pipeline.tsx` (the inline JSON sample shown in the marketing pipeline visualisation) updated to `ic_last6: 063417`.
+
+**i18n + privacy copy reframing.** Beyond the rote `4 → 6` swap, the FAQ-04 and `section2MyKad` strings were reworked per mid-task user feedback: the old framing claimed "we only store last X digits — your IC is safe", which is disingenuous once the stored tail is large enough that, combined with the in-flight DOB, reconstructs the full IC. New copy uses neutral, forward-compatible wording — "IC information used during the evaluation pipeline is disposed of after the process completes" — without making field-level claims that would break the moment MyKasih/BUDI95 integration ships. **Important caveat:** the current code persists `ic_last6` on the eval doc, so the new copy is not literally accurate yet (see Open Follow-Up A on plan.md Task 13).
+
+**Test suite.** 16 backend test files updated; all rename + fixture changes batch-applied with `replace_all` where safe and targeted edits elsewhere. `test_validation_rejects_non_4_digit_ic_last4 → _non_6_digit_ic_last6`; the explicit length-rejection test's invalid input went `"432"` (3 digits, rejecting under old 4-digit rule) → `"0643"` (4 digits, rejecting under new 6-digit rule). `test_error_humanization.py` synthetic Pydantic error string also bumped to `ic_last6=900324064321 not 6 digits` for symmetry. Final `git grep ic_last4` across the tree returns zero matches.
+
+**Docs.** `docs/trd.md` §4.6, §5.6 layer-3 invariant, §6 PII contract, §10 PDPA posture all reference `ic_last6` + the `******-PB-####` mask. `docs/prd.md` FR-3, FR-21, NFR-3 updated. `README.md` two references (eval-context digest invariant + two-tier reasoning PII clause) updated. Historical plan.md/progress.md entries describing earlier Phase 1/3/9 work intentionally left as-is — those tasks really did ship `ic_last4` at the time, and falsifying that history would obscure the actual migration this Task 13 records.
+
+**Open follow-ups (carried in plan.md Task 13).** (A) the privacy copy claim now exceeds what the code does — needs either a Firestore post-pipeline scrub of `profile.ic_last6` or a copy walk-back. (B) future-phase storage design decision for MyKasih/BUDI95 (re-prompt for DOB at scheme-check vs persist DOB alongside the tail). (C) `Dependant` uses `extra="ignore"` so legacy `ic_last4` keys on dependants silently get dropped to `null` rather than rejected — fine for an empty production DB, worth knowing if any seed docs exist.
+
+---
+
 ## [12/05/26] - Phase 11: production-grade SaaS enhancements (4 features + docs sweep)
 
 Phase 11 ships four production-grade features ahead of the 2026-05-16 Open Category finals. All four landed across five commits in a single session; backend test suite grew from 297 → 511 (+214 tests, all green). Subagent audits ran post-implementation on each feature in parallel — only two minor fixes flagged (keyboard a11y on the technical `<pre>`, demo fixture missing narrative events) and both addressed before commit.
@@ -988,6 +1092,28 @@ Findings the audit flagged that were **not** acted on (cosmetic or external to P
 - Integrated PDPA Consent routing (`X-PDPA-Consent` header triggering on first app auth via `/api/quota`) within `backend/app/auth.py`.
   \n## 2026-04-26\n\n### Phase 5: Auth + Gateway + Marketing (P5T1)\n- Added simple, transparent pricing structure to `en.json` with Free and Pro tiers.\n- Scaffolded `frontend/src/components/landing/landing-pricing.tsx` implementing the Free/Pro split as seen in the SaaS pivot spec.\n- Integrated `LandingPricing` component into `frontend/src/app/pages/marketing/landing-page.tsx`.\n- Marked Phase 5 Task 1 (Landing Page rewrite) as complete in `docs/plan.md`.
 
+## [13/05/26] - Upload sample button solid background fix
+
+- On `/dashboard/evaluation/upload`, changed the `Try Sample Data` action to use a solid `bg-card` surface in both light and dark themes so it no longer reads as a half-transparent outline button.
+- Verified with targeted ESLint on `evaluation-upload-client.tsx` and a full `pnpm -C frontend build`.
+
+## [13/05/26] - Landing header scroll transparency restore
+
+- Restored the marketing topbar to start fully transparent at the top of the landing page, then gradually gain background opacity, border, blur, shadow, and foreground contrast as the user scrolls down.
+- Verified with targeted ESLint on `marketing-header.tsx` and a full `pnpm -C frontend build`.
+
+## [13/05/26] - Alert recovery button underline fix
+
+- Scanned the frontend error/recovery surfaces and traced the underlined CTA bug to the shared `AlertTitle` and `AlertDescription` typography rules, which were underlining every nested anchor, including button-rendered links.
+- Updated `frontend/src/components/ui/alert.tsx` so any nested `[data-slot=button]` element explicitly opts out of underline styling while regular inline text links inside alerts still keep their underline treatment.
+- Verified with targeted ESLint on the alert primitive and a full `pnpm -C frontend build`.
+
+## [13/05/26] - Evaluation overview empty-state alignment polish
+
+- On `/dashboard/evaluation`, made the right-side `PIPELINE` rail align to the same top level as the empty history card whenever the fetched evaluations list is empty, instead of always inheriting the non-empty desktop offset.
+- Simplified the empty history card so `Run your first evaluation to populate this view.` now leads the card, `NO EVALUATIONS YET` sits beneath it, and the extra upload description plus first-evaluation CTA are removed.
+- Verified with targeted ESLint on the touched history components and a full `pnpm -C frontend build`.
+
 ## [24/04/26] - Results chatbot modal production glass fix
 
 - Traced the Cloud Run-only glass regression to the custom `.glass-panel` treatment: it looked fine in dev, but the optimized production CSS bundle was not reliably carrying that selector, so the chat shell fell back to a washed-out translucent look live.
@@ -1075,3 +1201,19 @@ Findings the audit flagged that were **not** acted on (cosmetic or external to P
 - Pruned deprecated i18n keys from en/ms/zh: `schemes.stats.{inScope,coming}`, `schemes.sections.{inScopeTitle,comingTitle,comingCount}`, `schemes.coming.{myKasihDesc,eKasihDesc,saraDesc}`.
 - Rewrote `schemes.pageDescription` to drop the "Three more land in v2..." sentence; new copy emphasises citation provenance instead of forward-looking scope.
 - Verified pnpm lint clean, pnpm build clean across all 13 routes.
+
+## [13/05/26] - Discovery admin header and trigger feedback polish
+
+- Updated `/dashboard/discovery` header copy so the eyebrow reads "Discovery" and the description is a shorter one-liner.
+- Wired "Run discovery now" success and failure outcomes into the existing notification store with matching toast feedback and bell-popover entries.
+- Verified: targeted ESLint on `discovery-trigger.tsx` clean; `pnpm -C frontend build` clean.
+
+## [13/05/26] - Dashboard topcard action alignment
+
+- Updated the shared `PageHeading` topcard layout so dashboard action buttons align to the top-right of the card instead of vertically centering beside the title block.
+- Verified: targeted ESLint on `page-heading.tsx` clean; `pnpm -C frontend build` clean.
+
+## [13/05/26] - Discovery topcard illustration
+
+- Added the new discovery dashboard illustration asset to `/dashboard/discovery` via the shared `PageHeading` illustration slot.
+- Verified: targeted ESLint on `discovery-page.tsx` clean; `pnpm -C frontend build` clean.

@@ -56,7 +56,6 @@ def _profile(monthly_income: float, children_ages: tuple[int, ...]) -> Profile:
     has_children = any(a < 18 for a in children_ages)
     return Profile(
         name="Test",
-        ic_last4="0001",
         age=35,
         monthly_income_rm=monthly_income,
         household_size=1 + len(dependants),

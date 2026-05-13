@@ -7,7 +7,12 @@
  * pipes through `humanize_error` exactly like the pipeline's `ErrorEvent`).
  */
 
-import type { ErrorCategory, StrategyAdvice } from '@/lib/agent-types'
+import type {
+  ErrorCategory,
+  StrategyAdvice,
+  WhatIfRequest,
+  WhatIfResponse
+} from '@/lib/agent-types'
 
 export type ChatRole = 'user' | 'model'
 
@@ -22,6 +27,16 @@ export type ChatRequest = {
   language: 'en' | 'ms' | 'zh'
   /** Phase 11 Feature 2 — optional advisory the user just clicked into. */
   recent_advisory?: StrategyAdvice | null
+  scenario_context?: ChatScenarioContext | null
+}
+
+/** Mirrors backend `ScenarioContext`: compact active What-If preview facts. */
+export type ChatScenarioContext = {
+  overrides: WhatIfRequest['overrides']
+  total_annual_rm: WhatIfResponse['total_annual_rm']
+  matches: WhatIfResponse['matches']
+  deltas: WhatIfResponse['deltas']
+  strategy: WhatIfResponse['strategy']
 }
 
 export type ChatCitation = {

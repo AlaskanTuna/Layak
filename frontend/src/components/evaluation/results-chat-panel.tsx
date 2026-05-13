@@ -361,6 +361,11 @@ export function ResultsChatPanel({ evalId, matches, chat }: Props) {
             {/* Composer — `items-stretch` + matched heights keep textarea +
                 send button visually consistent at all times. */}
             <footer className="border-t border-foreground/10 bg-foreground/[0.025] px-3 py-3 backdrop-blur-md backdrop-saturate-150">
+              {chat.pendingScenarioContext && (
+                <p className="mono-caption mb-2 text-[color:var(--primary)]">
+                  {t('evaluation.chat.scenarioQueued')}
+                </p>
+              )}
               <div className="flex items-stretch gap-2">
                 <textarea
                   ref={inputRef}

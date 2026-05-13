@@ -1911,6 +1911,18 @@ year: 'numeric' })`. Fallback to `"—"` if response is empty (shouldn't
 
 ---
 
+### 16. Feature: What-If deterministic preview benchmark documentation
+
+**Purpose/Issue:** The Phase 11 What-If slider originally blocked on Gemini classification and strategy advisory generation. Local Vertex benchmarking now shows deterministic preview is materially faster and should own immediate slider feedback, while strategy remains async enrichment.
+
+- [x] Reconcile the working branch with latest `origin/main` without dropping poster/demo assets or UI polish.
+- [x] Move raw benchmark CSVs out of `backend/` root into gitignored `tmp/benchmarks/what-if/2026-05-13/`.
+- [x] Keep the repeatable benchmark harness and tests as tracked backend tooling.
+- [x] Record benchmark findings in PRD/TRD without committing ADC, auth, or raw credential artifacts.
+- [x] Preserve existing StrategyAdvice baseline behavior while documenting strategy as non-blocking What-If enrichment.
+
+---
+
 ## Phase X: Submission Package
 
 > Covers the final submission artifacts. Keep it simple and complete.

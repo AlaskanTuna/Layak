@@ -318,7 +318,10 @@ async def stream_chat_response(
         return
 
     system_instruction = build_system_instruction(
-        eval_doc, language=language, recent_advisory=request.recent_advisory
+        eval_doc,
+        language=language,
+        recent_advisory=request.recent_advisory,
+        scenario_context=request.scenario_context,
     )
     contents = _history_to_contents(request.history, request.message)
     valid_ids = qualifying_scheme_ids(eval_doc)

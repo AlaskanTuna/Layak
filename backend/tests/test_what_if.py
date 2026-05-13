@@ -23,6 +23,7 @@ from app.services.what_if import (
     _recent_calls,
     apply_overrides,
     check_rate_limit,
+    classify_household_deterministic,
     compute_deltas,
 )
 
@@ -131,6 +132,15 @@ def test_household_size_reflects_new_dependants():
     out = apply_overrides(p, {"dependants_count": 2, "elderly_dependants_count": 1})
     # 1 filer + 2 children + 1 spouse (preserved) + 1 elderly = 5
     assert out.household_size == 5
+
+
+def test_deterministic_classification_uses_profile_flags_and_per_capita_income():
+    profile = _stub_profile()
+    classification = classify_household_deterministic(profile)
+    assert classification.has_children_under_18 is True
+    assert classification.has_elderly_dependant is False
+    assert classification.income_band == "b40_household_with_children"
+    assert classification.per_capita_monthly_rm == 1000.0
 
 
 # ---------------------------------------------------------------------------

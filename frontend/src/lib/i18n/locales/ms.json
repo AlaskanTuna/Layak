@@ -707,6 +707,9 @@
       "sliderChildrenLabel": "Kanak-kanak bawah 18",
       "sliderElderlyLabel": "Warga emas tanggungan",
       "totalUpsideLabel": "Jumlah apa-jika / tahun",
+      "previewLabel": "Pratonton senario",
+      "askScenario": "Tanya Cik Lay tentang senario ini",
+      "askScenarioPrompt": "Terangkan senario apa-jika ini. Apa yang berubah, skim mana yang bergerak, dan perkara utama apa yang patut saya perhatikan?",
       "deltaChip": {
         "gained": "Layak baru · RM {{amount}}",
         "lost": "Tidak lagi layak · dulu RM {{amount}}",
@@ -1039,6 +1042,7 @@
       "placeholder": "Tanya tentang keputusan anda…",
       "emptyBody": "Saya boleh menerangkan kenapa setiap skim sepadan, dokumen apa yang anda perlukan, atau cara memohon melalui portal rasmi. Saya tidak boleh memberi nasihat undang-undang atau kewangan.",
       "suggestionsLabel": "Soalan cadangan",
+      "scenarioQueued": "Pratonton senario akan dilampirkan pada mesej anda yang seterusnya.",
       "suggestions": {
         "whyQualify": "Kenapa saya layak untuk {{scheme}}?",
         "howApply": "Bagaimana saya memohon skim ini?",

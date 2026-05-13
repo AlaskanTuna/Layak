@@ -4,7 +4,13 @@ import { useCallback, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import type { ErrorCategory, StrategyAdvice } from '@/lib/agent-types'
-import type { ChatEvent, ChatMessage, ChatRequest, ChatTurn } from '@/lib/chat-types'
+import type {
+  ChatEvent,
+  ChatMessage,
+  ChatRequest,
+  ChatScenarioContext,
+  ChatTurn
+} from '@/lib/chat-types'
 import { authedFetch } from '@/lib/firebase'
 
 /**
@@ -55,7 +61,10 @@ function localId(): string {
 
 export type UseChatResult = {
   messages: ChatMessage[]
-  send: (message: string, opts?: { advisory?: StrategyAdvice }) => void
+  send: (
+    message: string,
+    opts?: { advisory?: StrategyAdvice; scenarioContext?: ChatScenarioContext | null }
+  ) => void
   abort: () => void
   reset: () => void
   isStreaming: boolean
@@ -65,10 +74,12 @@ export type UseChatResult = {
    *  `suggested_chat_prompt` as a draft (the chat panel reads `pendingDraft`
    *  to populate its textarea); the next `send()` call will carry the
    *  advisory through to the backend's `recent_advisory` field. */
-  handoffFromAdvice: (advice: StrategyAdvice) => void
+  handoffFromAdvice: (advice: StrategyAdvice, scenarioContext?: ChatScenarioContext | null) => void
+  handoffFromScenario: (scenarioContext: ChatScenarioContext, draft: string) => void
   pendingDraft: string | null
   consumePendingDraft: () => void
   pendingAdvisory: StrategyAdvice | null
+  pendingScenarioContext: ChatScenarioContext | null
 }
 
 export function useChat(evalId: string): UseChatResult {
@@ -85,6 +96,7 @@ export function useChat(evalId: string): UseChatResult {
   // forwards the advisory as the second arg to `send()`.
   const [pendingDraft, setPendingDraft] = useState<string | null>(null)
   const [pendingAdvisory, setPendingAdvisory] = useState<StrategyAdvice | null>(null)
+  const [pendingScenarioContext, setPendingScenarioContext] = useState<ChatScenarioContext | null>(null)
 
   const cleanup = useCallback(() => {
     abortRef.current?.abort()
@@ -97,6 +109,9 @@ export function useChat(evalId: string): UseChatResult {
     setIsStreaming(false)
     setErrorCategory(null)
     setErrorMessage(null)
+    setPendingDraft(null)
+    setPendingAdvisory(null)
+    setPendingScenarioContext(null)
   }, [cleanup])
 
   const abort = useCallback(() => {
@@ -105,7 +120,10 @@ export function useChat(evalId: string): UseChatResult {
   }, [cleanup])
 
   const send = useCallback(
-    (message: string, opts?: { advisory?: StrategyAdvice }) => {
+    (
+      message: string,
+      opts?: { advisory?: StrategyAdvice; scenarioContext?: ChatScenarioContext | null }
+    ) => {
       const trimmed = message.trim()
       if (!trimmed || isStreaming) return
 
@@ -141,11 +159,16 @@ export function useChat(evalId: string): UseChatResult {
       if (pendingAdvisory && !opts?.advisory) {
         setPendingAdvisory(null)
       }
+      const attachedScenarioContext = opts?.scenarioContext ?? pendingScenarioContext ?? null
+      if (pendingScenarioContext && !opts?.scenarioContext) {
+        setPendingScenarioContext(null)
+      }
       const body: ChatRequest = {
         history: priorHistory,
         message: trimmed,
         language,
-        recent_advisory: attachedAdvisory
+        recent_advisory: attachedAdvisory,
+        scenario_context: attachedScenarioContext
       }
 
       const controller = new AbortController()
@@ -201,12 +224,22 @@ export function useChat(evalId: string): UseChatResult {
         }
       })()
     },
-    [evalId, i18n.language, isStreaming, messages, pendingAdvisory]
+    [evalId, i18n.language, isStreaming, messages, pendingAdvisory, pendingScenarioContext]
   )
 
-  const handoffFromAdvice = useCallback((advice: StrategyAdvice) => {
-    setPendingDraft(advice.suggested_chat_prompt ?? advice.headline)
-    setPendingAdvisory(advice)
+  const handoffFromAdvice = useCallback(
+    (advice: StrategyAdvice, scenarioContext?: ChatScenarioContext | null) => {
+      setPendingDraft(advice.suggested_chat_prompt ?? advice.headline)
+      setPendingAdvisory(advice)
+      setPendingScenarioContext(scenarioContext ?? null)
+    },
+    []
+  )
+
+  const handoffFromScenario = useCallback((scenarioContext: ChatScenarioContext, draft: string) => {
+    setPendingDraft(draft)
+    setPendingAdvisory(null)
+    setPendingScenarioContext(scenarioContext)
   }, [])
 
   const consumePendingDraft = useCallback(() => {
@@ -222,8 +255,10 @@ export function useChat(evalId: string): UseChatResult {
     errorCategory,
     errorMessage,
     handoffFromAdvice,
+    handoffFromScenario,
     pendingDraft,
     consumePendingDraft,
-    pendingAdvisory
+    pendingAdvisory,
+    pendingScenarioContext
   }
 }

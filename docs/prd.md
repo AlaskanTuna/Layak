@@ -402,16 +402,17 @@ Each requirement below ties to one of the in-scope v1 and v2 deliverables. Accep
 
 ### FR-24 — What-If scenario exploration (Phase 11 Feature 3)
 
-**Description.** A collapsible "Explore what-if scenarios" subsection on the results page lets the user drag three sliders (monthly income, children under 18, elderly dependants) to see how their eligible schemes shift. Each slider change debounces 500 ms then POSTs to a partial-rerun endpoint that runs `classify → match → optimize_strategy` only (extract + compute_upside + generate_packet skipped). Results render as delta chips under each scheme card.
+**Description.** A collapsible "Explore what-if scenarios" subsection on the results page lets the user drag three sliders (monthly income, children under 18, elderly dependants) to see how their eligible schemes shift. Each slider change debounces 500 ms, aborts any older in-flight preview, and POSTs to a deterministic preview endpoint that applies overrides, re-derives household classification locally, runs rule-based scheme matching, and returns totals/deltas immediately. Strategy advisories refresh as non-blocking enrichment after the preview; extract, compute_upside, and generate_packet stay skipped.
 
 **Acceptance criteria:**
 
-- [ ] Adjusting any slider triggers a re-run that completes in under 2 seconds end-to-end on dev infra.
+- [ ] Adjusting any slider triggers a deterministic preview that completes well under 2 seconds on dev infra; local Vertex benchmark medians were about 0.71ms-1.31ms for the deterministic path versus 1194ms-1719ms for Gemini classification-only across the recorded runs.
 - [ ] Affected scheme cards show delta chips: `Newly eligible · RM N` (gained), `Now ineligible · was RM N` (lost), tier-change `note` verbatim, `±RM N` for amount changes; `unchanged` schemes render no chip.
 - [ ] Sliders clamp server-side to the documented ranges; unknown override keys are silently dropped.
 - [ ] "Reset all" restores baseline state and clears all delta chips by reverting `whatIfResult` to null.
 - [ ] The what-if endpoint does not write to Firestore (zero `.set` / `.update` / `.delete` calls).
-- [ ] Strategy section auto-refreshes from the rerun's `strategy` field when the new profile changes which interaction rules trip.
+- [ ] Strategy section auto-refreshes from a separate advisory refresh when the new profile changes which interaction rules trip; advisory failure does not invalidate deterministic scenario results.
+- [ ] "Ask Cik Lay about this scenario" sends compact scenario context from the computed preview, separate from `recent_advisory`, so chat explains the supplied scenario without recomputing eligibility.
 - [ ] Free-tier users get an additional rate limit of 5 calls / minute / uid; not counted against the daily evaluation quota. Pro tier bypasses.
 
 ### FR-25 — Two-tier reasoning surface (Phase 11 Feature 4)

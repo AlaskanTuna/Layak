@@ -198,6 +198,13 @@ export type SchemeDelta = {
   note: string | null
 }
 
+export type WhatIfSuggestion = {
+  field: 'monthly_income_rm' | 'dependants_count' | 'elderly_dependants_count'
+  suggested_value: number
+  label: string
+  scheme_id: SchemeId | null
+}
+
 /** POST body for `/api/evaluations/{evalId}/what-if`. */
 export type WhatIfRequest = {
   overrides: {
@@ -212,6 +219,8 @@ export type WhatIfResponse = {
   matches: SchemeMatch[]
   strategy: StrategyAdvice[]
   deltas: SchemeDelta[]
+  classification: HouseholdClassification
+  suggestions: WhatIfSuggestion[]
 }
 
 export type StepStartedEvent = { type: 'step_started'; step: Step }

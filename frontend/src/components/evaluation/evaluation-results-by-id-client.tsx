@@ -32,6 +32,7 @@ import {
   type Step,
   type WhatIfResponse
 } from '@/lib/agent-types'
+import type { ChatScenarioContext } from '@/lib/chat-types'
 import { authedFetch } from '@/lib/firebase'
 import { notificationStore } from '@/lib/notification-store'
 
@@ -115,7 +116,17 @@ export function EvaluationResultsByIdClient({ evalId }: { evalId: string }) {
   const chat = useChat(evalId)
   // Phase 11 Feature 3 — latest what-if rerun. When non-null, scheme cards
   // render delta chips and the upside hero swaps to `total_annual_rm`.
-  const [whatIfResult, setWhatIfResult] = useState<WhatIfResponse | null>(null)
+  const [whatIfPreview, setWhatIfPreview] = useState<{
+    result: WhatIfResponse
+    context: ChatScenarioContext
+  } | null>(null)
+  const whatIfResult = whatIfPreview?.result ?? null
+  const handleWhatIfResult = useCallback(
+    (result: WhatIfResponse | null, context: ChatScenarioContext | null) => {
+      setWhatIfPreview(result && context ? { result, context } : null)
+    },
+    []
+  )
 
   const fetchDoc = useCallback(async () => {
     try {
@@ -288,8 +299,10 @@ export function EvaluationResultsByIdClient({ evalId }: { evalId: string }) {
   // `totalAnnualRM` remains upside-only, but the hero copy should reflect the
   // full matched set the user sees on the page, including required-
   // contribution items surfaced in the separate card below.
-  const matchedCount = doc.matches.filter((m) => m.qualifies).length
-  const totalAnnualRm = doc.totalAnnualRM ?? 0
+  const displayedMatches = whatIfResult?.matches ?? doc.matches
+  const matchedCount = displayedMatches.filter((m) => m.qualifies).length
+  const totalAnnualRm = whatIfResult?.total_annual_rm ?? doc.totalAnnualRM ?? 0
+  const hasChatContext = doc.matches.some((m) => m.qualifies) || whatIfResult !== null
   const hasContent = isComplete || (isRunning && doc.matches.length > 0)
 
   // Derive section presence from the *actual* data the children will render.
@@ -369,6 +382,11 @@ export function EvaluationResultsByIdClient({ evalId }: { evalId: string }) {
                   <h2 className="font-heading text-xl font-semibold tracking-tight">
                     {t('evaluation.results.toc.overview')}
                   </h2>
+                  {whatIfResult && (
+                    <span className="mono-caption rounded-full border border-[color:var(--primary)]/35 bg-[color:var(--primary)]/10 px-2.5 py-1 text-[color:var(--primary)]">
+                      {t('evaluation.whatIf.previewLabel')}
+                    </span>
+                  )}
                 </div>
                 <EvaluationUpsideHero
                   totalAnnualRm={totalAnnualRm}
@@ -432,7 +450,9 @@ export function EvaluationResultsByIdClient({ evalId }: { evalId: string }) {
               >
                 <StrategySection
                   advisories={whatIfResult?.strategy ?? pipelineState.strategy}
-                  onAskCikLay={chat.handoffFromAdvice}
+                  onAskCikLay={(advice) =>
+                    chat.handoffFromAdvice(advice, whatIfPreview?.context ?? null)
+                  }
                 />
               </section>
             )}
@@ -454,7 +474,8 @@ export function EvaluationResultsByIdClient({ evalId }: { evalId: string }) {
                 <WhatIfPanel
                   evalId={evalId}
                   baselineProfile={doc.profile}
-                  onResult={setWhatIfResult}
+                  onResult={handleWhatIfResult}
+                  onAskCikLay={chat.handoffFromScenario}
                 />
               </section>
             )}
@@ -495,8 +516,8 @@ export function EvaluationResultsByIdClient({ evalId }: { evalId: string }) {
       {/* Phase 10 — floating chatbot. Only available when the eval has at
           least one qualifying match (no chat without context). The panel
           uses fixed positioning, so it never affects the page layout above. */}
-      {isComplete && matchedCount > 0 && (
-        <ResultsChatPanel evalId={evalId} matches={doc.matches} chat={chat} />
+      {isComplete && hasChatContext && (
+        <ResultsChatPanel evalId={evalId} matches={displayedMatches} chat={chat} />
       )}
     </div>
   )

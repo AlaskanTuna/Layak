@@ -1,21 +1,4 @@
-"""Phase 11 Feature 3 — What-If partial-rerun service.
-
-Applies caller-supplied profile overrides on top of a persisted
-evaluation, re-runs the deterministic / cheap pipeline steps
-(classify → match → optimize_strategy), and returns a delta-annotated
-match list. Stateless w.r.t. Firestore.
-
-Three sliders mapped to overrides (spec §4.2):
-  monthly_income_rm        float ∈ [0, 15_000]
-  dependants_count         int ∈ [0, 6]   (child-care recipients under 18)
-  elderly_dependants_count int ∈ [0, 4]   (elderly-care recipients 60+)
-
-Rate limit (spec §4.5): 5 calls / minute / uid for free tier. Pro
-tier bypasses. Counter lives in-memory per process — sufficient for
-the hackathon footprint (single Cloud Run instance per region). Resets
-on cold start; that's acceptable since a cold start clears any
-pending abuse.
-"""
+"""What-If preview services: fast deterministic loop + optional advisory refresh."""
 
 from __future__ import annotations
 
@@ -29,46 +12,39 @@ from app.agents.tools.classify import classify_household
 from app.agents.tools.match import match_schemes
 from app.agents.tools.optimize_strategy import optimize_strategy
 from app.schema.locale import DEFAULT_LANGUAGE, SupportedLanguage
-from app.schema.profile import Dependant, HouseholdFlags, Profile
+from app.schema.profile import Dependant, HouseholdClassification, HouseholdFlags, Profile
 from app.schema.scheme import SchemeMatch
-from app.schema.what_if import DeltaStatus, SchemeDelta, WhatIfResponse
+from app.schema.what_if import (
+    DeltaStatus,
+    SchemeDelta,
+    WhatIfResponse,
+    WhatIfStrategyResponse,
+    WhatIfSuggestion,
+)
+from app.services.vertex_ai_search import disable_vertex_ai_search
 
 _logger = logging.getLogger(__name__)
 
-# Slider bounds (spec §4.2). Server-side clamps so a hostile client
-# can't extend the range — Pydantic catches type errors but not
-# out-of-range floats.
 _INCOME_MIN = 0.0
 _INCOME_MAX = 15_000.0
 _DEPENDANTS_MAX = 6
 _ELDERLY_MAX = 4
-
-# Rate limit knobs.
 _WHATIF_WINDOW_SECONDS = 60.0
 _WHATIF_MAX_CALLS = 5
-
-# uid → deque of monotonic timestamps within the rolling 60s window.
-# Single-process in-memory store; per spec §4.5 deferral, sufficient for
-# v1. A v2 hardening pass moves this to Firestore counters or Redis when
-# Layak scales beyond one Cloud Run instance.
 _recent_calls: dict[str, deque[float]] = {}
 
 
 class WhatIfRateLimitError(Exception):
-    """Raised when the caller exceeded the per-minute what-if quota."""
-
     def __init__(self, retry_after_seconds: float):
         super().__init__("What-if rate limit exceeded")
         self.retry_after_seconds = retry_after_seconds
 
 
 def check_rate_limit(uid: str, *, is_pro: bool) -> None:
-    """Pro tier bypasses. Free tier: 5 / 60s rolling. Raises on excess."""
     if is_pro:
         return
     now = time.monotonic()
     window = _recent_calls.setdefault(uid, deque(maxlen=_WHATIF_MAX_CALLS * 2))
-    # Drop timestamps older than the window before counting.
     while window and (now - window[0]) > _WHATIF_WINDOW_SECONDS:
         window.popleft()
     if len(window) >= _WHATIF_MAX_CALLS:
@@ -83,42 +59,27 @@ def _build_dependants(
     children_override: int | None,
     elderly_override: int | None,
 ) -> list[Dependant]:
-    """Rebuild the dependants list when the sliders override counts.
-
-    Spec §4.2 sliders only adjust counts — not per-dependant ages or IC
-    fragments. We re-synthesize with archetypal ages (child=10,
-    parent=70) which are what the rule engines actually gate on. Other
-    relationship types from the original profile (spouse, other) are
-    preserved.
-    """
     if children_override is None and elderly_override is None:
         return existing
     preserved = [
-        d
-        for d in existing
-        if d.relationship not in ("child", "sibling", "parent", "grandparent")
+        dependant
+        for dependant in existing
+        if dependant.relationship not in ("child", "sibling", "parent", "grandparent")
     ]
-    children: list[Dependant] = []
-    if children_override is not None:
-        children = [Dependant(relationship="child", age=10) for _ in range(children_override)]
-    else:
-        children = [d for d in existing if d.relationship in ("child", "sibling")]
-    parents: list[Dependant] = []
-    if elderly_override is not None:
-        parents = [Dependant(relationship="parent", age=70) for _ in range(elderly_override)]
-    else:
-        parents = [d for d in existing if d.relationship in ("parent", "grandparent")]
-    return preserved + children + parents
+    children = (
+        [Dependant(relationship="child", age=10) for _ in range(children_override)]
+        if children_override is not None
+        else [d for d in existing if d.relationship in ("child", "sibling")]
+    )
+    elderly = (
+        [Dependant(relationship="parent", age=70) for _ in range(elderly_override)]
+        if elderly_override is not None
+        else [d for d in existing if d.relationship in ("parent", "grandparent")]
+    )
+    return preserved + children + elderly
 
 
 def apply_overrides(profile: Profile, overrides: dict[str, Any]) -> Profile:
-    """Clone the profile with the slider-bound overrides applied.
-
-    Unknown override keys are dropped silently (the route doesn't
-    surface them — the frontend only sends keys we recognise). Each
-    supported key is clamped server-side so a hostile client can't
-    push the rule engines past their validated ranges.
-    """
     raw_income = overrides.get("monthly_income_rm")
     raw_children = overrides.get("dependants_count")
     raw_elderly = overrides.get("elderly_dependants_count")
@@ -139,39 +100,44 @@ def apply_overrides(profile: Profile, overrides: dict[str, Any]) -> Profile:
         else None
     )
 
-    new_dependants = _build_dependants(
+    dependants = _build_dependants(
         existing=profile.dependants,
         children_override=children_count,
         elderly_override=elderly_count,
     )
-
-    # Re-derive flags so the income_band stays consistent with the new
-    # numbers (this is what the rule modules read).
-    new_flags: HouseholdFlags = derive_household_flags(new_income, new_dependants)
-
+    flags: HouseholdFlags = derive_household_flags(new_income, dependants)
     return profile.model_copy(
         update={
             "monthly_income_rm": new_income,
             "household_monthly_income_rm": new_income,
-            "dependants": new_dependants,
-            "household_size": 1 + len(new_dependants),
-            "household_flags": new_flags,
+            "dependants": dependants,
+            "household_size": 1 + len(dependants),
+            "household_flags": flags,
         }
     )
 
 
-def _round2(v: float) -> float:
-    return round(v, 2)
+def classify_household_deterministic(profile: Profile) -> HouseholdClassification:
+    flags = profile.household_flags
+    per_capita = round(profile.monthly_income_rm / max(profile.household_size, 1), 2)
+    return HouseholdClassification(
+        has_children_under_18=flags.has_children_under_18,
+        has_elderly_dependant=flags.has_elderly_dependant,
+        income_band=flags.income_band,
+        per_capita_monthly_rm=per_capita,
+        notes=[],
+    )
+
+
+def _round2(value: float) -> float:
+    return round(value, 2)
+
+
+def _floats_close(a: float, b: float, *, tol: float = 0.5) -> bool:
+    return abs(a - b) <= tol
 
 
 def _delta_status(baseline: SchemeMatch | None, rerun: SchemeMatch | None) -> DeltaStatus:
-    """Categorise the change between a baseline and rerun match.
-
-    `tier_changed` is detected by checking whether the scheme_id is the
-    same but the `summary` text differs (rule modules embed the tier
-    label in `summary`). Falls back to `amount_changed` when summaries
-    are identical but `annual_rm` changed.
-    """
     baseline_qualifies = baseline is not None and baseline.qualifies
     rerun_qualifies = rerun is not None and rerun.qualifies
     if rerun_qualifies and not baseline_qualifies:
@@ -180,7 +146,7 @@ def _delta_status(baseline: SchemeMatch | None, rerun: SchemeMatch | None) -> De
         return "lost"
     if not baseline_qualifies and not rerun_qualifies:
         return "unchanged"
-    assert baseline is not None and rerun is not None  # narrowed by the two early returns
+    assert baseline is not None and rerun is not None
     if baseline.summary != rerun.summary:
         return "tier_changed"
     if not _floats_close(baseline.annual_rm, rerun.annual_rm):
@@ -188,46 +154,183 @@ def _delta_status(baseline: SchemeMatch | None, rerun: SchemeMatch | None) -> De
     return "unchanged"
 
 
-def _floats_close(a: float, b: float, *, tol: float = 0.5) -> bool:
-    return abs(a - b) <= tol
-
-
-def compute_deltas(
-    baseline: list[SchemeMatch],
-    rerun: list[SchemeMatch],
-) -> list[SchemeDelta]:
-    """Diff baseline vs rerun matches keyed by scheme_id.
-
-    Emits a `SchemeDelta` for every scheme that appears on EITHER side
-    so the frontend can render "now ineligible" + "newly eligible"
-    chips. `unchanged` rows are emitted too — the client filters them
-    out for display but they make idempotency tests easier.
-    """
-    baseline_by_id = {m.scheme_id: m for m in baseline}
-    rerun_by_id = {m.scheme_id: m for m in rerun}
-    all_ids = sorted(baseline_by_id.keys() | rerun_by_id.keys())
+def compute_deltas(baseline: list[SchemeMatch], rerun: list[SchemeMatch]) -> list[SchemeDelta]:
+    baseline_by_id = {match.scheme_id: match for match in baseline}
+    rerun_by_id = {match.scheme_id: match for match in rerun}
     deltas: list[SchemeDelta] = []
-    for scheme_id in all_ids:
-        b = baseline_by_id.get(scheme_id)
-        r = rerun_by_id.get(scheme_id)
-        status = _delta_status(b, r)
-        b_rm = b.annual_rm if (b and b.qualifies) else None
-        r_rm = r.annual_rm if (r and r.qualifies) else None
-        delta_rm = _round2((r_rm or 0.0) - (b_rm or 0.0))
-        note: str | None = None
-        if status == "tier_changed" and b and r:
-            note = f"{b.summary[:36]} → {r.summary[:36]}"
+    for scheme_id in sorted(baseline_by_id.keys() | rerun_by_id.keys()):
+        baseline_match = baseline_by_id.get(scheme_id)
+        rerun_match = rerun_by_id.get(scheme_id)
+        status = _delta_status(baseline_match, rerun_match)
+        baseline_rm = baseline_match.annual_rm if (baseline_match and baseline_match.qualifies) else None
+        rerun_rm = rerun_match.annual_rm if (rerun_match and rerun_match.qualifies) else None
+        note = None
+        if status == "tier_changed" and baseline_match and rerun_match:
+            note = f"{baseline_match.summary[:36]} -> {rerun_match.summary[:36]}"
         deltas.append(
             SchemeDelta(
                 scheme_id=scheme_id,
                 status=status,
-                baseline_annual_rm=_round2(b_rm) if b_rm is not None else None,
-                new_annual_rm=_round2(r_rm) if r_rm is not None else None,
-                delta_rm=delta_rm,
+                baseline_annual_rm=_round2(baseline_rm) if baseline_rm is not None else None,
+                new_annual_rm=_round2(rerun_rm) if rerun_rm is not None else None,
+                delta_rm=_round2((rerun_rm or 0.0) - (baseline_rm or 0.0)),
                 note=note,
             )
         )
     return deltas
+
+
+def _material_deltas(deltas: list[SchemeDelta]) -> list[SchemeDelta]:
+    return [delta for delta in deltas if delta.status != "unchanged"]
+
+
+async def _probe_suggestions(
+    *,
+    baseline_profile: Profile,
+    scenario_profile: Profile,
+    scenario_matches: list[SchemeMatch],
+    language: SupportedLanguage,
+) -> list[WhatIfSuggestion]:
+    suggestions: list[WhatIfSuggestion] = []
+    current_income = scenario_profile.monthly_income_rm
+    income_candidates = [
+        value
+        for value in (current_income - 100, current_income - 300, current_income - 500, current_income - 1000)
+        if _INCOME_MIN <= value <= _INCOME_MAX
+    ]
+    for candidate in income_candidates:
+        probe_profile = apply_overrides(scenario_profile, {"monthly_income_rm": candidate})
+        with disable_vertex_ai_search():
+            probe_matches = await match_schemes(probe_profile, language=language)
+        deltas = _material_deltas(compute_deltas(scenario_matches, probe_matches))
+        if deltas:
+            delta = deltas[0]
+            suggestions.append(
+                WhatIfSuggestion(
+                    field="monthly_income_rm",
+                    suggested_value=candidate,
+                    label=f"Try RM {int(candidate):,}; it may change {delta.scheme_id}.",
+                    scheme_id=delta.scheme_id,
+                )
+            )
+            break
+
+    child_now = sum(
+        1
+        for dependant in scenario_profile.dependants
+        if dependant.relationship in ("child", "sibling") and dependant.age < 18
+    )
+    if child_now < _DEPENDANTS_MAX:
+        probe_profile = apply_overrides(scenario_profile, {"dependants_count": child_now + 1})
+        with disable_vertex_ai_search():
+            probe_matches = await match_schemes(probe_profile, language=language)
+        deltas = _material_deltas(compute_deltas(scenario_matches, probe_matches))
+        if deltas:
+            delta = deltas[0]
+            suggestions.append(
+                WhatIfSuggestion(
+                    field="dependants_count",
+                    suggested_value=float(child_now + 1),
+                    label=f"Try {child_now + 1} child dependants; it may change {delta.scheme_id}.",
+                    scheme_id=delta.scheme_id,
+                )
+            )
+
+    elderly_now = sum(
+        1
+        for dependant in scenario_profile.dependants
+        if dependant.relationship in ("parent", "grandparent") and dependant.age >= 60
+    )
+    if elderly_now < _ELDERLY_MAX:
+        probe_profile = apply_overrides(scenario_profile, {"elderly_dependants_count": elderly_now + 1})
+        with disable_vertex_ai_search():
+            probe_matches = await match_schemes(probe_profile, language=language)
+        deltas = _material_deltas(compute_deltas(scenario_matches, probe_matches))
+        if deltas:
+            delta = deltas[0]
+            suggestions.append(
+                WhatIfSuggestion(
+                    field="elderly_dependants_count",
+                    suggested_value=float(elderly_now + 1),
+                    label=f"Try {elderly_now + 1} elderly dependants; it may change {delta.scheme_id}.",
+                    scheme_id=delta.scheme_id,
+                )
+            )
+    return suggestions[:3]
+
+
+async def run_what_if_deterministic(
+    *,
+    baseline_profile: Profile,
+    baseline_matches: list[SchemeMatch],
+    overrides: dict[str, Any],
+    language: SupportedLanguage = DEFAULT_LANGUAGE,
+) -> WhatIfResponse:
+    scenario_profile = apply_overrides(baseline_profile, overrides)
+    classification = classify_household_deterministic(scenario_profile)
+    with disable_vertex_ai_search():
+        matches = await match_schemes(scenario_profile, language=language)
+    deltas = compute_deltas(baseline_matches, matches)
+    suggestions = await _probe_suggestions(
+        baseline_profile=baseline_profile,
+        scenario_profile=scenario_profile,
+        scenario_matches=matches,
+        language=language,
+    )
+    total = _round2(sum(match.annual_rm for match in matches if match.qualifies and match.kind == "upside"))
+    return WhatIfResponse(
+        total_annual_rm=total,
+        matches=matches,
+        strategy=[],
+        deltas=deltas,
+        classification=classification,
+        suggestions=suggestions,
+    )
+
+
+async def run_what_if_legacy(
+    *,
+    baseline_profile: Profile,
+    baseline_matches: list[SchemeMatch],
+    overrides: dict[str, Any],
+    language: SupportedLanguage = DEFAULT_LANGUAGE,
+) -> WhatIfResponse:
+    scenario_profile = apply_overrides(baseline_profile, overrides)
+    classification = await classify_household(scenario_profile, language=language)
+    matches = await match_schemes(scenario_profile, language=language)
+    try:
+        strategy = await optimize_strategy(scenario_profile, matches, classification, language=language)
+    except Exception:  # noqa: BLE001
+        _logger.exception("legacy what-if optimize_strategy failed")
+        strategy = []
+    deltas = compute_deltas(baseline_matches, matches)
+    total = _round2(sum(match.annual_rm for match in matches if match.qualifies and match.kind == "upside"))
+    return WhatIfResponse(
+        total_annual_rm=total,
+        matches=matches,
+        strategy=strategy,
+        deltas=deltas,
+        classification=classification,
+        suggestions=[],
+    )
+
+
+async def run_what_if_strategy_refresh(
+    *,
+    baseline_profile: Profile,
+    overrides: dict[str, Any],
+    language: SupportedLanguage = DEFAULT_LANGUAGE,
+) -> WhatIfStrategyResponse:
+    scenario_profile = apply_overrides(baseline_profile, overrides)
+    classification = classify_household_deterministic(scenario_profile)
+    with disable_vertex_ai_search():
+        matches = await match_schemes(scenario_profile, language=language)
+    try:
+        strategy = await optimize_strategy(scenario_profile, matches, classification, language=language)
+    except Exception:  # noqa: BLE001
+        _logger.exception("what-if strategy refresh failed")
+        strategy = []
+    return WhatIfStrategyResponse(strategy=strategy)
 
 
 async def run_what_if(
@@ -237,39 +340,9 @@ async def run_what_if(
     overrides: dict[str, Any],
     language: SupportedLanguage = DEFAULT_LANGUAGE,
 ) -> WhatIfResponse:
-    """End-to-end partial rerun.
-
-    1. Apply overrides → new Profile.
-    2. classify_household on the new profile.
-    3. match_schemes on the new profile.
-    4. optimize_strategy on the new profile + matches (fail-open to [] on
-       Gemini failure, just like the live pipeline).
-    5. Compute deltas vs `baseline_matches`.
-    6. Sum upside (we skip the Code Execution step — the math is just
-       `sum(m.annual_rm for m in matches if m.qualifies and m.kind == "upside")`).
-    """
-    new_profile = apply_overrides(baseline_profile, overrides)
-
-    classification = await classify_household(new_profile, language=language)
-    rerun_matches = await match_schemes(new_profile, language=language)
-
-    try:
-        strategy = await optimize_strategy(
-            new_profile, rerun_matches, classification, language=language
-        )
-    except Exception:  # noqa: BLE001 — strategy is optional; failure shouldn't break the rerun
-        _logger.exception("what-if optimize_strategy failed; returning empty advisories")
-        strategy = []
-
-    deltas = compute_deltas(baseline_matches, rerun_matches)
-
-    total_annual_rm = _round2(
-        sum(m.annual_rm for m in rerun_matches if m.qualifies and m.kind == "upside")
-    )
-
-    return WhatIfResponse(
-        total_annual_rm=total_annual_rm,
-        matches=rerun_matches,
-        strategy=strategy,
-        deltas=deltas,
+    return await run_what_if_deterministic(
+        baseline_profile=baseline_profile,
+        baseline_matches=baseline_matches,
+        overrides=overrides,
+        language=language,
     )

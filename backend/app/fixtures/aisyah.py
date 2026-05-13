@@ -17,6 +17,7 @@ from __future__ import annotations
 from app.rules import i_saraan, jkm_bkk, jkm_warga_emas, lhdn_form_b, perkeso_sksps, str_2026
 from app.schema.profile import Dependant, HouseholdFlags, Profile
 from app.schema.scheme import SchemeMatch
+from app.services.vertex_ai_search import disable_vertex_ai_search
 
 AISYAH_PROFILE = Profile(
     name="Aisyah binti Ahmad",
@@ -39,14 +40,15 @@ AISYAH_PROFILE = Profile(
 
 
 def _compute_aisyah_matches() -> list[SchemeMatch]:
-    results = [
-        str_2026.match(AISYAH_PROFILE),
-        jkm_warga_emas.match(AISYAH_PROFILE),
-        jkm_bkk.match(AISYAH_PROFILE),
-        lhdn_form_b.match(AISYAH_PROFILE),
-        i_saraan.match(AISYAH_PROFILE),
-        perkeso_sksps.match(AISYAH_PROFILE),
-    ]
+    with disable_vertex_ai_search():
+        results = [
+            str_2026.match(AISYAH_PROFILE),
+            jkm_warga_emas.match(AISYAH_PROFILE),
+            jkm_bkk.match(AISYAH_PROFILE),
+            lhdn_form_b.match(AISYAH_PROFILE),
+            i_saraan.match(AISYAH_PROFILE),
+            perkeso_sksps.match(AISYAH_PROFILE),
+        ]
     qualifying = [m for m in results if m.qualifies]
     # Sort: upside schemes first (descending by annual_rm), then required-
     # contribution schemes last. Mirrors `match_schemes.match_schemes()`.

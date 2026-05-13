@@ -1,6 +1,6 @@
 'use client'
 
-import { useCallback, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 
 import { authedFetch } from '@/lib/firebase'
 import type { WhatIfRequest, WhatIfResponse } from '@/lib/agent-types'
@@ -40,10 +40,10 @@ export function useWhatIf(evalId: string): UseWhatIfResult {
   const [retryAfterSeconds, setRetryAfterSeconds] = useState<number | null>(null)
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const abortRef = useRef<AbortController | null>(null)
+  const requestGenerationRef = useRef(0)
 
   const performRequest = useCallback(
-    async (overrides: WhatIfRequest['overrides']) => {
-      abortRef.current?.abort()
+    async (overrides: WhatIfRequest['overrides'], generation: number) => {
       const controller = new AbortController()
       abortRef.current = controller
       setPhase('in-flight')
@@ -56,24 +56,57 @@ export function useWhatIf(evalId: string): UseWhatIfResult {
           body: JSON.stringify({ overrides } as WhatIfRequest),
           signal: controller.signal
         })
+        if (generation !== requestGenerationRef.current || controller.signal.aborted) return
         if (res.status === 429) {
           const retry = Number(res.headers.get('Retry-After')) || 60
+          setData(null)
           setRetryAfterSeconds(retry)
           setPhase('rate-limited')
           return
         }
         if (!res.ok) {
+          setData(null)
           setErrorMessage(`Backend returned ${res.status}`)
           setPhase('error')
           return
         }
         const body = (await res.json()) as WhatIfResponse
+        if (generation !== requestGenerationRef.current || controller.signal.aborted) return
         setData(body)
         setPhase('ready')
+        void authedFetch(`${BACKEND()}/api/evaluations/${evalId}/what-if/strategy`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ overrides } as WhatIfRequest),
+          signal: controller.signal
+        })
+          .then(async (strategyRes) => {
+            if (
+              generation !== requestGenerationRef.current ||
+              controller.signal.aborted ||
+              !strategyRes.ok
+            ) {
+              return
+            }
+            const strategyBody = (await strategyRes.json()) as { strategy?: WhatIfResponse['strategy'] }
+            if (generation !== requestGenerationRef.current || controller.signal.aborted) return
+            setData((current) =>
+              current === null ? current : { ...current, strategy: strategyBody.strategy ?? [] }
+            )
+          })
+          .catch(() => {
+            // Strategy enrichment is optional; the deterministic preview remains valid.
+          })
       } catch (err) {
         if ((err as Error).name === 'AbortError') return
+        if (generation !== requestGenerationRef.current || controller.signal.aborted) return
+        setData(null)
         setErrorMessage(err instanceof Error ? err.message : String(err))
         setPhase('error')
+      } finally {
+        if (abortRef.current === controller) {
+          abortRef.current = null
+        }
       }
     },
     [evalId]
@@ -82,9 +115,15 @@ export function useWhatIf(evalId: string): UseWhatIfResult {
   const runWhatIf = useCallback(
     (overrides: WhatIfRequest['overrides']) => {
       if (debounceRef.current) clearTimeout(debounceRef.current)
+      abortRef.current?.abort()
+      abortRef.current = null
+      const generation = ++requestGenerationRef.current
       setPhase('debouncing')
+      setErrorMessage(null)
+      setRetryAfterSeconds(null)
       debounceRef.current = setTimeout(() => {
-        void performRequest(overrides)
+        debounceRef.current = null
+        void performRequest(overrides, generation)
       }, DEBOUNCE_MS)
     },
     [performRequest]
@@ -95,6 +134,7 @@ export function useWhatIf(evalId: string): UseWhatIfResult {
       clearTimeout(debounceRef.current)
       debounceRef.current = null
     }
+    requestGenerationRef.current += 1
     abortRef.current?.abort()
     abortRef.current = null
     setData(null)
@@ -102,6 +142,15 @@ export function useWhatIf(evalId: string): UseWhatIfResult {
     setErrorMessage(null)
     setRetryAfterSeconds(null)
   }, [])
+
+  useEffect(
+    () => () => {
+      if (debounceRef.current) clearTimeout(debounceRef.current)
+      requestGenerationRef.current += 1
+      abortRef.current?.abort()
+    },
+    []
+  )
 
   return { phase, data, errorMessage, retryAfterSeconds, runWhatIf, clear }
 }

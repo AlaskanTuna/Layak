@@ -1,19 +1,21 @@
 'use client'
 
 import { useCallback, useEffect, useMemo, useState } from 'react'
-import { Loader2, RotateCcw } from 'lucide-react'
+import { Loader2, MessageCircle, RotateCcw } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 
 import { Button } from '@/components/ui/button'
 import { useWhatIf } from '@/hooks/use-what-if'
 import type { Profile, WhatIfRequest, WhatIfResponse } from '@/lib/agent-types'
+import type { ChatScenarioContext } from '@/lib/chat-types'
 
 type Props = {
   evalId: string
   baselineProfile: Profile
   /** Lift state to the parent so scheme cards can read deltas + the rerun
    *  total animates on the upside hero (Phase 11 Feature 3 spec §4.4). */
-  onResult: (result: WhatIfResponse | null) => void
+  onResult: (result: WhatIfResponse | null, context: ChatScenarioContext | null) => void
+  onAskCikLay?: (context: ChatScenarioContext, draft: string) => void
 }
 
 type SliderInputs = {
@@ -50,7 +52,7 @@ function formatRm(value: number): string {
   return `RM ${value.toLocaleString('en-MY', { maximumFractionDigits: 0 })}`
 }
 
-export function WhatIfPanel({ evalId, baselineProfile, onResult }: Props) {
+export function WhatIfPanel({ evalId, baselineProfile, onResult, onAskCikLay }: Props) {
   const { t } = useTranslation()
   const baseline = useMemo(() => deriveBaselineSliders(baselineProfile), [baselineProfile])
   const [values, setValues] = useState<SliderInputs>(baseline)
@@ -73,6 +75,17 @@ export function WhatIfPanel({ evalId, baselineProfile, onResult }: Props) {
     return overrides
   }, [values, baseline])
 
+  const scenarioContext = useMemo<ChatScenarioContext | null>(() => {
+    if (whatIf.phase !== 'ready' || !whatIf.data) return null
+    return {
+      overrides: diffsFromBaseline,
+      total_annual_rm: whatIf.data.total_annual_rm,
+      matches: whatIf.data.matches,
+      deltas: whatIf.data.deltas,
+      strategy: whatIf.data.strategy
+    }
+  }, [diffsFromBaseline, whatIf.data, whatIf.phase])
+
   // Effect drives the debounced rerun. `runWhatIf` itself debounces 500ms.
   useEffect(() => {
     if (Object.keys(diffsFromBaseline).length === 0) {
@@ -87,12 +100,16 @@ export function WhatIfPanel({ evalId, baselineProfile, onResult }: Props) {
   // rendering. Treat 'rate-limited' / 'error' as no-result states so the
   // page doesn't strand stale data.
   useEffect(() => {
-    if (whatIf.phase === 'ready' && whatIf.data) {
-      onResult(whatIf.data)
-    } else if (whatIf.phase === 'idle') {
-      onResult(null)
+    if (whatIf.phase === 'ready' && whatIf.data && scenarioContext) {
+      onResult(whatIf.data, scenarioContext)
+    } else if (
+      whatIf.phase === 'idle' ||
+      whatIf.phase === 'rate-limited' ||
+      whatIf.phase === 'error'
+    ) {
+      onResult(null, null)
     }
-  }, [whatIf.phase, whatIf.data, onResult])
+  }, [whatIf.phase, whatIf.data, onResult, scenarioContext])
 
   const resetAll = useCallback(() => {
     setValues(baseline)
@@ -107,6 +124,11 @@ export function WhatIfPanel({ evalId, baselineProfile, onResult }: Props) {
   )
 
   const isDirty = Object.keys(diffsFromBaseline).length > 0
+  const suggestions = whatIf.data?.suggestions ?? []
+
+  const applySuggestion = useCallback((field: keyof SliderInputs, value: number) => {
+    setValues((prev) => ({ ...prev, [field]: value }))
+  }, [])
 
   return (
     <section className="paper-card flex flex-col gap-4 rounded-[16px] p-5">
@@ -152,6 +174,33 @@ export function WhatIfPanel({ evalId, baselineProfile, onResult }: Props) {
         />
       </div>
 
+      {suggestions.length > 0 && (
+        <div className="flex flex-col gap-2 border-t border-foreground/10 pt-3">
+          <span className="mono-caption text-foreground/55">
+            {t('evaluation.chat.suggestionsLabel')}
+          </span>
+          <div className="flex flex-wrap gap-2">
+            {suggestions.slice(0, 3).map((suggestion) => (
+              <Button
+                key={`${suggestion.field}-${suggestion.suggested_value}-${suggestion.scheme_id ?? 'none'}`}
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={() =>
+                  applySuggestion(
+                    suggestion.field,
+                    suggestion.suggested_value
+                  )
+                }
+                className="h-auto rounded-full px-3 py-1.5 text-left text-xs"
+              >
+                {suggestion.label}
+              </Button>
+            ))}
+          </div>
+        </div>
+      )}
+
       <footer className="flex flex-col gap-2 border-t border-foreground/10 pt-3 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex items-center gap-3 text-sm">
           {whatIf.phase === 'debouncing' || whatIf.phase === 'in-flight' ? (
@@ -178,6 +227,18 @@ export function WhatIfPanel({ evalId, baselineProfile, onResult }: Props) {
             </span>
           ) : null}
         </div>
+        {scenarioContext && onAskCikLay && (
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            onClick={() => onAskCikLay(scenarioContext, t('evaluation.whatIf.askScenarioPrompt'))}
+            className="gap-1.5 self-start rounded-full sm:self-auto"
+          >
+            <MessageCircle className="size-3.5" aria-hidden />
+            {t('evaluation.whatIf.askScenario')}
+          </Button>
+        )}
       </footer>
     </section>
   )

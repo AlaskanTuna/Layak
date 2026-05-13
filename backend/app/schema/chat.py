@@ -26,7 +26,9 @@ from pydantic import BaseModel, ConfigDict, Field
 
 from app.schema.events import ErrorCategory
 from app.schema.locale import DEFAULT_LANGUAGE, SupportedLanguage
+from app.schema.scheme import SchemeMatch
 from app.schema.strategy import StrategyAdvice
+from app.schema.what_if import SchemeDelta
 
 # Hard caps. The 4 KiB per-message cap matches the input-validator length
 # guard in `app.services.chat`; the 20-turn history cap keeps the prompt
@@ -71,6 +73,19 @@ class ChatRequest(BaseModel):
     message: str = Field(min_length=1, max_length=MAX_MESSAGE_CHARS)
     language: SupportedLanguage = DEFAULT_LANGUAGE
     recent_advisory: StrategyAdvice | None = None
+    scenario_context: ScenarioContext | None = None
+
+
+class ScenarioContext(BaseModel):
+    """Compact active What-If preview facts passed from the results page."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    overrides: dict[str, float | int] = Field(default_factory=dict)
+    total_annual_rm: float = Field(ge=0)
+    matches: list[SchemeMatch] = Field(default_factory=list)
+    deltas: list[SchemeDelta] = Field(default_factory=list)
+    strategy: list[StrategyAdvice] = Field(default_factory=list)
 
 
 class ChatCitation(BaseModel):

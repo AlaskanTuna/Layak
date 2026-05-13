@@ -35,6 +35,9 @@ from __future__ import annotations
 import logging
 import os
 import re
+from collections.abc import Iterator
+from contextlib import contextmanager
+from contextvars import ContextVar
 from functools import lru_cache
 
 from pydantic import BaseModel, ConfigDict, Field
@@ -46,6 +49,17 @@ _logger = logging.getLogger(__name__)
 _DEFAULT_DATA_STORE = "layak-schemes-v1"
 _DEFAULT_LOCATION = "global"
 _DEFAULT_SERVING_CONFIG = "default_serving_config"
+_RAG_DISABLED: ContextVar[bool] = ContextVar("vertex_ai_search_disabled", default=False)
+
+
+@contextmanager
+def disable_vertex_ai_search() -> Iterator[None]:
+    """Temporarily skip live retrieval and fall back to hardcoded citations."""
+    token = _RAG_DISABLED.set(True)
+    try:
+        yield
+    finally:
+        _RAG_DISABLED.reset(token)
 
 
 class RetrievedPassage(BaseModel):
@@ -297,8 +311,10 @@ def get_primary_rag_citation(
             if rag is not None:
                 cites.append(rag)
             cites.extend([<existing hardcoded citations>])
-            return cites
+        return cites
     """
+    if _RAG_DISABLED.get():
+        return None
     hits = search_passage(query, top_k=1, filter_uri_contains=[uri_substring])
     if not hits:
         return None

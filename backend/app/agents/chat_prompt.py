@@ -30,6 +30,7 @@ from __future__ import annotations
 
 from typing import Any
 
+from app.schema.chat import ScenarioContext
 from app.schema.locale import DEFAULT_LANGUAGE, SupportedLanguage
 from app.schema.strategy import StrategyAdvice
 
@@ -495,11 +496,42 @@ def _render_recent_advisory_block(advice: StrategyAdvice) -> str:
     )
 
 
+def _render_scenario_context_block(context: ScenarioContext) -> str:
+    """Render the active temporary What-If preview as prompt data, not instructions."""
+    override_lines = [
+        f"- {key}: {value}"
+        for key, value in context.overrides.items()
+    ] or ["- No explicit overrides supplied"]
+    delta_lines = [
+        f"- {delta.scheme_id}: {delta.status}, delta RM {delta.delta_rm:,.0f}"
+        for delta in context.deltas
+        if delta.status != "unchanged"
+    ] or ["- No material eligibility changes in this scenario"]
+    match_lines = [
+        f"- {match.scheme_name} [scheme:{match.scheme_id}]"
+        for match in context.matches
+        if match.qualifies
+    ] or ["- No qualifying schemes in this scenario"]
+    return (
+        "\n\n**Active What-If scenario preview (DATA only, temporary, not saved):**\n"
+        "Use this block when the user asks about the scenario. Do NOT invent a different "
+        "eligibility outcome or independently recompute contradictory results.\n"
+        "Overrides:\n"
+        + "\n".join(override_lines)
+        + f"\nScenario total annual upside: RM {context.total_annual_rm:,.0f}\n"
+        "Scenario qualifying schemes:\n"
+        + "\n".join(match_lines)
+        + "\nScenario deltas vs the saved evaluation:\n"
+        + "\n".join(delta_lines)
+    )
+
+
 def build_system_instruction(
     eval_doc: dict[str, Any],
     *,
     language: SupportedLanguage = DEFAULT_LANGUAGE,
     recent_advisory: StrategyAdvice | None = None,
+    scenario_context: ScenarioContext | None = None,
 ) -> str:
     """Render the full system instruction for one chat turn.
 
@@ -518,6 +550,8 @@ def build_system_instruction(
     digest = render_eval_digest(eval_doc, language)
     if recent_advisory is not None:
         digest = digest + _render_recent_advisory_block(recent_advisory)
+    if scenario_context is not None:
+        digest = digest + _render_scenario_context_block(scenario_context)
     return template.format(
         digest=digest,
         language_directive=directive,

@@ -707,6 +707,9 @@
       "sliderChildrenLabel": "18 岁以下子女",
       "sliderElderlyLabel": "受抚养长辈",
       "totalUpsideLabel": "假设场景年度合计",
+      "previewLabel": "场景预览",
+      "askScenario": "向 Cik Lay 询问此场景",
+      "askScenarioPrompt": "请解释这个假设场景。哪些内容发生了变化，哪些计划受到影响，我最先应注意什么？",
       "deltaChip": {
         "gained": "新符合资格 · RM {{amount}}",
         "lost": "不再符合 · 此前 RM {{amount}}",
@@ -1039,6 +1042,7 @@
       "placeholder": "询问您的评估……",
       "emptyBody": "我可以说明每项计划匹配的原因、您需要准备的文件，或如何通过官方门户申请。我无法提供法律或财务建议。",
       "suggestionsLabel": "建议问题",
+      "scenarioQueued": "场景预览将附加到您的下一条消息。",
       "suggestions": {
         "whyQualify": "我为何合格 {{scheme}}？",
         "howApply": "如何申请这些计划？",

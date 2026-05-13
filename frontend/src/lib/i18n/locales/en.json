@@ -707,6 +707,9 @@
       "sliderChildrenLabel": "Children under 18",
       "sliderElderlyLabel": "Elderly dependants",
       "totalUpsideLabel": "What-if total / year",
+      "previewLabel": "Scenario preview",
+      "askScenario": "Ask Cik Lay about this scenario",
+      "askScenarioPrompt": "Explain this what-if scenario. What changed, which schemes moved, and what should I notice first?",
       "deltaChip": {
         "gained": "Newly eligible · RM {{amount}}",
         "lost": "Now ineligible · was RM {{amount}}",
@@ -1039,6 +1042,7 @@
       "placeholder": "Ask about your results…",
       "emptyBody": "I can explain why each scheme matched, what documents you'll need, or how to apply through the official portal. I can't give legal or financial advice.",
       "suggestionsLabel": "Suggested questions",
+      "scenarioQueued": "Scenario preview will be attached to your next message.",
       "suggestions": {
         "whyQualify": "Why do I qualify for {{scheme}}?",
         "howApply": "How do I apply for these schemes?",

@@ -22,8 +22,18 @@ from app.auth import CurrentUser, get_firestore
 from app.schema.locale import DEFAULT_LANGUAGE, SupportedLanguage
 from app.schema.profile import Profile
 from app.schema.scheme import SchemeMatch
-from app.schema.what_if import WhatIfRequest, WhatIfResponse
-from app.services.what_if import WhatIfRateLimitError, check_rate_limit, run_what_if
+from app.schema.what_if import (
+    WhatIfRequest,
+    WhatIfResponse,
+    WhatIfStrategyRequest,
+    WhatIfStrategyResponse,
+)
+from app.services.what_if import (
+    WhatIfRateLimitError,
+    check_rate_limit,
+    run_what_if,
+    run_what_if_strategy_refresh,
+)
 
 _logger = logging.getLogger(__name__)
 
@@ -106,6 +116,49 @@ async def what_if(
     return await run_what_if(
         baseline_profile=baseline_profile,
         baseline_matches=baseline_matches,
+        overrides=payload.overrides,
+        language=language,
+    )
+
+
+@router.post(
+    "/{eval_id}/what-if/strategy",
+    response_model=WhatIfStrategyResponse,
+)
+async def refresh_what_if_strategy(
+    user: CurrentUser,
+    payload: WhatIfStrategyRequest,
+    eval_id: Annotated[str, PathParam(min_length=1)],
+) -> WhatIfStrategyResponse:
+    db = get_firestore()
+    snap = db.collection("evaluations").document(eval_id).get()
+    if not getattr(snap, "exists", False):
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Evaluation not found")
+    doc = snap.to_dict() or {}
+    if doc.get("userId") != user.uid:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Evaluation not found")
+    if doc.get("status") == "running":
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail="Evaluation is still running — wait until it completes.",
+        )
+    raw_profile = doc.get("profile")
+    if not isinstance(raw_profile, dict):
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail="Evaluation has no profile to vary against.",
+        )
+    try:
+        baseline_profile = Profile.model_validate(raw_profile)
+    except ValidationError as exc:
+        _logger.exception("baseline profile validation failed for eval=%s", eval_id)
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Stored evaluation profile is malformed",
+        ) from exc
+    language = _coerce_language(doc.get("language"))
+    return await run_what_if_strategy_refresh(
+        baseline_profile=baseline_profile,
         overrides=payload.overrides,
         language=language,
     )

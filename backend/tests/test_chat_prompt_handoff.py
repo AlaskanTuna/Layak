@@ -3,7 +3,10 @@
 from __future__ import annotations
 
 from app.agents.chat_prompt import build_system_instruction
+from app.schema.chat import ScenarioContext
+from app.schema.scheme import RuleCitation, SchemeMatch
 from app.schema.strategy import StrategyAdvice, StrategyCitation
+from app.schema.what_if import SchemeDelta
 
 
 def _stub_eval_doc() -> dict:
@@ -79,3 +82,45 @@ def test_advisory_block_marks_content_as_data_not_instructions():
         _stub_eval_doc(), language="en", recent_advisory=advice
     )
     assert "DATA" in augmented or "data" in augmented
+
+
+def test_build_system_instruction_injects_what_if_scenario_context():
+    scenario = ScenarioContext(
+        overrides={"monthly_income_rm": 2500},
+        total_annual_rm=5400.0,
+        matches=[
+            SchemeMatch(
+                scheme_id="str_2026",
+                scheme_name="STR 2026",
+                qualifies=True,
+                annual_rm=1800.0,
+                summary="Tier 1",
+                why_qualify="Lower income tier",
+                agency="LHDN",
+                portal_url="https://example.test",
+                rule_citations=[
+                    RuleCitation(rule_id="r", source_pdf="x.pdf", page_ref="p.1", passage="stub")
+                ],
+            )
+        ],
+        deltas=[
+            SchemeDelta(
+                scheme_id="str_2026",
+                status="amount_changed",
+                baseline_annual_rm=1200.0,
+                new_annual_rm=1800.0,
+                delta_rm=600.0,
+            )
+        ],
+        strategy=[],
+    )
+    text = build_system_instruction(
+        _stub_eval_doc(),
+        language="en",
+        scenario_context=scenario,
+    )
+    assert "Active What-If scenario preview" in text
+    assert "temporary, not saved" in text
+    assert "monthly_income_rm: 2500" in text
+    assert "STR 2026 [scheme:str_2026]" in text
+    assert "delta RM 600" in text

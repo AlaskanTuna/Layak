@@ -1227,3 +1227,11 @@ Findings the audit flagged that were **not** acted on (cosmetic or external to P
 
 - Updated the `/dashboard/discovery` Pipeline card metrics to use translucent blurred KPI surfaces with a subtle inset highlight.
 - Verified: targeted ESLint on `discovery-run-panel.tsx` clean; `pnpm -C frontend build` clean.
+
+## [13/05/26] - What-If deterministic preview benchmark documentation
+
+- Reconciled the working branch with latest `origin/main` (poster assets, screenshot cleanup, discovery metric blur, and landing-header contrast fixes) before documenting the What-If evidence.
+- Moved raw benchmark CSVs from `backend/` root to gitignored `tmp/benchmarks/what-if/2026-05-13/`; tracked deliverables are the repeatable benchmark harness plus focused tests.
+- Recorded the local Vertex-backed benchmark conclusion in PRD/TRD: deterministic preview medians were about 0.71ms-1.31ms across recorded runs, Gemini classification-only medians were about 1194ms-1719ms, and the full legacy blocking-path probe with strategy took about 25s-47s per scenario. Discovery Engine was disabled in the benchmark project during the full legacy probe, so those full-path values are treated as blocking-path evidence rather than production parity.
+- Re-ran the clean benchmark after the `origin/main` merge with `python scripts\benchmark_what_if.py --repeats 5 --gemini-runner scripts.benchmark_what_if:run_what_if_gemini_classify_only --csv-out ..\tmp\benchmarks\what-if\2026-05-13\benchmark_what_if_classify_vs_deterministic_rerun_20260513.csv`; every sample succeeded and the rerun kept deterministic preview above 1000x faster on median.
+- Verification: `pytest backend\tests\test_what_if.py backend\tests\test_chat_prompt_handoff.py backend\tests\test_benchmark_what_if.py -q` passed 27/27; `python -m ruff check` passed on touched backend files; `pnpm -C frontend exec tsc --noEmit`, `pnpm -C frontend lint`, and `pnpm -C frontend exec next build --webpack` all passed. `npx -y react-doctor@latest . --verbose --diff` could not start because the npx-installed `oxc-parser` optional Windows native binding was missing under Node 22.11.0.

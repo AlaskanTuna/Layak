@@ -155,11 +155,11 @@ _QUALIFY_VARS: dict[str, dict[str, object]] = {
         "annual_rm": 400.0,
         "band": "b40_hardcore",
     },
-    "jkm_bp": {
-        "child_count": 2,
-        "monthly_rm": 100.0,
-        "annual_rm": 2400.0,
-        "band": "b40_hardcore",
+    "perkeso_sip": {
+        "age": 34,
+        "first_month_pct": 80,
+        "max_monthly_rm": 4000.0,
+        "wage_ceiling_rm": 5000.0,
     },
     "taska_permata": {
         "child_count": 1,
@@ -189,7 +189,7 @@ _OUT_OF_SCOPE_VARS: dict[str, dict[str, object]] = {
     "rmt": {"reasons": ["no primary-school-age child (6–12) in household"]},
     "spbt": {"reasons": ["no school-age child (7–17) in household"]},
     "kwapm": {"reasons": ["household income band 'm40' above b40_hardcore — KWAPM is needs-tested"]},
-    "jkm_bp": {"reasons": ["household income band 'm40' above b40_hardcore — JKM BP gates on main-aid receipt"]},
+    "perkeso_sip": {"reasons": ["SIP coverage only applies to salaried (Form BE) filers with employer EIS contributions"]},
     "taska_permata": {"reasons": ["household income RM8,000 exceeds Permata cap RM5,000"]},
 }
 

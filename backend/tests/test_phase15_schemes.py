@@ -10,8 +10,11 @@ The four new rules:
                      school-age child only
     kwapm          — means-tested cash for primary students (upside),
                      gates on b40_hardcore + age 7–12
-    jkm_bp         — JKM Bantuan Pelajaran (upside), gates on b40_hardcore
-                     + school-age 7–18
+    perkeso_sip    — Employment Insurance System (subsidy_credit), gates on
+                     form_be salaried filer aged 18–60
+                     [Phase 16: replaced the originally-shipped jkm_bp rule
+                     after audit found "JKM Bantuan Pelajaran" was not a
+                     real federal scheme.]
     taska_permata  — preschool fee subsidy (upside), gates on
                      household_income ≤ RM5,000 + age 0–6
 """
@@ -20,7 +23,7 @@ from __future__ import annotations
 
 import pytest
 
-from app.rules import jkm_bp, kwapm, spbt, taska_permata
+from app.rules import kwapm, perkeso_sip, spbt, taska_permata
 from app.schema.profile import Dependant, HouseholdFlags, Profile
 
 
@@ -119,42 +122,30 @@ def test_kwapm_skips_secondary_only_children() -> None:
     assert result.qualifies is False
 
 
-# -------------------------- JKM Bantuan Pelajaran --------------------------
+# -------------------------- PERKESO SIP (Phase 16 replacement) -------------
 
 
-def test_jkm_bp_aisyah_baseline_out_of_scope_above_hardcore() -> None:
-    """Aisyah is b40_household_with_children — above JKM BP main-aid gate."""
-    result = jkm_bp.match(_profile())
+def test_perkeso_sip_aisyah_baseline_out_of_scope_form_b() -> None:
+    """Aisyah is form_b (Grab driver) — SIP only covers salaried Form BE."""
+    result = perkeso_sip.match(_profile())
     assert result.qualifies is False
+    assert result.kind == "subsidy_credit"
+    assert result.annual_rm == 0.0
 
 
-def test_jkm_bp_fires_for_b40_hardcore_with_school_children() -> None:
-    result = jkm_bp.match(
-        _profile(
-            monthly_income_rm=1100.0,
-            income_band="b40_hardcore",
-            dependants=[
-                Dependant(relationship="child", age=8),
-                Dependant(relationship="child", age=14),
-            ],
-        )
-    )
+def test_perkeso_sip_fires_for_salaried_filer_in_age_window() -> None:
+    result = perkeso_sip.match(_profile(form_type="form_be"))
     assert result.qualifies is True
-    # Modal RM100/month × 12 × 2 children = RM2,400.
-    assert result.annual_rm == 2400.0
+    assert result.kind == "subsidy_credit"
+    # SIP is a contingent insurance benefit — annual_rm stays 0.0 because the
+    # JSA payout only triggers on involuntary job loss.
+    assert result.annual_rm == 0.0
 
 
-def test_jkm_bp_includes_secondary_school_children() -> None:
-    """JKM BP covers primary through post-secondary (age 7–18)."""
-    result = jkm_bp.match(
-        _profile(
-            monthly_income_rm=1100.0,
-            income_band="b40_hardcore",
-            dependants=[Dependant(relationship="child", age=17)],
-        )
-    )
-    assert result.qualifies is True
-    assert result.annual_rm == 1200.0
+@pytest.mark.parametrize("age", [17, 61])
+def test_perkeso_sip_age_window_rejects_outside_18_to_60(age: int) -> None:
+    result = perkeso_sip.match(_profile(age=age, form_type="form_be"))
+    assert result.qualifies is False
 
 
 # -------------------------- TASKA Permata (preschool subsidy) --------------
@@ -208,7 +199,7 @@ def test_taska_permata_rejects_school_age_only_children() -> None:
     [
         (spbt, "moe.gov.my"),
         (kwapm, "moe.gov.my"),
-        (jkm_bp, "jkm.gov.my"),
+        (perkeso_sip, "perkeso.gov.my"),
         (taska_permata, "permata.gov.my"),
     ],
 )
@@ -220,7 +211,7 @@ def test_portal_url_points_to_official_domain(module, expected_domain: str) -> N
 # -------------------------- citations are non-empty ------------------------
 
 
-@pytest.mark.parametrize("module", [spbt, kwapm, jkm_bp, taska_permata])
+@pytest.mark.parametrize("module", [spbt, kwapm, perkeso_sip, taska_permata])
 def test_each_rule_emits_at_least_two_citations(module) -> None:
     result = module.match(_profile())
     assert len(result.rule_citations) >= 2

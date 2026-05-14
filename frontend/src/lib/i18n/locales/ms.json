@@ -1285,8 +1285,8 @@
     "bantuanElektrik": {
       "summary": "Rebat bil TNB sehingga RM 40/bulan untuk ketua isi rumah eKasih Miskin Tegar, dikenakan secara automatik pada bil. Dilanjutkan sehingga 31 Dis 2026 di bawah Belanjawan 2026."
     },
-    "jkmBp": {
-      "summary": "JKM Bantuan Pelajaran — RM 50/bulan (rendah) / RM 100/bulan (menengah) / RM 150/bulan (lepas menengah) untuk anak sekolah dalam isi rumah penerima bantuan utama JKM."
+    "perkesoSip": {
+      "summary": "Sistem Insurans Pekerjaan (Akta 800). Pemfail bergaji Form BE berumur 18–60 — Elaun Mencari Pekerjaan 80% gaji bulan ke-1 (had RM 4,000), tapering ke 50%/40%/30% sehingga 6 bulan jika kehilangan pekerjaan tanpa rela."
     },
     "budi95": {
       "summary": "Petrol RON95 pada RM 1.99/L untuk warga Malaysia dengan lesen memandu sah — dihadkan kepada 300 L/bulan setiap MyKad. Maklumat sahaja; kuota berulang setiap bulan."
@@ -1346,7 +1346,7 @@
       "rmt": "RMT — Rancangan Makanan Tambahan",
       "spbt": "SPBT — Skim Pinjaman Buku Teks",
       "kwapm": "KWAPM — Pelajar Miskin",
-      "jkm_bp": "JKM Bantuan Pelajaran",
+      "perkeso_sip": "PERKESO SIP — Insurans Pekerjaan",
       "taska_permata": "TASKA / TADIKA Permata"
     }
   },

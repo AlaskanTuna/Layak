@@ -1285,8 +1285,8 @@
     "bantuanElektrik": {
       "summary": "Up to RM 40/month TNB bill rebate for eKasih Miskin Tegar heads-of-household, auto-applied at billing. Extended through 31 Dec 2026 under Budget 2026."
     },
-    "jkmBp": {
-      "summary": "JKM Bantuan Pelajaran — RM 50/month (primary) / RM 100/month (secondary) / RM 150/month (post-secondary) for school-age children in JKM-aid households."
+    "perkesoSip": {
+      "summary": "Employment Insurance System (Akta 800). Salaried Form BE filers aged 18–60 — Job Search Allowance of 80% wage in month 1 (cap RM 4,000), tapering to 50%/40%/30% across up to 6 months on involuntary job loss."
     },
     "budi95": {
       "summary": "RON95 petrol at RM 1.99/L for Malaysian citizens with a valid driving licence — capped at 300 L/month per MyKad. Info-only; quota is rolling."
@@ -1346,7 +1346,7 @@
       "rmt": "RMT — Rancangan Makanan Tambahan",
       "spbt": "SPBT — Skim Pinjaman Buku Teks",
       "kwapm": "KWAPM — Pelajar Miskin",
-      "jkm_bp": "JKM Bantuan Pelajaran",
+      "perkeso_sip": "PERKESO SIP — Employment Insurance",
       "taska_permata": "TASKA / TADIKA Permata"
     }
   },

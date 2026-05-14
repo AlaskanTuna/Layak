@@ -1,17 +1,26 @@
-"""TASKA Permata — KPWKM preschool fee subsidy (TASKA / TADIKA Permata).
+"""TASKA Permata — preschool fee subsidy framework (KPWKM + JPA variants).
 
-Jabatan Permata under KPWKM (Ministry of Women, Family & Community
-Development) operates TASKA Permata (childcare, 0-4yo) and TADIKA Permata
-(preschool, 4-6yo) with means-tested fee subsidies for low- and
-middle-income households (gross household income ≤ RM5,000/month).
+Two TASKA fee-subsidy mechanisms operate concurrently in Malaysia:
+
+1. **KPWKM Jabatan Permata** — community TASKA / TADIKA Permata centres for
+   low- and middle-income households (gross income ≤ RM5,000/month).
+   Documented on `permata.gov.my` and the Ihsan MADANI initiative pages;
+   no canonical PDF circular is published publicly.
+
+2. **JPA Pekeliling Perkhidmatan 1/2023** — equivalent RM180/month TASKA
+   fee subsidy for civil servants ("pegawai Perkhidmatan Awam") regardless
+   of income band. This is the source we commit as
+   `taska-permata-circular.pdf` because it is the most authoritative
+   downloadable PDF describing the RM180/month rate, paying mechanism,
+   and centre-registration requirements that mirror the KPWKM variant.
 
 Eligibility (Layak's proxy):
     `household_monthly_income_rm <= INCOME_CAP_RM` AND at least one
     `dependants[*]` with `relationship == "child"` AND `age` in
-    [PRESCHOOL_AGE_MIN, PRESCHOOL_AGE_MAX]. Operator availability is
-    geography-dependent (urban + sub-urban primarily); Layak surfaces
-    eligibility, the parent confirms operator presence via the Permata
-    directory.
+    [PRESCHOOL_AGE_MIN, PRESCHOOL_AGE_MAX]. The B40-cap path matches the
+    KPWKM Permata Komuniti requirements; civil-servant filers can access
+    the JPA variant regardless of band but Layak does not track sector
+    employment so we stay on the household-income gate.
 
 Benefit:
     Up to RM180/month fee subsidy per child. Annualised at 11 school
@@ -41,28 +50,30 @@ _SOURCE_PDF = "taska-permata-circular.pdf"
 def _citations() -> list[RuleCitation]:
     return [
         RuleCitation(
-            rule_id="taska_permata.subsidy_rate",
+            rule_id="taska_permata.jpa_pekeliling_rate",
             source_pdf=_SOURCE_PDF,
-            page_ref="Jabatan Permata operator framework",
+            page_ref="JPA Pekeliling Perkhidmatan Bilangan 1 Tahun 2023",
             passage=(
-                "Up to RM180/month fee subsidy is paid per child enrolled at "
-                "a registered TASKA Permata (0-4yo) or TADIKA Permata (4-6yo) "
-                "for households with gross monthly income at or below "
-                "RM5,000."
+                "Pekeliling Perkhidmatan Bilangan 1 Tahun 2023: subsidi yuran "
+                "pengasuhan TASKA RM180 sebulan setiap kanak-kanak di pusat "
+                "TASKA berdaftar (di tempat kerja sektor awam). The KPWKM "
+                "Jabatan Permata community variant mirrors this RM180/month "
+                "rate for households at or below RM5,000/month gross income."
             ),
-            source_url="https://permata.gov.my",
+            source_url="https://docs.jpa.gov.my/docs/pp/2023/pp012023.pdf",
         ),
         RuleCitation(
-            rule_id="taska_permata.scope_ministry",
+            rule_id="taska_permata.kpwkm_community_scope",
             source_pdf=_SOURCE_PDF,
-            page_ref="KPWKM ministry portfolio",
+            page_ref="Jabatan Permata operator framework (external reference)",
             passage=(
-                "Jabatan Permata operates the subsidy framework under the "
-                "Ministry of Women, Family & Community Development. Permata "
-                "operators are listed in the public directory; subsidy is "
-                "applied at the centre, not centrally."
+                "Jabatan Permata operates the community TASKA / TADIKA "
+                "Permata subsidy framework under the Ministry of Women, "
+                "Family & Community Development. Permata operators are "
+                "listed in the public directory; subsidy is applied at the "
+                "centre, not centrally."
             ),
-            source_url="https://www.kpwkm.gov.my",
+            source_url="https://permata.gov.my",
         ),
     ]
 

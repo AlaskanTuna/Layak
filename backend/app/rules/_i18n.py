@@ -1307,72 +1307,77 @@ def _kwapm_out_of_scope(language: SupportedLanguage, **v: Any) -> SchemeCopy:
 
 
 # ---------------------------------------------------------------------------
-# JKM BP — Bantuan Pelajaran (school children) (Phase 15)
+# PERKESO SIP — Employment Insurance System (Akta 800) (Phase 16)
 # ---------------------------------------------------------------------------
 
 
-def _jkm_bp_qualify(language: SupportedLanguage, **v: Any) -> SchemeCopy:
-    child_count = v["child_count"]
-    monthly_rm = v["monthly_rm"]
-    annual_rm = v["annual_rm"]
+def _perkeso_sip_qualify(language: SupportedLanguage, **v: Any) -> SchemeCopy:
+    age = v["age"]
+    first_pct = v["first_month_pct"]
+    max_monthly = v["max_monthly_rm"]
+    ceiling = v["wage_ceiling_rm"]
     if language == "ms":
         return {
             "summary": (
-                f"RM{annual_rm:,.0f}/tahun di bawah JKM Bantuan Pelajaran — "
-                f"RM{monthly_rm:.0f}/bulan × {child_count} anak sekolah."
+                f"Anda berumur {age} dan bergaji — telah dilindungi oleh "
+                f"PERKESO SIP terhadap kehilangan pekerjaan tanpa rela."
             ),
             "why_qualify": (
-                f"Anda mempunyai {child_count} anak sekolah dalam isi rumah "
-                f"miskin tegar (b40_hardcore). JKM membayar Bantuan Pelajaran "
-                f"RM{monthly_rm:.0f}/bulan setiap anak (RM50 rendah, RM100 "
-                f"menengah, RM150 lepas-menengah). Memohon di portal eBantuan "
-                f"JKM atau pejabat JKM daerah dengan surat pengesahan "
-                f"sekolah."
+                f"Sebagai pemfail Form BE berumur {age} (18–60), majikan anda "
+                f"sepatutnya menyumbang kepada Sistem Insurans Pekerjaan (SIP) "
+                f"di bawah Akta 800. Jika anda hilang pekerjaan secara tidak "
+                f"sukarela, anda boleh menuntut Elaun Mencari Pekerjaan "
+                f"sehingga {first_pct}% dari gaji bulanan anggaran pada bulan "
+                f"pertama (had RM{max_monthly:,.0f}/bulan berdasarkan siling "
+                f"upah RM{ceiling:,.0f}), tapering kepada 50%/40%/30% untuk "
+                f"6 bulan secara keseluruhan."
             ),
         }
     if language == "zh":
         return {
             "summary": (
-                f"JKM 教育援助金每年 RM{annual_rm:,.0f} —— "
-                f"RM{monthly_rm:.0f}/月 × {child_count} 名学龄孩子。"
+                f"您 {age} 岁且为受薪员工 —— 已由 PERKESO 就业保险（SIP）覆盖"
+                f"非自愿失业风险。"
             ),
             "why_qualify": (
-                f"您有 {child_count} 名学龄孩子且属赤贫家庭（b40_hardcore）。"
-                f"JKM Bantuan Pelajaran 每月每名孩子 RM{monthly_rm:.0f}（小学 "
-                f"RM50、中学 RM100、专上 RM150）。请凭学校证明信经 eBantuan JKM "
-                f"门户或当地 JKM 办公室申请。"
+                f"作为 {age} 岁（18–60）的 Form BE 报税人，您的雇主依据 800 号"
+                f"法令向 SIP 缴费。若非自愿失业，您可申请寻职津贴，第 1 个月"
+                f"最高 {first_pct}% 推定月薪（按 RM{ceiling:,.0f} 上限计算最高"
+                f" RM{max_monthly:,.0f}/月），其后逐月降至 50%/40%/30%，"
+                f"总共最长 6 个月。"
             ),
         }
     return {
         "summary": (
-            f"RM{annual_rm:,.0f}/year under JKM Bantuan Pelajaran — "
-            f"RM{monthly_rm:.0f}/month × {child_count} school children."
+            f"You're {age} and salaried — already covered by PERKESO SIP "
+            f"against involuntary job loss."
         ),
         "why_qualify": (
-            f"You have {child_count} school-age children in a hardcore-poor "
-            f"household (b40_hardcore). JKM pays Bantuan Pelajaran at "
-            f"RM{monthly_rm:.0f}/month per child (RM50 primary, RM100 "
-            f"secondary, RM150 post-secondary). Apply via the eBantuan JKM "
-            f"portal or your district JKM office with the school's "
-            f"confirmation letter."
+            f"As a Form BE filer aged {age} (18–60), your employer should be "
+            f"contributing to the Employment Insurance System (SIP, Akta 800). "
+            f"On involuntary job loss you can claim the Job Search Allowance "
+            f"at up to {first_pct}% of assumed monthly wage in month 1 (capped "
+            f"at RM{max_monthly:,.0f}/month against the RM{ceiling:,.0f} "
+            f"insured-wage ceiling), tapering to 50%/40%/30% across up to 6 "
+            f"months."
         ),
     }
 
 
-def _jkm_bp_out_of_scope(language: SupportedLanguage, **v: Any) -> SchemeCopy:
+def _perkeso_sip_out_of_scope(language: SupportedLanguage, **v: Any) -> SchemeCopy:
     reasons: list[str] = v["reasons"]
     if language == "ms":
         return {
-            "summary": "Belum layak untuk JKM Bantuan Pelajaran.",
+            "summary": "Belum layak untuk PERKESO SIP.",
             "why_qualify": "Di luar skop: " + "; ".join(reasons) + ".",
         }
     if language == "zh":
         return {
-            "summary": "暂不符合 JKM 教育援助金资格。",
+            "summary": "暂不符合 PERKESO 就业保险（SIP）资格。",
             "why_qualify": "不在受惠范围内：" + "；".join(reasons) + "。",
         }
     return {
-        "summary": "Not yet eligible for JKM Bantuan Pelajaran.",
+        "summary": "Not yet eligible for PERKESO SIP.",
         "why_qualify": "Out of scope: " + "; ".join(reasons) + ".",
     }
 
@@ -1607,16 +1612,16 @@ _REASON_FRAGMENTS: dict[str, dict[SupportedLanguage, str]] = {
         "ms": "tiada anak sekolah rendah ({min_age}–{max_age}) dalam isi rumah",
         "zh": "家庭中没有 {min_age}–{max_age} 岁的小学子女",
     },
-    # ---- JKM BP ----
-    "jkm_bp_band_above_hardcore": {
-        "en": "household income band '{band}' above b40_hardcore — JKM BP gates on main-aid receipt",
-        "ms": "jalur pendapatan isi rumah '{band}' melebihi b40_hardcore — JKM BP berasaskan penerimaan bantuan utama",
-        "zh": "家庭收入分组「{band}」超出 b40_hardcore —— JKM BP 仅限领取 JKM 主援助的家庭",
+    # ---- PERKESO SIP ----
+    "perkeso_sip_not_salaried": {
+        "en": "SIP coverage only applies to salaried (Form BE) filers with employer EIS contributions",
+        "ms": "Perlindungan SIP hanya terpakai kepada pemfail bergaji (Form BE) dengan caruman SIP majikan",
+        "zh": "SIP 仅覆盖雇主缴纳 EIS 的受薪报税人（Form BE）",
     },
-    "jkm_bp_no_school_age_child": {
-        "en": "no school-age child ({min_age}–{max_age}) in household",
-        "ms": "tiada anak usia sekolah ({min_age}–{max_age}) dalam isi rumah",
-        "zh": "家庭中没有 {min_age}–{max_age} 岁的学龄孩子",
+    "perkeso_sip_age_outside_window": {
+        "en": "age {age} outside the SIP window ({min_age}–{max_age})",
+        "ms": "umur {age} di luar tetingkap SIP ({min_age}–{max_age})",
+        "zh": "年龄 {age} 岁超出 SIP 的 {min_age}–{max_age} 岁范围",
     },
     # ---- TASKA Permata ----
     "taska_permata_income_above_cap": {
@@ -1735,7 +1740,7 @@ _CATALOG: dict[SchemeId, dict[Variant, Callable[..., SchemeCopy]]] = {
     "rmt": {"qualify": _rmt_qualify, "out_of_scope": _rmt_out_of_scope},
     "spbt": {"qualify": _spbt_qualify, "out_of_scope": _spbt_out_of_scope},
     "kwapm": {"qualify": _kwapm_qualify, "out_of_scope": _kwapm_out_of_scope},
-    "jkm_bp": {"qualify": _jkm_bp_qualify, "out_of_scope": _jkm_bp_out_of_scope},
+    "perkeso_sip": {"qualify": _perkeso_sip_qualify, "out_of_scope": _perkeso_sip_out_of_scope},
     "taska_permata": {
         "qualify": _taska_permata_qualify,
         "out_of_scope": _taska_permata_out_of_scope,

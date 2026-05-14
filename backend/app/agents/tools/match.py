@@ -15,13 +15,13 @@ from app.rules import (
     i_saraan,
     i_suri,
     jkm_bkk,
-    jkm_bp,
     jkm_warga_emas,
     kwapm,
     lhdn_form_b,
     mykasih,
     mysalam,
     peka_b40,
+    perkeso_sip,
     perkeso_sksps,
     rmt,
     sara,
@@ -51,7 +51,7 @@ _RULES = (
     rmt,
     spbt,
     kwapm,
-    jkm_bp,
+    perkeso_sip,
     taska_permata,
 )
 

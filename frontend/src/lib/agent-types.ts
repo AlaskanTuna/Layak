@@ -32,7 +32,7 @@ export type SchemeId =
   | 'rmt'
   | 'spbt'
   | 'kwapm'
-  | 'jkm_bp'
+  | 'perkeso_sip'
   | 'taska_permata'
 
 // `upside` stacks into the headline annual-relief total. `required_contribution`

@@ -214,12 +214,14 @@ async def test_match_schemes_sorts_required_contribution_after_upside(aisyah: Pr
     assert kinds[:upside_count] == ["upside"] * upside_count
     assert kinds[upside_count : upside_count + subsidy_count] == ["subsidy_credit"] * subsidy_count
     assert kinds[upside_count + subsidy_count :] == ["required_contribution"] * contribution_count
-    # Aisyah (Phase 15): STR + Warga Emas + BKK + LHDN Form B + i-Saraan +
+    # Aisyah (Phase 16): STR + Warga Emas + BKK + LHDN Form B + i-Saraan +
     # BAP (6 upside) + BUDI95 + MyKasih + SARA + RMT + SPBT (5 subsidy_credit;
-    # SPBT added Phase 15 as the universal textbook loan that fires on every
-    # school-age-child household) + SKSPS (1 required_contribution).
-    # KWAPM, JKM BP, TASKA Permata all gate on b40_hardcore or preschool-age
-    # children and therefore stay out-of-scope for Aisyah's persona.
+    # SPBT is the universal textbook loan that fires on every school-age-child
+    # household) + SKSPS (1 required_contribution). The Phase-14/15 rules
+    # KWAPM, TASKA Permata, PeKa B40, MySalam, Bantuan Elektrik, i-Suri all
+    # stay out-of-scope for Aisyah (band/age/dependant gates). PERKESO SIP
+    # (Phase 16 replacement for the fabricated jkm_bp rule) is also out of
+    # scope because Aisyah is Form B (gig); SIP requires Form BE (salaried).
     assert upside_count == 6
     assert subsidy_count == 5
     assert contribution_count == 1

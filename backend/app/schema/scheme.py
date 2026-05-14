@@ -29,7 +29,7 @@ SchemeId = Literal[
     "rmt",
     "spbt",
     "kwapm",
-    "jkm_bp",
+    "perkeso_sip",
     "taska_permata",
 ]
 

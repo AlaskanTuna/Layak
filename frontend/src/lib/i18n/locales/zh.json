@@ -1274,8 +1274,8 @@
     "bantuanElektrik": {
       "summary": "为 eKasih 极贫家庭户主提供最高每月 RM 40 的 TNB 电费回扣，账单自动扣减。2026 年预算延长至 2026 年 12 月 31 日。"
     },
-    "jkmBp": {
-      "summary": "JKM 教育援助金 —— 小学 RM 50/月、中学 RM 100/月、专上 RM 150/月，面向 JKM 主援助家庭的学龄子女。"
+    "perkesoSip": {
+      "summary": "就业保险计划（800 号法令）。18–60 岁受薪 Form BE 报税人 —— 非自愿失业可获寻职津贴：第 1 个月 80% 薪资（上限 RM 4,000），其后逐月降至 50%/40%/30%，最长 6 个月。"
     },
     "budi95": {
       "summary": "持有效驾照的马来西亚公民可以 RM 1.99/升加 RON95 汽油 —— 每张 MyKad 每月限额 300 升。仅供参考，配额每月滚动。"
@@ -1335,7 +1335,7 @@
       "rmt": "RMT — Rancangan Makanan Tambahan",
       "spbt": "SPBT — Skim Pinjaman Buku Teks",
       "kwapm": "KWAPM — Pelajar Miskin",
-      "jkm_bp": "JKM Bantuan Pelajaran",
+      "perkeso_sip": "PERKESO SIP — 就业保险",
       "taska_permata": "TASKA / TADIKA Permata"
     }
   },

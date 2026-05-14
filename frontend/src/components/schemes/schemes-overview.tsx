@@ -143,17 +143,18 @@ const IN_SCOPE: InScopeScheme[] = [
     portalUrl: 'https://ihsanmadani.gov.my/inisiatif/utiliti/program-rebat-bil-elektrik-rm40'
   },
   {
-    id: 'jkm-bp',
-    canonicalSchemeId: 'jkm_bp',
-    group: 'cashWelfare',
-    categoryKey: 'schemes.labels.welfare',
-    icon: GraduationCap,
-    agency: 'JKM',
-    name: 'JKM · Bantuan Pelajaran',
-    summaryKey: 'schemes.jkmBp.summary',
-    upsideRm: '1,200.00',
-    formLabel: 'eBantuan JKM',
-    portalUrl: 'https://www.jkm.gov.my'
+    id: 'perkeso-sip',
+    canonicalSchemeId: 'perkeso_sip',
+    group: 'healthSafety',
+    categoryKey: 'schemes.labels.socialSecurity',
+    icon: ShieldCheck,
+    agency: 'PERKESO',
+    name: 'PERKESO SIP · Employment Insurance',
+    summaryKey: 'schemes.perkesoSip.summary',
+    upsideRm: '4,000.00',
+    formLabel: 'Auto via employer EIS',
+    portalUrl: 'https://eis.perkeso.gov.my',
+    kind: 'subsidy_credit'
   },
   {
     id: 'budi95',

@@ -730,7 +730,13 @@
         "warn": "Heads Up",
         "act": "Action"
       },
-      "softSuggestion": "Layak isn't fully certain — worth asking Cik Lay."
+      "softSuggestion": "Layak isn't fully certain — worth asking Cik Lay.",
+      "scenario": {
+        "refreshing": "Checking whether this scenario changes the strategy notes.",
+        "ready": "Showing strategy notes for the active scenario preview.",
+        "empty": "No scenario-specific strategy changes found; showing your saved evaluation strategy.",
+        "error": "Scenario strategy could not refresh; showing your saved evaluation strategy."
+      }
     },
     "narrative": {
       "showTechnical": "Show technical details",

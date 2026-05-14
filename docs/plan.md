@@ -2165,7 +2165,7 @@ preschool pathways.
       `income_band == "b40_hardcore"` AND child dependant aged 7–12.
       Kind: `upside`. RM200/year/child cash via school KWAPM committee.
 - [x] `jkm_bp` — JKM Bantuan Pelajaran (JKM). Gate: `income_band ==
-    "b40_hardcore"` AND child dependant aged 7–18. Kind: `upside`.
+"b40_hardcore"` AND child dependant aged 7–18. Kind: `upside`.
       Modal RM100/month/child (RM50 primary, RM100 secondary, RM150
       post-secondary).
 - [x] `taska_permata` — KPWKM Permata preschool fee subsidy. Gate:
@@ -2229,6 +2229,22 @@ rule system after the Phase 15 wiring landed:
 2. **Verified-schemes admin entries** for the 11 new schemes (Phase 14
    - 15. — same as Phase 14's deferral. The badge defaults to "Pending
          verification" until the admin stamps `verifiedAt` per scheme.
+
+---
+
+## Phase 16: What-If 20-Scheme Compatibility Follow-up
+
+### 1. Bugfix: Slider alignment and deterministic preview probe removal
+
+**Purpose/Issue:** After the scheme corpus expanded to 20 sources, the What-If slider panel still misaligned when the income label and reset control wrapped, and deterministic preview still spent work on suggestion probes that the UI no longer renders.
+
+**Implementation:**
+
+- [x] Keep `RM` in the current and baseline income display, but make slider header/value rows fixed-height and non-wrapping so all three slider tracks align.
+- [x] Remove the unused nearby-suggestion probing from `run_what_if_deterministic`; keep `suggestions: []` in `WhatIfResponse` for API compatibility.
+- [x] Add a real-corpus deterministic What-If test using the current 20-scheme matcher boundary and asserting upside totals only include `kind == "upside"`.
+- [x] Re-run correctness and speed evidence with `scripts.benchmark_what_if:run_what_if_gemini_classify_only`: 60/60 samples matched deterministic output signatures; deterministic medians were 0.29ms-0.36ms versus 1226ms-1518ms for Gemini classification-only, with deterministic p95 0.579ms and max 0.669ms across all samples.
+- [x] Update PRD/TRD/progress with the 14 May benchmark and the suggestion-probe removal decision.
 
 ---
 

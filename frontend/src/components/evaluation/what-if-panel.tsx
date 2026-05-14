@@ -242,23 +242,25 @@ function SliderField({
 }) {
   const isDirty = value !== baseline
   return (
-    <div className="flex min-h-[88px] flex-col gap-1.5">
-      <div className="flex min-h-5 items-center justify-between gap-2">
-        <span className="mono-caption text-foreground/55">{label}</span>
+    <div className="flex min-h-[96px] flex-col gap-1.5">
+      <div className="grid h-10 grid-cols-[minmax(0,1fr)_9.5rem] items-start gap-3">
+        <span className="mono-caption min-w-0 leading-[1.15] text-foreground/55">{label}</span>
         <button
           type="button"
           onClick={onReset}
           disabled={!isDirty}
-          className="text-[10.5px] uppercase tracking-[0.12em] text-[color:var(--primary)] hover:underline disabled:pointer-events-none disabled:opacity-0"
+          className="min-w-0 text-right text-[10.5px] uppercase leading-[1.15] tracking-[0.12em] text-[color:var(--primary)] hover:underline disabled:pointer-events-none disabled:opacity-0"
           aria-hidden={!isDirty}
           tabIndex={isDirty ? 0 : -1}
         >
           {resetLabel}
         </button>
       </div>
-      <div className="flex min-h-6 items-baseline gap-2">
-        <span className="font-mono text-[15px] tabular-nums text-foreground">{format(value)}</span>
-        <span className={`mono-caption text-foreground/40 ${isDirty ? '' : 'invisible'}`}>
+      <div className="flex h-7 min-w-0 items-baseline gap-2">
+        <span className="shrink-0 whitespace-nowrap font-mono text-[15px] tabular-nums text-foreground">
+          {format(value)}
+        </span>
+        <span className={`mono-caption min-w-0 truncate whitespace-nowrap text-foreground/40 ${isDirty ? '' : 'invisible'}`}>
           {format(baseline)} baseline
         </span>
       </div>

@@ -16,6 +16,7 @@ import { RequiredContributionsCard } from '@/components/evaluation/required-cont
 import { ResultsChatPanel } from '@/components/evaluation/results-chat-panel'
 import { StrategySection } from '@/components/evaluation/strategy-section'
 import { WhatIfPanel } from '@/components/evaluation/what-if-panel'
+import type { WhatIfStrategyPhase } from '@/hooks/use-what-if'
 import { useChat } from '@/hooks/use-chat'
 import { SchemeCardGrid } from '@/components/evaluation/scheme-card-grid'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
@@ -101,11 +102,19 @@ export function EvaluationResultsByIdClient({ evalId }: { evalId: string }) {
   const [whatIfPreview, setWhatIfPreview] = useState<{
     result: WhatIfResponse
     context: ChatScenarioContext
+    strategyPhase: WhatIfStrategyPhase
   } | null>(null)
   const whatIfResult = whatIfPreview?.result ?? null
-  const handleWhatIfResult = useCallback((result: WhatIfResponse | null, context: ChatScenarioContext | null) => {
-    setWhatIfPreview(result && context ? { result, context } : null)
-  }, [])
+  const handleWhatIfResult = useCallback(
+    (
+      result: WhatIfResponse | null,
+      context: ChatScenarioContext | null,
+      strategyPhase: WhatIfStrategyPhase
+    ) => {
+      setWhatIfPreview(result && context ? { result, context, strategyPhase } : null)
+    },
+    []
+  )
 
   const fetchDoc = useCallback(async () => {
     try {
@@ -283,6 +292,21 @@ export function EvaluationResultsByIdClient({ evalId }: { evalId: string }) {
   const optimizerComplete = doc.stepStates.optimize_strategy === 'complete'
   const showStrategy = isComplete && optimizerComplete
   const showWhatIfs = isComplete && Boolean(doc.profile)
+  const scenarioStrategyVisible =
+    whatIfPreview?.strategyPhase === 'ready'
+      ? (whatIfResult?.strategy ?? []).filter((advice) => advice.confidence >= 0.5).length > 0
+      : false
+  const strategyAdvisories = scenarioStrategyVisible ? (whatIfResult?.strategy ?? []) : pipelineState.strategy
+  const strategyScenarioStatus =
+    !whatIfResult || !whatIfPreview
+      ? 'baseline'
+      : whatIfPreview.strategyPhase === 'refreshing'
+        ? 'refreshing'
+        : whatIfPreview.strategyPhase === 'error'
+          ? 'error'
+          : scenarioStrategyVisible
+            ? 'ready'
+            : 'empty'
 
   const visibleSections: readonly TocSectionId[] = (() => {
     const ids: TocSectionId[] = []
@@ -397,7 +421,8 @@ export function EvaluationResultsByIdClient({ evalId }: { evalId: string }) {
                 className="scroll-mt-28 lg:scroll-mt-20"
               >
                 <StrategySection
-                  advisories={whatIfResult?.strategy ?? pipelineState.strategy}
+                  advisories={strategyAdvisories}
+                  scenarioStatus={strategyScenarioStatus}
                   onAskCikLay={(advice) => chat.handoffFromAdvice(advice, whatIfPreview?.context ?? null)}
                 />
               </section>

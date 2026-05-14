@@ -8,10 +8,11 @@ import type { StrategyAdvice } from '@/lib/agent-types'
 
 type Props = {
   advisories: StrategyAdvice[]
+  scenarioStatus?: 'baseline' | 'refreshing' | 'ready' | 'empty' | 'error'
   onAskCikLay?: (advice: StrategyAdvice) => void
 }
 
-export function StrategySection({ advisories, onAskCikLay }: Props) {
+export function StrategySection({ advisories, scenarioStatus = 'baseline', onAskCikLay }: Props) {
   const { t } = useTranslation()
   // Hard cap at 3 cards per spec §3.7 — the backend already caps but we
   // defensively slice here in case a legacy persisted eval carried more.
@@ -24,6 +25,9 @@ export function StrategySection({ advisories, onAskCikLay }: Props) {
         <h2 className="font-heading text-xl font-semibold tracking-tight">{t('evaluation.strategy.sectionTitle')}</h2>
         <InfoTooltip content={description} label={description} />
       </header>
+      <p className={`mono-caption min-h-4 text-foreground/55 ${scenarioStatus === 'baseline' ? 'invisible' : ''}`}>
+        {t(`evaluation.strategy.scenario.${scenarioStatus === 'baseline' ? 'refreshing' : scenarioStatus}`)}
+      </p>
 
       {visible.length === 0 ? (
         <div className="paper-card flex flex-col gap-1 rounded-[16px] border border-[color:var(--forest)]/25 p-5">

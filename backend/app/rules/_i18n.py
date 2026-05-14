@@ -1167,6 +1167,287 @@ def _rmt_out_of_scope(language: SupportedLanguage, **v: Any) -> SchemeCopy:
 
 
 # ---------------------------------------------------------------------------
+# SPBT — Skim Pinjaman Buku Teks (universal textbook loan) (Phase 15)
+# ---------------------------------------------------------------------------
+
+
+def _spbt_qualify(language: SupportedLanguage, **v: Any) -> SchemeCopy:
+    child_count = v["child_count"]
+    per_child = v["per_child_value_rm"]
+    annual_value = v["annual_value_rm"]
+    if language == "ms":
+        return {
+            "summary": (
+                f"{child_count} anak anda layak untuk pinjaman buku teks SPBT "
+                f"percuma — nilai anggaran RM{annual_value:,.0f}/tahun."
+            ),
+            "why_qualify": (
+                f"Anda mempunyai {child_count} anak usia sekolah. SPBT "
+                f"diperluaskan kepada semua pelajar warganegara Malaysia di "
+                f"sekolah Kerajaan dan Bantuan Kerajaan sejak 2008, dan "
+                f"sekolah meminjamkan set buku teks setiap tahun. Nilai "
+                f"setara dianggar RM{per_child:.0f}/anak/tahun. Tiada "
+                f"permohonan diperlukan — hubungi guru kelas atau guru "
+                f"penyelaras SPBT sekolah."
+            ),
+        }
+    if language == "zh":
+        return {
+            "summary": (
+                f"您的 {child_count} 名孩子可获 SPBT 免费课本借用 —— 估值"
+                f"每年 RM{annual_value:,.0f}。"
+            ),
+            "why_qualify": (
+                f"您有 {child_count} 名学龄孩子。课本借用计划 (SPBT) 自 2008 年起"
+                f"扩大至所有政府及政府资助学校的马来西亚籍学生，学校每年免费借出"
+                f"完整课本套。每名孩子年估值 RM{per_child:.0f}。无需申请 —— "
+                f"请向班主任或学校 SPBT 协调老师领取。"
+            ),
+        }
+    return {
+        "summary": (
+            f"Your {child_count} children qualify for the SPBT free textbook "
+            f"loan — estimated value RM{annual_value:,.0f}/year."
+        ),
+        "why_qualify": (
+            f"You have {child_count} school-age children. SPBT was "
+            f"universalised in 2008 — every Malaysian citizen in a government "
+            f"or government-aided school receives the annual textbook set on "
+            f"loan, free of charge. Estimated value RM{per_child:.0f}/child/"
+            f"year. No application required — collect from the form teacher "
+            f"or the school's SPBT coordinator."
+        ),
+    }
+
+
+def _spbt_out_of_scope(language: SupportedLanguage, **v: Any) -> SchemeCopy:
+    reasons: list[str] = v["reasons"]
+    if language == "ms":
+        return {
+            "summary": "Belum layak untuk SPBT.",
+            "why_qualify": "Di luar skop: " + "; ".join(reasons) + ".",
+        }
+    if language == "zh":
+        return {
+            "summary": "暂不符合 SPBT 资格。",
+            "why_qualify": "不在受惠范围内：" + "；".join(reasons) + "。",
+        }
+    return {
+        "summary": "Not yet eligible for SPBT.",
+        "why_qualify": "Out of scope: " + "; ".join(reasons) + ".",
+    }
+
+
+# ---------------------------------------------------------------------------
+# KWAPM — Kumpulan Wang Amanah Pelajar Miskin (Phase 15)
+# ---------------------------------------------------------------------------
+
+
+def _kwapm_qualify(language: SupportedLanguage, **v: Any) -> SchemeCopy:
+    child_count = v["child_count"]
+    per_child = v["per_child_rm"]
+    annual_rm = v["annual_rm"]
+    if language == "ms":
+        return {
+            "summary": (
+                f"RM{annual_rm:,.0f}/tahun di bawah KWAPM — {child_count} anak × "
+                f"RM{per_child:.0f}."
+            ),
+            "why_qualify": (
+                f"Anda mempunyai {child_count} anak sekolah rendah dalam jalur "
+                f"pendapatan paling rendah (b40_hardcore). KWAPM membayar "
+                f"RM{per_child:.0f}/anak/tahun ke akaun ibu bapa melalui "
+                f"jawatankuasa sekolah. Jawatankuasa juga menyediakan bantuan "
+                f"kecemasan RM300/insiden bagi keluarga yang menghadapi krisis."
+            ),
+        }
+    if language == "zh":
+        return {
+            "summary": (
+                f"KWAPM 每年 RM{annual_rm:,.0f} —— {child_count} 名孩子 × "
+                f"RM{per_child:.0f}。"
+            ),
+            "why_qualify": (
+                f"您有 {child_count} 名小学子女且属最低收入组（b40_hardcore）。"
+                f"KWAPM 每名孩子每年 RM{per_child:.0f} 由学校委员会汇入家长账户。"
+                f"委员会也提供每宗 RM300 的紧急援助以协助突发危机。"
+            ),
+        }
+    return {
+        "summary": (
+            f"RM{annual_rm:,.0f}/year under KWAPM — {child_count} children × "
+            f"RM{per_child:.0f}."
+        ),
+        "why_qualify": (
+            f"You have {child_count} primary-school children in the lowest "
+            f"income band (b40_hardcore). KWAPM pays RM{per_child:.0f}/child/"
+            f"year via the school KWAPM committee into the parent's bank "
+            f"account. The committee also runs an emergency-aid track of "
+            f"RM300/incident for families facing crisis events."
+        ),
+    }
+
+
+def _kwapm_out_of_scope(language: SupportedLanguage, **v: Any) -> SchemeCopy:
+    reasons: list[str] = v["reasons"]
+    if language == "ms":
+        return {
+            "summary": "Belum layak untuk KWAPM.",
+            "why_qualify": "Di luar skop: " + "; ".join(reasons) + ".",
+        }
+    if language == "zh":
+        return {
+            "summary": "暂不符合 KWAPM 资格。",
+            "why_qualify": "不在受惠范围内：" + "；".join(reasons) + "。",
+        }
+    return {
+        "summary": "Not yet eligible for KWAPM.",
+        "why_qualify": "Out of scope: " + "; ".join(reasons) + ".",
+    }
+
+
+# ---------------------------------------------------------------------------
+# JKM BP — Bantuan Pelajaran (school children) (Phase 15)
+# ---------------------------------------------------------------------------
+
+
+def _jkm_bp_qualify(language: SupportedLanguage, **v: Any) -> SchemeCopy:
+    child_count = v["child_count"]
+    monthly_rm = v["monthly_rm"]
+    annual_rm = v["annual_rm"]
+    if language == "ms":
+        return {
+            "summary": (
+                f"RM{annual_rm:,.0f}/tahun di bawah JKM Bantuan Pelajaran — "
+                f"RM{monthly_rm:.0f}/bulan × {child_count} anak sekolah."
+            ),
+            "why_qualify": (
+                f"Anda mempunyai {child_count} anak sekolah dalam isi rumah "
+                f"miskin tegar (b40_hardcore). JKM membayar Bantuan Pelajaran "
+                f"RM{monthly_rm:.0f}/bulan setiap anak (RM50 rendah, RM100 "
+                f"menengah, RM150 lepas-menengah). Memohon di portal eBantuan "
+                f"JKM atau pejabat JKM daerah dengan surat pengesahan "
+                f"sekolah."
+            ),
+        }
+    if language == "zh":
+        return {
+            "summary": (
+                f"JKM 教育援助金每年 RM{annual_rm:,.0f} —— "
+                f"RM{monthly_rm:.0f}/月 × {child_count} 名学龄孩子。"
+            ),
+            "why_qualify": (
+                f"您有 {child_count} 名学龄孩子且属赤贫家庭（b40_hardcore）。"
+                f"JKM Bantuan Pelajaran 每月每名孩子 RM{monthly_rm:.0f}（小学 "
+                f"RM50、中学 RM100、专上 RM150）。请凭学校证明信经 eBantuan JKM "
+                f"门户或当地 JKM 办公室申请。"
+            ),
+        }
+    return {
+        "summary": (
+            f"RM{annual_rm:,.0f}/year under JKM Bantuan Pelajaran — "
+            f"RM{monthly_rm:.0f}/month × {child_count} school children."
+        ),
+        "why_qualify": (
+            f"You have {child_count} school-age children in a hardcore-poor "
+            f"household (b40_hardcore). JKM pays Bantuan Pelajaran at "
+            f"RM{monthly_rm:.0f}/month per child (RM50 primary, RM100 "
+            f"secondary, RM150 post-secondary). Apply via the eBantuan JKM "
+            f"portal or your district JKM office with the school's "
+            f"confirmation letter."
+        ),
+    }
+
+
+def _jkm_bp_out_of_scope(language: SupportedLanguage, **v: Any) -> SchemeCopy:
+    reasons: list[str] = v["reasons"]
+    if language == "ms":
+        return {
+            "summary": "Belum layak untuk JKM Bantuan Pelajaran.",
+            "why_qualify": "Di luar skop: " + "; ".join(reasons) + ".",
+        }
+    if language == "zh":
+        return {
+            "summary": "暂不符合 JKM 教育援助金资格。",
+            "why_qualify": "不在受惠范围内：" + "；".join(reasons) + "。",
+        }
+    return {
+        "summary": "Not yet eligible for JKM Bantuan Pelajaran.",
+        "why_qualify": "Out of scope: " + "; ".join(reasons) + ".",
+    }
+
+
+# ---------------------------------------------------------------------------
+# TASKA Permata — KPWKM preschool fee subsidy (Phase 15)
+# ---------------------------------------------------------------------------
+
+
+def _taska_permata_qualify(language: SupportedLanguage, **v: Any) -> SchemeCopy:
+    child_count = v["child_count"]
+    monthly_subsidy = v["monthly_subsidy_rm"]
+    annual_rm = v["annual_rm"]
+    if language == "ms":
+        return {
+            "summary": (
+                f"RM{annual_rm:,.0f}/tahun subsidi yuran TASKA / TADIKA Permata"
+                f" — RM{monthly_subsidy:.0f}/bulan × {child_count} kanak-kanak."
+            ),
+            "why_qualify": (
+                f"Anda mempunyai {child_count} kanak-kanak berumur 0–6 dan "
+                f"pendapatan isi rumah ≤RM5,000. Jabatan Permata di bawah "
+                f"KPWKM menyubsidi sehingga RM{monthly_subsidy:.0f}/bulan/"
+                f"kanak-kanak di pusat TASKA / TADIKA Permata yang berdaftar. "
+                f"Subsidi dikenakan terus di pusat — semak direktori Permata "
+                f"untuk pusat berhampiran."
+            ),
+        }
+    if language == "zh":
+        return {
+            "summary": (
+                f"TASKA / TADIKA Permata 学费津贴每年 RM{annual_rm:,.0f} —— "
+                f"RM{monthly_subsidy:.0f}/月 × {child_count} 名幼儿。"
+            ),
+            "why_qualify": (
+                f"您有 {child_count} 名 0–6 岁的幼儿且家庭月收入 ≤RM5,000。"
+                f"KPWKM 旗下的 Jabatan Permata 在注册的 TASKA / TADIKA Permata 中心"
+                f"为每名幼儿每月津贴最高 RM{monthly_subsidy:.0f}。津贴直接在中心"
+                f"申请 —— 请参阅 Permata 目录查找附近的中心。"
+            ),
+        }
+    return {
+        "summary": (
+            f"RM{annual_rm:,.0f}/year TASKA / TADIKA Permata fee subsidy — "
+            f"RM{monthly_subsidy:.0f}/month × {child_count} young children."
+        ),
+        "why_qualify": (
+            f"You have {child_count} children aged 0–6 and household income "
+            f"≤RM5,000. Jabatan Permata (under KPWKM) subsidises up to "
+            f"RM{monthly_subsidy:.0f}/month per child at registered TASKA / "
+            f"TADIKA Permata centres. The subsidy is applied at the centre — "
+            f"check the Permata directory for participating centres near you."
+        ),
+    }
+
+
+def _taska_permata_out_of_scope(language: SupportedLanguage, **v: Any) -> SchemeCopy:
+    reasons: list[str] = v["reasons"]
+    if language == "ms":
+        return {
+            "summary": "Belum layak untuk subsidi TASKA / TADIKA Permata.",
+            "why_qualify": "Di luar skop: " + "; ".join(reasons) + ".",
+        }
+    if language == "zh":
+        return {
+            "summary": "暂不符合 TASKA / TADIKA Permata 津贴资格。",
+            "why_qualify": "不在受惠范围内：" + "；".join(reasons) + "。",
+        }
+    return {
+        "summary": "Not yet eligible for TASKA / TADIKA Permata subsidy.",
+        "why_qualify": "Out of scope: " + "; ".join(reasons) + ".",
+    }
+
+
+# ---------------------------------------------------------------------------
 # Reason fragments — rule modules pass localised reason strings into the
 # `out_of_scope` callables above. Keeping reason strings here (rather than
 # re-translating the full "Out of scope: X; Y." sentence inside every rule)
@@ -1309,6 +1590,45 @@ _REASON_FRAGMENTS: dict[str, dict[SupportedLanguage, str]] = {
         "ms": "tiada anak usia sekolah rendah ({min_age}–{max_age}) dalam isi rumah",
         "zh": "家庭中没有 {min_age}–{max_age} 岁的小学龄孩子",
     },
+    # ---- SPBT ----
+    "spbt_no_school_age_child": {
+        "en": "no school-age child ({min_age}–{max_age}) in household",
+        "ms": "tiada anak usia sekolah ({min_age}–{max_age}) dalam isi rumah",
+        "zh": "家庭中没有 {min_age}–{max_age} 岁的学龄孩子",
+    },
+    # ---- KWAPM ----
+    "kwapm_band_above_hardcore": {
+        "en": "household income band '{band}' above b40_hardcore — KWAPM is needs-tested",
+        "ms": "jalur pendapatan isi rumah '{band}' melebihi b40_hardcore — KWAPM diuji-keperluan",
+        "zh": "家庭收入分组「{band}」超出 b40_hardcore —— KWAPM 为需求型援助",
+    },
+    "kwapm_no_primary_child": {
+        "en": "no primary-school child ({min_age}–{max_age}) in household",
+        "ms": "tiada anak sekolah rendah ({min_age}–{max_age}) dalam isi rumah",
+        "zh": "家庭中没有 {min_age}–{max_age} 岁的小学子女",
+    },
+    # ---- JKM BP ----
+    "jkm_bp_band_above_hardcore": {
+        "en": "household income band '{band}' above b40_hardcore — JKM BP gates on main-aid receipt",
+        "ms": "jalur pendapatan isi rumah '{band}' melebihi b40_hardcore — JKM BP berasaskan penerimaan bantuan utama",
+        "zh": "家庭收入分组「{band}」超出 b40_hardcore —— JKM BP 仅限领取 JKM 主援助的家庭",
+    },
+    "jkm_bp_no_school_age_child": {
+        "en": "no school-age child ({min_age}–{max_age}) in household",
+        "ms": "tiada anak usia sekolah ({min_age}–{max_age}) dalam isi rumah",
+        "zh": "家庭中没有 {min_age}–{max_age} 岁的学龄孩子",
+    },
+    # ---- TASKA Permata ----
+    "taska_permata_income_above_cap": {
+        "en": "household income RM{household_income:,.0f} exceeds Permata cap RM{cap:,.0f}",
+        "ms": "pendapatan isi rumah RM{household_income:,.0f} melebihi siling Permata RM{cap:,.0f}",
+        "zh": "家庭月收入 RM{household_income:,.0f} 超出 Permata 上限 RM{cap:,.0f}",
+    },
+    "taska_permata_no_preschool_child": {
+        "en": "no preschool-age child ({min_age}–{max_age}) in household",
+        "ms": "tiada kanak-kanak prasekolah ({min_age}–{max_age}) dalam isi rumah",
+        "zh": "家庭中没有 {min_age}–{max_age} 岁的学前儿童",
+    },
     # ---- PERKESO SKSPS ----
     "perkeso_sksps_not_gig": {
         "en": "SKSPS only applies to self-employed / gig filers (Form B)",
@@ -1413,6 +1733,13 @@ _CATALOG: dict[SchemeId, dict[Variant, Callable[..., SchemeCopy]]] = {
     "mysalam": {"qualify": _mysalam_qualify, "out_of_scope": _mysalam_out_of_scope},
     "sara": {"qualify": _sara_qualify, "out_of_scope": _sara_out_of_scope},
     "rmt": {"qualify": _rmt_qualify, "out_of_scope": _rmt_out_of_scope},
+    "spbt": {"qualify": _spbt_qualify, "out_of_scope": _spbt_out_of_scope},
+    "kwapm": {"qualify": _kwapm_qualify, "out_of_scope": _kwapm_out_of_scope},
+    "jkm_bp": {"qualify": _jkm_bp_qualify, "out_of_scope": _jkm_bp_out_of_scope},
+    "taska_permata": {
+        "qualify": _taska_permata_qualify,
+        "out_of_scope": _taska_permata_out_of_scope,
+    },
 }
 
 

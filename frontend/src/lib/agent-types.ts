@@ -30,6 +30,10 @@ export type SchemeId =
   | 'mysalam'
   | 'sara'
   | 'rmt'
+  | 'spbt'
+  | 'kwapm'
+  | 'jkm_bp'
+  | 'taska_permata'
 
 // `upside` stacks into the headline annual-relief total. `required_contribution`
 // (e.g. PERKESO SKSPS) surfaces a separate block — user pays money, not receives.

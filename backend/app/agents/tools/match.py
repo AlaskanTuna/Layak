@@ -15,7 +15,9 @@ from app.rules import (
     i_saraan,
     i_suri,
     jkm_bkk,
+    jkm_bp,
     jkm_warga_emas,
+    kwapm,
     lhdn_form_b,
     mykasih,
     mysalam,
@@ -23,7 +25,9 @@ from app.rules import (
     perkeso_sksps,
     rmt,
     sara,
+    spbt,
     str_2026,
+    taska_permata,
 )
 from app.schema.locale import DEFAULT_LANGUAGE, SupportedLanguage
 from app.schema.profile import Profile
@@ -45,6 +49,10 @@ _RULES = (
     mysalam,
     sara,
     rmt,
+    spbt,
+    kwapm,
+    jkm_bp,
+    taska_permata,
 )
 
 

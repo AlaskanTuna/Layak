@@ -13,7 +13,9 @@ from app.rules import (
     i_saraan,
     i_suri,
     jkm_bkk,
+    jkm_bp,
     jkm_warga_emas,
+    kwapm,
     lhdn_form_b,
     mykasih,
     mysalam,
@@ -21,7 +23,9 @@ from app.rules import (
     perkeso_sksps,
     rmt,
     sara,
+    spbt,
     str_2026,
+    taska_permata,
 )
 
 __all__ = [
@@ -31,7 +35,9 @@ __all__ = [
     "i_saraan",
     "i_suri",
     "jkm_bkk",
+    "jkm_bp",
     "jkm_warga_emas",
+    "kwapm",
     "lhdn_form_b",
     "mykasih",
     "mysalam",
@@ -39,5 +45,7 @@ __all__ = [
     "perkeso_sksps",
     "rmt",
     "sara",
+    "spbt",
     "str_2026",
+    "taska_permata",
 ]

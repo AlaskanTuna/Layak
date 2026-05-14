@@ -9,7 +9,11 @@ parent declares income.
 Eligibility (Layak's proxy):
     `income_band` in any B40 tier AND at least one `dependants[*]` with
     `relationship == "child"` AND `age` in [PRIMARY_AGE_MIN,
-    PRIMARY_AGE_MAX].
+    PRIMARY_AGE_MAX]. The official program uses the DOSM National Poverty
+    Line Income (PGK ~RM2,589/month, 2022 DOSM) OR eKasih registration
+    OR Orang Asli / special-needs school enrolment; Layak's B40-band
+    proxy captures the bottom-half of the income distribution and the
+    school re-verifies the exact PGK cutoff at intake.
 
 Benefits (non-cash, surfaced as `subsidy_credit`):
     Free school breakfast on ~190 school days per year. Layak does not

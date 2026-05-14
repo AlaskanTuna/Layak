@@ -37,18 +37,18 @@ def _citations() -> list[RuleCitation]:
         RuleCitation(
             rule_id="bap.rate_2026",
             source_pdf=_SOURCE_PDF,
-            page_ref="MOE Bantuan Awal Persekolahan portal",
+            page_ref="MKN BAP 2026 announcement (23 Dec 2025)",
             passage=(
                 "Bantuan Awal Persekolahan 2026 (BAP) for Year 1 through Form 6 "
                 "is distributed from 11 January 2026 at RM150 per child, "
                 "regardless of parental income."
             ),
-            source_url="https://www.moe.gov.my/bantuan-awal-persekolahan",
+            source_url="https://www.mkn.gov.my/web/ms/2025/12/23/bantuan-awal-persekolahan-bap-tahun-2026/",
         ),
         RuleCitation(
             rule_id="bap.universal_2026",
             source_pdf=_SOURCE_PDF,
-            page_ref="Budget 2026 expansion (external reference)",
+            page_ref="MOE Bantuan Awal Persekolahan portal (fallback link)",
             passage=(
                 "Budget 2026 expanded BAP to all ~5.2 million primary/secondary "
                 "students plus ~100,000 Form 6 students nationwide."

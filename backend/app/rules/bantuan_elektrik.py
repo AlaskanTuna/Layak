@@ -39,16 +39,16 @@ def _citations() -> list[RuleCitation]:
         RuleCitation(
             rule_id="bantuan_elektrik.kir_eligibility",
             source_pdf=_SOURCE_PDF,
-            page_ref="TNB residential discounts page",
+            page_ref="Ihsan MADANI initiative page (Budget 2026)",
             passage=(
                 "Head of Household (KIR) under the Miskin Tegar (hardcore poor) "
                 "category, listed and verified in the eKasih System, receives "
-                "up to RM40 in monthly electricity bill rebate. The TNB rate "
-                "card runs through 31 December 2025; Budget 2026 confirmed "
-                "extension under the broader social-protection envelope — "
-                "the rule treats the rate as the most recently published cap."
+                "rebates of up to RM40 in monthly electricity bills until "
+                "31 December 2026. Budget 2026 extended the programme for a "
+                "further year; the TNB residential-discounts page may still "
+                "show the prior 31 Dec 2025 sunset until refreshed."
             ),
-            source_url="https://www.tnb.com.my/residential/discounts-rebates-offers",
+            source_url="https://ihsanmadani.gov.my/inisiatif/utiliti/program-rebat-bil-elektrik-rm40",
         ),
         RuleCitation(
             rule_id="bantuan_elektrik.petra_portal",

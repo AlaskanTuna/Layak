@@ -2116,6 +2116,122 @@ is False` to confirm threshold propagation reaches the rule engine.
 
 ---
 
+## Phase 15: Scheme Corpus Expansion (16 → 20)
+
+> Brings Layak's scheme corpus to 20 schemes total (10 federal agencies,
+> 8 benefit categories), crossing the 12% mark of the 167-scheme federal
+> universe referenced in the opening pitch. Research priority remained
+> mainstream-known schemes, supplemented by deep verification of the
+> Phase 14 set against 2026 sources.
+
+### 1. Feature: Verification pass on the Phase 14 set
+
+**Purpose/Issue:** A WebSearch + WebFetch audit on the seven Phase 14
+rules turned up four citation-grade corrections.
+
+- [x] `bap.py` — primary citation URL switched from the static MOE
+      Bantuan Awal Persekolahan landing page to the canonical MKN
+      announcement (`mkn.gov.my/web/ms/2025/12/23/bantuan-awal-persekolahan-bap-tahun-2026/`)
+      which is the document that confirms Year 1–Form 6 + RM150 + the
+      11 Jan 2026 disbursement date for 2026.
+- [x] `bantuan_elektrik.py` — confirmed extended through 31 Dec 2026 by
+      Budget 2026 (Ihsan MADANI / MOF Portal Manfaat). Citation URL
+      switched from the lagging TNB residential page to the Ihsan MADANI
+      initiative page so the 2026 extension is on the rule's primary
+      source. The TNB page still shows the prior 31 Dec 2025 sunset
+      until refreshed.
+- [x] `sara.py` — the rate table is officially four tiers, not two.
+      Re-modelled as three income-band-keyed tiers (`b40_hardcore` →
+      RM200 enhanced, `b40_household` → RM100 standard, the upper
+      `b40_household_with_children` band → RM50 non-eKasih STR floor).
+      The fourth tier (eKasih Miskin at RM100) is conceptually merged
+      with the standard tier since Layak can't distinguish eKasih status
+      from income alone.
+- [x] `rmt.py` — eligibility narrative updated from "households earning
+      ≤RM2,000" to reference the DOSM National Poverty Line Income (PGK
+      ~RM2,589/month, 2022 baseline) since the official MOE rule uses
+      PGK, not a hardcoded RM2,000.
+
+### 2. Feature: Four new rule modules (16 → 20)
+
+**Purpose/Issue:** Reach 20 schemes across mainstream education and
+preschool pathways.
+
+- [x] `spbt` — Skim Pinjaman Buku Teks (MOE). Gate: any school-age child
+      dependant (7–17). Kind: `subsidy_credit` (in-kind textbook loan,
+      estimated value RM250/child/year). Universal in 2026 (pre-2008
+      means-tested rules rescinded).
+- [x] `kwapm` — Kumpulan Wang Amanah Pelajar Miskin (MOE). Gate:
+      `income_band == "b40_hardcore"` AND child dependant aged 7–12.
+      Kind: `upside`. RM200/year/child cash via school KWAPM committee.
+- [x] `jkm_bp` — JKM Bantuan Pelajaran (JKM). Gate: `income_band ==
+    "b40_hardcore"` AND child dependant aged 7–18. Kind: `upside`.
+      Modal RM100/month/child (RM50 primary, RM100 secondary, RM150
+      post-secondary).
+- [x] `taska_permata` — KPWKM Permata preschool fee subsidy. Gate:
+      `household_income_rm <= RM5,000` AND child dependant aged 0–6.
+      Kind: `upside`. Up to RM180/month/child × 11 months = RM1,980/year.
+
+### 3. Feature: Wiring + lockstep + tests
+
+- [x] `SchemeId` Literal extended (16 → 20) in `app/schema/scheme.py`
+      and mirrored in `frontend/src/lib/agent-types.ts`.
+- [x] `app/rules/__init__.py` + `app/agents/tools/match.py` \_RULES
+      tuple updated. Three-tier sort auto-extends.
+- [x] `app/rules/_i18n.py` extended with eight new copy functions, eight
+      reason fragments, and four catalog entries across en / ms / zh.
+- [x] `frontend/src/components/schemes/schemes-stats-strip.tsx` headline
+      tile updated: 20 schemes / 10 agencies / 8 categories. README
+      mermaid example updated to "20 schemes · 12 qualifying" for Aisyah.
+- [x] `backend/tests/test_phase15_schemes.py` — 21 focused tests across
+      qualify-fires + out-of-scope + portal-URL domain + citations.
+- [x] `backend/tests/test_rule_copy_coverage.py` — extended fixture maps;
+      now 201 catalog tests pass for 20 schemes × 3 languages × 2 variants.
+- [x] `backend/tests/test_perkeso_sksps.py` three-tier sort assertion
+      bumped: 6 upside / 5 subsidy_credit / 1 required_contribution for
+      Aisyah (SPBT added to subsidy_credit because the textbook loan is
+      universal and fires on every school-age-child household).
+
+### 4. Feature: Independent audit subagent
+
+**Purpose/Issue:** Two subagents ran end-to-end audit of the 20-scheme
+rule system after the Phase 15 wiring landed:
+
+- [x] **Source-verification subagent** — WebFetch / WebSearch on every
+      Phase 14 + 15 scheme's portal URL, benefit rate, and 2026 status.
+      Surfaced the four corrections itemised in §1 of this phase.
+- [x] **System-audit subagent** — Inventory parity across SchemeId
+      Literal, \_CATALOG dispatch, \_RULES tuple, frontend type, and
+      **init**.py **all**. All 20 IDs present in every required surface.
+      Reviewed each rule's eligibility gate, kwarg passing to scheme_copy,
+      portal URL plausibility, and the three-tier sort behaviour. The
+      single "CRITICAL" finding (SPBT missing `kind="subsidy_credit"`
+      on out-of-scope) was a false positive — code already had the
+      kind on line 102. No real defects surfaced.
+
+### 5. Feature: Live smoke test confirmation
+
+- [x] Ran `match_schemes(AISYAH_PROFILE)` through the full 20-rule
+      pipeline. Returned 12 qualifying matches in the expected three-tier
+      order (6 upside → 5 subsidy_credit → 1 required_contribution).
+      Full backend suite green: 730 passing, 0 regressions, same 6
+      pre-existing failures (auth / discovery_schema / quota_routes,
+      all unrelated to the rule engine).
+
+### Open items deferred to a future phase
+
+1. **Marketing-catalog (SchemesOverview) cards.** Phase 14's deferral
+   still stands — the user-facing schemes page in
+   `frontend/src/components/schemes/schemes-overview.tsx` lists six
+   cards. Adding 11 more cards (Phase 14 + 15) requires English / Malay /
+   Chinese summary copy in the i18n locale files. Out of scope for
+   rule-engine expansion; deserves its own polish pass.
+2. **Verified-schemes admin entries** for the 11 new schemes (Phase 14
+   - 15. — same as Phase 14's deferral. The badge defaults to "Pending
+         verification" until the admin stamps `verifiedAt` per scheme.
+
+---
+
 ## Phase X: Submission Package
 
 > Covers the final submission artifacts. Keep it simple and complete.

@@ -144,6 +144,29 @@ _QUALIFY_VARS: dict[str, dict[str, object]] = {
         "child_count": 2,
         "band": "b40_household_with_children",
     },
+    "spbt": {
+        "child_count": 2,
+        "per_child_value_rm": 250.0,
+        "annual_value_rm": 500.0,
+    },
+    "kwapm": {
+        "child_count": 2,
+        "per_child_rm": 200.0,
+        "annual_rm": 400.0,
+        "band": "b40_hardcore",
+    },
+    "jkm_bp": {
+        "child_count": 2,
+        "monthly_rm": 100.0,
+        "annual_rm": 2400.0,
+        "band": "b40_hardcore",
+    },
+    "taska_permata": {
+        "child_count": 1,
+        "monthly_subsidy_rm": 180.0,
+        "annual_rm": 1980.0,
+        "household_income": 3000.0,
+    },
 }
 
 _OUT_OF_SCOPE_VARS: dict[str, dict[str, object]] = {
@@ -164,6 +187,10 @@ _OUT_OF_SCOPE_VARS: dict[str, dict[str, object]] = {
     "mysalam": {"reasons": ["age 70 outside the MySalam window (18–65)"]},
     "sara": {"reasons": ["household income band 'm40' is above the B40 ceiling"]},
     "rmt": {"reasons": ["no primary-school-age child (6–12) in household"]},
+    "spbt": {"reasons": ["no school-age child (7–17) in household"]},
+    "kwapm": {"reasons": ["household income band 'm40' above b40_hardcore — KWAPM is needs-tested"]},
+    "jkm_bp": {"reasons": ["household income band 'm40' above b40_hardcore — JKM BP gates on main-aid receipt"]},
+    "taska_permata": {"reasons": ["household income RM8,000 exceeds Permata cap RM5,000"]},
 }
 
 

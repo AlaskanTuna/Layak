@@ -27,15 +27,17 @@ from app.schema.locale import DEFAULT_LANGUAGE, SupportedLanguage
 from app.schema.profile import Profile
 from app.schema.scheme import RuleCitation, SchemeMatch
 
-# SARA 2026 tier table:
-# - eKasih-registered (proxied by `b40_hardcore`): RM200/month (enhanced).
-# - Other B40 STR recipients: RM100/month (standard).
-# The official program also publishes a lower RM50/month STR floor for the
-# upper-B40 cohort, but Layak conservatively shows the more generous RM100
-# tier — both rates are documented on `sara.gov.my` and the official portal
-# re-verifies the exact tier at MyKad scan.
-STANDARD_MONTHLY_RM = 100.0
+# SARA 2026 tier table (per sara.gov.my, four tiers official):
+# - eKasih Miskin Tegar (proxied by `b40_hardcore`): RM200/month enhanced.
+# - eKasih Miskin (proxied by `b40_household`): RM100/month enhanced-mid.
+# - STR non-eKasih upper-B40 (proxied by `b40_household_with_children`):
+#   RM50/month standard floor.
+# The official portal re-verifies the exact tier at MyKad scan against eKasih
+# registration; Layak picks the income_band-proxy tier closest to the
+# documented rate.
 ENHANCED_MONTHLY_RM = 200.0
+STANDARD_MONTHLY_RM = 100.0
+FLOOR_MONTHLY_RM = 50.0
 _B40_BANDS = ("b40_hardcore", "b40_household", "b40_household_with_children")
 
 _SCHEME_ID = "sara"
@@ -104,7 +106,12 @@ def match(
         )
 
     enhanced = band == "b40_hardcore"
-    monthly_rm = ENHANCED_MONTHLY_RM if enhanced else STANDARD_MONTHLY_RM
+    if band == "b40_hardcore":
+        monthly_rm = ENHANCED_MONTHLY_RM
+    elif band == "b40_household":
+        monthly_rm = STANDARD_MONTHLY_RM
+    else:  # b40_household_with_children → RM50 STR floor tier
+        monthly_rm = FLOOR_MONTHLY_RM
     copy = scheme_copy(
         _SCHEME_ID,
         "qualify",

@@ -4,16 +4,22 @@ Complements `jkm_warga_emas.py` (elderly dependant payment); this rule
 targets the same means-testable households but gates on children under 18
 instead of parents over 60.
 
-Scheme description (JKM BKK, current Budget 2021 schedule per JKM SPK ISO 9001
-procedure document, Oct 2024):
-    RM200/month per qualifying child aged 6 and under
-    RM150/month per qualifying child aged 7 to 17 (inclusive)
+Scheme description (JKM BKK, post-Belanjawan-2025 schedule):
+    RM250/month per qualifying child aged 6 and under
+    RM200/month per qualifying child aged 7 to 17 (inclusive)
     Capped at RM1,000/month per household.
 
-The pre-2021 schedule (RM100/child flat, RM450/household cap) is obsolete; the
-asset at `backend/data/schemes/jkm-bkk-brochure.pdf` is the current SPK and
-documents these rates verbatim under "BANTUAN BULANAN — BANTUAN KANAK-KANAK
-(BKK)".
+Belanjawan 2025 (tabled 18 Oct 2024) raised the per-child rates from
+RM200/RM150 to RM250/RM200. The MOF Portal Manfaat b2026 tree carries the
+post-uplift schedule (`https://manfaat.mof.gov.my/b2026/individu/kkjkm`)
+as does Ihsan MADANI; Belanjawan 2026 left the rates unchanged.
+
+The committed source PDF at `backend/data/schemes/jkm-bkk-brochure.pdf`
+(JKM SPK ISO 9001 procedure, Oct 2024) was finalised alongside Budget
+2025 tabling and still reflects the pre-uplift RM200/RM150 schedule. The
+rule's primary rate citation now points at the MOF Portal Manfaat live
+page instead of the stale PDF; the PDF is retained for the means-test +
+application-procedure passages that are unchanged.
 
 Qualifying criteria:
     - At least one child-care dependant has relationship `child` or `sibling`
@@ -37,10 +43,13 @@ CHILD_AGE_THRESHOLD = 18
 # get the higher rate; older children (still under 18) get the lower rate.
 YOUNGER_BAND_AGE = 6
 PER_CAPITA_THRESHOLD_RM = 1000.0
-# Budget 2026 raised the per-child BKK rates (Portal Manfaat MOF, 2026):
-# RM250/month for children aged ≤6, RM200/month for ages 7–18.
-# Previous values were RM200 / RM150 under the JKM SPK ISO 9001 procedure
-# document (Oct 2024).
+# Belanjawan 2025 (tabled 18 Oct 2024) raised the per-child BKK rates from
+# RM200/RM150 to RM250/RM200. Confirmed across MOF Portal Manfaat b2026
+# tree, Ihsan MADANI, and contemporaneous Belanjawan-2025 mainstream
+# coverage (Kosmo, TRP, RTM, Buzzkini). Belanjawan 2026 left the rates
+# unchanged. Note the committed `jkm-bkk-brochure.pdf` is the pre-uplift
+# Oct-2024 ISO SPK and still shows the legacy RM200/RM150 rates — kept
+# for the means-test passage; rate citation now points at Portal Manfaat.
 PER_CHILD_MONTHLY_RM_YOUNGER = 250.0  # ages 0–6 inclusive
 PER_CHILD_MONTHLY_RM_OLDER = 200.0  # ages 7–17 inclusive
 HOUSEHOLD_MONTHLY_CAP_RM = 1000.0
@@ -52,7 +61,10 @@ _AGENCY = "JKM (Jabatan Kebajikan Masyarakat)"
 _PORTAL_URL = "https://www.jkm.gov.my"
 _SCHEME_NAME = "JKM Bantuan Kanak-Kanak — per-child monthly payment"
 # JKM SPK ISO 9001 procedure document (Oct 2024) — committed to
-# backend/data/schemes/. Documents the current BKK rates verbatim.
+# backend/data/schemes/. Documents the BKK programme + means-test verbatim.
+# Per-child rates in the PDF are PRE-Belanjawan-2025 (RM200/RM150) and now
+# stale; the rate citation in `_citations()` points at the MOF Portal
+# Manfaat live page instead.
 _SOURCE_PDF = "jkm-bkk-brochure.pdf"
 
 # Vertex AI Search grounds the primary citation against the live source PDF.
@@ -87,11 +99,13 @@ def _citations() -> list[RuleCitation]:
         RuleCitation(
             rule_id="jkm.bkk.rate_per_child",
             source_pdf=_SOURCE_PDF,
-            page_ref="Portal Manfaat MOF (Budget 2026) — BKK",
+            page_ref="Portal Manfaat MOF (post-Belanjawan-2025 schedule, live in b2026 tree)",
             passage=(
-                "Budget 2026 raised the BKK per-child rates: RM250 per month for "
-                "children aged 6 years and below; RM200 per month for children "
-                "aged 7 to 18 years. The household maximum stays at RM1,000/month."
+                "Belanjawan 2025 (tabled 18 Oct 2024) raised the BKK per-child "
+                "rates from RM200/RM150 to RM250 per month for children aged "
+                "6 years and below and RM200 per month for children aged 7 to "
+                "18 years. The household maximum stays at RM1,000/month. "
+                "Belanjawan 2026 left the schedule unchanged."
             ),
             source_url="https://manfaat.mof.gov.my/b2026/individu/kkjkm",
         ),

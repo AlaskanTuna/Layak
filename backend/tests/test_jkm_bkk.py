@@ -1,11 +1,13 @@
-"""JKM Bantuan Kanak-Kanak (BKK) rule tests — Budget 2026 rates.
+"""JKM Bantuan Kanak-Kanak (BKK) rule tests — post-Belanjawan-2025 rates.
 
 Asserts:
-  1. Constants match the Budget 2026 BKK schedule (RM 250/child for ages ≤ 6,
-     RM 200/child for ages 7–17, RM 1,000/mo household cap, RM 1,000/capita
-     means-test threshold). Pre-2026 rates were RM200 / RM150.
+  1. Constants match the post-Belanjawan-2025 BKK schedule (RM 250/child
+     for ages ≤ 6, RM 200/child for ages 7–17, RM 1,000/mo household cap,
+     RM 1,000/capita means-test threshold). Belanjawan 2025 (tabled 18 Oct
+     2024) raised the per-child rates from RM 200/RM 150; Belanjawan 2026
+     left them unchanged.
   2. Aisyah-shape profile (2 children ages 10 + 7, both in the older band,
-     low income) qualifies with `annual_rm == 4800.0` under the 2026 rates.
+     low income) qualifies with `annual_rm == 4800.0` under the current rates.
   3. High-income profile does not qualify.
   4. Profile without qualifying child dependants does not qualify.
   5. Mixed-age and large-household scenarios respect the per-tier rate
@@ -29,13 +31,13 @@ from app.schema.profile import Dependant, HouseholdFlags, Profile
 
 
 def test_per_child_rate_younger_band_is_250() -> None:
-    """Budget 2026 schedule — RM 250/month for children aged 6 and under
+    """Belanjawan 2025 schedule — RM 250/month for children aged 6 and under
     (raised from RM 200 under prior budgets)."""
     assert jkm_bkk.PER_CHILD_MONTHLY_RM_YOUNGER == 250.0
 
 
 def test_per_child_rate_older_band_is_200() -> None:
-    """Budget 2026 schedule — RM 200/month for children aged 7–17
+    """Belanjawan 2025 schedule — RM 200/month for children aged 7–17
     (raised from RM 150 under prior budgets)."""
     assert jkm_bkk.PER_CHILD_MONTHLY_RM_OLDER == 200.0
 
@@ -90,7 +92,7 @@ def _profile(*, income: float, household_size: int, children: list[int], parents
 def test_aisyah_shape_qualifies_two_children_annual_rm_4800(aisyah: Profile) -> None:
     """Aisyah: RM 2,800 / 4 = RM 700/cap (≤ RM 1,000); two children ages 10 & 7
     both fall in the older 7–17 band → 2 × RM 200 × 12 = RM 4,800/yr under
-    the Budget 2026 rates (well under the RM 12,000 household cap)."""
+    the Belanjawan 2025 rates (well under the RM 12,000 household cap)."""
     result = jkm_bkk.match(aisyah)
     assert result.qualifies is True
     assert result.scheme_id == "jkm_bkk"
@@ -141,7 +143,7 @@ def test_seven_children_caps_at_household_monthly_ceiling() -> None:
 
 def test_five_children_engage_cap() -> None:
     """ages [2,5,8,11,14] = 2 younger × RM 250 + 3 older × RM 200 = RM 1,100/mo
-    uncapped; capped to RM 1,000/mo → RM 12,000/yr (Budget 2026 rate uplift
+    uncapped; capped to RM 1,000/mo → RM 12,000/yr (Belanjawan 2025 rate uplift
     pushes this composition into the cap; under prior RM 200/RM 150 rates
     the same mix was RM 850/mo and stayed below the cap)."""
     ages = [2, 5, 8, 11, 14]
@@ -188,14 +190,14 @@ def test_boundary_per_capita_exactly_at_threshold_qualifies() -> None:
 
 def test_age_boundary_six_pays_younger_rate() -> None:
     """Age 6 inclusive falls into the younger band (RM 250/mo under
-    Budget 2026)."""
+    Belanjawan 2025)."""
     result = jkm_bkk.match(_profile(income=2000, household_size=3, children=[6]))
     assert result.qualifies is True
     assert result.annual_rm == 3000.0  # 1 × 250 × 12
 
 
 def test_age_boundary_seven_pays_older_rate() -> None:
-    """Age 7 falls into the older band (RM 200/mo under Budget 2026)."""
+    """Age 7 falls into the older band (RM 200/mo under Belanjawan 2025)."""
     result = jkm_bkk.match(_profile(income=2000, household_size=3, children=[7]))
     assert result.qualifies is True
     assert result.annual_rm == 2400.0  # 1 × 200 × 12

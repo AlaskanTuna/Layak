@@ -1,7 +1,7 @@
 """EPF i-Saraan rule tests.
 
 Asserts:
-  1. Constants match the program schedule (15% match rate, RM500/yr cap,
+  1. Constants match the program schedule (20% match rate, RM500/yr cap,
      ages 18-60 inclusive).
   2. Aisyah-shape profile (Form B, age 34) qualifies with `annual_rm == 500.0`
      and surfaces the `kind="upside"` default so the headline upside total
@@ -45,13 +45,15 @@ def test_annual_match_cap_is_500() -> None:
     assert i_saraan.ANNUAL_MATCH_CAP_RM == 500.0
 
 
-def test_match_rate_is_15_percent() -> None:
-    assert i_saraan.MATCH_RATE_PCT == 15.0
+def test_match_rate_is_20_percent() -> None:
+    """Match rate raised from 15% to 20% on 1 Jan 2025 (KWSP / Bernama)."""
+    assert i_saraan.MATCH_RATE_PCT == 20.0
 
 
-def test_annual_contribution_to_max_match_is_about_3333() -> None:
-    """500 ÷ 0.15 ≈ 3,333.33; rounded to two decimals."""
-    assert abs(i_saraan.ANNUAL_CONTRIBUTION_TO_MAX_MATCH_RM - 3333.33) < 0.01
+def test_annual_contribution_to_max_match_is_2500() -> None:
+    """500 ÷ 0.20 = 2,500 exactly. The contribution that maxes out the
+    RM500/yr government incentive at the post-2025 rate."""
+    assert abs(i_saraan.ANNUAL_CONTRIBUTION_TO_MAX_MATCH_RM - 2500.0) < 0.01
 
 
 # ---------------------------------------------------------------------------

@@ -40,7 +40,11 @@ from app.schema.scheme import RuleCitation, SchemeMatch
 
 MIN_AGE = 16
 SUBSIDISED_PRICE_RM = 1.99
-MONTHLY_QUOTA_L = 300
+# Monthly RON95 quota cut from 300 L to 200 L effective April 2026 (MOF /
+# paultan.org coverage). Deputy Finance Minister flagged a further cut to
+# 150 L under consideration (May 2026) — Layak surfaces the currently
+# gazetted 200 L until a new figure is officially announced.
+MONTHLY_QUOTA_L = 200
 
 _SCHEME_ID = "budi95"
 _SCHEME_NAME = "BUDI95"

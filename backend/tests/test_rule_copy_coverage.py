@@ -82,11 +82,11 @@ _QUALIFY_VARS: dict[str, dict[str, object]] = {
     },
     "i_saraan": {
         "age": 34,
-        "match_rate_pct": 15.0,
+        "match_rate_pct": 20.0,
         "annual_match_cap_rm": 500.0,
         "min_age": 18,
         "max_age": 60,
-        "annual_contribution_to_max_match_rm": 3333.34,
+        "annual_contribution_to_max_match_rm": 2500.0,
     },
     "perkeso_sksps": {
         "plan_label": "Plan 2",
@@ -100,7 +100,7 @@ _QUALIFY_VARS: dict[str, dict[str, object]] = {
     "budi95": {
         "age": 34,
         "subsidised_price_rm": 1.99,
-        "monthly_quota_l": 300,
+        "monthly_quota_l": 200,
     },
     "mykasih": {
         "age": 34,
@@ -158,8 +158,8 @@ _QUALIFY_VARS: dict[str, dict[str, object]] = {
     "perkeso_sip": {
         "age": 34,
         "first_month_pct": 80,
-        "max_monthly_rm": 4000.0,
-        "wage_ceiling_rm": 5000.0,
+        "max_monthly_rm": 4800.0,
+        "wage_ceiling_rm": 6000.0,
     },
     "taska_permata": {
         "child_count": 1,

@@ -39,9 +39,12 @@ from app.schema.scheme import RuleCitation, SchemeMatch
 
 MIN_AGE = 18
 MAX_AGE = 60
-INSURED_WAGE_CEILING_RM = 5000.0
+# Insured wage ceiling raised from RM5,000 to RM6,000 effective 1 Oct 2024
+# (SOCSO Contribution Table / PERKESO). The wage band determines both the
+# employer/employee contribution rate AND the cap used for JSA replacement.
+INSURED_WAGE_CEILING_RM = 6000.0
 FIRST_MONTH_REPLACEMENT_PCT = 80
-MAX_MONTHLY_REPLACEMENT_RM = 4000.0  # 80% of RM5,000 ceiling
+MAX_MONTHLY_REPLACEMENT_RM = 4800.0  # 80% × RM6,000 ceiling
 
 _SCHEME_ID = "perkeso_sip"
 _SCHEME_NAME = "PERKESO SIP — Sistem Insurans Pekerjaan"
@@ -72,8 +75,9 @@ def _citations() -> list[RuleCitation]:
             passage=(
                 "Job Search Allowance (JSA) replaces 80% of assumed monthly "
                 "wage in the first month, 50% in the second, 40% in the "
-                "third, and 30% from the fourth to sixth month. Assumed "
-                "monthly wage is capped at RM5,000."
+                "third, and 30% from the fourth to sixth month. The insured-"
+                "wage ceiling was raised from RM5,000 to RM6,000 effective "
+                "1 October 2024, lifting the JSA month-1 cap to RM4,800."
             ),
             source_url="https://www.perkeso.gov.my/en/our-services/protection/employment-insurance.html",
         ),

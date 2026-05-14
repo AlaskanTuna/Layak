@@ -49,24 +49,27 @@ def _citations() -> list[RuleCitation]:
             source_pdf=_SOURCE_PDF,
             page_ref="MySalam product page",
             passage=(
-                "Eligible Malaysians diagnosed with any of 45 listed critical "
-                "illnesses receive a one-time cash payout of RM8,000; "
-                "additionally, RM50/day hospital income replacement is paid "
-                "for inpatient stays at government hospitals, up to 14 days "
-                "per year."
+                "Eligible Malaysians diagnosed with any of 50 listed critical "
+                "illnesses (expanded from 45 in 2026 to include rheumatoid "
+                "arthritis + rare diseases) receive a one-time cash payout of "
+                "RM8,000; additionally, RM50/day hospital income replacement "
+                "is paid for inpatient stays at government hospitals, up to "
+                "14 days per year."
             ),
             source_url="https://www.mysalam.com.my/",
         ),
         RuleCitation(
-            rule_id="mysalam.eligibility",
+            rule_id="mysalam.continued_2026",
             source_pdf=_SOURCE_PDF,
-            page_ref="Penerangan portal — MySalam summary",
+            page_ref="Dewan Rakyat statement, Nov 2025 (Parlimen via DagangNews)",
             passage=(
-                "Malaysian citizens aged 18–65 with household income not "
-                "exceeding RM24,000/year are eligible; STR / BSH / BPR "
-                "recipients are auto-enrolled."
+                "Malaysian citizens aged 18–65 in B40 households are eligible; "
+                "STR / BSH / BPR recipients are auto-enrolled. The scheme has "
+                "been formally continued through 2026 (Parlimen statement, "
+                "Nov 2025); the claim window for incidents occurring in 2026 "
+                "runs through 31 December 2026."
             ),
-            source_url="https://www.penerangan.gov.my/skim-perlindungan-nasional-b40-mysalam/",
+            source_url="https://www.dagangnews.com/article/terkini/program-mysalam-tetap-diteruskan-pada-tahun-2026-bantu-golongan-b40-parlimen-diberitahu-61568",
         ),
     ]
 

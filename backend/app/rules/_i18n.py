@@ -394,7 +394,7 @@ def _i_saraan_qualify(language: SupportedLanguage, **v: Any) -> SchemeCopy:
                 f"RM{annual_cap:,.0f} penuh — padanan tahunan maksimum. Sumbangan "
                 f"yang lebih kecil mendapat padanan "
                 f"{match_rate_pct:.0f}% berkadar (contoh: RM1,000 → padanan kerajaan "
-                f"RM150). Daftar melalui portal KWSP i-Saraan atau mana-mana cawangan KWSP."
+                f"RM{1000 * match_rate_pct / 100:,.0f}). Daftar melalui portal KWSP i-Saraan atau mana-mana cawangan KWSP."
             ),
         }
     if language == "zh":
@@ -409,7 +409,7 @@ def _i_saraan_qualify(language: SupportedLanguage, **v: Any) -> SchemeCopy:
                 f"RM{contribution_for_max:,.2f}/年，政府便会补齐全额 "
                 f"RM{annual_cap:,.0f} —— 每年的最高配比。较小的存款按 "
                 f"{match_rate_pct:.0f}% 比例配比（例如存入 RM1,000 —— 政府配比 "
-                f"RM150）。请通过 KWSP i-Saraan 网站或任何 KWSP 分行登记。"
+                f"RM{1000 * match_rate_pct / 100:,.0f}）。请通过 KWSP i-Saraan 网站或任何 KWSP 分行登记。"
             ),
         }
     return {
@@ -423,7 +423,8 @@ def _i_saraan_qualify(language: SupportedLanguage, **v: Any) -> SchemeCopy:
             f"{contribution_for_max:,.2f}/year voluntarily into your EPF Account "
             f"and the government will add the full RM{annual_cap:,.0f} — the maximum "
             f"annual match. Smaller contributions earn a proportional "
-            f"{match_rate_pct:.0f}% match (e.g. RM1,000 contributed → RM150 government match). "
+            f"{match_rate_pct:.0f}% match (e.g. RM1,000 contributed → "
+            f"RM{1000 * match_rate_pct / 100:,.0f} government match). "
             f"Register via the KWSP i-Saraan portal or at any KWSP branch."
         ),
     }

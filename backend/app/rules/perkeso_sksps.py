@@ -123,6 +123,20 @@ def _citations() -> list[RuleCitation]:
             ),
             source_url="https://www.perkeso.gov.my",
         ),
+        RuleCitation(
+            rule_id="perkeso.sksps.gig_workers_act_2025",
+            source_pdf=_SOURCE_PDF,
+            page_ref="Gig Workers Act 2025 (external reference)",
+            passage=(
+                "Under the Gig Workers Act 2025, SOCSO coverage via SKSPS "
+                "becomes mandatory for platform-economy workers (e-hailing, "
+                "p-hailing, food delivery). Budget 2026 expanded the freelance "
+                "sectors covered to include home cleaning, mobile beauty / "
+                "grooming, private tutoring, freelance photography/videography, "
+                "and personal fitness."
+            ),
+            source_url="https://www.perkeso.gov.my/en/our-services/protection/self-employed.html",
+        ),
     ])
     return cites
 

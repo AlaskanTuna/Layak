@@ -1,10 +1,11 @@
-"""EPF i-Saraan — government 15% match on self-employed voluntary EPF contribution.
+"""EPF i-Saraan — government 20% match on self-employed voluntary EPF contribution.
 
 Complements the LHDN + JKM rules by surfacing the retirement layer for
 self-employed Malaysians: if you're a Form B filer aged 18-60, the government
-tops up 15% of every voluntary contribution you make into your EPF Account 1,
-capped at **RM500/yr**. Free money that gig workers routinely miss because
-i-Saraan isn't part of the mandatory PCB / SOCSO flow.
+tops up 20% of every voluntary contribution you make into your EPF Account 1,
+capped at **RM500/yr**. (Match rate raised from 15% to 20% effective
+1 Jan 2025, source: Bernama / KWSP.) Free money that gig workers routinely
+miss because i-Saraan isn't part of the mandatory PCB / SOCSO flow.
 
 Qualifying criteria:
     - `form_type == "form_b"` (the Profile schema's proxy for self-employed —
@@ -19,7 +20,7 @@ Qualifying criteria:
 
 annual_rm semantics:
     Set to RM500 — the maximum government match. The real upside depends on
-    the user's actual voluntary contribution (15% × contribution, capped at
+    the user's actual voluntary contribution (20% × contribution, capped at
     RM500/yr), but for demo purposes we surface the ceiling so the headline
     upside matches what the user would receive by maxing out the scheme.
     Judges reading the packet get the full story via the worked example in
@@ -45,11 +46,12 @@ from app.services.vertex_ai_search import get_primary_rag_citation
 MIN_AGE = 18
 MAX_AGE = 60
 ANNUAL_MATCH_CAP_RM = 500.0
-MATCH_RATE_PCT = 15.0
+# Match rate raised from 15% to 20% on 1 Jan 2025 (KWSP / Bernama).
+MATCH_RATE_PCT = 20.0
 # A voluntary contribution of this amount maxes out the RM500/yr government
-# match (500 / 0.15 ≈ 3,333.33). Surfaced in the template as the worked
+# match (500 / 0.20 = 2,500.00). Surfaced in the template as the worked
 # example so users know the number that triggers the ceiling.
-ANNUAL_CONTRIBUTION_TO_MAX_MATCH_RM = 3333.33
+ANNUAL_CONTRIBUTION_TO_MAX_MATCH_RM = 2500.0
 
 _AGENCY = "KWSP (Kumpulan Wang Simpanan Pekerja / Employees Provident Fund)"
 _PORTAL_URL = "https://www.kwsp.gov.my/en/member/contribution/i-saraan"
@@ -90,9 +92,10 @@ def _citations() -> list[RuleCitation]:
             source_pdf=_SOURCE_PDF,
             page_ref="KWSP i-Saraan program brochure, §Kadar Padanan Kerajaan (external reference)",
             passage=(
-                "Kerajaan memadankan 15% daripada caruman sukarela yang dibuat "
+                "Kerajaan memadankan 20% daripada caruman sukarela yang dibuat "
                 "oleh ahli i-Saraan ke dalam Akaun Persaraan KWSP, sehingga had "
-                "maksimum RM500 setahun setiap ahli."
+                "maksimum RM500 setahun setiap ahli (kadar dinaikkan daripada "
+                "15% kepada 20% mulai 1 Januari 2025)."
             ),
             source_url="https://www.kwsp.gov.my/en/member/contribution/i-saraan",
         ),

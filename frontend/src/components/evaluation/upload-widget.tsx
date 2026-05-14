@@ -448,14 +448,8 @@ export function UploadWidget({ onSubmit, disabled = false, submitId, ref }: Prop
         </div>
       </div>
 
-      <div className="flex flex-col gap-3 border-t border-foreground/10 pt-5 sm:flex-row sm:items-center sm:justify-between">
-        <span className="mono-caption text-foreground/55">
-          {t('evaluation.upload.readyCount', {
-            ready: UPLOAD_SLOTS.filter((s) => state[s].file !== null).length,
-            total: 3
-          })}
-        </span>
-        <div className="flex flex-col items-start gap-3 sm:flex-row sm:items-center">
+      <div className="flex flex-col items-start gap-4 border-t border-foreground/10 pt-5 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex flex-col items-start gap-1.5">
           <Button
             type="button"
             variant="ghost"
@@ -467,18 +461,24 @@ export function UploadWidget({ onSubmit, disabled = false, submitId, ref }: Prop
             <Eraser className="size-4" aria-hidden />
             {t('evaluation.manual.clear')}
           </Button>
-          <Button
-            id={submitId}
-            type="button"
-            onClick={handleSubmit}
-            disabled={disabled || !canSubmit}
-            size="lg"
-            className="rounded-full bg-[color:var(--hibiscus)] px-6 text-[color:var(--hibiscus-foreground)] hover:bg-[color:var(--hibiscus)]/92"
-          >
-            {t('evaluation.upload.continue')}
-            <ArrowRight className="ml-1.5 size-4" aria-hidden />
-          </Button>
+          <span className="mono-caption pl-3 text-foreground/55">
+            {t('evaluation.upload.readyCount', {
+              ready: UPLOAD_SLOTS.filter((s) => state[s].file !== null).length,
+              total: 3
+            })}
+          </span>
         </div>
+        <Button
+          id={submitId}
+          type="button"
+          onClick={handleSubmit}
+          disabled={disabled || !canSubmit}
+          size="lg"
+          className="rounded-full bg-[color:var(--hibiscus)] px-6 text-[color:var(--hibiscus-foreground)] hover:bg-[color:var(--hibiscus)]/92"
+        >
+          {t('evaluation.upload.continue')}
+          <ArrowRight className="ml-1.5 size-4" aria-hidden />
+        </Button>
       </div>
 
       <CropPreviewModal

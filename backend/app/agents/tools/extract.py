@@ -29,10 +29,43 @@ Rules (enforce strictly):
 - `name` is the citizen's full name as it appears on the IC, uppercased.
 - `age` is derived from the IC prefix (`YYMMDD`) against today's date. If a
   date is ambiguous, prefer the older interpretation.
-- `monthly_income_rm` is the gross monthly income in MYR from the income
-  document — net payout for Grab / gig workers, basic pay for salaried.
-  Return a bare number (e.g. `2800.0`). Never use currency symbols or thousand
-  separators; `"RM2,800"` or `"2,800.00"` will fail validation.
+- `monthly_income_rm` is the **applicant's net monthly take-home pay** in
+  MYR — the amount the applicant actually receives after platform commission
+  (gig) or after statutory deductions (salaried). Return a bare number
+  (e.g. `2800.0`). Never use currency symbols or thousand separators;
+  `"RM2,800"` or `"2,800.00"` will fail validation.
+
+  Extraction rules (enforce in this order):
+
+  1. **Prefer the explicit net-payout line.** If the document shows any of
+     "Net Pay" / "Net Payout" / "Amount Credited" / "Bayaran Bersih" /
+     "Pendapatan Bersih" / "Take-Home Pay" / "Jumlah Bayaran", use that
+     value verbatim.
+  2. **For Grab / Foodpanda / gig payslips**, use the "Net Earnings" /
+     "Payout" / "Bayaran Bersih" figure — the one *after* platform
+     commission, tolls, and incentive adjustments. Do NOT return the
+     "Total Ride Fare" / "Gross Earnings" / "Jumlah Tambang" line.
+  3. **For salaried payslips (EA Form, monthly slip)**, use the "Net Pay"
+     / "Pendapatan Bersih" figure — after EPF, SOCSO, EIS, and PCB. Do
+     NOT return "Basic Pay" / "Gaji Pokok" / "Gross Pay" / "Jumlah Kasar".
+  4. **Never compute net yourself.** Do NOT subtract deductions from a
+     gross line to derive a net. If the document only shows gross + a
+     deductions table and the final net line is cropped, illegible, or
+     missing, return the next-most-clearly-labelled monthly amount — but
+     prefer a labelled deduction-subtotal (e.g. "After EPF") over the
+     gross. NEVER return a "Total Sales" / "Total Fares" line as net.
+  5. **Tie-breaker.** If multiple net-style figures are visible (e.g.
+     "Net of EPF" and "Net of EPF+SOCSO"), pick the lowest — that is the
+     most-deducted figure and the closest proxy to take-home pay.
+  6. **No income visible at all.** If the income document is illegible,
+     blank, or contains no monetary figures Gemini can confidently read
+     as a monthly amount, return `monthly_income_rm = 0.0`. Do NOT
+     hallucinate a value, do NOT refuse the extraction. Zero is also the
+     correct value for a genuine zero-income applicant (homemaker,
+     retired, between jobs); Layak treats both cases the same and lets
+     the rule engine surface the most-inclusive eligibility tier
+     (`b40_hardcore`), which the official agency portals will re-verify
+     against MyKad income data at submission time.
 - `household_size` includes the applicant. If the documents don't disclose
   household size, default to `1` and leave `dependants` empty.
 - `dependants` lists each child / parent / spouse / sibling / grandparent / other in the

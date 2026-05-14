@@ -2246,6 +2246,17 @@ rule system after the Phase 15 wiring landed:
 - [x] Re-run correctness and speed evidence with `scripts.benchmark_what_if:run_what_if_gemini_classify_only`: 60/60 samples matched deterministic output signatures; deterministic medians were 0.29ms-0.36ms versus 1226ms-1518ms for Gemini classification-only, with deterministic p95 0.579ms and max 0.669ms across all samples.
 - [x] Update PRD/TRD/progress with the 14 May benchmark and the suggestion-probe removal decision.
 
+### 2. UX: Scenario-aware Cik Lay soft-block
+
+**Purpose/Issue:** Users can ask Cik Lay about deterministic What-If changes before slow scenario strategy enrichment finishes, but the UI and prompt did not clearly distinguish eligibility-ready from strategy-ready states.
+
+**Implementation:**
+
+- [x] Add `strategy_status` to `scenario_context` so chat receives whether scenario strategy is refreshing, ready, unchanged, unavailable, or not requested.
+- [x] Update Cik Lay prompt rendering to answer from computed totals/matches/deltas when strategy is not ready, and to avoid inventing missing strategy advice.
+- [x] Update What-If CTA copy so users can ask about changed schemes while strategy notes are still refreshing.
+- [x] Update Strategy section status UI with spinner/success/neutral/error notices.
+
 ---
 
 ## Phase X: Submission Package

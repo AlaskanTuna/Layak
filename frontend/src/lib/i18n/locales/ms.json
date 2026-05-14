@@ -735,7 +735,11 @@
       "totalUpsideLabel": "Jumlah apa-jika / tahun",
       "previewLabel": "Pratonton senario",
       "askScenario": "Tanya Cik Lay tentang senario ini",
+      "askScenarioChanges": "Tanya tentang skim yang berubah",
       "askScenarioPrompt": "Terangkan senario apa-jika ini. Apa yang berubah, skim mana yang bergerak, dan perkara utama apa yang patut saya perhatikan?",
+      "askScenarioWithoutStrategyPrompt": "Terangkan perubahan kelayakan dan jumlah dalam senario apa-jika ini. Nota strategi masih disegar semula atau tidak tersedia, jadi fokus pada perubahan skim dan delta yang sudah dikira.",
+      "strategyStillRefreshing": "Nota strategi masih disegar semula. Cik Lay boleh terangkan perubahan kelayakan sekarang.",
+      "strategyNotBlocking": "Perubahan kelayakan sudah siap. Nota strategi tidak diperlukan untuk jawapan ini.",
       "deltaChip": {
         "gained": "Layak baru · RM {{amount}}",
         "lost": "Tidak lagi layak · dulu RM {{amount}}",
@@ -758,10 +762,10 @@
       },
       "softSuggestion": "Layak tidak sepenuhnya pasti — eloklah tanya Cik Lay.",
       "scenario": {
-        "refreshing": "Sedang menyemak sama ada senario ini mengubah nota strategi.",
-        "ready": "Memaparkan nota strategi untuk pratonton senario aktif.",
-        "empty": "Tiada perubahan strategi khusus senario; memaparkan strategi penilaian tersimpan.",
-        "error": "Strategi senario tidak dapat dimuat semula; memaparkan strategi penilaian tersimpan."
+        "refreshing": "Sedang menyegar semula strategi senario. Keputusan kelayakan sudah dikemas kini.",
+        "ready": "Strategi senario telah dikemas kini.",
+        "empty": "Tiada perubahan strategi besar dikesan. Memaparkan nota strategi tersimpan.",
+        "error": "Strategi senario tidak dapat disegar semula. Memaparkan nota strategi tersimpan."
       }
     },
     "narrative": {

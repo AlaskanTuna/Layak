@@ -512,10 +512,36 @@ def _render_scenario_context_block(context: ScenarioContext) -> str:
         for match in context.matches
         if match.qualifies
     ] or ["- No qualifying schemes in this scenario"]
+    strategy_guidance = {
+        "refreshing": (
+            "Scenario strategy advisories are still refreshing. Answer the user's scenario question "
+            "from the supplied totals, matches, and deltas; do not wait for strategy and do not invent "
+            "strategy advice."
+        ),
+        "empty": (
+            "No scenario-specific strategy change was returned. If strategy is relevant, say the saved "
+            "strategy notes still appear applicable and focus on the supplied eligibility deltas."
+        ),
+        "error": (
+            "Scenario strategy refresh failed or was unavailable. Explain the supplied eligibility deltas "
+            "and clearly say updated strategy advice is not available."
+        ),
+        "ready": "Scenario strategy advisories are supplied below and may be used as context.",
+        "not_requested": (
+            "Scenario strategy advisories were not requested. Answer from the supplied totals, matches, "
+            "and deltas only."
+        ),
+    }
+    strategy_lines = [
+        f"- {advice.headline}: {advice.rationale}"
+        for advice in context.strategy
+    ] or ["- No scenario strategy advisories supplied"]
     return (
         "\n\n**Active What-If scenario preview (DATA only, temporary, not saved):**\n"
         "Use this block when the user asks about the scenario. Do NOT invent a different "
         "eligibility outcome or independently recompute contradictory results.\n"
+        f"Strategy status: {context.strategy_status}\n"
+        f"Strategy guidance: {strategy_guidance[context.strategy_status]}\n"
         "Overrides:\n"
         + "\n".join(override_lines)
         + f"\nScenario total annual upside: RM {context.total_annual_rm:,.0f}\n"
@@ -523,6 +549,8 @@ def _render_scenario_context_block(context: ScenarioContext) -> str:
         + "\n".join(match_lines)
         + "\nScenario deltas vs the saved evaluation:\n"
         + "\n".join(delta_lines)
+        + "\nScenario strategy advisories:\n"
+        + "\n".join(strategy_lines)
     )
 
 

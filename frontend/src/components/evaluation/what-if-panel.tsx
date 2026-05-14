@@ -64,6 +64,13 @@ function formatRm(value: number): string {
   return `RM ${value.toLocaleString('en-MY', { maximumFractionDigits: 0 })}`
 }
 
+function scenarioStrategyStatus(phase: WhatIfStrategyPhase, strategyCount: number): ChatScenarioContext['strategy_status'] {
+  if (phase === 'refreshing') return 'refreshing'
+  if (phase === 'error') return 'error'
+  if (phase === 'ready') return strategyCount > 0 ? 'ready' : 'empty'
+  return 'not_requested'
+}
+
 export function WhatIfPanel({ evalId, baselineProfile, onResult, onAskCikLay }: Props) {
   const { t } = useTranslation()
   const baseline = useMemo(() => deriveBaselineSliders(baselineProfile), [baselineProfile])
@@ -94,7 +101,8 @@ export function WhatIfPanel({ evalId, baselineProfile, onResult, onAskCikLay }: 
       total_annual_rm: whatIf.data.total_annual_rm,
       matches: whatIf.data.matches,
       deltas: whatIf.data.deltas,
-      strategy: whatIf.strategyPhase === 'ready' ? whatIf.data.strategy : []
+      strategy: whatIf.strategyPhase === 'ready' ? whatIf.data.strategy : [],
+      strategy_status: scenarioStrategyStatus(whatIf.strategyPhase, whatIf.data.strategy.length)
     }
   }, [diffsFromBaseline, whatIf.data, whatIf.phase, whatIf.strategyPhase])
 
@@ -205,16 +213,33 @@ export function WhatIfPanel({ evalId, baselineProfile, onResult, onAskCikLay }: 
           ) : null}
         </div>
         {scenarioContext && onAskCikLay && (
-          <Button
-            type="button"
-            variant="outline"
-            size="sm"
-            onClick={() => onAskCikLay(scenarioContext, t('evaluation.whatIf.askScenarioPrompt'))}
-            className="gap-1.5 self-start rounded-full sm:self-auto"
-          >
-            <MessageCircle className="size-3.5" aria-hidden />
-            {t('evaluation.whatIf.askScenario')}
-          </Button>
+          <div className="flex flex-col items-start gap-1 sm:items-end">
+            {scenarioContext.strategy_status === 'refreshing' && (
+              <span className="mono-caption text-foreground/50">{t('evaluation.whatIf.strategyStillRefreshing')}</span>
+            )}
+            {(scenarioContext.strategy_status === 'empty' || scenarioContext.strategy_status === 'error') && (
+              <span className="mono-caption text-foreground/50">{t('evaluation.whatIf.strategyNotBlocking')}</span>
+            )}
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={() =>
+                onAskCikLay(
+                  scenarioContext,
+                  scenarioContext.strategy_status === 'ready'
+                    ? t('evaluation.whatIf.askScenarioPrompt')
+                    : t('evaluation.whatIf.askScenarioWithoutStrategyPrompt')
+                )
+              }
+              className="gap-1.5 self-start rounded-full sm:self-auto"
+            >
+              <MessageCircle className="size-3.5" aria-hidden />
+              {scenarioContext.strategy_status === 'ready'
+                ? t('evaluation.whatIf.askScenario')
+                : t('evaluation.whatIf.askScenarioChanges')}
+            </Button>
+          </div>
         )}
       </footer>
     </section>

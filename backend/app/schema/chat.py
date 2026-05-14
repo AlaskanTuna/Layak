@@ -86,6 +86,7 @@ class ScenarioContext(BaseModel):
     matches: list[SchemeMatch] = Field(default_factory=list)
     deltas: list[SchemeDelta] = Field(default_factory=list)
     strategy: list[StrategyAdvice] = Field(default_factory=list)
+    strategy_status: Literal["not_requested", "refreshing", "ready", "empty", "error"] = "not_requested"
 
 
 class ChatCitation(BaseModel):

@@ -735,7 +735,11 @@
       "totalUpsideLabel": "What-if total / year",
       "previewLabel": "Scenario preview",
       "askScenario": "Ask Cik Lay about this scenario",
+      "askScenarioChanges": "Ask about changed schemes",
       "askScenarioPrompt": "Explain this what-if scenario. What changed, which schemes moved, and what should I notice first?",
+      "askScenarioWithoutStrategyPrompt": "Explain the eligibility and amount changes in this what-if scenario. Strategy notes are still refreshing or unavailable, so focus only on the computed scheme changes and deltas.",
+      "strategyStillRefreshing": "Strategy notes are still refreshing. Cik Lay can explain eligibility changes now.",
+      "strategyNotBlocking": "Eligibility changes are ready. Strategy notes are not required for this answer.",
       "deltaChip": {
         "gained": "Newly eligible · RM {{amount}}",
         "lost": "Now ineligible · was RM {{amount}}",
@@ -758,10 +762,10 @@
       },
       "softSuggestion": "Layak isn't fully certain — worth asking Cik Lay.",
       "scenario": {
-        "refreshing": "Checking whether this scenario changes the strategy notes.",
-        "ready": "Showing strategy notes for the active scenario preview.",
-        "empty": "No scenario-specific strategy changes found; showing your saved evaluation strategy.",
-        "error": "Scenario strategy could not refresh; showing your saved evaluation strategy."
+        "refreshing": "Refreshing scenario strategy. Eligibility results are already updated.",
+        "ready": "Scenario strategy updated.",
+        "empty": "No major strategy change detected. Showing saved strategy notes.",
+        "error": "Scenario strategy could not refresh. Showing saved strategy notes."
       }
     },
     "narrative": {

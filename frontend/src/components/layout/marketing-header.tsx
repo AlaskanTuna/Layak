@@ -56,7 +56,7 @@ export function MarketingHeader() {
         WebkitBackdropFilter: `blur(${scrollProgress * 12}px)`
       }}
     >
-      <div className="mx-auto flex h-full max-w-7xl items-center justify-between px-4 sm:px-6">
+      <div className="flex h-full w-full items-center justify-between px-4 md:px-6">
         <Link href="/" className="flex items-center gap-2.5" aria-label={t('common.aria.layakHome')}>
           <BrandMark />
           <span className="font-sans text-[17px] font-semibold tracking-tight text-inherit">{t('common.brand')}</span>

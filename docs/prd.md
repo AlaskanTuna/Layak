@@ -406,7 +406,7 @@ Each requirement below ties to one of the in-scope v1 and v2 deliverables. Accep
 
 **Acceptance criteria:**
 
-- [ ] Adjusting any slider triggers a deterministic preview that completes well under 2 seconds on dev infra; after the 20-scheme expansion and suggestion-probe removal, local Vertex benchmark medians were about 0.29ms-0.36ms for the deterministic path versus 1226ms-1518ms for Gemini classification-only across the six-scenario matrix.
+- [ ] Adjusting any slider triggers a deterministic preview that completes well under 2 seconds on dev infra; after the 20-scheme expansion and suggestion-probe removal, local Vertex benchmark medians were about 0.29ms-0.36ms for the deterministic path versus 1226ms-1518ms for Gemini classification-only across the six-scenario matrix. Tail latency stayed low for deterministic preview: p95 0.579ms, max 0.669ms across 30 samples; Gemini classification-only p95 was 1650.210ms, max 4683.086ms.
 - [ ] Deterministic preview correctness is checked against the Gemini-classify comparison path; the 14 May 2026 benchmark matched output signatures across all 60 samples for totals, match counts, qualified counts, strategy counts, delta counts, changed-delta counts, and delta-status counts.
 - [ ] Affected scheme cards show delta chips: `Newly eligible · RM N` (gained), `Now ineligible · was RM N` (lost), tier-change `note` verbatim, `±RM N` for amount changes; `unchanged` schemes render no chip.
 - [ ] Sliders clamp server-side to the documented ranges; unknown override keys are silently dropped.

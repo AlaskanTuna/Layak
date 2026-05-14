@@ -223,6 +223,76 @@ def test_adult_household_income_rolls_into_household_total_only() -> None:
     ).annual_rm
 
 
+def test_spouse_only_income_drives_household_classification() -> None:
+    """QA-findings scenario: applicant has zero monthly income (e.g. carer at
+    home) and the spouse is the household earner. The household income band
+    must follow the spouse income, not the applicant zero."""
+    payload = ManualEntryPayload.model_validate(
+        {
+            **AISYAH_PAYLOAD_JSON,
+            "monthly_income_rm": 0,
+            "dependants": [
+                {"relationship": "spouse", "age": 40, "monthly_income_rm": 8200},
+            ],
+        }
+    )
+    built = build_profile_from_manual_entry(payload, today=_FIXED_TODAY)
+    assert built.applicant_income_rm == 0
+    assert built.household_income_rm == 8200
+    # 8200 lands in the m40 band (RM5,001 – RM10,000); applicant alone would
+    # have been b40_hardcore. The classifier rides on household, not applicant.
+    assert built.household_flags.income_band == "m40"
+
+
+def test_spouse_income_pushes_household_from_b40_to_m40() -> None:
+    """QA-findings scenario: spouse income that crosses a threshold. Applicant
+    at RM2,400 alone is b40_household; adding a RM3,000-spouse pushes the
+    household total to RM5,400 — m40 territory. JKM/STR rules read the
+    household total, so the threshold flip must propagate."""
+    payload = ManualEntryPayload.model_validate(
+        {
+            **AISYAH_PAYLOAD_JSON,
+            "monthly_income_rm": 2400,
+            "dependants": [
+                {"relationship": "spouse", "age": 35, "monthly_income_rm": 3000},
+                {"relationship": "child", "age": 8},
+            ],
+        }
+    )
+    built = build_profile_from_manual_entry(payload, today=_FIXED_TODAY)
+    assert built.applicant_income_rm == 2400
+    assert built.household_income_rm == 5400
+    assert built.household_flags.income_band == "m40"
+    # STR 2026 caps at <= RM5,000 household income; a m40 household is out.
+    assert str_2026.match(built).qualifies is False
+
+
+def test_spouse_listed_with_unknown_income_uses_applicant_only_for_household_total() -> None:
+    """QA-findings scenario: spouse on the dependants list with no income
+    declared (left blank). `Dependant.monthly_income_rm = None` must NOT count
+    as zero pulled into the total — but it also must not silently impute the
+    applicant's income. Household total = applicant + sum of *known* adult
+    incomes."""
+    payload = ManualEntryPayload.model_validate(
+        {
+            **AISYAH_PAYLOAD_JSON,
+            "monthly_income_rm": 2800,
+            "dependants": [
+                {"relationship": "spouse", "age": 33},  # no monthly_income_rm
+                {"relationship": "child", "age": 10},
+                {"relationship": "child", "age": 7},
+            ],
+        }
+    )
+    built = build_profile_from_manual_entry(payload, today=_FIXED_TODAY)
+    assert built.applicant_income_rm == 2800
+    # Spouse has no declared income → household total falls back to the
+    # applicant's RM2,800 (same as no-spouse Aisyah baseline). The schemes
+    # she qualifies for must match the AISYAH_PROFILE baseline.
+    assert built.household_income_rm == 2800
+    assert built.household_flags.income_band == "b40_household_with_children"
+
+
 def test_address_is_optional() -> None:
     body = {**AISYAH_PAYLOAD_JSON}
     del body["address"]

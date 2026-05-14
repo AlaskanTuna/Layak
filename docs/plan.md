@@ -1923,6 +1923,103 @@ year: 'numeric' })`. Fallback to `"—"` if response is empty (shouldn't
 
 ---
 
+## Phase 13: Noisy-Income QA Hardening
+
+> Direct response to `docs/qa-findings.md`. The QA suite ran the rule engine
+> against six noisy-income variants of Aisyah (clean baseline, gross-vs-net
+> ambiguity, BKK boundary pass/fail, just-over-JKM fail, STR cliff fail) and
+> got pass-grade outcomes on every case **except** the deliberate negative
+> case where the explicit net-payout line was cropped out of the document.
+> Under that condition the extraction agent fell back to the largest visible
+> figure — typically the gross / pre-deduction line — and the rule engine
+> then ranged downstream off a wrong `monthly_income_rm`.
+>
+> The findings also flagged a spouse-income gap in the schema (recorded
+> before the schema split landed in commit `feea2f0`-era refactors): one
+> `monthly_income_rm` field with no structured spouse income. The split
+> (`applicant_monthly_income_rm` + `household_monthly_income_rm` +
+> `Dependant.monthly_income_rm`) is already in the working tree; Phase 13
+> closes the missing test scenarios from the QA findings list.
+
+### 1. Feature: Extract-prompt hardening — net-payout-line precedence
+
+**Purpose/Issue:** Current `_INSTRUCTION` in `backend/app/agents/tools/extract.py`
+is internally inconsistent: it says `monthly_income_rm` is "gross monthly
+income" then qualifies with "net payout for Grab / gig workers". The QA
+suite found the model latches onto whatever the document labels prominently,
+which in the cropped-payout case is the gross-fare line. Re-anchor the prompt
+so the model:
+
+- prefers an explicit final net-payout line (`Net Pay` / `Bayaran Bersih` /
+  `Net Earnings` / `Amount Credited` / `Take-Home Pay` / `Jumlah Bayaran`);
+- avoids gross-equivalent lines (Total Ride Fare, Gross Earnings, Basic
+  Pay, Gaji Pokok, Jumlah Kasar);
+- never computes `net = gross − deductions` itself;
+- falls back to a labelled deduction-subtotal (e.g. "After EPF") rather
+  than the gross when the final net line is cropped;
+- breaks ties between multiple net-style figures by picking the lowest
+  (most-deducted) one.
+
+- [x] Replaced the one-line description with a numbered five-rule block
+      under `monthly_income_rm`. Rules ordered by precedence so the model
+      walks them in document scan order. The Grab/Foodpanda gig case and
+      the EA Form salaried case have their own bullet so the model can't
+      cross-paste them. The tie-breaker rule explicitly tells the model
+      to pick the lowest net-style figure — the most-deducted line is the
+      closest proxy to actual take-home.
+
+### 2. Feature: Spouse-income test coverage
+
+**Purpose/Issue:** QA findings listed five spouse-income scenarios that
+should appear in fixtures once the schema supports them:
+(1) applicant income only, (2) spouse income only, (3) both visible,
+(4) spouse listed with unknown income, (5) spouse income crossing a
+threshold. The existing `test_adult_household_income_rolls_into_household_total_only`
+covers (3) and partially (5) (a hard-into-t20 jump from RM8,000 alone).
+Phase 13 adds the missing three.
+
+- [x] `test_spouse_only_income_drives_household_classification` — applicant
+      `monthly_income_rm = 0` (carer at home), spouse with RM8,200 declared
+      income → household band must follow the spouse, not the applicant
+      zero. Asserts `household_income_rm == 8200`, `income_band == "m40"`.
+      Catches a regression where `_classify_income_band` would have used
+      `payload.monthly_income_rm` (zero) instead of the household total.
+- [x] `test_spouse_income_pushes_household_from_b40_to_m40` — applicant
+      RM2,400 + spouse RM3,000 = household RM5,400. Applicant alone is
+      `b40_household`; household is `m40`. Asserts `str_2026.match(built).qualifies
+    is False` to confirm threshold propagation reaches the rule engine.
+- [x] `test_spouse_listed_with_unknown_income_uses_applicant_only_for_household_total`
+      — spouse on the dependants list with no `monthly_income_rm` key
+      (`None`). Must NOT count as zero pulled into the total **and** must
+      NOT impute applicant income. Asserts `household_income_rm` equals
+      the applicant total alone (RM2,800) → matches the Aisyah baseline.
+
+### 3. Feature: Documentation
+
+- [x] This plan.md Phase 13 entry. `docs/qa-findings.md` itself stays
+      authoritative as the QA report; no edits there — the report is a
+      historical record of what was found, not a TODO list.
+
+### Open items deferred to a future phase
+
+1. **Explicit extraction-failure schema.** The QA findings recommend
+   "return a low-confidence extraction error or `null`-equivalent failure
+   path when the final payout line is cut off and arithmetic would be
+   required." Implementing this means making `Profile.monthly_income_rm`
+   nullable (or adding an `extraction_confidence` enum), which ripples
+   through every rule's eligibility gate. Deferred — current prompt-only
+   harm-reduction is sufficient for v1; the structured-failure path is a
+   v1.1 schema migration.
+2. **Real QA suite of cropped-payout fixtures.** The QA findings are
+   written against six fixture documents the team rendered by hand. A
+   future phase should bundle those as a regression suite (probably under
+   `backend/tests/qa-fixtures/`) so the prompt hardening stays validated
+   on every Gemini-model upgrade. Out of scope for Phase 13 because the
+   fixtures live in `docs/demo-docs/` as PDFs/images and aren't yet
+   structured for repeat-run pytest consumption.
+
+---
+
 ## Phase X: Submission Package
 
 > Covers the final submission artifacts. Keep it simple and complete.

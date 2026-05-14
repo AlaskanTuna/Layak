@@ -7,23 +7,37 @@ document is pending commit (noted in the rule module docstring).
 """
 
 from app.rules import (
+    bantuan_elektrik,
+    bap,
     budi95,
     i_saraan,
+    i_suri,
     jkm_bkk,
     jkm_warga_emas,
     lhdn_form_b,
     mykasih,
+    mysalam,
+    peka_b40,
     perkeso_sksps,
+    rmt,
+    sara,
     str_2026,
 )
 
 __all__ = [
+    "bantuan_elektrik",
+    "bap",
     "budi95",
     "i_saraan",
+    "i_suri",
     "jkm_bkk",
     "jkm_warga_emas",
     "lhdn_form_b",
     "mykasih",
+    "mysalam",
+    "peka_b40",
     "perkeso_sksps",
+    "rmt",
+    "sara",
     "str_2026",
 ]

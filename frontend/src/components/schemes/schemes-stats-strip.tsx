@@ -6,16 +6,17 @@ import { useTranslation } from 'react-i18next'
 
 import { useLatestVerifiedAt } from '@/hooks/use-verified-schemes'
 
-// User-facing scheme count rolls `lhdn_form_b` + `lhdn_form_be` together as
-// one "LHDN tax relief" scheme — the rule engine treats them as a single
-// rule module that diverges only on the user's `Profile.form_type` (gig vs.
-// salaried). The backend `SchemeId` literal has 9 distinct slugs because
-// of that internal split; the user-facing count is 8 (matches README +
-// Phase 12 progress entry).
+// User-facing scheme count: 16 backend `SchemeId` slugs covering 9
+// federal agencies and 7 benefit categories. Phase 14 added 7 more schemes
+// (PeKa B40, BAP, Bantuan Elektrik, i-Suri, MySalam, SARA, RMT) on top of
+// the original 9 (STR, JKM Warga Emas, JKM BKK, LHDN Form B, LHDN Form BE,
+// PERKESO SKSPS, i-Saraan, BUDI95, MyKasih). LHDN Form B + Form BE count
+// separately because they target different filer cohorts (gig vs salaried)
+// with different deadlines and relief baskets.
 const STATIC_STATS = [
-  { id: 'schemes', icon: Layers, accent: 'hibiscus', value: '8' },
-  { id: 'agencies', icon: Building2, accent: 'forest', value: '6' },
-  { id: 'categories', icon: Tag, accent: 'primary', value: '6' }
+  { id: 'schemes', icon: Layers, accent: 'hibiscus', value: '16' },
+  { id: 'agencies', icon: Building2, accent: 'forest', value: '9' },
+  { id: 'categories', icon: Tag, accent: 'primary', value: '7' }
 ] as const
 
 type Accent = 'hibiscus' | 'forest' | 'primary'

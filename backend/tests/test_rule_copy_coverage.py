@@ -106,6 +106,44 @@ _QUALIFY_VARS: dict[str, dict[str, object]] = {
         "age": 34,
         "credit_amount_rm": 100.0,
     },
+    "peka_b40": {
+        "age": 45,
+        "band": "b40_household_with_children",
+    },
+    "bap": {
+        "child_count": 2,
+        "per_child_rm": 150.0,
+        "annual_rm": 300.0,
+    },
+    "bantuan_elektrik": {
+        "monthly_rebate": 40.0,
+        "monthly_cost": 95.0,
+        "annual_rm": 480.0,
+        "rebate_cap": 40.0,
+    },
+    "i_suri": {
+        "spouse_age": 30,
+        "annual_incentive_rm": 300.0,
+        "lifetime_cap_rm": 3000.0,
+        "max_age": 60,
+    },
+    "mysalam": {
+        "age": 34,
+        "lump_sum_rm": 8000.0,
+        "hospital_daily_rm": 50.0,
+        "hospital_max_days": 14,
+        "band": "b40_household",
+    },
+    "sara": {
+        "band": "b40_household_with_children",
+        "monthly_rm": 100.0,
+        "enhanced": False,
+        "annual_rm": 1200.0,
+    },
+    "rmt": {
+        "child_count": 2,
+        "band": "b40_household_with_children",
+    },
 }
 
 _OUT_OF_SCOPE_VARS: dict[str, dict[str, object]] = {
@@ -119,6 +157,13 @@ _OUT_OF_SCOPE_VARS: dict[str, dict[str, object]] = {
     "perkeso_sksps": {"reasons": ["applicant age 70 outside the Akta 789 window"]},
     "budi95": {"reasons": ["age 14 below the BUDI95 minimum of 16"]},
     "mykasih": {"reasons": ["age 16 below the MyKasih SARA minimum of 18"]},
+    "peka_b40": {"reasons": ["age 34 below the PeKa B40 minimum of 40"]},
+    "bap": {"reasons": ["no child dependant aged 6–18 in household"]},
+    "bantuan_elektrik": {"reasons": ["household income band 'm40' is above eKasih Miskin Tegar"]},
+    "i_suri": {"reasons": ["no spouse aged 18–60 with zero declared income"]},
+    "mysalam": {"reasons": ["age 70 outside the MySalam window (18–65)"]},
+    "sara": {"reasons": ["household income band 'm40' is above the B40 ceiling"]},
+    "rmt": {"reasons": ["no primary-school-age child (6–12) in household"]},
 }
 
 

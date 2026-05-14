@@ -214,11 +214,13 @@ async def test_match_schemes_sorts_required_contribution_after_upside(aisyah: Pr
     assert kinds[:upside_count] == ["upside"] * upside_count
     assert kinds[upside_count : upside_count + subsidy_count] == ["subsidy_credit"] * subsidy_count
     assert kinds[upside_count + subsidy_count :] == ["required_contribution"] * contribution_count
-    # Aisyah: STR + Warga Emas + BKK + LHDN Form B + i-Saraan (5 upside) +
-    # BUDI95 + MyKasih (2 subsidy_credit, age 34 ≥ both minimums) +
+    # Aisyah (Phase 14): STR + Warga Emas + BKK + LHDN Form B + i-Saraan +
+    # BAP (6 upside, BAP added Phase 14 as universal RM150 × school children) +
+    # BUDI95 + MyKasih + SARA + RMT (4 subsidy_credit; SARA + RMT added Phase 14
+    # because Aisyah is b40_household_with_children with 2 primary-school kids) +
     # SKSPS (1 required_contribution).
-    assert upside_count == 5
-    assert subsidy_count == 2
+    assert upside_count == 6
+    assert subsidy_count == 4
     assert contribution_count == 1
     assert matches[-1].scheme_id == "perkeso_sksps"
 

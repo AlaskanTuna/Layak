@@ -1994,7 +1994,7 @@ Phase 13 adds the missing three.
 - [x] `test_spouse_income_pushes_household_from_b40_to_m40` — applicant
       RM2,400 + spouse RM3,000 = household RM5,400. Applicant alone is
       `b40_household`; household is `m40`. Asserts `str_2026.match(built).qualifies
-  is False` to confirm threshold propagation reaches the rule engine.
+is False` to confirm threshold propagation reaches the rule engine.
 - [x] `test_spouse_listed_with_unknown_income_uses_applicant_only_for_household_total`
       — spouse on the dependants list with no `monthly_income_rm` key
       (`None`). Must NOT count as zero pulled into the total **and** must
@@ -2024,6 +2024,95 @@ Phase 13 adds the missing three.
    on every Gemini-model upgrade. Out of scope for Phase 13 because the
    fixtures live in `docs/demo-docs/` as PDFs/images and aren't yet
    structured for repeat-run pytest consumption.
+
+---
+
+## Phase 14: Scheme Corpus Expansion (9 → 16)
+
+> The opening pitch references the 167 federal Malaysian social-assistance
+> schemes. Pre-Phase-14 the rule engine matched against 9 of those; this
+> phase brings the count to 16, hitting the ~10% coverage threshold called
+> out in the value-proposition statement.
+>
+> Research priority was widely-known mainstream subsidies (every Malaysian
+> parent knows BAP, every B40 household knows SARA / MySalam / TNB rebate
+> / RMT school meals), not niche programs. Every new scheme is verifiable
+> with data fields the existing `Profile` already carries — no schema
+> migrations were required.
+
+### 1. Feature: Seven new rule modules
+
+**Purpose/Issue:** Reach 16 schemes total (≥10% of the 167 federal corpus).
+
+- [x] `peka_b40` — Skim Peduli Kesihatan B40 (MOH/ProtectHealth). Gate:
+      `income_band` in any B40 tier AND `age ≥ 40`. Kind: `subsidy_credit`
+      (services). Covers free annual screening, RM20K equipment aid,
+      RM1,000 cancer-treatment incentive, RM500 transport claim.
+- [x] `bap` — Bantuan Awal Persekolahan (KPM). Gate: any school-age child
+      dependant (6–18). Kind: `upside`. RM150 × school-age children per
+      year. Budget 2026 made BAP universal (no income gate).
+- [x] `bantuan_elektrik` — TNB RM40 monthly bill rebate (KIR Miskin Tegar).
+      Gate: `income_band == "b40_hardcore"` AND positive `monthly_cost_rm`.
+      Kind: `upside`. RM40/month cap, annualised to RM480.
+- [x] `i_suri` — KWSP housewife top-up. Gate: at least one spouse-relationship
+      dependant with `monthly_income_rm` in `{None, 0.0}` AND age 18–60.
+      Kind: `upside`. RM300/year government incentive (lifetime cap RM3,000).
+- [x] `mysalam` — Skim Perlindungan Nasional B40 (MOF). Gate: age 18–65
+      AND `income_band` in `{b40_hardcore, b40_household}`. Kind:
+      `subsidy_credit` (insurance protection). Free critical-illness cover.
+- [x] `sara` — Sumbangan Asas Rahmah (MOF MyKad credit). Gate:
+      `income_band` in any B40 tier. Kind: `subsidy_credit`. RM100/month
+      standard / RM200/month enhanced (eKasih hardcore-poor tier).
+- [x] `rmt` — Rancangan Makanan Tambahan (KPM school meals). Gate: B40
+      band AND child dependant aged 6–12. Kind: `subsidy_credit` (service).
+
+### 2. Feature: Wiring + i18n parity
+
+- [x] Updated `SchemeId` Literal in `app/schema/scheme.py` (9 → 16) and
+      mirrored on the TypeScript side in `frontend/src/lib/agent-types.ts`.
+- [x] Extended `app/rules/_i18n.py` with seven `(qualify, out_of_scope)`
+      function pairs and ten reason fragments across en / ms / zh.
+- [x] Registered every new module in `app/rules/__init__.py` and
+      `app/agents/tools/match.py`'s `_RULES` tuple. Three-tier sort
+      (upside → subsidy_credit → required_contribution) auto-extends.
+- [x] `frontend/src/components/schemes/schemes-stats-strip.tsx` headline
+      tile updated to 16 schemes / 9 agencies / 7 categories. README
+      mermaid example updated to "16 schemes · 11 qualifying" for Aisyah.
+
+### 3. Feature: Audit + test coverage
+
+- [x] `backend/tests/test_phase14_schemes.py` — 37 focused tests:
+      qualify-fires + out-of-scope + kind/annual_rm contract + portal-URL
+      domain + ≥ 2 citations per rule. All seven new rules covered.
+- [x] `backend/tests/test_rule_copy_coverage.py` — extended
+      `_QUALIFY_VARS` + `_OUT_OF_SCOPE_VARS` fixture maps for all seven
+      new schemes; 161 catalogue tests pass (every scheme × language ×
+      variant has non-empty copy with the expected language signature).
+- [x] `backend/tests/test_perkeso_sksps.py` Aisyah three-tier sort
+      assertion updated: 6 upside / 4 subsidy_credit / 1 required_contribution
+      (BAP added to upside; SARA + RMT added to subsidy_credit).
+- [x] Spot-check audit ran against every new scheme's portal URL and rate
+      claim. Three corrections applied: SARA tier table clarification
+      note, RMT URL deep-link + eligibility broadened from "B40" to
+      "≤RM2,000/month or eKasih", Bantuan Elektrik citation now notes
+      the published rate runs through 31 Dec 2025 with Budget 2026
+      extension under the broader social-protection envelope.
+
+### Open items deferred to a future phase
+
+1. **Marketing-catalog (SchemesOverview) cards.** Frontend
+   `schemes-overview.tsx` still lists six cards. The user-facing marketing
+   page can be extended with the three new `upside` rules (BAP, Bantuan
+   Elektrik, i-Suri) — the four `subsidy_credit` rules follow BUDI95 +
+   MyKasih precedent and stay off the catalog. Deferred because the
+   catalog uses i18n keys for summary copy, requiring matching entries in
+   `frontend/src/lib/i18n/locales/{en,ms,zh}.json` — out of scope for
+   this rule-engine-only expansion.
+2. **Verified-schemes admin entries.** `verified_schemes/{id}` documents
+   in Firestore (used by `SchemeVerifiedBadge`) are not yet seeded for
+   the seven new schemes. The admin can stamp `verifiedAt` per scheme
+   through the existing admin UI; until then the badge reads "Pending
+   verification" which is the correct semantics.
 
 ---
 

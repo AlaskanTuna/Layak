@@ -668,6 +668,505 @@ def _mykasih_out_of_scope(language: SupportedLanguage, **v: Any) -> SchemeCopy:
 
 
 # ---------------------------------------------------------------------------
+# PeKa B40 — MOH/ProtectHealth health screening + cancer aid (Phase 14)
+# ---------------------------------------------------------------------------
+
+
+def _peka_b40_qualify(language: SupportedLanguage, **v: Any) -> SchemeCopy:
+    age = v["age"]
+    if language == "ms":
+        return {
+            "summary": (
+                f"Anda berumur {age} (≥40) dan berada dalam jalur B40 — layak "
+                f"untuk PeKa B40 (saringan kesihatan percuma + bantuan barah)."
+            ),
+            "why_qualify": (
+                f"PeKa B40 menawarkan saringan kesihatan tahunan percuma, "
+                f"bantuan peralatan perubatan sehingga RM20,000, insentif "
+                f"rawatan barah RM1,000, dan tuntutan pengangkutan sehingga "
+                f"RM500/tahun. Penerima STR berumur 40+ didaftar secara "
+                f"automatik. Klik 'Semak Status' untuk pengesahan di portal "
+                f"ProtectHealth."
+            ),
+        }
+    if language == "zh":
+        return {
+            "summary": (
+                f"您 {age} 岁（≥40）且属 B40 收入组 —— 符合 PeKa B40 资格"
+                f"（免费健康检查 + 癌症补助）。"
+            ),
+            "why_qualify": (
+                f"PeKa B40 提供每年免费健康检查、最高 RM20,000 医疗器材津贴、"
+                f"RM1,000 癌症治疗奖励金，以及每年最高 RM500 交通报销。"
+                f"年满 40 岁的 STR 受惠者自动登记。请点击「查询状态」前往 "
+                f"ProtectHealth 官方门户确认。"
+            ),
+        }
+    return {
+        "summary": (
+            f"You're {age} (≥40) and in the B40 band — eligible for PeKa B40 "
+            f"(free health screening + cancer aid)."
+        ),
+        "why_qualify": (
+            f"PeKa B40 covers a free annual health screening, medical-equipment "
+            f"aid up to RM20,000, RM1,000 in cancer-treatment incentives, and "
+            f"up to RM500/year transport claims. STR recipients aged 40+ are "
+            f"auto-enrolled. Click 'Check status' to confirm on the "
+            f"ProtectHealth portal."
+        ),
+    }
+
+
+def _peka_b40_out_of_scope(language: SupportedLanguage, **v: Any) -> SchemeCopy:
+    reasons: list[str] = v["reasons"]
+    if language == "ms":
+        return {
+            "summary": "Belum layak untuk PeKa B40.",
+            "why_qualify": "Di luar skop: " + "; ".join(reasons) + ".",
+        }
+    if language == "zh":
+        return {
+            "summary": "暂不符合 PeKa B40 资格。",
+            "why_qualify": "不在受惠范围内：" + "；".join(reasons) + "。",
+        }
+    return {
+        "summary": "Not yet eligible for PeKa B40.",
+        "why_qualify": "Out of scope: " + "; ".join(reasons) + ".",
+    }
+
+
+# ---------------------------------------------------------------------------
+# BAP — Bantuan Awal Persekolahan (RM150/child, MOE) (Phase 14)
+# ---------------------------------------------------------------------------
+
+
+def _bap_qualify(language: SupportedLanguage, **v: Any) -> SchemeCopy:
+    child_count = v["child_count"]
+    per_child_rm = v["per_child_rm"]
+    annual_rm = v["annual_rm"]
+    if language == "ms":
+        return {
+            "summary": (
+                f"RM{annual_rm:,.0f}/tahun di bawah BAP — {child_count} anak × "
+                f"RM{per_child_rm:.0f}, dibayar setiap Januari."
+            ),
+            "why_qualify": (
+                f"Anda mempunyai {child_count} anak usia sekolah (6–18). Bantuan "
+                f"Awal Persekolahan (BAP) 2026 membayar RM{per_child_rm:.0f} "
+                f"setiap anak, sejagat tanpa had pendapatan. KPM menjelaskan "
+                f"bayaran serentak setiap Januari ke akaun ibu bapa yang "
+                f"berdaftar. Layak menyediakan draf borang permohonan."
+            ),
+        }
+    if language == "zh":
+        return {
+            "summary": (
+                f"BAP 每年 RM{annual_rm:,.0f} —— {child_count} 名孩子 × "
+                f"RM{per_child_rm:.0f}，每年一月发放。"
+            ),
+            "why_qualify": (
+                f"您有 {child_count} 名学龄孩子（6–18 岁）。2026 年开学援助金 "
+                f"(BAP) 每名孩子 RM{per_child_rm:.0f}，全民派发，不设收入门槛。"
+                f"教育部每年一月直接汇入家长登记账户。Layak 为您准备申请草稿。"
+            ),
+        }
+    return {
+        "summary": (
+            f"RM{annual_rm:,.0f}/year under BAP — {child_count} children × "
+            f"RM{per_child_rm:.0f}, paid each January."
+        ),
+        "why_qualify": (
+            f"You have {child_count} school-age children (6–18). Bantuan Awal "
+            f"Persekolahan (BAP) 2026 pays RM{per_child_rm:.0f} per child, "
+            f"universally — no income cap. KPM disburses each January to the "
+            f"parent's registered bank account. Layak prepares the application "
+            f"draft."
+        ),
+    }
+
+
+def _bap_out_of_scope(language: SupportedLanguage, **v: Any) -> SchemeCopy:
+    reasons: list[str] = v["reasons"]
+    if language == "ms":
+        return {
+            "summary": "Belum layak untuk BAP.",
+            "why_qualify": "Di luar skop: " + "; ".join(reasons) + ".",
+        }
+    if language == "zh":
+        return {
+            "summary": "暂不符合 BAP 资格。",
+            "why_qualify": "不在受惠范围内：" + "；".join(reasons) + "。",
+        }
+    return {
+        "summary": "Not yet eligible for BAP.",
+        "why_qualify": "Out of scope: " + "; ".join(reasons) + ".",
+    }
+
+
+# ---------------------------------------------------------------------------
+# Bantuan Elektrik B40 — TNB RM40 rebate (Phase 14)
+# ---------------------------------------------------------------------------
+
+
+def _bantuan_elektrik_qualify(language: SupportedLanguage, **v: Any) -> SchemeCopy:
+    monthly_rebate = v["monthly_rebate"]
+    monthly_cost = v["monthly_cost"]
+    annual_rm = v["annual_rm"]
+    rebate_cap = v["rebate_cap"]
+    if language == "ms":
+        return {
+            "summary": (
+                f"Rebat RM{monthly_rebate:.0f}/bulan (RM{annual_rm:,.0f}/tahun) "
+                f"pada bil TNB anda di bawah Bantuan Elektrik KIR Miskin Tegar."
+            ),
+            "why_qualify": (
+                f"Isi rumah anda berada dalam jalur 'b40_hardcore' dan bil "
+                f"elektrik bulanan ialah RM{monthly_cost:.2f}. KIR Miskin "
+                f"Tegar di eKasih layak menerima rebat sehingga "
+                f"RM{rebate_cap:.0f}/bulan, dikenakan secara automatik oleh "
+                f"TNB. Sahkan status anda di portal Semakan Rebat PETRA."
+            ),
+        }
+    if language == "zh":
+        return {
+            "summary": (
+                f"TNB 电费账单每月 RM{monthly_rebate:.0f} 回扣（每年 "
+                f"RM{annual_rm:,.0f}）—— eKasih 极贫家庭电费津贴。"
+            ),
+            "why_qualify": (
+                f"您的家庭属于「赤贫」收入组，每月电费为 RM{monthly_cost:.2f}。"
+                f"eKasih 登记的赤贫家庭户主可获最高 RM{rebate_cap:.0f}/月的电费"
+                f"回扣，TNB 自动扣减。请前往 PETRA 的 Semakan Rebat 门户确认状态。"
+            ),
+        }
+    return {
+        "summary": (
+            f"RM{monthly_rebate:.0f}/month (RM{annual_rm:,.0f}/year) electricity "
+            f"rebate on your TNB bill under the KIR Miskin Tegar programme."
+        ),
+        "why_qualify": (
+            f"Your household is in the 'b40_hardcore' band and your monthly "
+            f"electricity bill is RM{monthly_cost:.2f}. eKasih-registered "
+            f"Miskin Tegar heads-of-household receive up to RM{rebate_cap:.0f}/"
+            f"month off the bill, applied automatically by TNB. Confirm your "
+            f"status on the PETRA Semakan Rebat portal."
+        ),
+    }
+
+
+def _bantuan_elektrik_out_of_scope(language: SupportedLanguage, **v: Any) -> SchemeCopy:
+    reasons: list[str] = v["reasons"]
+    if language == "ms":
+        return {
+            "summary": "Belum layak untuk Bantuan Elektrik TNB.",
+            "why_qualify": "Di luar skop: " + "; ".join(reasons) + ".",
+        }
+    if language == "zh":
+        return {
+            "summary": "暂不符合 TNB 电费津贴资格。",
+            "why_qualify": "不在受惠范围内：" + "；".join(reasons) + "。",
+        }
+    return {
+        "summary": "Not yet eligible for TNB Bantuan Elektrik.",
+        "why_qualify": "Out of scope: " + "; ".join(reasons) + ".",
+    }
+
+
+# ---------------------------------------------------------------------------
+# KWSP i-Suri — government top-up for housewives (Phase 14)
+# ---------------------------------------------------------------------------
+
+
+def _i_suri_qualify(language: SupportedLanguage, **v: Any) -> SchemeCopy:
+    spouse_age = v["spouse_age"]
+    annual = v["annual_incentive_rm"]
+    lifetime = v["lifetime_cap_rm"]
+    max_age = v["max_age"]
+    if language == "ms":
+        return {
+            "summary": (
+                f"Pasangan anda (umur {spouse_age}) layak untuk i-Suri — "
+                f"insentif kerajaan sehingga RM{annual:.0f}/tahun ke akaun EPF "
+                f"beliau."
+            ),
+            "why_qualify": (
+                f"Pasangan anda berumur {spouse_age} (≤{max_age}) tanpa "
+                f"pendapatan dilaporkan. Jika beliau berdaftar di eKasih dan "
+                f"menyumbang ≥RM600/tahun secara sukarela kepada i-Suri, "
+                f"kerajaan akan memadankan RM{annual:.0f}/tahun (had seumur "
+                f"hidup RM{lifetime:,.0f}). Daftar di portal KWSP."
+            ),
+        }
+    if language == "zh":
+        return {
+            "summary": (
+                f"您的配偶（{spouse_age} 岁）符合 i-Suri 资格 —— 政府每年最多"
+                f" RM{annual:.0f} 注入其公积金账户。"
+            ),
+            "why_qualify": (
+                f"您的配偶 {spouse_age} 岁（≤{max_age}）且无申报收入。若在 eKasih "
+                f"登记并每年自愿缴纳至少 RM600 至 i-Suri，政府将匹配"
+                f" RM{annual:.0f}/年（终身上限 RM{lifetime:,.0f}）。请前往 "
+                f"KWSP 官方门户注册。"
+            ),
+        }
+    return {
+        "summary": (
+            f"Your spouse (age {spouse_age}) is eligible for i-Suri — government "
+            f"incentive up to RM{annual:.0f}/year into their EPF account."
+        ),
+        "why_qualify": (
+            f"Your spouse is {spouse_age} (≤{max_age}) with no reported income. "
+            f"Once registered in eKasih and contributing ≥RM600/year voluntarily "
+            f"to i-Suri, the government matches RM{annual:.0f}/year (lifetime "
+            f"cap RM{lifetime:,.0f}). Register on the KWSP portal."
+        ),
+    }
+
+
+def _i_suri_out_of_scope(language: SupportedLanguage, **v: Any) -> SchemeCopy:
+    reasons: list[str] = v["reasons"]
+    if language == "ms":
+        return {
+            "summary": "Belum layak untuk KWSP i-Suri.",
+            "why_qualify": "Di luar skop: " + "; ".join(reasons) + ".",
+        }
+    if language == "zh":
+        return {
+            "summary": "暂不符合 KWSP i-Suri 资格。",
+            "why_qualify": "不在受惠范围内：" + "；".join(reasons) + "。",
+        }
+    return {
+        "summary": "Not yet eligible for KWSP i-Suri.",
+        "why_qualify": "Out of scope: " + "; ".join(reasons) + ".",
+    }
+
+
+# ---------------------------------------------------------------------------
+# MySalam — free critical-illness cover for B40 (Phase 14)
+# ---------------------------------------------------------------------------
+
+
+def _mysalam_qualify(language: SupportedLanguage, **v: Any) -> SchemeCopy:
+    age = v["age"]
+    lump_sum = v["lump_sum_rm"]
+    daily = v["hospital_daily_rm"]
+    max_days = v["hospital_max_days"]
+    if language == "ms":
+        return {
+            "summary": (
+                f"Perlindungan kritikal RM{lump_sum:,.0f} sekali bayar + "
+                f"RM{daily:.0f}/hari (sehingga {max_days} hari) di bawah "
+                f"MySalam."
+            ),
+            "why_qualify": (
+                f"Anda berumur {age} (18–65) dan berada dalam jalur pendapatan "
+                f"B40. MySalam memberi perlindungan kritikal percuma — "
+                f"RM{lump_sum:,.0f} sekali bayar pada diagnosis 45 penyakit "
+                f"kritikal yang disenaraikan, serta RM{daily:.0f}/hari "
+                f"penggantian pendapatan untuk kemasukan hospital kerajaan "
+                f"sehingga {max_days} hari/tahun. Dibiayai sepenuhnya oleh "
+                f"kerajaan — tiada premium dibayar."
+            ),
+        }
+    if language == "zh":
+        return {
+            "summary": (
+                f"MySalam 重大疾病保障：一次性 RM{lump_sum:,.0f} + "
+                f"住院日津贴 RM{daily:.0f}（最多 {max_days} 天）。"
+            ),
+            "why_qualify": (
+                f"您 {age} 岁（18–65）且属 B40 收入组。MySalam 提供免费重大疾病"
+                f"保障 —— 确诊 45 种列明重病可获一次性 RM{lump_sum:,.0f} 现金，"
+                f"政府医院住院期间另发 RM{daily:.0f}/天收入替补津贴，每年最多"
+                f" {max_days} 天。完全由政府承担，无需缴纳保费。"
+            ),
+        }
+    return {
+        "summary": (
+            f"MySalam critical-illness cover — RM{lump_sum:,.0f} lump sum + "
+            f"RM{daily:.0f}/day hospital income (up to {max_days} days)."
+        ),
+        "why_qualify": (
+            f"You're {age} (18–65) and in the B40 income band. MySalam offers "
+            f"free critical-illness protection — a one-off RM{lump_sum:,.0f} "
+            f"on diagnosis of any of 45 listed critical illnesses, plus "
+            f"RM{daily:.0f}/day income replacement for stays at government "
+            f"hospitals (up to {max_days} days/year). Fully government-funded "
+            f"— no premium payable."
+        ),
+    }
+
+
+def _mysalam_out_of_scope(language: SupportedLanguage, **v: Any) -> SchemeCopy:
+    reasons: list[str] = v["reasons"]
+    if language == "ms":
+        return {
+            "summary": "Belum layak untuk MySalam.",
+            "why_qualify": "Di luar skop: " + "; ".join(reasons) + ".",
+        }
+    if language == "zh":
+        return {
+            "summary": "暂不符合 MySalam 资格。",
+            "why_qualify": "不在受惠范围内：" + "；".join(reasons) + "。",
+        }
+    return {
+        "summary": "Not yet eligible for MySalam.",
+        "why_qualify": "Out of scope: " + "; ".join(reasons) + ".",
+    }
+
+
+# ---------------------------------------------------------------------------
+# SARA — Sumbangan Asas Rahmah (MyKad monthly credit) (Phase 14)
+# ---------------------------------------------------------------------------
+
+
+def _sara_qualify(language: SupportedLanguage, **v: Any) -> SchemeCopy:
+    monthly_rm = v["monthly_rm"]
+    annual_rm = v["annual_rm"]
+    enhanced = bool(v["enhanced"])
+    if language == "ms":
+        tier_note = (
+            "kadar dipertingkat untuk isi rumah eKasih Miskin Tegar"
+            if enhanced
+            else "kadar standard untuk penerima STR"
+        )
+        return {
+            "summary": (
+                f"RM{monthly_rm:.0f}/bulan kredit MyKad SARA — "
+                f"RM{annual_rm:,.0f}/tahun ({tier_note})."
+            ),
+            "why_qualify": (
+                f"Anda berada dalam jalur B40 dan layak STR. SARA mengkredit "
+                f"RM{monthly_rm:.0f}/bulan ke MyKad anda, dibelanjakan di kedai "
+                f"peserta MyKasih untuk barangan keperluan asas. Tiada "
+                f"permohonan diperlukan — kerajaan akan mengaktifkan kredit "
+                f"setelah pengesahan STR di portal rasmi SARA."
+            ),
+        }
+    if language == "zh":
+        tier_note = (
+            "eKasih 极贫家庭增强额"
+            if enhanced
+            else "STR 受惠者标准额"
+        )
+        return {
+            "summary": (
+                f"SARA 每月 RM{monthly_rm:.0f} MyKad 信用 —— 每年 "
+                f"RM{annual_rm:,.0f}（{tier_note}）。"
+            ),
+            "why_qualify": (
+                f"您属 B40 收入组且符合 STR。SARA 每月把 RM{monthly_rm:.0f} "
+                f"记入您的 MyKad，可在参与的 MyKasih 商店购买基本生活用品。"
+                f"无需申请 —— 政府将在 SARA 官方门户确认 STR 状态后自动激活。"
+            ),
+        }
+    tier_note = (
+        "enhanced rate for eKasih hardcore-poor households"
+        if enhanced
+        else "standard STR-recipient rate"
+    )
+    return {
+        "summary": (
+            f"RM{monthly_rm:.0f}/month SARA MyKad credit — RM{annual_rm:,.0f}/"
+            f"year ({tier_note})."
+        ),
+        "why_qualify": (
+            f"You're in the B40 band and STR-eligible. SARA credits "
+            f"RM{monthly_rm:.0f}/month to your MyKad, spendable at "
+            f"MyKasih-participating retailers for essentials. No application "
+            f"required — the government activates the credit after STR "
+            f"confirmation on the official SARA portal."
+        ),
+    }
+
+
+def _sara_out_of_scope(language: SupportedLanguage, **v: Any) -> SchemeCopy:
+    reasons: list[str] = v["reasons"]
+    if language == "ms":
+        return {
+            "summary": "Belum layak untuk SARA.",
+            "why_qualify": "Di luar skop: " + "; ".join(reasons) + ".",
+        }
+    if language == "zh":
+        return {
+            "summary": "暂不符合 SARA 资格。",
+            "why_qualify": "不在受惠范围内：" + "；".join(reasons) + "。",
+        }
+    return {
+        "summary": "Not yet eligible for SARA.",
+        "why_qualify": "Out of scope: " + "; ".join(reasons) + ".",
+    }
+
+
+# ---------------------------------------------------------------------------
+# RMT — Rancangan Makanan Tambahan (free school meals) (Phase 14)
+# ---------------------------------------------------------------------------
+
+
+def _rmt_qualify(language: SupportedLanguage, **v: Any) -> SchemeCopy:
+    child_count = v["child_count"]
+    if language == "ms":
+        return {
+            "summary": (
+                f"{child_count} anak rendah anda layak untuk sarapan sekolah "
+                f"percuma di bawah RMT."
+            ),
+            "why_qualify": (
+                f"Anda mempunyai {child_count} anak berumur 6–12 dalam isi "
+                f"rumah B40. Rancangan Makanan Tambahan (RMT) menyediakan "
+                f"sarapan sekolah harian percuma kepada murid sekolah rendah "
+                f"dari isi rumah B40, dikenal pasti oleh jawatankuasa RMT "
+                f"sekolah. Tiada permohonan pusat — berbincanglah dengan guru "
+                f"besar selepas mengisytiharkan pendapatan."
+            ),
+        }
+    if language == "zh":
+        return {
+            "summary": (
+                f"您的 {child_count} 名小学子女可获 RMT 学校免费早餐资格。"
+            ),
+            "why_qualify": (
+                f"您有 {child_count} 名 6–12 岁的子女属 B40 家庭。学校膳食"
+                f"补助计划 (RMT) 为 B40 家庭的小学生提供每日免费早餐，由学校的"
+                f" RMT 委员会鉴定受惠学生。无需中央申请 —— 向校长申报家庭"
+                f"收入后即可启动。"
+            ),
+        }
+    return {
+        "summary": (
+            f"Your {child_count} primary-school children qualify for free "
+            f"school breakfast under RMT."
+        ),
+        "why_qualify": (
+            f"You have {child_count} children aged 6–12 in a B40 household. "
+            f"Rancangan Makanan Tambahan (RMT) provides daily free school "
+            f"breakfast to primary-school pupils from B40 households, "
+            f"identified by the school's RMT committee. No central application "
+            f"— speak with the head teacher after declaring household income."
+        ),
+    }
+
+
+def _rmt_out_of_scope(language: SupportedLanguage, **v: Any) -> SchemeCopy:
+    reasons: list[str] = v["reasons"]
+    if language == "ms":
+        return {
+            "summary": "Belum layak untuk RMT.",
+            "why_qualify": "Di luar skop: " + "; ".join(reasons) + ".",
+        }
+    if language == "zh":
+        return {
+            "summary": "暂不符合 RMT 资格。",
+            "why_qualify": "不在受惠范围内：" + "；".join(reasons) + "。",
+        }
+    return {
+        "summary": "Not yet eligible for RMT.",
+        "why_qualify": "Out of scope: " + "; ".join(reasons) + ".",
+    }
+
+
+# ---------------------------------------------------------------------------
 # Reason fragments — rule modules pass localised reason strings into the
 # `out_of_scope` callables above. Keeping reason strings here (rather than
 # re-translating the full "Out of scope: X; Y." sentence inside every rule)
@@ -747,6 +1246,68 @@ _REASON_FRAGMENTS: dict[str, dict[SupportedLanguage, str]] = {
         "en": "age {age} below the MyKasih SARA minimum of {min_age}",
         "ms": "umur {age} di bawah minimum MyKasih SARA iaitu {min_age}",
         "zh": "年龄 {age} 岁低于 MyKasih SARA 的最低 {min_age} 岁",
+    },
+    # ---- PeKa B40 ----
+    "peka_b40_age_below_min": {
+        "en": "age {age} below the PeKa B40 minimum of {min_age}",
+        "ms": "umur {age} di bawah minimum PeKa B40 iaitu {min_age}",
+        "zh": "年龄 {age} 岁低于 PeKa B40 最低 {min_age} 岁的门槛",
+    },
+    "peka_b40_band_above_b40": {
+        "en": "household income band '{band}' is above the B40 ceiling",
+        "ms": "jalur pendapatan isi rumah '{band}' melebihi siling B40",
+        "zh": "家庭收入分组「{band}」超出 B40 上限",
+    },
+    # ---- BAP ----
+    "bap_no_school_age_child": {
+        "en": "no child dependant aged {min_age}–{max_age} in household",
+        "ms": "tiada tanggungan anak berumur {min_age}–{max_age} dalam isi rumah",
+        "zh": "家庭中没有 {min_age}–{max_age} 岁的受扶养子女",
+    },
+    # ---- Bantuan Elektrik ----
+    "bantuan_elektrik_band_above_hardcore": {
+        "en": "household income band '{band}' is above eKasih Miskin Tegar",
+        "ms": "jalur pendapatan isi rumah '{band}' melebihi Miskin Tegar eKasih",
+        "zh": "家庭收入分组「{band}」超出 eKasih 极贫范围",
+    },
+    "bantuan_elektrik_no_bill": {
+        "en": "no domestic TNB electricity bill on file",
+        "ms": "tiada bil elektrik TNB domestik dalam rekod",
+        "zh": "档案中没有 TNB 家庭电费账单",
+    },
+    # ---- i-Suri ----
+    "i_suri_no_zero_income_spouse": {
+        "en": "no spouse aged {min_age}–{max_age} with zero declared income",
+        "ms": "tiada pasangan berumur {min_age}–{max_age} dengan sifar pendapatan diisytiharkan",
+        "zh": "家庭中没有 {min_age}–{max_age} 岁、无申报收入的配偶",
+    },
+    # ---- MySalam ----
+    "mysalam_age_outside_window": {
+        "en": "age {age} outside the MySalam window ({min_age}–{max_age})",
+        "ms": "umur {age} di luar tetingkap MySalam ({min_age}–{max_age})",
+        "zh": "年龄 {age} 岁超出 MySalam 的 {min_age}–{max_age} 岁范围",
+    },
+    "mysalam_band_above_threshold": {
+        "en": "household income band '{band}' above MySalam B40-low cap",
+        "ms": "jalur pendapatan isi rumah '{band}' melebihi siling B40-rendah MySalam",
+        "zh": "家庭收入分组「{band}」超出 MySalam B40-低收入门槛",
+    },
+    # ---- SARA ----
+    "sara_band_above_b40": {
+        "en": "household income band '{band}' is above the B40 ceiling",
+        "ms": "jalur pendapatan isi rumah '{band}' melebihi siling B40",
+        "zh": "家庭收入分组「{band}」超出 B40 上限",
+    },
+    # ---- RMT ----
+    "rmt_band_above_b40": {
+        "en": "household income band '{band}' is above the B40 ceiling",
+        "ms": "jalur pendapatan isi rumah '{band}' melebihi siling B40",
+        "zh": "家庭收入分组「{band}」超出 B40 上限",
+    },
+    "rmt_no_primary_child": {
+        "en": "no primary-school-age child ({min_age}–{max_age}) in household",
+        "ms": "tiada anak usia sekolah rendah ({min_age}–{max_age}) dalam isi rumah",
+        "zh": "家庭中没有 {min_age}–{max_age} 岁的小学龄孩子",
     },
     # ---- PERKESO SKSPS ----
     "perkeso_sksps_not_gig": {
@@ -842,6 +1403,16 @@ _CATALOG: dict[SchemeId, dict[Variant, Callable[..., SchemeCopy]]] = {
     },
     "budi95": {"qualify": _budi95_qualify, "out_of_scope": _budi95_out_of_scope},
     "mykasih": {"qualify": _mykasih_qualify, "out_of_scope": _mykasih_out_of_scope},
+    "peka_b40": {"qualify": _peka_b40_qualify, "out_of_scope": _peka_b40_out_of_scope},
+    "bap": {"qualify": _bap_qualify, "out_of_scope": _bap_out_of_scope},
+    "bantuan_elektrik": {
+        "qualify": _bantuan_elektrik_qualify,
+        "out_of_scope": _bantuan_elektrik_out_of_scope,
+    },
+    "i_suri": {"qualify": _i_suri_qualify, "out_of_scope": _i_suri_out_of_scope},
+    "mysalam": {"qualify": _mysalam_qualify, "out_of_scope": _mysalam_out_of_scope},
+    "sara": {"qualify": _sara_qualify, "out_of_scope": _sara_out_of_scope},
+    "rmt": {"qualify": _rmt_qualify, "out_of_scope": _rmt_out_of_scope},
 }
 
 

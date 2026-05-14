@@ -302,7 +302,7 @@ flowchart TD
     Narrate --> Tier2["PipelineTechnicalEvent<br/>timestamp + log lines<br/>(English only)"]
     Tier1 --> SSE[SSE stream]
     Tier2 --> SSE
-    SSE --> Lay["Lay narration card<br/>'Read your documents · RM 2,800'<br/>'Matched against 8 schemes · 7 qualifying'"]
+    SSE --> Lay["Lay narration card<br/>'Read your documents · RM 2,800'<br/>'Matched against 16 schemes · 11 qualifying'"]
     SSE --> Tech["Technical transcript<br/>collapsed by default<br/>show details ▾"]
     Tier1 --> Firestore["evaluations/{id}.narrativeLog"]
     Tier2 --> Firestore2["evaluations/{id}.technicalLog"]

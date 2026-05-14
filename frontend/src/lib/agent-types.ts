@@ -23,6 +23,13 @@ export type SchemeId =
   | 'i_saraan'
   | 'budi95'
   | 'mykasih'
+  | 'peka_b40'
+  | 'bap'
+  | 'bantuan_elektrik'
+  | 'i_suri'
+  | 'mysalam'
+  | 'sara'
+  | 'rmt'
 
 // `upside` stacks into the headline annual-relief total. `required_contribution`
 // (e.g. PERKESO SKSPS) surfaces a separate block — user pays money, not receives.

@@ -1,6 +1,7 @@
 'use client'
 
 import { useCallback, useEffect, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 
 import { DashboardContinueRail, type ContinueRailPhase } from '@/components/dashboard/dashboard-continue-rail'
 import { DashboardLauncherGrid } from '@/components/dashboard/dashboard-launcher-grid'
@@ -20,6 +21,7 @@ function getBackendUrl(): string {
  * waits on `GET /api/evaluations` to surface the latest item.
  */
 export function DashboardDataSection() {
+  const { t } = useTranslation()
   const { user, loading: authLoading } = useAuth()
   const [items, setItems] = useState<EvaluationListItem[]>([])
   const [phase, setPhase] = useState<ContinueRailPhase>('loading')
@@ -29,7 +31,7 @@ export function DashboardDataSection() {
     try {
       const res = await authedFetch(`${getBackendUrl()}/api/evaluations?limit=${FETCH_LIMIT}`, { method: 'GET' })
       if (!res.ok) {
-        setErrorMessage(`Backend returned ${res.status} ${res.statusText}`)
+        setErrorMessage(t('evaluation.results.backendReturned', { status: res.status, statusText: res.statusText }))
         setPhase('error')
         return
       }
@@ -40,7 +42,7 @@ export function DashboardDataSection() {
       setErrorMessage(err instanceof Error ? err.message : String(err))
       setPhase('error')
     }
-  }, [])
+  }, [t])
 
   useEffect(() => {
     if (authLoading || !user) return

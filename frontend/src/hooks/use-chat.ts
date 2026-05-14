@@ -74,7 +74,7 @@ export type UseChatResult = {
 }
 
 export function useChat(evalId: string): UseChatResult {
-  const { i18n } = useTranslation()
+  const { i18n, t } = useTranslation()
   const [messages, setMessages] = useState<ChatMessage[]>([])
   const [isStreaming, setIsStreaming] = useState(false)
   const [errorCategory, setErrorCategory] = useState<ErrorCategory | null>(null)
@@ -203,7 +203,7 @@ export function useChat(evalId: string): UseChatResult {
             setMessages((prev) => prev.filter((m) => m.id !== modelTurnId))
           } else {
             setErrorCategory(null)
-            setErrorMessage((err as Error).message || 'Chat request failed')
+            setErrorMessage((err as Error).message || t('evaluation.chat.errorRequestFailed'))
             setMessages((prev) => prev.filter((m) => m.id !== modelTurnId))
           }
         } finally {
@@ -212,7 +212,7 @@ export function useChat(evalId: string): UseChatResult {
         }
       })()
     },
-    [evalId, i18n.language, isStreaming, messages, pendingAdvisory, pendingScenarioContext]
+    [evalId, i18n.language, isStreaming, messages, pendingAdvisory, pendingScenarioContext, t]
   )
 
   const handoffFromAdvice = useCallback((advice: StrategyAdvice, scenarioContext?: ChatScenarioContext | null) => {

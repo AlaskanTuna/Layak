@@ -1,4 +1,7 @@
+'use client'
+
 import Link from 'next/link'
+import { useTranslation } from 'react-i18next'
 
 import { AuthContextPane } from '@/components/auth/auth-context-pane'
 import { BrandMark } from '@/components/layout/brand-mark'
@@ -7,10 +10,11 @@ import { LanguageToggle } from '@/components/layout/language-toggle'
 import { ThemeToggle } from '@/components/layout/theme-toggle'
 
 export default function AuthLayout({ children }: { children: React.ReactNode }) {
+  const { t } = useTranslation()
   return (
     <div className="flex min-h-svh flex-col">
       <header className="flex h-(--topbar-height) items-center justify-between px-4 md:px-6">
-        <Link href="/" className="flex items-center gap-2" aria-label="Layak home">
+        <Link href="/" className="flex items-center gap-2" aria-label={t('common.aria.layakHome')}>
           <BrandMark />
           <span className="font-sans text-base font-semibold tracking-tight">Layak</span>
         </Link>

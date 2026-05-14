@@ -16,7 +16,10 @@ export function BrandMark({ className, size = 'md' }: Props) {
         className
       )}
     >
-      <Image src="/layak-logo.png" alt="Layak Logo" width={box} height={box} className="object-cover" />
+      {/* `alt` carries only the brand mark — "Layak" is universal across en/ms/zh,
+          and the surrounding header link already supplies the localized
+          `common.aria.layakHome` so screen readers get the localized intent. */}
+      <Image src="/layak-logo.png" alt="Layak" width={box} height={box} className="object-cover" />
     </div>
   )
 }

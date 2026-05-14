@@ -1,6 +1,7 @@
 'use client'
 
 import { useCallback, useEffect, useRef, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 
 import { authedFetch } from '@/lib/firebase'
 import type { WhatIfRequest, WhatIfResponse } from '@/lib/agent-types'
@@ -36,6 +37,7 @@ export type UseWhatIfResult = {
  * AbortController so a fast slider drag never races and never leaves a
  * stale response behind. */
 export function useWhatIf(evalId: string): UseWhatIfResult {
+  const { t } = useTranslation()
   const [phase, setPhase] = useState<WhatIfPhase>('idle')
   const [strategyPhase, setStrategyPhase] = useState<WhatIfStrategyPhase>('idle')
   const [data, setData] = useState<WhatIfResponse | null>(null)
@@ -70,7 +72,7 @@ export function useWhatIf(evalId: string): UseWhatIfResult {
         }
         if (!res.ok) {
           setData(null)
-          setErrorMessage(`Backend returned ${res.status}`)
+          setErrorMessage(t('evaluation.results.backendReturned', { status: res.status, statusText: res.statusText }))
           setPhase('error')
           return
         }
@@ -119,7 +121,7 @@ export function useWhatIf(evalId: string): UseWhatIfResult {
         }
       }
     },
-    [evalId]
+    [evalId, t]
   )
 
   const runWhatIf = useCallback(

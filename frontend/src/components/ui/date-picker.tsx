@@ -2,6 +2,7 @@
 
 import * as React from 'react'
 import { ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 
 import { Button } from '@/components/ui/button'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
@@ -30,8 +31,11 @@ type Props = {
   className?: string
 }
 
-const WEEKDAYS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'] as const
-const MONTH_NAMES = [
+// English defaults used as fallback if i18n hasn't hydrated yet. The runtime
+// labels come from `common.calendar.weekdays` / `common.calendar.months` so a
+// ms / zh user sees "Jan / Januari / 一月" without re-mounting the calendar.
+const WEEKDAYS_EN = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'] as const
+const MONTH_NAMES_EN = [
   'January',
   'February',
   'March',
@@ -78,6 +82,24 @@ export function DatePicker({
   disabled = false,
   className
 }: Props) {
+  const { t } = useTranslation()
+  // i18n catalog returns arrays via `returnObjects: true`. Fall back to the
+  // English defaults if the runtime catalog is missing (e.g. during initial
+  // hydration or an i18n provider mismatch).
+  const weekdaysRaw = t('common.calendar.weekdays', {
+    returnObjects: true,
+    defaultValue: WEEKDAYS_EN as unknown as string[]
+  })
+  const monthsRaw = t('common.calendar.months', {
+    returnObjects: true,
+    defaultValue: MONTH_NAMES_EN as unknown as string[]
+  })
+  const WEEKDAYS = (Array.isArray(weekdaysRaw) && weekdaysRaw.length === 7
+    ? weekdaysRaw
+    : WEEKDAYS_EN) as readonly string[]
+  const MONTH_NAMES = (Array.isArray(monthsRaw) && monthsRaw.length === 12
+    ? monthsRaw
+    : MONTH_NAMES_EN) as readonly string[]
   const parsed = parseISO(value)
   const [open, setOpen] = React.useState(false)
   // Visible month — anchored to the selected value if present, else today.
@@ -145,7 +167,7 @@ export function DatePicker({
             <button
               type="button"
               onClick={() => shiftYear(-1)}
-              aria-label="Previous year"
+              aria-label={t('common.calendar.aria.prevYear')}
               className="inline-flex size-7 cursor-pointer items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
             >
               <ChevronsLeft className="size-4" aria-hidden />
@@ -153,7 +175,7 @@ export function DatePicker({
             <button
               type="button"
               onClick={() => shiftMonth(-1)}
-              aria-label="Previous month"
+              aria-label={t('common.calendar.aria.prevMonth')}
               className="inline-flex size-7 cursor-pointer items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
             >
               <ChevronLeft className="size-4" aria-hidden />
@@ -166,7 +188,7 @@ export function DatePicker({
             <button
               type="button"
               onClick={() => shiftMonth(1)}
-              aria-label="Next month"
+              aria-label={t('common.calendar.aria.nextMonth')}
               className="inline-flex size-7 cursor-pointer items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
             >
               <ChevronRight className="size-4" aria-hidden />
@@ -174,7 +196,7 @@ export function DatePicker({
             <button
               type="button"
               onClick={() => shiftYear(1)}
-              aria-label="Next year"
+              aria-label={t('common.calendar.aria.nextYear')}
               className="inline-flex size-7 cursor-pointer items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
             >
               <ChevronsRight className="size-4" aria-hidden />

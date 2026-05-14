@@ -22,7 +22,11 @@ type Props = {
 export function DiscoveryFilterChips({ active, onChange, counts }: Props) {
   const { t } = useTranslation()
   return (
-    <div role="tablist" aria-label="filter" className="border-b border-foreground/10">
+    <div
+      role="tablist"
+      aria-label={t('admin.discovery.filters.tablistAriaLabel')}
+      className="border-b border-foreground/10"
+    >
       <div className="flex flex-wrap gap-x-6 gap-y-1">
         {FILTERS.map((f) => {
           const isActive = f === active

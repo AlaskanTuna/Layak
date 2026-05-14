@@ -3,6 +3,8 @@
     "brand": "Layak",
     "aria": {
       "layakHome": "Layak 首页",
+      "brandLogo": "Layak",
+      "breadcrumb": "面包屑导航",
       "toggleTheme": "切换主题",
       "languageSelector": "切换语言",
       "accountMenu": "账户菜单",
@@ -23,9 +25,33 @@
       "howItWorks": "运作原理",
       "done": "完成",
       "cancel": "取消",
+      "close": "关闭",
       "maybeLater": "稍后再说",
       "startOver": "重新开始",
       "retry": "重试"
+    },
+    "calendar": {
+      "weekdays": ["日", "一", "二", "三", "四", "五", "六"],
+      "months": [
+        "一月",
+        "二月",
+        "三月",
+        "四月",
+        "五月",
+        "六月",
+        "七月",
+        "八月",
+        "九月",
+        "十月",
+        "十一月",
+        "十二月"
+      ],
+      "aria": {
+        "prevYear": "上一年",
+        "prevMonth": "上一月",
+        "nextMonth": "下一月",
+        "nextYear": "下一年"
+      }
     },
     "nav": {
       "dashboard": "仪表板",
@@ -1045,7 +1071,8 @@
         "deadlines": "我应该先申请哪一项？"
       },
       "groundingUnavailable": "注：当前 PDF 实时引用不可用。",
-      "disclaimer": "Layak 帮助您理解此评估。它不是律师、税务顾问或理财规划师。"
+      "disclaimer": "Layak 帮助您理解此评估。它不是律师、税务顾问或理财规划师。",
+      "errorRequestFailed": "聊天请求失败"
     }
   },
   "admin": {
@@ -1087,7 +1114,8 @@
         "pending": "待审",
         "approved": "已批准",
         "rejected": "已拒绝",
-        "changes_requested": "请求修改"
+        "changes_requested": "请求修改",
+        "tablistAriaLabel": "按审核状态筛选发现候选项"
       },
       "queue": {
         "title": "审核队列",

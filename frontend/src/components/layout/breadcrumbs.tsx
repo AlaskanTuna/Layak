@@ -51,7 +51,7 @@ export function Breadcrumbs() {
   }, [])
 
   return (
-    <nav aria-label="Breadcrumb" className="hidden min-w-0 items-center gap-1.5 md:flex">
+    <nav aria-label={t('common.aria.breadcrumb')} className="hidden min-w-0 items-center gap-1.5 md:flex">
       {crumbs.map((crumb, i) => (
         <div key={crumb.href} className="flex min-w-0 items-center gap-1.5">
           {i > 0 && <ChevronRight className="size-3 shrink-0 text-muted-foreground/50" aria-hidden />}

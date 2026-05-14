@@ -3,6 +3,8 @@
     "brand": "Layak",
     "aria": {
       "layakHome": "Layak home",
+      "brandLogo": "Layak",
+      "breadcrumb": "Breadcrumb",
       "toggleTheme": "Toggle theme",
       "languageSelector": "Change language",
       "accountMenu": "Account menu",
@@ -23,9 +25,33 @@
       "howItWorks": "How it works",
       "done": "Done",
       "cancel": "Cancel",
+      "close": "Close",
       "maybeLater": "Maybe later",
       "startOver": "Start over",
       "retry": "Retry"
+    },
+    "calendar": {
+      "weekdays": ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"],
+      "months": [
+        "January",
+        "February",
+        "March",
+        "April",
+        "May",
+        "June",
+        "July",
+        "August",
+        "September",
+        "October",
+        "November",
+        "December"
+      ],
+      "aria": {
+        "prevYear": "Previous year",
+        "prevMonth": "Previous month",
+        "nextMonth": "Next month",
+        "nextYear": "Next year"
+      }
     },
     "nav": {
       "dashboard": "Dashboard",
@@ -1056,7 +1082,8 @@
         "deadlines": "Which scheme should I apply for first?"
       },
       "groundingUnavailable": "Note: live PDF grounding is unavailable right now.",
-      "disclaimer": "Layak helps you understand this evaluation. It is not a lawyer, tax adviser, or financial planner."
+      "disclaimer": "Layak helps you understand this evaluation. It is not a lawyer, tax adviser, or financial planner.",
+      "errorRequestFailed": "Chat request failed"
     }
   },
   "admin": {
@@ -1098,7 +1125,8 @@
         "pending": "Pending",
         "approved": "Approved",
         "rejected": "Rejected",
-        "changes_requested": "Changes Requested"
+        "changes_requested": "Changes Requested",
+        "tablistAriaLabel": "Filter discovery candidates by review status"
       },
       "queue": {
         "title": "Moderation Queue",

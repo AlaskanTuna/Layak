@@ -3,6 +3,8 @@
     "brand": "Layak",
     "aria": {
       "layakHome": "Laman utama Layak",
+      "brandLogo": "Layak",
+      "breadcrumb": "Laluan",
       "toggleTheme": "Tukar tema",
       "languageSelector": "Tukar bahasa",
       "accountMenu": "Menu akaun",
@@ -23,9 +25,33 @@
       "howItWorks": "Cara ia berfungsi",
       "done": "Selesai",
       "cancel": "Batal",
+      "close": "Tutup",
       "maybeLater": "Nanti sahaja",
       "startOver": "Mula semula",
       "retry": "Cuba semula"
+    },
+    "calendar": {
+      "weekdays": ["Ahd", "Isn", "Sel", "Rab", "Kha", "Jum", "Sab"],
+      "months": [
+        "Januari",
+        "Februari",
+        "Mac",
+        "April",
+        "Mei",
+        "Jun",
+        "Julai",
+        "Ogos",
+        "September",
+        "Oktober",
+        "November",
+        "Disember"
+      ],
+      "aria": {
+        "prevYear": "Tahun sebelumnya",
+        "prevMonth": "Bulan sebelumnya",
+        "nextMonth": "Bulan seterusnya",
+        "nextYear": "Tahun seterusnya"
+      }
     },
     "nav": {
       "dashboard": "Papan Pemuka",
@@ -1056,7 +1082,8 @@
         "deadlines": "Skim mana yang patut saya mohon dahulu?"
       },
       "groundingUnavailable": "Nota: rujukan PDF langsung tidak tersedia buat masa ini.",
-      "disclaimer": "Layak membantu anda memahami penilaian ini. Ia bukan peguam, penasihat cukai, atau perancang kewangan."
+      "disclaimer": "Layak membantu anda memahami penilaian ini. Ia bukan peguam, penasihat cukai, atau perancang kewangan.",
+      "errorRequestFailed": "Permintaan sembang gagal"
     }
   },
   "admin": {
@@ -1098,7 +1125,8 @@
         "pending": "Menunggu",
         "approved": "Diluluskan",
         "rejected": "Ditolak",
-        "changes_requested": "Perubahan diminta"
+        "changes_requested": "Perubahan diminta",
+        "tablistAriaLabel": "Tapis calon penemuan mengikut status semakan"
       },
       "queue": {
         "title": "Barisan moderasi",

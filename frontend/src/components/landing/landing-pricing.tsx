@@ -62,7 +62,7 @@ export function LandingPricing() {
         <div className="grid gap-8 md:grid-cols-2 md:gap-10">
           {/* Free Tier */}
           <PricingTier
-            tag="Free"
+            tag={t('marketing.pricing.freeTier.name', 'Free')}
             tagTone="primary"
             title={t('marketing.pricing.freeTier.name', 'Free')}
             description={t('marketing.pricing.freeTier.description', 'For individuals exploring their eligibility.')}

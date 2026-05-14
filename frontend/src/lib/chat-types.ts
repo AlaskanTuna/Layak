@@ -32,6 +32,7 @@ export type ChatScenarioContext = {
   matches: WhatIfResponse['matches']
   deltas: WhatIfResponse['deltas']
   strategy: WhatIfResponse['strategy']
+  strategy_status: 'not_requested' | 'refreshing' | 'ready' | 'empty' | 'error'
 }
 
 export type ChatCitation = {

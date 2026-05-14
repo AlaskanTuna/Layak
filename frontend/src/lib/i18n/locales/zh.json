@@ -724,7 +724,11 @@
       "totalUpsideLabel": "假设场景年度合计",
       "previewLabel": "场景预览",
       "askScenario": "向 Cik Lay 询问此场景",
+      "askScenarioChanges": "询问已变化的计划",
       "askScenarioPrompt": "请解释这个假设场景。哪些内容发生了变化，哪些计划受到影响，我最先应注意什么？",
+      "askScenarioWithoutStrategyPrompt": "解释这个 what-if 情境中的资格和金额变化。策略备注仍在刷新或暂不可用，请只聚焦已计算出的计划变化和差异。",
+      "strategyStillRefreshing": "策略备注仍在刷新。Cik Lay 现在可以先解释资格变化。",
+      "strategyNotBlocking": "资格变化已经就绪。此回答不需要等待策略备注。",
       "deltaChip": {
         "gained": "新符合资格 · RM {{amount}}",
         "lost": "不再符合 · 此前 RM {{amount}}",
@@ -747,10 +751,10 @@
       },
       "softSuggestion": "Layak 尚未完全确定 —— 值得问问 Cik Lay。",
       "scenario": {
-        "refreshing": "正在检查此情境是否会改变策略备注。",
-        "ready": "正在显示当前情境预览的策略备注。",
-        "empty": "未发现此情境专属的策略变化；显示已保存评估的策略。",
-        "error": "无法刷新情境策略；显示已保存评估的策略。"
+        "refreshing": "正在刷新情境策略。资格结果已更新。",
+        "ready": "情境策略已更新。",
+        "empty": "未检测到主要策略变化。显示已保存的策略备注。",
+        "error": "无法刷新情境策略。显示已保存的策略备注。"
       }
     },
     "narrative": {

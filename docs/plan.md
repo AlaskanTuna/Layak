@@ -1967,6 +1967,13 @@ so the model:
       cross-paste them. The tie-breaker rule explicitly tells the model
       to pick the lowest net-style figure — the most-deducted line is the
       closest proxy to actual take-home.
+- [x] Added Rule 6: "no income visible at all" → return
+      `monthly_income_rm = 0.0` rather than hallucinating, refusing, or
+      requiring a nullable schema. Zero is also the correct value for a
+      genuine zero-income applicant (homemaker, retired, between jobs);
+      both cases land in `b40_hardcore` so the official agency portals
+      re-verify against MyKad income at submission time. This supersedes
+      the deferred nullable-schema item below.
 
 ### 2. Feature: Spouse-income test coverage
 
@@ -1987,7 +1994,7 @@ Phase 13 adds the missing three.
 - [x] `test_spouse_income_pushes_household_from_b40_to_m40` — applicant
       RM2,400 + spouse RM3,000 = household RM5,400. Applicant alone is
       `b40_household`; household is `m40`. Asserts `str_2026.match(built).qualifies
-    is False` to confirm threshold propagation reaches the rule engine.
+  is False` to confirm threshold propagation reaches the rule engine.
 - [x] `test_spouse_listed_with_unknown_income_uses_applicant_only_for_household_total`
       — spouse on the dependants list with no `monthly_income_rm` key
       (`None`). Must NOT count as zero pulled into the total **and** must
@@ -2002,14 +2009,14 @@ Phase 13 adds the missing three.
 
 ### Open items deferred to a future phase
 
-1. **Explicit extraction-failure schema.** The QA findings recommend
-   "return a low-confidence extraction error or `null`-equivalent failure
-   path when the final payout line is cut off and arithmetic would be
-   required." Implementing this means making `Profile.monthly_income_rm`
-   nullable (or adding an `extraction_confidence` enum), which ripples
-   through every rule's eligibility gate. Deferred — current prompt-only
-   harm-reduction is sufficient for v1; the structured-failure path is a
-   v1.1 schema migration.
+1. ~~**Explicit extraction-failure schema.**~~ **Resolved by Rule 6** in
+   Feature 1 above. Rather than nullable-schema migration (which would
+   ripple through every rule's eligibility gate), the extract prompt now
+   instructs Gemini to return `monthly_income_rm = 0.0` when no income
+   figure is visible. Zero lands the applicant in `b40_hardcore` (most
+   inclusive tier); agencies catch over-qualifications at submission via
+   MyKad cross-check. Matches Layak's draft-only framing — we never
+   submit, we just prepare the packet.
 2. **Real QA suite of cropped-payout fixtures.** The QA findings are
    written against six fixture documents the team rendered by hand. A
    future phase should bundle those as a regression suite (probably under

@@ -57,6 +57,15 @@ Rules (enforce strictly):
   5. **Tie-breaker.** If multiple net-style figures are visible (e.g.
      "Net of EPF" and "Net of EPF+SOCSO"), pick the lowest — that is the
      most-deducted figure and the closest proxy to take-home pay.
+  6. **No income visible at all.** If the income document is illegible,
+     blank, or contains no monetary figures Gemini can confidently read
+     as a monthly amount, return `monthly_income_rm = 0.0`. Do NOT
+     hallucinate a value, do NOT refuse the extraction. Zero is also the
+     correct value for a genuine zero-income applicant (homemaker,
+     retired, between jobs); Layak treats both cases the same and lets
+     the rule engine surface the most-inclusive eligibility tier
+     (`b40_hardcore`), which the official agency portals will re-verify
+     against MyKad income data at submission time.
 - `household_size` includes the applicant. If the documents don't disclose
   household size, default to `1` and leave `dependants` empty.
 - `dependants` lists each child / parent / spouse / sibling / grandparent / other in the

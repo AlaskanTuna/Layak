@@ -37,9 +37,9 @@ True to our team's name, we are here to help with that. Introducing **LAYAK**, t
 
 Here is a brief architecture overview of Layak. Layak is not just a generic chatbot wrapper. There's no free-text answer. Every number on screen comes from a typed Python rule engine, grounded against a government PDF.
 
-**Five autonomous steps.** [Slide 05] Gemini Flash reads your MyKad, payslip, and bill — multimodal, no OCR. Flash-Lite classifies your household. The rule engine matches you against Budget-2026 schemes — STR, JKM, LHDN reliefs, BUDI95, MyKasih. Gemini Code Execution computes annual upside in real Python — visible in the stream. WeasyPrint generates the draft packets.
+**Six autonomous steps.** [Slide 04] Gemini Flash reads your MyKad, payslip, and bill — multimodal, no OCR. Flash-Lite classifies your household. The rule engine matches you against Budget-2026 schemes — STR, JKM, LHDN reliefs, BUDI95, MyKasih. Gemini 2.5 Pro picks the best strategy, Code Execution computes annual upside in real Python — visible in the stream. WeasyPrint generates the draft packets.
 
-**Eight Google components.** [Slide 11] Three Gemini tiers, Code Execution, Vertex AI Search for grounding, ADK-Python orchestrating, Cloud Run hosting, Firebase Auth gating.
+**Eight Google components.** [Slide 05] Three Gemini tiers, Code Execution, Vertex AI Search for grounding, ADK-Python orchestrating, Cloud Run hosting, Firebase Auth gating.
 
 **The grounding guarantee.** [Slide 06]
 

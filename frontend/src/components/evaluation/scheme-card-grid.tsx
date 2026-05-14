@@ -36,13 +36,35 @@ function formatRm(value: number): string {
   return `RM ${value.toLocaleString('en-MY', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
 }
 
-function categoryKeyFor(match: SchemeMatch): 'cashTransfer' | 'taxRelief' | 'welfare' | 'subsidy' | 'assistance' {
-  if (match.kind === 'subsidy_credit') return 'subsidy'
+function categoryKeyFor(
+  match: SchemeMatch
+):
+  | 'cashTransfer'
+  | 'taxRelief'
+  | 'welfare'
+  | 'education'
+  | 'healthcare'
+  | 'retirement'
+  | 'subsidy'
+  | 'assistance' {
+  // Subsidy-credit cards get the more specific category when we know it
+  // (PeKa B40 / MySalam → healthcare, RMT / SPBT → education, SARA / MyKasih
+  // → cash transfer, BUDI95 → generic subsidy). Keep the catch-all "subsidy"
+  // for unknown subsidy_credit matches the discovery agent surfaces later.
+  if (match.kind === 'subsidy_credit') {
+    const id = match.scheme_id.toLowerCase()
+    if (id === 'peka_b40' || id === 'mysalam') return 'healthcare'
+    if (id === 'rmt' || id === 'spbt') return 'education'
+    if (id === 'sara' || id === 'mykasih') return 'cashTransfer'
+    return 'subsidy'
+  }
   const agency = match.agency.toLowerCase()
   const id = match.scheme_id.toLowerCase()
   if (id.includes('str') || agency.includes('treasury')) return 'cashTransfer'
   if (agency.includes('lhdn')) return 'taxRelief'
-  if (agency.includes('jkm')) return 'welfare'
+  if (id === 'i_saraan' || id === 'i_suri' || agency.includes('kwsp') || agency.includes('epf')) return 'retirement'
+  if (id === 'bap' || id === 'kwapm' || id === 'taska_permata' || agency.includes('kpm') || agency.includes('moe') || agency.includes('permata') || agency.includes('kpwkm')) return 'education'
+  if (agency.includes('jkm') || agency.includes('tnb') || agency.includes('petra')) return 'welfare'
   return 'assistance'
 }
 
@@ -112,9 +134,15 @@ export function SchemeCardGrid({ matches, deltas, kind = 'upside', heading, hide
                 ? t('schemes.labels.taxRelief')
                 : categoryKey === 'welfare'
                   ? t('schemes.labels.welfare')
-                  : categoryKey === 'subsidy'
-                    ? t('evaluation.schemeCard.categorySubsidy')
-                    : t('evaluation.schemeCard.categoryAssistance')
+                  : categoryKey === 'education'
+                    ? t('schemes.labels.education')
+                    : categoryKey === 'healthcare'
+                      ? t('schemes.labels.healthcare')
+                      : categoryKey === 'retirement'
+                        ? t('schemes.labels.retirement')
+                        : categoryKey === 'subsidy'
+                          ? t('evaluation.schemeCard.categorySubsidy')
+                          : t('evaluation.schemeCard.categoryAssistance')
           return (
             <li
               key={match.scheme_id}

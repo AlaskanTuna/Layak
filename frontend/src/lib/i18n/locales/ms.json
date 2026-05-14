@@ -1228,11 +1228,14 @@
       "cashWelfare": {
         "title": "Pemindahan Tunai & Kebajikan"
       },
+      "education": {
+        "title": "Pendidikan & Pembangunan Kanak-Kanak"
+      },
+      "healthSafety": {
+        "title": "Kesihatan & Keselamatan Sosial"
+      },
       "taxRetirement": {
         "title": "Cukai & Persaraan"
-      },
-      "socialSecurity": {
-        "title": "Keselamatan Sosial"
       }
     },
     "howMatching": {
@@ -1249,11 +1252,16 @@
     "labels": {
       "cashTransfer": "Pindahan Tunai",
       "welfare": "Kebajikan",
+      "education": "Pendidikan",
+      "healthcare": "Kesihatan",
+      "fuelSubsidy": "Subsidi Petrol",
       "taxRelief": "Pelepasan Cukai",
       "socialSecurity": "Keselamatan Sosial",
       "retirement": "Persaraan",
       "typicalUpside": "Faedah biasa",
       "annualContribution": "Caruman tahunan",
+      "indicativeBenefit": "Anggaran faedah",
+      "inKindBenefit": "Faedah bukan tunai",
       "upTo": "Sehingga RM",
       "rm": "RM",
       "perYear": "/ tahun",
@@ -1262,20 +1270,62 @@
     "str": {
       "summary": "Sumbangan Tunai Rahmah — peringkat isi rumah dan individu berdasarkan pendapatan per kapita dan saiz isi rumah."
     },
+    "sara": {
+      "summary": "Kredit MyKad bulanan (RM50–RM200/bulan) untuk penerima STR, dibelanjakan di kedai peserta MyKasih. Diaktifkan secara automatik, tiada permohonan."
+    },
+    "mykasih": {
+      "summary": "Kredit MyKad sekali sahaja RM100 (SARA Untuk Semua) untuk setiap warga Malaysia dewasa, dikreditkan pada 9 Feb 2026 untuk barangan keperluan asas."
+    },
     "jkm": {
       "summary": "Bayaran bulanan RM 600 untuk tanggungan warga emas yang layak (berumur 60+) dalam isi rumah berpendapatan rendah."
     },
     "jkmBkk": {
       "summary": "RM 200/bulan bagi anak berumur 6 tahun ke bawah, RM 150/bulan bagi umur 7–17, dengan had maksimum RM 1,000/bulan setiap keluarga — untuk isi rumah berpendapatan rendah."
     },
-    "lhdn": {
-      "summary": "Lima pelepasan cukai meliputi pemfail Borang B (bekerja sendiri) dan Borang BE (bergaji): individu, anak, perubatan ibu bapa, KWSP + insurans hayat, dan gaya hidup."
+    "bantuanElektrik": {
+      "summary": "Rebat bil TNB sehingga RM 40/bulan untuk ketua isi rumah eKasih Miskin Tegar, dikenakan secara automatik pada bil. Dilanjutkan sehingga 31 Dis 2026 di bawah Belanjawan 2026."
+    },
+    "jkmBp": {
+      "summary": "JKM Bantuan Pelajaran — RM 50/bulan (rendah) / RM 100/bulan (menengah) / RM 150/bulan (lepas menengah) untuk anak sekolah dalam isi rumah penerima bantuan utama JKM."
+    },
+    "budi95": {
+      "summary": "Petrol RON95 pada RM 1.99/L untuk warga Malaysia dengan lesen memandu sah — dihadkan kepada 300 L/bulan setiap MyKad. Maklumat sahaja; kuota berulang setiap bulan."
+    },
+    "bap": {
+      "summary": "RM 150 setiap anak usia sekolah (Tahun 1–Tingkatan 6), dibayar setiap Januari. Sejagat pada 2026 — tiada had pendapatan. Dikeluarkan oleh KPM kepada akaun ibu bapa yang berdaftar."
+    },
+    "rmt": {
+      "summary": "Hidangan sekolah harian percuma untuk murid sekolah rendah (Tahun 1–6) dari isi rumah di bawah Pendapatan Garis Kemiskinan atau eKasih. Dikenal pasti oleh jawatankuasa RMT sekolah."
+    },
+    "spbt": {
+      "summary": "Pinjaman buku teks percuma untuk setiap pelajar warganegara Malaysia di sekolah Kerajaan dan Bantuan Kerajaan. Disejagatkan sejak 2008 — tiada permohonan diperlukan."
+    },
+    "kwapm": {
+      "summary": "RM 200/tahun setiap anak sekolah rendah untuk isi rumah miskin tegar, dibayar melalui jawatankuasa KWAPM sekolah. Termasuk bantuan kecemasan RM 300/insiden."
+    },
+    "taskaPermata": {
+      "summary": "Subsidi yuran sehingga RM 180/bulan setiap kanak-kanak berumur 0–6 di pusat TASKA / TADIKA Permata berdaftar, untuk isi rumah dengan pendapatan kasar ≤ RM 5,000/bulan."
+    },
+    "pekaB40": {
+      "summary": "Saringan kesihatan tahunan percuma, bantuan peralatan perubatan RM 20,000, insentif rawatan barah RM 1,000, dan tuntutan pengangkutan RM 500/tahun untuk rakyat B40 berumur 40+."
+    },
+    "mysalam": {
+      "summary": "Perlindungan kritikal percuma untuk rakyat B40 berumur 18–65 — RM 8,000 sekali bayar pada diagnosis 45 penyakit kritikal, serta RM 50/hari pendapatan hospital (maksimum 14 hari/tahun)."
+    },
+    "lhdnB": {
+      "summary": "Pelepasan Borang B untuk pemfail bekerja sendiri / gig — individu, anak, perubatan ibu bapa, KWSP + insurans hayat, gaya hidup. Tarikh akhir 30 Jun 2026."
+    },
+    "lhdnBE": {
+      "summary": "Pelepasan Borang BE untuk pemfail bergaji — individu, anak, perubatan ibu bapa, KWSP + insurans hayat, gaya hidup. Tarikh akhir 30 April 2026."
     },
     "perkesoSksps": {
       "summary": "Caruman keselamatan sosial bekerja sendiri (Akta 789). Wajib untuk pekerja gig dan pengangkutan penumpang — meliputi perubatan, hilang upaya, dan tanggungan kematian."
     },
     "iSaraan": {
       "summary": "Kerajaan menambah 15% caruman KWSP sukarela bagi pekerja sendiri, had RM 500/tahun. Sasaran pemfail Borang B berumur 18-60 tahun tanpa caruman KWSP majikan."
+    },
+    "iSuri": {
+      "summary": "Kerajaan menambah 50% (had RM 300/tahun, seumur hidup RM 3,000) untuk caruman KWSP sukarela suri rumah yang berdaftar di eKasih. Had umur dilanjutkan ke 60 di bawah Belanjawan 2026."
     },
     "namesById": {
       "str_2026": "STR 2026 — Tier isi rumah berkanak-kanak",
@@ -1286,7 +1336,18 @@
       "perkeso_sksps": "PERKESO SKSPS — Jaminan Sosial Pekerja Sendiri",
       "i_saraan": "EPF i-Saraan — padanan kerajaan untuk caruman sukarela",
       "budi95": "BUDI95 — subsidi petrol RON95",
-      "mykasih": "MyKasih — kredit MyKad SARA RM100"
+      "mykasih": "MyKasih — kredit MyKad SARA RM100",
+      "peka_b40": "PeKa B40 — Saringan kesihatan + bantuan barah",
+      "bap": "BAP — Bantuan Awal Persekolahan",
+      "bantuan_elektrik": "Bantuan Elektrik — Rebat TNB Miskin Tegar",
+      "i_suri": "KWSP i-Suri — Caruman tambah-nilai suri rumah",
+      "mysalam": "MySalam — Perlindungan penyakit kritikal",
+      "sara": "SARA — Sumbangan Asas Rahmah",
+      "rmt": "RMT — Rancangan Makanan Tambahan",
+      "spbt": "SPBT — Skim Pinjaman Buku Teks",
+      "kwapm": "KWAPM — Pelajar Miskin",
+      "jkm_bp": "JKM Bantuan Pelajaran",
+      "taska_permata": "TASKA / TADIKA Permata"
     }
   },
   "settings": {

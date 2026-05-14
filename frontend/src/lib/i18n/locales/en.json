@@ -1228,11 +1228,14 @@
       "cashWelfare": {
         "title": "Cash Transfer & Welfare"
       },
+      "education": {
+        "title": "Education & Child Development"
+      },
+      "healthSafety": {
+        "title": "Health & Social Safety"
+      },
       "taxRetirement": {
         "title": "Tax & Retirement"
-      },
-      "socialSecurity": {
-        "title": "Social Security"
       }
     },
     "howMatching": {
@@ -1249,11 +1252,16 @@
     "labels": {
       "cashTransfer": "Cash Transfer",
       "welfare": "Welfare",
+      "education": "Education",
+      "healthcare": "Healthcare",
+      "fuelSubsidy": "Fuel Subsidy",
       "taxRelief": "Tax Relief",
       "socialSecurity": "Social Security",
       "retirement": "Retirement",
       "typicalUpside": "Typical upside",
       "annualContribution": "Annual contribution",
+      "indicativeBenefit": "Indicative benefit",
+      "inKindBenefit": "In-kind benefit",
       "upTo": "Up to RM",
       "rm": "RM",
       "perYear": "/ year",
@@ -1262,20 +1270,62 @@
     "str": {
       "summary": "Sumbangan Tunai Rahmah — household and individual tiers based on per-capita income and household size."
     },
+    "sara": {
+      "summary": "Monthly MyKad credit (RM50–RM200/month) for STR recipients, spent at MyKasih-participating retailers for essentials. Auto-activated, no application."
+    },
+    "mykasih": {
+      "summary": "One-off RM100 MyKad credit (SARA Untuk Semua) for every adult Malaysian, credited 9 Feb 2026 to spend on essentials."
+    },
     "jkm": {
       "summary": "Monthly RM 600 payment for a qualifying elderly dependant (aged 60+) in low-income households."
     },
     "jkmBkk": {
       "summary": "RM 200/month per child aged 6 and under, RM 150/month for ages 7–17, capped at RM 1,000/month per household — for low-income families."
     },
-    "lhdn": {
-      "summary": "Five tax reliefs covering both Form B (self-employed) and Form BE (salaried) filers: individual, child, parent medical, EPF + life insurance, and lifestyle."
+    "bantuanElektrik": {
+      "summary": "Up to RM 40/month TNB bill rebate for eKasih Miskin Tegar heads-of-household, auto-applied at billing. Extended through 31 Dec 2026 under Budget 2026."
+    },
+    "jkmBp": {
+      "summary": "JKM Bantuan Pelajaran — RM 50/month (primary) / RM 100/month (secondary) / RM 150/month (post-secondary) for school-age children in JKM-aid households."
+    },
+    "budi95": {
+      "summary": "RON95 petrol at RM 1.99/L for Malaysian citizens with a valid driving licence — capped at 300 L/month per MyKad. Info-only; quota is rolling."
+    },
+    "bap": {
+      "summary": "RM 150 per school-age child (Year 1–Form 6), paid each January. Universal in 2026 — no income gate. Disbursed by KPM to the parent's registered account."
+    },
+    "rmt": {
+      "summary": "Daily free school meal for primary-school pupils (Year 1–6) from households below the National Poverty Line or in eKasih. Identified by the school's RMT committee."
+    },
+    "spbt": {
+      "summary": "Free textbook loan for every Malaysian student in government and government-aided schools. Universalised in 2008 — no application required."
+    },
+    "kwapm": {
+      "summary": "RM 200/year per primary-school child for hardcore-poor households, paid via the school's KWAPM committee. Includes a RM 300/incident emergency-aid track."
+    },
+    "taskaPermata": {
+      "summary": "Up to RM 180/month fee subsidy per child aged 0–6 at registered TASKA / TADIKA Permata centres, for households with gross income ≤ RM 5,000/month."
+    },
+    "pekaB40": {
+      "summary": "Free annual health screening, RM 20,000 medical-equipment aid, RM 1,000 cancer-treatment incentive, and RM 500/year transport claim for B40 Malaysians aged 40+."
+    },
+    "mysalam": {
+      "summary": "Free critical-illness cover for B40 Malaysians aged 18–65 — RM 8,000 one-off on diagnosis of any of 45 listed illnesses, plus RM 50/day hospital income (max 14 days/year)."
+    },
+    "lhdnB": {
+      "summary": "Form B reliefs for self-employed / gig filers — individual, child, parent medical, EPF + life insurance, lifestyle. Filing deadline 30 June 2026."
+    },
+    "lhdnBE": {
+      "summary": "Form BE reliefs for salaried filers — individual, child, parent medical, EPF + life insurance, lifestyle. Filing deadline 30 April 2026."
     },
     "perkesoSksps": {
       "summary": "Self-employed social-security contribution (Akta 789). Mandatory for gig and passenger-transport workers — buys medical, disability, and survivor cover."
     },
     "iSaraan": {
       "summary": "Government tops up 15% of self-employed voluntary EPF contribution, capped RM 500/yr. Targets Form B filers aged 18-60 without employer EPF."
+    },
+    "iSuri": {
+      "summary": "Government adds 50% (capped RM 300/yr, lifetime RM 3,000) to voluntary EPF contributions from housewives registered in eKasih. Age window extended to 60 under Budget 2026."
     },
     "namesById": {
       "str_2026": "STR 2026 — Household with children tier",
@@ -1286,7 +1336,18 @@
       "perkeso_sksps": "PERKESO SKSPS — Self-Employed Social Security",
       "i_saraan": "EPF i-Saraan — voluntary contribution government match",
       "budi95": "BUDI95 — RON95 petrol subsidy",
-      "mykasih": "MyKasih — SARA RM100 MyKad credit"
+      "mykasih": "MyKasih — SARA RM100 MyKad credit",
+      "peka_b40": "PeKa B40 — Health screening + cancer aid",
+      "bap": "BAP — Bantuan Awal Persekolahan",
+      "bantuan_elektrik": "Bantuan Elektrik — TNB Miskin Tegar rebate",
+      "i_suri": "KWSP i-Suri — Housewife EPF top-up",
+      "mysalam": "MySalam — Critical illness cover",
+      "sara": "SARA — Sumbangan Asas Rahmah",
+      "rmt": "RMT — Rancangan Makanan Tambahan",
+      "spbt": "SPBT — Skim Pinjaman Buku Teks",
+      "kwapm": "KWAPM — Pelajar Miskin",
+      "jkm_bp": "JKM Bantuan Pelajaran",
+      "taska_permata": "TASKA / TADIKA Permata"
     }
   },
   "settings": {

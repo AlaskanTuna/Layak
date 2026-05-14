@@ -6,17 +6,20 @@ import { useTranslation } from 'react-i18next'
 
 import { useLatestVerifiedAt } from '@/hooks/use-verified-schemes'
 
-// User-facing scheme count: 20 backend `SchemeId` slugs covering 10
-// federal agencies and 8 benefit categories. Phase 15 added 4 schemes
-// (SPBT, KWAPM, JKM Bantuan Pelajaran, TASKA Permata) on top of the
-// Phase 14 expansion (PeKa B40, BAP, Bantuan Elektrik, i-Suri, MySalam,
-// SARA, RMT) and the original 9 (STR, JKM Warga Emas, JKM BKK, LHDN
-// Form B, LHDN Form BE, PERKESO SKSPS, i-Saraan, BUDI95, MyKasih). LHDN
-// Form B + Form BE count separately because they target different filer
-// cohorts (gig vs salaried) with different deadlines and relief baskets.
+// User-facing scheme count: 20 backend `SchemeId` slugs covering 9 federal
+// agencies (MOF, MOH/ProtectHealth, KPWKM/Permata, KPM/MOE, JKM, KWSP,
+// LHDN, PERKESO, TNB+PETRA) and 8 benefit categories (cashTransfer,
+// welfare, education, healthcare, fuelSubsidy, taxRelief, retirement,
+// socialSecurity). Phase 15 added 4 schemes (SPBT, KWAPM, JKM Bantuan
+// Pelajaran, TASKA Permata) on top of the Phase 14 expansion (PeKa B40,
+// BAP, Bantuan Elektrik, i-Suri, MySalam, SARA, RMT) and the original 9
+// (STR, JKM Warga Emas, JKM BKK, LHDN Form B, LHDN Form BE, PERKESO
+// SKSPS, i-Saraan, BUDI95, MyKasih). LHDN Form B + Form BE count
+// separately because they target different filer cohorts (gig vs
+// salaried) with different deadlines and relief baskets.
 const STATIC_STATS = [
   { id: 'schemes', icon: Layers, accent: 'hibiscus', value: '20' },
-  { id: 'agencies', icon: Building2, accent: 'forest', value: '10' },
+  { id: 'agencies', icon: Building2, accent: 'forest', value: '9' },
   { id: 'categories', icon: Tag, accent: 'primary', value: '8' }
 ] as const
 

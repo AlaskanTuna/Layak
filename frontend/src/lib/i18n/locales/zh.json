@@ -1217,11 +1217,14 @@
       "cashWelfare": {
         "title": "现金援助与福利"
       },
+      "education": {
+        "title": "教育与儿童发展"
+      },
+      "healthSafety": {
+        "title": "健康与社会保障"
+      },
       "taxRetirement": {
         "title": "税务与退休"
-      },
-      "socialSecurity": {
-        "title": "社会保障"
       }
     },
     "howMatching": {
@@ -1238,11 +1241,16 @@
     "labels": {
       "cashTransfer": "现金转账",
       "welfare": "福利",
+      "education": "教育",
+      "healthcare": "医疗保健",
+      "fuelSubsidy": "燃油补贴",
       "taxRelief": "税务减免",
       "socialSecurity": "社会保障",
       "retirement": "退休金",
       "typicalUpside": "典型收益",
       "annualContribution": "年度缴款",
+      "indicativeBenefit": "估算福利",
+      "inKindBenefit": "实物福利",
       "upTo": "最高 RM",
       "rm": "RM",
       "perYear": "/ 年",
@@ -1251,20 +1259,62 @@
     "str": {
       "summary": "Sumbangan Tunai Rahmah —— 根据人均收入和家庭规模划分的家庭和个人层级。"
     },
+    "sara": {
+      "summary": "每月 RM50–RM200 的 MyKad 信用，发放给 STR 受惠者，可在 MyKasih 参与商店购买基本生活用品。自动激活，无需申请。"
+    },
+    "mykasih": {
+      "summary": "面向所有成年马来西亚公民的一次性 RM100 MyKad 信用（SARA Untuk Semua），于 2026 年 2 月 9 日发放，用于购买基本生活用品。"
+    },
     "jkm": {
       "summary": "每月 RM 600 补助金，适用于低收入家庭中符合资格的年长受扶养人（60 岁以上）。"
     },
     "jkmBkk": {
       "summary": "6 岁及以下子女每月 RM 200，7–17 岁每月 RM 150，每户每月上限 RM 1,000，面向低收入家庭。"
     },
-    "lhdn": {
-      "summary": "涵盖 Form B（自雇）和 Form BE（受薪）申报者的五项税务减免：个人、子女、父母医疗、EPF + 寿险、生活方式。"
+    "bantuanElektrik": {
+      "summary": "为 eKasih 极贫家庭户主提供最高每月 RM 40 的 TNB 电费回扣，账单自动扣减。2026 年预算延长至 2026 年 12 月 31 日。"
+    },
+    "jkmBp": {
+      "summary": "JKM 教育援助金 —— 小学 RM 50/月、中学 RM 100/月、专上 RM 150/月，面向 JKM 主援助家庭的学龄子女。"
+    },
+    "budi95": {
+      "summary": "持有效驾照的马来西亚公民可以 RM 1.99/升加 RON95 汽油 —— 每张 MyKad 每月限额 300 升。仅供参考，配额每月滚动。"
+    },
+    "bap": {
+      "summary": "每名学龄子女（一年级–中六）RM 150，每年一月发放。2026 年全民派发，无收入门槛。由教育部直接汇入家长登记账户。"
+    },
+    "rmt": {
+      "summary": "为低收入家庭（家庭月收入低于国家贫困线或 eKasih 登记）的小学生（一年级–六年级）提供每日免费学校膳食。由学校 RMT 委员会鉴定。"
+    },
+    "spbt": {
+      "summary": "为所有政府及政府资助学校的马来西亚籍学生提供免费课本借用。自 2008 年起全民化 —— 无需申请。"
+    },
+    "kwapm": {
+      "summary": "极贫家庭每名小学子女每年 RM 200，通过学校 KWAPM 委员会发放。另设每宗 RM 300 紧急援助通道。"
+    },
+    "taskaPermata": {
+      "summary": "为 0–6 岁子女在注册的 TASKA / TADIKA Permata 中心提供最高 RM 180/月学费津贴，适用于月家庭毛收入 ≤ RM 5,000 的家庭。"
+    },
+    "pekaB40": {
+      "summary": "为 40 岁以上的 B40 公民提供免费年度健康检查、最高 RM 20,000 医疗器材津贴、RM 1,000 癌症治疗奖励金，以及每年最高 RM 500 交通报销。"
+    },
+    "mysalam": {
+      "summary": "为 18–65 岁的 B40 公民提供免费重大疾病保障 —— 确诊 45 种列明重病可获一次性 RM 8,000，并每天 RM 50 住院收入津贴（每年最多 14 天）。"
+    },
+    "lhdnB": {
+      "summary": "Form B 为自雇 / 零工申报者提供减免 —— 个人、子女、父母医疗、EPF + 寿险、生活方式。报税截止 2026 年 6 月 30 日。"
+    },
+    "lhdnBE": {
+      "summary": "Form BE 为受薪申报者提供减免 —— 个人、子女、父母医疗、EPF + 寿险、生活方式。报税截止 2026 年 4 月 30 日。"
     },
     "perkesoSksps": {
       "summary": "自雇社会保障缴款（Akta 789）。零工与客运工作者强制参与 —— 提供医疗、伤残与遗属保障。"
     },
     "iSaraan": {
       "summary": "政府按自雇人士的自愿 EPF 缴款额加发 15%，每年上限 RM 500。面向 18-60 岁、无雇主 EPF 缴款路径的 Form B 申报者。"
+    },
+    "iSuri": {
+      "summary": "政府按 eKasih 登记的家庭主妇的自愿 EPF 缴款额匹配 50%（每年上限 RM 300，终身 RM 3,000）。2026 年预算将年龄上限延长至 60 岁。"
     },
     "namesById": {
       "str_2026": "STR 2026 — 有子女家庭级别",
@@ -1275,7 +1325,18 @@
       "perkeso_sksps": "PERKESO SKSPS — 自雇人士社会保障",
       "i_saraan": "EPF i-Saraan — 自愿缴款政府配对",
       "budi95": "BUDI95 — RON95 汽油补贴",
-      "mykasih": "MyKasih — SARA RM100 MyKad 信用"
+      "mykasih": "MyKasih — SARA RM100 MyKad 信用",
+      "peka_b40": "PeKa B40 — 健康检查 + 癌症补助",
+      "bap": "BAP — Bantuan Awal Persekolahan",
+      "bantuan_elektrik": "Bantuan Elektrik — TNB 极贫电费回扣",
+      "i_suri": "KWSP i-Suri — 家庭主妇公积金加值",
+      "mysalam": "MySalam — 重大疾病保障",
+      "sara": "SARA — Sumbangan Asas Rahmah",
+      "rmt": "RMT — Rancangan Makanan Tambahan",
+      "spbt": "SPBT — Skim Pinjaman Buku Teks",
+      "kwapm": "KWAPM — Pelajar Miskin",
+      "jkm_bp": "JKM Bantuan Pelajaran",
+      "taska_permata": "TASKA / TADIKA Permata"
     }
   },
   "settings": {

@@ -33,8 +33,8 @@ const STEPS_FALLBACK: StepCopy[] = [
   },
   {
     label: 'Match',
-    title: 'Check against every locked\nMalaysian scheme.',
-    body: 'STR 2026 tiers, JKM Warga Emas, the five LHDN Form B reliefs. Each match cites the exact passage from the agency PDF — no hallucinated rules.'
+    title: 'Run deterministic rules\nacross the scheme corpus.',
+    body: 'The rule engine checks the structured profile against STR, JKM, LHDN, PERKESO, education, and subsidy rules. Citations point back to cached agency sources; the model does not invent eligibility.'
   },
   {
     label: 'Compute',
@@ -51,7 +51,7 @@ const STEPS_FALLBACK: StepCopy[] = [
 const STEP_TOOLS: string[][] = [
   ['Gemini 3.1 Flash', 'Vision OCR'],
   ['Python rules', 'Pydantic v2'],
-  ['Vertex AI Search', 'Rule engine'],
+  ['Rule engine', 'Source citations'],
   ['Gemini Code Execution', 'Python sandbox'],
   ['WeasyPrint', 'Jinja2']
 ]

@@ -245,8 +245,8 @@
         },
         {
           "label": "Padan",
-          "title": "Semak setiap skim Malaysia\nyang dikunci.",
-          "body": "Peringkat STR 2026, JKM Warga Emas, lima pelepasan LHDN Borang B. Setiap padanan memetik petikan tepat daripada PDF agensi — tiada peraturan rekaan."
+          "title": "Jalankan peraturan deterministik\nmerentas korpus skim.",
+          "body": "Enjin peraturan menyemak profil berstruktur terhadap peraturan STR, JKM, LHDN, PERKESO, pendidikan, dan subsidi. Petikan merujuk kembali kepada sumber agensi yang dicache; model tidak mencipta kelayakan."
         },
         {
           "label": "Kira",

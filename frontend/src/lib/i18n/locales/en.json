@@ -280,8 +280,8 @@
         },
         {
           "label": "Match",
-          "title": "Check against every locked\nMalaysian scheme.",
-          "body": "STR 2026 tiers, JKM Warga Emas, the five LHDN Form B reliefs. Each match cites the exact passage from the agency PDF — no hallucinated rules."
+          "title": "Run deterministic rules\nacross the scheme corpus.",
+          "body": "The rule engine checks the structured profile against STR, JKM, LHDN, PERKESO, education, and subsidy rules. Citations point back to cached agency sources; the model does not invent eligibility."
         },
         {
           "label": "Compute",

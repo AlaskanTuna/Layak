@@ -738,7 +738,7 @@
       "askScenarioChanges": "Ask about changed schemes",
       "askScenarioPrompt": "Explain this what-if scenario. What changed, which schemes moved, and what should I notice first?",
       "askScenarioWithoutStrategyPrompt": "Explain the eligibility and amount changes in this what-if scenario. Strategy notes are still refreshing or unavailable, so focus only on the computed scheme changes and deltas.",
-      "strategyStillRefreshing": "Strategy notes are still refreshing. Cik Lay can explain eligibility changes now.",
+      "strategyStillRefreshing": "Strategy notes are still refreshing. If you ask Cik Lay about this scenario, it will respond after that finishes.",
       "strategyNotBlocking": "Eligibility changes are ready. Strategy notes are not required for this answer.",
       "deltaChip": {
         "gained": "Newly eligible · RM {{amount}}",

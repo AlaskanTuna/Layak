@@ -738,7 +738,7 @@
       "askScenarioChanges": "Tanya tentang skim yang berubah",
       "askScenarioPrompt": "Terangkan senario apa-jika ini. Apa yang berubah, skim mana yang bergerak, dan perkara utama apa yang patut saya perhatikan?",
       "askScenarioWithoutStrategyPrompt": "Terangkan perubahan kelayakan dan jumlah dalam senario apa-jika ini. Nota strategi masih disegar semula atau tidak tersedia, jadi fokus pada perubahan skim dan delta yang sudah dikira.",
-      "strategyStillRefreshing": "Nota strategi masih disegar semula. Cik Lay boleh terangkan perubahan kelayakan sekarang.",
+      "strategyStillRefreshing": "Nota strategi masih disegar semula. Jika anda tanya Cik Lay tentang senario ini, ia akan menjawab selepas proses itu selesai.",
       "strategyNotBlocking": "Perubahan kelayakan sudah siap. Nota strategi tidak diperlukan untuk jawapan ini.",
       "deltaChip": {
         "gained": "Layak baru · RM {{amount}}",

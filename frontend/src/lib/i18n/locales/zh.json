@@ -727,7 +727,7 @@
       "askScenarioChanges": "询问已变化的计划",
       "askScenarioPrompt": "请解释这个假设场景。哪些内容发生了变化，哪些计划受到影响，我最先应注意什么？",
       "askScenarioWithoutStrategyPrompt": "解释这个 what-if 情境中的资格和金额变化。策略备注仍在刷新或暂不可用，请只聚焦已计算出的计划变化和差异。",
-      "strategyStillRefreshing": "策略备注仍在刷新。Cik Lay 现在可以先解释资格变化。",
+      "strategyStillRefreshing": "策略备注仍在刷新。如果你向 Cik Lay 询问此情境，它会在刷新完成后回复。",
       "strategyNotBlocking": "资格变化已经就绪。此回答不需要等待策略备注。",
       "deltaChip": {
         "gained": "新符合资格 · RM {{amount}}",

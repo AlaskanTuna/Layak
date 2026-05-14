@@ -4,6 +4,12 @@
 
 ---
 
+## [15/05/26] - Landing match-step copy aligned with deterministic matcher
+
+Updated the public landing pipeline's "Match" step to stop implying Vertex AI Search decides eligibility. Current architecture is deterministic: `match_schemes()` runs the local rule engine across the scheme corpus, while individual rules may attach Vertex AI Search / cached PDF citations as grounding. The landing badges now read `Rule engine` + `Source citations`, matching the backend boundary.
+
+---
+
 ## [12/05/26] - Household modelling: adult income split + caregiving roles
 
 Recorded the manual-entry household modelling work in `docs/trd.md` so future agents do not have to infer it from staged code. `monthly_income_rm` is now documented as the backward-compatible household-total alias, with applicant-only schemes reading `applicant_income_rm` and household/per-capita schemes reading `household_income_rm`. Added the minimal caregiving-role fix: `grandparent` is a real relationship; BKK counts under-18 `child | sibling`; JKM Warga Emas counts age-60+ `parent | grandparent`; LHDN parent medical, LHDN child relief, and STR child buckets stay strict. The BKK 16-17 full-time-working/not-schooling exclusion is documented as future scope, not implemented.

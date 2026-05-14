@@ -280,8 +280,8 @@
         },
         {
           "label": "Match",
-          "title": "Check against every locked\nMalaysian scheme.",
-          "body": "STR 2026 tiers, JKM Warga Emas, the five LHDN Form B reliefs. Each match cites the exact passage from the agency PDF — no hallucinated rules."
+          "title": "Run deterministic rules\nacross the scheme corpus.",
+          "body": "The rule engine checks the structured profile against STR, JKM, LHDN, PERKESO, education, and subsidy rules. Citations point back to cached agency sources; the model does not invent eligibility."
         },
         {
           "label": "Compute",
@@ -738,7 +738,7 @@
       "askScenarioChanges": "Ask about changed schemes",
       "askScenarioPrompt": "Explain this what-if scenario. What changed, which schemes moved, and what should I notice first?",
       "askScenarioWithoutStrategyPrompt": "Explain the eligibility and amount changes in this what-if scenario. Strategy notes are still refreshing or unavailable, so focus only on the computed scheme changes and deltas.",
-      "strategyStillRefreshing": "Strategy notes are still refreshing. Cik Lay can explain eligibility changes now.",
+      "strategyStillRefreshing": "Strategy notes are still refreshing. If you ask Cik Lay about this scenario, it will respond after that finishes.",
       "strategyNotBlocking": "Eligibility changes are ready. Strategy notes are not required for this answer.",
       "deltaChip": {
         "gained": "Newly eligible · RM {{amount}}",

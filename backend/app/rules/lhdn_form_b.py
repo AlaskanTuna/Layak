@@ -189,7 +189,10 @@ def _citations(form_type: str) -> list[RuleCitation]:
                 page_ref="RF Filing Programme 2026, doc p.2, Example 2",
                 passage=(
                     "The due date for submission of Form B for Year of Assessment 2025 is "
-                    "30 June 2026. Grace period is given until 15 July 2026 for the e-Filing."
+                    "30 June 2026, with an automatic 15-day grace period to 15 July 2026. "
+                    "Manual paper-form submission has been deprecated since YA2024 — "
+                    "the only accepted channel is the LHDN e-Filing portal at "
+                    "mytax.hasil.gov.my."
                 ),
                 source_url="https://www.hasil.gov.my/media/fqog1423/rf-filing-programme-for-2026.pdf",
             )
@@ -202,7 +205,9 @@ def _citations(form_type: str) -> list[RuleCitation]:
                 page_ref="RF Filing Programme 2026, doc p.2, Example 1",
                 passage=(
                     "The due date for submission of Form BE for Year of Assessment 2025 is "
-                    "30 April 2026. Grace period is given until 15 May 2026 for the e-Filing."
+                    "30 April 2026, with an automatic 15-day grace period to 15 May 2026. "
+                    "Manual paper-form submission has been deprecated since YA2024 — the "
+                    "only accepted channel is the LHDN e-Filing portal at mytax.hasil.gov.my."
                 ),
                 source_url="https://www.hasil.gov.my/media/fqog1423/rf-filing-programme-for-2026.pdf",
             )

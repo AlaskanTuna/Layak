@@ -37,8 +37,12 @@ CHILD_AGE_THRESHOLD = 18
 # get the higher rate; older children (still under 18) get the lower rate.
 YOUNGER_BAND_AGE = 6
 PER_CAPITA_THRESHOLD_RM = 1000.0
-PER_CHILD_MONTHLY_RM_YOUNGER = 200.0  # ages 0–6 inclusive
-PER_CHILD_MONTHLY_RM_OLDER = 150.0  # ages 7–17 inclusive
+# Budget 2026 raised the per-child BKK rates (Portal Manfaat MOF, 2026):
+# RM250/month for children aged ≤6, RM200/month for ages 7–18.
+# Previous values were RM200 / RM150 under the JKM SPK ISO 9001 procedure
+# document (Oct 2024).
+PER_CHILD_MONTHLY_RM_YOUNGER = 250.0  # ages 0–6 inclusive
+PER_CHILD_MONTHLY_RM_OLDER = 200.0  # ages 7–17 inclusive
 HOUSEHOLD_MONTHLY_CAP_RM = 1000.0
 # Annual cap derived from the monthly cap. Kept as a constant so tests can
 # import it instead of reconstructing `1000 * 12` inline.
@@ -83,14 +87,13 @@ def _citations() -> list[RuleCitation]:
         RuleCitation(
             rule_id="jkm.bkk.rate_per_child",
             source_pdf=_SOURCE_PDF,
-            page_ref="JKM SPK ISO 9001 — Bantuan Kanak-Kanak (BKK), Kadar Bantuan",
+            page_ref="Portal Manfaat MOF (Budget 2026) — BKK",
             passage=(
-                "Kadar minimum sebanyak RM150 sehingga maksimum RM1,000 mengikut "
-                "pecahan berikut: RM200 seorang bagi anak berumur 6 tahun dan ke bawah; "
-                "RM150 seorang bagi anak berumur 7 tahun hingga 18 tahun; "
-                "Kadar bantuan maksimum RM1,000/keluarga sebulan."
+                "Budget 2026 raised the BKK per-child rates: RM250 per month for "
+                "children aged 6 years and below; RM200 per month for children "
+                "aged 7 to 18 years. The household maximum stays at RM1,000/month."
             ),
-            source_url="https://www.jkm.gov.my/uploads/content-downloads/file_20241025152555.pdf",
+            source_url="https://manfaat.mof.gov.my/b2026/individu/kkjkm",
         ),
     ])
     return cites

@@ -55,10 +55,10 @@ _QUALIFY_VARS: dict[str, dict[str, object]] = {
     "jkm_bkk": {
         "per_capita": 700.0,
         "threshold_rm": 1000.0,
-        "breakdown": "2 × RM150 (age 7–17)",
+        "breakdown": "2 × RM200 (age 7–17)",
         "cap_note": "",
-        "capped_monthly": 300.0,
-        "annual_rm": 3600.0,
+        "capped_monthly": 400.0,
+        "annual_rm": 4800.0,
         "monthly_income_rm": 2800.0,
         "household_size": 4,
     },
@@ -151,8 +151,8 @@ _QUALIFY_VARS: dict[str, dict[str, object]] = {
     },
     "kwapm": {
         "child_count": 2,
-        "per_child_rm": 200.0,
-        "annual_rm": 400.0,
+        "per_child_rm": 100.0,
+        "annual_rm": 200.0,
         "band": "b40_hardcore",
     },
     "perkeso_sip": {

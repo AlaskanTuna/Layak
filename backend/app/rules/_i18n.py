@@ -616,10 +616,11 @@ def _mykasih_qualify(language: SupportedLanguage, **v: Any) -> SchemeCopy:
             "why_qualify": (
                 f"Anda berumur {age} (≥18) — semua warga Malaysia dewasa "
                 f"menerima RM{amount:.0f} kredit sekali ini secara automatik "
-                f"ke MyKad pada 9 Feb 2026. Boleh dibelanjakan di kedai "
-                f"peserta MyKasih untuk barangan keperluan asas. Tiada "
-                f"permohonan diperlukan. Klik 'Semak Baki' untuk melihat "
-                f"baki tersisa di portal rasmi MyKasih."
+                f"ke MyKad pada 9 Feb 2026. Belanjakan di kedai peserta "
+                f"MyKasih untuk barangan keperluan asas sebelum 31 Disember "
+                f"2026 — baki yang tidak digunakan selepas tarikh tersebut "
+                f"akan luput. Tiada permohonan diperlukan. Klik 'Semak Baki' "
+                f"untuk melihat baki tersisa di portal rasmi MyKasih."
             ),
         }
     if language == "zh":
@@ -631,8 +632,9 @@ def _mykasih_qualify(language: SupportedLanguage, **v: Any) -> SchemeCopy:
             "why_qualify": (
                 f"您的年龄 {age} 岁（≥18）—— 所有成年马来西亚公民均于"
                 f" 2026 年 2 月 9 日自动获得 RM{amount:.0f} 一次性 MyKad 信用。"
-                f"可在 MyKasih 参与的零售店购买基本生活用品。无需申请。"
-                f"请点击「查询余额」前往 MyKasih 官方门户查看剩余余额。"
+                f"请在 2026 年 12 月 31 日前到 MyKasih 参与商店购买基本生活用品 —— "
+                f"逾期未使用的余额将作废。无需申请。请点击「查询余额」前往 "
+                f"MyKasih 官方门户查看剩余余额。"
             ),
         }
     return {
@@ -642,10 +644,11 @@ def _mykasih_qualify(language: SupportedLanguage, **v: Any) -> SchemeCopy:
         ),
         "why_qualify": (
             f"You're {age} (≥18) — every adult Malaysian received an automatic "
-            f"one-off RM{amount:.0f} MyKad credit on 9 Feb 2026. Spend at any "
-            f"MyKasih participating merchant for essential goods. No "
-            f"application required. Click 'Check your balance' to see your "
-            f"remaining balance on the official MyKasih portal."
+            f"one-off RM{amount:.0f} MyKad credit on 9 Feb 2026. Spend it at any "
+            f"MyKasih participating merchant for essential goods before "
+            f"31 December 2026 — any remaining balance is forfeited after that "
+            f"date. No application required. Click 'Check your balance' to "
+            f"see your remaining balance on the official MyKasih portal."
         ),
     }
 

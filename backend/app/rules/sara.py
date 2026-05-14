@@ -27,17 +27,21 @@ from app.schema.locale import DEFAULT_LANGUAGE, SupportedLanguage
 from app.schema.profile import Profile
 from app.schema.scheme import RuleCitation, SchemeMatch
 
-# SARA 2026 tier table (per sara.gov.my, four tiers official):
-# - eKasih Miskin Tegar (proxied by `b40_hardcore`): RM200/month enhanced.
-# - eKasih Miskin (proxied by `b40_household`): RM100/month enhanced-mid.
-# - STR non-eKasih upper-B40 (proxied by `b40_household_with_children`):
-#   RM50/month standard floor.
+# SARA 2026 tier table (per sara.gov.my + Budget 2026 sources):
+# - eKasih-registered miskin / miskin tegar (proxied by `b40_hardcore`):
+#   RM200/month enhanced tier (RM2,400/year).
+# - STR-eligible household / elderly (proxied by `b40_household` and
+#   `b40_household_with_children`): RM100/month standard tier (RM1,200/year).
+# - STR-eligible bujang (single, no dependants): RM50/month (RM600/year).
+#   Reserved for future bujang-detection logic — currently no profile band
+#   maps to this tier because every B40 band in Layak's intake forms is
+#   household-coded. The constant stays defined for documentation symmetry.
 # The official portal re-verifies the exact tier at MyKad scan against eKasih
 # registration; Layak picks the income_band-proxy tier closest to the
 # documented rate.
 ENHANCED_MONTHLY_RM = 200.0
 STANDARD_MONTHLY_RM = 100.0
-FLOOR_MONTHLY_RM = 50.0
+FLOOR_MONTHLY_RM = 50.0  # Bujang (single) tier — see note above.
 _B40_BANDS = ("b40_hardcore", "b40_household", "b40_household_with_children")
 
 _SCHEME_ID = "sara"
@@ -108,10 +112,11 @@ def match(
     enhanced = band == "b40_hardcore"
     if band == "b40_hardcore":
         monthly_rm = ENHANCED_MONTHLY_RM
-    elif band == "b40_household":
+    else:
+        # `b40_household` and `b40_household_with_children` both land on the
+        # standard RM100/month tier. The RM50 bujang tier is not surfaced
+        # through any band today (every Layak intake band is household-coded).
         monthly_rm = STANDARD_MONTHLY_RM
-    else:  # b40_household_with_children → RM50 STR floor tier
-        monthly_rm = FLOOR_MONTHLY_RM
     copy = scheme_copy(
         _SCHEME_ID,
         "qualify",

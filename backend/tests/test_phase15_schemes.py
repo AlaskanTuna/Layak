@@ -106,8 +106,8 @@ def test_kwapm_fires_for_b40_hardcore_with_primary_child() -> None:
         )
     )
     assert result.qualifies is True
-    # RM200/year × 2 primary children = RM400.
-    assert result.annual_rm == 400.0
+    # Budget 2026 BAmP primary rate: RM100/year × 2 primary children = RM200.
+    assert result.annual_rm == 200.0
 
 
 def test_kwapm_skips_secondary_only_children() -> None:

@@ -28,7 +28,13 @@ from app.schema.scheme import RuleCitation, SchemeMatch
 
 PRIMARY_AGE_MIN = 7
 PRIMARY_AGE_MAX = 12
-PER_CHILD_ANNUAL_RM = 200.0
+# Per Ihsan MADANI (KWAPM official page) the Bantuan Am Persekolahan (BAmP)
+# stream pays RM100/year/child for primary-school students (Year 1–6) and
+# RM150/year/child for secondary-school students (Form 1–5). Layak's rule
+# gates on primary age (7–12) only, so the constant captures the primary
+# rate. Prior value RM200 (legacy) refreshed downward per the Q1 2026
+# Ihsan MADANI / Portal Manfaat refresh.
+PER_CHILD_ANNUAL_RM = 100.0
 
 _SCHEME_ID = "kwapm"
 _SCHEME_NAME = "KWAPM — Kumpulan Wang Amanah Pelajar Miskin"
@@ -42,23 +48,25 @@ def _citations() -> list[RuleCitation]:
         RuleCitation(
             rule_id="kwapm.eligibility",
             source_pdf=_SOURCE_PDF,
-            page_ref="MOE KWAPM programme page",
+            page_ref="Ihsan MADANI KWAPM initiative page (Q1 2026 refresh)",
             passage=(
                 "Bantuan Am Persekolahan (BAmP) under KWAPM is paid to "
-                "primary-school students from households below the National "
-                "Poverty Line Income or registered in eKasih, at RM200 per "
-                "child per year."
+                "students from households below the National Poverty Line "
+                "Income or registered in eKasih: RM100 per year for primary "
+                "school (Year 1–6) and RM150 per year for secondary school "
+                "(Form 1–5)."
             ),
-            source_url="https://www.moe.gov.my/bantuan-kumpulan-wang-amanah-pelajar-miskin-kwapm",
+            source_url="https://ihsanmadani.gov.my/inisiatif/pendidikan/kumpulan-wang-amanah-pelajar-miskin-kwapm",
         ),
         RuleCitation(
-            rule_id="kwapm.ihsan_madani",
+            rule_id="kwapm.bk_emergency_track",
             source_pdf=_SOURCE_PDF,
-            page_ref="Ihsan MADANI KWAPM initiative page",
+            page_ref="Ihsan MADANI KWAPM initiative page — Bantuan Khas",
             passage=(
-                "KWAPM also runs an emergency-aid track (BK) of RM300/incident "
-                "for crisis events. Both BAmP and BK are administered by the "
-                "school's KWAPM committee — no central application."
+                "KWAPM also runs a Bantuan Khas (BK) emergency-aid track of "
+                "RM300 per school for crisis events. Both BAmP and BK are "
+                "administered by the school's KWAPM committee — no central "
+                "application."
             ),
             source_url="https://ihsanmadani.gov.my/inisiatif/pendidikan/kumpulan-wang-amanah-pelajar-miskin-kwapm",
         ),

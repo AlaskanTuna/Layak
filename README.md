@@ -53,7 +53,7 @@ _Three uploads. One website. Five autonomous steps. **Zero hallucinated rules.**
 
 <table>
   <tr>
-    <td align="center"><strong>RM 12,308</strong><br/><sub>annual relief surfaced for our reference user, Aisyah</sub></td>
+    <td align="center"><strong>RM 13,808</strong><br/><sub>annual relief surfaced for our reference user, Aisyah</sub></td>
     <td align="center"><strong>~60s</strong><br/><sub>median end-to-end latency, upload → draft packets</sub></td>
     <td align="center"><strong>5&nbsp;+&nbsp;2&nbsp;+&nbsp;1</strong><br/><sub>upside + subsidy-credit info cards + 1 contribution flagged</sub></td>
     <td align="center"><strong>0</strong><br/><sub>hallucinated rules — every number cites a source PDF</sub></td>

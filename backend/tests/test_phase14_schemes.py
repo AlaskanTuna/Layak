@@ -239,12 +239,16 @@ def test_mysalam_age_window_rejects_outside_18_to_65(age: int) -> None:
 
 
 def test_sara_aisyah_baseline_qualifies_standard_tier() -> None:
-    """Aisyah is b40_household_with_children → standard SARA tier RM100/mo."""
+    """Aisyah is b40_household_with_children → standard SARA tier RM100/mo.
+    (Phase 18: both b40_household and b40_household_with_children map to the
+    RM100 standard tier; the RM50 bujang tier is reserved for single STR
+    recipients and isn't surfaced through Layak's intake bands today.)"""
     result = sara.match(_profile())
     assert result.qualifies is True
     assert result.kind == "subsidy_credit"
     assert result.annual_rm == 0.0
-    assert "SARA" in result.scheme_name
+    assert result.scheme_id == "sara"
+    assert "100" in result.why_qualify
 
 
 def test_sara_enhanced_rate_for_b40_hardcore() -> None:

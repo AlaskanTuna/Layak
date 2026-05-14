@@ -14,7 +14,8 @@ Benefits (non-cash; surfaced as info-only `subsidy_credit`):
     - Free annual health screening (clinical exam + lab panel, ~RM500 value)
     - Medical equipment aid up to RM20,000
     - Cancer-treatment incentive: RM300 + RM700 (RM1,000 total)
-    - Transport claim up to RM500/year Peninsular
+    - Transport claim up to RM500/year (Peninsular) or RM1,000/year
+      (Sabah / Sarawak / Labuan)
 
 `annual_rm = 0.0` because Layak cannot confirm whether the user has utilised
 the benefit. Renders as an eligibility card; the user clicks through to
@@ -58,7 +59,9 @@ def _citations() -> list[RuleCitation]:
             passage=(
                 "Free annual health screening, medical equipment aid up to "
                 "RM20,000, cancer-treatment incentives (RM300 on start + "
-                "RM700 on completion), and transport claims up to RM500/year."
+                "RM700 on completion), and transport claims up to RM500/year "
+                "for Peninsular Malaysia or RM1,000/year for Sabah, Sarawak, "
+                "and Labuan."
             ),
             source_url="https://manfaat.mof.gov.my/b2025/individu/peka-b40",
         ),

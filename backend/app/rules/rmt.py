@@ -10,10 +10,11 @@ Eligibility (Layak's proxy):
     `income_band` in any B40 tier AND at least one `dependants[*]` with
     `relationship == "child"` AND `age` in [PRIMARY_AGE_MIN,
     PRIMARY_AGE_MAX]. The official program uses the DOSM National Poverty
-    Line Income (PGK ~RM2,589/month, 2022 DOSM) OR eKasih registration
-    OR Orang Asli / special-needs school enrolment; Layak's B40-band
-    proxy captures the bottom-half of the income distribution and the
-    school re-verifies the exact PGK cutoff at intake.
+    Line Income (PGK ~RM2,705/month per DOSM 2024 Poverty in Malaysia
+    release) OR eKasih registration OR Orang Asli / special-needs school
+    enrolment; Layak's B40-band proxy captures the bottom-half of the
+    income distribution and the school re-verifies the exact PGK cutoff
+    at intake.
 
 Benefits (non-cash, surfaced as `subsidy_credit`):
     Free school breakfast on ~190 school days per year. Layak does not
@@ -46,14 +47,16 @@ def _citations() -> list[RuleCitation]:
         RuleCitation(
             rule_id="rmt.programme_overview",
             source_pdf=_SOURCE_PDF,
-            page_ref="MOE RMT circular (external reference)",
+            page_ref="Portal Manfaat MOF (Budget 2026) — RMT",
             passage=(
                 "Rancangan Makanan Tambahan (RMT) provides a daily free school "
                 "meal to primary-school pupils (Year 1–6) from households "
-                "earning ≤RM2,000/month or registered under eKasih, identified "
-                "by the school's RMT committee."
+                "below the current National Poverty Line Income (~RM2,705/month "
+                "per DOSM 2024) or registered under eKasih, identified by the "
+                "school's RMT committee. Menu expanded from 20 to 33 options "
+                "for the 2026 academic year."
             ),
-            source_url="https://www.moe.gov.my/rancangan-makanan-tambahan",
+            source_url="https://manfaat.mof.gov.my/b2026/individu/rmt",
         ),
         RuleCitation(
             rule_id="rmt.target_cohort",
@@ -61,11 +64,13 @@ def _citations() -> list[RuleCitation]:
             page_ref="MOE Bahagian Pengurusan Sekolah Harian (external reference)",
             passage=(
                 "Eligibility is needs-based: pupils from low-income households "
-                "(≤RM2,000/month gross), eKasih-registered families, "
-                "single-parent families, or families facing temporary "
-                "financial hardship are prioritised."
+                "(below the National PGK), eKasih-registered families, single-"
+                "parent families, Orang Asli / Penan school enrolment, or "
+                "families facing temporary financial hardship are prioritised. "
+                "Per-meal funding RM3.50/student (Peninsular) or RM4.00 "
+                "(Sabah / Sarawak / Labuan), up to 190 school days/year."
             ),
-            source_url="https://manfaat.mof.gov.my/b2026/individu/rmt",
+            source_url="https://www.moe.gov.my/rancangan-makanan-tambahan",
         ),
     ]
 

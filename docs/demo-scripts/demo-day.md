@@ -69,7 +69,7 @@ We can select the sample documents for Aisyah using this dropdown. Next, please 
 
 **[ACTION — Headline number lands. Pause.]**
 
-> "RM 12,308 a year. Five upside schemes, two subsidy-credit cards, one mandatory PERKESO contribution flagged separately so the headline stays honest."
+> "RM 13,808 a year. Six upside schemes, five subsidy-credit cards, one mandatory PERKESO contribution flagged separately so the headline stays honest."
 
 **[ACTION — Scroll to the MyKasih card. Point to the bold red expiry line.]**
 

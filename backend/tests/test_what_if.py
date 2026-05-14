@@ -16,6 +16,7 @@ from __future__ import annotations
 
 import pytest
 
+from app.agents.tools.match import match_schemes
 from app.schema.profile import Dependant, HouseholdFlags, Profile
 from app.schema.scheme import RuleCitation, SchemeMatch
 from app.services.what_if import (
@@ -25,6 +26,7 @@ from app.services.what_if import (
     check_rate_limit,
     classify_household_deterministic,
     compute_deltas,
+    run_what_if_deterministic,
 )
 
 
@@ -192,6 +194,34 @@ def test_delta_amount_changed_with_same_summary():
     deltas = compute_deltas(base, rerun)
     assert deltas[0].status == "amount_changed"
     assert deltas[0].delta_rm == 700.0
+
+
+# ---------------------------------------------------------------------------
+# deterministic service path
+# ---------------------------------------------------------------------------
+
+
+@pytest.mark.asyncio
+async def test_deterministic_what_if_uses_current_rule_corpus_without_suggestions(aisyah: Profile):
+    baseline_matches = await match_schemes(aisyah)
+
+    result = await run_what_if_deterministic(
+        baseline_profile=aisyah,
+        baseline_matches=baseline_matches,
+        overrides={"monthly_income_rm": 600.0, "dependants_count": 3, "elderly_dependants_count": 1},
+    )
+
+    assert result.suggestions == []
+    assert result.strategy == []
+    assert result.matches
+    assert all(match.qualifies for match in result.matches)
+    assert {delta.scheme_id for delta in result.deltas} == {
+        match.scheme_id for match in baseline_matches
+    } | {match.scheme_id for match in result.matches}
+    assert result.total_annual_rm == round(
+        sum(match.annual_rm for match in result.matches if match.kind == "upside"),
+        2,
+    )
 
 
 # ---------------------------------------------------------------------------

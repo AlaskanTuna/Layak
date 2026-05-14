@@ -19,7 +19,6 @@ from app.schema.what_if import (
     SchemeDelta,
     WhatIfResponse,
     WhatIfStrategyResponse,
-    WhatIfSuggestion,
 )
 from app.services.vertex_ai_search import disable_vertex_ai_search
 
@@ -180,85 +179,6 @@ def compute_deltas(baseline: list[SchemeMatch], rerun: list[SchemeMatch]) -> lis
     return deltas
 
 
-def _material_deltas(deltas: list[SchemeDelta]) -> list[SchemeDelta]:
-    return [delta for delta in deltas if delta.status != "unchanged"]
-
-
-async def _probe_suggestions(
-    *,
-    baseline_profile: Profile,
-    scenario_profile: Profile,
-    scenario_matches: list[SchemeMatch],
-    language: SupportedLanguage,
-) -> list[WhatIfSuggestion]:
-    suggestions: list[WhatIfSuggestion] = []
-    current_income = scenario_profile.monthly_income_rm
-    income_candidates = [
-        value
-        for value in (current_income - 100, current_income - 300, current_income - 500, current_income - 1000)
-        if _INCOME_MIN <= value <= _INCOME_MAX
-    ]
-    for candidate in income_candidates:
-        probe_profile = apply_overrides(scenario_profile, {"monthly_income_rm": candidate})
-        with disable_vertex_ai_search():
-            probe_matches = await match_schemes(probe_profile, language=language)
-        deltas = _material_deltas(compute_deltas(scenario_matches, probe_matches))
-        if deltas:
-            delta = deltas[0]
-            suggestions.append(
-                WhatIfSuggestion(
-                    field="monthly_income_rm",
-                    suggested_value=candidate,
-                    label=f"Try RM {int(candidate):,}; it may change {delta.scheme_id}.",
-                    scheme_id=delta.scheme_id,
-                )
-            )
-            break
-
-    child_now = sum(
-        1
-        for dependant in scenario_profile.dependants
-        if dependant.relationship in ("child", "sibling") and dependant.age < 18
-    )
-    if child_now < _DEPENDANTS_MAX:
-        probe_profile = apply_overrides(scenario_profile, {"dependants_count": child_now + 1})
-        with disable_vertex_ai_search():
-            probe_matches = await match_schemes(probe_profile, language=language)
-        deltas = _material_deltas(compute_deltas(scenario_matches, probe_matches))
-        if deltas:
-            delta = deltas[0]
-            suggestions.append(
-                WhatIfSuggestion(
-                    field="dependants_count",
-                    suggested_value=float(child_now + 1),
-                    label=f"Try {child_now + 1} child dependants; it may change {delta.scheme_id}.",
-                    scheme_id=delta.scheme_id,
-                )
-            )
-
-    elderly_now = sum(
-        1
-        for dependant in scenario_profile.dependants
-        if dependant.relationship in ("parent", "grandparent") and dependant.age >= 60
-    )
-    if elderly_now < _ELDERLY_MAX:
-        probe_profile = apply_overrides(scenario_profile, {"elderly_dependants_count": elderly_now + 1})
-        with disable_vertex_ai_search():
-            probe_matches = await match_schemes(probe_profile, language=language)
-        deltas = _material_deltas(compute_deltas(scenario_matches, probe_matches))
-        if deltas:
-            delta = deltas[0]
-            suggestions.append(
-                WhatIfSuggestion(
-                    field="elderly_dependants_count",
-                    suggested_value=float(elderly_now + 1),
-                    label=f"Try {elderly_now + 1} elderly dependants; it may change {delta.scheme_id}.",
-                    scheme_id=delta.scheme_id,
-                )
-            )
-    return suggestions[:3]
-
-
 async def run_what_if_deterministic(
     *,
     baseline_profile: Profile,
@@ -271,12 +191,6 @@ async def run_what_if_deterministic(
     with disable_vertex_ai_search():
         matches = await match_schemes(scenario_profile, language=language)
     deltas = compute_deltas(baseline_matches, matches)
-    suggestions = await _probe_suggestions(
-        baseline_profile=baseline_profile,
-        scenario_profile=scenario_profile,
-        scenario_matches=matches,
-        language=language,
-    )
     total = _round2(sum(match.annual_rm for match in matches if match.qualifies and match.kind == "upside"))
     return WhatIfResponse(
         total_annual_rm=total,
@@ -284,7 +198,7 @@ async def run_what_if_deterministic(
         strategy=[],
         deltas=deltas,
         classification=classification,
-        suggestions=suggestions,
+        suggestions=[],
     )
 
 

@@ -730,7 +730,13 @@
         "warn": "Perhatian",
         "act": "Tindakan"
       },
-      "softSuggestion": "Layak tidak sepenuhnya pasti — eloklah tanya Cik Lay."
+      "softSuggestion": "Layak tidak sepenuhnya pasti — eloklah tanya Cik Lay.",
+      "scenario": {
+        "refreshing": "Sedang menyemak sama ada senario ini mengubah nota strategi.",
+        "ready": "Memaparkan nota strategi untuk pratonton senario aktif.",
+        "empty": "Tiada perubahan strategi khusus senario; memaparkan strategi penilaian tersimpan.",
+        "error": "Strategi senario tidak dapat dimuat semula; memaparkan strategi penilaian tersimpan."
+      }
     },
     "narrative": {
       "showTechnical": "Lihat butiran teknikal",

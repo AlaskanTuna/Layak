@@ -5,7 +5,7 @@ import { Loader2, MessageCircle, RotateCcw } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 
 import { Button } from '@/components/ui/button'
-import { useWhatIf } from '@/hooks/use-what-if'
+import { type WhatIfStrategyPhase, useWhatIf } from '@/hooks/use-what-if'
 import type { Profile, WhatIfRequest, WhatIfResponse } from '@/lib/agent-types'
 import type { ChatScenarioContext } from '@/lib/chat-types'
 
@@ -14,7 +14,11 @@ type Props = {
   baselineProfile: Profile
   /** Lift state to the parent so scheme cards can read deltas + the rerun
    *  total animates on the upside hero (Phase 11 Feature 3 spec §4.4). */
-  onResult: (result: WhatIfResponse | null, context: ChatScenarioContext | null) => void
+  onResult: (
+    result: WhatIfResponse | null,
+    context: ChatScenarioContext | null,
+    strategyPhase: WhatIfStrategyPhase
+  ) => void
   onAskCikLay?: (context: ChatScenarioContext, draft: string) => void
 }
 
@@ -90,9 +94,9 @@ export function WhatIfPanel({ evalId, baselineProfile, onResult, onAskCikLay }: 
       total_annual_rm: whatIf.data.total_annual_rm,
       matches: whatIf.data.matches,
       deltas: whatIf.data.deltas,
-      strategy: whatIf.data.strategy
+      strategy: whatIf.strategyPhase === 'ready' ? whatIf.data.strategy : []
     }
-  }, [diffsFromBaseline, whatIf.data, whatIf.phase])
+  }, [diffsFromBaseline, whatIf.data, whatIf.phase, whatIf.strategyPhase])
 
   // Effect drives the debounced rerun. `runWhatIf` itself debounces 500ms.
   useEffect(() => {
@@ -109,11 +113,11 @@ export function WhatIfPanel({ evalId, baselineProfile, onResult, onAskCikLay }: 
   // page doesn't strand stale data.
   useEffect(() => {
     if (whatIf.phase === 'ready' && whatIf.data && scenarioContext) {
-      onResult(whatIf.data, scenarioContext)
+      onResult(whatIf.data, scenarioContext, whatIf.strategyPhase)
     } else if (whatIf.phase === 'idle' || whatIf.phase === 'rate-limited' || whatIf.phase === 'error') {
-      onResult(null, null)
+      onResult(null, null, 'idle')
     }
-  }, [whatIf.phase, whatIf.data, onResult, scenarioContext])
+  }, [whatIf.phase, whatIf.data, whatIf.strategyPhase, onResult, scenarioContext])
 
   const resetAll = useCallback(() => {
     setValues(baseline)
@@ -128,22 +132,24 @@ export function WhatIfPanel({ evalId, baselineProfile, onResult, onAskCikLay }: 
   )
 
   const isDirty = Object.keys(diffsFromBaseline).length > 0
-  const suggestions = whatIf.data?.suggestions ?? []
-
-  const applySuggestion = useCallback((field: keyof SliderInputs, value: number) => {
-    setValues((prev) => ({ ...prev, [field]: value }))
-  }, [])
 
   return (
     <section className="paper-card flex flex-col gap-4 rounded-[16px] p-5">
-      {isDirty && (
-        <div className="flex justify-end">
-          <Button type="button" variant="ghost" size="sm" onClick={resetAll} className="gap-1.5">
-            <RotateCcw className="size-3.5" aria-hidden />
-            {t('evaluation.whatIf.resetAll')}
-          </Button>
-        </div>
-      )}
+      <div className="flex min-h-8 justify-end">
+        <Button
+          type="button"
+          variant="ghost"
+          size="sm"
+          onClick={resetAll}
+          disabled={!isDirty}
+          className="gap-1.5 disabled:pointer-events-none disabled:opacity-0"
+          aria-hidden={!isDirty}
+          tabIndex={isDirty ? 0 : -1}
+        >
+          <RotateCcw className="size-3.5" aria-hidden />
+          {t('evaluation.whatIf.resetAll')}
+        </Button>
+      </div>
 
       <div className="grid grid-cols-1 gap-5 sm:grid-cols-3">
         <SliderField
@@ -177,26 +183,6 @@ export function WhatIfPanel({ evalId, baselineProfile, onResult, onAskCikLay }: 
           resetLabel={t('evaluation.whatIf.resetSlider')}
         />
       </div>
-
-      {suggestions.length > 0 && (
-        <div className="flex flex-col gap-2 border-t border-foreground/10 pt-3">
-          <span className="mono-caption text-foreground/55">{t('evaluation.chat.suggestionsLabel')}</span>
-          <div className="flex flex-wrap gap-2">
-            {suggestions.slice(0, 3).map((suggestion) => (
-              <Button
-                key={`${suggestion.field}-${suggestion.suggested_value}-${suggestion.scheme_id ?? 'none'}`}
-                type="button"
-                variant="outline"
-                size="sm"
-                onClick={() => applySuggestion(suggestion.field, suggestion.suggested_value)}
-                className="h-auto rounded-full px-3 py-1.5 text-left text-xs"
-              >
-                {suggestion.label}
-              </Button>
-            ))}
-          </div>
-        </div>
-      )}
 
       <footer className="flex flex-col gap-2 border-t border-foreground/10 pt-3 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex items-center gap-3 text-sm">
@@ -256,22 +242,25 @@ function SliderField({
 }) {
   const isDirty = value !== baseline
   return (
-    <div className="flex flex-col gap-1.5">
-      <div className="flex items-center justify-between gap-2">
+    <div className="flex min-h-[88px] flex-col gap-1.5">
+      <div className="flex min-h-5 items-center justify-between gap-2">
         <span className="mono-caption text-foreground/55">{label}</span>
-        {isDirty && (
-          <button
-            type="button"
-            onClick={onReset}
-            className="text-[10.5px] uppercase tracking-[0.12em] text-[color:var(--primary)] hover:underline"
-          >
-            {resetLabel}
-          </button>
-        )}
+        <button
+          type="button"
+          onClick={onReset}
+          disabled={!isDirty}
+          className="text-[10.5px] uppercase tracking-[0.12em] text-[color:var(--primary)] hover:underline disabled:pointer-events-none disabled:opacity-0"
+          aria-hidden={!isDirty}
+          tabIndex={isDirty ? 0 : -1}
+        >
+          {resetLabel}
+        </button>
       </div>
-      <div className="flex items-baseline gap-2">
+      <div className="flex min-h-6 items-baseline gap-2">
         <span className="font-mono text-[15px] tabular-nums text-foreground">{format(value)}</span>
-        {isDirty && <span className="mono-caption text-foreground/40">{format(baseline)} ↓</span>}
+        <span className={`mono-caption text-foreground/40 ${isDirty ? '' : 'invisible'}`}>
+          {format(baseline)} baseline
+        </span>
       </div>
       <input
         type="range"

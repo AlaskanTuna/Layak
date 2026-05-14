@@ -129,13 +129,11 @@ type Props = {
   ref?: React.Ref<UploadWidgetHandle>
 }
 
-function hasValidDependants(rows: DependantInputRow[]): boolean {
-  return rows.every((row) => {
-    if (!Number.isInteger(row.age) || row.age < 0 || row.age > 120) return false
-    if (row.monthly_income_rm === '') return true
-    if (row.age < 18) return false
-    return /^\d+(\.\d{1,2})?$/.test(row.monthly_income_rm) && Number(row.monthly_income_rm) <= 1_000_000
-  })
+function isSubmittableDependant(row: DependantInputRow): boolean {
+  if (!Number.isInteger(row.age) || row.age < 0 || row.age > 120) return false
+  if (row.monthly_income_rm === '') return true
+  if (row.age < 18) return false
+  return /^\d+(\.\d{1,2})?$/.test(row.monthly_income_rm) && Number(row.monthly_income_rm) <= 1_000_000
 }
 
 export type UploadWidgetHandle = {
@@ -292,7 +290,7 @@ export function UploadWidget({ onSubmit, disabled = false, submitId, ref }: Prop
 
   const filesReady = UPLOAD_SLOTS.every((s) => state[s].file !== null && state[s].error === null)
   const spouseCount = dependants.filter((row) => row.relationship === 'spouse').length
-  const canSubmit = filesReady && spouseCount <= MAX_SPOUSE_ROWS && hasValidDependants(dependants)
+  const canSubmit = filesReady && spouseCount <= MAX_SPOUSE_ROWS
 
   function commitFile(slot: UploadSlot, file: File) {
     setState((prev) => ({ ...prev, [slot]: { file, error: null } }))
@@ -358,13 +356,14 @@ export function UploadWidget({ onSubmit, disabled = false, submitId, ref }: Prop
 
   function handleSubmit() {
     if (!canSubmit) return
+    const submittableDependants = dependants.filter(isSubmittableDependant)
     onSubmit({
       files: {
         ic: state.ic.file!,
         payslip: state.payslip.file!,
         utility: state.utility.file!
       },
-      dependants: dependants.map((d) => ({
+      dependants: submittableDependants.map((d) => ({
         relationship: d.relationship,
         age: d.age,
         monthly_income_rm: d.monthly_income_rm === '' ? null : Number(d.monthly_income_rm)
@@ -448,14 +447,8 @@ export function UploadWidget({ onSubmit, disabled = false, submitId, ref }: Prop
         </div>
       </div>
 
-      <div className="flex flex-col gap-3 border-t border-foreground/10 pt-5 sm:flex-row sm:items-center sm:justify-between">
-        <span className="mono-caption text-foreground/55">
-          {t('evaluation.upload.readyCount', {
-            ready: UPLOAD_SLOTS.filter((s) => state[s].file !== null).length,
-            total: 3
-          })}
-        </span>
-        <div className="flex flex-col items-start gap-3 sm:flex-row sm:items-center">
+      <div className="flex flex-col items-start gap-4 border-t border-foreground/10 pt-5 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex flex-col items-start gap-1.5">
           <Button
             type="button"
             variant="ghost"
@@ -467,18 +460,24 @@ export function UploadWidget({ onSubmit, disabled = false, submitId, ref }: Prop
             <Eraser className="size-4" aria-hidden />
             {t('evaluation.manual.clear')}
           </Button>
-          <Button
-            id={submitId}
-            type="button"
-            onClick={handleSubmit}
-            disabled={disabled || !canSubmit}
-            size="lg"
-            className="rounded-full bg-[color:var(--hibiscus)] px-6 text-[color:var(--hibiscus-foreground)] hover:bg-[color:var(--hibiscus)]/92"
-          >
-            {t('evaluation.upload.continue')}
-            <ArrowRight className="ml-1.5 size-4" aria-hidden />
-          </Button>
+          <span className="mono-caption pl-3 text-foreground/55">
+            {t('evaluation.upload.readyCount', {
+              ready: UPLOAD_SLOTS.filter((s) => state[s].file !== null).length,
+              total: 3
+            })}
+          </span>
         </div>
+        <Button
+          id={submitId}
+          type="button"
+          onClick={handleSubmit}
+          disabled={disabled || !canSubmit}
+          size="lg"
+          className="rounded-full bg-[color:var(--hibiscus)] px-6 text-[color:var(--hibiscus-foreground)] hover:bg-[color:var(--hibiscus)]/92"
+        >
+          {t('evaluation.upload.continue')}
+          <ArrowRight className="ml-1.5 size-4" aria-hidden />
+        </Button>
       </div>
 
       <CropPreviewModal

@@ -10,9 +10,11 @@ const BACKEND = (): string => process.env.NEXT_PUBLIC_BACKEND_URL ?? 'http://loc
 const DEBOUNCE_MS = 500
 
 export type WhatIfPhase = 'idle' | 'debouncing' | 'in-flight' | 'ready' | 'rate-limited' | 'error'
+export type WhatIfStrategyPhase = 'idle' | 'refreshing' | 'ready' | 'error'
 
 export type UseWhatIfResult = {
   phase: WhatIfPhase
+  strategyPhase: WhatIfStrategyPhase
   /** Latest response from the backend, or null when no rerun has landed. */
   data: WhatIfResponse | null
   errorMessage: string | null
@@ -35,6 +37,7 @@ export type UseWhatIfResult = {
  * stale response behind. */
 export function useWhatIf(evalId: string): UseWhatIfResult {
   const [phase, setPhase] = useState<WhatIfPhase>('idle')
+  const [strategyPhase, setStrategyPhase] = useState<WhatIfStrategyPhase>('idle')
   const [data, setData] = useState<WhatIfResponse | null>(null)
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
   const [retryAfterSeconds, setRetryAfterSeconds] = useState<number | null>(null)
@@ -45,6 +48,7 @@ export function useWhatIf(evalId: string): UseWhatIfResult {
   const performRequest = useCallback(
     async (overrides: WhatIfRequest['overrides'], generation: number) => {
       const controller = new AbortController()
+      let strategyRefreshStarted = false
       abortRef.current = controller
       setPhase('in-flight')
       setErrorMessage(null)
@@ -74,6 +78,8 @@ export function useWhatIf(evalId: string): UseWhatIfResult {
         if (generation !== requestGenerationRef.current || controller.signal.aborted) return
         setData(body)
         setPhase('ready')
+        setStrategyPhase('refreshing')
+        strategyRefreshStarted = true
         void authedFetch(`${BACKEND()}/api/evaluations/${evalId}/what-if/strategy`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -81,15 +87,25 @@ export function useWhatIf(evalId: string): UseWhatIfResult {
           signal: controller.signal
         })
           .then(async (strategyRes) => {
-            if (generation !== requestGenerationRef.current || controller.signal.aborted || !strategyRes.ok) {
+            if (generation !== requestGenerationRef.current || controller.signal.aborted) return
+            if (!strategyRes.ok) {
+              setStrategyPhase('error')
               return
             }
             const strategyBody = (await strategyRes.json()) as { strategy?: WhatIfResponse['strategy'] }
             if (generation !== requestGenerationRef.current || controller.signal.aborted) return
             setData((current) => (current === null ? current : { ...current, strategy: strategyBody.strategy ?? [] }))
+            setStrategyPhase('ready')
           })
-          .catch(() => {
+          .catch((err) => {
+            if ((err as Error).name === 'AbortError' || generation !== requestGenerationRef.current) return
             // Strategy enrichment is optional; the deterministic preview remains valid.
+            setStrategyPhase('error')
+          })
+          .finally(() => {
+            if (abortRef.current === controller) {
+              abortRef.current = null
+            }
           })
       } catch (err) {
         if ((err as Error).name === 'AbortError') return
@@ -98,7 +114,7 @@ export function useWhatIf(evalId: string): UseWhatIfResult {
         setErrorMessage(err instanceof Error ? err.message : String(err))
         setPhase('error')
       } finally {
-        if (abortRef.current === controller) {
+        if (!strategyRefreshStarted && abortRef.current === controller) {
           abortRef.current = null
         }
       }
@@ -115,6 +131,7 @@ export function useWhatIf(evalId: string): UseWhatIfResult {
       setPhase('debouncing')
       setErrorMessage(null)
       setRetryAfterSeconds(null)
+      setStrategyPhase('idle')
       debounceRef.current = setTimeout(() => {
         debounceRef.current = null
         void performRequest(overrides, generation)
@@ -133,6 +150,7 @@ export function useWhatIf(evalId: string): UseWhatIfResult {
     abortRef.current = null
     setData(null)
     setPhase('idle')
+    setStrategyPhase('idle')
     setErrorMessage(null)
     setRetryAfterSeconds(null)
   }, [])
@@ -146,5 +164,5 @@ export function useWhatIf(evalId: string): UseWhatIfResult {
     []
   )
 
-  return { phase, data, errorMessage, retryAfterSeconds, runWhatIf, clear }
+  return { phase, strategyPhase, data, errorMessage, retryAfterSeconds, runWhatIf, clear }
 }

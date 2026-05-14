@@ -719,7 +719,13 @@
         "warn": "注意",
         "act": "行动"
       },
-      "softSuggestion": "Layak 尚未完全确定 —— 值得问问 Cik Lay。"
+      "softSuggestion": "Layak 尚未完全确定 —— 值得问问 Cik Lay。",
+      "scenario": {
+        "refreshing": "正在检查此情境是否会改变策略备注。",
+        "ready": "正在显示当前情境预览的策略备注。",
+        "empty": "未发现此情境专属的策略变化；显示已保存评估的策略。",
+        "error": "无法刷新情境策略；显示已保存评估的策略。"
+      }
     },
     "narrative": {
       "showTechnical": "显示技术细节",

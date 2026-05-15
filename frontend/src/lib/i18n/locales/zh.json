@@ -1166,6 +1166,12 @@
         "deleteAction": "删除 {{count}} 项",
         "deleteConfirm": "确定从队列删除 {{count}} 个候选项？此操作无法撤销。",
         "deletePartialFailure": "已删除 {{total}} 项中的 {{deleted}} 项；{{failed}} 项失败。",
+        "approveAction": "批准 {{count}} 项",
+        "approveConfirm": "批准 {{count}} 个候选项？已匹配的方案将被标记为已验证。",
+        "approvePartialFailure": "已批准 {{total}} 项中的 {{succeeded}} 项；{{failed}} 项失败。",
+        "rejectAction": "拒绝 {{count}} 项",
+        "rejectConfirm": "拒绝 {{count}} 个候选项？它们将留在队列中并标记为已拒绝。",
+        "rejectPartialFailure": "已拒绝 {{total}} 项中的 {{succeeded}} 项；{{failed}} 项失败。",
         "selectRowAria": "选择候选项 {{name}}",
         "selectPageAria": "选择全部候选项",
         "deselectPageAria": "取消选择全部候选项",
@@ -1248,6 +1254,20 @@
         },
         "deleteFailure": {
           "title": "删除失败"
+        },
+        "bulkApproveSuccess": {
+          "title": "候选项已批准",
+          "body": "已批准 {{count}} 个候选项并完成验证标记。"
+        },
+        "bulkApproveFailure": {
+          "title": "批量批准失败"
+        },
+        "bulkRejectSuccess": {
+          "title": "候选项已拒绝",
+          "body": "已将 {{count}} 个候选项移入已拒绝。"
+        },
+        "bulkRejectFailure": {
+          "title": "批量拒绝失败"
         }
       }
     }

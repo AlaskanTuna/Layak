@@ -1177,6 +1177,12 @@
         "deleteAction": "Delete {{count}}",
         "deleteConfirm": "Delete {{count}} candidate(s) from the queue? This cannot be undone.",
         "deletePartialFailure": "Deleted {{deleted}} of {{total}}; {{failed}} failed.",
+        "approveAction": "Approve {{count}}",
+        "approveConfirm": "Approve {{count}} candidate(s)? Matched schemes will be stamped as verified.",
+        "approvePartialFailure": "Approved {{succeeded}} of {{total}}; {{failed}} failed.",
+        "rejectAction": "Reject {{count}}",
+        "rejectConfirm": "Reject {{count}} candidate(s)? They stay in the queue under Rejected.",
+        "rejectPartialFailure": "Rejected {{succeeded}} of {{total}}; {{failed}} failed.",
         "selectRowAria": "Select candidate {{name}}",
         "selectPageAria": "Select all candidates",
         "deselectPageAria": "Deselect all candidates",
@@ -1259,6 +1265,20 @@
         },
         "deleteFailure": {
           "title": "Delete Failed"
+        },
+        "bulkApproveSuccess": {
+          "title": "Candidates Approved",
+          "body": "{{count}} candidate(s) approved and verifications stamped."
+        },
+        "bulkApproveFailure": {
+          "title": "Bulk Approve Failed"
+        },
+        "bulkRejectSuccess": {
+          "title": "Candidates Rejected",
+          "body": "{{count}} candidate(s) moved to Rejected."
+        },
+        "bulkRejectFailure": {
+          "title": "Bulk Reject Failed"
         }
       }
     }

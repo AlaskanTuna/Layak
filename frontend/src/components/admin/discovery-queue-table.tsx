@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { useMemo, useState } from 'react'
-import { ArrowUpDown, ChevronRight, Loader2, Trash2 } from 'lucide-react'
+import { ArrowUpDown, Check, ChevronRight, Loader2, Trash2, X } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 
 import { CandidateStatusPill } from '@/components/admin/status-pill-status'
@@ -10,7 +10,12 @@ import { ConfidenceMeter } from '@/components/admin/confidence-meter'
 import { Button } from '@/components/ui/button'
 import { Checkbox } from '@/components/ui/checkbox'
 import { cn } from '@/lib/utils'
-import { deleteCandidate, type CandidateRow } from '@/lib/admin-discovery'
+import {
+  approveCandidate,
+  deleteCandidate,
+  rejectCandidate,
+  type CandidateRow
+} from '@/lib/admin-discovery'
 import { notificationStore } from '@/lib/notification-store'
 
 type SortKey = 'name' | 'confidence' | 'agency'
@@ -25,12 +30,15 @@ type Props = {
   totalCount?: number
 }
 
+type BulkAction = 'delete' | 'approve' | 'reject'
+
 export function DiscoveryQueueTable({ rows, onRefresh, totalCount }: Props) {
   const { t } = useTranslation()
   const [selected, setSelected] = useState<Set<string>>(() => new Set())
-  const [deleting, setDeleting] = useState(false)
-  const [deleteError, setDeleteError] = useState<string | null>(null)
+  const [busyAction, setBusyAction] = useState<BulkAction | null>(null)
+  const [actionError, setActionError] = useState<string | null>(null)
   const [sort, setSort] = useState<{ key: SortKey; dir: SortDir }>({ key: 'name', dir: 'asc' })
+  const busy = busyAction !== null
 
   const sortedRows = useMemo(() => {
     const copy = [...rows]
@@ -73,40 +81,70 @@ export function DiscoveryQueueTable({ rows, onRefresh, totalCount }: Props) {
     setSort((prev) => (prev.key === key ? { key, dir: prev.dir === 'asc' ? 'desc' : 'asc' } : { key, dir: 'asc' }))
   }
 
-  async function handleDelete() {
-    if (selected.size === 0 || deleting) return
+  async function runBulk(action: BulkAction) {
+    if (selected.size === 0 || busy) return
     const ids = Array.from(selected)
-    if (!window.confirm(t('admin.discovery.queue.deleteConfirm', { count: ids.length }))) return
+    const confirmKey =
+      action === 'delete'
+        ? 'admin.discovery.queue.deleteConfirm'
+        : action === 'approve'
+          ? 'admin.discovery.queue.approveConfirm'
+          : 'admin.discovery.queue.rejectConfirm'
+    if (!window.confirm(t(confirmKey, { count: ids.length }))) return
 
-    setDeleting(true)
-    setDeleteError(null)
-    const results = await Promise.allSettled(ids.map((id) => deleteCandidate(id)))
+    setBusyAction(action)
+    setActionError(null)
+    const op =
+      action === 'delete' ? deleteCandidate : action === 'approve' ? approveCandidate : rejectCandidate
+    const results = await Promise.allSettled(ids.map((id) => op(id)))
     const failed = results.filter((r) => r.status === 'rejected')
-    const deletedCount = ids.length - failed.length
-    setDeleting(false)
+    const succeeded = ids.length - failed.length
+    setBusyAction(null)
     setSelected(new Set())
     onRefresh()
+
     if (failed.length > 0) {
-      const message = t('admin.discovery.queue.deletePartialFailure', {
-        deleted: deletedCount,
-        total: ids.length,
-        failed: failed.length
-      })
-      setDeleteError(message)
+      const partialKey =
+        action === 'delete'
+          ? 'admin.discovery.queue.deletePartialFailure'
+          : action === 'approve'
+            ? 'admin.discovery.queue.approvePartialFailure'
+            : 'admin.discovery.queue.rejectPartialFailure'
+      const failureTitleKey =
+        action === 'delete'
+          ? 'admin.discovery.notify.deleteFailure.title'
+          : action === 'approve'
+            ? 'admin.discovery.notify.bulkApproveFailure.title'
+            : 'admin.discovery.notify.bulkRejectFailure.title'
+      const message = t(partialKey, { succeeded, total: ids.length, failed: failed.length })
+      setActionError(message)
       notificationStore.notify({
-        title: t('admin.discovery.notify.deleteFailure.title'),
+        title: t(failureTitleKey),
         description: message,
         severity: 'error',
         toast: true
       })
-    } else {
-      notificationStore.notify({
-        title: t('admin.discovery.notify.deleteSuccess.title'),
-        description: t('admin.discovery.notify.deleteSuccess.body', { count: deletedCount }),
-        severity: 'success',
-        toast: true
-      })
+      return
     }
+
+    const successTitleKey =
+      action === 'delete'
+        ? 'admin.discovery.notify.deleteSuccess.title'
+        : action === 'approve'
+          ? 'admin.discovery.notify.bulkApproveSuccess.title'
+          : 'admin.discovery.notify.bulkRejectSuccess.title'
+    const successBodyKey =
+      action === 'delete'
+        ? 'admin.discovery.notify.deleteSuccess.body'
+        : action === 'approve'
+          ? 'admin.discovery.notify.bulkApproveSuccess.body'
+          : 'admin.discovery.notify.bulkRejectSuccess.body'
+    notificationStore.notify({
+      title: t(successTitleKey),
+      description: t(successBodyKey, { count: succeeded }),
+      severity: action === 'reject' ? 'info' : 'success',
+      toast: true
+    })
   }
 
   if (sortedRows.length === 0) {
@@ -120,22 +158,51 @@ export function DiscoveryQueueTable({ rows, onRefresh, totalCount }: Props) {
   return (
     <section className="flex flex-col gap-3">
       {selected.size > 0 && (
-        <div className="flex items-center justify-end gap-2">
+        <div className="flex flex-wrap items-center justify-end gap-2">
           <span className="text-xs text-muted-foreground">
             {t('admin.discovery.queue.selected', { count: selected.size })}
           </span>
-          <Button type="button" size="sm" variant="outline" onClick={() => setSelected(new Set())} disabled={deleting}>
+          <Button type="button" size="sm" variant="outline" onClick={() => setSelected(new Set())} disabled={busy}>
             {t('common.button.cancel')}
           </Button>
           <Button
             type="button"
             size="sm"
-            variant="destructive"
-            onClick={handleDelete}
-            disabled={deleting}
+            onClick={() => runBulk('approve')}
+            disabled={busy}
             className="gap-1.5"
           >
-            {deleting ? (
+            {busyAction === 'approve' ? (
+              <Loader2 className="size-3.5 animate-spin" aria-hidden />
+            ) : (
+              <Check className="size-3.5" aria-hidden />
+            )}
+            {t('admin.discovery.queue.approveAction', { count: selected.size })}
+          </Button>
+          <Button
+            type="button"
+            size="sm"
+            variant="outline"
+            onClick={() => runBulk('reject')}
+            disabled={busy}
+            className="gap-1.5"
+          >
+            {busyAction === 'reject' ? (
+              <Loader2 className="size-3.5 animate-spin" aria-hidden />
+            ) : (
+              <X className="size-3.5" aria-hidden />
+            )}
+            {t('admin.discovery.queue.rejectAction', { count: selected.size })}
+          </Button>
+          <Button
+            type="button"
+            size="sm"
+            variant="destructive"
+            onClick={() => runBulk('delete')}
+            disabled={busy}
+            className="gap-1.5"
+          >
+            {busyAction === 'delete' ? (
               <Loader2 className="size-3.5 animate-spin" aria-hidden />
             ) : (
               <Trash2 className="size-3.5" aria-hidden />
@@ -145,9 +212,9 @@ export function DiscoveryQueueTable({ rows, onRefresh, totalCount }: Props) {
         </div>
       )}
 
-      {deleteError && (
+      {actionError && (
         <p role="alert" className="text-xs text-destructive">
-          {deleteError}
+          {actionError}
         </p>
       )}
 

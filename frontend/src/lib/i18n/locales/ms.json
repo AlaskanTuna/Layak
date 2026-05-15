@@ -1177,6 +1177,12 @@
         "deleteAction": "Padam {{count}}",
         "deleteConfirm": "Padam {{count}} calon dari baris gilir? Tindakan ini tidak boleh diundur.",
         "deletePartialFailure": "{{deleted}} daripada {{total}} dipadam; {{failed}} gagal.",
+        "approveAction": "Luluskan {{count}}",
+        "approveConfirm": "Luluskan {{count}} calon? Skim yang dipadan akan ditanda sebagai disahkan.",
+        "approvePartialFailure": "{{succeeded}} daripada {{total}} diluluskan; {{failed}} gagal.",
+        "rejectAction": "Tolak {{count}}",
+        "rejectConfirm": "Tolak {{count}} calon? Mereka akan kekal dalam baris gilir sebagai Ditolak.",
+        "rejectPartialFailure": "{{succeeded}} daripada {{total}} ditolak; {{failed}} gagal.",
         "selectRowAria": "Pilih calon {{name}}",
         "selectPageAria": "Pilih semua calon",
         "deselectPageAria": "Nyahpilih semua calon",
@@ -1259,6 +1265,20 @@
         },
         "deleteFailure": {
           "title": "Padam gagal"
+        },
+        "bulkApproveSuccess": {
+          "title": "Calon diluluskan",
+          "body": "{{count}} calon diluluskan dan pengesahan dicop."
+        },
+        "bulkApproveFailure": {
+          "title": "Luluskan pukal gagal"
+        },
+        "bulkRejectSuccess": {
+          "title": "Calon ditolak",
+          "body": "{{count}} calon dipindah ke Ditolak."
+        },
+        "bulkRejectFailure": {
+          "title": "Tolak pukal gagal"
         }
       }
     }

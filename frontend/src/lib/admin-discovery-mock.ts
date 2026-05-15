@@ -253,34 +253,285 @@ const SEED_POOL: SeedCandidate[] = [
     confidence: 0.92
   },
   {
-    // Unmatched candidate — exercises the "new scheme" path in the detail page.
-    // Tests that the moderator UI gracefully handles an extracted scheme the
-    // engineer team has not coded a Pydantic rule for yet.
-    source_id: 'mof-bantuan-musim-tengkujuh',
-    scheme_id: null,
-    name: 'Bantuan Khas Musim Tengkujuh 2026',
+    source_id: 'mof-sara-rate-schedule',
+    scheme_id: 'sara',
+    name: 'SARA — Sumbangan Asas Rahmah (MyKad credit)',
     agency: 'Ministry of Finance Malaysia',
     eligibility_summary:
-      'New flood-relief cash payment for households in Kelantan, Terengganu, and Pahang affected by the 2026 monsoon. Eligibility verified via NADMA registration.',
+      'Adult Malaysian individual with household monthly income ≤ RM 5,000 enrolled in eKasih; benefit auto-credited to MyKad each cycle.',
     rate_summary:
-      'One-off RM 1,000 per affected household head, credited to MyKad-linked bank account. Application window: 1 May – 30 Jun 2026.',
+      'May 2026 schedule: per-cycle credit raised from RM 100 to RM 120 across all six 2026 disbursement windows (annualised RM 1,440 → RM 1,440 + RM 120 × 6 cap RM 2,400 retained).',
+    citation: {
+      source_url: 'https://sara.gov.my/jadual-kadar-2026-may.pdf',
+      snippet:
+        'Mulai Mei 2026, nilai kredit setiap kitaran SARA dinaikkan kepada RM 120 sekitaran bagi penerima berkelayakan dengan pendapatan isi rumah ≤ RM 5,000.'
+    },
+    source_url: 'https://sara.gov.my/jadual-kadar-2026-may.pdf',
+    source_content_hash:
+      '4b3a2c1d0e9f8a7b6c5d4e3f2a1b0c9d8e7f6a5b4c3d2e1f0a9b8c7d6e5f4a3b',
+    confidence: 0.85
+  },
+  {
+    source_id: 'mof-mykasih-sara-rm100',
+    scheme_id: 'mykasih',
+    name: 'MyKasih SARA RM100 — one-off MyKad credit top-up',
+    agency: 'Ministry of Finance Malaysia',
+    eligibility_summary:
+      'Existing SARA recipients with one or more registered school-age children; one-off RM 100 top-up credited alongside the regular SARA cycle.',
+    rate_summary:
+      'Programme extended into Q3 2026 with the RM 100 cap unchanged; eligibility broadened to include B40+ households earning ≤ RM 5,500 / month.',
     citation: {
       source_url:
-        'https://www.mof.gov.my/portal/en/news/press-citations/bantuan-musim-tengkujuh-2026.pdf',
+        'https://www.mof.gov.my/portal/en/news/press-citations/mykasih-sara-rm100-q3-extension.html',
       snippet:
-        'Bantuan khas RM 1,000 sekali bayaran ditawarkan kepada ketua isi rumah yang terjejas banjir Musim Tengkujuh 2026 di Kelantan, Terengganu dan Pahang.'
+        'Penambahan satu kali RM 100 di bawah inisiatif MyKasih SARA dilanjutkan ke suku ketiga 2026 dengan had pendapatan isi rumah ≤ RM 5,500.'
     },
     source_url:
-      'https://www.mof.gov.my/portal/en/news/press-citations/bantuan-musim-tengkujuh-2026.pdf',
+      'https://www.mof.gov.my/portal/en/news/press-citations/mykasih-sara-rm100-q3-extension.html',
     source_content_hash:
-      '7c4a3e2d1b0f9e8d7c6b5a4e3d2c1b0a9f8e7d6c5b4a3e2d1c0b9a8f7e6d5c4b',
-    confidence: 0.71
+      '9a8b7c6d5e4f3a2b1c0d9e8f7a6b5c4d3e2f1a0b9c8d7e6f5a4b3c2d1e0f9a8b',
+    confidence: 0.74
+  },
+  {
+    source_id: 'perkeso-sip-coverage',
+    scheme_id: 'perkeso_sip',
+    name: 'PERKESO SIP — Employment Insurance scheme',
+    agency: 'PERKESO (SOCSO)',
+    eligibility_summary:
+      'Employees insured under SIP via employer EIS contributions; benefits include Job Search Allowance, Reduced Income Allowance, and re-employment placement.',
+    rate_summary:
+      '2026 update: Job Search Allowance ceiling raised from RM 4,000 to RM 4,500 / month for the first 3 months; subsequent months unchanged.',
+    citation: {
+      source_url: 'https://eis.perkeso.gov.my/manual/SIP-coverage-2026.pdf',
+      snippet:
+        'Elaun Mencari Pekerjaan (EMP) — kadar bagi tiga bulan pertama dikemaskini kepada RM 4,500 mulai Januari 2026.'
+    },
+    source_url: 'https://eis.perkeso.gov.my/manual/SIP-coverage-2026.pdf',
+    source_content_hash:
+      '6c5b4a3d2e1f0a9b8c7d6e5f4a3b2c1d0e9f8a7b6c5d4e3f2a1b0c9d8e7f6a5b',
+    confidence: 0.83
+  },
+  {
+    source_id: 'budi95-press-release',
+    scheme_id: 'budi95',
+    name: 'BUDI95 — RON95 petrol subsidy (MyKad scan at pump)',
+    agency: 'Ministry of Finance Malaysia',
+    eligibility_summary:
+      'Malaysian citizen aged 16+ with a valid driving licence (classes A/A1/B/B1/B2/C/D/DA); MyKad scanned at participating petrol stations.',
+    rate_summary:
+      'Monthly subsidised quota lowered from 200 L to 150 L per MyKad effective June 2026; subsidised price RM 1.99/L retained.',
+    citation: {
+      source_url:
+        'https://www.budi95.gov.my/en/news/quota-revision-june-2026.html',
+      snippet:
+        'Kuota subsidi RON95 di bawah BUDI95 dikurangkan kepada 150 liter sebulan setiap MyKad mulai Jun 2026 manakala harga subsidi RM 1.99 seliter dikekalkan.'
+    },
+    source_url:
+      'https://www.budi95.gov.my/en/news/quota-revision-june-2026.html',
+    source_content_hash:
+      '1f0e9d8c7b6a5d4e3f2a1b0c9d8e7f6a5b4c3d2e1f0a9b8c7d6e5f4a3b2c1d0e',
+    confidence: 0.77
+  },
+  {
+    source_id: 'kpm-bap-circular',
+    scheme_id: 'bap',
+    name: 'BAP — Bantuan Awal Persekolahan',
+    agency: 'Ministry of Education (KPM)',
+    eligibility_summary:
+      'Pupils enrolled in public primary or secondary schools whose parents file Form B / BE / employer payroll income ≤ RM 5,000 / month.',
+    rate_summary:
+      '2026 circular increases the per-child grant from RM 150 to RM 200, credited via school sometime in late January per academic year.',
+    citation: {
+      source_url:
+        'https://www.moe.gov.my/bantuan-awal-persekolahan/circular-bap-2026.pdf',
+      snippet:
+        'Bantuan Awal Persekolahan (BAP) — kadar bantuan dikemaskini kepada RM 200 setiap murid mulai sesi persekolahan 2026.'
+    },
+    source_url:
+      'https://www.moe.gov.my/bantuan-awal-persekolahan/circular-bap-2026.pdf',
+    source_content_hash:
+      '8e7d6c5b4a3d2e1f0a9b8c7d6e5f4a3b2c1d0e9f8a7b6c5d4e3f2a1b0c9d8e7f',
+    confidence: 0.88
+  },
+  {
+    source_id: 'kpm-rmt-circular',
+    scheme_id: 'rmt',
+    name: 'RMT — Rancangan Makanan Tambahan',
+    agency: 'Ministry of Education (KPM)',
+    eligibility_summary:
+      'Primary school pupils from low-income households endorsed by the school RMT committee; complimentary daily meal during academic terms.',
+    rate_summary:
+      '2026 menu pack budget raised from RM 4.00 to RM 5.50 per meal for SK schools in B40 catchment districts; rural ceiling unchanged.',
+    citation: {
+      source_url:
+        'https://www.moe.gov.my/rancangan-makanan-tambahan/rmt-pekeliling-2026.pdf',
+      snippet:
+        'Kos makanan Rancangan Makanan Tambahan (RMT) bagi sekolah B40 dinaikkan kepada RM 5.50 setiap hidangan mulai Januari 2026.'
+    },
+    source_url:
+      'https://www.moe.gov.my/rancangan-makanan-tambahan/rmt-pekeliling-2026.pdf',
+    source_content_hash:
+      '2d1e0f9a8b7c6d5e4f3a2b1c0d9e8f7a6b5c4d3e2f1a0b9c8d7e6f5a4b3c2d1e',
+    confidence: 0.81
+  },
+  {
+    source_id: 'kpm-spbt-circular',
+    scheme_id: 'spbt',
+    name: 'SPBT — Skim Pinjaman Buku Teks',
+    agency: 'Ministry of Education (KPM)',
+    eligibility_summary:
+      'All Malaysian pupils in public schools receive textbook loans (auto enrolment); supplementary subject books distributed via school SPBT committee.',
+    rate_summary:
+      '2026 circular adds Year 4 Bahasa Cina / Tamil textbooks under SPBT auto-loan; nominal book value rises from RM 250 to RM 280 / child.',
+    citation: {
+      source_url:
+        'https://www.moe.gov.my/bantuan-pembelajaran-menu/skim-pinjaman-buku-teks-spbt/spbt-pekeliling-2026.pdf',
+      snippet:
+        'Buku teks tambahan SJKC / SJKT Tahun 4 dimasukkan ke dalam senarai SPBT mulai sesi 2026; nilai pinjaman setiap murid dianggar RM 280.'
+    },
+    source_url:
+      'https://www.moe.gov.my/bantuan-pembelajaran-menu/skim-pinjaman-buku-teks-spbt/spbt-pekeliling-2026.pdf',
+    source_content_hash:
+      '7b6a5d4e3f2a1b0c9d8e7f6a5b4c3d2e1f0a9b8c7d6e5f4a3b2c1d0e9f8a7b6c',
+    confidence: 0.86
+  },
+  {
+    source_id: 'kpm-kwapm-circular',
+    scheme_id: 'kwapm',
+    name: 'KWAPM — Kumpulan Wang Amanah Pelajar Miskin',
+    agency: 'Ministry of Education (KPM)',
+    eligibility_summary:
+      'Pupils in primary or secondary public schools from households earning ≤ RM 1,500 / month; endorsed by the school KWAPM committee.',
+    rate_summary:
+      '2026 cycle raises per-pupil grant from RM 200 to RM 250 / year; secondary cohort gains a new uniform allowance of RM 80 / year.',
+    citation: {
+      source_url:
+        'https://www.moe.gov.my/bantuan-kumpulan-wang-amanah-pelajar-miskin-kwapm/kwapm-pekeliling-2026.pdf',
+      snippet:
+        'Bantuan Kumpulan Wang Amanah Pelajar Miskin (KWAPM) — kadar bantuan tahunan dinaikkan kepada RM 250 setiap pelajar mulai 2026.'
+    },
+    source_url:
+      'https://www.moe.gov.my/bantuan-kumpulan-wang-amanah-pelajar-miskin-kwapm/kwapm-pekeliling-2026.pdf',
+    source_content_hash:
+      '5a4b3c2d1e0f9a8b7c6d5e4f3a2b1c0d9e8f7a6b5c4d3e2f1a0b9c8d7e6f5a4b',
+    confidence: 0.83
+  },
+  {
+    source_id: 'kpwkm-taska-permata',
+    scheme_id: 'taska_permata',
+    name: 'TASKA / TADIKA Permata — childcare fee subsidy',
+    agency: 'KPWKM · Jabatan Permata',
+    eligibility_summary:
+      'Working parents enrolled with PERMATA-registered TASKA / TADIKA; household income ≤ RM 5,000 / month per parent.',
+    rate_summary:
+      '2026 subsidy ceiling raised from RM 165 to RM 180 / child / month (annualised RM 2,160) for TASKA; TADIKA tier unchanged at RM 90 / month.',
+    citation: {
+      source_url:
+        'https://www.kpwkm.gov.my/portal-main/list-services?type=taman-asuhan-kanak-kanak&doc=permata-circular-2026.pdf',
+      snippet:
+        'Subsidi yuran TASKA Permata bagi keluarga berpendapatan RM 5,000 ke bawah dikemaskini kepada RM 180 sebulan setiap kanak-kanak mulai Januari 2026.'
+    },
+    source_url:
+      'https://www.kpwkm.gov.my/portal-main/list-services?type=taman-asuhan-kanak-kanak&doc=permata-circular-2026.pdf',
+    source_content_hash:
+      '0c9d8e7f6a5b4c3d2e1f0a9b8c7d6e5f4a3b2c1d0e9f8a7b6c5d4e3f2a1b0c9d',
+    confidence: 0.80
+  },
+  {
+    source_id: 'moh-peka-b40',
+    scheme_id: 'peka_b40',
+    name: 'PeKa B40 — health screening voucher',
+    agency: 'Ministry of Health · ProtectHealth',
+    eligibility_summary:
+      'Adult Malaysian aged 40+ in B40 households (eKasih / STR-flagged); annual non-communicable disease screening at participating GP clinics.',
+    rate_summary:
+      '2026 voucher value raised from RM 200 to RM 250 per beneficiary; cardiovascular risk panel added to the bundled screening list.',
+    citation: {
+      source_url:
+        'https://protecthealth.com.my/peka-b40/circular-2026.pdf',
+      snippet:
+        'Baucar saringan PeKa B40 — nilai dinaikkan kepada RM 250 setiap penerima dan ditambah panel risiko kardiovaskular mulai 2026.'
+    },
+    source_url:
+      'https://protecthealth.com.my/peka-b40/circular-2026.pdf',
+    source_content_hash:
+      '3e2f1a0b9c8d7e6f5a4b3c2d1e0f9a8b7c6d5e4f3a2b1c0d9e8f7a6b5c4d3e2f',
+    confidence: 0.82
+  },
+  {
+    source_id: 'mof-mysalam',
+    scheme_id: 'mysalam',
+    name: 'MySalam — critical illness + hospitalisation income protection',
+    agency: 'Ministry of Finance Malaysia',
+    eligibility_summary:
+      'Malaysian citizens aged 18–65 in B40 / STR-flagged households; auto-enrolled via STR processing.',
+    rate_summary:
+      '2026 coverage refresh: 36-disease list extended to 40 critical illnesses; one-time lump-sum payout raised from RM 8,000 to RM 10,000.',
+    citation: {
+      source_url:
+        'https://www.mysalam.com.my/documents/mysalam-2026-coverage.pdf',
+      snippet:
+        'Senarai penyakit kritikal dilanjutkan kepada 40 keadaan dan bayaran sekali gus dinaikkan kepada RM 10,000 mulai pelan 2026.'
+    },
+    source_url:
+      'https://www.mysalam.com.my/documents/mysalam-2026-coverage.pdf',
+    source_content_hash:
+      'b1a0c9d8e7f6a5b4c3d2e1f0a9b8c7d6e5f4a3b2c1d0e9f8a7b6c5d4e3f2a1b0',
+    confidence: 0.79
+  },
+  {
+    source_id: 'lhdn-form-be',
+    scheme_id: 'lhdn_form_be',
+    name: 'LHDN Form BE — YA 2025 salaried reliefs',
+    agency: 'LHDN (Inland Revenue Board of Malaysia)',
+    eligibility_summary:
+      'Salaried filers under Section 4(b) Income Tax Act 1967 with monthly PCB deducted; reliefs cover personal, EPF, lifestyle, parental, medical.',
+    rate_summary:
+      'Public Ruling No. 4/2024 (Form BE amended Mar 2026): lifestyle relief sub-cap for digital subscriptions raised from RM 2,500 to RM 3,000.',
+    citation: {
+      source_url:
+        'https://lampiran1.hasil.gov.my/pdf/pdfam/PR_4_2024_amended_2026_BE.pdf',
+      snippet:
+        'Bagi Borang BE Tahun Taksiran 2025, sub-had pelepasan gaya hidup digital ialah RM 3,000, naik daripada RM 2,500 pada tahun sebelumnya.'
+    },
+    source_url:
+      'https://lampiran1.hasil.gov.my/pdf/pdfam/PR_4_2024_amended_2026_BE.pdf',
+    source_content_hash:
+      '6f5e4d3c2b1a0c9d8e7f6a5b4c3d2e1f0a9b8c7d6e5f4a3b2c1d0e9f8a7b6c5d',
+    confidence: 0.90
+  },
+  {
+    source_id: 'kwsp-i-suri',
+    scheme_id: 'i_suri',
+    name: 'KWSP i-Suri — homemaker savings incentive',
+    agency: 'KWSP (Employees Provident Fund)',
+    eligibility_summary:
+      'Female Malaysian citizens registered as homemakers under eKasih / STR with valid MyKad; voluntary i-Suri account contributions.',
+    rate_summary:
+      'Government incentive raised from RM 300 to RM 360 / year (matching RM 30 / month for 12 months); previously RM 25 / month.',
+    citation: {
+      source_url:
+        'https://www.kwsp.gov.my/documents/40/2026-i-suri-incentive.pdf',
+      snippet:
+        'Insentif Kerajaan i-Suri ditambah baik kepada RM 360 setahun (RM 30 sebulan) bagi ahli homemaker yang memenuhi syarat eKasih mulai 2026.'
+    },
+    source_url:
+      'https://www.kwsp.gov.my/documents/40/2026-i-suri-incentive.pdf',
+    source_content_hash:
+      'd4c3b2a1c0d9e8f7a6b5c4d3e2f1a0b9c8d7e6f5a4b3c2d1e0f9a8b7c6d5e4f3',
+    confidence: 0.81
   }
 ]
 
 // ---------------------------------------------------------------------------
 // Public mock API
 // ---------------------------------------------------------------------------
+
+function candidateIdForSeed(seed: SeedCandidate): string {
+  // Stable per-scheme key — every re-scrape reuses the same id so two
+  // pending rows for the same scheme never coexist in the queue.
+  return seed.scheme_id ? `mock-${seed.scheme_id}` : `mock-new-${seed.source_id}`
+}
 
 export async function mockTrigger(): Promise<DiscoveryRunSummary> {
   const startedAt = new Date().toISOString()
@@ -290,48 +541,43 @@ export async function mockTrigger(): Promise<DiscoveryRunSummary> {
   const runNumber = readRunCount() + 1
   writeRunCount(runNumber)
 
-  // Rotate which seeds are surfaced each run so re-clicks produce a different
-  // batch — matches the "agent re-scrapes and finds different deltas" mental
-  // model. Batch size oscillates 4↔3 so the KPIs visibly change run-to-run.
-  const batchSize = runNumber % 2 === 1 ? 4 : 3
-  const offset = ((runNumber - 1) * 3) % SEED_POOL.length
-
-  const picks: SchemeCandidate[] = []
-  for (let i = 0; i < batchSize; i++) {
-    const seedIdx = (offset + i) % SEED_POOL.length
-    const seed = SEED_POOL[seedIdx]
-    picks.push({
-      ...seed,
-      candidate_id: `mock-r${runNumber}-${seedIdx}`,
-      extracted_at: finishedAt
-    })
-  }
-
+  // Re-scrape every in-scope source on each trigger. Idempotency rule:
+  // a freshly-extracted pending candidate REPLACES the existing pending
+  // row for the same scheme, but never clobbers an approved / rejected /
+  // changes-requested row — moderated state is preserved across re-runs.
   const store = readStore()
-  for (const pick of picks) {
-    store.candidates[pick.candidate_id] = {
+  let changedCount = 0
+  for (const seed of SEED_POOL) {
+    const candidateId = candidateIdForSeed(seed)
+    const existing = store.candidates[candidateId]
+    if (existing && existing.detail.status !== 'pending') {
+      // Moderated — leave it alone. The reviewer already made a call.
+      continue
+    }
+    store.candidates[candidateId] = {
       detail: {
-        candidate: pick,
+        candidate: { ...seed, candidate_id: candidateId, extracted_at: finishedAt },
         status: 'pending',
         reviewed_by: null,
         reviewed_at: null,
         admin_note: null
       }
     }
+    changedCount += 1
   }
   writeStore(store)
   dispatchChanged()
 
-  // Sources_checked deliberately > batch size — reflects the agent visiting
-  // every gazetted source page even when only a subset reports a content
-  // delta. Numbers chosen to feel realistic in the KPI tiles.
+  // Sources_checked reflects every source the agent visited (always the
+  // full seed pool); sources_changed only counts rows the queue actually
+  // rewrote, so re-runs with everything already moderated read as zero.
   return {
     started_at: startedAt,
     finished_at: finishedAt,
-    sources_checked: SEED_POOL.length + 4,
-    sources_changed: batchSize,
-    candidates_extracted: batchSize,
-    candidates_persisted: batchSize,
+    sources_checked: SEED_POOL.length,
+    sources_changed: changedCount,
+    candidates_extracted: changedCount,
+    candidates_persisted: changedCount,
     errors: []
   }
 }

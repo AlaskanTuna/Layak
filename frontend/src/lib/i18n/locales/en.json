@@ -233,7 +233,7 @@
         "features": [
           "5 evaluations per 24 hours",
           "30-day evaluation history",
-          "Access to STR, JKM, and LHDN schemes",
+          "Access to 20 tracked scheme entries",
           "Watermarked draft packets"
         ]
       },
@@ -256,7 +256,7 @@
       "headlinePart1": "Know every Malaysian scheme",
       "headlineEmphasis": "you qualify for",
       "headlineTail": "in three uploads.",
-      "description": "Layak reads your MyKad, payslip, and utility bill, then runs a six-step agent pipeline to match you against government schemes — STR, JKM Warga Emas, LHDN Form B reliefs, and more. Every number cites a source page.",
+      "description": "Layak reads your MyKad, payslip, and utility bill, then runs a six-step agent pipeline across 20 tracked scheme entries. Deterministic rules decide eligibility while source citations ground every number.",
       "getStarted": "Get Started",
       "metaFree": "Free · 5 evals / day",
       "metaDrafts": "Drafts only · you submit",
@@ -271,7 +271,7 @@
         {
           "label": "Extract",
           "title": "Read three documents,\npull a structured profile.",
-          "body": "Gemini Vision opens your MyKad, payslip, and utility bill in one pass. Last four IC digits surface; the rest are redacted in-memory and never logged."
+          "body": "Gemini Vision opens your MyKad, payslip, and utility bill in one pass. Upload-path IC details are processed in request memory only and are not retained on the persisted profile."
         },
         {
           "label": "Classify",
@@ -281,12 +281,12 @@
         {
           "label": "Match",
           "title": "Run deterministic rules\nacross the scheme corpus.",
-          "body": "The rule engine checks the structured profile against STR, JKM, LHDN, PERKESO, education, and subsidy rules. Citations point back to cached agency sources; the model does not invent eligibility."
+          "body": "The rule engine checks the structured profile against 20 tracked scheme entries across 19 rule modules. Vertex AI Search grounds citations when available; deterministic rules decide eligibility."
         },
         {
           "label": "Strategy",
           "title": "Cross-scheme reasoning",
-          "body": "Gemini 2.5 Pro reasons across the matched schemes to surface 0-3 grounded advisories — e.g. 'if you also do X, scheme Y fires.'"
+          "body": "Gemini reasons across the matched schemes to surface 0-3 grounded advisories after deterministic trigger filtering."
         },
         {
           "label": "Compute",
@@ -296,7 +296,7 @@
         {
           "label": "Generate",
           "title": "Watermarked draft packets,\nready to lodge.",
-          "body": "WeasyPrint renders one packet per qualifying scheme — BK-01 for STR, JKM18 for Warga Emas, an LHDN Form B relief summary, and so on. Every page reads \"DRAFT — NOT SUBMITTED.\""
+          "body": "WeasyPrint renders packets only for qualifying schemes with draft templates, then marks every page \"DRAFT ? NOT SUBMITTED.\" Subsidy-only cards stay out of the packet preview."
         }
       ]
     },
@@ -310,7 +310,7 @@
     "cta": {
       "eyebrow": "05 — Take it for a spin",
       "headline": "Ready to see what you qualify for?",
-      "description": "Sign in with Google is one click — no account setup needed. Three uploads, a ranked list, three draft packets. Takes under a minute.",
+      "description": "Sign in with Google is one click ? no account setup needed. Three uploads, a ranked list, and draft packets for schemes with templates. Takes about a minute.",
       "seePipeline": "See the pipeline",
       "faqHeader": "Common questions",
       "faqs": [
@@ -322,7 +322,7 @@
         {
           "docCode": "FAQ-02",
           "question": "Which schemes does Layak cover today?",
-          "body": "STR 2026 (household tier), JKM Bantuan Warga Emas, and the five LHDN Form B reliefs. The corpus is committed to the repo and grows each release — coverage notes track which YA each rule is sourced from."
+          "body": "Layak currently tracks 20 scheme entries across cash aid, welfare, education, healthcare, tax relief, retirement, subsidy credits, and required contributions. Eligibility and amounts come from deterministic rules; Vertex AI Search grounds the citations where available."
         },
         {
           "docCode": "FAQ-03",
@@ -337,7 +337,7 @@
         {
           "docCode": "FAQ-05",
           "question": "How accurate are the figures Layak shows?",
-          "body": "Every match cites the exact passage from the source agency PDF — no hallucinated rules. The agency still makes the final call on every application; Layak surfaces estimates so you know which forms are worth filing."
+          "body": "Eligibility and amount logic is deterministic. Each match carries source citations, with Vertex AI Search used for primary grounding when available and cached agency citations as fallback. The agency still makes the final call on every application."
         },
         {
           "docCode": "FAQ-06",
@@ -363,7 +363,7 @@
       },
       "step4": {
         "title": "Strategy",
-        "description": "Gemini 2.5 Pro reasons across matched schemes to surface grounded advisories."
+        "description": "Gemini reasons across matched schemes after deterministic trigger filtering to surface grounded advisories."
       },
       "step5": {
         "title": "Compute",
@@ -371,7 +371,7 @@
       },
       "step6": {
         "title": "Generate",
-        "description": "WeasyPrint drafts three watermarked PDF packets — ready to review and submit."
+        "description": "WeasyPrint drafts packet PDFs only for qualifying schemes with templates."
       }
     },
     "howItWorks": {
@@ -379,10 +379,10 @@
       "pipelineSubtitle": "Streaming · step-by-step",
       "step1Body": "Gemini Vision reads your MyKad, payslip, and utility bill and pulls structured profile fields — name, IC, monthly income, household composition, address.",
       "step2Body": "Household size, per-capita monthly income, filer category (Form B vs BE), and counts of children under 18 and elderly dependants 60+ are derived from the extracted profile.",
-      "step3Body": "The rule engine checks your derived profile against every scheme threshold — STR 2026 tiers, JKM Warga Emas eligibility, five LHDN Form B reliefs — and returns qualifying schemes with exact citations.",
-      "step4Body": "Gemini 2.5 Pro reasons across the matched schemes to surface 0-3 grounded advisories — e.g. 'if you also do X, scheme Y fires.'",
+      "step3Body": "The rule engine checks your derived profile against 20 tracked scheme entries across 19 rule modules. Vertex AI Search grounds the primary citation when available, and cached agency citations stay as fallback.",
+      "step4Body": "Gemini reasons across the matched schemes after deterministic trigger filtering to surface 0-3 grounded advisories.",
       "step5Body": "Gemini writes a Python snippet and runs it in Google's code sandbox to sum your annual upside across every qualifying scheme. The generated code and its output stream live to the UI, so you see the full working — not just a final number.",
-      "step6Body": "WeasyPrint renders three draft PDFs — BK-01 for STR, JKM18 for Warga Emas, a Form B relief summary for LHDN. Every page carries the watermark: DRAFT — NOT SUBMITTED.",
+      "step6Body": "WeasyPrint renders draft PDFs only for qualifying schemes with packet templates. Every page carries the watermark: DRAFT ? NOT SUBMITTED. Subsidy-only and required-contribution cards stay out of the inline packet preview.",
       "statsSteps": "6",
       "statsStepsLabel": "steps",
       "statsTiming": "under a minute end-to-end",
@@ -390,7 +390,7 @@
       "stackTitle": "The agent stack",
       "stackSubtitle": "What's under the hood",
       "stackGeminiRole": "Orchestrates the agent pipeline and handles document understanding + classification.",
-      "stackVertexRole": "RAG layer over committed scheme PDFs — the source of every cited rule passage.",
+      "stackVertexRole": "RAG layer over the scheme PDF corpus ? used to ground citations, while deterministic rules decide eligibility and amounts.",
       "stackCodeExecRole": "Gemini writes and runs a Python snippet in Google's sandbox to compute your annual upside. Both the generated source and its stdout stream to the UI — verifiable math, not a black box.",
       "stackWeasyRole": "HTML-to-PDF draft packet generator. Every page watermarked and agency-portal-ready.",
       "finePrintTitle": "The fine print",
@@ -413,7 +413,7 @@
       "section2Files": "The original bytes of your uploaded files. Extraction runs in-memory inside a single request, and the raw files are discarded once the structured profile is produced.",
       "section2Logs": "IC numbers, authentication tokens, or document content in any log line.",
       "section3Title": "3. Why we collect it",
-      "section3Matching": "To match you against locked Malaysian schemes (STR 2026, JKM Warga Emas, LHDN Form B reliefs).",
+      "section3Matching": "To match you against 20 tracked Malaysian scheme entries using deterministic rules with source-backed citations.",
       "section3Packets": "To generate your draft application packets, every page watermarked \"DRAFT — NOT SUBMITTED.\"",
       "section3History": "To show you a history of your past evaluations on the dashboard.",
       "section3FairUse": "To enforce per-user fair-use rate limits on the free tier.",
@@ -639,7 +639,7 @@
         },
         "match": {
           "title": "Match",
-          "body": "Score your profile against every locked 2026 scheme."
+          "body": "Score your profile against 20 tracked 2026 scheme entries."
         },
         "strategy": {
           "title": "Strategy",

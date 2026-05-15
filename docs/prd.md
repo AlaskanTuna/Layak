@@ -69,12 +69,12 @@ Malaysia's social-assistance estate is fragmented. The Ministry of Finance's _Ec
 
 ## 2. Project Aim & Objectives
 
-**Aim.** To demonstrate, in a 24-hour hackathon build, that an agentic AI concierge grounded in a small, auditable corpus of Malaysian government eligibility rules can reduce the discovery and application effort for three Budget-2026-era social-assistance schemes from hours of portal-hopping to a single document-upload interaction that yields a pre-filled, signed draft application packet.
+**Aim.** To demonstrate, in a 24-hour hackathon build, that an agentic AI concierge grounded in an auditable corpus of Malaysian government eligibility rules can reduce the discovery and application effort across 20 tracked scheme entries from hours of portal-hopping to a single document-upload or manual-entry interaction that yields matched guidance and draft packets where templates exist.
 
 **Objectives.**
 
-1. **Design** a five-step agent pipeline (extract → classify household → cross-reference → rank by annual RM upside → generate packet) that runs autonomously from a single user interaction and maps one-to-one to the "Chat → Action" rubric axis.
-2. **Develop** a grounded rule engine encoding STR 2026 tier logic, JKM Warga Emas means-test logic, and five LHDN personal reliefs (individual, parent medical, child 16a ×2, EPF+life #17, lifestyle #9) for Form B (gig/self-employed) filers, with every rule traceable to a cached source PDF URL.
+1. **Design** a six-step agent pipeline (extract → classify household → match → strategy → compute upside → generate packet) that runs autonomously from a single user interaction and maps one-to-one to the "Chat → Action" rubric axis.
+2. **Develop** a grounded rule engine covering 20 tracked scheme entries across 19 rule modules, with deterministic eligibility/amount logic and every rule traceable to cached source citations plus Vertex AI Search grounding where available.
 3. **Develop** a multimodal document-intake layer using Gemini 2.5 Flash to extract profile data directly from IC, payslip, and utility-bill images, without a separate OCR stage.
 4. **Demonstrate** end-to-end on Google Cloud Run with min-instances=1, first-byte latency under 3 seconds during the judging window, and a zero-hallucination rule-provenance layer (every eligibility claim cites its source PDF).
 5. **Demonstrate** at least four Google AI ecosystem components — Gemini family models across the pipeline, Gemini Code Execution (arithmetic), Vertex AI Search (grounded RAG over scheme PDFs), and Cloud Run + Secret Manager (deployment).
@@ -158,7 +158,7 @@ Each requirement below ties to one of the in-scope v1 and v2 deliverables. Accep
 
 ### FR-4 — Hardcoded eligibility rule engine
 
-**Description.** Pydantic-typed rule engine for three schemes: STR 2026 household-with-children tier, JKM Warga Emas per-capita means test, and five LHDN Form B personal reliefs (individual RM9,000; parent medical up to RM8,000; child relief #16a RM2,000 each × 2; EPF + life insurance under #17 up to RM7,000; lifestyle #9 up to RM2,500).
+**Description.** Pydantic-typed rule engine for 20 tracked scheme entries across 19 rule modules, spanning cash aid, welfare, education, healthcare, tax relief, retirement incentives, subsidy-credit cards, and required-contribution schemes. Eligibility and amount logic remains deterministic; Vertex AI Search grounds citations where available.
 
 **Acceptance criteria:**
 
@@ -354,7 +354,7 @@ Each requirement below ties to one of the in-scope v1 and v2 deliverables. Accep
 
 ### FR-21 — Manual Entry Mode (privacy alternative to document upload)
 
-**Description.** An intake-page toggle lets users replace the three document uploads with a structured form that collects the same eligibility-driving fields without accepting any MyKad digits. Users who are unwilling to hand their MyKad / payslip / utility bill to an LLM can type the information instead, and the five-step pipeline runs unchanged from classify onward. Design spec: `docs/superpowers/specs/2026-04-21-manual-entry-mode-design.md`.
+**Description.** An intake-page toggle lets users replace the three document uploads with a structured form that collects the same eligibility-driving fields without accepting any MyKad digits. Users who are unwilling to hand their MyKad / payslip / utility bill to an LLM can type the information instead, and the six-step pipeline runs unchanged from classify onward. Design spec: `docs/superpowers/specs/2026-04-21-manual-entry-mode-design.md`.
 
 **Acceptance criteria:**
 
@@ -369,7 +369,7 @@ Each requirement below ties to one of the in-scope v1 and v2 deliverables. Accep
 - [ ] Manual Continue remains disabled until the form is submission-ready: required fields are valid, dependant rows are valid, and spouse count is `<= 4`.
 - [ ] Multi-spouse guidance stays live in the Household editor; `>1` spouses shows the shared-household note, while `>4` spouses shows the destructive cap note and keeps Continue unavailable.
 - [ ] `?mode=manual` query parameter preloads the manual tab on first paint.
-- [ ] The stepper still shows all five steps; the `extract` step label reads "Profile prepared" in manual mode.
+- [ ] The stepper still shows all six steps; the `extract` step label reads "Profile prepared" in manual mode.
 - [ ] The manual path follows the same authenticated policy as `/api/agent/intake`; there is no manual-entry bypass.
 
 ### FR-22 — Admin moderation surface for agentic scheme discovery (Phase 11 Feature 1)
@@ -555,7 +555,7 @@ Mirrored verbatim from `docs/project-idea.md` §5. Ten items:
 1. Single-page Next.js web app deployed at a Cloud Run HTTPS URL, localized to English, Bahasa Malaysia, and Simplified Chinese.
 2. Document-upload widget accepting three image/PDF files (IC, payslip or e-wallet income screenshot, utility bill).
 3. Gemini 2.5 Flash multimodal extraction into a strict JSON profile.
-4. Hardcoded eligibility rule engine for STR 2026 (household-with-children tier), JKM Warga Emas, and five LHDN reliefs.
+4. Deterministic eligibility rule engine for 20 tracked scheme entries across 19 rule modules.
 5. Gemini Code Execution arithmetic step computing annual RM upside per scheme + total.
 6. Ranked scheme list ordered by RM upside.
 7. Provenance panel: every rule cites its source PDF URL.
@@ -602,7 +602,7 @@ Mirrored verbatim from `docs/project-idea.md` §5. Any item below renders as a g
 
 **Hard feature freeze at hour 20/24.** No new endpoints, pages, or flows after that point.
 
-If the pipeline is not stable by hour 18/24, cut in the following order until the core five-step flow is demo-stable:
+If the pipeline is not stable by hour 18/24, cut in the following order until the core six-step flow is demo-stable:
 
 1. Drop PDF packet generation (FR-8); replace with an on-screen "pre-filled form preview" panel.
 2. Drop Gemini Code Execution arithmetic (FR-5); compute upside in pure Python directly.

@@ -87,7 +87,7 @@ export function LandingHero() {
             <p className="mt-7 max-w-xl text-base leading-[1.65] text-foreground/72 sm:text-[17px]">
               {t(
                 'marketing.hero.description',
-                'Layak reads your MyKad, payslip, and utility bill, then runs a six-step agent pipeline to match you against government schemes — STR, JKM Warga Emas, LHDN Form B reliefs, and more. Every number cites a source page.'
+                'Layak reads your MyKad, payslip, and utility bill, then runs a six-step agent pipeline across 20 tracked scheme entries. Deterministic rules decide eligibility while source citations ground every number.'
               )}
             </p>
 

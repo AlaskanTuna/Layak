@@ -24,7 +24,7 @@ const STEPS_FALLBACK: StepCopy[] = [
   {
     label: 'Extract',
     title: 'Read three documents,\npull a structured profile.',
-    body: 'Gemini Vision opens your MyKad, payslip, and utility bill in one pass. Last four IC digits surface; the rest are redacted in-memory and never logged.'
+    body: 'Gemini Vision opens your MyKad, payslip, and utility bill in one pass. Upload-path IC details are processed in request memory only and are not retained on the persisted profile.'
   },
   {
     label: 'Classify',
@@ -34,12 +34,12 @@ const STEPS_FALLBACK: StepCopy[] = [
   {
     label: 'Match',
     title: 'Run deterministic rules\nacross the scheme corpus.',
-    body: 'The rule engine checks the structured profile against STR, JKM, LHDN, PERKESO, education, and subsidy rules. Citations point back to cached agency sources; the model does not invent eligibility.'
+    body: 'The rule engine checks the structured profile against 20 tracked scheme entries across 19 rule modules. Vertex AI Search grounds citations when available; deterministic rules decide eligibility.'
   },
   {
     label: 'Strategy',
     title: 'Reason across schemes.\nSurface grounded advisories.',
-    body: "Gemini 2.5 Pro reasons across the matched schemes to surface 0-3 grounded advisories — e.g. 'if you also do X, scheme Y fires.'"
+    body: "Gemini reasons across the matched schemes to surface 0-3 grounded advisories after deterministic trigger filtering."
   },
   {
     label: 'Compute',
@@ -49,15 +49,15 @@ const STEPS_FALLBACK: StepCopy[] = [
   {
     label: 'Generate',
     title: 'Watermarked draft packets,\nready to lodge.',
-    body: 'WeasyPrint renders one packet per qualifying scheme — BK-01 for STR, JKM18 for Warga Emas, an LHDN Form B relief summary, and so on. Every page reads "DRAFT — NOT SUBMITTED."'
+    body: 'WeasyPrint renders packets only for qualifying schemes with draft templates, then marks every page "DRAFT — NOT SUBMITTED." Subsidy-only cards stay out of the packet preview.'
   }
 ]
 
 const STEP_TOOLS: string[][] = [
   ['Gemini 3.1 Flash', 'Vision OCR'],
   ['Python rules', 'Pydantic v2'],
-  ['Rule engine', 'Source citations'],
-  ['Gemini 2.5 Pro', 'Strategy advisories'],
+  ['19 rule modules', 'Vertex citations'],
+  ['Gemini strategy', 'Trigger filter'],
   ['Gemini Code Execution', 'Python sandbox'],
   ['WeasyPrint', 'Jinja2']
 ]

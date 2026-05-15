@@ -25,7 +25,7 @@ const FAQS_FALLBACK: FaqItem[] = [
   {
     docCode: 'FAQ-02',
     question: 'Which schemes does Layak cover today?',
-    body: 'STR 2026 (household tier), JKM Bantuan Warga Emas, and the five LHDN Form B reliefs. The corpus is committed to the repo and grows each release — coverage notes track which YA each rule is sourced from.'
+    body: 'Layak currently tracks 20 scheme entries across cash aid, welfare, education, healthcare, tax relief, retirement, subsidy credits, and required contributions. Eligibility and amounts come from deterministic rules; Vertex AI Search grounds the citations where available.'
   },
   {
     docCode: 'FAQ-03',
@@ -40,7 +40,7 @@ const FAQS_FALLBACK: FaqItem[] = [
   {
     docCode: 'FAQ-05',
     question: 'How accurate are the figures Layak shows?',
-    body: 'Every match cites the exact passage from the source agency PDF — no hallucinated rules. The agency still makes the final call on every application; Layak surfaces estimates so you know which forms are worth filing.'
+    body: 'Eligibility and amount logic is deterministic. Each match carries source citations, with Vertex AI Search used for primary grounding when available and cached agency citations as fallback. The agency still makes the final call on every application.'
   },
   {
     docCode: 'FAQ-06',

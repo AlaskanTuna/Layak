@@ -221,7 +221,7 @@
       "headlinePart1": "Ketahui setiap skim Malaysia",
       "headlineEmphasis": "yang anda layak",
       "headlineTail": "dengan tiga muat naik.",
-      "description": "Layak membaca MyKad, slip gaji, dan bil utiliti anda, kemudian menjalankan saluran ejen enam langkah untuk memadankan anda dengan skim kerajaan — STR, JKM Warga Emas, pelepasan LHDN Borang B, dan banyak lagi. Setiap nombor mempunyai rujukan sumber.",
+      "description": "Layak membaca MyKad, slip gaji, dan bil utiliti anda, kemudian menjalankan saluran ejen enam langkah merentasi 20 entri skim yang dijejaki. Peraturan deterministik menentukan kelayakan, manakala petikan sumber mengasaskan setiap angka.",
       "getStarted": "Mula Sekarang",
       "metaFree": "Percuma · 5 penilaian / hari",
       "metaDrafts": "Draf sahaja · anda hantar",
@@ -236,7 +236,7 @@
         {
           "label": "Ekstrak",
           "title": "Baca tiga dokumen,\ntarik profil berstruktur.",
-          "body": "Gemini Vision membuka MyKad, slip gaji, dan bil utiliti anda dalam satu pas. Hanya enam digit terakhir IC dipaparkan; selebihnya disunting dalam memori dan tidak pernah dilog."
+          "body": "Gemini Vision membuka MyKad, slip gaji, dan bil utiliti anda dalam satu pas. Butiran IC laluan muat naik diproses hanya dalam memori permintaan dan tidak dikekalkan pada profil tersimpan."
         },
         {
           "label": "Kelaskan",
@@ -246,12 +246,12 @@
         {
           "label": "Padan",
           "title": "Jalankan peraturan deterministik\nmerentas korpus skim.",
-          "body": "Enjin peraturan menyemak profil berstruktur terhadap peraturan STR, JKM, LHDN, PERKESO, pendidikan, dan subsidi. Petikan merujuk kembali kepada sumber agensi yang dicache; model tidak mencipta kelayakan."
+          "body": "Enjin peraturan menyemak profil berstruktur terhadap 20 entri skim yang dijejaki merentas 19 modul peraturan. Vertex AI Search mengasaskan petikan apabila tersedia; peraturan deterministik menentukan kelayakan."
         },
         {
           "label": "Strategi",
           "title": "Penaakulan merentas skim",
-          "body": "Gemini 2.5 Pro menaakul merentas skim yang dipadankan untuk mengeluarkan 0-3 nasihat strategi — contoh, 'jika anda juga lakukan X, skim Y akan diaktifkan.'"
+          "body": "Gemini menaakul merentas skim yang dipadankan untuk mengeluarkan 0-3 nasihat strategi selepas penapisan pencetus deterministik."
         },
         {
           "label": "Kira",
@@ -261,7 +261,7 @@
         {
           "label": "Jana",
           "title": "Pakej draf bertanda air,\nsedia diserahkan.",
-          "body": "WeasyPrint menghasilkan satu pakej untuk setiap skim yang layak — BK-01 untuk STR, JKM18 untuk Warga Emas, ringkasan pelepasan LHDN Borang B, dan seterusnya. Setiap halaman bertulis \"DRAF — BELUM DIHANTAR.\""
+          "body": "WeasyPrint menjana paket hanya untuk skim layak yang mempunyai templat draf, kemudian menanda setiap halaman \"DRAFT ? NOT SUBMITTED.\" Kad subsidi sahaja tidak muncul dalam pratonton paket."
         }
       ]
     },
@@ -275,7 +275,7 @@
     "cta": {
       "eyebrow": "05 — Cuba sekarang",
       "headline": "Sedia untuk melihat apa yang anda layak?",
-      "description": "Log masuk dengan Google dalam satu klik — tiada pendaftaran akaun diperlukan. Tiga muat naik, senarai tersusun, tiga pakej draf. Kurang daripada seminit.",
+      "description": "Log masuk dengan Google dalam satu klik ? tiada pendaftaran akaun diperlukan. Tiga muat naik, senarai tersusun, dan paket draf untuk skim yang mempunyai templat. Kira-kira seminit.",
       "seePipeline": "Lihat saluran agen",
       "faqHeader": "Soalan lazim",
       "faqs": [
@@ -287,7 +287,7 @@
         {
           "docCode": "FAQ-02",
           "question": "Skim manakah yang Layak liputi hari ini?",
-          "body": "STR 2026 (peringkat isi rumah), Bantuan Warga Emas JKM, dan lima pelepasan LHDN Borang B. Korpus disimpan dalam repositori dan berkembang setiap keluaran — nota liputan menjejaki tahun taksiran setiap peraturan."
+          "body": "Layak kini menjejaki 20 entri skim merentas bantuan tunai, kebajikan, pendidikan, kesihatan, pelepasan cukai, persaraan, kredit subsidi, dan caruman wajib. Kelayakan dan jumlah datang daripada peraturan deterministik; Vertex AI Search mengasaskan petikan apabila tersedia."
         },
         {
           "docCode": "FAQ-03",
@@ -302,7 +302,7 @@
         {
           "docCode": "FAQ-05",
           "question": "Sejauh manakah ketepatan angka yang Layak tunjukkan?",
-          "body": "Setiap padanan memetik petikan tepat daripada PDF agensi sumber — tiada peraturan rekaan. Agensi masih membuat keputusan akhir untuk setiap permohonan; Layak menonjolkan anggaran supaya anda tahu borang mana yang berbaloi diisi."
+          "body": "Logik kelayakan dan jumlah adalah deterministik. Setiap padanan membawa petikan sumber, dengan Vertex AI Search digunakan untuk asas utama apabila tersedia dan petikan agensi tersimpan sebagai sandaran. Agensi masih membuat keputusan akhir bagi setiap permohonan."
         },
         {
           "docCode": "FAQ-06",
@@ -327,7 +327,7 @@
         "features": [
           "5 penilaian setiap 24 jam",
           "Rekod penilaian 30 hari",
-          "Akses kepada skim STR, JKM, dan LHDN",
+          "Akses kepada 20 entri skim yang dijejaki",
           "Pakej draf dengan tanda air"
         ]
       },
@@ -363,7 +363,7 @@
       },
       "step4": {
         "title": "Strategi",
-        "description": "Gemini 2.5 Pro menaakul merentas skim yang dipadankan untuk mengeluarkan nasihat strategi."
+        "description": "Gemini menaakul merentas skim yang dipadankan selepas penapisan pencetus deterministik untuk mengeluarkan nasihat strategi."
       },
       "step5": {
         "title": "Kira",
@@ -371,7 +371,7 @@
       },
       "step6": {
         "title": "Jana",
-        "description": "WeasyPrint menyediakan tiga pakej PDF bertanda air — sedia untuk disemak dan dihantar."
+        "description": "WeasyPrint menyediakan PDF draf hanya untuk skim layak yang mempunyai templat."
       }
     },
     "howItWorks": {
@@ -379,10 +379,10 @@
       "pipelineSubtitle": "Penstriman · langkah demi langkah",
       "step1Body": "Gemini Vision membaca MyKad, slip gaji, dan bil utiliti anda, kemudian mengeluarkan medan profil berstruktur — nama, IC, pendapatan bulanan, komposisi isi rumah, alamat.",
       "step2Body": "Saiz isi rumah, pendapatan bulanan per kapita, kategori pemfail (Borang B berbanding BE), serta bilangan anak di bawah 18 tahun dan tanggungan warga emas 60+ diperoleh daripada profil yang diekstrak.",
-      "step3Body": "Enjin peraturan menyemak profil anda terhadap setiap ambang skim — peringkat STR 2026, kelayakan JKM Warga Emas, lima pelepasan LHDN Borang B — dan memulangkan skim yang layak dengan rujukan tepat.",
-      "step4Body": "Gemini 2.5 Pro menaakul merentas skim yang dipadankan untuk mengeluarkan 0-3 nasihat strategi — contoh, 'jika anda juga lakukan X, skim Y akan diaktifkan.'",
+      "step3Body": "Enjin peraturan menyemak profil anda terhadap 20 entri skim yang dijejaki merentas 19 modul peraturan. Vertex AI Search mengasaskan petikan utama apabila tersedia, dan petikan agensi tersimpan kekal sebagai sandaran.",
+      "step4Body": "Gemini menaakul merentas skim yang dipadankan selepas penapisan pencetus deterministik untuk mengeluarkan 0-3 nasihat strategi.",
       "step5Body": "Gemini menulis skrip Python dan menjalankannya dalam kotak pasir kod Google untuk menjumlahkan faedah tahunan anda merentasi setiap skim yang layak. Kod yang dihasilkan dan keluarannya dihantar langsung ke antara muka, jadi anda dapat melihat keseluruhan pengiraan — bukan hanya angka akhir.",
-      "step6Body": "WeasyPrint menjana tiga PDF draf — BK-01 untuk STR, JKM18 untuk Warga Emas, ringkasan pelepasan Borang B untuk LHDN. Setiap halaman membawa tanda air: DRAFT — NOT SUBMITTED.",
+      "step6Body": "WeasyPrint menjana PDF draf hanya untuk skim layak yang mempunyai templat paket. Setiap halaman membawa tanda air: DRAFT ? NOT SUBMITTED. Kad subsidi sahaja dan caruman wajib tidak muncul dalam pratonton paket sebaris.",
       "statsSteps": "6",
       "statsStepsLabel": "langkah",
       "statsTiming": "kurang daripada seminit dari awal hingga akhir",
@@ -390,7 +390,7 @@
       "stackTitle": "Tindanan ejen",
       "stackSubtitle": "Apa yang berada di belakang tabir",
       "stackGeminiRole": "Mengorkestrasi saluran ejen dan mengendalikan pemahaman dokumen + pengelasan.",
-      "stackVertexRole": "Lapisan RAG ke atas PDF skim yang dikomitkan — sumber bagi setiap petikan peraturan yang dirujuk.",
+      "stackVertexRole": "Lapisan RAG ke atas korpus PDF skim ? digunakan untuk mengasaskan petikan, manakala peraturan deterministik menentukan kelayakan dan jumlah.",
       "stackCodeExecRole": "Gemini menulis dan menjalankan skrip Python dalam kotak pasir Google untuk mengira faedah tahunan anda. Kod sumber yang dihasilkan dan keluarannya dihantar ke antara muka — pengiraan yang boleh disahkan, bukan kotak hitam.",
       "stackWeasyRole": "Penjana pakej draf HTML-ke-PDF. Setiap halaman bertanda air dan sedia untuk portal agensi.",
       "finePrintTitle": "Peringatan penting",
@@ -413,7 +413,7 @@
       "section2Files": "Bait asal fail yang anda muat naik. Pengekstrakan dijalankan dalam memori dalam satu permintaan, dan fail mentah dibuang sebaik sahaja profil berstruktur dihasilkan.",
       "section2Logs": "Nombor IC, token pengesahan, atau kandungan dokumen dalam mana-mana baris log.",
       "section3Title": "3. Kenapa kami mengumpulnya",
-      "section3Matching": "Untuk memadankan anda dengan skim Malaysia yang dikunci (STR 2026, JKM Warga Emas, pelepasan LHDN Borang B).",
+      "section3Matching": "Untuk memadankan anda dengan 20 entri skim Malaysia yang dijejaki menggunakan peraturan deterministik dengan petikan bersumber.",
       "section3Packets": "Untuk menjana pakej permohonan draf anda, setiap halaman bertanda air \"DRAFT — NOT SUBMITTED.\"",
       "section3History": "Untuk menunjukkan sejarah penilaian lepas anda di papan pemuka.",
       "section3FairUse": "Untuk menguatkuasakan had kadar penggunaan saksama setiap pengguna pada peringkat percuma.",
@@ -639,7 +639,7 @@
         },
         "match": {
           "title": "Padan",
-          "body": "Nilai profil anda terhadap setiap skim 2026 yang dikunci."
+          "body": "Skor profil anda terhadap 20 entri skim 2026 yang dijejaki."
         },
         "strategy": {
           "title": "Strategi",

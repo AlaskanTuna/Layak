@@ -6,7 +6,7 @@
 
 ### The agentic AI concierge for Malaysian social-assistance schemes.
 
-_Three uploads. One website. Five autonomous steps. **Zero hallucinated rules.**_
+_Three uploads. One website. Six autonomous steps. **Zero hallucinated rules.**_
 
 <br/>
 
@@ -115,8 +115,8 @@ Layak collapses that into a single guided flow. A user uploads documents (or use
 |     | Feature                     | What it means                                                                                                                                                                                                                                                                   |
 | --- | --------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | 📥  | **Dual Intake**             | Document upload for IC / payslip / utility, or a manual form for users who'd rather not upload anything.                                                                                                                                                                        |
-| 🧩  | **Visible 5-step Agent**    | Extract → Classify → Match → Rank → Generate, streamed over SSE so the citizen watches the work happen.                                                                                                                                                                         |
-| 🔎  | **Grounded Retrieval**      | Vertex AI Search over committed scheme PDFs — if no passage is retrieved, the rule is flagged `unverified` and drops out of the ranking.                                                                                                                                        |
+|     | **Visible 6-step Agent**    | Extract -> Classify -> Match -> Strategy -> Compute -> Generate, streamed over SSE so the citizen watches the work happen.                                                                                                                                                      |
+|     | **Grounded Retrieval**      | Vertex AI Search grounds citations over the scheme PDF corpus; deterministic rule modules still decide eligibility and amounts, with cached citations as fail-open fallback.                                                                                                    |
 | 🧮  | **Live Arithmetic**         | Annual upside computed via Gemini Code Execution, not LLM narration.                                                                                                                                                                                                            |
 | 🖨  | **Draft Packet Generation** | WeasyPrint renders pre-filled application PDFs for each matched scheme, all watermarked `DRAFT — NOT SUBMITTED`.                                                                                                                                                                |
 | 👤  | **Accounts & History**      | Firebase Auth (Google), Firestore-backed evaluation history, free-tier quota, and an upgrade waitlist.                                                                                                                                                                          |
@@ -162,8 +162,8 @@ flowchart LR
 flowchart LR
     Intake[Upload or manual entry] --> Extract[1. Extract<br/>Gemini 3.1 Flash-Lite]
     Extract --> Classify[2. Classify<br/>Gemini 3.1 Flash-Lite]
-    Classify --> Match[3. Match<br/>Pydantic rules + Vertex AI Search]
-    Match --> Optimize[4. Optimize Strategy<br/>Gemini 2.5 Pro structured output]
+    Classify --> Match[3. Match<br/>19 rule modules + Vertex citations]
+    Match --> Optimize[4. Optimize Strategy<br/>Gemini structured output]
     Optimize --> Compute[5. Compute Upside<br/>Gemini Code Execution]
     Compute --> Generate[6. Generate<br/>WeasyPrint draft PDFs]
     Extract --> SSE[SSE stream to UI]

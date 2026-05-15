@@ -4,6 +4,12 @@
 
 ---
 
+## [15/05/26] - Public copy aligned to 20-scheme corpus
+
+Updated landing-page fallbacks, localized marketing copy, README, PRD, and TRD current-architecture notes to reflect the latest structure: 20 tracked scheme entries, 19 rule modules, six streamed pipeline steps, deterministic eligibility/amount logic, and Vertex AI Search as citation grounding rather than match decisioning. Also replaced old "three drafts" language with packet-template-aware copy so subsidy-only schemes are not implied to generate PDFs.
+
+---
+
 ## [15/05/26] - Landing match-step copy aligned with deterministic matcher
 
 Updated the public landing pipeline's "Match" step to stop implying Vertex AI Search decides eligibility. Current architecture is deterministic: `match_schemes()` runs the local rule engine across the scheme corpus, while individual rules may attach Vertex AI Search / cached PDF citations as grounding. The landing badges now read `Rule engine` + `Source citations`, matching the backend boundary.

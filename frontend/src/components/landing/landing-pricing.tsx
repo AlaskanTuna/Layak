@@ -14,7 +14,7 @@ export function LandingPricing() {
     defaultValue: [
       '5 evaluations per 24 hours',
       '30-day evaluation history',
-      'Access to STR, JKM, and LHDN schemes',
+      'Access to 20 tracked scheme entries',
       'Watermarked draft packets'
     ]
   }) as string[]

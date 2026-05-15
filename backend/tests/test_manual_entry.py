@@ -155,16 +155,23 @@ def test_manual_profile_carries_no_ic_information() -> None:
 
 def test_built_profile_drives_same_scheme_matches_as_fixture() -> None:
     """Feeding the built Profile into the rule engine produces the same matches."""
+    from app.services.vertex_ai_search import disable_vertex_ai_search
+
     payload = ManualEntryPayload.model_validate(AISYAH_PAYLOAD_JSON)
     built = build_profile_from_manual_entry(payload, today=_FIXED_TODAY)
-    results = [
-        str_2026.match(built),
-        jkm_warga_emas.match(built),
-        jkm_bkk.match(built),
-        lhdn_form_b.match(built),
-        i_saraan.match(built),
-        perkeso_sksps.match(built),
-    ]
+    # Match `AISYAH_SCHEME_MATCHES`'s build context — the fixture is computed
+    # under `disable_vertex_ai_search()` so it carries hardcoded citations
+    # only. Without this wrap a live Discovery Engine hit prepends a
+    # `rag.*.primary` citation and the comparison fails on citation length.
+    with disable_vertex_ai_search():
+        results = [
+            str_2026.match(built),
+            jkm_warga_emas.match(built),
+            jkm_bkk.match(built),
+            lhdn_form_b.match(built),
+            i_saraan.match(built),
+            perkeso_sksps.match(built),
+        ]
     qualifying = [m for m in results if m.qualifies]
     # Same dual-key sort as `app.agents.tools.match.match_schemes` + the
     # Aisyah fixture: upside first (annual_rm desc), required_contribution last.
@@ -573,14 +580,32 @@ def test_intake_manual_accepts_aisyah_and_streams_sse(
         assert resp.headers["content-type"].startswith("text/event-stream")
         events = [line for line in resp.iter_lines() if line.startswith("data:")]
 
-    # Full healthy stream (Phase 11 Features 2 + 4): per step we now emit
+    # Full healthy stream (Phase 11 Features 2 + 4): per step we emit
     # step_started → step_result → narrative → technical, then a final done.
-    # Feature 2 added the optimize_strategy step between match and
-    # compute_upside, so 6 steps × 4 + 1 done = 25 events.
+    # optimize_strategy + compute_upside run concurrently via asyncio.gather
+    # (Phase 16 perf): both `step_started` events fire upfront, then both
+    # full result blocks emit as the gather resolves. Total count stays 25
+    # (4 × extract + 4 × classify + 4 × match + 8 × parallel + 4 × generate
+    # + 1 × done), but the parallel block's interleaving changes the order.
     assert len(events) == 25
     parsed = [json.loads(e[5:].strip()) for e in events]
-    expected_per_step = ["step_started", "step_result", "narrative", "technical"]
-    assert [p.get("type") for p in parsed] == expected_per_step * 6 + ["done"]
+    seq = ["step_started", "step_result", "narrative", "technical"]
+    expected_types = (
+        seq * 3
+        + [
+            "step_started",  # optimize_strategy
+            "step_started",  # compute_upside (fires before either gather member resolves)
+            "step_result",
+            "narrative",
+            "technical",  # optimize_strategy block
+            "step_result",
+            "narrative",
+            "technical",  # compute_upside block
+        ]
+        + seq  # generate
+        + ["done"]
+    )
+    assert [p.get("type") for p in parsed] == expected_types
     extract_result = parsed[1]
     assert extract_result["step"] == "extract"
     assert extract_result["data"]["profile"]["name"] == "Aisyah binti Ahmad"

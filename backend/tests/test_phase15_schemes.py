@@ -200,7 +200,7 @@ def test_taska_permata_rejects_school_age_only_children() -> None:
         (spbt, "moe.gov.my"),
         (kwapm, "moe.gov.my"),
         (perkeso_sip, "perkeso.gov.my"),
-        (taska_permata, "permata.gov.my"),
+        (taska_permata, "kpwkm.gov.my"),
     ],
 )
 def test_portal_url_points_to_official_domain(module, expected_domain: str) -> None:

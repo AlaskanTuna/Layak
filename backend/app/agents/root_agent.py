@@ -1,8 +1,8 @@
-"""RootAgent — ADK-Python SequentialAgent composition for the five-step pipeline.
+"""RootAgent — ADK-Python SequentialAgent composition for the six-step pipeline.
 
-  - Wraps all five tool callables as ADK `FunctionTool`s so sub-agents can
+  - Wraps all six tool callables as ADK `FunctionTool`s so sub-agents can
     bind them onto Gemini-backed `LlmAgent`s.
-  - Instantiates a `SequentialAgent` shell with five `LlmAgent` sub-agents
+  - Instantiates a `SequentialAgent` shell with six `LlmAgent` sub-agents
     (no `model` set — structural stand-ins). Each placeholder's `description`
     names the target model + tool binding.
   - Exports `stream_agent_events()`, a direct async orchestrator that bypasses
@@ -12,7 +12,11 @@ Locked SSE wire shape (see app/schema/events.py):
 
     step_started → step_result → ... → done | error
 
-Step order: extract → classify → match → compute_upside → generate → done.
+Step order: extract → classify → match → optimize_strategy → compute_upside → generate → done.
+
+Phase 11 Feature 2 added the `optimize_strategy` step between match and
+compute_upside; it runs the Cross-Scheme Strategy Optimizer (Gemini 2.5 Pro
+structured output) to surface 0-3 grounded cross-scheme advisories.
 """
 
 from __future__ import annotations
@@ -72,7 +76,7 @@ generate_packet_tool = FunctionTool(generate_packet)
 
 root_agent = SequentialAgent(
     name="layak_root_agent",
-    description="Five-step pipeline: extract → classify → match → compute_upside → generate.",
+    description="Six-step pipeline: extract → classify → match → optimize_strategy → compute_upside → generate.",
     sub_agents=[
         LlmAgent(
             name="extractor_stub",
@@ -92,10 +96,19 @@ root_agent = SequentialAgent(
         LlmAgent(
             name="matcher_stub",
             description=(
-                "Matcher. Pure-Python rule engine in app/rules/ validates thresholds; "
+                "Matcher. Pure-Python rule engine in app/rules/ validates thresholds "
+                "across 19 modules dispatched concurrently via asyncio.to_thread; "
                 "app/services/vertex_ai_search.py augments each rule's "
                 "_citations() with a Discovery Engine retrieved passage as the primary "
                 "citation, hardcoded URL as fail-open fallback."
+            ),
+        ),
+        LlmAgent(
+            name="optimizer_stub",
+            description=(
+                "optimize_strategy. Gemini 2.5 Pro structured-output reasoner producing "
+                "0-3 cross-scheme advisories grounded in the curated scheme_interactions "
+                "catalog. Phase 11 Feature 2."
             ),
         ),
         LlmAgent(
@@ -136,7 +149,7 @@ async def stream_agent_events(
     | DoneEvent
     | ErrorEvent
 ]:
-    """Stream the five-step pipeline as ordered SSE events.
+    """Stream the six-step pipeline as ordered SSE events.
 
     Two entry modes:
 
@@ -237,34 +250,41 @@ async def stream_agent_events(
         yield narrate_match_lay(matches, language=language)
         yield narrate_match_technical(matches, latency_ms=_match_latency_ms)
 
+        # optimize_strategy and compute_upside are mutually independent —
+        # both consume `matches` (and classification) but neither's output
+        # feeds the other. Run them concurrently so wallclock latency
+        # collapses from sum(optimize, upside) to max(optimize, upside).
+        # The SSE wire emits both step_started events first, then both
+        # step_result events as the gather resolves, so the frontend's
+        # per-step state machine stays well-defined.
         current_step = "optimize_strategy"
-        yield StepStartedEvent(step=current_step)
+        yield StepStartedEvent(step="optimize_strategy")
+        await asyncio.sleep(_INTER_STEP_DELAY_S)
+        yield StepStartedEvent(step="compute_upside")
         await asyncio.sleep(_INTER_STEP_DELAY_S)
         _t0 = asyncio.get_event_loop().time()
-        advisories = await optimize_strategy(
-            profile, matches, classification, language=language
+        advisories, trace = await asyncio.gather(
+            optimize_strategy(profile, matches, classification, language=language),
+            compute_upside(matches, language=language),
         )
-        _optimize_latency_ms = int((asyncio.get_event_loop().time() - _t0) * 1000)
+        _parallel_latency_ms = int((asyncio.get_event_loop().time() - _t0) * 1000)
+
+        current_step = "optimize_strategy"
         yield StepResultEvent(
-            step=current_step,
+            step="optimize_strategy",
             data=OptimizeStrategyResult(advisories=advisories),
         )
         yield narrate_optimize_strategy_lay(advisories, language=language)
         yield narrate_optimize_strategy_technical(
             advisories,
             triggered_rule_ids=[a.interaction_id for a in advisories],
-            latency_ms=_optimize_latency_ms,
+            latency_ms=_parallel_latency_ms,
         )
 
         current_step = "compute_upside"
-        yield StepStartedEvent(step=current_step)
-        await asyncio.sleep(_INTER_STEP_DELAY_S)
-        _t0 = asyncio.get_event_loop().time()
-        trace = await compute_upside(matches, language=language)
-        _upside_latency_ms = int((asyncio.get_event_loop().time() - _t0) * 1000)
-        yield StepResultEvent(step=current_step, data=trace)
+        yield StepResultEvent(step="compute_upside", data=trace)
         yield narrate_compute_upside_lay(trace, language=language)
-        yield narrate_compute_upside_technical(trace, latency_ms=_upside_latency_ms)
+        yield narrate_compute_upside_technical(trace, latency_ms=_parallel_latency_ms)
 
         current_step = "generate"
         yield StepStartedEvent(step=current_step)

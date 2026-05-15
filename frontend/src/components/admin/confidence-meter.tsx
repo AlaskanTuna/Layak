@@ -13,9 +13,9 @@ function bandFor(confidence: number): Band {
 }
 
 const SEGMENT_COLOR: Record<Band, string> = {
-  high: 'bg-[color:var(--hibiscus)]',
+  high: 'bg-[color:var(--forest)]',
   mid: 'bg-[color:var(--warning)]',
-  low: 'bg-destructive'
+  low: 'bg-[color:var(--hibiscus)]'
 }
 
 /**

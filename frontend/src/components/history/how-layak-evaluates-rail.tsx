@@ -1,10 +1,10 @@
 'use client'
 
-import { Calculator, FileCheck, FileSearch, Network, ScanSearch, type LucideIcon } from 'lucide-react'
+import { Calculator, Compass, FileCheck, FileSearch, Network, ScanSearch, type LucideIcon } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 
 type Step = {
-  id: 'extract' | 'classify' | 'match' | 'compute' | 'generate'
+  id: 'extract' | 'classify' | 'match' | 'strategy' | 'compute' | 'generate'
   icon: LucideIcon
 }
 
@@ -12,13 +12,14 @@ const STEPS: readonly Step[] = [
   { id: 'extract', icon: FileSearch },
   { id: 'classify', icon: ScanSearch },
   { id: 'match', icon: Network },
+  { id: 'strategy', icon: Compass },
   { id: 'compute', icon: Calculator },
   { id: 'generate', icon: FileCheck }
 ]
 
 /**
- * Five-step explainer rail mirroring the landing page pipeline:
- * extract → classify → match → compute → generate. One-liner bodies.
+ * Six-step explainer rail mirroring the landing page pipeline:
+ * extract → classify → match → strategy → compute → generate. One-liner bodies.
  */
 export function HowLayakEvaluatesRail() {
   const { t } = useTranslation()

@@ -221,7 +221,7 @@
       "headlinePart1": "三次上传，",
       "headlineEmphasis": "了解你符合资格的",
       "headlineTail": "马来西亚政府计划。",
-      "description": "Layak 读取您的 MyKad、工资单和水电费账单，然后运行五步智能代理流程，将您与政府计划配对 —— STR、JKM Warga Emas、LHDN Form B 税务减免等。每个数字都附有出处引用。",
+      "description": "Layak 读取您的 MyKad、工资单和水电费账单，然后运行六步智能代理流程，将您与政府计划配对 —— STR、JKM Warga Emas、LHDN Form B 税务减免等。每个数字都附有出处引用。",
       "getStarted": "立即开始",
       "metaFree": "免费 · 每日 5 次评估",
       "metaDrafts": "仅生成草稿 · 由您提交",
@@ -262,13 +262,13 @@
         {
           "docCode": "FAQ-06",
           "question": "整个流程需要多长时间？",
-          "body": "端到端不到一分钟。五个步骤 —— 提取、分类、匹配、计算、生成 —— 实时流式呈现到界面，让您看着代理推理，而不是盯着加载圈。"
+          "body": "端到端不到一分钟。六个步骤 —— 提取、分类、匹配、策略、计算、生成 —— 实时流式呈现到界面，让您看着代理推理，而不是盯着加载圈。"
         }
       ]
     },
     "pipeline": {
       "eyebrow": "02 —— 工作原理",
-      "headlineLead": "五个步骤，实时呈现 ——",
+      "headlineLead": "六个步骤，实时呈现 ——",
       "headlineTail": "您可以看到代理推理的全过程。",
       "description": "Layak 不是黑箱。每一步都会将其推理过程回写到您的屏幕 —— 提取的档案、匹配的规则、执行计算的 Python，以及最终输出的 PDF。",
       "steps": [
@@ -286,6 +286,11 @@
           "label": "匹配",
           "title": "用确定性规则\n检查整个计划库。",
           "body": "规则引擎会把结构化档案对照 STR、JKM、LHDN、PERKESO、教育和补贴规则。引用会指回已缓存的机构来源；模型不会编造资格结果。"
+        },
+        {
+          "label": "策略",
+          "title": "跨计划推理",
+          "body": "Gemini 2.5 Pro 跨已匹配的计划进行推理，生成 0-3 条可执行的策略提示 — 例如「若你也执行 X，将激活计划 Y」。"
         },
         {
           "label": "计算",
@@ -332,7 +337,7 @@
     },
     "features": {
       "sectionTitle": "代理如何运作",
-      "sectionDescription": "五个步骤。每一步都实时传送到界面，让您亲眼看到推理过程。",
+      "sectionDescription": "六个步骤。每一步都实时传送到界面，让您亲眼看到推理过程。",
       "step1": {
         "title": "提取",
         "description": "Gemini Vision 读取您的三份文件并提取结构化的档案字段。"
@@ -346,10 +351,14 @@
         "description": "规则引擎将每份档案与计划门槛进行比对，并附上完整引用。"
       },
       "step4": {
+        "title": "策略",
+        "description": "Gemini 2.5 Pro 跨已匹配的计划进行推理，生成可执行的策略提示。"
+      },
+      "step5": {
         "title": "计算",
         "description": "Gemini Code Execution 在舞台上汇总所有符合资格计划的年度收益。"
       },
-      "step5": {
+      "step6": {
         "title": "生成",
         "description": "WeasyPrint 生成三份带水印的 PDF 申请包 —— 可供审阅和提交。"
       }
@@ -360,9 +369,10 @@
       "step1Body": "Gemini Vision 读取您的 MyKad、工资单和水电费账单，并提取结构化的档案字段 —— 姓名、身份证号、月收入、家庭构成和地址。",
       "step2Body": "从提取的档案中推导出家庭规模、人均月收入、申报类别（Form B 与 BE）、18 岁以下子女人数和 60 岁以上年长受扶养人的人数。",
       "step3Body": "规则引擎将您推导出的档案与每个计划门槛进行比对 —— STR 2026 层级、JKM Warga Emas 资格、五项 LHDN Form B 减免 —— 并返回附有精确引用的符合资格计划。",
-      "step4Body": "Gemini 编写 Python 代码片段并在 Google 代码沙箱中运行，汇总您在每个符合资格计划上的年度收益。生成的代码及其输出实时传送到界面，让您看到完整的演算过程 —— 不只是最终数字。",
-      "step5Body": "WeasyPrint 生成三份草拟 PDF —— BK-01 给 STR、JKM18 给 Warga Emas、Form B 减免摘要给 LHDN。每页都带有水印：DRAFT — NOT SUBMITTED。",
-      "statsSteps": "5",
+      "step4Body": "Gemini 2.5 Pro 跨已匹配的计划进行推理，生成 0-3 条可执行的策略提示 — 例如「若你也执行 X，将激活计划 Y」。",
+      "step5Body": "Gemini 编写 Python 代码片段并在 Google 代码沙箱中运行，汇总您在每个符合资格计划上的年度收益。生成的代码及其输出实时传送到界面，让您看到完整的演算过程 —— 不只是最终数字。",
+      "step6Body": "WeasyPrint 生成三份草拟 PDF —— BK-01 给 STR、JKM18 给 Warga Emas、Form B 减免摘要给 LHDN。每页都带有水印：DRAFT — NOT SUBMITTED。",
+      "statsSteps": "6",
       "statsStepsLabel": "步骤",
       "statsTiming": "全程不到一分钟",
       "statsDrafts": "仅草稿 —— 由您提交",
@@ -620,6 +630,10 @@
           "title": "匹配",
           "body": "将您的档案对照每一项 2026 锁定方案。"
         },
+        "strategy": {
+          "title": "策略",
+          "body": "用 Gemini 2.5 Pro 生成有依据的跨计划策略提示。"
+        },
         "compute": {
           "title": "计算",
           "body": "用 Gemini 运行 Python 汇总年度减免。"
@@ -703,7 +717,7 @@
         "extractManual": "档案已就绪",
         "classify": "分类家庭",
         "match": "匹配计划",
-        "optimize_strategy": "优化策略",
+        "optimize_strategy": "策略",
         "compute_upside": "计算收益",
         "generate": "生成草稿"
       }
@@ -991,6 +1005,7 @@
       "matchesPlural": "{{count}} 项匹配",
       "noMatches": "本次构建中未找到符合您档案的计划。",
       "whyQualify": "为何您符合资格",
+      "whyQualifyTapReveal": "点击展开",
       "whyIQualify": "我为何符合资格",
       "estValue": "预估价值",
       "startApp": "申请",

@@ -45,7 +45,7 @@ const FAQS_FALLBACK: FaqItem[] = [
   {
     docCode: 'FAQ-06',
     question: 'How long does the whole pipeline take?',
-    body: 'Under a minute end-to-end. The five steps — extract, classify, match, compute, generate — stream live to the UI so you watch the agent reason instead of staring at a spinner.'
+    body: 'Under a minute end-to-end. The six steps — extract, classify, match, strategy, compute, generate — stream live to the UI so you watch the agent reason instead of staring at a spinner.'
   }
 ]
 

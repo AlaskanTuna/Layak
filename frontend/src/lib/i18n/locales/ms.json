@@ -221,7 +221,7 @@
       "headlinePart1": "Ketahui setiap skim Malaysia",
       "headlineEmphasis": "yang anda layak",
       "headlineTail": "dengan tiga muat naik.",
-      "description": "Layak membaca MyKad, slip gaji, dan bil utiliti anda, kemudian menjalankan saluran ejen lima langkah untuk memadankan anda dengan skim kerajaan — STR, JKM Warga Emas, pelepasan LHDN Borang B, dan banyak lagi. Setiap nombor mempunyai rujukan sumber.",
+      "description": "Layak membaca MyKad, slip gaji, dan bil utiliti anda, kemudian menjalankan saluran ejen enam langkah untuk memadankan anda dengan skim kerajaan — STR, JKM Warga Emas, pelepasan LHDN Borang B, dan banyak lagi. Setiap nombor mempunyai rujukan sumber.",
       "getStarted": "Mula Sekarang",
       "metaFree": "Percuma · 5 penilaian / hari",
       "metaDrafts": "Draf sahaja · anda hantar",
@@ -229,7 +229,7 @@
     },
     "pipeline": {
       "eyebrow": "02 — Cara ia berfungsi",
-      "headlineLead": "Lima langkah, distrim secara langsung —",
+      "headlineLead": "Enam langkah, distrim secara langsung —",
       "headlineTail": "anda lihat ejen menaakul.",
       "description": "Layak bukan kotak hitam. Setiap langkah menulis kerjanya kembali ke skrin anda — profil yang diekstrak, peraturan yang dipadankan, Python yang melakukan pengiraan, dan PDF yang dihasilkan di hujung.",
       "steps": [
@@ -247,6 +247,11 @@
           "label": "Padan",
           "title": "Jalankan peraturan deterministik\nmerentas korpus skim.",
           "body": "Enjin peraturan menyemak profil berstruktur terhadap peraturan STR, JKM, LHDN, PERKESO, pendidikan, dan subsidi. Petikan merujuk kembali kepada sumber agensi yang dicache; model tidak mencipta kelayakan."
+        },
+        {
+          "label": "Strategi",
+          "title": "Penaakulan merentas skim",
+          "body": "Gemini 2.5 Pro menaakul merentas skim yang dipadankan untuk mengeluarkan 0-3 nasihat strategi — contoh, 'jika anda juga lakukan X, skim Y akan diaktifkan.'"
         },
         {
           "label": "Kira",
@@ -302,7 +307,7 @@
         {
           "docCode": "FAQ-06",
           "question": "Berapa lama keseluruhan saluran mengambil masa?",
-          "body": "Kurang daripada seminit dari hujung ke hujung. Lima langkah — ekstrak, kelas, padan, kira, jana — distrim secara langsung ke UI supaya anda menonton ejen menaakul, bukan menatap spinner."
+          "body": "Kurang daripada seminit dari hujung ke hujung. Enam langkah — ekstrak, kelas, padan, strategi, kira, jana — distrim secara langsung ke UI supaya anda menonton ejen menaakul, bukan menatap spinner."
         }
       ]
     },
@@ -343,7 +348,7 @@
     },
     "features": {
       "sectionTitle": "Cara ejen berfungsi",
-      "sectionDescription": "Lima langkah. Setiap langkah dihantar ke antara muka secara langsung supaya anda dapat melihat proses penaakulannya.",
+      "sectionDescription": "Enam langkah. Setiap langkah dihantar ke antara muka secara langsung supaya anda dapat melihat proses penaakulannya.",
       "step1": {
         "title": "Ekstrak",
         "description": "Gemini Vision membaca tiga dokumen anda dan mengeluarkan medan profil berstruktur."
@@ -357,10 +362,14 @@
         "description": "Enjin peraturan menyemak setiap profil terhadap ambang skim dengan rujukan lengkap."
       },
       "step4": {
+        "title": "Strategi",
+        "description": "Gemini 2.5 Pro menaakul merentas skim yang dipadankan untuk mengeluarkan nasihat strategi."
+      },
+      "step5": {
         "title": "Kira",
         "description": "Gemini Code Execution menjumlahkan faedah tahunan merentasi skim yang layak di atas pentas."
       },
-      "step5": {
+      "step6": {
         "title": "Jana",
         "description": "WeasyPrint menyediakan tiga pakej PDF bertanda air — sedia untuk disemak dan dihantar."
       }
@@ -371,9 +380,10 @@
       "step1Body": "Gemini Vision membaca MyKad, slip gaji, dan bil utiliti anda, kemudian mengeluarkan medan profil berstruktur — nama, IC, pendapatan bulanan, komposisi isi rumah, alamat.",
       "step2Body": "Saiz isi rumah, pendapatan bulanan per kapita, kategori pemfail (Borang B berbanding BE), serta bilangan anak di bawah 18 tahun dan tanggungan warga emas 60+ diperoleh daripada profil yang diekstrak.",
       "step3Body": "Enjin peraturan menyemak profil anda terhadap setiap ambang skim — peringkat STR 2026, kelayakan JKM Warga Emas, lima pelepasan LHDN Borang B — dan memulangkan skim yang layak dengan rujukan tepat.",
-      "step4Body": "Gemini menulis skrip Python dan menjalankannya dalam kotak pasir kod Google untuk menjumlahkan faedah tahunan anda merentasi setiap skim yang layak. Kod yang dihasilkan dan keluarannya dihantar langsung ke antara muka, jadi anda dapat melihat keseluruhan pengiraan — bukan hanya angka akhir.",
-      "step5Body": "WeasyPrint menjana tiga PDF draf — BK-01 untuk STR, JKM18 untuk Warga Emas, ringkasan pelepasan Borang B untuk LHDN. Setiap halaman membawa tanda air: DRAFT — NOT SUBMITTED.",
-      "statsSteps": "5",
+      "step4Body": "Gemini 2.5 Pro menaakul merentas skim yang dipadankan untuk mengeluarkan 0-3 nasihat strategi — contoh, 'jika anda juga lakukan X, skim Y akan diaktifkan.'",
+      "step5Body": "Gemini menulis skrip Python dan menjalankannya dalam kotak pasir kod Google untuk menjumlahkan faedah tahunan anda merentasi setiap skim yang layak. Kod yang dihasilkan dan keluarannya dihantar langsung ke antara muka, jadi anda dapat melihat keseluruhan pengiraan — bukan hanya angka akhir.",
+      "step6Body": "WeasyPrint menjana tiga PDF draf — BK-01 untuk STR, JKM18 untuk Warga Emas, ringkasan pelepasan Borang B untuk LHDN. Setiap halaman membawa tanda air: DRAFT — NOT SUBMITTED.",
+      "statsSteps": "6",
       "statsStepsLabel": "langkah",
       "statsTiming": "kurang daripada seminit dari awal hingga akhir",
       "statsDrafts": "draf sahaja — anda yang menghantar",
@@ -631,6 +641,10 @@
           "title": "Padan",
           "body": "Nilai profil anda terhadap setiap skim 2026 yang dikunci."
         },
+        "strategy": {
+          "title": "Strategi",
+          "body": "Keluarkan nasihat merentas skim yang berasas dengan Gemini 2.5 Pro."
+        },
         "compute": {
           "title": "Kira",
           "body": "Jumlahkan pelepasan tahunan dengan Python yang dijalankan oleh Gemini."
@@ -714,7 +728,7 @@
         "extractManual": "Profil disediakan",
         "classify": "Kelaskan isi rumah",
         "match": "Padankan skim",
-        "optimize_strategy": "Optimalkan strategi",
+        "optimize_strategy": "Strategi",
         "compute_upside": "Kira faedah",
         "generate": "Jana draf"
       }
@@ -1002,6 +1016,7 @@
       "matchesPlural": "{{count}} padanan",
       "noMatches": "Tiada skim yang layak ditemui untuk profil anda dalam binaan ini.",
       "whyQualify": "Mengapa anda layak",
+      "whyQualifyTapReveal": "Ketik untuk dedahkan",
       "whyIQualify": "Mengapa saya layak",
       "estValue": "Anggaran Nilai",
       "startApp": "Mohon",

@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { Calculator, FileSearch, FileType, Network, ScanSearch, type LucideIcon } from 'lucide-react'
+import { Calculator, Compass, FileSearch, FileType, Network, ScanSearch, type LucideIcon } from 'lucide-react'
 
 type Step = {
   num: string
@@ -37,6 +37,11 @@ const STEPS_FALLBACK: StepCopy[] = [
     body: 'The rule engine checks the structured profile against STR, JKM, LHDN, PERKESO, education, and subsidy rules. Citations point back to cached agency sources; the model does not invent eligibility.'
   },
   {
+    label: 'Strategy',
+    title: 'Reason across schemes.\nSurface grounded advisories.',
+    body: "Gemini 2.5 Pro reasons across the matched schemes to surface 0-3 grounded advisories — e.g. 'if you also do X, scheme Y fires.'"
+  },
+  {
     label: 'Compute',
     title: 'Sum the annual upside.\nShow the working.',
     body: "Gemini writes a Python snippet, runs it in Google's sandbox, and streams both the source and stdout to the UI. Verifiable arithmetic, not a final number."
@@ -52,12 +57,20 @@ const STEP_TOOLS: string[][] = [
   ['Gemini 3.1 Flash', 'Vision OCR'],
   ['Python rules', 'Pydantic v2'],
   ['Rule engine', 'Source citations'],
+  ['Gemini 2.5 Pro', 'Strategy advisories'],
   ['Gemini Code Execution', 'Python sandbox'],
   ['WeasyPrint', 'Jinja2']
 ]
 
-const STEP_ICONS: LucideIcon[] = [FileSearch, ScanSearch, Network, Calculator, FileType]
-const STEP_MOCKS: Array<() => React.ReactNode> = [ExtractMock, ClassifyMock, MatchMock, ComputeMock, GenerateMock]
+const STEP_ICONS: LucideIcon[] = [FileSearch, ScanSearch, Network, Compass, Calculator, FileType]
+const STEP_MOCKS: Array<() => React.ReactNode> = [
+  ExtractMock,
+  ClassifyMock,
+  MatchMock,
+  StrategyMock,
+  ComputeMock,
+  GenerateMock
+]
 
 export function LandingPipeline() {
   const { t } = useTranslation()
@@ -108,7 +121,7 @@ export function LandingPipeline() {
             {t('marketing.pipeline.eyebrow', '02 — How it works')}
           </div>
           <h2 className="mt-4 font-heading text-4xl font-semibold leading-[1.04] tracking-[-0.02em] sm:text-5xl lg:text-[56px]">
-            {t('marketing.pipeline.headlineLead', 'Five steps, streamed live —')}
+            {t('marketing.pipeline.headlineLead', 'Six steps, streamed live —')}
             <br />
             <span className="text-foreground/55">
               {t('marketing.pipeline.headlineTail', 'so you watch the agent reason.')}
@@ -428,6 +441,68 @@ function MatchMock() {
           </div>
         </div>
       ))}
+    </div>
+  )
+}
+
+function StrategyMock() {
+  const advisories = [
+    {
+      title: 'Add OKU dependant evidence',
+      body: 'May unlock JKM companion support if agency proof is available.',
+      confidence: 'high'
+    },
+    {
+      title: 'Keep Form B route',
+      body: 'Business filer path preserves relief stacking for this profile.',
+      confidence: 'medium'
+    },
+    {
+      title: 'Check state education aid',
+      body: 'Two school-age children create a possible non-federal follow-up.',
+      confidence: 'watch'
+    }
+  ]
+  return (
+    <div className="flex h-full flex-col gap-3 bg-[color:color-mix(in_oklch,var(--ink)_92%,transparent)] p-4 text-[color:color-mix(in_oklch,var(--paper)_94%,transparent)]">
+      <div className="flex items-center justify-between">
+        <div>
+          <div className="mono-caption text-[10px] text-[color:color-mix(in_oklch,var(--paper)_55%,transparent)]">
+            gemini_2_5_pro · strategy
+          </div>
+          <div className="mt-1 text-[13px] font-semibold">Cross-scheme advisories</div>
+        </div>
+        <span className="rounded-full bg-[color:var(--forest)]/18 px-2.5 py-1 mono-caption text-[9px] text-[color:var(--forest)]">
+          3 found
+        </span>
+      </div>
+      <div className="grid gap-2.5">
+        {advisories.map((item, i) => (
+          <div
+            key={item.title}
+            className="fade-rise rounded-lg border border-[color:color-mix(in_oklch,var(--paper)_10%,transparent)]/30 bg-[color:color-mix(in_oklch,var(--paper)_4%,transparent)] p-3"
+            style={{ animationDelay: `${i * 120}ms` }}
+          >
+            <div className="flex items-center justify-between gap-3">
+              <div className="text-[12px] font-semibold">{item.title}</div>
+              <span className="mono-caption rounded bg-[color:color-mix(in_oklch,var(--paper)_8%,transparent)] px-1.5 py-0.5 text-[8px] text-[color:color-mix(in_oklch,var(--paper)_60%,transparent)]">
+                {item.confidence}
+              </span>
+            </div>
+            <p className="mt-1.5 text-[11px] leading-relaxed text-[color:color-mix(in_oklch,var(--paper)_68%,transparent)]">
+              {item.body}
+            </p>
+          </div>
+        ))}
+      </div>
+      <div className="mt-auto rounded-md bg-[color:color-mix(in_oklch,var(--paper)_6%,transparent)] p-3">
+        <div className="mono-caption text-[9px] text-[color:color-mix(in_oklch,var(--paper)_55%,transparent)]">
+          reasoning trace
+        </div>
+        <div className="mt-1 font-mono text-[10px] leading-relaxed text-[color:color-mix(in_oklch,var(--paper)_78%,transparent)]">
+          matched_schemes → constraints → 0-3 grounded next moves
+        </div>
+      </div>
     </div>
   )
 }

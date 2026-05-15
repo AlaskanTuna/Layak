@@ -256,7 +256,7 @@
       "headlinePart1": "Know every Malaysian scheme",
       "headlineEmphasis": "you qualify for",
       "headlineTail": "in three uploads.",
-      "description": "Layak reads your MyKad, payslip, and utility bill, then runs a five-step agent pipeline to match you against government schemes — STR, JKM Warga Emas, LHDN Form B reliefs, and more. Every number cites a source page.",
+      "description": "Layak reads your MyKad, payslip, and utility bill, then runs a six-step agent pipeline to match you against government schemes — STR, JKM Warga Emas, LHDN Form B reliefs, and more. Every number cites a source page.",
       "getStarted": "Get Started",
       "metaFree": "Free · 5 evals / day",
       "metaDrafts": "Drafts only · you submit",
@@ -264,7 +264,7 @@
     },
     "pipeline": {
       "eyebrow": "02 — How it works",
-      "headlineLead": "Five steps, streamed live —",
+      "headlineLead": "Six steps, streamed live —",
       "headlineTail": "so you watch the agent reason.",
       "description": "Layak is not a black box. Every step writes its working back to your screen — the extracted profile, the matched rules, the Python that does the math, the PDF that comes out the other side.",
       "steps": [
@@ -282,6 +282,11 @@
           "label": "Match",
           "title": "Run deterministic rules\nacross the scheme corpus.",
           "body": "The rule engine checks the structured profile against STR, JKM, LHDN, PERKESO, education, and subsidy rules. Citations point back to cached agency sources; the model does not invent eligibility."
+        },
+        {
+          "label": "Strategy",
+          "title": "Cross-scheme reasoning",
+          "body": "Gemini 2.5 Pro reasons across the matched schemes to surface 0-3 grounded advisories — e.g. 'if you also do X, scheme Y fires.'"
         },
         {
           "label": "Compute",
@@ -337,13 +342,13 @@
         {
           "docCode": "FAQ-06",
           "question": "How long does the whole pipeline take?",
-          "body": "Under a minute end-to-end. The five steps — extract, classify, match, compute, generate — stream live to the UI so you watch the agent reason instead of staring at a spinner."
+          "body": "Under a minute end-to-end. The six steps — extract, classify, match, strategy, compute, generate — stream live to the UI so you watch the agent reason instead of staring at a spinner."
         }
       ]
     },
     "features": {
       "sectionTitle": "How the agent works",
-      "sectionDescription": "Five steps. Every step streams to the UI in real time so you can see the reasoning as it happens.",
+      "sectionDescription": "Six steps. Every step streams to the UI in real time so you can see the reasoning as it happens.",
       "step1": {
         "title": "Extract",
         "description": "Gemini Vision reads your three documents and pulls structured profile fields."
@@ -357,10 +362,14 @@
         "description": "Rule engine checks every profile against scheme thresholds with full citations."
       },
       "step4": {
+        "title": "Strategy",
+        "description": "Gemini 2.5 Pro reasons across matched schemes to surface grounded advisories."
+      },
+      "step5": {
         "title": "Compute",
         "description": "Gemini Code Execution sums annual upside across qualifying schemes on stage."
       },
-      "step5": {
+      "step6": {
         "title": "Generate",
         "description": "WeasyPrint drafts three watermarked PDF packets — ready to review and submit."
       }
@@ -371,9 +380,10 @@
       "step1Body": "Gemini Vision reads your MyKad, payslip, and utility bill and pulls structured profile fields — name, IC, monthly income, household composition, address.",
       "step2Body": "Household size, per-capita monthly income, filer category (Form B vs BE), and counts of children under 18 and elderly dependants 60+ are derived from the extracted profile.",
       "step3Body": "The rule engine checks your derived profile against every scheme threshold — STR 2026 tiers, JKM Warga Emas eligibility, five LHDN Form B reliefs — and returns qualifying schemes with exact citations.",
-      "step4Body": "Gemini writes a Python snippet and runs it in Google's code sandbox to sum your annual upside across every qualifying scheme. The generated code and its output stream live to the UI, so you see the full working — not just a final number.",
-      "step5Body": "WeasyPrint renders three draft PDFs — BK-01 for STR, JKM18 for Warga Emas, a Form B relief summary for LHDN. Every page carries the watermark: DRAFT — NOT SUBMITTED.",
-      "statsSteps": "5",
+      "step4Body": "Gemini 2.5 Pro reasons across the matched schemes to surface 0-3 grounded advisories — e.g. 'if you also do X, scheme Y fires.'",
+      "step5Body": "Gemini writes a Python snippet and runs it in Google's code sandbox to sum your annual upside across every qualifying scheme. The generated code and its output stream live to the UI, so you see the full working — not just a final number.",
+      "step6Body": "WeasyPrint renders three draft PDFs — BK-01 for STR, JKM18 for Warga Emas, a Form B relief summary for LHDN. Every page carries the watermark: DRAFT — NOT SUBMITTED.",
+      "statsSteps": "6",
       "statsStepsLabel": "steps",
       "statsTiming": "under a minute end-to-end",
       "statsDrafts": "drafts only — you submit",
@@ -631,6 +641,10 @@
           "title": "Match",
           "body": "Score your profile against every locked 2026 scheme."
         },
+        "strategy": {
+          "title": "Strategy",
+          "body": "Surface grounded cross-scheme advisories with Gemini 2.5 Pro."
+        },
         "compute": {
           "title": "Compute",
           "body": "Sum the annual upside with Gemini-run Python."
@@ -714,7 +728,7 @@
         "extractManual": "Profile prepared",
         "classify": "Classify household",
         "match": "Match schemes",
-        "optimize_strategy": "Optimize strategy",
+        "optimize_strategy": "Strategy",
         "compute_upside": "Compute upside",
         "generate": "Generate drafts"
       }
@@ -1002,6 +1016,7 @@
       "matchesPlural": "{{count}} matches",
       "noMatches": "No qualifying schemes found for your profile in this build.",
       "whyQualify": "Why you qualify",
+      "whyQualifyTapReveal": "Tap to reveal",
       "whyIQualify": "Why I qualify",
       "estValue": "Est. Value",
       "startApp": "Apply",

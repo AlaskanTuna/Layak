@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { ArrowRight, ChevronDown, ExternalLink, Quote } from 'lucide-react'
+import { ArrowRight, ChevronDown, ExternalLink, Quote, Sparkles, TrendingDown, TrendingUp, XCircle } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 
 import { Button } from '@/components/ui/button'
@@ -355,38 +355,86 @@ function SourcesPanel({
 
 function DeltaChip({ delta, t }: { delta: SchemeDelta | undefined; t: ReturnType<typeof useTranslation>['t'] }) {
   if (!delta || delta.status === 'unchanged') return null
+
+  const isAmountUp = delta.status === 'amount_changed' && delta.delta_rm >= 0
+  const isAmountDown = delta.status === 'amount_changed' && delta.delta_rm < 0
+
   const tone =
-    delta.status === 'lost'
-      ? 'border-destructive/40 bg-destructive/10 text-destructive'
-      : delta.status === 'gained'
-        ? 'border-[color:var(--forest)]/40 bg-[color:var(--forest)]/10 text-[color:var(--forest)]'
-        : 'border-[color:var(--primary)]/40 bg-[color:var(--primary)]/10 text-[color:var(--primary)]'
-  let label = ''
-  if (delta.status === 'gained' && delta.new_annual_rm != null) {
-    label = t('evaluation.whatIf.deltaChip.gained', {
-      amount: Math.round(delta.new_annual_rm).toLocaleString('en-MY')
-    })
-  } else if (delta.status === 'lost' && delta.baseline_annual_rm != null) {
-    label = t('evaluation.whatIf.deltaChip.lost', {
-      amount: Math.round(delta.baseline_annual_rm).toLocaleString('en-MY')
-    })
-  } else if (delta.status === 'tier_changed') {
-    label = t('evaluation.whatIf.deltaChip.tier_changed', { note: delta.note ?? '' })
-  } else if (delta.status === 'amount_changed') {
-    label = t('evaluation.whatIf.deltaChip.amount_changed', {
-      sign: delta.delta_rm >= 0 ? '+' : '−',
-      amount: Math.round(Math.abs(delta.delta_rm)).toLocaleString('en-MY')
-    })
+    delta.status === 'lost' || isAmountDown
+      ? 'border-destructive/35 bg-destructive/8 text-destructive'
+      : delta.status === 'gained' || isAmountUp
+        ? 'border-[color:var(--forest)]/35 bg-[color:var(--forest)]/8 text-[color:var(--forest)]'
+        : 'border-[color:var(--primary)]/35 bg-[color:var(--primary)]/8 text-[color:var(--primary)]'
+
+  const Icon =
+    delta.status === 'gained'
+      ? Sparkles
+      : delta.status === 'lost'
+        ? XCircle
+        : isAmountDown
+          ? TrendingDown
+          : delta.status === 'amount_changed'
+            ? TrendingUp
+            : ArrowRight
+
+  const eyebrow =
+    delta.status === 'gained'
+      ? t('evaluation.whatIf.deltaChip.eyebrow.gained')
+      : delta.status === 'lost'
+        ? t('evaluation.whatIf.deltaChip.eyebrow.lost')
+        : delta.status === 'tier_changed'
+          ? t('evaluation.whatIf.deltaChip.eyebrow.tier_changed')
+          : t('evaluation.whatIf.deltaChip.eyebrow.amount_changed')
+
+  // tier_changed renders as a two-line pill: eyebrow on top, the before→after
+  // diff (with the backend's ASCII "->" swapped to a unicode arrow) on a
+  // second line in sentence-case prose. The other statuses are short labels
+  // and fit a single-line pill with the eyebrow as the value's lead-in.
+  if (delta.status === 'tier_changed') {
+    const note = (delta.note ?? '').replace(/\s*->\s*/g, ' → ')
+    const [before, after] = note.split(' → ')
+    return (
+      <div
+        className={cn('inline-flex w-full items-start gap-2 rounded-lg border px-2.5 py-1.5', tone)}
+        role="status"
+      >
+        <Icon className="mt-0.5 size-3.5 shrink-0" aria-hidden />
+        <div className="flex min-w-0 flex-col gap-0.5">
+          <span className="mono-caption text-[9.5px] leading-none opacity-80">{eyebrow}</span>
+          <span className="text-[11px] leading-[1.35] text-foreground/85">
+            {after ? (
+              <>
+                <span className="text-foreground/55 line-through decoration-foreground/30">{before}</span>{' '}
+                <span className="opacity-60">→</span> <span className="font-medium">{after}</span>
+              </>
+            ) : (
+              note
+            )}
+          </span>
+        </div>
+      </div>
+    )
   }
+
+  let value = ''
+  if (delta.status === 'gained' && delta.new_annual_rm != null) {
+    value = `RM ${Math.round(delta.new_annual_rm).toLocaleString('en-MY')}`
+  } else if (delta.status === 'lost' && delta.baseline_annual_rm != null) {
+    value = `RM ${Math.round(delta.baseline_annual_rm).toLocaleString('en-MY')}`
+  } else if (delta.status === 'amount_changed') {
+    const sign = delta.delta_rm >= 0 ? '+' : '−'
+    value = `${sign}RM ${Math.round(Math.abs(delta.delta_rm)).toLocaleString('en-MY')}`
+  }
+
   return (
     <div
-      className={cn(
-        'inline-flex w-fit items-center rounded-full border px-2 py-0.5 text-[10.5px] font-medium uppercase tracking-[0.1em]',
-        tone
-      )}
+      className={cn('inline-flex w-fit max-w-full items-center gap-1.5 rounded-full border px-2.5 py-1', tone)}
       role="status"
     >
-      {label}
+      <Icon className="size-3.5 shrink-0" aria-hidden />
+      <span className="mono-caption text-[9.5px] leading-none opacity-85">{eyebrow}</span>
+      <span aria-hidden className="opacity-40">·</span>
+      <span className="text-[11px] font-semibold tabular-nums leading-none">{value}</span>
     </div>
   )
 }

@@ -748,7 +748,13 @@
         "lost": "不再符合 · 此前 RM {{amount}}",
         "tier_changed": "{{note}}",
         "amount_changed": "{{sign}}RM {{amount}}",
-        "unchanged": "无变化"
+        "unchanged": "无变化",
+        "eyebrow": {
+          "gained": "新符合资格",
+          "lost": "不再符合",
+          "tier_changed": "等级已更新",
+          "amount_changed": "金额变动"
+        }
       }
     },
     "strategy": {

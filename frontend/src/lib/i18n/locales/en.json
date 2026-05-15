@@ -759,7 +759,13 @@
         "lost": "Now ineligible · was RM {{amount}}",
         "tier_changed": "{{note}}",
         "amount_changed": "{{sign}}RM {{amount}}",
-        "unchanged": "No change"
+        "unchanged": "No change",
+        "eyebrow": {
+          "gained": "Newly eligible",
+          "lost": "No longer eligible",
+          "tier_changed": "Tier updated",
+          "amount_changed": "Amount changed"
+        }
       }
     },
     "strategy": {

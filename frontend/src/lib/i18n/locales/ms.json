@@ -759,7 +759,13 @@
         "lost": "Tidak lagi layak · dulu RM {{amount}}",
         "tier_changed": "{{note}}",
         "amount_changed": "{{sign}}RM {{amount}}",
-        "unchanged": "Tiada perubahan"
+        "unchanged": "Tiada perubahan",
+        "eyebrow": {
+          "gained": "Layak baru",
+          "lost": "Tidak lagi layak",
+          "tier_changed": "Tahap dikemas kini",
+          "amount_changed": "Jumlah berubah"
+        }
       }
     },
     "strategy": {

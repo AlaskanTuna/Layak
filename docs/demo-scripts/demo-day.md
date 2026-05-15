@@ -35,15 +35,23 @@ True to our team's name, we are here to help with that. Introducing **LAYAK**, t
 
 ## [Architecture Overview] (1m – 1m30s max)
 
-Layak is not a chatbot wrapper. Every number comes from a typed Python rule engine, grounded against a gazetted PDF.
+And that last point — every claim backed by a verified source — is exactly where Layak's architecture earns its keep. Layak is not just any chatbot wrapper. Every number you see on screen comes from a typed Python rule engine, grounded against a real gazetted PDF. Let me show you how, in four pieces.
 
-**System architecture.** [Slide 04] Three GCP tiers in one trust boundary — Cloud Run for compute, Vertex AI for models, Firestore for state. Raw uploads never persist.
+**[Slide 04 — System Architecture]**
 
-**Agent pipeline.** [Slide 05] Six autonomous steps stream live — Gemini Flash reads MyKad and payslip; Flash-Lite classifies; a typed Python rule engine matches Budget-2026 schemes; Gemini 2.5 Pro picks the strategy; Code Execution computes annual upside in real Python; WeasyPrint drafts the packets.
+Architecturally, Layak lives entirely inside one Google Cloud trust boundary, organised into three tiers — compute runs on Cloud Run, the AI layer runs on Vertex, and state sits in Firestore. And critically, the user's raw documents never persist anywhere. They're processed in memory and discarded the moment the pipeline finishes.
 
-**Grounded retrieval.** [Slide 09] Every rule queries Vertex AI Search over 20 gazetted PDFs. If retrieval misses, the rule drops — numbers are never invented.
+**[Slide 05 — Agent Pipeline]**
 
-**Cik Lay.** [Slide 10] Our concierge is hard-constrained to your evaluation. Five-layer guardrails — scope, topic, PII, legal, citation. Every reply cites the source.
+Our ADK-Python SequentialAgent orchestrates six autonomous steps — extract to draft packet — all streaming live to the screen. I'll save the step-by-step walkthrough for the live demo, where the pipeline runs in front of you and you can watch the agent think in real time.
+
+**[Slide 09 — Vertex AI Search]**
+
+The match step is the heart of our grounding story. Every rule queries Vertex AI Search across [switch] 20 gazetted government PDFs and pulls back the exact passage that justifies the eligibility decision. If retrieval misses, the rule is dropped — never invented. That's how we can promise zero hallucinations.
+
+**[Slide 10 — Cik Lay]**
+
+And once the results are on screen, Cik Lay — our concierge chatbot — takes over the conversation. She's hard-constrained to your evaluation only, guarded by five layers covering scope, topic, PII, legal, and citation. So every reply she gives is grounded in a real PDF, citing the exact page it came from.
 
 ---
 

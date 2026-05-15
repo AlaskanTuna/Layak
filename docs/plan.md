@@ -2118,7 +2118,7 @@ is False` to confirm threshold propagation reaches the rule engine.
 
 ## Phase 15: Scheme Corpus Expansion (16 → 20)
 
-> Brings Layak's scheme corpus to 20 schemes total (10 federal agencies,
+> Brings Layak's scheme corpus to 20 schemes total (9 federal agencies,
 > 8 benefit categories), crossing the 12% mark of the 167-scheme federal
 > universe referenced in the opening pitch. Research priority remained
 > mainstream-known schemes, supplemented by deep verification of the
@@ -2181,7 +2181,7 @@ preschool pathways.
 - [x] `app/rules/_i18n.py` extended with eight new copy functions, eight
       reason fragments, and four catalog entries across en / ms / zh.
 - [x] `frontend/src/components/schemes/schemes-stats-strip.tsx` headline
-      tile updated: 20 schemes / 10 agencies / 8 categories. README
+      tile updated: 20 schemes / 9 agencies / 8 categories. README
       mermaid example updated to "20 schemes · 12 qualifying" for Aisyah.
 - [x] `backend/tests/test_phase15_schemes.py` — 21 focused tests across
       qualify-fires + out-of-scope + portal-URL domain + citations.

@@ -59,19 +59,19 @@ Malaysia currently has 167 subsidy schemes across 17 agencies, yet most people o
 
 ## [Architecture Overview] (1m – 1m30s max)
 
-And that last point — every claim backed by a verified source — is exactly where Layak's architecture earns its keep. Layak is not just any chatbot wrapper. Every number you see on screen comes from a typed Python rule engine, grounded against a real gazetted PDF. Let me show you how, in four pieces.
+And that last point — every claim backed by a verified source — is exactly where Layak's architecture earns its keep. Layak is not just any chatbot wrapper. Every number you see on screen comes from a typed Python rule engine, grounded against a real gazetted PDF.
 
 **[Slide 04 — System Architecture]**
 
-Architecturally, Layak lives entirely inside one Google Cloud trust boundary, organised into three tiers — compute runs on Cloud Run, the AI layer runs on Vertex, and state sits in Firestore. And critically, the user's raw documents never persist anywhere. They're processed in memory and discarded the moment the pipeline finishes.
+Architecturally, Layak lives entirely inside one Google Cloud trust boundary, organized into three tiers: compute runs on Cloud Run, the AI layer runs on Vertex, and state sits in Firestore. And critically, the user's raw documents never persist anywhere. They're processed in memory and discarded the moment the pipeline finishes.
 
 **[Slide 05 — Agent Pipeline]**
 
-Our ADK-Python SequentialAgent orchestrates six autonomous steps — extract to draft packet — all streaming live to the screen. I'll save the step-by-step walkthrough for the live demo, where the pipeline runs in front of you and you can watch the agent think in real time.
+Our ADK-Python SequentialAgent orchestrates six autonomous steps from "EXTRACT" to "GENERATION", more info in the step-by-step live demo walkthrough.
 
 **[Slide 09 — Vertex AI Search]**
 
-The match step is the heart of our grounding story. Every rule queries Vertex AI Search across [switch] 20 gazetted government PDFs and pulls back the exact passage that justifies the eligibility decision. If retrieval misses, the rule is dropped — never invented. That's how we can promise zero hallucinations.
+The match step of the agentic pipeline is the heart of Layak's grounding story. Every rule queries Vertex AI Search across [switch] 20 gazetted government PDFs and pulls back the exact passage that justifies the eligibility decision. If a retrieval misses, the rule is dropped and never invented. That's how we can promise zero hallucinations.
 
 **[Slide 10 — Cik Lay]**
 

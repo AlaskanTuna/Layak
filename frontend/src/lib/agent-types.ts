@@ -200,7 +200,11 @@ export type SchemeDelta = {
   baseline_annual_rm: number | null
   new_annual_rm: number | null
   delta_rm: number
-  note: string | null
+  /** Raw baseline summary string, populated only when status === 'tier_changed'.
+   *  The frontend handles any visual truncation (line-clamp / tooltip). */
+  baseline_summary: string | null
+  /** Raw rerun summary string, populated only when status === 'tier_changed'. */
+  rerun_summary: string | null
 }
 
 export type WhatIfSuggestion = {

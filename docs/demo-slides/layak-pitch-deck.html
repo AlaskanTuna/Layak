@@ -1082,18 +1082,18 @@
 
       /* Slides 02–04: tighter head so content doesn't crash the bottom edge */
       .slide[data-label^='02'] .frame-head,
-      .slide[data-label^='10'] .frame-head,
-      .slide[data-label^='03'] .frame-head,
       .slide[data-label^='12'] .frame-head,
-      .slide[data-label^='13'] .frame-head,
+      .slide[data-label^='03'] .frame-head,
       .slide[data-label^='14'] .frame-head,
-      .slide[data-label^='08'] .frame-head {
+      .slide[data-label^='15'] .frame-head,
+      .slide[data-label^='16'] .frame-head,
+      .slide[data-label^='06'] .frame-head {
         margin-top: 14px !important;
         margin-bottom: 32px;
         padding-bottom: 20px;
       }
       .slide[data-label^='02'] .t-title,
-      .slide[data-label^='10'] .t-title,
+      .slide[data-label^='12'] .t-title,
       .slide[data-label^='03'] .t-title {
         font-size: 62px;
       }
@@ -1101,33 +1101,33 @@
         font-size: 54px;
         white-space: nowrap;
       }
-      .slide[data-label^='10'] .persona-facts {
+      .slide[data-label^='12'] .persona-facts {
         align-content: start;
       }
-      .slide[data-label^='10'] .quote-block {
+      .slide[data-label^='12'] .quote-block {
         margin-top: 24px;
       }
 
       /* Slides 09–13: shrink titles so content sits higher — bold statement size */
-      .slide[data-label^='12'] .t-title,
-      .slide[data-label^='13'] .t-title-sm,
-      .slide[data-label^='14'] .t-title-sm,
-      .slide[data-label^='08'] .t-title-sm {
+      .slide[data-label^='14'] .t-title,
+      .slide[data-label^='15'] .t-title-sm,
+      .slide[data-label^='16'] .t-title-sm,
+      .slide[data-label^='06'] .t-title-sm {
         font-size: 60px;
       }
 
       /* Slides 06, 08, 14: raise the left paragraph block slightly above center */
-      .slide[data-label^='06'] .grounded-grid {
+      .slide[data-label^='08'] .grounded-grid {
         align-items: start;
       }
-      .slide[data-label^='06'] .grounded-grid > :first-child {
+      .slide[data-label^='08'] .grounded-grid > :first-child {
         padding-top: 20px;
       }
-      .slide[data-label^='08'] .manual-copy {
+      .slide[data-label^='06'] .manual-copy {
         align-self: start;
         padding-top: 20px;
       }
-      .slide[data-label^='14'] .next-grid > :first-child {
+      .slide[data-label^='16'] .next-grid > :first-child {
         align-self: start !important;
         padding-top: 20px;
       }
@@ -2413,7 +2413,7 @@
         <div class="slide-pad">
           <div class="top-chrome">
             <div class="brand"><span class="brand-mark"></span><span>LAYAK</span></div>
-            <div>02 / 16 · The Problem</div>
+            <div>02 / 18 · The Problem</div>
           </div>
           <div class="frame-head" style="margin-top: 36px">
             <div class="frame-title-group">
@@ -2458,7 +2458,7 @@
         <div class="slide-pad">
           <div class="top-chrome">
             <div class="brand"><span class="brand-mark"></span><span>LAYAK</span></div>
-            <div>03 / 16 · What Layak Does</div>
+            <div>03 / 18 · What Layak Does</div>
           </div>
 
           <div class="frame-head" style="margin-top: 36px">
@@ -2503,254 +2503,12 @@
         </div>
       </section>
 
-      <!-- ============ SLIDE 04 — 6-STEP PIPELINE ============ -->
-      <section class="slide" data-label="04 Pipeline">
+      <!-- ============ SLIDE 04 — SYSTEM ARCHITECTURE (SVG) ============ -->
+      <section class="slide" data-label="04 System Architecture">
         <div class="slide-pad">
           <div class="top-chrome">
             <div class="brand"><span class="brand-mark"></span><span>LAYAK</span></div>
-            <div>04 / 16 · The Agentic Moment</div>
-          </div>
-
-          <div class="frame-head" style="margin-top: 36px">
-            <div class="frame-title-group">
-              <div class="t-eyebrow">Six autonomous steps · ADK-Python SequentialAgent</div>
-              <h2 class="t-title-sm">Chat → Action, made visible on stage.</h2>
-            </div>
-          </div>
-
-          <div class="pipe-rail">
-            <div class="pipe-step accent">
-              <div class="num">01 · EXTRACT</div>
-              <div class="label">Read documents.</div>
-              <ul class="card-bullets on-dark compact">
-                <li>Multimodal OCR over MyKad, payslip, utility bill.</li>
-                <li>Typed Profile · no IC number emitted.</li>
-              </ul>
-              <div class="tech">Gemini 2.5 Flash · multimodal</div>
-            </div>
-            <div class="pipe-step accent">
-              <div class="num">02 · CLASSIFY</div>
-              <div class="label">Tag household.</div>
-              <ul class="card-bullets on-dark compact">
-                <li>Income band · dependants · form type.</li>
-                <li>Structured JSON + plain-English notes.</li>
-              </ul>
-              <div class="tech">Gemini 2.5 Flash · structured</div>
-            </div>
-            <div class="pipe-step accent">
-              <div class="num">03 · MATCH</div>
-              <div class="label">Check rules.</div>
-              <ul class="card-bullets on-dark compact">
-                <li>Pure-Python engine runs 20 schemes in parallel.</li>
-                <li>Six rules enriched by Vertex AI Search.</li>
-              </ul>
-              <div class="tech">Python · Vertex AI Search</div>
-            </div>
-            <div class="pipe-step accent">
-              <div class="num">04 · STRATEGY</div>
-              <div class="label">Cross-scheme advisories.</div>
-              <ul class="card-bullets on-dark compact">
-                <li>0–3 strategic advisories per evaluation.</li>
-                <li>Grounded in a hand-curated interaction catalog.</li>
-              </ul>
-              <div class="tech">Gemini 2.5 Pro</div>
-            </div>
-            <div class="pipe-step accent">
-              <div class="num">05 · UPSIDE</div>
-              <div class="label">Compute RM.</div>
-              <ul class="card-bullets on-dark compact">
-                <li>Sandboxed Python sums every annual RM.</li>
-                <li>Server-side guardrail check alongside.</li>
-              </ul>
-              <div class="tech">Gemini 2.5 Flash + Code Execution</div>
-            </div>
-            <div class="pipe-step accent">
-              <div class="num">06 · GENERATE</div>
-              <div class="label">Draft packet.</div>
-              <ul class="card-bullets on-dark compact">
-                <li>One PDF per qualifying scheme.</li>
-                <li>Watermarked DRAFT — NOT SUBMITTED.</li>
-              </ul>
-              <div class="tech">WeasyPrint · HTML → PDF</div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <!-- ============ SLIDE 05 — STACK ============ -->
-      <section class="slide" data-label="05 Stack">
-        <div class="slide-pad">
-          <div class="top-chrome">
-            <div class="brand"><span class="brand-mark"></span><span>LAYAK</span></div>
-            <div>05 / 16 · Google AI Ecosystem</div>
-          </div>
-
-          <div class="frame-head" style="margin-top: 36px">
-            <div class="frame-title-group">
-              <div class="t-eyebrow">Google ecosystem · coverage report</div>
-              <h2 class="t-title-sm">Eight Google components in one flow.</h2>
-            </div>
-          </div>
-
-          <div class="stack-grid">
-            <div class="stack-card">
-              <div>
-                <div class="tier">Brain · 01</div>
-                <h4>Gemini 2.5 Pro</h4>
-                <ul class="card-bullets compact">
-                  <li>Orchestrator + heavy reasoning.</li>
-                  <li>Runs compute_upside + strategy.</li>
-                </ul>
-              </div>
-              <div class="code">ORCHESTRATOR_MODEL · HEAVY_MODEL</div>
-            </div>
-            <div class="stack-card">
-              <div>
-                <div class="tier">Brain · 02</div>
-                <h4>Gemini 3.1 Flash-Lite</h4>
-                <ul class="card-bullets compact">
-                  <li>Multimodal document extract.</li>
-                  <li>Structured household classify.</li>
-                </ul>
-              </div>
-              <div class="code">FAST_MODEL · WORKER_MODEL</div>
-            </div>
-            <div class="stack-card">
-              <div>
-                <div class="tier">Brain · 03</div>
-                <h4>Gemini Code Execution</h4>
-                <ul class="card-bullets compact">
-                  <li>Sandboxed Python for RM math.</li>
-                  <li>Snippet streams to the UI.</li>
-                </ul>
-              </div>
-              <div class="code">tools: [{codeExecution: {}}]</div>
-            </div>
-            <div class="stack-card">
-              <div>
-                <div class="tier">Context · 04</div>
-                <h4>Vertex AI Search</h4>
-                <ul class="card-bullets compact">
-                  <li>Grounded RAG over scheme PDFs.</li>
-                  <li>Every rule carries a passage.</li>
-                </ul>
-              </div>
-              <div class="code">tools: [{retrieval: {vertexAiSearch}}]</div>
-            </div>
-
-            <div class="stack-card">
-              <div>
-                <div class="tier">Orchestrator · 05</div>
-                <h4>ADK-Python v1.31</h4>
-                <ul class="card-bullets compact">
-                  <li>SequentialAgent + FunctionTool.</li>
-                  <li>First-party GA agent framework.</li>
-                </ul>
-              </div>
-              <div class="code">adk deploy cloud_run --with_ui</div>
-            </div>
-            <div class="stack-card">
-              <div>
-                <div class="tier">Lifecycle · 06</div>
-                <h4>Cloud Run</h4>
-                <ul class="card-bullets compact">
-                  <li>Hosts frontend + backend services.</li>
-                  <li>min-instances=1 with CPU boost.</li>
-                </ul>
-              </div>
-              <div class="code">region · asia-southeast1</div>
-            </div>
-            <div class="stack-card">
-              <div>
-                <div class="tier">Identity · 07</div>
-                <h4>Firebase Auth</h4>
-                <ul class="card-bullets compact">
-                  <li>Google OAuth + email sign-in.</li>
-                  <li>ID-token verified on every call.</li>
-                </ul>
-              </div>
-              <div class="code">firebase_admin.auth.verify_id_token</div>
-            </div>
-            <div class="stack-card">
-              <div>
-                <div class="tier">State · 08</div>
-                <h4>Cloud Firestore</h4>
-                <ul class="card-bullets compact">
-                  <li>Stores derived evaluations only.</li>
-                  <li>Raw uploads never persisted.</li>
-                </ul>
-              </div>
-              <div class="code">evaluations/{evalId}</div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <!-- ============ SLIDE 06 — GROUNDED ============ -->
-      <section class="slide" data-label="06 Grounded">
-        <div class="slide-pad">
-          <div class="top-chrome">
-            <div class="brand"><span class="brand-mark"></span><span>LAYAK</span></div>
-            <div>06 / 16 · Grounded, Not Guessed</div>
-          </div>
-
-          <div class="frame-head" style="margin-top: 36px">
-            <div class="frame-title-group">
-              <div class="t-eyebrow">Provenance as a first-class surface</div>
-              <h2 class="t-title-sm" style="font-family: 'Literata', Georgia, serif">
-                Every number on screen links to a source PDF.
-              </h2>
-            </div>
-          </div>
-
-          <div class="grounded-grid">
-            <div>
-              <p class="grounded-lead">No rule value ever appears in the UI <em>without</em> a retrievable citation.</p>
-              <ul class="card-bullets" style="margin-top: 24px; gap: 18px">
-                <li>One beat away from the MyGov + NYC MyCity chatbot failures.</li>
-                <li>If Search returns no passage, the rule is flagged <em>unverified</em>.</li>
-                <li>Unverified rules never contribute to the ranked list.</li>
-              </ul>
-            </div>
-
-            <div class="cite-mock">
-              <div class="cm-head">
-                <div class="cm-title">STR 2026 — Household Tier</div>
-                <div class="cm-tag">Provenance</div>
-              </div>
-              <div class="cite-row">
-                <div class="cite-key">Household income band</div>
-                <div class="cite-val">
-                  <span class="val-num">≤ RM 2,500</span>
-                  <span class="chip">risalah-str-2026.pdf · p.2</span>
-                </div>
-              </div>
-              <div class="cite-row">
-                <div class="cite-key">Children multiplier</div>
-                <div class="cite-val">
-                  <span class="val-num">×2</span>
-                  <span class="chip">risalah-str-2026.pdf · p.2</span>
-                </div>
-              </div>
-              <div class="cite-row">
-                <div class="cite-key">Annual STR cash tier</div>
-                <div class="cite-val">
-                  <span class="val-num">RM 2,500 / yr</span>
-                  <span class="chip">risalah-str-2026.pdf · p.3</span>
-                </div>
-              </div>
-              <div class="cite-foot">retrieved via Vertex AI Search</div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <!-- ============ SLIDE 07 — SYSTEM ARCHITECTURE (SVG) ============ -->
-      <section class="slide" data-label="07 System Architecture">
-        <div class="slide-pad">
-          <div class="top-chrome">
-            <div class="brand"><span class="brand-mark"></span><span>LAYAK</span></div>
-            <div>07 / 16 · System Architecture</div>
+            <div>04 / 18 · System Architecture</div>
           </div>
 
           <div class="frame-head" style="margin-top: 36px">
@@ -3055,12 +2813,86 @@
         </div>
       </section>
 
-      <!-- ============ SLIDE 08 — ARCHITECTURE (DATA PATH) ============ -->
-      <section class="slide" data-label="08 Data Path">
+      <!-- ============ SLIDE 05 — 6-STEP PIPELINE ============ -->
+      <section class="slide" data-label="05 Pipeline">
         <div class="slide-pad">
           <div class="top-chrome">
             <div class="brand"><span class="brand-mark"></span><span>LAYAK</span></div>
-            <div>08 / 16 · Data Pipeline</div>
+            <div>05 / 18 · The Agentic Moment</div>
+          </div>
+
+          <div class="frame-head" style="margin-top: 36px">
+            <div class="frame-title-group">
+              <div class="t-eyebrow">Six autonomous steps · ADK-Python SequentialAgent</div>
+              <h2 class="t-title-sm">Chat → Action, made visible on stage.</h2>
+            </div>
+          </div>
+
+          <div class="pipe-rail">
+            <div class="pipe-step accent">
+              <div class="num">01 · EXTRACT</div>
+              <div class="label">Read documents.</div>
+              <ul class="card-bullets on-dark compact">
+                <li>Multimodal OCR over MyKad, payslip, utility bill.</li>
+                <li>Typed Profile · no IC number emitted.</li>
+              </ul>
+              <div class="tech">Gemini 2.5 Flash · multimodal</div>
+            </div>
+            <div class="pipe-step accent">
+              <div class="num">02 · CLASSIFY</div>
+              <div class="label">Tag household.</div>
+              <ul class="card-bullets on-dark compact">
+                <li>Income band · dependants · form type.</li>
+                <li>Structured JSON + plain-English notes.</li>
+              </ul>
+              <div class="tech">Gemini 2.5 Flash · structured</div>
+            </div>
+            <div class="pipe-step accent">
+              <div class="num">03 · MATCH</div>
+              <div class="label">Check rules.</div>
+              <ul class="card-bullets on-dark compact">
+                <li>Pure-Python engine runs 20 schemes in parallel.</li>
+                <li>Six rules enriched by Vertex AI Search.</li>
+              </ul>
+              <div class="tech">Python · Vertex AI Search</div>
+            </div>
+            <div class="pipe-step accent">
+              <div class="num">04 · STRATEGY</div>
+              <div class="label">Cross-scheme advisories.</div>
+              <ul class="card-bullets on-dark compact">
+                <li>0–3 strategic advisories per evaluation.</li>
+                <li>Grounded in a hand-curated interaction catalog.</li>
+              </ul>
+              <div class="tech">Gemini 2.5 Pro</div>
+            </div>
+            <div class="pipe-step accent">
+              <div class="num">05 · UPSIDE</div>
+              <div class="label">Compute RM.</div>
+              <ul class="card-bullets on-dark compact">
+                <li>Sandboxed Python sums every annual RM.</li>
+                <li>Server-side guardrail check alongside.</li>
+              </ul>
+              <div class="tech">Gemini 2.5 Flash + Code Execution</div>
+            </div>
+            <div class="pipe-step accent">
+              <div class="num">06 · GENERATE</div>
+              <div class="label">Draft packet.</div>
+              <ul class="card-bullets on-dark compact">
+                <li>One PDF per qualifying scheme.</li>
+                <li>Watermarked DRAFT — NOT SUBMITTED.</li>
+              </ul>
+              <div class="tech">WeasyPrint · HTML → PDF</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============ SLIDE 06 — ARCHITECTURE (DATA PATH) ============ -->
+      <section class="slide" data-label="06 Data Path">
+        <div class="slide-pad">
+          <div class="top-chrome">
+            <div class="brand"><span class="brand-mark"></span><span>LAYAK</span></div>
+            <div>06 / 18 · Data Pipeline</div>
           </div>
 
           <div class="frame-head" style="margin-top: 36px">
@@ -3137,12 +2969,734 @@
         </div>
       </section>
 
-      <!-- ============ SLIDE 09 — FIRESTORE ERD (SVG) ============ -->
-      <section class="slide" data-label="09 Firestore ERD">
+      <!-- ============ SLIDE 07 — STACK ============ -->
+      <section class="slide" data-label="07 Stack">
         <div class="slide-pad">
           <div class="top-chrome">
             <div class="brand"><span class="brand-mark"></span><span>LAYAK</span></div>
-            <div>09 / 16 · Firestore Schema</div>
+            <div>07 / 18 · Google AI Ecosystem</div>
+          </div>
+
+          <div class="frame-head" style="margin-top: 36px">
+            <div class="frame-title-group">
+              <div class="t-eyebrow">Google ecosystem · coverage report</div>
+              <h2 class="t-title-sm">Eight Google components in one flow.</h2>
+            </div>
+          </div>
+
+          <div class="stack-grid">
+            <div class="stack-card">
+              <div>
+                <div class="tier">Brain · 01</div>
+                <h4>Gemini 2.5 Pro</h4>
+                <ul class="card-bullets compact">
+                  <li>Orchestrator + heavy reasoning.</li>
+                  <li>Runs compute_upside + strategy.</li>
+                </ul>
+              </div>
+              <div class="code">ORCHESTRATOR_MODEL · HEAVY_MODEL</div>
+            </div>
+            <div class="stack-card">
+              <div>
+                <div class="tier">Brain · 02</div>
+                <h4>Gemini 3.1 Flash-Lite</h4>
+                <ul class="card-bullets compact">
+                  <li>Multimodal document extract.</li>
+                  <li>Structured household classify.</li>
+                </ul>
+              </div>
+              <div class="code">FAST_MODEL · WORKER_MODEL</div>
+            </div>
+            <div class="stack-card">
+              <div>
+                <div class="tier">Brain · 03</div>
+                <h4>Gemini Code Execution</h4>
+                <ul class="card-bullets compact">
+                  <li>Sandboxed Python for RM math.</li>
+                  <li>Snippet streams to the UI.</li>
+                </ul>
+              </div>
+              <div class="code">tools: [{codeExecution: {}}]</div>
+            </div>
+            <div class="stack-card">
+              <div>
+                <div class="tier">Context · 04</div>
+                <h4>Vertex AI Search</h4>
+                <ul class="card-bullets compact">
+                  <li>Grounded RAG over scheme PDFs.</li>
+                  <li>Every rule carries a passage.</li>
+                </ul>
+              </div>
+              <div class="code">tools: [{retrieval: {vertexAiSearch}}]</div>
+            </div>
+
+            <div class="stack-card">
+              <div>
+                <div class="tier">Orchestrator · 05</div>
+                <h4>ADK-Python v1.31</h4>
+                <ul class="card-bullets compact">
+                  <li>SequentialAgent + FunctionTool.</li>
+                  <li>First-party GA agent framework.</li>
+                </ul>
+              </div>
+              <div class="code">adk deploy cloud_run --with_ui</div>
+            </div>
+            <div class="stack-card">
+              <div>
+                <div class="tier">Lifecycle · 06</div>
+                <h4>Cloud Run</h4>
+                <ul class="card-bullets compact">
+                  <li>Hosts frontend + backend services.</li>
+                  <li>min-instances=1 with CPU boost.</li>
+                </ul>
+              </div>
+              <div class="code">region · asia-southeast1</div>
+            </div>
+            <div class="stack-card">
+              <div>
+                <div class="tier">Identity · 07</div>
+                <h4>Firebase Auth</h4>
+                <ul class="card-bullets compact">
+                  <li>Google OAuth + email sign-in.</li>
+                  <li>ID-token verified on every call.</li>
+                </ul>
+              </div>
+              <div class="code">firebase_admin.auth.verify_id_token</div>
+            </div>
+            <div class="stack-card">
+              <div>
+                <div class="tier">State · 08</div>
+                <h4>Cloud Firestore</h4>
+                <ul class="card-bullets compact">
+                  <li>Stores derived evaluations only.</li>
+                  <li>Raw uploads never persisted.</li>
+                </ul>
+              </div>
+              <div class="code">evaluations/{evalId}</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============ SLIDE 08 — GROUNDED ============ -->
+      <section class="slide" data-label="08 Grounded">
+        <div class="slide-pad">
+          <div class="top-chrome">
+            <div class="brand"><span class="brand-mark"></span><span>LAYAK</span></div>
+            <div>08 / 18 · Grounded, Not Guessed</div>
+          </div>
+
+          <div class="frame-head" style="margin-top: 36px">
+            <div class="frame-title-group">
+              <div class="t-eyebrow">Provenance as a first-class surface</div>
+              <h2 class="t-title-sm" style="font-family: 'Literata', Georgia, serif">
+                Every number on screen links to a source PDF.
+              </h2>
+            </div>
+          </div>
+
+          <div class="grounded-grid">
+            <div>
+              <p class="grounded-lead">No rule value ever appears in the UI <em>without</em> a retrievable citation.</p>
+              <ul class="card-bullets" style="margin-top: 24px; gap: 18px">
+                <li>One beat away from the MyGov + NYC MyCity chatbot failures.</li>
+                <li>If Search returns no passage, the rule is flagged <em>unverified</em>.</li>
+                <li>Unverified rules never contribute to the ranked list.</li>
+              </ul>
+            </div>
+
+            <div class="cite-mock">
+              <div class="cm-head">
+                <div class="cm-title">STR 2026 — Household Tier</div>
+                <div class="cm-tag">Provenance</div>
+              </div>
+              <div class="cite-row">
+                <div class="cite-key">Household income band</div>
+                <div class="cite-val">
+                  <span class="val-num">≤ RM 2,500</span>
+                  <span class="chip">risalah-str-2026.pdf · p.2</span>
+                </div>
+              </div>
+              <div class="cite-row">
+                <div class="cite-key">Children multiplier</div>
+                <div class="cite-val">
+                  <span class="val-num">×2</span>
+                  <span class="chip">risalah-str-2026.pdf · p.2</span>
+                </div>
+              </div>
+              <div class="cite-row">
+                <div class="cite-key">Annual STR cash tier</div>
+                <div class="cite-val">
+                  <span class="val-num">RM 2,500 / yr</span>
+                  <span class="chip">risalah-str-2026.pdf · p.3</span>
+                </div>
+              </div>
+              <div class="cite-foot">retrieved via Vertex AI Search</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============ SLIDE 09 — VERTEX AI SEARCH (RAG) ============ -->
+      <section class="slide" data-label="09 Vertex AI Search">
+        <div class="slide-pad">
+          <div class="top-chrome">
+            <div class="brand"><span class="brand-mark"></span><span>LAYAK</span></div>
+            <div>09 / 18 · Vertex AI Search</div>
+          </div>
+
+          <div class="frame-head" style="margin-top: 36px">
+            <div class="frame-title-group">
+              <div class="t-eyebrow">20 gazetted PDFs · fail-open hybrid retrieval</div>
+              <h2 class="t-title-sm">Every claim cites a gazetted PDF.</h2>
+            </div>
+          </div>
+
+          <figure
+            style="
+              flex: 1;
+              display: flex;
+              flex-direction: column;
+              align-items: center;
+              justify-content: center;
+              padding: 8px 0 12px;
+              min-height: 0;
+              margin: 0;
+            "
+          >
+            <svg
+              viewBox="0 0 1500 540"
+              xmlns="http://www.w3.org/2000/svg"
+              style="
+                width: 100%;
+                height: auto;
+                font-family: 'Geist Mono', ui-monospace, monospace;
+              "
+              role="img"
+              aria-labelledby="rag-title rag-desc"
+            >
+              <title id="rag-title">Vertex AI Search retrieval pipeline</title>
+              <desc id="rag-desc">
+                Two-phase RAG diagram. Phase A (ingestion): 20 gazetted PDFs sync into a GCS bucket, then into the
+                Vertex AI Search data store, where the engine parses, chunks, and indexes them. Phase B (query): each
+                rule module queries the engine for a verbatim citation that renders directly on the scheme card.
+              </desc>
+
+              <!-- ============================ PHASE A — INGESTION ============================ -->
+              <text
+                aria-hidden="true"
+                x="40"
+                y="32"
+                font-size="13"
+                fill="var(--accent)"
+                letter-spacing="0.18em"
+                font-weight="600"
+              >
+                PHASE A · INGESTION · ONE-TIME · RUNS AT DEPLOY
+              </text>
+              <line aria-hidden="true" x1="40" y1="46" x2="1460" y2="46" stroke="var(--rule)" stroke-width="1" />
+
+              <!-- Card: 20 PDFs -->
+              <rect
+                aria-hidden="true"
+                x="70"
+                y="80"
+                width="240"
+                height="90"
+                fill="var(--paper-2)"
+                stroke="var(--ink)"
+                stroke-width="1.5"
+              />
+              <text
+                aria-hidden="true"
+                x="90"
+                y="108"
+                font-size="11"
+                fill="var(--accent)"
+                letter-spacing="0.16em"
+                font-weight="600"
+              >
+                SOURCE
+              </text>
+              <text
+                aria-hidden="true"
+                x="90"
+                y="138"
+                font-family="Literata, Georgia, serif"
+                font-size="22"
+                font-weight="700"
+                fill="var(--ink)"
+              >
+                20 PDFs
+              </text>
+              <text aria-hidden="true" x="90" y="160" font-size="12" fill="var(--ink-2)">git-versioned · gazetted</text>
+
+              <!-- Arrow PDFs → GCS -->
+              <line aria-hidden="true" x1="315" y1="125" x2="380" y2="125" stroke="var(--ink)" stroke-width="2" />
+              <polygon aria-hidden="true" points="376,120 376,130 388,125" fill="var(--ink)" />
+
+              <!-- Card: GCS Bucket -->
+              <rect
+                aria-hidden="true"
+                x="392"
+                y="80"
+                width="316"
+                height="90"
+                fill="var(--paper-2)"
+                stroke="var(--ink)"
+                stroke-width="1.5"
+              />
+              <text
+                aria-hidden="true"
+                x="412"
+                y="108"
+                font-size="11"
+                fill="var(--accent)"
+                letter-spacing="0.16em"
+                font-weight="600"
+              >
+                STAGING
+              </text>
+              <text
+                aria-hidden="true"
+                x="412"
+                y="138"
+                font-family="Literata, Georgia, serif"
+                font-size="22"
+                font-weight="700"
+                fill="var(--ink)"
+              >
+                GCS Bucket
+              </text>
+              <text aria-hidden="true" x="412" y="160" font-size="12" fill="var(--ink-2)">
+                gs://layak-schemes-pdfs/
+              </text>
+
+              <!-- Arrow GCS → VAIS -->
+              <line aria-hidden="true" x1="713" y1="125" x2="778" y2="125" stroke="var(--ink)" stroke-width="2" />
+              <polygon aria-hidden="true" points="774,120 774,130 786,125" fill="var(--ink)" />
+
+              <!-- Card: Vertex AI Search data store -->
+              <rect aria-hidden="true" x="790" y="80" width="612" height="90" fill="var(--ink)" />
+              <text
+                aria-hidden="true"
+                x="810"
+                y="108"
+                font-size="11"
+                fill="var(--accent)"
+                letter-spacing="0.16em"
+                font-weight="600"
+              >
+                DATA STORE
+              </text>
+              <text
+                aria-hidden="true"
+                x="810"
+                y="138"
+                font-family="Literata, Georgia, serif"
+                font-size="22"
+                font-weight="700"
+                fill="var(--paper)"
+              >
+                Vertex AI Search
+              </text>
+              <text aria-hidden="true" x="810" y="160" font-size="12" fill="rgba(245,241,232,0.72)">
+                layak-schemes-v1 · Discovery Engine data store
+              </text>
+
+              <!-- Branch line: VAIS bottom → three substeps -->
+              <line aria-hidden="true" x1="1096" y1="170" x2="1096" y2="206" stroke="var(--ink-2)" stroke-width="1.5" />
+              <line aria-hidden="true" x1="900" y1="206" x2="1292" y2="206" stroke="var(--ink-2)" stroke-width="1.5" />
+              <line aria-hidden="true" x1="900" y1="206" x2="900" y2="232" stroke="var(--ink-2)" stroke-width="1.5" />
+              <polygon aria-hidden="true" points="895,226 905,226 900,236" fill="var(--ink-2)" />
+              <line aria-hidden="true" x1="1096" y1="206" x2="1096" y2="232" stroke="var(--ink-2)" stroke-width="1.5" />
+              <polygon aria-hidden="true" points="1091,226 1101,226 1096,236" fill="var(--ink-2)" />
+              <line aria-hidden="true" x1="1292" y1="206" x2="1292" y2="232" stroke="var(--ink-2)" stroke-width="1.5" />
+              <polygon aria-hidden="true" points="1287,226 1297,226 1292,236" fill="var(--ink-2)" />
+
+              <!-- Substep cards -->
+              <rect
+                aria-hidden="true"
+                x="820"
+                y="236"
+                width="160"
+                height="72"
+                fill="var(--paper-2)"
+                stroke="var(--rule)"
+                stroke-width="1.2"
+              />
+              <text aria-hidden="true" x="900" y="268" text-anchor="middle" font-size="14" fill="var(--ink)" font-weight="600">
+                Parse PDF text
+              </text>
+              <text aria-hidden="true" x="900" y="289" text-anchor="middle" font-size="11" fill="var(--muted)">
+                content extractor
+              </text>
+
+              <rect
+                aria-hidden="true"
+                x="1016"
+                y="236"
+                width="160"
+                height="72"
+                fill="var(--paper-2)"
+                stroke="var(--rule)"
+                stroke-width="1.2"
+              />
+              <text aria-hidden="true" x="1096" y="268" text-anchor="middle" font-size="14" fill="var(--ink)" font-weight="600">
+                Chunk passages
+              </text>
+              <text aria-hidden="true" x="1096" y="289" text-anchor="middle" font-size="11" fill="var(--muted)">
+                ~512 tokens · overlap
+              </text>
+
+              <rect
+                aria-hidden="true"
+                x="1212"
+                y="236"
+                width="160"
+                height="72"
+                fill="var(--paper-2)"
+                stroke="var(--rule)"
+                stroke-width="1.2"
+              />
+              <text aria-hidden="true" x="1292" y="268" text-anchor="middle" font-size="14" fill="var(--ink)" font-weight="600">
+                Build lexical index
+              </text>
+              <text aria-hidden="true" x="1292" y="289" text-anchor="middle" font-size="11" fill="var(--muted)">
+                BM25 · no embeddings
+              </text>
+
+              <!-- ============================ DIVIDER ============================ -->
+              <line
+                aria-hidden="true"
+                x1="40"
+                y1="338"
+                x2="1460"
+                y2="338"
+                stroke="var(--rule)"
+                stroke-width="1"
+                stroke-dasharray="4 6"
+              />
+
+              <!-- ============================ PHASE B — QUERY ============================ -->
+              <text
+                aria-hidden="true"
+                x="40"
+                y="372"
+                font-size="13"
+                fill="var(--accent)"
+                letter-spacing="0.18em"
+                font-weight="600"
+              >
+                PHASE B · QUERY · PER EVALUATION · PER RULE
+              </text>
+              <line aria-hidden="true" x1="40" y1="386" x2="1460" y2="386" stroke="var(--rule)" stroke-width="1" />
+
+              <!-- Card: Rule module -->
+              <rect
+                aria-hidden="true"
+                x="50"
+                y="418"
+                width="400"
+                height="92"
+                fill="var(--paper-2)"
+                stroke="var(--ink)"
+                stroke-width="1.5"
+              />
+              <text
+                aria-hidden="true"
+                x="70"
+                y="446"
+                font-size="11"
+                fill="var(--accent)"
+                letter-spacing="0.16em"
+                font-weight="600"
+              >
+                RULE MODULE
+              </text>
+              <text
+                aria-hidden="true"
+                x="70"
+                y="476"
+                font-family="'Geist Mono', ui-monospace, monospace"
+                font-size="20"
+                font-weight="700"
+                fill="var(--ink)"
+              >
+                str_2026.py
+              </text>
+              <text aria-hidden="true" x="70" y="498" font-size="12" fill="var(--ink-2)">
+                _citations() · 19 sibling modules
+              </text>
+
+              <!-- Arrow Rule → VAIS -->
+              <text
+                aria-hidden="true"
+                x="500"
+                y="455"
+                text-anchor="middle"
+                font-size="11"
+                fill="var(--muted)"
+                letter-spacing="0.04em"
+              >
+                query
+              </text>
+              <line aria-hidden="true" x1="460" y1="465" x2="540" y2="465" stroke="var(--ink)" stroke-width="2" />
+              <polygon aria-hidden="true" points="536,460 536,470 548,465" fill="var(--ink)" />
+
+              <!-- Card: VAIS Query -->
+              <rect aria-hidden="true" x="550" y="418" width="400" height="92" fill="var(--ink)" />
+              <text
+                aria-hidden="true"
+                x="570"
+                y="446"
+                font-size="11"
+                fill="var(--accent)"
+                letter-spacing="0.16em"
+                font-weight="600"
+              >
+                LEXICAL SEARCH
+              </text>
+              <text
+                aria-hidden="true"
+                x="570"
+                y="476"
+                font-family="Literata, Georgia, serif"
+                font-size="22"
+                font-weight="700"
+                fill="var(--paper)"
+              >
+                Vertex AI Search
+              </text>
+              <text aria-hidden="true" x="570" y="498" font-size="12" fill="rgba(245,241,232,0.72)">
+                top-k=1 · ≤2s latency
+              </text>
+
+              <!-- Arrow VAIS → UI -->
+              <text
+                aria-hidden="true"
+                x="1000"
+                y="455"
+                text-anchor="middle"
+                font-size="11"
+                fill="var(--muted)"
+                letter-spacing="0.04em"
+              >
+                citation
+              </text>
+              <line aria-hidden="true" x1="960" y1="465" x2="1040" y2="465" stroke="var(--ink)" stroke-width="2" />
+              <polygon aria-hidden="true" points="1036,460 1036,470 1048,465" fill="var(--ink)" />
+
+              <!-- Card: UI panel -->
+              <rect
+                aria-hidden="true"
+                x="1050"
+                y="418"
+                width="400"
+                height="92"
+                fill="var(--paper-2)"
+                stroke="var(--ink)"
+                stroke-width="1.5"
+              />
+              <text
+                aria-hidden="true"
+                x="1070"
+                y="446"
+                font-size="11"
+                fill="var(--accent)"
+                letter-spacing="0.16em"
+                font-weight="600"
+              >
+                UI SURFACE
+              </text>
+              <text
+                aria-hidden="true"
+                x="1070"
+                y="476"
+                font-family="Literata, Georgia, serif"
+                font-size="22"
+                font-weight="700"
+                fill="var(--ink)"
+              >
+                "Why You Qualify"
+              </text>
+              <text aria-hidden="true" x="1070" y="498" font-size="12" fill="var(--ink-2)">
+                scheme card desc. · citations
+              </text>
+            </svg>
+
+            <figcaption
+              style="
+                position: absolute;
+                width: 1px;
+                height: 1px;
+                overflow: hidden;
+                clip: rect(0 0 0 0);
+                white-space: nowrap;
+              "
+            >
+              Two-phase Vertex AI Search retrieval pipeline. Phase A ingests 20 gazetted PDFs into the
+              layak-schemes-v1 data store. Phase B queries that store per rule and renders the verbatim citation
+              on the scheme card.
+            </figcaption>
+          </figure>
+        </div>
+      </section>
+
+      <!-- ============ SLIDE 10 — CHATBOT (CIK LAY) ============ -->
+      <section class="slide" data-label="10 Chatbot">
+        <div class="slide-pad">
+          <div class="top-chrome">
+            <div class="brand"><span class="brand-mark"></span><span>LAYAK</span></div>
+            <div>10 / 18 · Chatbot</div>
+          </div>
+
+          <div class="frame-head" style="margin-top: 36px; margin-bottom: 8px">
+            <div class="frame-title-group">
+              <div class="t-eyebrow">5-layer guardrails · context-bound concierge</div>
+              <h2 class="t-title-sm">Cik Lay knows only your evaluation.</h2>
+            </div>
+          </div>
+
+          <div
+            style="
+              display: grid;
+              grid-template-columns: minmax(0, 1fr) 460px;
+              gap: 56px;
+              flex: 1;
+              min-height: 0;
+              align-items: start;
+            "
+          >
+            <figure style="margin: 0; min-width: 0; align-self: start">
+              <svg
+                viewBox="0 0 1100 620"
+                xmlns="http://www.w3.org/2000/svg"
+                style="
+                  width: 100%;
+                  height: auto;
+                  font-family: 'Geist Mono', ui-monospace, monospace;
+                "
+                role="img"
+                aria-labelledby="cik-lay-title cik-lay-desc"
+              >
+                <title id="cik-lay-title">Cik Lay constrained concierge pipeline</title>
+                <desc id="cik-lay-desc">
+                  Vertical flow: a user question passes through a 5-layer guardrail block (scope, topic, PII, legal,
+                  citation). If all five pass, Gemini 3.1 Flash-Lite — bound to the user's loaded evaluation context —
+                  returns a cited reply that surfaces in the Cik Lay chat panel.
+                </desc>
+
+                <!-- User question card -->
+                <rect aria-hidden="true" x="180" y="15" width="740" height="74" fill="var(--paper-2)" stroke="var(--ink)" stroke-width="1.5" />
+                <text aria-hidden="true" x="550" y="43" text-anchor="middle" font-size="11" fill="var(--accent)" letter-spacing="0.16em" font-weight="600">USER ASKS</text>
+                <text aria-hidden="true" x="550" y="72" text-anchor="middle" font-family="Literata, Georgia, serif" font-size="20" font-weight="700" fill="var(--ink)">
+                  "Am I eligible for STR 2026?"
+                </text>
+
+                <!-- Arrow ↓ -->
+                <line aria-hidden="true" x1="550" y1="91" x2="550" y2="125" stroke="var(--ink-2)" stroke-width="1.5" />
+                <polygon aria-hidden="true" points="545,119 555,119 550,131" fill="var(--ink-2)" />
+
+                <!-- 5-LAYER GUARDRAILS block -->
+                <rect aria-hidden="true" x="40" y="135" width="1020" height="222" fill="var(--paper-2)" stroke="var(--accent)" stroke-width="1.5" />
+                <text aria-hidden="true" x="550" y="161" text-anchor="middle" font-size="11" fill="var(--accent)" letter-spacing="0.16em" font-weight="600">5-LAYER GUARDRAILS · ENFORCED IN ORDER</text>
+                <line aria-hidden="true" x1="60" y1="173" x2="1040" y2="173" stroke="var(--rule)" stroke-width="1" />
+
+                <!-- Layer 01: SCOPE -->
+                <text aria-hidden="true" x="550" y="205" text-anchor="middle">
+                  <tspan font-family="Literata, Georgia, serif" font-size="20" font-weight="700" fill="var(--accent)">01</tspan>
+                  <tspan dx="14" font-size="13" fill="var(--ink)" font-weight="600" letter-spacing="0.14em">SCOPE</tspan>
+                  <tspan dx="22" font-size="14" fill="var(--ink-2)">Answers only from this evaluation.</tspan>
+                </text>
+
+                <!-- Layer 02: TOPIC -->
+                <text aria-hidden="true" x="550" y="237" text-anchor="middle">
+                  <tspan font-family="Literata, Georgia, serif" font-size="20" font-weight="700" fill="var(--accent)">02</tspan>
+                  <tspan dx="14" font-size="13" fill="var(--ink)" font-weight="600" letter-spacing="0.14em">TOPIC</tspan>
+                  <tspan dx="22" font-size="14" fill="var(--ink-2)">Schemes &amp; eligibility only — off-topic blocked.</tspan>
+                </text>
+
+                <!-- Layer 03: PII -->
+                <text aria-hidden="true" x="550" y="269" text-anchor="middle">
+                  <tspan font-family="Literata, Georgia, serif" font-size="20" font-weight="700" fill="var(--accent)">03</tspan>
+                  <tspan dx="14" font-size="13" fill="var(--ink)" font-weight="600" letter-spacing="0.14em">PII</tspan>
+                  <tspan dx="22" font-size="14" fill="var(--ink-2)">Never requests IC / MyKad — never echoes back.</tspan>
+                </text>
+
+                <!-- Layer 04: LEGAL -->
+                <text aria-hidden="true" x="550" y="301" text-anchor="middle">
+                  <tspan font-family="Literata, Georgia, serif" font-size="20" font-weight="700" fill="var(--accent)">04</tspan>
+                  <tspan dx="14" font-size="13" fill="var(--ink)" font-weight="600" letter-spacing="0.14em">LEGAL</tspan>
+                  <tspan dx="22" font-size="14" fill="var(--ink-2)">No legal advice — redirects to official portal.</tspan>
+                </text>
+
+                <!-- Layer 05: CITATION -->
+                <text aria-hidden="true" x="550" y="333" text-anchor="middle">
+                  <tspan font-family="Literata, Georgia, serif" font-size="20" font-weight="700" fill="var(--accent)">05</tspan>
+                  <tspan dx="14" font-size="13" fill="var(--ink)" font-weight="600" letter-spacing="0.14em">CITATION</tspan>
+                  <tspan dx="22" font-size="14" fill="var(--ink-2)">Every claim cites a scheme PDF.</tspan>
+                </text>
+
+                <!-- Arrow ↓ to engine -->
+                <line aria-hidden="true" x1="550" y1="357" x2="550" y2="392" stroke="var(--ink-2)" stroke-width="1.5" />
+                <polygon aria-hidden="true" points="545,386 555,386 550,398" fill="var(--ink-2)" />
+                <text aria-hidden="true" x="562" y="378" font-size="11" fill="var(--muted)" letter-spacing="0.04em">if all 5 pass</text>
+
+                <!-- Engine card (dark) -->
+                <rect aria-hidden="true" x="180" y="400" width="740" height="68" fill="var(--ink)" />
+                <text aria-hidden="true" x="550" y="425" text-anchor="middle" font-size="11" fill="var(--accent)" letter-spacing="0.16em" font-weight="600">CONSTRAINED ENGINE</text>
+                <text aria-hidden="true" x="550" y="453" text-anchor="middle" font-family="Literata, Georgia, serif" font-size="18" font-weight="700" fill="var(--paper)">
+                  Gemini 3.1 Flash-Lite · bound to your evaluation
+                </text>
+
+                <!-- Arrow ↓ to reply -->
+                <line aria-hidden="true" x1="550" y1="470" x2="550" y2="504" stroke="var(--ink-2)" stroke-width="1.5" />
+                <polygon aria-hidden="true" points="545,498 555,498 550,510" fill="var(--ink-2)" />
+
+                <!-- Cik Lay reply card -->
+                <rect aria-hidden="true" x="140" y="512" width="820" height="100" fill="var(--paper-2)" stroke="var(--ink)" stroke-width="1.5" />
+                <text aria-hidden="true" x="550" y="540" text-anchor="middle" font-size="11" fill="var(--accent)" letter-spacing="0.16em" font-weight="600">CIK LAY · CITED REPLY</text>
+                <text aria-hidden="true" x="550" y="572" text-anchor="middle" font-family="Literata, Georgia, serif" font-size="18" font-weight="700" fill="var(--ink)">
+                  "Yes — STR Household tier, RM 2,500 / year."
+                </text>
+                <text aria-hidden="true" x="550" y="598" text-anchor="middle" font-family="'Geist Mono', ui-monospace, monospace" font-size="11" fill="var(--accent)" letter-spacing="0.04em">
+                  [ risalah-str-2026.pdf · p.3 ]
+                </text>
+              </svg>
+
+              <figcaption
+                style="
+                  position: absolute;
+                  width: 1px;
+                  height: 1px;
+                  overflow: hidden;
+                  clip: rect(0 0 0 0);
+                  white-space: nowrap;
+                "
+              >
+                Cik Lay request flow: user question → 5-layer guardrails → Gemini 3.1 Flash-Lite bound to the loaded
+                evaluation → cited reply rendered in the Cik Lay chat panel.
+              </figcaption>
+            </figure>
+
+            <div style="align-self: start; min-width: 0">
+              <img
+                src="assets/slide-10-image.png"
+                alt="Cik Lay chatbot panel — header 'Cik Lay · Pegawai Skim', greeting, four suggested questions, input field"
+                style="width: 100%; height: auto; display: block"
+              />
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============ SLIDE 11 — FIRESTORE ERD (SVG) ============ -->
+      <section class="slide" data-label="11 Firestore ERD">
+        <div class="slide-pad">
+          <div class="top-chrome">
+            <div class="brand"><span class="brand-mark"></span><span>LAYAK</span></div>
+            <div>11 / 18 · Firestore Schema</div>
           </div>
 
           <div class="frame-head" style="margin-top: 36px">
@@ -3260,12 +3814,12 @@
         </div>
       </section>
 
-      <!-- ============ SLIDE 10 — AISYAH ============ -->
-      <section class="slide" data-label="10 Persona">
+      <!-- ============ SLIDE 12 — AISYAH ============ -->
+      <section class="slide" data-label="12 Persona">
         <div class="slide-pad">
           <div class="top-chrome">
             <div class="brand"><span class="brand-mark"></span><span>LAYAK</span></div>
-            <div>10 / 16 · The User</div>
+            <div>12 / 18 · The User</div>
           </div>
 
           <div class="frame-head" style="margin-top: 36px">
@@ -3325,8 +3879,8 @@
         </div>
       </section>
 
-      <!-- ============ SLIDE 11 — OUTCOME ============ -->
-      <section class="slide outcome" data-label="11 Outcome">
+      <!-- ============ SLIDE 13 — OUTCOME ============ -->
+      <section class="slide outcome" data-label="13 Outcome">
         <div class="outcome-grid">
           <div class="outcome-left">
             <div style="display: flex; align-items: center; gap: 16px">
@@ -3348,7 +3902,7 @@
               </div>
             </div>
 
-            <div class="t-mono-sm">11 / 16 · based on Budget 2026 gazetted rates as of 20 Apr 2026</div>
+            <div class="t-mono-sm">13 / 18 · based on Budget 2026 gazetted rates as of 20 Apr 2026</div>
           </div>
 
           <div class="outcome-right">
@@ -3388,12 +3942,12 @@
         </div>
       </section>
 
-      <!-- ============ SLIDE 12 — DATA PRIVACY ============ -->
-      <section class="slide" data-label="12 Privacy">
+      <!-- ============ SLIDE 14 — DATA PRIVACY ============ -->
+      <section class="slide" data-label="14 Privacy">
         <div class="slide-pad">
           <div class="top-chrome">
             <div class="brand"><span class="brand-mark"></span><span>LAYAK</span></div>
-            <div>12 / 16 · Data Privacy by Design</div>
+            <div>14 / 18 · Data Privacy by Design</div>
           </div>
 
           <div class="frame-head" style="margin-top: 36px">
@@ -3461,12 +4015,12 @@
         </div>
       </section>
 
-      <!-- ============ SLIDE 13 — MANUAL ENTRY ============ -->
-      <section class="slide" data-label="13 Manual Entry">
+      <!-- ============ SLIDE 15 — MANUAL ENTRY ============ -->
+      <section class="slide" data-label="15 Manual Entry">
         <div class="slide-pad">
           <div class="top-chrome">
             <div class="brand"><span class="brand-mark"></span><span>LAYAK</span></div>
-            <div>13 / 16 · Privacy Path</div>
+            <div>15 / 18 · Privacy Path</div>
           </div>
 
           <div class="frame-head" style="margin-top: 36px">
@@ -3519,12 +4073,12 @@
         </div>
       </section>
 
-      <!-- ============ SLIDE 14 — GEMMA SWAP ============ -->
-      <section class="slide sov" data-label="14 Sovereign Swap">
+      <!-- ============ SLIDE 16 — GEMMA SWAP ============ -->
+      <section class="slide sov" data-label="16 Sovereign Swap">
         <div class="slide-pad">
           <div class="top-chrome">
             <div class="brand"><span class="brand-mark"></span><span style="color: var(--paper)">LAYAK</span></div>
-            <div>14 / 16 · Sovereign AI</div>
+            <div>16 / 18 · Sovereign AI</div>
           </div>
 
           <div class="frame-head" style="margin-top: 36px">
@@ -3562,12 +4116,12 @@
         </div>
       </section>
 
-      <!-- ============ SLIDE 15 — WHAT'S NEXT ============ -->
-      <section class="slide" data-label="15 Roadmap">
+      <!-- ============ SLIDE 17 — WHAT'S NEXT ============ -->
+      <section class="slide" data-label="17 Roadmap">
         <div class="slide-pad">
           <div class="top-chrome">
             <div class="brand"><span class="brand-mark"></span><span>LAYAK</span></div>
-            <div>15 / 16 · What's Next</div>
+            <div>17 / 18 · What's Next</div>
           </div>
 
           <div class="frame-head" style="margin-top: 36px">
@@ -3637,8 +4191,8 @@
         </div>
       </section>
 
-      <!-- ============ SLIDE 16 — THANK YOU ============ -->
-      <section class="slide ty" data-label="16 Thank You">
+      <!-- ============ SLIDE 18 — THANK YOU ============ -->
+      <section class="slide ty" data-label="18 Thank You">
         <div class="ty-grid">
           <div class="ty-left">
             <div style="display: flex; align-items: center; gap: 16px">

@@ -108,6 +108,7 @@ export function EvaluationResultsByIdClient({ evalId }: { evalId: string }) {
     isDirty: boolean
     resetAll: () => void
   } | null>(null)
+  const [whatIfPending, setWhatIfPending] = useState(false)
   const whatIfResult = whatIfPreview?.result ?? null
   const handleWhatIfResult = useCallback(
     (
@@ -382,6 +383,7 @@ export function EvaluationResultsByIdClient({ evalId }: { evalId: string }) {
                 <SchemeCardGrid
                   matches={whatIfResult?.matches ?? doc.matches}
                   deltas={whatIfResult?.deltas ?? null}
+                  pending={whatIfPending}
                   kind="upside"
                 />
               </section>
@@ -404,6 +406,7 @@ export function EvaluationResultsByIdClient({ evalId }: { evalId: string }) {
                 <SchemeCardGrid
                   matches={whatIfResult?.matches ?? doc.matches}
                   deltas={whatIfResult?.deltas ?? null}
+                  pending={whatIfPending}
                   kind="subsidy_credit"
                   hideHeading
                 />
@@ -471,6 +474,7 @@ export function EvaluationResultsByIdClient({ evalId }: { evalId: string }) {
                   onResult={handleWhatIfResult}
                   onAskCikLay={chat.handoffFromScenario}
                   onHeaderActionChange={setWhatIfHeaderAction}
+                  onPendingChange={setWhatIfPending}
                 />
               </section>
             )}

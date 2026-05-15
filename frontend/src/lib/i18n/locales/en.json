@@ -1399,6 +1399,16 @@
       "kwapm": "KWAPM — Pelajar Miskin",
       "perkeso_sip": "PERKESO SIP — Employment Insurance",
       "taska_permata": "TASKA / TADIKA Permata"
+    },
+    "filters": {
+      "searchLabel": "Search schemes",
+      "searchPlaceholder": "Search by name, agency, form, or source...",
+      "categoryLabel": "Category",
+      "allCategories": "All categories",
+      "resultsCount": "{{count}} of {{total}} schemes",
+      "clear": "Clear filters",
+      "emptyTitle": "No schemes match these filters.",
+      "emptyBody": "Try a different search term or switch back to all categories."
     }
   },
   "settings": {

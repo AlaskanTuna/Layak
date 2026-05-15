@@ -1,17 +1,21 @@
 'use client'
 
+import * as Select from '@radix-ui/react-select'
 import {
   ArrowUpRight,
   Baby,
   Book,
   BookOpen,
   Briefcase,
+  Check,
+  ChevronDown,
   Coins,
   Fuel,
-  GraduationCap,
   HandCoins,
   Heart,
   HeartHandshake,
+  Search,
+  X,
   PiggyBank,
   Scale,
   School,
@@ -24,15 +28,21 @@ import {
   Zap,
   type LucideIcon
 } from 'lucide-react'
+import { useMemo, useState, type ReactNode } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import { SchemeVerifiedBadge } from '@/components/schemes/scheme-verified-badge'
+import { cn } from '@/lib/utils'
 
 type SchemeKind = 'upside' | 'subsidy_credit' | 'required_contribution'
 
 type SchemeGroup = 'cashWelfare' | 'education' | 'healthSafety' | 'taxRetirement'
 
 const GROUPS: readonly SchemeGroup[] = ['cashWelfare', 'education', 'healthSafety', 'taxRetirement']
+
+const ALL_GROUPS = 'all'
+
+type GroupFilter = SchemeGroup | typeof ALL_GROUPS
 
 type InScopeScheme = {
   id: string
@@ -412,10 +422,126 @@ function InScopeCard({ scheme }: { scheme: InScopeScheme }) {
 
 export function SchemesOverview() {
   const { t } = useTranslation()
+  const [query, setQuery] = useState('')
+  const [groupFilter, setGroupFilter] = useState<GroupFilter>(ALL_GROUPS)
+  const normalizedQuery = query.trim().toLocaleLowerCase()
+
+  const filteredByGroup = useMemo(() => {
+    return IN_SCOPE.filter((scheme) => {
+      if (groupFilter !== ALL_GROUPS && scheme.group !== groupFilter) {
+        return false
+      }
+      if (!normalizedQuery) {
+        return true
+      }
+      const haystack = [
+        scheme.name,
+        scheme.agency,
+        scheme.formLabel,
+        scheme.canonicalSchemeId,
+        t(scheme.summaryKey),
+        t(scheme.categoryKey),
+        t(`schemes.groups.${scheme.group}.title`)
+      ]
+        .join(' ')
+        .toLocaleLowerCase()
+      return haystack.includes(normalizedQuery)
+    })
+  }, [groupFilter, normalizedQuery, t])
+
+  const filteredCount = filteredByGroup.length
+  const hasActiveFilters = groupFilter !== ALL_GROUPS || query.trim().length > 0
+
+  function clearFilters() {
+    setQuery('')
+    setGroupFilter(ALL_GROUPS)
+  }
+
   return (
     <div className="flex flex-col gap-10">
+      <div className="paper-card flex flex-col gap-4 rounded-[16px] p-4 md:flex-row md:items-end md:justify-between">
+        <div className="grid flex-1 gap-3 md:grid-cols-[minmax(0,1fr)_260px]">
+          <label className="flex flex-col gap-2">
+            <span className="mono-caption text-foreground/55">{t('schemes.filters.searchLabel')}</span>
+            <span className="relative">
+              <Search
+                className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-foreground/45"
+                aria-hidden
+              />
+              <input
+                value={query}
+                onChange={(event) => setQuery(event.target.value)}
+                placeholder={t('schemes.filters.searchPlaceholder')}
+                className="h-10 w-full rounded-lg border border-input bg-transparent pl-9 pr-3 text-sm outline-none transition-colors placeholder:text-foreground/40 focus:border-[color:var(--primary)] focus:ring-3 focus:ring-[color:var(--primary)]/15"
+              />
+            </span>
+          </label>
+
+          <label className="flex flex-col gap-2">
+            <span className="mono-caption text-foreground/55">{t('schemes.filters.categoryLabel')}</span>
+            <Select.Root value={groupFilter} onValueChange={(value) => setGroupFilter(value as GroupFilter)}>
+              <Select.Trigger
+                className={cn(
+                  'flex h-10 w-full items-center justify-between gap-2 rounded-lg border border-input bg-transparent px-3 text-left text-sm outline-none transition-colors',
+                  'hover:border-foreground/30 focus:border-[color:var(--primary)] focus:ring-3 focus:ring-[color:var(--primary)]/15'
+                )}
+                aria-label={t('schemes.filters.categoryLabel')}
+              >
+                <Select.Value />
+                <Select.Icon>
+                  <ChevronDown className="size-4 text-foreground/55" aria-hidden />
+                </Select.Icon>
+              </Select.Trigger>
+              <Select.Portal>
+                <Select.Content
+                  position="popper"
+                  sideOffset={6}
+                  className="z-50 min-w-[var(--radix-select-trigger-width)] overflow-hidden rounded-xl border border-border bg-popover p-1 text-sm text-popover-foreground shadow-[0_18px_48px_-12px_rgb(15_23_42/0.18)]"
+                >
+                  <Select.Viewport>
+                    <SelectItem value={ALL_GROUPS}>{t('schemes.filters.allCategories')}</SelectItem>
+                    {GROUPS.map((group) => (
+                      <SelectItem key={group} value={group}>
+                        {t(`schemes.groups.${group}.title`)}
+                      </SelectItem>
+                    ))}
+                  </Select.Viewport>
+                </Select.Content>
+              </Select.Portal>
+            </Select.Root>
+          </label>
+        </div>
+
+        <div className="flex flex-wrap items-center justify-between gap-3 md:justify-end">
+          <span className="mono-caption text-foreground/55">
+            {t('schemes.filters.resultsCount', { count: filteredCount, total: IN_SCOPE.length })}
+          </span>
+          <button
+            type="button"
+            onClick={clearFilters}
+            disabled={!hasActiveFilters}
+            className={cn(
+              'inline-flex h-9 items-center gap-2 rounded-lg border border-foreground/10 px-3 text-xs font-medium transition-colors',
+              hasActiveFilters
+                ? 'text-[color:var(--primary)] hover:border-[color:var(--primary)]/40 hover:bg-[color:var(--primary)]/8'
+                : 'cursor-not-allowed text-foreground/35'
+            )}
+          >
+            <X className="size-3.5" aria-hidden />
+            {t('schemes.filters.clear')}
+          </button>
+        </div>
+      </div>
+
+      {filteredCount === 0 ? (
+        <div className="paper-card rounded-[16px] p-8 text-center">
+          <p className="font-heading text-lg font-semibold">{t('schemes.filters.emptyTitle')}</p>
+          <p className="mt-2 text-sm text-foreground/60">{t('schemes.filters.emptyBody')}</p>
+        </div>
+      ) : null}
+
       {GROUPS.map((group) => {
-        const groupSchemes = IN_SCOPE.filter((s) => s.group === group)
+        const groupSchemes = filteredByGroup.filter((s) => s.group === group)
         if (groupSchemes.length === 0) return null
         return (
           <section key={group} className="flex flex-col gap-4">
@@ -440,5 +566,29 @@ export function SchemesOverview() {
         )
       })}
     </div>
+  )
+}
+
+function SelectItem({
+  children,
+  className,
+  ...props
+}: Select.SelectItemProps & { children: ReactNode }) {
+  return (
+    <Select.Item
+      className={cn(
+        'relative flex cursor-pointer select-none items-center rounded-lg py-1.5 pl-8 pr-3 outline-none transition-colors',
+        'data-[highlighted]:bg-accent data-[highlighted]:text-accent-foreground',
+        className
+      )}
+      {...props}
+    >
+      <span className="absolute left-2 flex size-4 items-center justify-center">
+        <Select.ItemIndicator>
+          <Check className="size-3.5" aria-hidden />
+        </Select.ItemIndicator>
+      </span>
+      <Select.ItemText>{children}</Select.ItemText>
+    </Select.Item>
   )
 }

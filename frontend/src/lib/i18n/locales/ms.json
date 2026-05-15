@@ -1399,6 +1399,16 @@
       "kwapm": "KWAPM — Pelajar Miskin",
       "perkeso_sip": "PERKESO SIP — Insurans Pekerjaan",
       "taska_permata": "TASKA / TADIKA Permata"
+    },
+    "filters": {
+      "searchLabel": "Cari skim",
+      "searchPlaceholder": "Cari mengikut nama, agensi, borang, atau sumber...",
+      "categoryLabel": "Kategori",
+      "allCategories": "Semua kategori",
+      "resultsCount": "{{count}} daripada {{total}} skim",
+      "clear": "Kosongkan penapis",
+      "emptyTitle": "Tiada skim sepadan dengan penapis ini.",
+      "emptyBody": "Cuba istilah carian lain atau kembali kepada semua kategori."
     }
   },
   "settings": {

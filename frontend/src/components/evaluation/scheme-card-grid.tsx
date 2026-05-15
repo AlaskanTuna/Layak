@@ -183,9 +183,13 @@ export function SchemeCardGrid({ matches, deltas, kind = 'upside', heading, hide
                 hint={t('evaluation.schemeCard.whyQualifyTapReveal')}
               />
 
-              <SourcesPanel citations={match.rule_citations} t={t} />
-
-              <footer className="mt-auto flex flex-col gap-3 border-t border-foreground/10 pt-3">
+              {/* Sources + footer are wrapped so `mt-auto` glues the whole
+                  group to the bottom. This pins the Sources disclosure flush
+                  above the footer's border-top divider on every card,
+                  regardless of how short or long the header content is. */}
+              <div className="mt-auto flex flex-col gap-3">
+                <SourcesPanel citations={match.rule_citations} t={t} />
+                <footer className="flex flex-col gap-3 border-t border-foreground/10 pt-3">
                 {/* Unified value row: same `label left / bold value right`
                     structure on both subsidy and upside cards. Color is the
                     only differentiator (hibiscus for subsidy, foreground for
@@ -234,7 +238,8 @@ export function SchemeCardGrid({ matches, deltas, kind = 'upside', heading, hide
                     <ArrowRight className="ml-1 size-3.5" aria-hidden />
                   )}
                 </Button>
-              </footer>
+                </footer>
+              </div>
             </li>
           )
         })}

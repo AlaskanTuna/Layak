@@ -127,27 +127,55 @@ def generate_with_retry(
     config: Any,
     max_retries: int | None = None,
     base_delay_seconds: float | None = None,
+    fallback_model: str | None = None,
 ) -> Any:
+    """Call Gemini with exponential-backoff retry on transient errors.
+
+    When `fallback_model` is supplied and differs from `model`, a terminal
+    failure on the primary (retry budget exhausted OR a non-retryable error
+    like a 404 for an unallowlisted preview model) swaps to the fallback for
+    a fresh retry budget. The fallback is consumed at most once per call —
+    if it also fails, the exception propagates.
+    """
     # Full jitter so concurrent 429s don't synchronously retry on the same tick.
     retries = _RETRY_MAX_RETRIES if max_retries is None else max_retries
     base = _RETRY_BASE_DELAY_S if base_delay_seconds is None else base_delay_seconds
+    current_model = model
+    fallback_consumed = False
     attempt = 0
     while True:
         try:
-            return client.models.generate_content(model=model, contents=contents, config=config)
+            return client.models.generate_content(model=current_model, contents=contents, config=config)
         except Exception as exc:  # noqa: BLE001 — typed re-raise inside
-            if attempt >= retries or not _is_retryable_api_error(exc):
-                raise
-            sleep_for = random.uniform(0, base * (2**attempt))
-            _log.warning(
-                "Gemini generate_content failed with retryable error (attempt %d/%d, sleeping %.2fs): %s",
-                attempt + 1,
-                retries + 1,
-                sleep_for,
-                exc,
-            )
-            time.sleep(sleep_for)
-            attempt += 1
+            retryable = _is_retryable_api_error(exc)
+            if retryable and attempt < retries:
+                sleep_for = random.uniform(0, base * (2**attempt))
+                _log.warning(
+                    "Gemini %r failed with retryable error (attempt %d/%d, sleeping %.2fs): %s",
+                    current_model,
+                    attempt + 1,
+                    retries + 1,
+                    sleep_for,
+                    exc,
+                )
+                time.sleep(sleep_for)
+                attempt += 1
+                continue
+            # Retries exhausted OR non-retryable. Try the configured fallback
+            # once before propagating — covers the "preview model 404s on a
+            # specific project" failure mode that backoff alone can't fix.
+            if fallback_model and current_model != fallback_model and not fallback_consumed:
+                _log.warning(
+                    "Primary model %r exhausted (%s); falling back to %r once.",
+                    current_model,
+                    exc,
+                    fallback_model,
+                )
+                current_model = fallback_model
+                fallback_consumed = True
+                attempt = 0
+                continue
+            raise
 
 
 _FENCE_RE = re.compile(r"^\s*```(?:json)?\s*\n(.*?)\n```\s*$", re.DOTALL | re.IGNORECASE)

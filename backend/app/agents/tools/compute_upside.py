@@ -22,6 +22,7 @@ from google.genai import types
 
 from app.agents.gemini import (
     HEAVY_MODEL,
+    HEAVY_MODEL_FALLBACK,
     LANGUAGE_INSTRUCTION_BLOCK,
     generate_with_retry,
     get_client,
@@ -156,6 +157,7 @@ async def compute_upside(
     response = generate_with_retry(
         client,
         model=HEAVY_MODEL,
+        fallback_model=HEAVY_MODEL_FALLBACK,
         contents=prompt,
         config=types.GenerateContentConfig(
             tools=[types.Tool(code_execution=types.ToolCodeExecution())],

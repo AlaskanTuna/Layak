@@ -36,6 +36,7 @@ from pydantic import ValidationError
 
 from app.agents.gemini import (
     HEAVY_MODEL,
+    HEAVY_MODEL_FALLBACK,
     generate_with_retry,
     get_client,
     strip_json_fences,
@@ -293,6 +294,7 @@ async def optimize_strategy(
         response = generate_with_retry(
             client,
             model=HEAVY_MODEL,
+            fallback_model=HEAVY_MODEL_FALLBACK,
             contents=prompt,
             config=types.GenerateContentConfig(
                 response_mime_type="application/json",

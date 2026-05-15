@@ -128,10 +128,13 @@ export function EvaluationHistoryTable({ items, onRefresh }: Props) {
 
   if (items.length === 0) {
     return (
-      <div className="paper-card flex flex-col items-center gap-3 rounded-[16px] px-6 py-12 text-center sm:py-16">
-        <h3 className="font-heading text-lg font-semibold tracking-tight">{t('evaluation.history.emptyTitle')}</h3>
-        <p className="mono-caption text-foreground/55">{t('evaluation.history.emptyEyebrow')}</p>
-      </div>
+      <section className="flex h-full flex-col gap-3">
+        <h2 className="font-heading text-xl font-semibold tracking-tight">{t('evaluation.history.title')}</h2>
+        <div className="paper-card flex flex-1 flex-col items-center justify-start gap-3 rounded-[16px] px-6 py-12 text-center sm:py-16">
+          <h3 className="font-heading text-lg font-semibold tracking-tight">{t('evaluation.history.emptyTitle')}</h3>
+          <p className="mono-caption text-foreground/55">{t('evaluation.history.emptyEyebrow')}</p>
+        </div>
+      </section>
     )
   }
 

@@ -104,7 +104,15 @@ export function EvaluationHistorySection() {
       <div id="tour-evaluation-stats" className="scroll-mt-24 rounded-[14px]">
         <AggregateStatsCards items={items} />
       </div>
-      <div className="grid grid-cols-1 items-start gap-6 lg:grid-cols-[1fr_22rem]">
+      <div
+        className={cn(
+          'grid grid-cols-1 gap-6 lg:grid-cols-[1fr_22rem]',
+          // When history is non-empty, the table is shorter than the rail and
+          // both naturally pin to the top. When empty, stretch so the empty
+          // card's bottom edge meets the rail's bottom edge.
+          items.length === 0 ? 'items-stretch' : 'items-start'
+        )}
+      >
         {/* `min-w-0` is critical: grid items default to `min-width: auto`,
             which lets the inner table's intrinsic content width force the
             track wider than the viewport. Clamping the track to 0 lets the

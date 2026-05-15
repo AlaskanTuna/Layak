@@ -31,7 +31,31 @@ This is the crux of the issue. Malaysia's Ministry of Finance runs 167 (🤲) sc
 
 True to our team's name, we are here to help with that. Introducing **LAYAK**, the agentic concierge website that finds every Malaysian subsidy you qualify for, in three uploads, under a minute, fully private and secure, with every single source backed up via verified gomen websites or documents.
 
----
+### Finalized script
+
+Good morning/afternoon everyone. We are team T010NG.
+
+Imagine this — during raya, your pak cik suddenly asks:
+
+“Ah boy, can help pak cik check what subsidies I qualify for ah?”
+
+(10 second)
+
+So you try helping him.
+
+A few minutes later, you're stuck between endless Google searches, confusing eligibility rules, and complicated application processes. You even try using AI, but here's your concern: is uploading pak cik’s personal details safe? Does all answers come from verified government sources?
+
+At that point, you realise you're not Tom Cruise, and this is starting to feel more like Mission Impossible.
+
+(40 second)
+
+And that’s the real issue.
+
+Malaysia currently has 167 subsidy schemes across 17 agencies, yet most people only claim one or two because discovering them is simply too complicated.
+
+(55 seconds)
+
+## True to our team’s name, we’re here to TOLONG / (help with that). Introducing LAYAK — meaning “eligible” — an AI-powered platform that helps Malaysians discover the subsidies they qualify for in under a minute, privately, securely, and backed by verified government sources.
 
 ## [Architecture Overview] (1m – 1m30s max)
 
@@ -57,41 +81,22 @@ And once the results are on screen, Cik Lay — our concierge chatbot — takes 
 
 ## [Live Demo] (2m15s – 3m max)
 
-We would now like to do a quick live demo of our deployed product, at **layak.tech**.
+Now, we are going to do a live demo on our website, layak.tech. The following is our sample persona, Aisyah, who's a Grab driver in Kuantan.
 
-**[ACTION — landing page → login page]**
+We can select the sample documents for Aisyah using this dropdown. As you can see, all you need is 3 documents for Layak to work its magic - a scanned copy of your IC, payslip and utility bill. For those concerned with their privacy regarding scanned documents, the documents are promptly discarded after extraction, never stored. There's also a manual input option as well. For better accuracy, we can also add dependants - for Aisyah here, she has 2 children below the age of 18, and 1 elderly parent.
 
-Our login page offers Google SSO and the traditional email/password signup options. For this demo, we shall proceed using the Guest account.
+Once all those details are done, the Layak pipeline executes. As briefly mentioned earlier, our pipeline consists of six steps:
 
-**[ACTION — Click "Try sample data" → Aisyah. Submit.]**
+1. The first step is extract. Our multimodal OCR first scans the user's MyKad, payslip and utility bill to fetch their relevant income details.
+2. Second step is to classify the user's household according to three income bands, which you know are T20, M40, and B40.
+3. Thirdly, we match the extracted details against the list of schemes in our database. Currently, we have 20 matchable schemes. and one day we hope to reach 167.
+4. Fourth, we strategize. For each scheme that's matched, Gemini generates 1-3 sentences to advise the user as to why they're qualified for the scheme.
+5. Then, we compute the upside of all the matched subsidies. This is the potential amount that is claimable by Aisyah.
+6. Finally, we generate a pdf for each qualifying scheme, to allow Aisyah to download and submit her claims easily.
 
-To simulate a fictional user, we shall use the persona as follows:
+While the evaluation is running, we can view the pre-evaluated page first. As you can see, there is RM13k that Aisyah is potentially missing out on, which is 13k more than my bank account's balance. Jokes aside, below the computed upside, we can see the list of evaluated schemes that she's eligible for, as well as the pre-generated pdfs that she can use to apply for the subisides. Additionally, we have a chatbot, Cik Lay, that she can follow up with in case she has any questions or confusion.
 
-> Aisyah, 34, Grab driver in Kuantan, RM 2,800 a month, two kids, elderly father.
-
-We can select the sample documents for Aisyah using this dropdown. Next, please watch the screen as our exclusive Layak agentic pipeline runs.
-
-**[ACTION — Pipeline streams. Don't narrate every step — let the work speak.]**
-
-> "Gemini Flash is reading her documents. Classify runs. Match — each scheme appears with a citation chip linking to the source PDF. Code Execution runs real Python in a Gemini sandbox — you can read the snippet. Five seconds later: three pre-filled PDFs."
-
-**[ACTION — Headline number lands. Pause.]**
-
-> "RM 13,808 a year. Six upside schemes, five subsidy-credit cards, one mandatory PERKESO contribution flagged separately so the headline stays honest."
-
-**[ACTION — Scroll to the MyKasih card. Point to the bold red expiry line.]**
-
-> "And here's the MyKasih RM100 card — eligibility confirmed, official portal link, and the bold red expiry: 31 December 2026. So Aisyah sees the deadline before she scrolls past."
-
-**[ACTION — Click Cik Lay chatbot icon. Type a question.]**
-
-> "Cik Lay — our concierge — is hard-constrained to her evaluation. Every reply cites the scheme. No legal advice, no IC requests, no off-topic answers. Five-layer guardrails."
-
-**[ACTION — Click any 'Download PDF' button. Show watermark.]**
-
-> "DRAFT — NOT SUBMITTED on every page. Layak never auto-submits — Aisyah reviews, signs, and submits via the official portal herself. That's the line we don't cross."
-
-Five schemes, one minute, zero hallucinations. That's Layak. We're happy to take questions.
+Three documents, one minute, zero hallucinations. That's Layak. We're happy to take questions.
 
 ---
 

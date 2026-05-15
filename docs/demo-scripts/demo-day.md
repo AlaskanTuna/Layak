@@ -131,7 +131,17 @@ Five schemes, one minute, zero hallucinations. That's Layak. We're happy to take
 
 **"Is the demo hardcoded?"**
 
-→ No. Try Farhan instead of Aisyah — the LHDN deadline citation flips from 30 June (Form B) to 30 April (Form BE) because the rule engine genuinely re-evaluates `form_type`. Happy to show it.
+→ No. Try Farhan instead of Aisyah — the matched set changes because the rule engine genuinely re-evaluates `form_type`, income, dependants, and household flags. For example, a salaried profile routes to Form BE while a gig/self-employed profile routes to Form B; the UI shows the matching scheme IDs and citation chips from that actual run.
+
+**"If the rule engine already knows the thresholds, why use Vertex AI Search instead of hardcoded citation text?"**
+
+→ The rule decision is deterministic, but the evidence is retrieved. Hardcoded passages are summaries we wrote; Vertex AI Search returns text extracted from the actual gazetted PDF, with a `rag.<scheme>.primary` citation and `gs://` source URI that can be inspected on stage. That makes the pitch claim true: eligibility is rule-based, and every claim is grounded in a retrieved government source. It also keeps the system extensible — when a new scheme PDF is seeded, the citation layer can retrieve from the new source instead of waiting for someone to rewrite every passage by hand.
+
+The design is fail-open hybrid, not RAG-or-nothing. If Discovery Engine misses or is down, the rule can fall back to the curated citation text; if RAG works, the user gets the verbatim PDF extract. The real trade-off is latency: each RAG call costs roughly 1–2s, but the 19 scheme checks now run in parallel, so Match is about the slowest retrieval call (~2.4s), not 19 calls added together.
+
+**"Does RAG replace the deterministic rule engine?"**
+
+→ No. RAG grounds the citation, not the eligibility math. The rule engine still decides things like income bands, dependant counts, form type, and annual amount in typed Python. Vertex AI Search supplies the auditable passage from the official PDF, so the UI can say why the rule exists without asking the model to invent or recompute it.
 
 ### Third tier (less likely, prepare brief answers)
 

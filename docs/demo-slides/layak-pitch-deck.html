@@ -714,6 +714,194 @@
         flex-direction: column;
       }
 
+      .opening-split {
+        display: grid;
+        grid-template-columns: minmax(0, 1.05fr) 520px;
+        gap: 72px;
+        flex: 1;
+        align-items: stretch;
+        min-height: 0;
+      }
+      .opening-main {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        gap: 44px;
+      }
+      .opening-title {
+        font-family: 'Literata', Georgia, serif;
+        font-size: 86px;
+        font-weight: 700;
+        line-height: 1.02;
+        letter-spacing: 0;
+        color: var(--ink);
+        max-width: 1120px;
+      }
+      .opening-quote {
+        border-left: 6px solid var(--accent);
+        padding: 20px 0 22px 34px;
+        font-family: 'Literata', Georgia, serif;
+        font-size: 50px;
+        font-weight: 700;
+        line-height: 1.15;
+        color: var(--ink);
+        max-width: 1080px;
+      }
+      .opening-note {
+        font-family: 'Geist Mono', ui-monospace, monospace;
+        font-size: 24px;
+        line-height: 1.35;
+        letter-spacing: 0;
+        color: var(--muted);
+        text-transform: uppercase;
+      }
+      .opening-team-card {
+        background: var(--ink);
+        color: var(--paper);
+        padding: 48px;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        min-height: 0;
+      }
+      .opening-team-name {
+        font-family: 'Literata', Georgia, serif;
+        font-size: 76px;
+        font-weight: 700;
+        line-height: 1;
+        color: var(--paper);
+      }
+      .opening-team-meta {
+        font-family: 'Geist Mono', ui-monospace, monospace;
+        font-size: 20px;
+        line-height: 1.4;
+        letter-spacing: 0;
+        text-transform: uppercase;
+        color: rgba(245, 241, 232, 0.7);
+      }
+      .mission-visual {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+      .mission-shade {
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(90deg, rgba(20, 30, 46, 0.92) 0%, rgba(20, 30, 46, 0.75) 42%, rgba(20, 30, 46, 0.12) 100%);
+      }
+      .mission-copy {
+        position: relative;
+        z-index: 2;
+        width: 760px;
+        height: 100%;
+        padding: 82px 0 82px 110px;
+        box-sizing: border-box;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        gap: 34px;
+        color: var(--paper);
+      }
+      .mission-title {
+        font-family: 'Literata', Georgia, serif;
+        font-size: 76px;
+        font-weight: 700;
+        line-height: 1.02;
+        letter-spacing: 0;
+        color: var(--paper);
+      }
+      .mission-list {
+        display: grid;
+        gap: 16px;
+        margin: 0;
+        padding: 0;
+        list-style: none;
+        font-family: 'Geist Mono', ui-monospace, monospace;
+        font-size: 24px;
+        line-height: 1.35;
+        letter-spacing: 0;
+        text-transform: uppercase;
+        color: rgba(245, 241, 232, 0.82);
+      }
+      .mission-list li {
+        border-left: 4px solid var(--accent);
+        padding-left: 18px;
+      }
+      .reveal-grid {
+        display: grid;
+        grid-template-columns: 560px minmax(0, 1fr);
+        gap: 72px;
+        flex: 1;
+        align-items: center;
+        min-height: 0;
+      }
+      .reveal-stat {
+        background: var(--ink);
+        color: var(--paper);
+        padding: 52px;
+        min-height: 620px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        gap: 22px;
+      }
+      .reveal-stat-num {
+        font-family: 'Literata', Georgia, serif;
+        font-size: 190px;
+        font-weight: 700;
+        line-height: 0.86;
+        letter-spacing: 0;
+        color: var(--accent);
+      }
+      .reveal-stat-copy {
+        font-family: 'Geist Mono', ui-monospace, monospace;
+        font-size: 28px;
+        line-height: 1.3;
+        letter-spacing: 0;
+        text-transform: uppercase;
+        color: rgba(245, 241, 232, 0.78);
+      }
+      .reveal-copy {
+        display: flex;
+        flex-direction: column;
+        gap: 30px;
+      }
+      .reveal-title {
+        font-family: 'Literata', Georgia, serif;
+        font-size: 82px;
+        font-weight: 700;
+        line-height: 1.03;
+        letter-spacing: 0;
+        color: var(--ink);
+      }
+      .reveal-title .accent {
+        color: var(--accent);
+      }
+      .reveal-sub {
+        font-size: 36px;
+        line-height: 1.28;
+        color: var(--ink-2);
+        max-width: 1040px;
+      }
+      .reveal-pill-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 16px;
+        margin-top: 8px;
+      }
+      .reveal-pill {
+        font-family: 'Geist Mono', ui-monospace, monospace;
+        font-size: 20px;
+        letter-spacing: 0;
+        text-transform: uppercase;
+        color: var(--ink);
+        border: 1px solid var(--rule);
+        background: var(--paper-2);
+        padding: 14px 18px;
+      }
+
       /* top chrome */
       .top-chrome {
         display: flex;
@@ -1102,37 +1290,37 @@
 
       /* Slides 02–04: tighter head so content doesn't crash the bottom edge */
       .slide[data-label^='02'] .frame-head,
-      .slide[data-label^='12'] .frame-head,
-      .slide[data-label^='03'] .frame-head,
-      .slide[data-label^='14'] .frame-head,
-      .slide[data-label^='15'] .frame-head,
+      .slide[data-label^='11'] .frame-head,
+      .slide[data-label^='05'] .frame-head,
       .slide[data-label^='16'] .frame-head,
-      .slide[data-label^='06'] .frame-head {
+      .slide[data-label^='17'] .frame-head,
+      .slide[data-label^='18'] .frame-head,
+      .slide[data-label^='08'] .frame-head {
         margin-top: 14px !important;
         margin-bottom: 32px;
         padding-bottom: 20px;
       }
       .slide[data-label^='02'] .t-title,
-      .slide[data-label^='12'] .t-title,
-      .slide[data-label^='03'] .t-title {
+      .slide[data-label^='11'] .t-title,
+      .slide[data-label^='05'] .t-title {
         font-size: 62px;
       }
-      .slide[data-label^='03'] .t-title {
+      .slide[data-label^='05'] .t-title {
         font-size: 54px;
         white-space: nowrap;
       }
-      .slide[data-label^='12'] .persona-facts {
+      .slide[data-label^='11'] .persona-facts {
         align-content: start;
       }
-      .slide[data-label^='12'] .quote-block {
-        margin-top: 24px;
+      .slide[data-label^='11'] .quote-block {
+        margin-top: 0;
       }
 
       /* Slides 09–13: shrink titles so content sits higher — bold statement size */
-      .slide[data-label^='14'] .t-title,
-      .slide[data-label^='15'] .t-title-sm,
-      .slide[data-label^='16'] .t-title-sm,
-      .slide[data-label^='06'] .t-title-sm {
+      .slide[data-label^='16'] .t-title,
+      .slide[data-label^='17'] .t-title-sm,
+      .slide[data-label^='18'] .t-title-sm,
+      .slide[data-label^='08'] .t-title-sm {
         font-size: 60px;
       }
 
@@ -1143,11 +1331,11 @@
       .slide[data-label^='08'] .grounded-grid > :first-child {
         padding-top: 20px;
       }
-      .slide[data-label^='06'] .manual-copy {
+      .slide[data-label^='17'] .manual-copy {
         align-self: start;
         padding-top: 20px;
       }
-      .slide[data-label^='16'] .next-grid > :first-child {
+      .slide[data-label^='19'] .next-grid > :first-child {
         align-self: start !important;
         padding-top: 20px;
       }
@@ -2312,6 +2500,9 @@
   </head>
   <body>
     <deck-stage width="1920" height="1080">
+
+
+
       <!-- ============ SLIDE 01 — COVER ============ -->
       <section class="slide cover" data-label="01 Cover">
         <div class="cover-grid">
@@ -2428,57 +2619,106 @@
         </div>
       </section>
 
-      <!-- ============ SLIDE 02 — PROBLEM ============ -->
-      <section class="slide" data-label="02 Problem">
+
+      <!-- ============ SLIDE 02 — RAYA HOOK ============ -->
+      <section class="slide" data-label="02 Raya Hook">
         <div class="slide-pad">
           <div class="top-chrome">
             <div class="brand"><span class="brand-mark"></span><span>LAYAK</span></div>
-            <div>02 / 18 · The Problem</div>
-          </div>
-          <div class="frame-head" style="margin-top: 36px">
-            <div class="frame-title-group">
-              <div class="t-eyebrow">The problem</div>
-              <h2 class="t-title">Fragmented on the supply side. Invisible to the demand side.</h2>
-            </div>
+            <div>02 / 20 · Team T010NG</div>
           </div>
 
-          <div class="problem-grid">
-            <div class="big-stat">
-              <div class="num">167</div>
-              <div class="num-label" style="width: 1200px">
-                social-assistance schemes across 17 ministries — yet most Malaysians never know what they qualify for.
-              </div>
-              <div class="t-mono-sm" style="margin-top: 16px">Source · Ministry of Finance, Economic Outlook 2024</div>
+          <div class="opening-split">
+            <div class="opening-main">
+              <div class="opening-note">Hello World · We are Team T010NG</div>
+              <h1 class="opening-title">During Raya, pak cik suddenly asks for help.</h1>
+              <div class="opening-quote">“Ah boy, can help pak cik check what subsidies I qualify for ah?”</div>
             </div>
 
-            <div class="stat-stack">
-              <div class="stat-card">
-                <div class="sc-num" style="font-size: 56px">MyGov's Attempt</div>
-                <ul class="card-bullets">
-                  <li>In-house chatbot pulled one day after launch (Aug 2025).</li>
-                  <li>Hallucinated minister portfolios and RON95 prices.</li>
-                  <li>Layak's rule engine cites every number it shows.</li>
-                </ul>
+            <div class="opening-team-card">
+              <div>
+                <div class="opening-team-meta">True to our name</div>
+                <div class="opening-team-name">T010NG</div>
               </div>
-              <div class="stat-card">
-                <div class="sc-num" style="font-size: 56px">Future Facing</div>
-                <ul class="card-bullets">
-                  <li>Ministry of Digital launched PPDSA in Feb 2026.</li>
-                  <li>Names <em>agentic AI</em> as the next public-service layer.</li>
-                  <li>Layak is the reference build of that layer.</li>
-                </ul>
+              <div class="opening-team-meta">
+                Tolong means help.<br />This is the problem we are here to help with.
+              </div>
+              <div style="display: flex; align-items: center; gap: 18px">
+                <span class="brand-mark"></span>
+                <span class="opening-team-meta" style="color: var(--paper)">LAYAK · eligible</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+      <!-- ============ SLIDE 03 — MISSION IMPOSSIBLE MOMENT ============ -->
+      <section class="slide" data-label="03 Search Chaos">
+        <img class="mission-visual" src="assets/slide-02-mission-search.png" alt="Raya subsidy search becoming an impossible mission" />
+        <div class="mission-shade"></div>
+        <div class="mission-copy">
+          <div class="top-chrome" style="color: rgba(245, 241, 232, 0.68)">
+            <div class="brand" style="color: var(--paper)"><span class="brand-mark"></span><span>LAYAK</span></div>
+            <div>03 / 20 · The Search</div>
+          </div>
+          <div style="display: flex; flex-direction: column; gap: 34px">
+            <div class="opening-note" style="color: var(--accent)">A few minutes later</div>
+            <h2 class="mission-title">This starts to feel like Mission Impossible.</h2>
+            <ul class="mission-list">
+              <li>Endless Google searches</li>
+              <li>Confusing eligibility rules</li>
+              <li>Complicated application processes</li>
+              <li>Unsafe uploads of personal details?</li>
+              <li>Answers from verified government sources?</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+
+
+      <!-- ============ SLIDE 04 — LAYAK REVEAL ============ -->
+      <section class="slide" data-label="04 Layak Reveal">
+        <div class="slide-pad">
+          <div class="top-chrome">
+            <div class="brand"><span class="brand-mark"></span><span>LAYAK</span></div>
+            <div>04 / 20 · Eligible In Under A Minute</div>
+          </div>
+
+          <div class="reveal-grid">
+            <div class="reveal-stat">
+              <div class="reveal-stat-num">167</div>
+              <div class="reveal-stat-copy">Subsidy schemes across 17 agencies.</div>
+              <div class="reveal-stat-copy" style="font-size: 22px; color: rgba(245, 241, 232, 0.62)">
+                Most people only claim one or two because discovery is too complicated.
+              </div>
+            </div>
+
+            <div class="reveal-copy">
+              <div class="opening-note">Introducing</div>
+              <h2 class="reveal-title"><span class="accent">LAYAK</span> — AI-powered subsidy discovery for Malaysians.</h2>
+              <p class="reveal-sub">
+                Layak means <strong>eligible</strong>. In under a minute, it helps Malaysians find the subsidies they qualify for,
+                privately, securely, and backed by verified government sources.
+              </p>
+              <div class="reveal-pill-row">
+                <div class="reveal-pill">Private by design</div>
+                <div class="reveal-pill">Verified sources</div>
+                <div class="reveal-pill">Under 60 seconds</div>
+                <div class="reveal-pill">Built for everyone’s pak cik</div>
               </div>
             </div>
           </div>
         </div>
       </section>
 
-      <!-- ============ SLIDE 03 — WHAT LAYAK DOES ============ -->
-      <section class="slide" data-label="03 What Layak Does">
+
+
+      <!-- ============ SLIDE 05 — WHAT LAYAK DOES ============ -->
+      <section class="slide" data-label="05 What Layak Does">
         <div class="slide-pad">
           <div class="top-chrome">
             <div class="brand"><span class="brand-mark"></span><span>LAYAK</span></div>
-            <div>03 / 18 · What Layak Does</div>
+            <div>05 / 20 · What Layak Does</div>
           </div>
 
           <div class="frame-head" style="margin-top: 36px">
@@ -2522,13 +2762,12 @@
           </div>
         </div>
       </section>
-
-      <!-- ============ SLIDE 04 — SYSTEM ARCHITECTURE (SVG) ============ -->
-      <section class="slide" data-label="04 System Architecture">
+      <!-- ============ SLIDE 06 — SYSTEM ARCHITECTURE (SVG) ============ -->
+      <section class="slide" data-label="06 System Architecture">
         <div class="slide-pad">
           <div class="top-chrome">
             <div class="brand"><span class="brand-mark"></span><span>LAYAK</span></div>
-            <div>04 / 18 · System Architecture</div>
+            <div>06 / 20 · System Architecture</div>
           </div>
 
           <div class="frame-head" style="margin-top: 36px">
@@ -2833,12 +3072,12 @@
         </div>
       </section>
 
-      <!-- ============ SLIDE 05 — 6-STEP PIPELINE ============ -->
-      <section class="slide" data-label="05 Pipeline">
+      <!-- ============ SLIDE 07 — 6-STEP PIPELINE ============ -->
+      <section class="slide" data-label="07 Pipeline">
         <div class="slide-pad">
           <div class="top-chrome">
             <div class="brand"><span class="brand-mark"></span><span>LAYAK</span></div>
-            <div>05 / 18 · The Agentic Moment</div>
+            <div>07 / 20 · The Agentic Moment</div>
           </div>
 
           <div class="frame-head" style="margin-top: 36px">
@@ -2907,203 +3146,12 @@
         </div>
       </section>
 
-      <!-- ============ SLIDE 06 — ARCHITECTURE (DATA PATH) ============ -->
-      <section class="slide" data-label="06 Data Path">
-        <div class="slide-pad">
-          <div class="top-chrome">
-            <div class="brand"><span class="brand-mark"></span><span>LAYAK</span></div>
-            <div>06 / 18 · Data Pipeline</div>
-          </div>
-
-          <div class="frame-head" style="margin-top: 36px">
-            <div class="frame-title-group">
-              <div class="t-eyebrow">Two services on Cloud Run · stateless pipeline</div>
-              <h2 class="t-title-sm">End-to-end data path.</h2>
-            </div>
-          </div>
-
-          <div class="arch-diagram">
-            <div class="arch-row">
-              <div class="arch-row-label">Frontend</div>
-              <div class="arch-row-cells">
-                <div class="arch-cell dark">
-                  <span class="name">Next.js 16 · Cloud Run</span
-                  ><span class="sub">React 19 · Tailwind 4 · SSE consumer · Firebase ID-token</span>
-                </div>
-              </div>
-            </div>
-            <div class="arch-arrow">↓ HTTPS · multipart or JSON ↓</div>
-            <div class="arch-row">
-              <div class="arch-row-label">Backend</div>
-              <div class="arch-row-cells">
-                <div class="arch-cell dark">
-                  <span class="name">FastAPI · Cloud Run</span
-                  ><span class="sub">POST /api/agent/intake · min-instances=1 · cpu-boost · asia-southeast1</span>
-                </div>
-              </div>
-            </div>
-            <div class="arch-arrow">↓ ADK SequentialAgent · Gemini 2.5 Pro orchestrator ↓</div>
-            <div class="arch-row">
-              <div class="arch-row-label">Agent tools</div>
-              <div class="arch-row-cells">
-                <div class="arch-cell accent">
-                  <span class="name">extract</span><span class="sub">Gemini 3.1 Flash-Lite · multimodal</span>
-                </div>
-                <div class="arch-h-arrow">→</div>
-                <div class="arch-cell accent">
-                  <span class="name">classify</span><span class="sub">Gemini 3.1 Flash-Lite · structured</span>
-                </div>
-                <div class="arch-h-arrow">→</div>
-                <div class="arch-cell accent">
-                  <span class="name">match</span><span class="sub">Vertex AI Search + 19 typed rules</span>
-                </div>
-                <div class="arch-h-arrow">→</div>
-                <div class="arch-cell accent">
-                  <span class="name">strategy</span><span class="sub">Gemini 2.5 Pro · scheme picker</span>
-                </div>
-                <div class="arch-h-arrow">→</div>
-                <div class="arch-cell accent">
-                  <span class="name">upside</span><span class="sub">Code Execution · real Python</span>
-                </div>
-                <div class="arch-h-arrow">→</div>
-                <div class="arch-cell accent">
-                  <span class="name">generate</span><span class="sub">WeasyPrint → draft PDFs</span>
-                </div>
-              </div>
-            </div>
-            <div class="arch-arrow">↓ grounded retrieval ↓</div>
-            <div class="arch-row">
-              <div class="arch-row-label">Data</div>
-              <div class="arch-row-cells">
-                <div class="arch-cell">
-                  <span class="name">Scheme PDFs</span
-                  ><span class="sub">backend/data/schemes/ · source of truth</span>
-                </div>
-                <div class="arch-h-arrow">→</div>
-                <div class="arch-cell">
-                  <span class="name">Vertex AI Search</span><span class="sub">layak-schemes-v1 · indexed once</span>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <!-- ============ SLIDE 07 — STACK ============ -->
-      <section class="slide" data-label="07 Stack">
-        <div class="slide-pad">
-          <div class="top-chrome">
-            <div class="brand"><span class="brand-mark"></span><span>LAYAK</span></div>
-            <div>07 / 18 · Google AI Ecosystem</div>
-          </div>
-
-          <div class="frame-head" style="margin-top: 36px">
-            <div class="frame-title-group">
-              <div class="t-eyebrow">Google ecosystem · coverage report</div>
-              <h2 class="t-title-sm">Eight Google components in one flow.</h2>
-            </div>
-          </div>
-
-          <div class="stack-grid">
-            <div class="stack-card">
-              <div>
-                <div class="tier">Brain · 01</div>
-                <h4>Gemini 2.5 Pro</h4>
-                <ul class="card-bullets compact">
-                  <li>Orchestrator + heavy reasoning.</li>
-                  <li>Runs compute_upside + strategy.</li>
-                </ul>
-              </div>
-              <div class="code">ORCHESTRATOR_MODEL · HEAVY_MODEL</div>
-            </div>
-            <div class="stack-card">
-              <div>
-                <div class="tier">Brain · 02</div>
-                <h4>Gemini 3.1 Flash-Lite</h4>
-                <ul class="card-bullets compact">
-                  <li>Multimodal document extract.</li>
-                  <li>Structured household classify.</li>
-                </ul>
-              </div>
-              <div class="code">FAST_MODEL · WORKER_MODEL</div>
-            </div>
-            <div class="stack-card">
-              <div>
-                <div class="tier">Brain · 03</div>
-                <h4>Gemini Code Execution</h4>
-                <ul class="card-bullets compact">
-                  <li>Sandboxed Python for RM math.</li>
-                  <li>Snippet streams to the UI.</li>
-                </ul>
-              </div>
-              <div class="code">tools: [{codeExecution: {}}]</div>
-            </div>
-            <div class="stack-card">
-              <div>
-                <div class="tier">Context · 04</div>
-                <h4>Vertex AI Search</h4>
-                <ul class="card-bullets compact">
-                  <li>Grounded RAG over scheme PDFs.</li>
-                  <li>Every rule carries a passage.</li>
-                </ul>
-              </div>
-              <div class="code">tools: [{retrieval: {vertexAiSearch}}]</div>
-            </div>
-
-            <div class="stack-card">
-              <div>
-                <div class="tier">Orchestrator · 05</div>
-                <h4>ADK-Python v1.31</h4>
-                <ul class="card-bullets compact">
-                  <li>SequentialAgent + FunctionTool.</li>
-                  <li>First-party GA agent framework.</li>
-                </ul>
-              </div>
-              <div class="code">adk deploy cloud_run --with_ui</div>
-            </div>
-            <div class="stack-card">
-              <div>
-                <div class="tier">Lifecycle · 06</div>
-                <h4>Cloud Run</h4>
-                <ul class="card-bullets compact">
-                  <li>Hosts frontend + backend services.</li>
-                  <li>min-instances=1 with CPU boost.</li>
-                </ul>
-              </div>
-              <div class="code">region · asia-southeast1</div>
-            </div>
-            <div class="stack-card">
-              <div>
-                <div class="tier">Identity · 07</div>
-                <h4>Firebase Auth</h4>
-                <ul class="card-bullets compact">
-                  <li>Google OAuth + email sign-in.</li>
-                  <li>ID-token verified on every call.</li>
-                </ul>
-              </div>
-              <div class="code">firebase_admin.auth.verify_id_token</div>
-            </div>
-            <div class="stack-card">
-              <div>
-                <div class="tier">State · 08</div>
-                <h4>Cloud Firestore</h4>
-                <ul class="card-bullets compact">
-                  <li>Stores derived evaluations only.</li>
-                  <li>Raw uploads never persisted.</li>
-                </ul>
-              </div>
-              <div class="code">evaluations/{evalId}</div>
-            </div>
-          </div>
-        </div>
-      </section>
-
       <!-- ============ SLIDE 08 — GROUNDED ============ -->
       <section class="slide" data-label="08 Grounded">
         <div class="slide-pad">
           <div class="top-chrome">
             <div class="brand"><span class="brand-mark"></span><span>LAYAK</span></div>
-            <div>08 / 18 · Grounded, Not Guessed</div>
+            <div>08 / 20 · Grounded, Not Guessed</div>
           </div>
 
           <div class="frame-head" style="margin-top: 36px">
@@ -3157,12 +3205,13 @@
         </div>
       </section>
 
+
       <!-- ============ SLIDE 09 — VERTEX AI SEARCH (RAG) ============ -->
       <section class="slide" data-label="09 Vertex AI Search">
         <div class="slide-pad">
           <div class="top-chrome">
             <div class="brand"><span class="brand-mark"></span><span>LAYAK</span></div>
-            <div>09 / 18 · Vertex AI Search</div>
+            <div>09 / 20 · Vertex AI Search</div>
           </div>
 
           <div class="frame-head" style="margin-top: 36px">
@@ -3563,12 +3612,13 @@
         </div>
       </section>
 
+
       <!-- ============ SLIDE 10 — CHATBOT (CIK LAY) ============ -->
       <section class="slide" data-label="10 Chatbot">
         <div class="slide-pad">
           <div class="top-chrome">
             <div class="brand"><span class="brand-mark"></span><span>LAYAK</span></div>
-            <div>10 / 18 · Chatbot</div>
+            <div>10 / 20 · Chatbot</div>
           </div>
 
           <div class="frame-head" style="margin-top: 36px; margin-bottom: 8px">
@@ -3711,12 +3761,271 @@
         </div>
       </section>
 
-      <!-- ============ SLIDE 11 — FIRESTORE ERD (SVG) ============ -->
-      <section class="slide" data-label="11 Firestore ERD">
+      <!-- ============ SLIDE 11 — AISYAH ============ -->
+      <section class="slide" data-label="11 Persona">
         <div class="slide-pad">
           <div class="top-chrome">
             <div class="brand"><span class="brand-mark"></span><span>LAYAK</span></div>
-            <div>11 / 18 · Firestore Schema</div>
+            <div>11 / 20 · The User</div>
+          </div>
+
+          <div class="frame-head" style="margin-top: 36px">
+            <div class="frame-title-group">
+              <div class="t-eyebrow">Our reference user</div>
+              <h2 class="t-title">Meet Aisyah.</h2>
+            </div>
+          </div>
+
+          <div class="persona-grid">
+            <div class="persona-card">
+              <div class="persona-portrait">
+                <img
+                  src="assets/aisyah-photo.jpeg"
+                  alt="Aisyah"
+                  style="width: 100%; height: 100%; object-fit: cover; display: block"
+                />
+              </div>
+              <div>
+                <div class="persona-name">Aisyah, 34</div>
+                <div class="persona-meta" style="margin-top: 10px">Grab driver · Kuantan, Pahang</div>
+              </div>
+            </div>
+            <div style="display: flex; flex-direction: column; justify-content: flex-start; gap: 32px">
+              <div class="persona-facts">
+                <div class="pfact">
+                  <div class="pfact-label">Household</div>
+                  <div class="pfact-value">Two children (7, 10). One father, 70, resident.</div>
+                </div>
+                <div class="pfact">
+                  <div class="pfact-label">Income</div>
+                  <div class="pfact-value">~RM 2,800 / month gig income. No EA form.</div>
+                </div>
+                <div class="pfact">
+                  <div class="pfact-label">Tax form</div>
+                  <div class="pfact-value">Form B (self-employed). Deadline 30 June 2026.</div>
+                </div>
+                <div class="pfact">
+                  <div class="pfact-label">Device</div>
+                  <div class="pfact-value">Mid-range Android. Data-capped plan.</div>
+                </div>
+                <div class="pfact">
+                  <div class="pfact-label">Schemes in play</div>
+                  <div class="pfact-value">STR 2026 · JKM Warga Emas · 5 LHDN reliefs</div>
+                </div>
+                <div class="pfact">
+                  <div class="pfact-label">Trust posture</div>
+                  <div class="pfact-value">Skeptical after MyGov chatbot incident.</div>
+                </div>
+              </div>
+              <div class="quote-block">
+                "I don't know what I'm entitled to, the forms all want the same documents twice, and I don't trust that
+                entering my IC number anywhere online is safe."
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+
+
+      <!-- ============ SLIDE 12 — ARCHITECTURE (DATA PATH) ============ -->
+      <section class="slide" data-label="12 Data Path">
+        <div class="slide-pad">
+          <div class="top-chrome">
+            <div class="brand"><span class="brand-mark"></span><span>LAYAK</span></div>
+            <div>12 / 20 · Data Pipeline</div>
+          </div>
+
+          <div class="frame-head" style="margin-top: 36px">
+            <div class="frame-title-group">
+              <div class="t-eyebrow">Two services on Cloud Run · stateless pipeline</div>
+              <h2 class="t-title-sm">End-to-end data path.</h2>
+            </div>
+          </div>
+
+          <div class="arch-diagram">
+            <div class="arch-row">
+              <div class="arch-row-label">Frontend</div>
+              <div class="arch-row-cells">
+                <div class="arch-cell dark">
+                  <span class="name">Next.js 16 · Cloud Run</span
+                  ><span class="sub">React 19 · Tailwind 4 · SSE consumer · Firebase ID-token</span>
+                </div>
+              </div>
+            </div>
+            <div class="arch-arrow">↓ HTTPS · multipart or JSON ↓</div>
+            <div class="arch-row">
+              <div class="arch-row-label">Backend</div>
+              <div class="arch-row-cells">
+                <div class="arch-cell dark">
+                  <span class="name">FastAPI · Cloud Run</span
+                  ><span class="sub">POST /api/agent/intake · min-instances=1 · cpu-boost · asia-southeast1</span>
+                </div>
+              </div>
+            </div>
+            <div class="arch-arrow">↓ ADK SequentialAgent · Gemini 2.5 Pro orchestrator ↓</div>
+            <div class="arch-row">
+              <div class="arch-row-label">Agent tools</div>
+              <div class="arch-row-cells">
+                <div class="arch-cell accent">
+                  <span class="name">extract</span><span class="sub">Gemini 3.1 Flash-Lite · multimodal</span>
+                </div>
+                <div class="arch-h-arrow">→</div>
+                <div class="arch-cell accent">
+                  <span class="name">classify</span><span class="sub">Gemini 3.1 Flash-Lite · structured</span>
+                </div>
+                <div class="arch-h-arrow">→</div>
+                <div class="arch-cell accent">
+                  <span class="name">match</span><span class="sub">Vertex AI Search + 19 typed rules</span>
+                </div>
+                <div class="arch-h-arrow">→</div>
+                <div class="arch-cell accent">
+                  <span class="name">strategy</span><span class="sub">Gemini 2.5 Pro · scheme picker</span>
+                </div>
+                <div class="arch-h-arrow">→</div>
+                <div class="arch-cell accent">
+                  <span class="name">upside</span><span class="sub">Code Execution · real Python</span>
+                </div>
+                <div class="arch-h-arrow">→</div>
+                <div class="arch-cell accent">
+                  <span class="name">generate</span><span class="sub">WeasyPrint → draft PDFs</span>
+                </div>
+              </div>
+            </div>
+            <div class="arch-arrow">↓ grounded retrieval ↓</div>
+            <div class="arch-row">
+              <div class="arch-row-label">Data</div>
+              <div class="arch-row-cells">
+                <div class="arch-cell">
+                  <span class="name">Scheme PDFs</span
+                  ><span class="sub">backend/data/schemes/ · source of truth</span>
+                </div>
+                <div class="arch-h-arrow">→</div>
+                <div class="arch-cell">
+                  <span class="name">Vertex AI Search</span><span class="sub">layak-schemes-v1 · indexed once</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============ SLIDE 13 — STACK ============ -->
+      <section class="slide" data-label="13 Stack">
+        <div class="slide-pad">
+          <div class="top-chrome">
+            <div class="brand"><span class="brand-mark"></span><span>LAYAK</span></div>
+            <div>13 / 20 · Google AI Ecosystem</div>
+          </div>
+
+          <div class="frame-head" style="margin-top: 36px">
+            <div class="frame-title-group">
+              <div class="t-eyebrow">Google ecosystem · coverage report</div>
+              <h2 class="t-title-sm">Eight Google components in one flow.</h2>
+            </div>
+          </div>
+
+          <div class="stack-grid">
+            <div class="stack-card">
+              <div>
+                <div class="tier">Brain · 01</div>
+                <h4>Gemini 2.5 Pro</h4>
+                <ul class="card-bullets compact">
+                  <li>Orchestrator + heavy reasoning.</li>
+                  <li>Runs compute_upside + strategy.</li>
+                </ul>
+              </div>
+              <div class="code">ORCHESTRATOR_MODEL · HEAVY_MODEL</div>
+            </div>
+            <div class="stack-card">
+              <div>
+                <div class="tier">Brain · 02</div>
+                <h4>Gemini 3.1 Flash-Lite</h4>
+                <ul class="card-bullets compact">
+                  <li>Multimodal document extract.</li>
+                  <li>Structured household classify.</li>
+                </ul>
+              </div>
+              <div class="code">FAST_MODEL · WORKER_MODEL</div>
+            </div>
+            <div class="stack-card">
+              <div>
+                <div class="tier">Brain · 03</div>
+                <h4>Gemini Code Execution</h4>
+                <ul class="card-bullets compact">
+                  <li>Sandboxed Python for RM math.</li>
+                  <li>Snippet streams to the UI.</li>
+                </ul>
+              </div>
+              <div class="code">tools: [{codeExecution: {}}]</div>
+            </div>
+            <div class="stack-card">
+              <div>
+                <div class="tier">Context · 04</div>
+                <h4>Vertex AI Search</h4>
+                <ul class="card-bullets compact">
+                  <li>Grounded RAG over scheme PDFs.</li>
+                  <li>Every rule carries a passage.</li>
+                </ul>
+              </div>
+              <div class="code">tools: [{retrieval: {vertexAiSearch}}]</div>
+            </div>
+
+            <div class="stack-card">
+              <div>
+                <div class="tier">Orchestrator · 05</div>
+                <h4>ADK-Python v1.31</h4>
+                <ul class="card-bullets compact">
+                  <li>SequentialAgent + FunctionTool.</li>
+                  <li>First-party GA agent framework.</li>
+                </ul>
+              </div>
+              <div class="code">adk deploy cloud_run --with_ui</div>
+            </div>
+            <div class="stack-card">
+              <div>
+                <div class="tier">Lifecycle · 06</div>
+                <h4>Cloud Run</h4>
+                <ul class="card-bullets compact">
+                  <li>Hosts frontend + backend services.</li>
+                  <li>min-instances=1 with CPU boost.</li>
+                </ul>
+              </div>
+              <div class="code">region · asia-southeast1</div>
+            </div>
+            <div class="stack-card">
+              <div>
+                <div class="tier">Identity · 07</div>
+                <h4>Firebase Auth</h4>
+                <ul class="card-bullets compact">
+                  <li>Google OAuth + email sign-in.</li>
+                  <li>ID-token verified on every call.</li>
+                </ul>
+              </div>
+              <div class="code">firebase_admin.auth.verify_id_token</div>
+            </div>
+            <div class="stack-card">
+              <div>
+                <div class="tier">State · 08</div>
+                <h4>Cloud Firestore</h4>
+                <ul class="card-bullets compact">
+                  <li>Stores derived evaluations only.</li>
+                  <li>Raw uploads never persisted.</li>
+                </ul>
+              </div>
+              <div class="code">evaluations/{evalId}</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+
+      <!-- ============ SLIDE 14 — FIRESTORE ERD (SVG) ============ -->
+      <section class="slide" data-label="14 Firestore ERD">
+        <div class="slide-pad">
+          <div class="top-chrome">
+            <div class="brand"><span class="brand-mark"></span><span>LAYAK</span></div>
+            <div>14 / 20 · Firestore Schema</div>
           </div>
 
           <div class="frame-head" style="margin-top: 36px">
@@ -3834,73 +4143,8 @@
         </div>
       </section>
 
-      <!-- ============ SLIDE 12 — AISYAH ============ -->
-      <section class="slide" data-label="12 Persona">
-        <div class="slide-pad">
-          <div class="top-chrome">
-            <div class="brand"><span class="brand-mark"></span><span>LAYAK</span></div>
-            <div>12 / 18 · The User</div>
-          </div>
-
-          <div class="frame-head" style="margin-top: 36px">
-            <div class="frame-title-group">
-              <div class="t-eyebrow">Our reference user</div>
-              <h2 class="t-title">Meet Aisyah.</h2>
-            </div>
-          </div>
-
-          <div class="persona-grid">
-            <div class="persona-card">
-              <div class="persona-portrait">
-                <img
-                  src="assets/aisyah-photo.jpeg"
-                  alt="Aisyah"
-                  style="width: 100%; height: 100%; object-fit: cover; display: block"
-                />
-              </div>
-              <div>
-                <div class="persona-name">Aisyah, 34</div>
-                <div class="persona-meta" style="margin-top: 10px">Grab driver · Kuantan, Pahang</div>
-              </div>
-            </div>
-            <div style="display: flex; flex-direction: column; justify-content: space-between">
-              <div class="persona-facts">
-                <div class="pfact">
-                  <div class="pfact-label">Household</div>
-                  <div class="pfact-value">Two children (7, 10). One father, 70, resident.</div>
-                </div>
-                <div class="pfact">
-                  <div class="pfact-label">Income</div>
-                  <div class="pfact-value">~RM 2,800 / month gig income. No EA form.</div>
-                </div>
-                <div class="pfact">
-                  <div class="pfact-label">Tax form</div>
-                  <div class="pfact-value">Form B (self-employed). Deadline 30 June 2026.</div>
-                </div>
-                <div class="pfact">
-                  <div class="pfact-label">Device</div>
-                  <div class="pfact-value">Mid-range Android. Data-capped plan.</div>
-                </div>
-                <div class="pfact">
-                  <div class="pfact-label">Schemes in play</div>
-                  <div class="pfact-value">STR 2026 · JKM Warga Emas · 5 LHDN reliefs</div>
-                </div>
-                <div class="pfact">
-                  <div class="pfact-label">Trust posture</div>
-                  <div class="pfact-value">Skeptical after MyGov chatbot incident.</div>
-                </div>
-              </div>
-              <div class="quote-block">
-                "I don't know what I'm entitled to, the forms all want the same documents twice, and I don't trust that
-                entering my IC number anywhere online is safe."
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <!-- ============ SLIDE 13 — OUTCOME ============ -->
-      <section class="slide outcome" data-label="13 Outcome">
+      <!-- ============ SLIDE 15 — OUTCOME ============ -->
+      <section class="slide outcome" data-label="15 Outcome">
         <div class="outcome-grid">
           <div class="outcome-left">
             <div style="display: flex; align-items: center; gap: 16px">
@@ -3922,7 +4166,7 @@
               </div>
             </div>
 
-            <div class="t-mono-sm">13 / 18 · based on Budget 2026 gazetted rates as of 20 Apr 2026</div>
+            <div class="t-mono-sm">15 / 20 · based on Budget 2026 gazetted rates as of 20 Apr 2026</div>
           </div>
 
           <div class="outcome-right">
@@ -3962,12 +4206,12 @@
         </div>
       </section>
 
-      <!-- ============ SLIDE 14 — DATA PRIVACY ============ -->
-      <section class="slide" data-label="14 Privacy">
+      <!-- ============ SLIDE 16 — DATA PRIVACY ============ -->
+      <section class="slide" data-label="16 Privacy">
         <div class="slide-pad">
           <div class="top-chrome">
             <div class="brand"><span class="brand-mark"></span><span>LAYAK</span></div>
-            <div>14 / 18 · Data Privacy by Design</div>
+            <div>16 / 20 · Data Privacy by Design</div>
           </div>
 
           <div class="frame-head" style="margin-top: 36px">
@@ -4035,12 +4279,12 @@
         </div>
       </section>
 
-      <!-- ============ SLIDE 15 — MANUAL ENTRY ============ -->
-      <section class="slide" data-label="15 Manual Entry">
+      <!-- ============ SLIDE 17 — MANUAL ENTRY ============ -->
+      <section class="slide" data-label="17 Manual Entry">
         <div class="slide-pad">
           <div class="top-chrome">
             <div class="brand"><span class="brand-mark"></span><span>LAYAK</span></div>
-            <div>15 / 18 · Privacy Path</div>
+            <div>17 / 20 · Privacy Path</div>
           </div>
 
           <div class="frame-head" style="margin-top: 36px">
@@ -4093,12 +4337,12 @@
         </div>
       </section>
 
-      <!-- ============ SLIDE 16 — GEMMA SWAP ============ -->
-      <section class="slide sov" data-label="16 Sovereign Swap">
+      <!-- ============ SLIDE 18 — GEMMA SWAP ============ -->
+      <section class="slide sov" data-label="18 Sovereign Swap">
         <div class="slide-pad">
           <div class="top-chrome">
             <div class="brand"><span class="brand-mark"></span><span style="color: var(--paper)">LAYAK</span></div>
-            <div>16 / 18 · Sovereign AI</div>
+            <div>18 / 20 · Sovereign AI</div>
           </div>
 
           <div class="frame-head" style="margin-top: 36px">
@@ -4136,12 +4380,12 @@
         </div>
       </section>
 
-      <!-- ============ SLIDE 17 — WHAT'S NEXT ============ -->
-      <section class="slide" data-label="17 Roadmap">
+      <!-- ============ SLIDE 19 — WHAT'S NEXT ============ -->
+      <section class="slide" data-label="19 Roadmap">
         <div class="slide-pad">
           <div class="top-chrome">
             <div class="brand"><span class="brand-mark"></span><span>LAYAK</span></div>
-            <div>17 / 18 · What's Next</div>
+            <div>19 / 20 · What's Next</div>
           </div>
 
           <div class="frame-head" style="margin-top: 36px">
@@ -4211,8 +4455,8 @@
         </div>
       </section>
 
-      <!-- ============ SLIDE 18 — THANK YOU ============ -->
-      <section class="slide ty" data-label="18 Thank You">
+      <!-- ============ SLIDE 20 — THANK YOU ============ -->
+      <section class="slide ty" data-label="20 Thank You">
         <div class="ty-grid">
           <div class="ty-left">
             <div style="display: flex; align-items: center; gap: 16px">

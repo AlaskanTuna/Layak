@@ -15,7 +15,6 @@ import {
   Heart,
   HeartHandshake,
   Search,
-  X,
   PiggyBank,
   Scale,
   School,
@@ -449,17 +448,9 @@ export function SchemesOverview() {
     })
   }, [groupFilter, normalizedQuery, t])
 
-  const filteredCount = filteredByGroup.length
-  const hasActiveFilters = groupFilter !== ALL_GROUPS || query.trim().length > 0
-
-  function clearFilters() {
-    setQuery('')
-    setGroupFilter(ALL_GROUPS)
-  }
-
   return (
     <div className="flex flex-col gap-10">
-      <div className="paper-card flex flex-col gap-4 rounded-[16px] p-4 md:flex-row md:items-end md:justify-between">
+      <div className="paper-card rounded-[16px] p-4">
         <div className="grid flex-1 gap-3 md:grid-cols-[minmax(0,1fr)_260px]">
           <label className="flex flex-col gap-2">
             <span className="mono-caption text-foreground/55">{t('schemes.filters.searchLabel')}</span>
@@ -511,29 +502,9 @@ export function SchemesOverview() {
             </Select.Root>
           </label>
         </div>
-
-        <div className="flex flex-wrap items-center justify-between gap-3 md:justify-end">
-          <span className="mono-caption text-foreground/55">
-            {t('schemes.filters.resultsCount', { count: filteredCount, total: IN_SCOPE.length })}
-          </span>
-          <button
-            type="button"
-            onClick={clearFilters}
-            disabled={!hasActiveFilters}
-            className={cn(
-              'inline-flex h-9 items-center gap-2 rounded-lg border border-foreground/10 px-3 text-xs font-medium transition-colors',
-              hasActiveFilters
-                ? 'text-[color:var(--primary)] hover:border-[color:var(--primary)]/40 hover:bg-[color:var(--primary)]/8'
-                : 'cursor-not-allowed text-foreground/35'
-            )}
-          >
-            <X className="size-3.5" aria-hidden />
-            {t('schemes.filters.clear')}
-          </button>
-        </div>
       </div>
 
-      {filteredCount === 0 ? (
+      {filteredByGroup.length === 0 ? (
         <div className="paper-card rounded-[16px] p-8 text-center">
           <p className="font-heading text-lg font-semibold">{t('schemes.filters.emptyTitle')}</p>
           <p className="mt-2 text-sm text-foreground/60">{t('schemes.filters.emptyBody')}</p>

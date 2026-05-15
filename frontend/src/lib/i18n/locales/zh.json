@@ -1394,8 +1394,6 @@
       "searchPlaceholder": "按名称、机构、表格或来源搜索...",
       "categoryLabel": "类别",
       "allCategories": "所有类别",
-      "resultsCount": "{{count}} / {{total}} 项计划",
-      "clear": "清除筛选",
       "emptyTitle": "没有符合筛选条件的计划。",
       "emptyBody": "请尝试其他搜索词，或切回所有类别。"
     }

@@ -52,10 +52,23 @@ export function DraftPacketPreview({ evalId, matches }: Props) {
   const [zipError, setZipError] = useState<string | null>(null)
   const blobUrlsRef = useRef<string[]>([])
 
-  // Surface every qualifying packet-producing scheme, including
-  // `required_contribution` forms (e.g. PERKESO SKSPS). Subsidy credits are
-  // info-only and intentionally have no draft packet.
-  const qualifying = matches.filter((m) => m.qualifies && m.kind !== 'subsidy_credit')
+  // Backend `_TEMPLATE_MAP` in `agents/tools/generate_packet.py` only renders
+  // packets for these scheme_ids. Other qualifying schemes (BAP, BUDI95,
+  // i-Suri, KWAPM, etc.) are advisory-only — eligibility cards display but no
+  // separate Borang exists. Filtering here matches the backend so the preview
+  // never tries to fetch a non-existent template (else: HTTP 404).
+  const SCHEMES_WITH_PACKET_TEMPLATES = new Set([
+    'str_2026',
+    'jkm_warga_emas',
+    'jkm_bkk',
+    'lhdn_form_b',
+    'lhdn_form_be',
+    'perkeso_sksps',
+    'i_saraan'
+  ])
+  const qualifying = matches.filter(
+    (m) => m.qualifies && m.kind !== 'subsidy_credit' && SCHEMES_WITH_PACKET_TEMPLATES.has(m.scheme_id)
+  )
 
   useEffect(() => {
     const ref = blobUrlsRef
@@ -233,7 +246,7 @@ export function DraftPacketPreview({ evalId, matches }: Props) {
           )
         })}
       </div>
-      <div className="mt-4 flex flex-col gap-3">
+      <div id="download" className="mt-4 flex scroll-mt-28 flex-col gap-3 lg:scroll-mt-20">
         <Button type="button" onClick={handleDownloadZip} disabled={zipBusy} size="lg" className="w-full sm:w-auto">
           {zipBusy ? (
             <>

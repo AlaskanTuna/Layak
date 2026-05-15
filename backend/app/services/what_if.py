@@ -153,12 +153,13 @@ def _delta_status(baseline: SchemeMatch | None, rerun: SchemeMatch | None) -> De
     return "unchanged"
 
 
-def _truncate_summary(text: str, max_chars: int = 48) -> str:
+def _truncate_summary(text: str, max_chars: int = 36) -> str:
     """Word-boundary truncate so the tier_changed chip never chops mid-word.
 
     Falls back to a hard slice only when the text has no whitespace inside
-    the budget (e.g. a single long token). The frontend chip wraps prose,
-    so a slightly higher per-side budget is fine.
+    the budget (e.g. a single long token). The 36-char budget keeps two
+    truncated sides plus the ' -> ' separator and the trailing ellipsis
+    inside `SchemeDelta.note`'s 80-char Pydantic ceiling.
     """
     text = text.strip()
     if len(text) <= max_chars:

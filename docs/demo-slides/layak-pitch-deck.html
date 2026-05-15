@@ -607,10 +607,24 @@
         box-sizing: border-box;
       }
       section.slide:not(.cover):not(.ty):not(.sov) {
+        isolation: isolate;
+      }
+      section.slide:not(.cover):not(.ty):not(.sov) .frame-head {
+        position: relative;
+      }
+      section.slide:not(.cover):not(.ty):not(.sov) .frame-head::after {
+        content: '';
+        position: absolute;
+        top: calc(100% + 1px);
+        left: -110px;
+        right: -110px;
+        height: 1500px;
         background-image:
           linear-gradient(to right, rgba(20, 30, 46, 0.035) 1px, transparent 1px),
           linear-gradient(to bottom, rgba(20, 30, 46, 0.035) 1px, transparent 1px);
         background-size: 80px 80px;
+        pointer-events: none;
+        z-index: -1;
       }
 
       /* ===== TYPE SCALE (1920x1080) ===== */

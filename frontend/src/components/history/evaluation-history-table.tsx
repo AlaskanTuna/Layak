@@ -14,7 +14,7 @@ import { authedFetch } from '@/lib/firebase'
 import { notificationStore } from '@/lib/notification-store'
 import { cn } from '@/lib/utils'
 
-const PAGE_SIZE = 5
+const PAGE_SIZE = 10
 
 type Props = {
   items: EvaluationListItem[]

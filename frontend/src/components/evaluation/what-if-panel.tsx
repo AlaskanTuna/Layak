@@ -21,6 +21,10 @@ type Props = {
   ) => void
   onAskCikLay?: (context: ChatScenarioContext, draft: string) => void
   onHeaderActionChange?: (state: HeaderActionState | null) => void
+  /** Signal the parent that a scenario rerun is in flight so dependent
+   *  surfaces (scheme grids) can render a recalculating affordance. Fired
+   *  on every phase transition. */
+  onPendingChange?: (pending: boolean) => void
 }
 
 type HeaderActionState = {
@@ -82,7 +86,8 @@ export function WhatIfPanel({
   baselineProfile,
   onResult,
   onAskCikLay,
-  onHeaderActionChange
+  onHeaderActionChange,
+  onPendingChange
 }: Props) {
   const { t } = useTranslation()
   const baseline = useMemo(() => deriveBaselineSliders(baselineProfile), [baselineProfile])
@@ -138,6 +143,15 @@ export function WhatIfPanel({
       onResult(null, null, 'idle')
     }
   }, [whatIf.phase, whatIf.data, whatIf.strategyPhase, onResult, scenarioContext])
+
+  // Bubble pending state so scheme grids can pulse while the deterministic
+  // rerun is debouncing or in flight. Deterministic backend latency is
+  // sub-ms but network latency + 500ms debounce still produce a perceptible
+  // window where the cards on screen are stale.
+  const isPending = whatIf.phase === 'debouncing' || whatIf.phase === 'in-flight'
+  useEffect(() => {
+    onPendingChange?.(isPending)
+  }, [isPending, onPendingChange])
 
   const resetAll = useCallback(() => {
     setValues(baseline)

@@ -153,6 +153,22 @@ def _delta_status(baseline: SchemeMatch | None, rerun: SchemeMatch | None) -> De
     return "unchanged"
 
 
+def _truncate_summary(text: str, max_chars: int = 48) -> str:
+    """Word-boundary truncate so the tier_changed chip never chops mid-word.
+
+    Falls back to a hard slice only when the text has no whitespace inside
+    the budget (e.g. a single long token). The frontend chip wraps prose,
+    so a slightly higher per-side budget is fine.
+    """
+    text = text.strip()
+    if len(text) <= max_chars:
+        return text
+    head = text[:max_chars]
+    cut = head.rfind(" ")
+    truncated = head[:cut] if cut > 0 else head
+    return truncated.rstrip(" ,;:.-") + "…"
+
+
 def compute_deltas(baseline: list[SchemeMatch], rerun: list[SchemeMatch]) -> list[SchemeDelta]:
     baseline_by_id = {match.scheme_id: match for match in baseline}
     rerun_by_id = {match.scheme_id: match for match in rerun}
@@ -165,7 +181,7 @@ def compute_deltas(baseline: list[SchemeMatch], rerun: list[SchemeMatch]) -> lis
         rerun_rm = rerun_match.annual_rm if (rerun_match and rerun_match.qualifies) else None
         note = None
         if status == "tier_changed" and baseline_match and rerun_match:
-            note = f"{baseline_match.summary[:36]} -> {rerun_match.summary[:36]}"
+            note = f"{_truncate_summary(baseline_match.summary)} -> {_truncate_summary(rerun_match.summary)}"
         deltas.append(
             SchemeDelta(
                 scheme_id=scheme_id,

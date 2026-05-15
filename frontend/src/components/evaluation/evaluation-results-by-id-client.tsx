@@ -3,7 +3,7 @@
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { AlertTriangle, ArrowLeft, ArrowRight, Loader2 } from 'lucide-react'
+import { AlertTriangle, ArrowLeft, ArrowRight, Loader2, RotateCcw } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 
 import { DraftPacketPreview } from '@/components/evaluation/draft-packet-preview'
@@ -103,6 +103,10 @@ export function EvaluationResultsByIdClient({ evalId }: { evalId: string }) {
     result: WhatIfResponse
     context: ChatScenarioContext
     strategyPhase: WhatIfStrategyPhase
+  } | null>(null)
+  const [whatIfHeaderAction, setWhatIfHeaderAction] = useState<{
+    isDirty: boolean
+    resetAll: () => void
   } | null>(null)
   const whatIfResult = whatIfPreview?.result ?? null
   const handleWhatIfResult = useCallback(
@@ -433,20 +437,40 @@ export function EvaluationResultsByIdClient({ evalId }: { evalId: string }) {
                 aria-label={t('evaluation.results.toc.whatIfs')}
                 className="flex scroll-mt-28 flex-col gap-3 lg:scroll-mt-20"
               >
-                <div className="flex items-center gap-2">
-                  <h2 className="font-heading text-xl font-semibold tracking-tight">
-                    {t('evaluation.whatIfs.sectionTitle')}
-                  </h2>
-                  <InfoTooltip
-                    content={t('evaluation.whatIfs.sectionDescription')}
-                    label={t('evaluation.whatIfs.sectionDescription')}
-                  />
+                <div className="flex items-center justify-between gap-3">
+                  <div className="flex items-center gap-2">
+                    <h2 className="font-heading text-xl font-semibold tracking-tight">
+                      {t('evaluation.whatIfs.sectionTitle')}
+                    </h2>
+                    <InfoTooltip
+                      content={t('evaluation.whatIfs.sectionDescription')}
+                      label={t('evaluation.whatIfs.sectionDescription')}
+                    />
+                  </div>
+                  <div className="flex min-h-8 items-center">
+                    {whatIfHeaderAction ? (
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="sm"
+                        onClick={whatIfHeaderAction.resetAll}
+                        disabled={!whatIfHeaderAction.isDirty}
+                        className="gap-1.5 disabled:pointer-events-none disabled:opacity-0"
+                        aria-hidden={!whatIfHeaderAction.isDirty}
+                        tabIndex={whatIfHeaderAction.isDirty ? 0 : -1}
+                      >
+                        <RotateCcw className="size-3.5" aria-hidden />
+                        {t('evaluation.whatIf.resetAll')}
+                      </Button>
+                    ) : null}
+                  </div>
                 </div>
                 <WhatIfPanel
                   evalId={evalId}
                   baselineProfile={doc.profile}
                   onResult={handleWhatIfResult}
                   onAskCikLay={chat.handoffFromScenario}
+                  onHeaderActionChange={setWhatIfHeaderAction}
                 />
               </section>
             )}

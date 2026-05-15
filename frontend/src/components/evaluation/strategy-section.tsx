@@ -32,27 +32,29 @@ export function StrategySection({ advisories, scenarioStatus = 'baseline', onAsk
 
   return (
     <section className="flex flex-col gap-4">
-      <header className="flex items-center gap-2">
-        <h2 className="font-heading text-xl font-semibold tracking-tight">{t('evaluation.strategy.sectionTitle')}</h2>
-        <InfoTooltip content={description} label={description} />
+      <header className="flex items-center justify-between gap-3">
+        <div className="flex items-center gap-2">
+          <h2 className="font-heading text-xl font-semibold tracking-tight">{t('evaluation.strategy.sectionTitle')}</h2>
+          <InfoTooltip content={description} label={description} />
+        </div>
+        <div
+          className={`inline-flex min-h-8 w-fit items-center gap-2 rounded-full border px-3 py-1.5 ${SCENARIO_STATUS_STYLES[scenarioStatus]}`}
+          aria-hidden={scenarioStatus === 'baseline'}
+        >
+          {scenarioStatus === 'refreshing' ? (
+            <Loader2 className="size-3.5 animate-spin" aria-hidden />
+          ) : scenarioStatus === 'ready' ? (
+            <CheckCircle2 className="size-3.5" aria-hidden />
+          ) : scenarioStatus === 'error' ? (
+            <AlertTriangle className="size-3.5" aria-hidden />
+          ) : (
+            <Info className="size-3.5" aria-hidden />
+          )}
+          <span className="mono-caption">
+            {t(`evaluation.strategy.scenario.${scenarioStatus === 'baseline' ? 'refreshing' : scenarioStatus}`)}
+          </span>
+        </div>
       </header>
-      <div
-        className={`inline-flex min-h-8 w-fit items-center gap-2 rounded-full border px-3 py-1.5 ${SCENARIO_STATUS_STYLES[scenarioStatus]}`}
-        aria-hidden={scenarioStatus === 'baseline'}
-      >
-        {scenarioStatus === 'refreshing' ? (
-          <Loader2 className="size-3.5 animate-spin" aria-hidden />
-        ) : scenarioStatus === 'ready' ? (
-          <CheckCircle2 className="size-3.5" aria-hidden />
-        ) : scenarioStatus === 'error' ? (
-          <AlertTriangle className="size-3.5" aria-hidden />
-        ) : (
-          <Info className="size-3.5" aria-hidden />
-        )}
-        <span className="mono-caption">
-          {t(`evaluation.strategy.scenario.${scenarioStatus === 'baseline' ? 'refreshing' : scenarioStatus}`)}
-        </span>
-      </div>
 
       {visible.length === 0 ? (
         <div className="paper-card flex flex-col gap-1 rounded-[16px] border border-[color:var(--forest)]/25 p-5">

@@ -31,7 +31,12 @@ class SchemeDelta(BaseModel):
     baseline_annual_rm: float | None = None
     new_annual_rm: float | None = None
     delta_rm: float = 0.0
-    note: str | None = Field(default=None, max_length=80)
+    # When status == "tier_changed", these carry the raw baseline + rerun
+    # summary strings so the frontend can render the diff however it likes
+    # (line-clamp, hover tooltip, etc.) without backend pre-truncation. Both
+    # `None` for other statuses.
+    baseline_summary: str | None = Field(default=None, max_length=400)
+    rerun_summary: str | None = Field(default=None, max_length=400)
 
 
 class WhatIfSuggestion(BaseModel):

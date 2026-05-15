@@ -184,8 +184,29 @@ def test_delta_tier_changed_when_summary_differs():
     rerun = [_stub_match("str_2026", annual_rm=2500.0, summary="Tier 1")]
     deltas = compute_deltas(base, rerun)
     assert deltas[0].status == "tier_changed"
-    assert "Tier 2" in (deltas[0].note or "")
-    assert "Tier 1" in (deltas[0].note or "")
+    assert deltas[0].baseline_summary == "Tier 2"
+    assert deltas[0].rerun_summary == "Tier 1"
+
+
+def test_delta_tier_changed_carries_full_untruncated_summaries():
+    """Schema-level guarantee: long summaries pass through verbatim, no chop."""
+    long_baseline = "Per-capita income RM700/month is below food-PLI RM1,236 threshold — elderly parent qualifies"
+    long_rerun = "Per-capita income RM1,150/month is below food-PLI RM1,236 threshold — elderly parent qualifies"
+    base = [_stub_match("str_2026", annual_rm=1500.0, summary=long_baseline)]
+    rerun = [_stub_match("str_2026", annual_rm=2500.0, summary=long_rerun)]
+    deltas = compute_deltas(base, rerun)
+    assert deltas[0].status == "tier_changed"
+    assert deltas[0].baseline_summary == long_baseline
+    assert deltas[0].rerun_summary == long_rerun
+
+
+def test_delta_non_tier_changed_has_null_summaries():
+    base = [_stub_match("lhdn_form_b", annual_rm=4500.0, summary="stub")]
+    rerun = [_stub_match("lhdn_form_b", annual_rm=5200.0, summary="stub")]
+    deltas = compute_deltas(base, rerun)
+    assert deltas[0].status == "amount_changed"
+    assert deltas[0].baseline_summary is None
+    assert deltas[0].rerun_summary is None
 
 
 def test_delta_amount_changed_with_same_summary():

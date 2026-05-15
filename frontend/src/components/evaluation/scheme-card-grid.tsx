@@ -415,21 +415,16 @@ function DeltaChip({
           ? t('evaluation.whatIf.deltaChip.eyebrow.tier_changed')
           : t('evaluation.whatIf.deltaChip.eyebrow.amount_changed')
 
-  // tier_changed renders as a two-line pill: eyebrow on top, the before→after
-  // diff (with the backend's ASCII "->" swapped to a unicode arrow) on a
-  // second line in sentence-case prose. The other statuses are short labels
-  // and fit a single-line pill with the eyebrow as the value's lead-in.
+  // tier_changed carries the full untruncated baseline + rerun summaries
+  // from the backend. Render the diff inline with `line-clamp-3` so long
+  // text wraps gracefully; the `title` attribute on each side gives a
+  // hover tooltip with the complete string. Collapses to an eyebrow-only
+  // pill if the two summaries are identical (defensive — backend only
+  // emits tier_changed when they differ).
   if (delta.status === 'tier_changed') {
-    const note = (delta.note ?? '').replace(/\s*->\s*/g, ' → ')
-    const [rawBefore, rawAfter] = note.split(' → ')
-    const before = (rawBefore ?? '').trim()
-    const after = (rawAfter ?? '').trim()
-    // When the backend's word-boundary truncation collapses the two sides
-    // to identical strings (e.g. a tier flip where the differing detail
-    // sits past the per-side budget), the diff line carries no information.
-    // Drop to a single-line eyebrow pill instead of repeating identical
-    // strikethrough/bold text.
-    const diffMeaningful = !!after && before !== after
+    const before = (delta.baseline_summary ?? '').trim()
+    const after = (delta.rerun_summary ?? '').trim()
+    const diffMeaningful = !!before && !!after && before !== after
     if (!diffMeaningful) {
       return (
         <div
@@ -449,9 +444,17 @@ function DeltaChip({
         <Icon className="mt-0.5 size-3.5 shrink-0" aria-hidden />
         <div className="flex min-w-0 flex-col gap-0.5">
           <span className="mono-caption text-[9.5px] leading-none opacity-80">{eyebrow}</span>
-          <span className="text-[11px] leading-[1.35] text-foreground/85">
-            <span className="text-foreground/55 line-through decoration-foreground/30">{before}</span>{' '}
-            <span className="opacity-60">→</span> <span className="font-medium">{after}</span>
+          <span className="line-clamp-3 text-[11px] leading-[1.35] text-foreground/85">
+            <span
+              className="text-foreground/55 line-through decoration-foreground/30"
+              title={before}
+            >
+              {before}
+            </span>{' '}
+            <span className="opacity-60">→</span>{' '}
+            <span className="font-medium" title={after}>
+              {after}
+            </span>
           </span>
         </div>
       </div>

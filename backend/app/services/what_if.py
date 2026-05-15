@@ -153,23 +153,6 @@ def _delta_status(baseline: SchemeMatch | None, rerun: SchemeMatch | None) -> De
     return "unchanged"
 
 
-def _truncate_summary(text: str, max_chars: int = 36) -> str:
-    """Word-boundary truncate so the tier_changed chip never chops mid-word.
-
-    Falls back to a hard slice only when the text has no whitespace inside
-    the budget (e.g. a single long token). The 36-char budget keeps two
-    truncated sides plus the ' -> ' separator and the trailing ellipsis
-    inside `SchemeDelta.note`'s 80-char Pydantic ceiling.
-    """
-    text = text.strip()
-    if len(text) <= max_chars:
-        return text
-    head = text[:max_chars]
-    cut = head.rfind(" ")
-    truncated = head[:cut] if cut > 0 else head
-    return truncated.rstrip(" ,;:.-") + "…"
-
-
 def compute_deltas(baseline: list[SchemeMatch], rerun: list[SchemeMatch]) -> list[SchemeDelta]:
     baseline_by_id = {match.scheme_id: match for match in baseline}
     rerun_by_id = {match.scheme_id: match for match in rerun}
@@ -180,9 +163,14 @@ def compute_deltas(baseline: list[SchemeMatch], rerun: list[SchemeMatch]) -> lis
         status = _delta_status(baseline_match, rerun_match)
         baseline_rm = baseline_match.annual_rm if (baseline_match and baseline_match.qualifies) else None
         rerun_rm = rerun_match.annual_rm if (rerun_match and rerun_match.qualifies) else None
-        note = None
-        if status == "tier_changed" and baseline_match and rerun_match:
-            note = f"{_truncate_summary(baseline_match.summary)} -> {_truncate_summary(rerun_match.summary)}"
+        # Carry raw summaries on tier_changed so the frontend renders the
+        # diff (full text, hover tooltip, line-clamp) without backend
+        # pre-truncation. Both `None` for other statuses keeps the wire
+        # tight when nothing meaningful changed.
+        baseline_summary = (
+            baseline_match.summary if status == "tier_changed" and baseline_match else None
+        )
+        rerun_summary = rerun_match.summary if status == "tier_changed" and rerun_match else None
         deltas.append(
             SchemeDelta(
                 scheme_id=scheme_id,
@@ -190,7 +178,8 @@ def compute_deltas(baseline: list[SchemeMatch], rerun: list[SchemeMatch]) -> lis
                 baseline_annual_rm=_round2(baseline_rm) if baseline_rm is not None else None,
                 new_annual_rm=_round2(rerun_rm) if rerun_rm is not None else None,
                 delta_rm=_round2((rerun_rm or 0.0) - (baseline_rm or 0.0)),
-                note=note,
+                baseline_summary=baseline_summary,
+                rerun_summary=rerun_summary,
             )
         )
     return deltas

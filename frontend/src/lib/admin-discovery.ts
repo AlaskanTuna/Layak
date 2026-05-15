@@ -1,83 +1,42 @@
 'use client'
 
 import { authedFetch } from '@/lib/firebase'
+import {
+  isMockEnabled,
+  mockApprove,
+  mockDelete,
+  mockFetchCandidate,
+  mockFetchQueue,
+  mockFetchSchemeHealth,
+  mockReject,
+  mockRequestChanges,
+  mockTrigger
+} from '@/lib/admin-discovery-mock'
+
+export type {
+  ActionResponse,
+  CandidateDetail,
+  CandidateRow,
+  CandidateStatus,
+  DiscoveryRunSummary,
+  QueueFilter,
+  QueueResponse,
+  SchemeCandidate,
+  SchemeHealthResponse,
+  SchemeHealthRow,
+  SourceCitation
+} from '@/lib/admin-discovery-types'
+
+import type {
+  ActionResponse,
+  CandidateDetail,
+  DiscoveryRunSummary,
+  QueueFilter,
+  QueueResponse,
+  SchemeHealthResponse
+} from '@/lib/admin-discovery-types'
 
 const backendBase = (): string => process.env.NEXT_PUBLIC_BACKEND_URL ?? 'http://localhost:8080'
-
-export type CandidateStatus = 'pending' | 'approved' | 'rejected' | 'changes_requested'
-
-export type QueueFilter = CandidateStatus | 'all'
-
-export type CandidateRow = {
-  candidate_id: string
-  source_id: string
-  scheme_id: string | null
-  name: string
-  agency: string
-  status: CandidateStatus
-  created_at: string | null
-  reviewed_at: string | null
-  confidence: number
-}
-
-export type QueueResponse = {
-  items: CandidateRow[]
-}
-
-export type SourceCitation = {
-  source_url: string
-  snippet: string
-}
-
-export type SchemeCandidate = {
-  candidate_id: string
-  source_id: string
-  scheme_id: string | null
-  name: string
-  agency: string
-  eligibility_summary: string
-  rate_summary: string
-  citation: SourceCitation
-  source_url: string
-  source_content_hash: string
-  extracted_at: string
-  confidence: number
-}
-
-export type CandidateDetail = {
-  candidate: SchemeCandidate
-  status: CandidateStatus
-  reviewed_by: string | null
-  reviewed_at: string | null
-  admin_note: string | null
-}
-
-export type ActionResponse = {
-  candidate_id: string
-  status: CandidateStatus
-  manifest_path: string | null
-  manifest_yaml: string | null
-}
-
-export type DiscoveryRunSummary = {
-  started_at: string
-  finished_at: string
-  sources_checked: number
-  sources_changed: number
-  candidates_extracted: number
-  candidates_persisted: number
-  errors: string[]
-}
-
-export type SchemeHealthRow = {
-  scheme_id: string
-  verified_at: string | null
-  source_content_hash: string | null
-}
-
-export type SchemeHealthResponse = {
-  items: SchemeHealthRow[]
-}
 
 async function jsonOrThrow<T>(res: Response): Promise<T> {
   if (!res.ok) {
@@ -94,6 +53,7 @@ async function jsonOrThrow<T>(res: Response): Promise<T> {
 }
 
 export async function fetchQueue(filter: QueueFilter): Promise<QueueResponse> {
+  if (isMockEnabled()) return mockFetchQueue(filter)
   const url = new URL(`${backendBase()}/api/admin/discovery/queue`)
   url.searchParams.set('status', filter)
   const res = await authedFetch(url.toString())
@@ -101,11 +61,13 @@ export async function fetchQueue(filter: QueueFilter): Promise<QueueResponse> {
 }
 
 export async function fetchCandidate(candidateId: string): Promise<CandidateDetail> {
+  if (isMockEnabled()) return mockFetchCandidate(candidateId)
   const res = await authedFetch(`${backendBase()}/api/admin/discovery/${candidateId}`)
   return jsonOrThrow<CandidateDetail>(res)
 }
 
 export async function triggerDiscovery(): Promise<DiscoveryRunSummary> {
+  if (isMockEnabled()) return mockTrigger()
   const res = await authedFetch(`${backendBase()}/api/admin/discovery/trigger`, {
     method: 'POST'
   })
@@ -113,6 +75,7 @@ export async function triggerDiscovery(): Promise<DiscoveryRunSummary> {
 }
 
 export async function approveCandidate(candidateId: string, note?: string): Promise<ActionResponse> {
+  if (isMockEnabled()) return mockApprove(candidateId, note)
   const res = await authedFetch(`${backendBase()}/api/admin/discovery/${candidateId}/approve`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -122,6 +85,7 @@ export async function approveCandidate(candidateId: string, note?: string): Prom
 }
 
 export async function rejectCandidate(candidateId: string, note?: string): Promise<ActionResponse> {
+  if (isMockEnabled()) return mockReject(candidateId, note)
   const res = await authedFetch(`${backendBase()}/api/admin/discovery/${candidateId}/reject`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -131,6 +95,7 @@ export async function rejectCandidate(candidateId: string, note?: string): Promi
 }
 
 export async function requestChangesCandidate(candidateId: string, note?: string): Promise<ActionResponse> {
+  if (isMockEnabled()) return mockRequestChanges(candidateId, note)
   const res = await authedFetch(`${backendBase()}/api/admin/discovery/${candidateId}/request-changes`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -140,6 +105,10 @@ export async function requestChangesCandidate(candidateId: string, note?: string
 }
 
 export async function deleteCandidate(candidateId: string): Promise<void> {
+  if (isMockEnabled()) {
+    mockDelete(candidateId)
+    return
+  }
   const res = await authedFetch(`${backendBase()}/api/admin/discovery/${candidateId}`, {
     method: 'DELETE'
   })
@@ -149,6 +118,7 @@ export async function deleteCandidate(candidateId: string): Promise<void> {
 }
 
 export async function fetchSchemeHealth(): Promise<SchemeHealthResponse> {
+  if (isMockEnabled()) return mockFetchSchemeHealth()
   const res = await authedFetch(`${backendBase()}/api/admin/schemes/health`)
   return jsonOrThrow<SchemeHealthResponse>(res)
 }

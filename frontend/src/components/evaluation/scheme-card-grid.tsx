@@ -1,5 +1,6 @@
 'use client'
 
+import { useState } from 'react'
 import { ArrowRight, ExternalLink } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 
@@ -152,7 +153,7 @@ export function SchemeCardGrid({ matches, deltas, kind = 'upside', heading, hide
               )}
             >
               <header className="flex flex-col gap-2">
-                <div className="flex items-center justify-between gap-2">
+                <div className="flex min-h-[1.25rem] items-center justify-between gap-2">
                   <span
                     className={cn(
                       'mono-caption',
@@ -168,75 +169,108 @@ export function SchemeCardGrid({ matches, deltas, kind = 'upside', heading, hide
                     </span>
                   )}
                 </div>
-                <h3 className="font-heading text-base font-semibold tracking-tight">
+                <h3 className="line-clamp-2 min-h-[2.5rem] font-heading text-base font-semibold leading-[1.25] tracking-tight">
                   {localisedSchemeName(t, match.scheme_id, match.scheme_name)}
                 </h3>
-                <p className="text-xs leading-relaxed text-foreground/65">{tidyText(match.summary)}</p>
+                <p className="line-clamp-3 min-h-[3.4rem] text-xs leading-relaxed text-foreground/65">
+                  {tidyText(match.summary)}
+                </p>
               </header>
 
-              <div className="flex flex-col gap-1 rounded-md border border-foreground/8 bg-foreground/[0.025] p-3">
-                <p className="mono-caption text-foreground/55">{t('evaluation.schemeCard.whyQualify')}</p>
-                <p className="text-xs leading-[1.55] text-foreground/80">{tidyText(match.why_qualify)}</p>
-              </div>
+              <WhyQualifyBlock
+                label={t('evaluation.schemeCard.whyQualify')}
+                text={tidyText(match.why_qualify)}
+                hint={t('evaluation.schemeCard.whyQualifyTapReveal')}
+              />
 
-              {isSubsidy ? (
-                <footer className="mt-auto flex items-end justify-between gap-3 border-t border-foreground/10 pt-3">
-                  <div className="flex flex-col gap-1">
-                    <p className="mono-caption text-foreground/55">{t('evaluation.schemeCard.subsidyInfo')}</p>
-                    <p className="text-xs leading-[1.4] text-foreground/80">
+              <footer className="mt-auto flex flex-col gap-3 border-t border-foreground/10 pt-3">
+                {/* Unified value row: same `label left / bold value right`
+                    structure on both subsidy and upside cards. Color is the
+                    only differentiator (hibiscus for subsidy, foreground for
+                    upside) so visual hierarchy matches across the grid. */}
+                <div className="flex min-h-[2.25rem] items-baseline justify-between gap-3">
+                  <p className="mono-caption shrink-0 text-foreground/55">
+                    {isSubsidy ? t('evaluation.schemeCard.subsidyInfo') : t('evaluation.schemeCard.estValue')}
+                  </p>
+                  {isSubsidy ? (
+                    <p className="text-right font-heading text-[13px] font-semibold leading-[1.25] text-[color:var(--hibiscus)]">
                       {t('evaluation.schemeCard.subsidyAutoCredited')}
                     </p>
-                    {match.expires_at_iso && (
-                      <p className="text-[12px] font-bold text-[color:var(--hibiscus)]">
-                        {t('evaluation.schemeCard.expiresOn', {
-                          date: formatExpiryDate(match.expires_at_iso, i18n.language)
-                        })}
-                      </p>
-                    )}
-                  </div>
-                  <Button
-                    render={<a href={match.portal_url} target="_blank" rel="noopener noreferrer" />}
-                    size="sm"
-                    variant="outline"
-                    className="rounded-full border-[color:var(--hibiscus)]/55 hover:border-[color:var(--hibiscus)] hover:bg-[color:var(--hibiscus)]/8 dark:hover:bg-[color:var(--hibiscus)]/12"
-                  >
-                    {t('evaluation.schemeCard.checkBalance')}
-                    <ExternalLink className="ml-1 size-3.5 text-[color:var(--hibiscus)]" aria-hidden />
-                  </Button>
-                </footer>
-              ) : (
-                <footer className="mt-auto flex items-end justify-between gap-3 border-t border-foreground/10 pt-3">
-                  <div className="flex flex-col gap-1">
-                    <p className="mono-caption text-foreground/55">{t('evaluation.schemeCard.estValue')}</p>
+                  ) : (
                     <p className="font-heading text-[15px] font-semibold tabular-nums text-foreground">
                       {formatRm(match.annual_rm)}
                     </p>
-                  </div>
-                  <Button
-                    render={<a href={match.portal_url} target="_blank" rel="noopener noreferrer" />}
-                    size="sm"
-                    className={
-                      isTop
-                        ? 'rounded-full bg-[color:var(--hibiscus)] text-[color:var(--hibiscus-foreground)] hover:bg-[color:var(--hibiscus)]/92'
-                        : 'rounded-full'
-                    }
-                    variant={isTop ? 'default' : 'outline'}
-                  >
-                    {t('evaluation.schemeCard.startApp')}
+                  )}
+                </div>
+                {isSubsidy && match.expires_at_iso && (
+                  <p className="text-right text-[11px] font-medium text-[color:var(--hibiscus)]">
+                    {t('evaluation.schemeCard.expiresOn', {
+                      date: formatExpiryDate(match.expires_at_iso, i18n.language)
+                    })}
+                  </p>
+                )}
+                {/* Phase 11 Feature 3 — what-if delta chip inside the footer
+                    so the visual hierarchy stays card-body → footer instead of
+                    spilling a status pill outside the action area. */}
+                <DeltaChip delta={deltaByScheme.get(match.scheme_id)} t={t} />
+                <Button
+                  render={<a href={match.portal_url} target="_blank" rel="noopener noreferrer" />}
+                  size="sm"
+                  variant={isTop && !isSubsidy ? 'default' : 'outline'}
+                  className={cn(
+                    'w-full rounded-full',
+                    isTop && !isSubsidy &&
+                      'bg-[color:var(--hibiscus)] text-[color:var(--hibiscus-foreground)] hover:bg-[color:var(--hibiscus)]/92',
+                    isSubsidy &&
+                      'border-[color:var(--hibiscus)]/55 hover:border-[color:var(--hibiscus)] hover:bg-[color:var(--hibiscus)]/8 dark:hover:bg-[color:var(--hibiscus)]/12'
+                  )}
+                >
+                  {isSubsidy ? t('evaluation.schemeCard.checkBalance') : t('evaluation.schemeCard.startApp')}
+                  {isSubsidy ? (
+                    <ExternalLink className="ml-1 size-3.5 text-[color:var(--hibiscus)]" aria-hidden />
+                  ) : (
                     <ArrowRight className="ml-1 size-3.5" aria-hidden />
-                  </Button>
-                </footer>
-              )}
-
-              {/* Phase 11 Feature 3 — what-if delta chip under the footer.
-                  Renders only when the user has dragged a slider and the
-                  rerun has landed. `unchanged` is silent. */}
-              <DeltaChip delta={deltaByScheme.get(match.scheme_id)} t={t} />
+                  )}
+                </Button>
+              </footer>
             </li>
           )
         })}
       </ul>
     </section>
+  )
+}
+
+/** Per-card click-to-reveal spoiler over the AI-generated `why_qualify`
+ *  description. Reduces visual noise on a grid of 6-12 cards: the text is
+ *  obscured by a heavy blur with cursor-pointer + hover affordance, and
+ *  unveils on click. Each instance carries its own reveal state. */
+function WhyQualifyBlock({ label, text, hint }: { label: string; text: string; hint: string }) {
+  const [revealed, setRevealed] = useState(false)
+  return (
+    <button
+      type="button"
+      onClick={() => setRevealed(true)}
+      aria-expanded={revealed}
+      aria-label={revealed ? label : hint}
+      disabled={revealed}
+      className={cn(
+        'group relative flex flex-col gap-1 rounded-md border border-foreground/8 bg-foreground/[0.025] p-3 text-left transition-colors',
+        !revealed && 'cursor-pointer hover:bg-foreground/[0.04]',
+        revealed && 'cursor-default'
+      )}
+    >
+      <p className="mono-caption text-foreground/55">{label}</p>
+      <p
+        className={cn(
+          'text-xs leading-[1.55] text-foreground/80 transition-[filter] duration-200',
+          !revealed && 'select-none blur-[8px]'
+        )}
+        aria-hidden={!revealed}
+      >
+        {text}
+      </p>
+    </button>
   )
 }
 
@@ -268,7 +302,7 @@ function DeltaChip({ delta, t }: { delta: SchemeDelta | undefined; t: ReturnType
   return (
     <div
       className={cn(
-        'mt-2 inline-flex w-fit items-center rounded-full border px-2 py-0.5 text-[10.5px] font-medium uppercase tracking-[0.1em]',
+        'inline-flex w-fit items-center rounded-full border px-2 py-0.5 text-[10.5px] font-medium uppercase tracking-[0.1em]',
         tone
       )}
       role="status"

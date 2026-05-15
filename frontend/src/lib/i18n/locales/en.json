@@ -1336,7 +1336,7 @@
       "summary": "Employment Insurance System (Akta 800). Salaried Form BE filers aged 18–60 — Job Search Allowance of 80% wage in month 1 (cap RM 4,000), tapering to 50%/40%/30% across up to 6 months on involuntary job loss."
     },
     "budi95": {
-      "summary": "RON95 petrol at RM 1.99/L for Malaysian citizens with a valid driving licence — capped at 300 L/month per MyKad. Info-only; quota is rolling."
+      "summary": "RON95 petrol at RM 1.99/L for Malaysian citizens with a valid driving licence — capped at 200 L/month per MyKad. Info-only; quota is rolling."
     },
     "bap": {
       "summary": "RM 150 per school-age child (Year 1–Form 6), paid each January. Universal in 2026 — no income gate. Disbursed by KPM to the parent's registered account."
@@ -1360,10 +1360,10 @@
       "summary": "Free critical-illness cover for B40 Malaysians aged 18–65 — RM 8,000 one-off on diagnosis of any of 45 listed illnesses, plus RM 50/day hospital income (max 14 days/year)."
     },
     "lhdnB": {
-      "summary": "Form B reliefs for self-employed / gig filers — individual, child, parent medical, EPF + life insurance, lifestyle. Filing deadline 30 June 2026."
+      "summary": "Form B reliefs for self-employed / gig filers — individual, child, parent medical, EPF + life insurance, lifestyle."
     },
     "lhdnBE": {
-      "summary": "Form BE reliefs for salaried filers — individual, child, parent medical, EPF + life insurance, lifestyle. Filing deadline 30 April 2026."
+      "summary": "Form BE reliefs for salaried filers — individual, child, parent medical, EPF + life insurance, lifestyle."
     },
     "perkesoSksps": {
       "summary": "Self-employed social-security contribution (Akta 789). Mandatory for gig and passenger-transport workers — buys medical, disability, and survivor cover."

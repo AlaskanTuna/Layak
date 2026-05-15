@@ -2,7 +2,7 @@
 
 BUDI95 is Malaysia's targeted RON95 subsidy programme launched 30 Sep 2025
 under MOF (Ministry of Finance). Eligible Malaysians get RON95 petrol at
-**RM1.99/L** vs the unsubsidised market price, capped at 300 L/month per
+**RM1.99/L** vs the unsubsidised market price, capped at 200 L/month per
 person. As of Feb 2026, 14.8M Malaysians have transacted under the scheme.
 
 Eligibility (Layak's age-only proxy):
@@ -17,7 +17,7 @@ Eligibility (Layak's age-only proxy):
 annual_rm semantics:
     Always `0.0`. `kind="subsidy_credit"` is filtered from `compute_upside`
     so the headline annual total stays honest. The card surfaces eligibility
-    + "Check your balance" CTA + the program constants (RM1.99/L, 300 L/mo
+    + "Check your balance" CTA + the program constants (RM1.99/L, 200 L/mo
     cap), refreshed periodically by the discovery agent. We don't compute
     estimated savings because that would require asking the user for their
     consumption, which we deliberately avoid.
@@ -42,10 +42,9 @@ from app.services.vertex_ai_search import get_primary_rag_citation
 
 MIN_AGE = 16
 SUBSIDISED_PRICE_RM = 1.99
-# Monthly RON95 quota cut from 300 L to 200 L effective April 2026 (MOF /
-# paultan.org coverage). Deputy Finance Minister flagged a further cut to
-# 150 L under consideration (May 2026) — Layak surfaces the currently
-# gazetted 200 L until a new figure is officially announced.
+# Monthly RON95 quota is currently surfaced as 200 L. Deputy Finance Minister
+# flagged a further cut to 150 L under consideration (May 2026) — Layak keeps
+# the current 200 L figure until a new figure is officially announced.
 MONTHLY_QUOTA_L = 200
 
 _SCHEME_ID = "budi95"
@@ -93,10 +92,9 @@ def _citations() -> list[RuleCitation]:
             source_pdf=_SOURCE_PDF,
             page_ref="Maybank2u BUDI95 explainer (external reference)",
             passage=(
-                "Each eligible Malaysian is entitled to a monthly quota of 300 "
+                "Each eligible Malaysian is entitled to a monthly quota of 200 "
                 "litres of RON95 petrol at the subsidised price of RM1.99 per "
-                "litre. Quota was temporarily reduced to 200 L during the "
-                "geopolitical-driven oil-price spike."
+                "litre per MyKad under the currently surfaced BUDI95 quota."
             ),
             source_url=(
                 "https://www.maybank2u.com.my/maybank2u/malaysia/en/articles/"

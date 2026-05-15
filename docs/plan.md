@@ -1692,7 +1692,7 @@ licence dimension, the official portal will tell them when they click through.
 **Display values (refreshed periodically by the discovery agent):**
 
 - Subsidised price: **RM1.99/L**
-- Monthly quota cap: **300 L**
+- Monthly quota cap: **200 L**
 - Eligibility blurb cites: Malaysian citizen + age ≥ 16 + valid driving
   licence.
 

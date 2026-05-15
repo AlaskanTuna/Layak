@@ -20,10 +20,12 @@ Benefit:
 
 from __future__ import annotations
 
+from app.config import getenv
 from app.rules._i18n import out_of_scope_reason, scheme_copy
 from app.schema.locale import DEFAULT_LANGUAGE, SupportedLanguage
 from app.schema.profile import Profile
 from app.schema.scheme import RuleCitation, SchemeMatch
+from app.services.vertex_ai_search import get_primary_rag_citation
 
 ANNUAL_INCENTIVE_RM = 300.0
 LIFETIME_CAP_RM = 3000.0
@@ -36,9 +38,24 @@ _AGENCY = "KWSP (Kumpulan Wang Simpanan Pekerja)"
 _PORTAL_URL = "https://www.kwsp.gov.my/en/member/savings/i-suri"
 _SOURCE_PDF = "kwsp-i-suri-incentive.pdf"
 
+# Vertex AI Search grounds the primary citation against the live source PDF.
+# URI filter constrains the snippet ranker to the expected document so the
+# rule cannot accidentally cite a different scheme's PDF.
+_RAG_QUERY = getenv("LAYAK_RAG_QUERY_I_SURI", "i-Suri housewife KWSP RM480 incentive")
+_RAG_URI_SUBSTRING = "kwsp-i-suri-incentive.pdf"
+
 
 def _citations() -> list[RuleCitation]:
-    return [
+    cites: list[RuleCitation] = []
+    rag = get_primary_rag_citation(
+        query=_RAG_QUERY,
+        uri_substring=_RAG_URI_SUBSTRING,
+        rule_id="rag.i_suri.primary",
+        fallback_pdf="kwsp-i-suri-incentive.pdf",
+    )
+    if rag is not None:
+        cites.append(rag)
+    cites.extend([
         RuleCitation(
             rule_id="i_suri.incentive_cap",
             source_pdf=_SOURCE_PDF,
@@ -60,7 +77,8 @@ def _citations() -> list[RuleCitation]:
             ),
             source_url="https://www.kwsp.gov.my/en/w/news/epf-policy-product-enhancements-2026",
         ),
-    ]
+    ])
+    return cites
 
 
 def match(

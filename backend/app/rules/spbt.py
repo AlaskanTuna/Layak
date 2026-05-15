@@ -21,10 +21,12 @@ Benefits (in-kind, surfaced as `subsidy_credit`):
 
 from __future__ import annotations
 
+from app.config import getenv
 from app.rules._i18n import out_of_scope_reason, scheme_copy
 from app.schema.locale import DEFAULT_LANGUAGE, SupportedLanguage
 from app.schema.profile import Profile
 from app.schema.scheme import RuleCitation, SchemeMatch
+from app.services.vertex_ai_search import get_primary_rag_citation
 
 SCHOOL_AGE_MIN = 7
 SCHOOL_AGE_MAX = 17
@@ -33,12 +35,30 @@ PER_CHILD_VALUE_RM = 250.0
 _SCHEME_ID = "spbt"
 _SCHEME_NAME = "SPBT — Skim Pinjaman Buku Teks"
 _AGENCY = "KPM (Ministry of Education Malaysia)"
-_PORTAL_URL = "https://www.moe.gov.my/index.php/en/bantuan-pembelajaran-menu/skim-pinjaman-buku-teks-spbt"
+_PORTAL_URL = "https://www.moe.gov.my/en/bantuan-pembelajaran-menu/skim-pinjaman-buku-teks-spbt"
 _SOURCE_PDF = "spbt-circular.pdf"
+
+# Vertex AI Search grounds the primary citation against the live source PDF.
+# URI filter constrains the snippet ranker to the expected document so the
+# rule cannot accidentally cite a different scheme's PDF.
+_RAG_QUERY = getenv(
+    "LAYAK_RAG_QUERY_SPBT",
+    "Skim Pinjaman Buku Teks textbook loan school",
+)
+_RAG_URI_SUBSTRING = "spbt-circular.pdf"
 
 
 def _citations() -> list[RuleCitation]:
-    return [
+    cites: list[RuleCitation] = []
+    rag = get_primary_rag_citation(
+        query=_RAG_QUERY,
+        uri_substring=_RAG_URI_SUBSTRING,
+        rule_id="rag.spbt.primary",
+        fallback_pdf="spbt-circular.pdf",
+    )
+    if rag is not None:
+        cites.append(rag)
+    cites.extend([
         RuleCitation(
             rule_id="spbt.universal_eligibility",
             source_pdf=_SOURCE_PDF,
@@ -49,7 +69,7 @@ def _citations() -> list[RuleCitation]:
                 "government-aided school. The means-test thresholds in force "
                 "prior to 2008 were rescinded when SPBT was universalised."
             ),
-            source_url="https://www.moe.gov.my/index.php/en/bantuan-pembelajaran-menu/skim-pinjaman-buku-teks-spbt",
+            source_url="https://www.moe.gov.my/en/bantuan-pembelajaran-menu/skim-pinjaman-buku-teks-spbt",
         ),
         RuleCitation(
             rule_id="spbt.scope_2026",
@@ -61,9 +81,10 @@ def _citations() -> list[RuleCitation]:
                 "berasrama penuh. Excluded: private schools, MRSM, and "
                 "special-education schools (covered by separate programmes)."
             ),
-            source_url="https://www.moe.gov.my/index.php/en/bantuan-pembelajaran-menu/skim-pinjaman-buku-teks-spbt",
+            source_url="https://www.moe.gov.my/en/corporate/divisions-and-units/bahagian-sumber-dan-teknologi-pendidikan",
         ),
-    ]
+    ])
+    return cites
 
 
 def match(

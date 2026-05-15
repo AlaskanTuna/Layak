@@ -33,10 +33,12 @@ not via open APIs. See `docs/trd.md` §5.11 for the locked research finding.
 
 from __future__ import annotations
 
+from app.config import getenv
 from app.rules._i18n import out_of_scope_reason, scheme_copy
 from app.schema.locale import DEFAULT_LANGUAGE, SupportedLanguage
 from app.schema.profile import Profile
 from app.schema.scheme import RuleCitation, SchemeMatch
+from app.services.vertex_ai_search import get_primary_rag_citation
 
 MIN_AGE = 16
 SUBSIDISED_PRICE_RM = 1.99
@@ -52,9 +54,24 @@ _AGENCY = "MOF (Ministry of Finance Malaysia)"
 _PORTAL_URL = "https://www.budi95.gov.my/"
 _SOURCE_PDF = "budi95-press-release.pdf"
 
+# Vertex AI Search grounds the primary citation against the live source PDF.
+# URI filter constrains the snippet ranker to the expected document so the
+# rule cannot accidentally cite a different scheme's PDF.
+_RAG_QUERY = getenv("LAYAK_RAG_QUERY_BUDI95", "BUDI95 petrol diesel subsidy eligibility")
+_RAG_URI_SUBSTRING = "budi95-press-release.pdf"
+
 
 def _citations() -> list[RuleCitation]:
-    return [
+    cites: list[RuleCitation] = []
+    rag = get_primary_rag_citation(
+        query=_RAG_QUERY,
+        uri_substring=_RAG_URI_SUBSTRING,
+        rule_id="rag.budi95.primary",
+        fallback_pdf="budi95-press-release.pdf",
+    )
+    if rag is not None:
+        cites.append(rag)
+    cites.extend([
         RuleCitation(
             rule_id="budi95.eligibility",
             source_pdf=_SOURCE_PDF,
@@ -100,7 +117,8 @@ def _citations() -> list[RuleCitation]:
                 "nearly-14-8-mln-benefited-from-budi95-petrol-subsidy-as-of-feb-28-2026-amir-hamzah"
             ),
         ),
-    ]
+    ])
+    return cites
 
 
 def match(

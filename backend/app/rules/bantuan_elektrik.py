@@ -20,10 +20,12 @@ Benefit:
 
 from __future__ import annotations
 
+from app.config import getenv
 from app.rules._i18n import out_of_scope_reason, scheme_copy
 from app.schema.locale import DEFAULT_LANGUAGE, SupportedLanguage
 from app.schema.profile import Profile
 from app.schema.scheme import RuleCitation, SchemeMatch
+from app.services.vertex_ai_search import get_primary_rag_citation
 
 MONTHLY_REBATE_CAP_RM = 40.0
 
@@ -33,9 +35,27 @@ _AGENCY = "TNB (Tenaga Nasional Berhad) + PETRA (Ministry of Energy Transition)"
 _PORTAL_URL = "https://www.tnb.com.my/residential/discounts-rebates-offers"
 _SOURCE_PDF = "tnb-rebate-eligibility.pdf"
 
+# Vertex AI Search grounds the primary citation against the live source PDF.
+# URI filter constrains the snippet ranker to the expected document so the
+# rule cannot accidentally cite a different scheme's PDF.
+_RAG_QUERY = getenv(
+    "LAYAK_RAG_QUERY_BANTUAN_ELEKTRIK",
+    "TNB electricity rebate B40 hardcore RM40 monthly",
+)
+_RAG_URI_SUBSTRING = "tnb-rebate-eligibility.pdf"
+
 
 def _citations() -> list[RuleCitation]:
-    return [
+    cites: list[RuleCitation] = []
+    rag = get_primary_rag_citation(
+        query=_RAG_QUERY,
+        uri_substring=_RAG_URI_SUBSTRING,
+        rule_id="rag.bantuan_elektrik.primary",
+        fallback_pdf="tnb-rebate-eligibility.pdf",
+    )
+    if rag is not None:
+        cites.append(rag)
+    cites.extend([
         RuleCitation(
             rule_id="bantuan_elektrik.kir_eligibility",
             source_pdf=_SOURCE_PDF,
@@ -60,7 +80,8 @@ def _citations() -> list[RuleCitation]:
             ),
             source_url="https://semakanrebat.petra.gov.my/",
         ),
-    ]
+    ])
+    return cites
 
 
 def match(

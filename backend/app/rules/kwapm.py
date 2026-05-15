@@ -21,10 +21,12 @@ Benefit:
 
 from __future__ import annotations
 
+from app.config import getenv
 from app.rules._i18n import out_of_scope_reason, scheme_copy
 from app.schema.locale import DEFAULT_LANGUAGE, SupportedLanguage
 from app.schema.profile import Profile
 from app.schema.scheme import RuleCitation, SchemeMatch
+from app.services.vertex_ai_search import get_primary_rag_citation
 
 PRIMARY_AGE_MIN = 7
 PRIMARY_AGE_MAX = 12
@@ -42,9 +44,27 @@ _AGENCY = "KPM (Ministry of Education Malaysia)"
 _PORTAL_URL = "https://www.moe.gov.my/bantuan-kumpulan-wang-amanah-pelajar-miskin-kwapm"
 _SOURCE_PDF = "kwapm-circular.pdf"
 
+# Vertex AI Search grounds the primary citation against the live source PDF.
+# URI filter constrains the snippet ranker to the expected document so the
+# rule cannot accidentally cite a different scheme's PDF.
+_RAG_QUERY = getenv(
+    "LAYAK_RAG_QUERY_KWAPM",
+    "Kumpulan Wang Amanah Pelajar Miskin RM200 annual",
+)
+_RAG_URI_SUBSTRING = "kwapm-circular.pdf"
+
 
 def _citations() -> list[RuleCitation]:
-    return [
+    cites: list[RuleCitation] = []
+    rag = get_primary_rag_citation(
+        query=_RAG_QUERY,
+        uri_substring=_RAG_URI_SUBSTRING,
+        rule_id="rag.kwapm.primary",
+        fallback_pdf="kwapm-circular.pdf",
+    )
+    if rag is not None:
+        cites.append(rag)
+    cites.extend([
         RuleCitation(
             rule_id="kwapm.eligibility",
             source_pdf=_SOURCE_PDF,
@@ -70,7 +90,8 @@ def _citations() -> list[RuleCitation]:
             ),
             source_url="https://ihsanmadani.gov.my/inisiatif/pendidikan/kumpulan-wang-amanah-pelajar-miskin-kwapm",
         ),
-    ]
+    ])
+    return cites
 
 
 def match(

@@ -29,10 +29,12 @@ Benefit:
 
 from __future__ import annotations
 
+from app.config import getenv
 from app.rules._i18n import out_of_scope_reason, scheme_copy
 from app.schema.locale import DEFAULT_LANGUAGE, SupportedLanguage
 from app.schema.profile import Profile
 from app.schema.scheme import RuleCitation, SchemeMatch
+from app.services.vertex_ai_search import get_primary_rag_citation
 
 PRESCHOOL_AGE_MIN = 0
 PRESCHOOL_AGE_MAX = 6
@@ -43,12 +45,30 @@ SUBSIDY_MONTHS_PER_YEAR = 11
 _SCHEME_ID = "taska_permata"
 _SCHEME_NAME = "TASKA Permata — KPWKM Preschool Subsidy"
 _AGENCY = "KPWKM (Ministry of Women, Family & Community Development) — Jabatan Permata"
-_PORTAL_URL = "https://permata.gov.my"
+_PORTAL_URL = "https://www.kpwkm.gov.my/portal-main/list-services?type=taman-asuhan-kanak-kanak"
 _SOURCE_PDF = "taska-permata-circular.pdf"
+
+# Vertex AI Search grounds the primary citation against the live source PDF.
+# URI filter constrains the snippet ranker to the expected document so the
+# rule cannot accidentally cite a different scheme's PDF.
+_RAG_QUERY = getenv(
+    "LAYAK_RAG_QUERY_TASKA_PERMATA",
+    "TASKA Permata preschool fee subsidy RM180 monthly",
+)
+_RAG_URI_SUBSTRING = "taska-permata-circular.pdf"
 
 
 def _citations() -> list[RuleCitation]:
-    return [
+    cites: list[RuleCitation] = []
+    rag = get_primary_rag_citation(
+        query=_RAG_QUERY,
+        uri_substring=_RAG_URI_SUBSTRING,
+        rule_id="rag.taska_permata.primary",
+        fallback_pdf="taska-permata-circular.pdf",
+    )
+    if rag is not None:
+        cites.append(rag)
+    cites.extend([
         RuleCitation(
             rule_id="taska_permata.jpa_pekeliling_rate",
             source_pdf=_SOURCE_PDF,
@@ -65,17 +85,17 @@ def _citations() -> list[RuleCitation]:
         RuleCitation(
             rule_id="taska_permata.kpwkm_community_scope",
             source_pdf=_SOURCE_PDF,
-            page_ref="Jabatan Permata operator framework (external reference)",
+            page_ref="KPWKM TASKA services directory",
             passage=(
-                "Jabatan Permata operates the community TASKA / TADIKA "
-                "Permata subsidy framework under the Ministry of Women, "
-                "Family & Community Development. Permata operators are "
-                "listed in the public directory; subsidy is applied at the "
-                "centre, not centrally."
+                "The Ministry of Women, Family & Community Development "
+                "(KPWKM) supervises TASKA registration, training, and the "
+                "Permohonan Subsidi Yuran Pengasuhan Kanak-Kanak childcare "
+                "fee subsidy programme through its services directory."
             ),
-            source_url="https://permata.gov.my",
+            source_url="https://www.kpwkm.gov.my/portal-main/list-services?type=taman-asuhan-kanak-kanak",
         ),
-    ]
+    ])
+    return cites
 
 
 def match(

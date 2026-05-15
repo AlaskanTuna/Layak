@@ -22,10 +22,12 @@ Benefits (non-cash, surfaced as `subsidy_credit`):
 
 from __future__ import annotations
 
+from app.config import getenv
 from app.rules._i18n import out_of_scope_reason, scheme_copy
 from app.schema.locale import DEFAULT_LANGUAGE, SupportedLanguage
 from app.schema.profile import Profile
 from app.schema.scheme import RuleCitation, SchemeMatch
+from app.services.vertex_ai_search import get_primary_rag_citation
 
 # SARA 2026 tier table (per sara.gov.my + Budget 2026 sources):
 # - eKasih-registered miskin / miskin tegar (proxied by `b40_hardcore`):
@@ -50,9 +52,27 @@ _AGENCY = "MOF (Ministry of Finance Malaysia)"
 _PORTAL_URL = "https://sara.gov.my/en/home.html"
 _SOURCE_PDF = "sara-rate-schedule.pdf"
 
+# Vertex AI Search grounds the primary citation against the live source PDF.
+# URI filter constrains the snippet ranker to the expected document so the
+# rule cannot accidentally cite a different scheme's PDF.
+_RAG_QUERY = getenv(
+    "LAYAK_RAG_QUERY_SARA",
+    "Sumbangan Asas Rahmah MyKad monthly credit",
+)
+_RAG_URI_SUBSTRING = "sara-rate-schedule.pdf"
+
 
 def _citations() -> list[RuleCitation]:
-    return [
+    cites: list[RuleCitation] = []
+    rag = get_primary_rag_citation(
+        query=_RAG_QUERY,
+        uri_substring=_RAG_URI_SUBSTRING,
+        rule_id="rag.sara.primary",
+        fallback_pdf="sara-rate-schedule.pdf",
+    )
+    if rag is not None:
+        cites.append(rag)
+    cites.extend([
         RuleCitation(
             rule_id="sara.standard_rate",
             source_pdf=_SOURCE_PDF,
@@ -75,7 +95,8 @@ def _citations() -> list[RuleCitation]:
             ),
             source_url="https://www.housingwatch.my/finance/sumbangan-tunai-rahmah-str-ecosystem-all-benefits-in-2026/",
         ),
-    ]
+    ])
+    return cites
 
 
 def match(

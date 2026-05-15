@@ -16,10 +16,12 @@ Benefit:
 
 from __future__ import annotations
 
+from app.config import getenv
 from app.rules._i18n import out_of_scope_reason, scheme_copy
 from app.schema.locale import DEFAULT_LANGUAGE, SupportedLanguage
 from app.schema.profile import Profile
 from app.schema.scheme import RuleCitation, SchemeMatch
+from app.services.vertex_ai_search import get_primary_rag_citation
 
 PER_CHILD_RM = 150.0
 SCHOOL_AGE_MIN = 6
@@ -31,9 +33,27 @@ _AGENCY = "KPM (Ministry of Education Malaysia)"
 _PORTAL_URL = "https://www.moe.gov.my/bantuan-awal-persekolahan"
 _SOURCE_PDF = "bap-2026-circular.pdf"
 
+# Vertex AI Search grounds the primary citation against the live source PDF.
+# URI filter constrains the snippet ranker to the expected document so the
+# rule cannot accidentally cite a different scheme's PDF.
+_RAG_QUERY = getenv(
+    "LAYAK_RAG_QUERY_BAP",
+    "Bantuan Awal Persekolahan RM150 school children",
+)
+_RAG_URI_SUBSTRING = "bap-2026-circular.pdf"
+
 
 def _citations() -> list[RuleCitation]:
-    return [
+    cites: list[RuleCitation] = []
+    rag = get_primary_rag_citation(
+        query=_RAG_QUERY,
+        uri_substring=_RAG_URI_SUBSTRING,
+        rule_id="rag.bap.primary",
+        fallback_pdf="bap-2026-circular.pdf",
+    )
+    if rag is not None:
+        cites.append(rag)
+    cites.extend([
         RuleCitation(
             rule_id="bap.rate_2026",
             source_pdf=_SOURCE_PDF,
@@ -55,7 +75,8 @@ def _citations() -> list[RuleCitation]:
             ),
             source_url="https://www.moe.gov.my/bantuan-awal-persekolahan",
         ),
-    ]
+    ])
+    return cites
 
 
 def match(

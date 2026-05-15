@@ -32,10 +32,12 @@ this happens" peace-of-mind reminder for salaried filers.
 
 from __future__ import annotations
 
+from app.config import getenv
 from app.rules._i18n import out_of_scope_reason, scheme_copy
 from app.schema.locale import DEFAULT_LANGUAGE, SupportedLanguage
 from app.schema.profile import Profile
 from app.schema.scheme import RuleCitation, SchemeMatch
+from app.services.vertex_ai_search import get_primary_rag_citation
 
 MIN_AGE = 18
 MAX_AGE = 60
@@ -52,9 +54,27 @@ _AGENCY = "PERKESO (Social Security Organisation)"
 _PORTAL_URL = "https://eis.perkeso.gov.my"
 _SOURCE_PDF = "perkeso-sip-coverage.pdf"
 
+# Vertex AI Search grounds the primary citation against the live source PDF.
+# URI filter constrains the snippet ranker to the expected document so the
+# rule cannot accidentally cite a different scheme's PDF.
+_RAG_QUERY = getenv(
+    "LAYAK_RAG_QUERY_PERKESO_SIP",
+    "PERKESO SIP Employment Insurance Sistem Insurans Pekerjaan",
+)
+_RAG_URI_SUBSTRING = "perkeso-sip-coverage.pdf"
+
 
 def _citations() -> list[RuleCitation]:
-    return [
+    cites: list[RuleCitation] = []
+    rag = get_primary_rag_citation(
+        query=_RAG_QUERY,
+        uri_substring=_RAG_URI_SUBSTRING,
+        rule_id="rag.perkeso_sip.primary",
+        fallback_pdf="perkeso-sip-coverage.pdf",
+    )
+    if rag is not None:
+        cites.append(rag)
+    cites.extend([
         RuleCitation(
             rule_id="perkeso_sip.eligibility",
             source_pdf=_SOURCE_PDF,
@@ -81,7 +101,8 @@ def _citations() -> list[RuleCitation]:
             ),
             source_url="https://www.perkeso.gov.my/en/our-services/protection/employment-insurance.html",
         ),
-    ]
+    ])
+    return cites
 
 
 def match(

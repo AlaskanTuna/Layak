@@ -8,6 +8,8 @@ list only surfaces the schemes the profile actually qualifies for.
 
 from __future__ import annotations
 
+import asyncio
+
 from app.rules import (
     bantuan_elektrik,
     bap,
@@ -76,8 +78,16 @@ async def match_schemes(
 
     `language` threads into each rule's `match()` so the human-readable
     `summary` + `why_qualify` strings render in the user's language.
+
+    Rule modules run concurrently via `asyncio.to_thread` — each rule's
+    `_citations()` may hit Vertex AI Search synchronously over gRPC, so
+    serialising all 19 modules previously bottlenecked the Match step at
+    sum(per-rule latency). Concurrent dispatch caps it at max(per-rule),
+    which matters now that more rules cite from the live data store.
     """
-    results = [module.match(profile, language=language) for module in _RULES]
+    results = await asyncio.gather(
+        *(asyncio.to_thread(module.match, profile, language=language) for module in _RULES)
+    )
     qualifying = [m for m in results if m.qualifies]
     # Three-tier sort: upside first (descending by annual_rm), then
     # subsidy_credit (info-only — user RECEIVES benefit, no payment),

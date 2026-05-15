@@ -38,10 +38,12 @@ expires_at_iso: "2026-12-31"
 
 from __future__ import annotations
 
+from app.config import getenv
 from app.rules._i18n import out_of_scope_reason, scheme_copy
 from app.schema.locale import DEFAULT_LANGUAGE, SupportedLanguage
 from app.schema.profile import Profile
 from app.schema.scheme import RuleCitation, SchemeMatch
+from app.services.vertex_ai_search import get_primary_rag_citation
 
 MIN_AGE = 18
 CREDIT_AMOUNT_RM = 100.0
@@ -53,9 +55,24 @@ _AGENCY = "MOF / MyKasih Foundation"
 _PORTAL_URL = "https://checkstatus.mykasih.net/"
 _SOURCE_PDF = "mykasih-sara-2026.pdf"
 
+# Vertex AI Search grounds the primary citation against the live source PDF.
+# URI filter constrains the snippet ranker to the expected document so the
+# rule cannot accidentally cite a different scheme's PDF.
+_RAG_QUERY = getenv("LAYAK_RAG_QUERY_MYKASIH", "MyKasih SARA RM100 February disbursement")
+_RAG_URI_SUBSTRING = "mykasih-sara-2026.pdf"
+
 
 def _citations() -> list[RuleCitation]:
-    return [
+    cites: list[RuleCitation] = []
+    rag = get_primary_rag_citation(
+        query=_RAG_QUERY,
+        uri_substring=_RAG_URI_SUBSTRING,
+        rule_id="rag.mykasih.primary",
+        fallback_pdf="mykasih-sara-2026.pdf",
+    )
+    if rag is not None:
+        cites.append(rag)
+    cites.extend([
         RuleCitation(
             rule_id="mykasih.eligibility",
             source_pdf=_SOURCE_PDF,
@@ -111,7 +128,8 @@ def _citations() -> list[RuleCitation]:
             ),
             source_url="https://theedgemalaysia.com/node/788033",
         ),
-    ]
+    ])
+    return cites
 
 
 def match(

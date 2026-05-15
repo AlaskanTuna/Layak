@@ -35,15 +35,15 @@ True to our team's name, we are here to help with that. Introducing **LAYAK**, t
 
 ## [Architecture Overview] (1m – 1m30s max)
 
-Here is a brief architecture overview of Layak. Layak is not just a generic chatbot wrapper. There's no free-text answer. Every number on screen comes from a typed Python rule engine, grounded against a government PDF.
+Layak is not a chatbot wrapper. Every number comes from a typed Python rule engine, grounded against a gazetted PDF.
 
-**Six autonomous steps.** [Slide 04] Gemini Flash reads your MyKad, payslip, and bill — multimodal, no OCR. Flash-Lite classifies your household. The rule engine matches you against Budget-2026 schemes — STR, JKM, LHDN reliefs, BUDI95, MyKasih. Gemini 2.5 Pro picks the best strategy, Code Execution computes annual upside in real Python — visible in the stream. WeasyPrint generates the draft packets.
+**System architecture.** [Slide 04] Three GCP tiers in one trust boundary — Cloud Run for compute, Vertex AI for models, Firestore for state. Raw uploads never persist.
 
-**Eight Google components.** [Slide 05] Three Gemini tiers, Code Execution, Vertex AI Search for grounding, ADK-Python orchestrating, Cloud Run hosting, Firebase Auth gating.
+**Agent pipeline.** [Slide 05] Six autonomous steps stream live — Gemini Flash reads MyKad and payslip; Flash-Lite classifies; a typed Python rule engine matches Budget-2026 schemes; Gemini 2.5 Pro picks the strategy; Code Execution computes annual upside in real Python; WeasyPrint drafts the packets.
 
-**The grounding guarantee.** [Slide 06]
+**Grounded retrieval.** [Slide 09] Every rule queries Vertex AI Search over 20 gazetted PDFs. If retrieval misses, the rule drops — numbers are never invented.
 
-If Vertex AI Search returns no passage for a rule, the rule is dropped, not invented. Every number on screen is one click from its source PDF and page. That's the single beat that separates Layak from the MyGov chatbot disabled after one day.
+**Cik Lay.** [Slide 10] Our concierge is hard-constrained to your evaluation. Five-layer guardrails — scope, topic, PII, legal, citation. Every reply cites the source.
 
 ---
 

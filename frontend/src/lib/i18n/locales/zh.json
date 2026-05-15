@@ -1018,7 +1018,11 @@
       "perYearEst": "每年（预估）",
       "openAgencyPortal": "打开 {{agency}} 门户",
       "emptyList": "您首次评估完成后，计划匹配将在此显示。",
-      "eligibleSchemesCount": "符合资格的计划（{{count}}）"
+      "eligibleSchemesCount": "符合资格的计划（{{count}}）",
+      "sourcesLabel": "来源（{{count}}）",
+      "sourceRagBadge": "Vertex AI Search",
+      "sourceGovBadge": "政府来源",
+      "sourceOpen": "查看来源"
     },
     "subsidies": {
       "title": "补贴",

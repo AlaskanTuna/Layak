@@ -1029,7 +1029,11 @@
       "perYearEst": "per year (est.)",
       "openAgencyPortal": "Open {{agency}} portal",
       "emptyList": "Scheme matches will appear here after your first evaluation completes.",
-      "eligibleSchemesCount": "Eligible Schemes ({{count}})"
+      "eligibleSchemesCount": "Eligible Schemes ({{count}})",
+      "sourcesLabel": "Sources ({{count}})",
+      "sourceRagBadge": "Vertex AI Search",
+      "sourceGovBadge": "Gov source",
+      "sourceOpen": "Open source"
     },
     "subsidies": {
       "title": "Subsidies",

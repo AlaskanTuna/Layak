@@ -1,11 +1,11 @@
 'use client'
 
 import { useState } from 'react'
-import { ArrowRight, ExternalLink } from 'lucide-react'
+import { ArrowRight, ChevronDown, ExternalLink, Quote } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 
 import { Button } from '@/components/ui/button'
-import type { SchemeDelta, SchemeMatch } from '@/lib/agent-types'
+import type { RuleCitation, SchemeDelta, SchemeMatch } from '@/lib/agent-types'
 import { localisedSchemeName } from '@/lib/scheme-name'
 import { cn } from '@/lib/utils'
 
@@ -183,6 +183,8 @@ export function SchemeCardGrid({ matches, deltas, kind = 'upside', heading, hide
                 hint={t('evaluation.schemeCard.whyQualifyTapReveal')}
               />
 
+              <SourcesPanel citations={match.rule_citations} t={t} />
+
               <footer className="mt-auto flex flex-col gap-3 border-t border-foreground/10 pt-3">
                 {/* Unified value row: same `label left / bold value right`
                     structure on both subsidy and upside cards. Color is the
@@ -271,6 +273,78 @@ function WhyQualifyBlock({ label, text, hint }: { label: string; text: string; h
         {text}
       </p>
     </button>
+  )
+}
+
+/** Render the rule's citation list with visual distinction between RAG-retrieved
+ *  passages (live Vertex AI Search) and hardcoded fallback citations. Lets a
+ *  judge or end-user verify that the eligibility claim is grounded in a
+ *  gazetted PDF — the architectural payoff of `services/vertex_ai_search.py`. */
+function SourcesPanel({
+  citations,
+  t
+}: {
+  citations: RuleCitation[]
+  t: ReturnType<typeof useTranslation>['t']
+}) {
+  if (!citations || citations.length === 0) return null
+  return (
+    <details className="group rounded-md border border-foreground/8 bg-foreground/[0.02]">
+      <summary className="flex cursor-pointer list-none items-center justify-between gap-2 px-3 py-2 mono-caption text-foreground/65 transition-colors hover:bg-foreground/[0.04] [&::-webkit-details-marker]:hidden">
+        <span className="flex items-center gap-1.5">
+          <Quote className="size-3.5" aria-hidden />
+          {t('evaluation.schemeCard.sourcesLabel', { count: citations.length })}
+        </span>
+        <ChevronDown className="size-3.5 transition-transform duration-200 group-open:rotate-180" aria-hidden />
+      </summary>
+      <ul className="flex flex-col gap-2.5 border-t border-foreground/8 p-3">
+        {citations.map((c, i) => {
+          const isRag = c.rule_id.startsWith('rag.') || c.page_ref === 'Vertex AI Search retrieval'
+          const isHttp = c.source_url != null && /^https?:\/\//.test(c.source_url)
+          return (
+            <li key={`${c.rule_id}-${i}`} className="flex flex-col gap-1">
+              <div className="flex flex-wrap items-baseline gap-1.5">
+                <span
+                  className={cn(
+                    'inline-flex shrink-0 items-center rounded-full px-1.5 py-0.5 text-[9px] font-medium uppercase tracking-[0.1em]',
+                    isRag
+                      ? 'bg-[color:var(--primary)]/12 text-[color:var(--primary)]'
+                      : 'bg-foreground/10 text-foreground/65'
+                  )}
+                >
+                  {isRag ? t('evaluation.schemeCard.sourceRagBadge') : t('evaluation.schemeCard.sourceGovBadge')}
+                </span>
+                <span
+                  className="mono-caption min-w-0 truncate text-foreground/55"
+                  title={c.source_pdf}
+                >
+                  {c.source_pdf}
+                </span>
+              </div>
+              <p className="line-clamp-3 text-[11px] leading-[1.5] text-foreground/75">{c.passage}</p>
+              {isHttp ? (
+                <a
+                  href={c.source_url ?? '#'}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="mono-caption inline-flex w-fit items-center gap-1 text-[10px] text-[color:var(--primary)] hover:underline"
+                >
+                  {t('evaluation.schemeCard.sourceOpen')}
+                  <ExternalLink className="size-3" aria-hidden />
+                </a>
+              ) : c.source_url ? (
+                // `gs://` URIs (Vertex AI Search hits) aren't browser-openable
+                // but are worth surfacing as visible proof the passage came
+                // from Discovery Engine, not from a hand-written string.
+                <span className="mono-caption inline-flex w-fit items-center text-[10px] text-foreground/45" title={c.source_url}>
+                  {c.source_url}
+                </span>
+              ) : null}
+            </li>
+          )
+        })}
+      </ul>
+    </details>
   )
 }
 

@@ -1029,7 +1029,11 @@
       "perYearEst": "setahun (anggaran)",
       "openAgencyPortal": "Buka portal {{agency}}",
       "emptyList": "Padanan skim akan muncul di sini selepas penilaian pertama anda selesai.",
-      "eligibleSchemesCount": "Skim yang layak ({{count}})"
+      "eligibleSchemesCount": "Skim yang layak ({{count}})",
+      "sourcesLabel": "Sumber ({{count}})",
+      "sourceRagBadge": "Vertex AI Search",
+      "sourceGovBadge": "Sumber kerajaan",
+      "sourceOpen": "Buka sumber"
     },
     "subsidies": {
       "title": "Subsidi",

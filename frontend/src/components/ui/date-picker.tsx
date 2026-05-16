@@ -94,12 +94,12 @@ export function DatePicker({
     returnObjects: true,
     defaultValue: MONTH_NAMES_EN as unknown as string[]
   })
-  const WEEKDAYS = (Array.isArray(weekdaysRaw) && weekdaysRaw.length === 7
-    ? weekdaysRaw
-    : WEEKDAYS_EN) as readonly string[]
-  const MONTH_NAMES = (Array.isArray(monthsRaw) && monthsRaw.length === 12
-    ? monthsRaw
-    : MONTH_NAMES_EN) as readonly string[]
+  const WEEKDAYS = (
+    Array.isArray(weekdaysRaw) && weekdaysRaw.length === 7 ? weekdaysRaw : WEEKDAYS_EN
+  ) as readonly string[]
+  const MONTH_NAMES = (
+    Array.isArray(monthsRaw) && monthsRaw.length === 12 ? monthsRaw : MONTH_NAMES_EN
+  ) as readonly string[]
   const parsed = parseISO(value)
   const [open, setOpen] = React.useState(false)
   // Visible month — anchored to the selected value if present, else today.

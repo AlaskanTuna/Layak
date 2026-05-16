@@ -45,15 +45,7 @@ function formatRm(value: number): string {
 
 function categoryKeyFor(
   match: SchemeMatch
-):
-  | 'cashTransfer'
-  | 'taxRelief'
-  | 'welfare'
-  | 'education'
-  | 'healthcare'
-  | 'retirement'
-  | 'subsidy'
-  | 'assistance' {
+): 'cashTransfer' | 'taxRelief' | 'welfare' | 'education' | 'healthcare' | 'retirement' | 'subsidy' | 'assistance' {
   // Subsidy-credit cards get the more specific category when we know it
   // (PeKa B40 / MySalam → healthcare, RMT / SPBT → education, SARA / MyKasih
   // → cash transfer, BUDI95 → generic subsidy). Keep the catch-all "subsidy"
@@ -70,7 +62,16 @@ function categoryKeyFor(
   if (id.includes('str') || agency.includes('treasury')) return 'cashTransfer'
   if (agency.includes('lhdn')) return 'taxRelief'
   if (id === 'i_saraan' || id === 'i_suri' || agency.includes('kwsp') || agency.includes('epf')) return 'retirement'
-  if (id === 'bap' || id === 'kwapm' || id === 'taska_permata' || agency.includes('kpm') || agency.includes('moe') || agency.includes('permata') || agency.includes('kpwkm')) return 'education'
+  if (
+    id === 'bap' ||
+    id === 'kwapm' ||
+    id === 'taska_permata' ||
+    agency.includes('kpm') ||
+    agency.includes('moe') ||
+    agency.includes('permata') ||
+    agency.includes('kpwkm')
+  )
+    return 'education'
   if (agency.includes('jkm') || agency.includes('tnb') || agency.includes('petra')) return 'welfare'
   return 'assistance'
 }
@@ -214,50 +215,51 @@ export function SchemeCardGrid({
                 />
                 <SourcesPanel citations={match.rule_citations} t={t} />
                 <footer className="flex flex-col gap-3 border-t border-foreground/10 pt-3">
-                {/* Unified value row: same `label left / bold value right`
+                  {/* Unified value row: same `label left / bold value right`
                     structure on both subsidy and upside cards. Color is the
                     only differentiator (hibiscus for subsidy, foreground for
                     upside) so visual hierarchy matches across the grid. */}
-                <div className="flex min-h-[2.25rem] items-baseline justify-between gap-3">
-                  <p className="mono-caption shrink-0 text-foreground/55">
-                    {isSubsidy ? t('evaluation.schemeCard.subsidyInfo') : t('evaluation.schemeCard.estValue')}
-                  </p>
-                  {isSubsidy ? (
-                    <p className="text-right font-heading text-[13px] font-semibold leading-[1.25] text-[color:var(--hibiscus)]">
-                      {t('evaluation.schemeCard.subsidyAutoCredited')}
+                  <div className="flex min-h-[2.25rem] items-baseline justify-between gap-3">
+                    <p className="mono-caption shrink-0 text-foreground/55">
+                      {isSubsidy ? t('evaluation.schemeCard.subsidyInfo') : t('evaluation.schemeCard.estValue')}
                     </p>
-                  ) : (
-                    <p className="font-heading text-[15px] font-semibold tabular-nums text-foreground">
-                      {formatRm(match.annual_rm)}
+                    {isSubsidy ? (
+                      <p className="text-right font-heading text-[13px] font-semibold leading-[1.25] text-[color:var(--hibiscus)]">
+                        {t('evaluation.schemeCard.subsidyAutoCredited')}
+                      </p>
+                    ) : (
+                      <p className="font-heading text-[15px] font-semibold tabular-nums text-foreground">
+                        {formatRm(match.annual_rm)}
+                      </p>
+                    )}
+                  </div>
+                  {isSubsidy && match.expires_at_iso && (
+                    <p className="text-right text-[11px] font-medium text-[color:var(--hibiscus)]">
+                      {t('evaluation.schemeCard.expiresOn', {
+                        date: formatExpiryDate(match.expires_at_iso, i18n.language)
+                      })}
                     </p>
                   )}
-                </div>
-                {isSubsidy && match.expires_at_iso && (
-                  <p className="text-right text-[11px] font-medium text-[color:var(--hibiscus)]">
-                    {t('evaluation.schemeCard.expiresOn', {
-                      date: formatExpiryDate(match.expires_at_iso, i18n.language)
-                    })}
-                  </p>
-                )}
-                <Button
-                  render={<a href={match.portal_url} target="_blank" rel="noopener noreferrer" />}
-                  size="sm"
-                  variant={isTop && !isSubsidy ? 'default' : 'outline'}
-                  className={cn(
-                    'w-full rounded-full',
-                    isTop && !isSubsidy &&
-                      'bg-[color:var(--hibiscus)] text-[color:var(--hibiscus-foreground)] hover:bg-[color:var(--hibiscus)]/92',
-                    isSubsidy &&
-                      'border-[color:var(--hibiscus)]/55 hover:border-[color:var(--hibiscus)] hover:bg-[color:var(--hibiscus)]/8 dark:hover:bg-[color:var(--hibiscus)]/12'
-                  )}
-                >
-                  {isSubsidy ? t('evaluation.schemeCard.checkBalance') : t('evaluation.schemeCard.startApp')}
-                  {isSubsidy ? (
-                    <ExternalLink className="ml-1 size-3.5 text-[color:var(--hibiscus)]" aria-hidden />
-                  ) : (
-                    <ArrowRight className="ml-1 size-3.5" aria-hidden />
-                  )}
-                </Button>
+                  <Button
+                    render={<a href={match.portal_url} target="_blank" rel="noopener noreferrer" />}
+                    size="sm"
+                    variant={isTop && !isSubsidy ? 'default' : 'outline'}
+                    className={cn(
+                      'w-full rounded-full',
+                      isTop &&
+                        !isSubsidy &&
+                        'bg-[color:var(--hibiscus)] text-[color:var(--hibiscus-foreground)] hover:bg-[color:var(--hibiscus)]/92',
+                      isSubsidy &&
+                        'border-[color:var(--hibiscus)]/55 hover:border-[color:var(--hibiscus)] hover:bg-[color:var(--hibiscus)]/8 dark:hover:bg-[color:var(--hibiscus)]/12'
+                    )}
+                  >
+                    {isSubsidy ? t('evaluation.schemeCard.checkBalance') : t('evaluation.schemeCard.startApp')}
+                    {isSubsidy ? (
+                      <ExternalLink className="ml-1 size-3.5 text-[color:var(--hibiscus)]" aria-hidden />
+                    ) : (
+                      <ArrowRight className="ml-1 size-3.5" aria-hidden />
+                    )}
+                  </Button>
                 </footer>
               </div>
             </li>
@@ -305,13 +307,7 @@ function WhyQualifyBlock({ label, text, hint }: { label: string; text: string; h
  *  passages (live Vertex AI Search) and hardcoded fallback citations. Lets a
  *  judge or end-user verify that the eligibility claim is grounded in a
  *  gazetted PDF — the architectural payoff of `services/vertex_ai_search.py`. */
-function SourcesPanel({
-  citations,
-  t
-}: {
-  citations: RuleCitation[]
-  t: ReturnType<typeof useTranslation>['t']
-}) {
+function SourcesPanel({ citations, t }: { citations: RuleCitation[]; t: ReturnType<typeof useTranslation>['t'] }) {
   if (!citations || citations.length === 0) return null
   return (
     <details className="group rounded-md border border-foreground/8 bg-foreground/[0.02]">
@@ -339,10 +335,7 @@ function SourcesPanel({
                 >
                   {isRag ? t('evaluation.schemeCard.sourceRagBadge') : t('evaluation.schemeCard.sourceGovBadge')}
                 </span>
-                <span
-                  className="mono-caption min-w-0 truncate text-foreground/55"
-                  title={c.source_pdf}
-                >
+                <span className="mono-caption min-w-0 truncate text-foreground/55" title={c.source_pdf}>
                   {c.source_pdf}
                 </span>
               </div>
@@ -361,7 +354,10 @@ function SourcesPanel({
                 // `gs://` URIs (Vertex AI Search hits) aren't browser-openable
                 // but are worth surfacing as visible proof the passage came
                 // from Discovery Engine, not from a hand-written string.
-                <span className="mono-caption inline-flex w-fit items-center text-[10px] text-foreground/45" title={c.source_url}>
+                <span
+                  className="mono-caption inline-flex w-fit items-center text-[10px] text-foreground/45"
+                  title={c.source_url}
+                >
                   {c.source_url}
                 </span>
               ) : null}
@@ -437,18 +433,12 @@ function DeltaChip({
       )
     }
     return (
-      <div
-        className={cn('inline-flex w-full items-start gap-2 rounded-md border px-2.5 py-1.5', tone)}
-        role="status"
-      >
+      <div className={cn('inline-flex w-full items-start gap-2 rounded-md border px-2.5 py-1.5', tone)} role="status">
         <Icon className="mt-0.5 size-3.5 shrink-0" aria-hidden />
         <div className="flex min-w-0 flex-col gap-0.5">
           <span className="mono-caption text-[9.5px] leading-none opacity-80">{eyebrow}</span>
           <span className="line-clamp-3 text-[11px] leading-[1.35] text-foreground/85">
-            <span
-              className="text-foreground/55 line-through decoration-foreground/30"
-              title={before}
-            >
+            <span className="text-foreground/55 line-through decoration-foreground/30" title={before}>
               {before}
             </span>{' '}
             <span className="opacity-60">→</span>{' '}
@@ -488,7 +478,9 @@ function DeltaChip({
       <span className="mono-caption text-[9.5px] leading-none opacity-85">{eyebrow}</span>
       {value && (
         <>
-          <span aria-hidden className="opacity-40">·</span>
+          <span aria-hidden className="opacity-40">
+            ·
+          </span>
           <span className="text-[11px] font-semibold tabular-nums leading-none">{value}</span>
         </>
       )}

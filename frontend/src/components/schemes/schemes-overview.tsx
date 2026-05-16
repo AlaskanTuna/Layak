@@ -540,11 +540,7 @@ export function SchemesOverview() {
   )
 }
 
-function SelectItem({
-  children,
-  className,
-  ...props
-}: Select.SelectItemProps & { children: ReactNode }) {
+function SelectItem({ children, className, ...props }: Select.SelectItemProps & { children: ReactNode }) {
   return (
     <Select.Item
       className={cn(

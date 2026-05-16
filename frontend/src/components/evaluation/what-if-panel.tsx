@@ -74,7 +74,10 @@ function formatRm(value: number): string {
   return `RM ${value.toLocaleString('en-MY', { maximumFractionDigits: 0 })}`
 }
 
-function scenarioStrategyStatus(phase: WhatIfStrategyPhase, strategyCount: number): ChatScenarioContext['strategy_status'] {
+function scenarioStrategyStatus(
+  phase: WhatIfStrategyPhase,
+  strategyCount: number
+): ChatScenarioContext['strategy_status'] {
   if (phase === 'refreshing') return 'refreshing'
   if (phase === 'error') return 'error'
   if (phase === 'ready') return strategyCount > 0 ? 'ready' : 'empty'
@@ -228,7 +231,9 @@ export function WhatIfPanel({
           {scenarioContext && onAskCikLay && (
             <div className="flex flex-col items-start gap-1 sm:items-end">
               {scenarioContext.strategy_status === 'refreshing' && (
-                <span className="mono-caption text-foreground/50">{t('evaluation.whatIf.strategyStillRefreshing')}</span>
+                <span className="mono-caption text-foreground/50">
+                  {t('evaluation.whatIf.strategyStillRefreshing')}
+                </span>
               )}
               {(scenarioContext.strategy_status === 'empty' || scenarioContext.strategy_status === 'error') && (
                 <span className="mono-caption text-foreground/50">{t('evaluation.whatIf.strategyNotBlocking')}</span>
@@ -283,7 +288,9 @@ function SliderField({
         <span className="shrink-0 whitespace-nowrap font-mono text-[15px] tabular-nums text-foreground">
           {format(value)}
         </span>
-        <span className={`mono-caption min-w-0 truncate whitespace-nowrap text-foreground/40 ${isDirty ? '' : 'invisible'}`}>
+        <span
+          className={`mono-caption min-w-0 truncate whitespace-nowrap text-foreground/40 ${isDirty ? '' : 'invisible'}`}
+        >
           {format(baseline)} baseline
         </span>
       </div>

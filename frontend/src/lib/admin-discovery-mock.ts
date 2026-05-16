@@ -120,14 +120,12 @@ const SEED_POOL: SeedCandidate[] = [
     rate_summary:
       'Q2 2026 update: top child bucket (≥5) increased from RM 2,200 to RM 2,500 / year. Bands 1–2 and 3–4 unchanged.',
     citation: {
-      source_url:
-        'https://bantuantunai.hasil.gov.my/risalah-str-2026-q2.pdf',
+      source_url: 'https://bantuantunai.hasil.gov.my/risalah-str-2026-q2.pdf',
       snippet:
         'Bagi keluarga yang mempunyai lima atau lebih kanak-kanak tanggungan, bantuan tahunan adalah RM 2,500 berkuat kuasa pembayaran fasa kedua (Jun 2026).'
     },
     source_url: 'https://bantuantunai.hasil.gov.my/risalah-str-2026-q2.pdf',
-    source_content_hash:
-      '8b3c2f6e91d4a07c5a2e60a3d7f1bb2c4d895fe1a206c4839b7c1f3d2a6e80b9',
+    source_content_hash: '8b3c2f6e91d4a07c5a2e60a3d7f1bb2c4d895fe1a206c4839b7c1f3d2a6e80b9',
     confidence: 0.94
   },
   {
@@ -140,15 +138,12 @@ const SEED_POOL: SeedCandidate[] = [
     rate_summary:
       'Public Ruling No. 4/2024 (amended Mar 2026): parental medical relief ceiling raised from RM 8,000 to RM 9,000. Lifestyle and personal reliefs unchanged.',
     citation: {
-      source_url:
-        'https://lampiran1.hasil.gov.my/pdf/pdfam/PR_4_2024_amended_2026.pdf',
+      source_url: 'https://lampiran1.hasil.gov.my/pdf/pdfam/PR_4_2024_amended_2026.pdf',
       snippet:
         'Perenggan 47 — Pelepasan perubatan ibu bapa adalah dinaikkan kepada RM 9,000 setahun, berkuat kuasa Tahun Taksiran 2025.'
     },
-    source_url:
-      'https://lampiran1.hasil.gov.my/pdf/pdfam/PR_4_2024_amended_2026.pdf',
-    source_content_hash:
-      'c1d0a7e4b820f93a16c2b8e5d4f8a06b9e1c5d3f7a2b4c6d8e0f1a3b5c7d9e0f',
+    source_url: 'https://lampiran1.hasil.gov.my/pdf/pdfam/PR_4_2024_amended_2026.pdf',
+    source_content_hash: 'c1d0a7e4b820f93a16c2b8e5d4f8a06b9e1c5d3f7a2b4c6d8e0f1a3b5c7d9e0f',
     confidence: 0.91
   },
   {
@@ -166,8 +161,7 @@ const SEED_POOL: SeedCandidate[] = [
         'Bantuan Warga Emas (BWE) ditambah baik kepada RM 600 sebulan bagi setiap penerima yang berkelayakan mulai Januari 2026.'
     },
     source_url: 'https://www.jkm.gov.my/jkm/uploads/files/JKM18-circular-2026.pdf',
-    source_content_hash:
-      '3f8a1b4c7d6e9020a3b5c7d9e1f3a5b7c9d0e2f4a6b8c0d2e4f6a8b0c2d4e6f8',
+    source_content_hash: '3f8a1b4c7d6e9020a3b5c7d9e1f3a5b7c9d0e2f4a6b8c0d2e4f6a8b0c2d4e6f8',
     confidence: 0.88
   },
   {
@@ -185,8 +179,7 @@ const SEED_POOL: SeedCandidate[] = [
         'Kadar bantuan bulanan bagi kanak-kanak sekolah rendah (7-12 tahun) dinaikkan kepada RM 250 sebulan setiap kanak-kanak.'
     },
     source_url: 'https://www.jkm.gov.my/jkm/uploads/files/BKK-pekeliling-1-2026.pdf',
-    source_content_hash:
-      'a92e5f1b7c4d6e8f0a2b4c6d8e0f2a4b6c8d0e2f4a6b8c0d2e4f6a8b0c2d4e6',
+    source_content_hash: 'a92e5f1b7c4d6e8f0a2b4c6d8e0f2a4b6c8d0e2f4a6b8c0d2e4f6a8b0c2d4e6',
     confidence: 0.86
   },
   {
@@ -195,19 +188,16 @@ const SEED_POOL: SeedCandidate[] = [
     name: 'Bantuan Elektrik — Kumpulan Isi Rumah Miskin Tegar',
     agency: 'TNB · PETRA (Ministry of Economy)',
     eligibility_summary:
-      'Household enrolled in eKasih (KIR Miskin Tegar registry); domestic electricity account in household head\'s name.',
+      "Household enrolled in eKasih (KIR Miskin Tegar registry); domestic electricity account in household head's name.",
     rate_summary:
       'Monthly rebate cap raised from RM 40 to RM 50; annual ceiling now RM 600 (was RM 480). Income trigger unchanged.',
     citation: {
-      source_url:
-        'https://ihsanmadani.gov.my/wp-content/uploads/2026/rebat-elektrik-q2.pdf',
+      source_url: 'https://ihsanmadani.gov.my/wp-content/uploads/2026/rebat-elektrik-q2.pdf',
       snippet:
         'Penerima KIR Miskin Tegar layak menikmati rebat bil elektrik sehingga RM 50 sebulan, berkuat kuasa kitaran bil April 2026.'
     },
-    source_url:
-      'https://ihsanmadani.gov.my/wp-content/uploads/2026/rebat-elektrik-q2.pdf',
-    source_content_hash:
-      'd47b9c2e5a1f8036b4d0c7e9f1a3b5c7d9e1f3a5b7c9d0e2f4a6b8c0d2e4f6a8',
+    source_url: 'https://ihsanmadani.gov.my/wp-content/uploads/2026/rebat-elektrik-q2.pdf',
+    source_content_hash: 'd47b9c2e5a1f8036b4d0c7e9f1a3b5c7d9e1f3a5b7c9d0e2f4a6b8c0d2e4f6a8',
     confidence: 0.82
   },
   {
@@ -215,20 +205,16 @@ const SEED_POOL: SeedCandidate[] = [
     scheme_id: 'perkeso_sksps',
     name: 'PERKESO SKSPS — Self-Employed Social Security',
     agency: 'PERKESO (SOCSO)',
-    eligibility_summary:
-      'Self-employed Malaysians across all 20 SKSPS sectors; voluntary enrolment via Form SKSPS-1.',
+    eligibility_summary: 'Self-employed Malaysians across all 20 SKSPS sectors; voluntary enrolment via Form SKSPS-1.',
     rate_summary:
       'Plan 1 base contribution unchanged at RM 232.80 / year; Plan 4 ceiling lifted from RM 596.40 to RM 692.40 to reflect 2026 wage-ceiling refresh.',
     citation: {
-      source_url:
-        'https://www.perkeso.gov.my/images/Pelan-SKSPS-2026.pdf',
+      source_url: 'https://www.perkeso.gov.my/images/Pelan-SKSPS-2026.pdf',
       snippet:
         'Pelan 4 (pendapatan diinsuranskan RM 3,950) — caruman tahunan dikemaskini kepada RM 692.40 berkuat kuasa Januari 2026.'
     },
-    source_url:
-      'https://www.perkeso.gov.my/images/Pelan-SKSPS-2026.pdf',
-    source_content_hash:
-      '5e1c8a7d3b6f9024c1e3a5b7c9d0e2f4a6b8c0d2e4f6a8b0c2d4e6f8a0b2c4d6',
+    source_url: 'https://www.perkeso.gov.my/images/Pelan-SKSPS-2026.pdf',
+    source_content_hash: '5e1c8a7d3b6f9024c1e3a5b7c9d0e2f4a6b8c0d2e4f6a8b0c2d4e6f8a0b2c4d6',
     confidence: 0.79
   },
   {
@@ -241,15 +227,12 @@ const SEED_POOL: SeedCandidate[] = [
     rate_summary:
       '15% government match cap stays at RM 500 / year; new top-up: members aged 40+ receive an additional 5% match for the first RM 1,000 contributed.',
     citation: {
-      source_url:
-        'https://www.kwsp.gov.my/documents/40/2026-i-saraan-incentive.pdf',
+      source_url: 'https://www.kwsp.gov.my/documents/40/2026-i-saraan-incentive.pdf',
       snippet:
         'Insentif tambahan 5% bagi ahli berumur 40 tahun ke atas — diberikan untuk RM 1,000 caruman sukarela pertama setiap tahun.'
     },
-    source_url:
-      'https://www.kwsp.gov.my/documents/40/2026-i-saraan-incentive.pdf',
-    source_content_hash:
-      '2b9f1d0e3a8c7b6a5d4f2e0b9c8a7d6e5f4a3b2c1d0e9f8a7b6c5d4e3f2a1b0c',
+    source_url: 'https://www.kwsp.gov.my/documents/40/2026-i-saraan-incentive.pdf',
+    source_content_hash: '2b9f1d0e3a8c7b6a5d4f2e0b9c8a7d6e5f4a3b2c1d0e9f8a7b6c5d4e3f2a1b0c',
     confidence: 0.92
   },
   {
@@ -267,8 +250,7 @@ const SEED_POOL: SeedCandidate[] = [
         'Mulai Mei 2026, nilai kredit setiap kitaran SARA dinaikkan kepada RM 120 sekitaran bagi penerima berkelayakan dengan pendapatan isi rumah ≤ RM 5,000.'
     },
     source_url: 'https://sara.gov.my/jadual-kadar-2026-may.pdf',
-    source_content_hash:
-      '4b3a2c1d0e9f8a7b6c5d4e3f2a1b0c9d8e7f6a5b4c3d2e1f0a9b8c7d6e5f4a3b',
+    source_content_hash: '4b3a2c1d0e9f8a7b6c5d4e3f2a1b0c9d8e7f6a5b4c3d2e1f0a9b8c7d6e5f4a3b',
     confidence: 0.85
   },
   {
@@ -281,15 +263,12 @@ const SEED_POOL: SeedCandidate[] = [
     rate_summary:
       'Programme extended into Q3 2026 with the RM 100 cap unchanged; eligibility broadened to include B40+ households earning ≤ RM 5,500 / month.',
     citation: {
-      source_url:
-        'https://www.mof.gov.my/portal/en/news/press-citations/mykasih-sara-rm100-q3-extension.html',
+      source_url: 'https://www.mof.gov.my/portal/en/news/press-citations/mykasih-sara-rm100-q3-extension.html',
       snippet:
         'Penambahan satu kali RM 100 di bawah inisiatif MyKasih SARA dilanjutkan ke suku ketiga 2026 dengan had pendapatan isi rumah ≤ RM 5,500.'
     },
-    source_url:
-      'https://www.mof.gov.my/portal/en/news/press-citations/mykasih-sara-rm100-q3-extension.html',
-    source_content_hash:
-      '9a8b7c6d5e4f3a2b1c0d9e8f7a6b5c4d3e2f1a0b9c8d7e6f5a4b3c2d1e0f9a8b',
+    source_url: 'https://www.mof.gov.my/portal/en/news/press-citations/mykasih-sara-rm100-q3-extension.html',
+    source_content_hash: '9a8b7c6d5e4f3a2b1c0d9e8f7a6b5c4d3e2f1a0b9c8d7e6f5a4b3c2d1e0f9a8b',
     confidence: 0.74
   },
   {
@@ -307,8 +286,7 @@ const SEED_POOL: SeedCandidate[] = [
         'Elaun Mencari Pekerjaan (EMP) — kadar bagi tiga bulan pertama dikemaskini kepada RM 4,500 mulai Januari 2026.'
     },
     source_url: 'https://eis.perkeso.gov.my/manual/SIP-coverage-2026.pdf',
-    source_content_hash:
-      '6c5b4a3d2e1f0a9b8c7d6e5f4a3b2c1d0e9f8a7b6c5d4e3f2a1b0c9d8e7f6a5b',
+    source_content_hash: '6c5b4a3d2e1f0a9b8c7d6e5f4a3b2c1d0e9f8a7b6c5d4e3f2a1b0c9d8e7f6a5b',
     confidence: 0.83
   },
   {
@@ -321,15 +299,12 @@ const SEED_POOL: SeedCandidate[] = [
     rate_summary:
       'Monthly subsidised quota lowered from 200 L to 150 L per MyKad effective June 2026; subsidised price RM 1.99/L retained.',
     citation: {
-      source_url:
-        'https://www.budi95.gov.my/en/news/quota-revision-june-2026.html',
+      source_url: 'https://www.budi95.gov.my/en/news/quota-revision-june-2026.html',
       snippet:
         'Kuota subsidi RON95 di bawah BUDI95 dikurangkan kepada 150 liter sebulan setiap MyKad mulai Jun 2026 manakala harga subsidi RM 1.99 seliter dikekalkan.'
     },
-    source_url:
-      'https://www.budi95.gov.my/en/news/quota-revision-june-2026.html',
-    source_content_hash:
-      '1f0e9d8c7b6a5d4e3f2a1b0c9d8e7f6a5b4c3d2e1f0a9b8c7d6e5f4a3b2c1d0e',
+    source_url: 'https://www.budi95.gov.my/en/news/quota-revision-june-2026.html',
+    source_content_hash: '1f0e9d8c7b6a5d4e3f2a1b0c9d8e7f6a5b4c3d2e1f0a9b8c7d6e5f4a3b2c1d0e',
     confidence: 0.77
   },
   {
@@ -342,15 +317,12 @@ const SEED_POOL: SeedCandidate[] = [
     rate_summary:
       '2026 circular increases the per-child grant from RM 150 to RM 200, credited via school sometime in late January per academic year.',
     citation: {
-      source_url:
-        'https://www.moe.gov.my/bantuan-awal-persekolahan/circular-bap-2026.pdf',
+      source_url: 'https://www.moe.gov.my/bantuan-awal-persekolahan/circular-bap-2026.pdf',
       snippet:
         'Bantuan Awal Persekolahan (BAP) — kadar bantuan dikemaskini kepada RM 200 setiap murid mulai sesi persekolahan 2026.'
     },
-    source_url:
-      'https://www.moe.gov.my/bantuan-awal-persekolahan/circular-bap-2026.pdf',
-    source_content_hash:
-      '8e7d6c5b4a3d2e1f0a9b8c7d6e5f4a3b2c1d0e9f8a7b6c5d4e3f2a1b0c9d8e7f',
+    source_url: 'https://www.moe.gov.my/bantuan-awal-persekolahan/circular-bap-2026.pdf',
+    source_content_hash: '8e7d6c5b4a3d2e1f0a9b8c7d6e5f4a3b2c1d0e9f8a7b6c5d4e3f2a1b0c9d8e7f',
     confidence: 0.88
   },
   {
@@ -363,15 +335,12 @@ const SEED_POOL: SeedCandidate[] = [
     rate_summary:
       '2026 menu pack budget raised from RM 4.00 to RM 5.50 per meal for SK schools in B40 catchment districts; rural ceiling unchanged.',
     citation: {
-      source_url:
-        'https://www.moe.gov.my/rancangan-makanan-tambahan/rmt-pekeliling-2026.pdf',
+      source_url: 'https://www.moe.gov.my/rancangan-makanan-tambahan/rmt-pekeliling-2026.pdf',
       snippet:
         'Kos makanan Rancangan Makanan Tambahan (RMT) bagi sekolah B40 dinaikkan kepada RM 5.50 setiap hidangan mulai Januari 2026.'
     },
-    source_url:
-      'https://www.moe.gov.my/rancangan-makanan-tambahan/rmt-pekeliling-2026.pdf',
-    source_content_hash:
-      '2d1e0f9a8b7c6d5e4f3a2b1c0d9e8f7a6b5c4d3e2f1a0b9c8d7e6f5a4b3c2d1e',
+    source_url: 'https://www.moe.gov.my/rancangan-makanan-tambahan/rmt-pekeliling-2026.pdf',
+    source_content_hash: '2d1e0f9a8b7c6d5e4f3a2b1c0d9e8f7a6b5c4d3e2f1a0b9c8d7e6f5a4b3c2d1e',
     confidence: 0.81
   },
   {
@@ -391,8 +360,7 @@ const SEED_POOL: SeedCandidate[] = [
     },
     source_url:
       'https://www.moe.gov.my/bantuan-pembelajaran-menu/skim-pinjaman-buku-teks-spbt/spbt-pekeliling-2026.pdf',
-    source_content_hash:
-      '7b6a5d4e3f2a1b0c9d8e7f6a5b4c3d2e1f0a9b8c7d6e5f4a3b2c1d0e9f8a7b6c',
+    source_content_hash: '7b6a5d4e3f2a1b0c9d8e7f6a5b4c3d2e1f0a9b8c7d6e5f4a3b2c1d0e9f8a7b6c',
     confidence: 0.86
   },
   {
@@ -405,15 +373,12 @@ const SEED_POOL: SeedCandidate[] = [
     rate_summary:
       '2026 cycle raises per-pupil grant from RM 200 to RM 250 / year; secondary cohort gains a new uniform allowance of RM 80 / year.',
     citation: {
-      source_url:
-        'https://www.moe.gov.my/bantuan-kumpulan-wang-amanah-pelajar-miskin-kwapm/kwapm-pekeliling-2026.pdf',
+      source_url: 'https://www.moe.gov.my/bantuan-kumpulan-wang-amanah-pelajar-miskin-kwapm/kwapm-pekeliling-2026.pdf',
       snippet:
         'Bantuan Kumpulan Wang Amanah Pelajar Miskin (KWAPM) — kadar bantuan tahunan dinaikkan kepada RM 250 setiap pelajar mulai 2026.'
     },
-    source_url:
-      'https://www.moe.gov.my/bantuan-kumpulan-wang-amanah-pelajar-miskin-kwapm/kwapm-pekeliling-2026.pdf',
-    source_content_hash:
-      '5a4b3c2d1e0f9a8b7c6d5e4f3a2b1c0d9e8f7a6b5c4d3e2f1a0b9c8d7e6f5a4b',
+    source_url: 'https://www.moe.gov.my/bantuan-kumpulan-wang-amanah-pelajar-miskin-kwapm/kwapm-pekeliling-2026.pdf',
+    source_content_hash: '5a4b3c2d1e0f9a8b7c6d5e4f3a2b1c0d9e8f7a6b5c4d3e2f1a0b9c8d7e6f5a4b',
     confidence: 0.83
   },
   {
@@ -433,9 +398,8 @@ const SEED_POOL: SeedCandidate[] = [
     },
     source_url:
       'https://www.kpwkm.gov.my/portal-main/list-services?type=taman-asuhan-kanak-kanak&doc=permata-circular-2026.pdf',
-    source_content_hash:
-      '0c9d8e7f6a5b4c3d2e1f0a9b8c7d6e5f4a3b2c1d0e9f8a7b6c5d4e3f2a1b0c9d',
-    confidence: 0.80
+    source_content_hash: '0c9d8e7f6a5b4c3d2e1f0a9b8c7d6e5f4a3b2c1d0e9f8a7b6c5d4e3f2a1b0c9d',
+    confidence: 0.8
   },
   {
     source_id: 'moh-peka-b40',
@@ -447,15 +411,12 @@ const SEED_POOL: SeedCandidate[] = [
     rate_summary:
       '2026 voucher value raised from RM 200 to RM 250 per beneficiary; cardiovascular risk panel added to the bundled screening list.',
     citation: {
-      source_url:
-        'https://protecthealth.com.my/peka-b40/circular-2026.pdf',
+      source_url: 'https://protecthealth.com.my/peka-b40/circular-2026.pdf',
       snippet:
         'Baucar saringan PeKa B40 — nilai dinaikkan kepada RM 250 setiap penerima dan ditambah panel risiko kardiovaskular mulai 2026.'
     },
-    source_url:
-      'https://protecthealth.com.my/peka-b40/circular-2026.pdf',
-    source_content_hash:
-      '3e2f1a0b9c8d7e6f5a4b3c2d1e0f9a8b7c6d5e4f3a2b1c0d9e8f7a6b5c4d3e2f',
+    source_url: 'https://protecthealth.com.my/peka-b40/circular-2026.pdf',
+    source_content_hash: '3e2f1a0b9c8d7e6f5a4b3c2d1e0f9a8b7c6d5e4f3a2b1c0d9e8f7a6b5c4d3e2f',
     confidence: 0.82
   },
   {
@@ -468,15 +429,12 @@ const SEED_POOL: SeedCandidate[] = [
     rate_summary:
       '2026 coverage refresh: 36-disease list extended to 40 critical illnesses; one-time lump-sum payout raised from RM 8,000 to RM 10,000.',
     citation: {
-      source_url:
-        'https://www.mysalam.com.my/documents/mysalam-2026-coverage.pdf',
+      source_url: 'https://www.mysalam.com.my/documents/mysalam-2026-coverage.pdf',
       snippet:
         'Senarai penyakit kritikal dilanjutkan kepada 40 keadaan dan bayaran sekali gus dinaikkan kepada RM 10,000 mulai pelan 2026.'
     },
-    source_url:
-      'https://www.mysalam.com.my/documents/mysalam-2026-coverage.pdf',
-    source_content_hash:
-      'b1a0c9d8e7f6a5b4c3d2e1f0a9b8c7d6e5f4a3b2c1d0e9f8a7b6c5d4e3f2a1b0',
+    source_url: 'https://www.mysalam.com.my/documents/mysalam-2026-coverage.pdf',
+    source_content_hash: 'b1a0c9d8e7f6a5b4c3d2e1f0a9b8c7d6e5f4a3b2c1d0e9f8a7b6c5d4e3f2a1b0',
     confidence: 0.79
   },
   {
@@ -489,16 +447,13 @@ const SEED_POOL: SeedCandidate[] = [
     rate_summary:
       'Public Ruling No. 4/2024 (Form BE amended Mar 2026): lifestyle relief sub-cap for digital subscriptions raised from RM 2,500 to RM 3,000.',
     citation: {
-      source_url:
-        'https://lampiran1.hasil.gov.my/pdf/pdfam/PR_4_2024_amended_2026_BE.pdf',
+      source_url: 'https://lampiran1.hasil.gov.my/pdf/pdfam/PR_4_2024_amended_2026_BE.pdf',
       snippet:
         'Bagi Borang BE Tahun Taksiran 2025, sub-had pelepasan gaya hidup digital ialah RM 3,000, naik daripada RM 2,500 pada tahun sebelumnya.'
     },
-    source_url:
-      'https://lampiran1.hasil.gov.my/pdf/pdfam/PR_4_2024_amended_2026_BE.pdf',
-    source_content_hash:
-      '6f5e4d3c2b1a0c9d8e7f6a5b4c3d2e1f0a9b8c7d6e5f4a3b2c1d0e9f8a7b6c5d',
-    confidence: 0.90
+    source_url: 'https://lampiran1.hasil.gov.my/pdf/pdfam/PR_4_2024_amended_2026_BE.pdf',
+    source_content_hash: '6f5e4d3c2b1a0c9d8e7f6a5b4c3d2e1f0a9b8c7d6e5f4a3b2c1d0e9f8a7b6c5d',
+    confidence: 0.9
   },
   {
     source_id: 'kwsp-i-suri',
@@ -510,15 +465,12 @@ const SEED_POOL: SeedCandidate[] = [
     rate_summary:
       'Government incentive raised from RM 300 to RM 360 / year (matching RM 30 / month for 12 months); previously RM 25 / month.',
     citation: {
-      source_url:
-        'https://www.kwsp.gov.my/documents/40/2026-i-suri-incentive.pdf',
+      source_url: 'https://www.kwsp.gov.my/documents/40/2026-i-suri-incentive.pdf',
       snippet:
         'Insentif Kerajaan i-Suri ditambah baik kepada RM 360 setahun (RM 30 sebulan) bagi ahli homemaker yang memenuhi syarat eKasih mulai 2026.'
     },
-    source_url:
-      'https://www.kwsp.gov.my/documents/40/2026-i-suri-incentive.pdf',
-    source_content_hash:
-      'd4c3b2a1c0d9e8f7a6b5c4d3e2f1a0b9c8d7e6f5a4b3c2d1e0f9a8b7c6d5e4f3',
+    source_url: 'https://www.kwsp.gov.my/documents/40/2026-i-suri-incentive.pdf',
+    source_content_hash: 'd4c3b2a1c0d9e8f7a6b5c4d3e2f1a0b9c8d7e6f5a4b3c2d1e0f9a8b7c6d5e4f3',
     confidence: 0.81
   }
 ]
@@ -686,14 +638,12 @@ export function mockFetchSchemeHealth(): SchemeHealthResponse {
   // Build a hash map per scheme_id, preferring the most-recent verified_at.
   const items = Object.entries(verified).map(([schemeId, verifiedAt]) => {
     const approvedCandidate = Object.values(store.candidates).find(
-      (entry) =>
-        entry.detail.candidate.scheme_id === schemeId && entry.detail.status === 'approved'
+      (entry) => entry.detail.candidate.scheme_id === schemeId && entry.detail.status === 'approved'
     )
     return {
       scheme_id: schemeId,
       verified_at: verifiedAt,
-      source_content_hash:
-        approvedCandidate?.detail.candidate.source_content_hash ?? null
+      source_content_hash: approvedCandidate?.detail.candidate.source_content_hash ?? null
     }
   })
   return { items }

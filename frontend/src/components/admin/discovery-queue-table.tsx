@@ -10,12 +10,7 @@ import { ConfidenceMeter } from '@/components/admin/confidence-meter'
 import { Button } from '@/components/ui/button'
 import { Checkbox } from '@/components/ui/checkbox'
 import { cn } from '@/lib/utils'
-import {
-  approveCandidate,
-  deleteCandidate,
-  rejectCandidate,
-  type CandidateRow
-} from '@/lib/admin-discovery'
+import { approveCandidate, deleteCandidate, rejectCandidate, type CandidateRow } from '@/lib/admin-discovery'
 import { notificationStore } from '@/lib/notification-store'
 
 type SortKey = 'name' | 'confidence' | 'agency'
@@ -94,8 +89,7 @@ export function DiscoveryQueueTable({ rows, onRefresh, totalCount }: Props) {
 
     setBusyAction(action)
     setActionError(null)
-    const op =
-      action === 'delete' ? deleteCandidate : action === 'approve' ? approveCandidate : rejectCandidate
+    const op = action === 'delete' ? deleteCandidate : action === 'approve' ? approveCandidate : rejectCandidate
     const results = await Promise.allSettled(ids.map((id) => op(id)))
     const failed = results.filter((r) => r.status === 'rejected')
     const succeeded = ids.length - failed.length
@@ -165,13 +159,7 @@ export function DiscoveryQueueTable({ rows, onRefresh, totalCount }: Props) {
           <Button type="button" size="sm" variant="outline" onClick={() => setSelected(new Set())} disabled={busy}>
             {t('common.button.cancel')}
           </Button>
-          <Button
-            type="button"
-            size="sm"
-            onClick={() => runBulk('approve')}
-            disabled={busy}
-            className="gap-1.5"
-          >
+          <Button type="button" size="sm" onClick={() => runBulk('approve')} disabled={busy} className="gap-1.5">
             {busyAction === 'approve' ? (
               <Loader2 className="size-3.5 animate-spin" aria-hidden />
             ) : (

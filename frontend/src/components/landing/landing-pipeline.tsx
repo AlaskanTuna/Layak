@@ -39,7 +39,7 @@ const STEPS_FALLBACK: StepCopy[] = [
   {
     label: 'Strategy',
     title: 'Reason across schemes.\nSurface grounded advisories.',
-    body: "Gemini reasons across the matched schemes to surface 0-3 grounded advisories after deterministic trigger filtering."
+    body: 'Gemini reasons across the matched schemes to surface 0-3 grounded advisories after deterministic trigger filtering.'
   },
   {
     label: 'Compute',

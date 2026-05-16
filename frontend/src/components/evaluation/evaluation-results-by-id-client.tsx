@@ -111,11 +111,7 @@ export function EvaluationResultsByIdClient({ evalId }: { evalId: string }) {
   const [whatIfPending, setWhatIfPending] = useState(false)
   const whatIfResult = whatIfPreview?.result ?? null
   const handleWhatIfResult = useCallback(
-    (
-      result: WhatIfResponse | null,
-      context: ChatScenarioContext | null,
-      strategyPhase: WhatIfStrategyPhase
-    ) => {
+    (result: WhatIfResponse | null, context: ChatScenarioContext | null, strategyPhase: WhatIfStrategyPhase) => {
       setWhatIfPreview(result && context ? { result, context, strategyPhase } : null)
     },
     []

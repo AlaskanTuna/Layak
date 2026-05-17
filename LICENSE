@@ -1,0 +1,42 @@
+MIT License
+
+Copyright (c) 2026 Team T010NG — Adam, Hao, JS
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+THE SOFTWARE.
+
+---
+
+Attribution Note (non-binding, courtesy request)
+
+If you use Layak — in part or in whole — for a paper, talk, blog post, fork,
+or derivative product, a credit line back to the original team is appreciated:
+
+Based on Layak by Team T010NG (Adam · Hao · JS) —
+Grand Champion, Project 2030: MyAI Future Hackathon (Open Category, 2026).
+https://github.com/AlaskanTuna/Layak
+
+---
+
+Third-Party Material
+
+The scheme PDFs committed under `backend/data/schemes/` are gazetted Malaysian
+government documents and remain the property of their respective issuing
+agencies (MOF, LHDN, JKM, KWSP, PERKESO). They are included here under
+fair-dealing for research and demonstration of the Layak agent pipeline.
+Redistribution of those PDFs must respect each original publisher's terms.

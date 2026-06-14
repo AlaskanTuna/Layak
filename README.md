@@ -40,7 +40,7 @@ _Three uploads. One website. Six autonomous steps. **Zero hallucinated rules.**_
 
 <br/>
 
-[**Live Demo**](https://layak.tech) · [**Pitch Deck**](https://docs.google.com/presentation/d/10sZA_cJGqoypqAIinCfxXzN9VCqGtEF-FD8ZZC-NzwM/edit?usp=sharing) · [**Demo Video**](#-demo-video)
+[**Live Demo**](https://layak.vercel.app) · [**Pitch Deck**](https://docs.google.com/presentation/d/10sZA_cJGqoypqAIinCfxXzN9VCqGtEF-FD8ZZC-NzwM/edit?usp=sharing) · [**Demo Video**](#-demo-video)
 
 </div>
 
@@ -411,7 +411,7 @@ pnpm format      # prettier --write across the repo
 
 ## ☁ Deployment
 
-The frontend deploys to **Vercel** (Next.js native, free Hobby tier) and the backend deploys to **Render** (Docker web service, free tier; cold-starts ~30-60s after idle). Live demo: <https://layak.tech>.
+The frontend deploys to **Vercel** (Next.js native, free Hobby tier) and the backend deploys to **Render** (Docker web service, free tier; cold-starts ~30-60s after idle). Live demo: <https://layak.vercel.app>.
 
 <details>
 <summary><strong>Deploy Steps</strong></summary>

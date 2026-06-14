@@ -1,0 +1,30 @@
+# Render Blueprint — Layak backend (FastAPI + ADK + WeasyPrint).
+# Frontend deploys separately on Vercel (Next.js native, free Hobby tier);
+# point the Vercel project's NEXT_PUBLIC_BACKEND_URL at this service's URL,
+# and set this service's LAYAK_CORS_ORIGINS to the Vercel origin.
+#
+# Free tier note: the instance spins down after ~15 min idle, so the first
+# request after a quiet period pays a cold start (~30-60 s). Acceptable for a
+# concluded project; see README.
+services:
+  - type: web
+    name: layak-backend
+    runtime: docker
+    dockerfilePath: ./backend/Dockerfile
+    dockerContext: ./backend
+    region: singapore
+    plan: free
+    healthCheckPath: /health
+    autoDeploy: true
+    envVars:
+      # Set in the Render dashboard (Secret) — free Gemini Developer API key.
+      - key: GEMINI_API_KEY
+        sync: false
+      - key: GOOGLE_GENAI_USE_VERTEXAI
+        value: 'FALSE'
+      # Firebase Admin service-account JSON (Spark tier) — set as a Secret.
+      - key: FIREBASE_ADMIN_KEY
+        sync: false
+      # Comma-separated Vercel frontend origin(s) for CORS.
+      - key: LAYAK_CORS_ORIGINS
+        sync: false

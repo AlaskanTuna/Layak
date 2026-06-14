@@ -1,14 +1,14 @@
-# Layak backend — FastAPI + ADK-Python + WeasyPrint on Cloud Run.
+# Layak backend — FastAPI + ADK-Python + WeasyPrint (Render / local Docker).
 #
 # Build: docker build -t layak-backend -f backend/Dockerfile backend
 # Run:   docker run --rm -p 8080:8080 \
 #           -e GEMINI_API_KEY=$GEMINI_API_KEY \
-#           -e GOOGLE_CLOUD_PROJECT=$GOOGLE_CLOUD_PROJECT \
+#           -e FIREBASE_ADMIN_KEY="$FIREBASE_ADMIN_KEY" \
 #           layak-backend
 #
-# Cloud Run deploy (Task 6): `gcloud run deploy layak-backend --source backend`
-# supplies these same native libs automatically via its buildpacks, but we ship
-# an explicit Dockerfile so behaviour is reproducible across platforms.
+# Render builds this image directly (see render.yaml at the repo root); the
+# explicit Dockerfile keeps the WeasyPrint native libs reproducible across
+# platforms.
 
 FROM python:3.12-slim
 
@@ -43,14 +43,13 @@ RUN pip install --no-cache-dir --upgrade pip wheel \
        "google-genai>=1.0" \
        "jinja2>=3.1" \
        "weasyprint>=62" \
-       "firebase-admin>=6.5,<7"
+       "firebase-admin>=6.5,<7" \
+       "numpy>=1.26"
 
 # App code (templates + schemas + tools + rules + agents + fixtures + main).
 COPY app ./app
 COPY data ./data
-# Operational scripts — the prune Cloud Run Job (Phase 6 Task 1) runs from
-# inside this image. `adk deploy cloud_run` + `gcloud run jobs deploy` share
-# the image; the Job overrides CMD via `--command python --args -m,scripts.prune_free_tier`.
+# Operational scripts (RAG index builder, demo fixtures, optional Firestore prune).
 COPY scripts ./scripts
 
 # Cloud Run injects PORT; default to 8080 for local runs.

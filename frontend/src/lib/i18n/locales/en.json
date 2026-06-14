@@ -418,7 +418,7 @@
       "section3History": "To show you a history of your past evaluations on the dashboard.",
       "section3FairUse": "To enforce per-user fair-use rate limits on the free tier.",
       "section4Title": "4. Where it lives",
-      "section4Body": "All processing and storage happens in Google Cloud, <code>asia-southeast1</code> region. The Cloud Run services and the Firestore database are owned by the Layak team. Authentication is handled by Firebase Authentication, also under our project.",
+      "section4Body": "The web app is hosted on Vercel and the backend on Render (Singapore region). AI document processing uses Google's Gemini API. Your saved evaluations and profile are stored in Google Firestore, with sign-in handled by Firebase Authentication.",
       "section5Title": "5. How long we keep it",
       "section5FreeDelete": "Free-tier evaluations are deleted after 30 days by an automated nightly job.",
       "section5ProKeep": "Pro-tier evaluations persist until you delete them.",

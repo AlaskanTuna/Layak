@@ -394,7 +394,7 @@
       "section3History": "为了在仪表板上向您展示过往评估历史。",
       "section3FairUse": "为了在免费层级上执行每用户公平使用速率限制。",
       "section4Title": "4. 资料存放地点",
-      "section4Body": "所有处理和存储都在 Google Cloud <code>asia-southeast1</code> 区域进行。Cloud Run 服务和 Firestore 数据库由 Layak 团队拥有。身份验证由 Firebase Authentication 处理，同样在我们的项目下。",
+      "section4Body": "网页应用托管在 Vercel，后端在 Render（新加坡区域）。AI 文档处理使用 Google 的 Gemini API。您保存的评估和个人资料存储在 Google Firestore 中，登录由 Firebase Authentication 处理。",
       "section5Title": "5. 我们保留资料的期限",
       "section5FreeDelete": "免费层级的评估在 30 天后由自动化夜间作业删除。",
       "section5ProKeep": "Pro 层级的评估一直保留，直到您删除为止。",

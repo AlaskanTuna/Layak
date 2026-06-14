@@ -418,7 +418,7 @@
       "section3History": "Untuk menunjukkan sejarah penilaian lepas anda di papan pemuka.",
       "section3FairUse": "Untuk menguatkuasakan had kadar penggunaan saksama setiap pengguna pada peringkat percuma.",
       "section4Title": "4. Di mana ia berada",
-      "section4Body": "Semua pemprosesan dan penyimpanan berlaku di Google Cloud, rantau <code>asia-southeast1</code>. Perkhidmatan Cloud Run dan pangkalan data Firestore dimiliki oleh pasukan Layak. Pengesahan dikendalikan oleh Firebase Authentication, juga di bawah projek kami.",
+      "section4Body": "Aplikasi web dihoskan di Vercel dan backend di Render (rantau Singapura). Pemprosesan dokumen AI menggunakan API Gemini Google. Penilaian dan profil anda yang disimpan berada dalam Google Firestore, manakala log masuk dikendalikan oleh Firebase Authentication.",
       "section5Title": "5. Berapa lama kami menyimpannya",
       "section5FreeDelete": "Penilaian peringkat percuma dipadam selepas 30 hari oleh kerja automatik setiap malam.",
       "section5ProKeep": "Penilaian peringkat Pro kekal sehingga anda memadamnya.",

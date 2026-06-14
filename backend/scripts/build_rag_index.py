@@ -51,16 +51,33 @@ def _chunk_pages(reader: PdfReader) -> list[dict]:
 
 
 def _embed(client, texts: list[str], task_type: str) -> np.ndarray:  # type: ignore[no-untyped-def]
+    import time
+
+    from google.genai import errors as genai_errors
     from google.genai import types
 
+    # Small batches + pacing to stay under the free-tier TPM; on a 429 wait out
+    # the full per-minute window and retry the same batch.
     vectors: list[list[float]] = []
-    for text in texts:
-        resp = client.models.embed_content(
-            model=_EMBED_MODEL,
-            contents=text,
-            config=types.EmbedContentConfig(task_type=task_type, output_dimensionality=_DIM),
-        )
-        vectors.append(list(resp.embeddings[0].values))
+    batch_size = 16
+    for start in range(0, len(texts), batch_size):
+        batch = texts[start : start + batch_size]
+        for attempt in range(10):
+            try:
+                resp = client.models.embed_content(
+                    model=_EMBED_MODEL,
+                    contents=batch,
+                    config=types.EmbedContentConfig(task_type=task_type, output_dimensionality=_DIM),
+                )
+                vectors.extend(list(e.values) for e in resp.embeddings)
+                break
+            except genai_errors.ClientError as exc:
+                if getattr(exc, "code", None) == 429 and attempt < 9:
+                    print(f"  429 at chunk {start}; waiting 65s (attempt {attempt + 1})", flush=True)
+                    time.sleep(65)
+                    continue
+                raise
+        time.sleep(4)  # gentle pacing between batches
     arr = np.asarray(vectors, dtype=np.float32)
     norms = np.linalg.norm(arr, axis=1, keepdims=True)
     norms[norms == 0] = 1.0

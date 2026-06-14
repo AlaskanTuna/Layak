@@ -326,7 +326,7 @@
         "cta": "Mula Sekarang",
         "features": [
           "5 penilaian setiap 24 jam",
-          "Rekod penilaian 30 hari",
+          "Sejarah penilaian (kekal sehingga dipadam)",
           "Akses kepada 20 entri skim yang dijejaki",
           "Pakej draf dengan tanda air"
         ]
@@ -420,8 +420,8 @@
       "section4Title": "4. Di mana ia berada",
       "section4Body": "Aplikasi web dihoskan di Vercel dan backend di Render (rantau Singapura). Pemprosesan dokumen AI menggunakan API Gemini Google. Penilaian dan profil anda yang disimpan berada dalam Google Firestore, manakala log masuk dikendalikan oleh Firebase Authentication.",
       "section5Title": "5. Berapa lama kami menyimpannya",
-      "section5FreeDelete": "Penilaian peringkat percuma dipadam selepas 30 hari oleh kerja automatik setiap malam.",
-      "section5ProKeep": "Penilaian peringkat Pro kekal sehingga anda memadamnya.",
+      "section5FreeDelete": "Kami menyimpan penilaian anda sehingga anda memadamnya — sama untuk setiap akaun, tanpa mengira peringkat.",
+      "section5ProKeep": "Padam mana-mana penilaian tersimpan pada bila-bila masa daripada sejarah penilaian anda.",
       "section5AccountDelete": "Anda boleh meminta pemadaman segera akaun dan semua rekod berkaitan pada bila-bila masa dari halaman Tetapan.",
       "section6Title": "6. Hak PDPA anda",
       "section6Access": "<strong>Akses</strong> — muat turun eksport JSON profil dan sejarah penilaian penuh anda.",
@@ -1450,7 +1450,7 @@
       "description": "Peringkat penilaian semasa anda.",
       "freeLabel": "Peringkat percuma",
       "proLabel": "Pro · tanpa had",
-      "freeHint": "Peringkat percuma mengehadkan penilaian dalam tetingkap 24 jam bergulir dan memadam sejarah selepas 30 hari.",
+      "freeHint": "Peringkat percuma mengehadkan penilaian dalam tetingkap 24 jam bergulir.",
       "usage": "{{used}} / {{limit}} dalam 24 j ini"
     },
     "appearance": {
@@ -1487,7 +1487,7 @@
       "descriptionDefault": "Anda telah mencapai had penilaian peringkat percuma. Peringkat Pro adalah naratif pemegang tempat dalam v2 — belum ada produk langganan sebenar.",
       "descriptionRateLimit": "Anda telah mencapai had peringkat percuma sebanyak {{limit}} penilaian setiap {{hours}} jam. Had ini akan set semula secara automatik — tiada pendaftaran diperlukan.",
       "feature1": "Penilaian tanpa had — tiada had bergulir.",
-      "feature2": "Sejarah kekal tanpa had (peringkat percuma auto-padam selepas 30 hari).",
+      "feature2": "Sejarah kekal sehingga anda memadamnya.",
       "feature3": "Akses keutamaan kepada skim baharu apabila ditambah.",
       "resetInfo": "Kuota percuma set semula pada {{time}}."
     }

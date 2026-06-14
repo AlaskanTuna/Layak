@@ -232,7 +232,7 @@
         "cta": "Get Started",
         "features": [
           "5 evaluations per 24 hours",
-          "30-day evaluation history",
+          "Evaluation history (kept until you delete it)",
           "Access to 20 tracked scheme entries",
           "Watermarked draft packets"
         ]
@@ -420,8 +420,8 @@
       "section4Title": "4. Where it lives",
       "section4Body": "The web app is hosted on Vercel and the backend on Render (Singapore region). AI document processing uses Google's Gemini API. Your saved evaluations and profile are stored in Google Firestore, with sign-in handled by Firebase Authentication.",
       "section5Title": "5. How long we keep it",
-      "section5FreeDelete": "Free-tier evaluations are deleted after 30 days by an automated nightly job.",
-      "section5ProKeep": "Pro-tier evaluations persist until you delete them.",
+      "section5FreeDelete": "We keep your evaluations until you delete them — the same for every account, regardless of tier.",
+      "section5ProKeep": "Delete any saved evaluation at any time from your evaluation history.",
       "section5AccountDelete": "You can request immediate deletion of your account and all linked records at any time from the Settings page.",
       "section6Title": "6. Your PDPA rights",
       "section6Access": "<strong>Access</strong> — download a JSON export of your profile and full evaluation history.",
@@ -1450,7 +1450,7 @@
       "description": "Your current evaluation tier.",
       "freeLabel": "Free tier",
       "proLabel": "Pro · unlimited",
-      "freeHint": "Free tier caps evaluations to a rolling 24-hour window and prunes history after 30 days.",
+      "freeHint": "Free tier caps evaluations to a rolling 24-hour window.",
       "usage": "{{used}} / {{limit}} this 24 h"
     },
     "appearance": {
@@ -1487,7 +1487,7 @@
       "descriptionDefault": "You've hit the free-tier evaluation cap. The Pro tier is a placeholder narrative in v2 — there is no real subscription product yet.",
       "descriptionRateLimit": "You've hit the free-tier cap of {{limit}} evaluations every {{hours}} hours. The cap resets automatically — no signup required.",
       "feature1": "Unlimited evaluations — no rolling cap.",
-      "feature2": "History persists indefinitely (free tier auto-prunes after 30 days).",
+      "feature2": "History persists until you delete it.",
       "feature3": "Priority access to new schemes as they're added.",
       "resetInfo": "Free quota resets at {{time}}."
     }

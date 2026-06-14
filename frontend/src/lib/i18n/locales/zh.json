@@ -311,7 +311,7 @@
         "price": "RM 0",
         "period": "永久免费",
         "cta": "立即开始",
-        "features": ["每 24 小时 5 次评估", "30 天评估历史", "??? 20 ?????????", "带水印的草稿申请包"]
+        "features": ["每 24 小时 5 次评估", "评估历史（保留至删除为止）", "??? 20 ?????????", "带水印的草稿申请包"]
       },
       "proTier": {
         "name": "Pro 版",
@@ -396,8 +396,8 @@
       "section4Title": "4. 资料存放地点",
       "section4Body": "网页应用托管在 Vercel，后端在 Render（新加坡区域）。AI 文档处理使用 Google 的 Gemini API。您保存的评估和个人资料存储在 Google Firestore 中，登录由 Firebase Authentication 处理。",
       "section5Title": "5. 我们保留资料的期限",
-      "section5FreeDelete": "免费层级的评估在 30 天后由自动化夜间作业删除。",
-      "section5ProKeep": "Pro 层级的评估一直保留，直到您删除为止。",
+      "section5FreeDelete": "我们会保留您的评估，直到您将其删除——所有账户一视同仁，不分等级。",
+      "section5ProKeep": "您可以随时从评估历史记录中删除任何已保存的评估。",
       "section5AccountDelete": "您可以随时从「设置」页面请求立即删除您的账户和所有相关记录。",
       "section6Title": "6. 您的 PDPA 权利",
       "section6Access": "<strong>访问</strong> —— 下载您档案和完整评估历史的 JSON 导出。",
@@ -1426,7 +1426,7 @@
       "description": "您当前的评估套餐。",
       "freeLabel": "免费套餐",
       "proLabel": "Pro · 无限",
-      "freeHint": "免费套餐将评估限制在 24 小时滚动窗口内，历史记录在 30 天后自动清除。",
+      "freeHint": "免费套餐将评估限制在 24 小时滚动窗口内。",
       "usage": "本 24 小时内 {{used}} / {{limit}}"
     },
     "appearance": {
@@ -1463,7 +1463,7 @@
       "descriptionDefault": "您已达到免费层级评估上限。v2 中的 Pro 层级仅为占位说明 —— 目前尚无真实订阅产品。",
       "descriptionRateLimit": "您已达到免费层级每 {{hours}} 小时 {{limit}} 次评估的上限。配额会自动重置 —— 无需任何注册。",
       "feature1": "无限评估 —— 无滚动上限。",
-      "feature2": "历史永久保留（免费层级 30 天后自动清除）。",
+      "feature2": "历史保留至您删除为止。",
       "feature3": "优先体验新计划。",
       "resetInfo": "免费配额将于 {{time}} 重置。"
     }

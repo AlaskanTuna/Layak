@@ -129,7 +129,7 @@ Layak collapses that into a single guided flow. A user uploads documents (or use
 | 🧮  | **Live Arithmetic**         | Annual upside computed via Gemini Code Execution, not LLM narration.                                                                                                                                                                                                     |
 | 🖨  | **Draft Packet Generation** | WeasyPrint renders pre-filled application PDFs for each matched scheme, all watermarked `DRAFT - NOT SUBMITTED`.                                                                                                                                                         |
 | 👤  | **Accounts & History**      | Firebase Auth (Google + Guest), Firestore-backed evaluation history, free-tier quota, and an upgrade waitlist.                                                                                                                                                           |
-| 🔐  | **PDPA-Aligned**            | Explicit consent on sign-up, JSON export, and hard-delete endpoints. 30-day prune of free-tier history.                                                                                                                                                                  |
+| 🔐  | **PDPA-Aligned**            | Explicit consent on sign-up, JSON export, and hard-delete endpoints. Delete any evaluation or your whole account anytime.                                                                                                                                                |
 | 🎭  | **Demo-Ready Fixtures**     | Five synthetic personas (Aisyah, Farhan, Hashim, Meiling, Ravi) for stable judging walkthroughs.                                                                                                                                                                         |
 | 🤖  | **Per-Evaluation Chatbot**  | A floating panel on every completed results page - grounded on _that_ eval doc + local RAG retrieval, multilingual (en/ms/zh), with a five-layer guardrail stack (system-prompt language lock, safety filters, input validator, RAG grounding, citation-drift detector). |
 
@@ -448,7 +448,7 @@ cd backend && GEMINI_API_KEY=... python -m scripts.build_rag_index --verbose
 - 🧾 **No Unverified Claim** reaches the UI. If local RAG returns no passage for a rule, the rule drops out of the ranking.
 - 🎭 **Synthetic Demo Documents Only.** Every MyKad, payslip, and utility bill used in our demo fixtures is fictional and watermarked `SYNTHETIC - FOR DEMO ONLY`.
 - ⚖ **No Final Legal Determination** is claimed. Every explanation uses _"you appear to qualify ... the agency confirms on application."_
-- 🗑 **30-Day Retention** on free-tier history, cascade-delete on account deletion, JSON export on demand - PDPA 2010-aligned.
+- 🗑 **User-Controlled Deletion** — delete any evaluation, cascade-delete on account deletion, JSON export on demand - PDPA 2010-aligned.
 
 ---
 

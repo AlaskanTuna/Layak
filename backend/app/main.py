@@ -131,7 +131,7 @@ app.include_router(what_if_router)
 
 @app.get("/health")
 async def health() -> dict[str, str]:
-    # Cloud Run / Knative intercepts `/healthz` at the GFE layer before it
+    # Some platforms intercept `/healthz` at the GFE layer before it
     # reaches the container — use `/health` so smoke tests hit the app.
     return {"status": "ok", "version": app.version}
 

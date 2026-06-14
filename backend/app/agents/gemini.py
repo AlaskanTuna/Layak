@@ -57,7 +57,7 @@ _DOTENV_CANDIDATES = (
 
 
 def _load_var_from_dotenv(key: str) -> str | None:
-    # Local-dev fallback for uvicorn started outside `pnpm dev`; Cloud Run never hits this.
+    # Local-dev fallback for uvicorn started outside `pnpm dev`; the deployed server never hits this.
     prefix = f"{key}="
     for candidate in _DOTENV_CANDIDATES:
         if not candidate.is_file():

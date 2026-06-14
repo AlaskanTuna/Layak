@@ -9,7 +9,7 @@ constants resolve correctly whether the process was started via
 
 Resolution order, per call:
 
-    1. `os.environ.get(key)` — set by Cloud Run `--set-env-vars`, by
+    1. `os.environ.get(key)` — set by the host env (Render), by
        `uvicorn`'s dotenv preload, or by an explicit shell export.
     2. `_load_var_from_dotenv(key)` — direct read from the repo-root `.env`
        so `uv run` smoke scripts pick up the same values without a wrapper.

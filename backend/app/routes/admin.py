@@ -180,7 +180,7 @@ def _write_manifest(candidate: SchemeCandidate) -> tuple[Path, str]:
     reference for the engineer who hand-codes the Pydantic rule update
     (or new rule, when `scheme_id` is None).
 
-    Returns the local path (ephemeral on Cloud Run — survives only the
+    Returns the local path (ephemeral on the host — survives only the
     serving container's lifetime) AND the YAML string content so the caller
     can persist it durably (e.g. on the Firestore candidate doc) before the
     container recycles.
@@ -294,7 +294,7 @@ async def approve_candidate(
     db, candidate = _transition(user, candidate_id, "approved", payload.note)
     manifest_path, manifest_yaml = _write_manifest(candidate)
     # Persist the manifest YAML onto the candidate doc so it survives the
-    # Cloud Run container recycle (the local file write above is ephemeral).
+    # host container recycle (the local file write above is ephemeral).
     db.collection("discovered_schemes").document(candidate_id).set(
         {"manifestYaml": manifest_yaml, "manifestApprovedAt": SERVER_TIMESTAMP},
         merge=True,

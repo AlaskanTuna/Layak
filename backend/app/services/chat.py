@@ -41,7 +41,7 @@ from app.schema.chat import (
 )
 from app.schema.events import ErrorCategory
 from app.schema.locale import SupportedLanguage
-from app.services.vertex_ai_search import RetrievedPassage, search_passage
+from app.services.rag_search import RetrievedPassage, search_passage
 
 _logger = logging.getLogger(__name__)
 

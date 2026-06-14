@@ -65,7 +65,7 @@ def _warmup_rag() -> float:
     Reuses `search_passage` (the helper rule modules already use) so the
     cached index matrix is the one chat will hit at request time.
     """
-    from app.services.vertex_ai_search import search_passage
+    from app.services.rag_search import search_passage
 
     start = time.perf_counter()
     search_passage("STR", top_k=1)

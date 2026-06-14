@@ -50,7 +50,7 @@ _RAG_DISABLED: ContextVar[bool] = ContextVar("local_rag_disabled", default=False
 
 
 @contextmanager
-def disable_vertex_ai_search() -> Iterator[None]:
+def disable_rag_search() -> Iterator[None]:
     """Temporarily skip live retrieval and fall back to hardcoded citations."""
     token = _RAG_DISABLED.set(True)
     try:

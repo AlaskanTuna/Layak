@@ -6,8 +6,8 @@ import numpy as np
 import pytest
 
 from app.schema.scheme import RuleCitation
-from app.services import vertex_ai_search
-from app.services.vertex_ai_search import (
+from app.services import rag_search
+from app.services.rag_search import (
     RetrievedPassage,
     get_primary_rag_citation,
     passage_to_citation,
@@ -23,9 +23,9 @@ _VECTORS = np.asarray([[1.0, 0.0], [0.0, 1.0]], dtype=np.float32)
 
 @pytest.fixture(autouse=True)
 def _stub_index(monkeypatch: pytest.MonkeyPatch) -> None:
-    monkeypatch.setattr(vertex_ai_search, "_load_index", lambda: (_VECTORS, _CHUNKS))
+    monkeypatch.setattr(rag_search, "_load_index", lambda: (_VECTORS, _CHUNKS))
     # Query embedding aligns with chunk 0 (STR) by default.
-    monkeypatch.setattr(vertex_ai_search, "_embed_query", lambda _q: np.asarray([1.0, 0.0], dtype=np.float32))
+    monkeypatch.setattr(rag_search, "_embed_query", lambda _q: np.asarray([1.0, 0.0], dtype=np.float32))
 
 
 def test_search_passage_returns_empty_list_on_empty_query() -> None:
@@ -36,7 +36,7 @@ def test_search_passage_fail_open_on_embed_error(monkeypatch: pytest.MonkeyPatch
     def _boom(_q: str):
         raise RuntimeError("no api key")
 
-    monkeypatch.setattr(vertex_ai_search, "_embed_query", _boom)
+    monkeypatch.setattr(rag_search, "_embed_query", _boom)
     assert search_passage("anything") == []
 
 
@@ -66,7 +66,7 @@ def test_passage_to_citation_prefers_fallback_source_pdf() -> None:
 
 
 def test_get_primary_rag_citation_returns_none_when_no_hits(monkeypatch: pytest.MonkeyPatch) -> None:
-    monkeypatch.setattr(vertex_ai_search, "search_passage", lambda *a, **k: [])
+    monkeypatch.setattr(rag_search, "search_passage", lambda *a, **k: [])
     assert get_primary_rag_citation(query="q", uri_substring="uri", rule_id="r", fallback_pdf="f.pdf") is None
 
 
@@ -74,6 +74,6 @@ def test_get_primary_rag_citation_builds_citation_when_hit(monkeypatch: pytest.M
     passage = RetrievedPassage(
         passage_text="body", source_uri="risalah-str-2026.pdf", document_id="d", relevance_score=None
     )
-    monkeypatch.setattr(vertex_ai_search, "search_passage", lambda *a, **k: [passage])
+    monkeypatch.setattr(rag_search, "search_passage", lambda *a, **k: [passage])
     citation = get_primary_rag_citation(query="q", uri_substring="uri", rule_id="r", fallback_pdf="f.pdf")
     assert isinstance(citation, RuleCitation) and citation.passage == "body"

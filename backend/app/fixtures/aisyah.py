@@ -17,7 +17,7 @@ from __future__ import annotations
 from app.rules import i_saraan, jkm_bkk, jkm_warga_emas, lhdn_form_b, perkeso_sksps, str_2026
 from app.schema.profile import Dependant, HouseholdFlags, Profile
 from app.schema.scheme import SchemeMatch
-from app.services.vertex_ai_search import disable_vertex_ai_search
+from app.services.rag_search import disable_rag_search
 
 AISYAH_PROFILE = Profile(
     name="Aisyah binti Ahmad",
@@ -40,7 +40,7 @@ AISYAH_PROFILE = Profile(
 
 
 def _compute_aisyah_matches() -> list[SchemeMatch]:
-    with disable_vertex_ai_search():
+    with disable_rag_search():
         results = [
             str_2026.match(AISYAH_PROFILE),
             jkm_warga_emas.match(AISYAH_PROFILE),

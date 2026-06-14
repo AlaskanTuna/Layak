@@ -36,7 +36,7 @@ from app.rules._i18n import bkk_breakdown, bkk_cap_note, out_of_scope_reason, sc
 from app.schema.locale import DEFAULT_LANGUAGE, SupportedLanguage
 from app.schema.profile import Dependant, Profile
 from app.schema.scheme import RuleCitation, SchemeMatch
-from app.services.vertex_ai_search import get_primary_rag_citation
+from app.services.rag_search import get_primary_rag_citation
 
 CHILD_AGE_THRESHOLD = 18
 # Age boundary for the two per-child rate tiers. Children aged ≤ YOUNGER_BAND_AGE

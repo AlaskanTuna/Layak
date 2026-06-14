@@ -20,7 +20,7 @@ from app.schema.what_if import (
     WhatIfResponse,
     WhatIfStrategyResponse,
 )
-from app.services.vertex_ai_search import disable_vertex_ai_search
+from app.services.rag_search import disable_rag_search
 
 _logger = logging.getLogger(__name__)
 
@@ -194,7 +194,7 @@ async def run_what_if_deterministic(
 ) -> WhatIfResponse:
     scenario_profile = apply_overrides(baseline_profile, overrides)
     classification = classify_household_deterministic(scenario_profile)
-    with disable_vertex_ai_search():
+    with disable_rag_search():
         matches = await match_schemes(scenario_profile, language=language)
     deltas = compute_deltas(baseline_matches, matches)
     total = _round2(sum(match.annual_rm for match in matches if match.qualifies and match.kind == "upside"))
@@ -243,7 +243,7 @@ async def run_what_if_strategy_refresh(
 ) -> WhatIfStrategyResponse:
     scenario_profile = apply_overrides(baseline_profile, overrides)
     classification = classify_household_deterministic(scenario_profile)
-    with disable_vertex_ai_search():
+    with disable_rag_search():
         matches = await match_schemes(scenario_profile, language=language)
     try:
         strategy = await optimize_strategy(scenario_profile, matches, classification, language=language)

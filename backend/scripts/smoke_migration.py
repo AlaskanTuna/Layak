@@ -135,7 +135,7 @@ def _embeddings() -> str:
 
 @_check("6. local RAG retrieval (search_passage + citation)")
 def _local_rag() -> str:
-    from app.services.vertex_ai_search import get_primary_rag_citation, search_passage
+    from app.services.rag_search import get_primary_rag_citation, search_passage
 
     hits = search_passage("Sumbangan Tunai Rahmah household tier with children", top_k=1)
     assert hits, "no RAG hits — did you run `python -m scripts.build_rag_index`?"

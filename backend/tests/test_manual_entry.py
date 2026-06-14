@@ -155,15 +155,15 @@ def test_manual_profile_carries_no_ic_information() -> None:
 
 def test_built_profile_drives_same_scheme_matches_as_fixture() -> None:
     """Feeding the built Profile into the rule engine produces the same matches."""
-    from app.services.vertex_ai_search import disable_vertex_ai_search
+    from app.services.rag_search import disable_rag_search
 
     payload = ManualEntryPayload.model_validate(AISYAH_PAYLOAD_JSON)
     built = build_profile_from_manual_entry(payload, today=_FIXED_TODAY)
     # Match `AISYAH_SCHEME_MATCHES`'s build context — the fixture is computed
-    # under `disable_vertex_ai_search()` so it carries hardcoded citations
+    # under `disable_rag_search()` so it carries hardcoded citations
     # only. Without this wrap a live Discovery Engine hit prepends a
     # `rag.*.primary` citation and the comparison fails on citation length.
-    with disable_vertex_ai_search():
+    with disable_rag_search():
         results = [
             str_2026.match(built),
             jkm_warga_emas.match(built),

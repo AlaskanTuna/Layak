@@ -29,7 +29,7 @@ from app.rules._i18n import out_of_scope_reason, scheme_copy
 from app.schema.locale import DEFAULT_LANGUAGE, SupportedLanguage
 from app.schema.profile import Profile
 from app.schema.scheme import RuleCitation, SchemeMatch
-from app.services.vertex_ai_search import get_primary_rag_citation
+from app.services.rag_search import get_primary_rag_citation
 
 MIN_AGE = 40
 _B40_BANDS = ("b40_hardcore", "b40_household", "b40_household_with_children")

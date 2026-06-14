@@ -7,7 +7,7 @@ each chunk with the free `gemini-embedding-001` model (RETRIEVAL_DOCUMENT,
     backend/data/rag_index/vectors.npz   float32 matrix (n_chunks x 768)
     backend/data/rag_index/chunks.json   aligned [{source_pdf,page_start,page_end,text}]
 
-Runtime retrieval (app/services/vertex_ai_search.py) loads these and does a
+Runtime retrieval (app/services/rag_search.py) loads these and does a
 numpy cosine search — no GCP, no billing. Re-run this whenever the scheme
 PDFs change.
 

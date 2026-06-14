@@ -187,9 +187,9 @@ def triggered_strategy_rules(profile: Any, matches: list[Any], classification: A
 async def _build_fixture(language: str) -> tuple[Any, list[Any], Any]:
     from app.agents.tools.match import match_schemes
     from app.fixtures.aisyah import AISYAH_PROFILE
-    from app.services.vertex_ai_search import disable_vertex_ai_search
+    from app.services.rag_search import disable_rag_search
 
-    with disable_vertex_ai_search():
+    with disable_rag_search():
         matches = await match_schemes(AISYAH_PROFILE, language=language)
     return AISYAH_PROFILE, matches, _classification_for(AISYAH_PROFILE)
 

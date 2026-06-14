@@ -39,7 +39,7 @@ from app.rules._i18n import out_of_scope_reason, scheme_copy, sksps_ceiling_note
 from app.schema.locale import DEFAULT_LANGUAGE, SupportedLanguage
 from app.schema.profile import Profile
 from app.schema.scheme import RuleCitation, SchemeMatch
-from app.services.vertex_ai_search import get_primary_rag_citation
+from app.services.rag_search import get_primary_rag_citation
 
 # Eligibility window
 GIG_AGE_MIN = 18

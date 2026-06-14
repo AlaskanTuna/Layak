@@ -306,7 +306,7 @@ function WhyQualifyBlock({ label, text, hint }: { label: string; text: string; h
 /** Render the rule's citation list with visual distinction between RAG-retrieved
  *  passages (live Vertex AI Search) and hardcoded fallback citations. Lets a
  *  judge or end-user verify that the eligibility claim is grounded in a
- *  gazetted PDF — the architectural payoff of `services/vertex_ai_search.py`. */
+ *  gazetted PDF — the architectural payoff of `services/rag_search.py`. */
 function SourcesPanel({ citations, t }: { citations: RuleCitation[]; t: ReturnType<typeof useTranslation>['t'] }) {
   if (!citations || citations.length === 0) return null
   return (

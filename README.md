@@ -20,8 +20,9 @@ _Three uploads. One website. Six autonomous steps. **Zero hallucinated rules.**_
   <img src="https://img.shields.io/badge/next.js-16-black?style=flat-square&logo=next.js&logoColor=white" alt="Next.js" />
   <img src="https://img.shields.io/badge/react-19-61DAFB?style=flat-square&logo=react&logoColor=black" alt="React" />
   <img src="https://img.shields.io/badge/fastapi-python%203.12-009688?style=flat-square&logo=fastapi&logoColor=white" alt="FastAPI" />
-  <img src="https://img.shields.io/badge/gemini-2.5%20Pro%20%2B%203.1%20Flash--Lite-FF6F00?style=flat-square&logo=googlegemini&logoColor=white" alt="Gemini" />
-  <img src="https://img.shields.io/badge/deploy-cloud%20run-4285F4?style=flat-square&logo=googlecloud&logoColor=white" alt="Cloud Run" />
+  <img src="https://img.shields.io/badge/gemini-3.1%20Flash--Lite-FF6F00?style=flat-square&logo=googlegemini&logoColor=white" alt="Gemini" />
+  <img src="https://img.shields.io/badge/frontend-Vercel-000000?style=flat-square&logo=vercel&logoColor=white" alt="Frontend on Vercel" />
+  <img src="https://img.shields.io/badge/backend-Render-46E3B7?style=flat-square&logo=render&logoColor=white" alt="Backend on Render" />
   <img src="https://img.shields.io/badge/license-MIT-blue?style=flat-square" alt="MIT License" />
 </p>
 
@@ -120,17 +121,17 @@ Layak collapses that into a single guided flow. A user uploads documents (or use
 
 ## 🏗 Feature Matrix
 
-|     | Feature                     | What It Means                                                                                                                                                                                                                                                                   |
-| --- | --------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 📥  | **Dual Intake**             | Document upload for IC / payslip / utility, or a manual form for users who'd rather not upload anything.                                                                                                                                                                        |
-|     | **Visible 6-Step Agent**    | Extract → Classify → Match → Optimize Strategy → Compute Upside → Generate, streamed over SSE so the citizen watches the work happen. Steps 4 + 5 run concurrently via `asyncio.gather`.                                                                                        |
-|     | **Grounded Retrieval**      | Vertex AI Search grounds citations over the scheme PDF corpus; deterministic rule modules still decide eligibility and amounts, with cached citations as fail-open fallback.                                                                                                    |
-| 🧮  | **Live Arithmetic**         | Annual upside computed via Gemini Code Execution, not LLM narration.                                                                                                                                                                                                            |
-| 🖨  | **Draft Packet Generation** | WeasyPrint renders pre-filled application PDFs for each matched scheme, all watermarked `DRAFT - NOT SUBMITTED`.                                                                                                                                                                |
-| 👤  | **Accounts & History**      | Firebase Auth (Google + Guest), Firestore-backed evaluation history, free-tier quota, and an upgrade waitlist.                                                                                                                                                                  |
-| 🔐  | **PDPA-Aligned**            | Explicit consent on sign-up, JSON export, and hard-delete endpoints. 30-day prune of free-tier history.                                                                                                                                                                         |
-| 🎭  | **Demo-Ready Fixtures**     | Five synthetic personas (Aisyah, Farhan, Hashim, Meiling, Ravi) for stable judging walkthroughs.                                                                                                                                                                                |
-| 🤖  | **Per-Evaluation Chatbot**  | A floating panel on every completed results page - grounded on _that_ eval doc + Vertex AI Search retrieval, multilingual (en/ms/zh), with a five-layer guardrail stack (system-prompt language lock, safety filters, input validator, RAG grounding, citation-drift detector). |
+|     | Feature                     | What It Means                                                                                                                                                                                                                                                            |
+| --- | --------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| 📥  | **Dual Intake**             | Document upload for IC / payslip / utility, or a manual form for users who'd rather not upload anything.                                                                                                                                                                 |
+|     | **Visible 6-Step Agent**    | Extract → Classify → Match → Optimize Strategy → Compute Upside → Generate, streamed over SSE so the citizen watches the work happen. Steps 4 + 5 run concurrently via `asyncio.gather`.                                                                                 |
+|     | **Grounded Retrieval**      | Local embedding RAG grounds citations over the scheme PDF corpus; deterministic rule modules still decide eligibility and amounts, with cached citations as fail-open fallback.                                                                                          |
+| 🧮  | **Live Arithmetic**         | Annual upside computed via Gemini Code Execution, not LLM narration.                                                                                                                                                                                                     |
+| 🖨  | **Draft Packet Generation** | WeasyPrint renders pre-filled application PDFs for each matched scheme, all watermarked `DRAFT - NOT SUBMITTED`.                                                                                                                                                         |
+| 👤  | **Accounts & History**      | Firebase Auth (Google + Guest), Firestore-backed evaluation history, free-tier quota, and an upgrade waitlist.                                                                                                                                                           |
+| 🔐  | **PDPA-Aligned**            | Explicit consent on sign-up, JSON export, and hard-delete endpoints. 30-day prune of free-tier history.                                                                                                                                                                  |
+| 🎭  | **Demo-Ready Fixtures**     | Five synthetic personas (Aisyah, Farhan, Hashim, Meiling, Ravi) for stable judging walkthroughs.                                                                                                                                                                         |
+| 🤖  | **Per-Evaluation Chatbot**  | A floating panel on every completed results page - grounded on _that_ eval doc + local RAG retrieval, multilingual (en/ms/zh), with a five-layer guardrail stack (system-prompt language lock, safety filters, input validator, RAG grounding, citation-drift detector). |
 
 ---
 
@@ -148,7 +149,7 @@ Layak is built around a simple product stance: **citizens should not have to por
 
 ## 🏛 Architecture
 
-Layak is a two-service app on Google Cloud Run: a **Next.js 16 frontend** and a **FastAPI + ADK-Python backend**. The backend runs a `RootAgent` (Gemini 2.5 Pro) that orchestrates six `FunctionTool`s as a `SequentialAgent`. The two middle-pipeline Gemini calls - `optimize_strategy` and `compute_upside` - dispatch concurrently via `asyncio.gather`, so wallclock latency collapses from `sum` to `max`.
+Layak is a two-service app: a **Next.js 16 frontend** on Vercel and a **FastAPI + ADK-Python backend** on Render. The backend runs a `RootAgent` (gemini-3.1-flash-lite) that orchestrates six `FunctionTool`s as a `SequentialAgent`. The two middle-pipeline Gemini calls - `optimize_strategy` and `compute_upside` - dispatch concurrently via `asyncio.gather`, so wallclock latency collapses from `sum` to `max`.
 
 ```mermaid
 flowchart LR
@@ -156,11 +157,10 @@ flowchart LR
     Frontend --> Backend[FastAPI backend]
     Frontend --> Auth[Firebase Auth]
     Backend --> Firestore[Firestore]
-    Backend --> Gemini[Gemini models]
-    Backend --> Search[Vertex AI Search]
-    Backend --> Secrets[Secret Manager]
-    Frontend --> CloudRun[Google Cloud Run]
-    Backend --> CloudRun
+    Backend --> Gemini[Gemini Developer API]
+    Backend --> Search[Local RAG index]
+    Frontend --> Vercel[Vercel hosting]
+    Backend --> Render[Render hosting]
 ```
 
 <details>
@@ -170,9 +170,9 @@ flowchart LR
 flowchart LR
     Intake[Upload or manual entry] --> Extract[1. Extract<br/>Gemini 3.1 Flash-Lite]
     Extract --> Classify[2. Classify<br/>Gemini 3.1 Flash-Lite]
-    Classify --> Match[3. Match<br/>19 rule modules + Vertex citations]
-    Match --> Optimize[4. Optimize Strategy<br/>Gemini 2.5 Pro structured output]
-    Optimize --> Compute[5. Compute Upside<br/>Gemini 2.5 Pro + Code Execution]
+    Classify --> Match[3. Match<br/>19 rule modules + local RAG citations]
+    Match --> Optimize[4. Optimize Strategy<br/>Gemini 3.1 Flash-Lite structured output]
+    Optimize --> Compute[5. Compute Upside<br/>Gemini 3.1 Flash-Lite + Code Execution]
     Compute --> Generate[6. Generate<br/>WeasyPrint draft PDFs]
     Extract --> SSE[SSE stream to UI]
     Classify --> SSE
@@ -206,16 +206,16 @@ flowchart LR
 <details>
 <summary><strong>Conversational Concierge - Per-Evaluation Grounded Chatbot</strong></summary>
 
-Cik Lay (Pegawai Skim) fronts a floating chatbot on every completed results page so a low-tech-literacy user can ask follow-up questions about _their_ evaluation in plain English, Bahasa Malaysia, or Mandarin. The bot is hard-constrained to the loaded `evaluations/{evalId}` doc plus Vertex AI Search retrieval over the **twenty cached scheme PDFs** - it is **not** a general-purpose chatbot.
+Cik Lay (Pegawai Skim) fronts a floating chatbot on every completed results page so a low-tech-literacy user can ask follow-up questions about _their_ evaluation in plain English, Bahasa Malaysia, or Mandarin. The bot is hard-constrained to the loaded `evaluations/{evalId}` doc plus local RAG retrieval over the **twenty cached scheme PDFs** - it is **not** a general-purpose chatbot.
 
 ```mermaid
 graph TD
     User[User message] --> L1[Layer 1 - Input validator<br/>regex prompt-injection guard + length cap]
     L1 --> L2[Layer 2 - System prompt<br/>identity + Rule 0 language lock + eval-context digest + 5 hard rules]
     L2 --> L3[Layer 3 - Per-turn language reinforcement<br/>appended to user message]
-    L3 --> L4[Layer 4 - Grounding + safety<br/>Vertex AI Search grounding tool + Gemini built-in safety_settings<br/>BLOCK_LOW_AND_ABOVE on 4 harm categories]
+    L3 --> L4[Layer 4 - Grounding + safety<br/>Local RAG grounding passages injected into prompt + Gemini built-in safety_settings<br/>BLOCK_LOW_AND_ABOVE on 4 harm categories]
     L4 --> Gemini[Gemini Flash]
-    L4 --> Search[Vertex AI Search]
+    L4 --> Search[Local RAG index]
     Search --> Gemini
     Gemini --> Draft[Draft response]
     Draft --> L5[Layer 5 - Output validator<br/>citation-drift detector drops &#91;scheme:xxx&#93; markers not in eval's qualifying matches]
@@ -235,7 +235,7 @@ A background discovery agent watches a hardcoded allowlist of authoritative gove
 flowchart TD
     Trigger["Admin clicks<br/>'Run discovery now'"] --> Watcher[Source Watcher<br/>httpx + SHA-256 hash]
     Allowlist["discovery_sources.yaml<br/>6 gazetted URLs"] --> Watcher
-    Watcher -->|content changed| Extractor[Gemini 2.5 Pro<br/>structured-output extractor]
+    Watcher -->|content changed| Extractor[Gemini 3.1 Flash-Lite<br/>structured-output extractor]
     Watcher -->|unchanged| Skip[Skip]
     Extractor -->|confidence >= 0.5| Queue[Moderation queue<br/>discovered_schemes/Firestore]
     Extractor -->|confidence < 0.5| Drop[Drop]
@@ -260,7 +260,7 @@ After matching, an optimizer agent surfaces cross-scheme coordination opportunit
 flowchart LR
     Matches[Matched schemes<br/>+ Profile + Classification] --> TripFilter[Trip filter<br/>pure Python]
     Registry["scheme_interactions.yaml<br/>3 hardcoded rules"] --> TripFilter
-    TripFilter -->|triggered rules| Optimizer[Gemini 2.5 Pro<br/>structured output<br/>+ few-shot prompt]
+    TripFilter -->|triggered rules| Optimizer[Gemini 3.1 Flash-Lite<br/>structured output<br/>+ few-shot prompt]
     TripFilter -->|nothing trips| Empty["Empty state<br/>'No conflicts detected'"]
     Optimizer --> Schema[Pydantic validation<br/>+ registry membership check]
     Schema --> Gate{"Confidence<br/>gate"}
@@ -303,7 +303,7 @@ The endpoint is stateless w.r.t. Firestore - sliders are exploratory and draggin
 <details>
 <summary><strong>Two-Tier Reasoning Surface - Watch the Agent Think</strong></summary>
 
-The pipeline streams two parallel reasoning registers as it runs. Layperson users see a lay narration card (always visible) with one humanised line per step. Anyone curious about the internals can expand a developer transcript with timestamps, tool names, Vertex retrieval hits with scores, and Gemini Code Execution stdout - the same data a backend engineer would see in logs.
+The pipeline streams two parallel reasoning registers as it runs. Layperson users see a lay narration card (always visible) with one humanised line per step. Anyone curious about the internals can expand a developer transcript with timestamps, tool names, local RAG retrieval hits with scores, and Gemini Code Execution stdout - the same data a backend engineer would see in logs.
 
 ```mermaid
 flowchart TD
@@ -328,35 +328,35 @@ The technical layer is PII-clean by contract: full IC numbers, names, and addres
 
 ## 🌀 Google AI Ecosystem
 
-Layak exercises **eight** first-party Google components in one flow:
+Layak's AI and identity stack runs on first-party Google components — Gemini, Gemini Code Execution, `gemini-embedding-001`, ADK-Python, Firebase Auth + Firestore — with hosting on Vercel + Render:
 
-| Layer                | Component                 | Role                                                                                                              |
-| -------------------- | ------------------------- | ----------------------------------------------------------------------------------------------------------------- |
-| 🧠 Brain · 01        | **Gemini 2.5 Pro**        | `RootAgent` orchestrator + `optimize_strategy` (structured output) + `compute_upside` (sandboxed code execution). |
-| 🧠 Brain · 02        | **Gemini 3.1 Flash-Lite** | Multimodal extract (IC + payslip + utility) and household classify. ~5× cheaper than Pro per call.                |
-| 🧠 Brain · 03        | **Gemini Code Execution** | Sandboxed Python on top of 2.5 Pro for annual-RM arithmetic - stdout streamed verbatim to the UI.                 |
-| 📚 Context · 04      | **Vertex AI Search**      | Grounded RAG over the **twenty** cached scheme PDFs. Every rule carries a passage citation.                       |
-| 🎛 Orchestrator · 05 | **ADK-Python v1.31**      | First-party GA agent framework. `SequentialAgent` + `FunctionTool`.                                               |
-| ☁ Lifecycle · 06     | **Cloud Run**             | Two services, both `min-instances=1` with CPU boost.                                                              |
-| 👤 Identity · 07     | **Firebase Auth**         | Google OAuth + Guest mode. ID-token verification on every dashboard call.                                         |
-| 🗄 State · 08        | **Firestore**             | Evaluation history, discovery moderation queue, verified-scheme cache, user preferences.                          |
+| Layer                | Component                 | Role                                                                                                                        |
+| -------------------- | ------------------------- | --------------------------------------------------------------------------------------------------------------------------- |
+| 🧠 Brain · 01        | **Gemini 3.1 Flash-Lite** | `RootAgent` orchestrator + `optimize_strategy` (structured output) + `compute_upside` (sandboxed code execution).           |
+| 🧠 Brain · 02        | **Gemini 3.1 Flash-Lite** | Multimodal extract (IC + payslip + utility) and household classify, on the free Gemini Developer API tier.                  |
+| 🧠 Brain · 03        | **Gemini Code Execution** | Sandboxed Python on top of Flash-Lite for annual-RM arithmetic - stdout streamed verbatim to the UI.                        |
+| 📚 Context · 04      | **Local embedding RAG**   | `gemini-embedding-001` + numpy cosine search over the **twenty** cached scheme PDFs. Every rule carries a passage citation. |
+| 🎛 Orchestrator · 05 | **ADK-Python v1.31**      | First-party GA agent framework. `SequentialAgent` + `FunctionTool`.                                                         |
+| ☁ Lifecycle · 06     | **Vercel + Render**       | Frontend on Vercel, backend on Render (free tier).                                                                          |
+| 👤 Identity · 07     | **Firebase Auth**         | Google OAuth + Guest mode. ID-token verification on every dashboard call.                                                   |
+| 🗄 State · 08        | **Firestore**             | Evaluation history, discovery moderation queue, verified-scheme cache, user preferences.                                    |
 
 ---
 
 ## 🧰 Tech Stack
 
-| Category        | Technology                                                        | Notes                                                                                |
-| --------------- | ----------------------------------------------------------------- | ------------------------------------------------------------------------------------ |
-| Frontend        | Next.js 16 · React 19 · TypeScript 5 · Tailwind CSS 4 · shadcn/ui | Public experience, dashboard, evaluation UI                                          |
-| Backend         | FastAPI · Python 3.12 · Pydantic v2                               | Intake APIs, orchestration, rules, packet generation                                 |
-| Agent Framework | Google ADK for Python v1.31 · `SequentialAgent`                   | `RootAgent` orchestration                                                            |
-| Models          | Gemini 2.5 Pro · Gemini 3.1 Flash-Lite                            | 2.5 Pro for orchestrator / optimizer / upside; 3.1 Flash-Lite for extract + classify |
-| Grounding       | Vertex AI Search (Discovery Engine)                               | Source passage retrieval for provenance                                              |
-| Computation     | Gemini Code Execution                                             | Annual upside calculations                                                           |
-| Document Output | WeasyPrint                                                        | Draft PDF packet generation                                                          |
-| Identity & Data | Firebase Auth · Firestore                                         | Authenticated flows, saved evaluations, quotas, discovery queue                      |
-| Cloud           | Google Cloud Run · Secret Manager · Artifact Registry             | Deployment and runtime secrets                                                       |
-| Tooling         | pnpm · ESLint · Prettier · Husky · lint-staged · ruff             | Workspace and code quality                                                           |
+| Category        | Technology                                                               | Notes                                                                      |
+| --------------- | ------------------------------------------------------------------------ | -------------------------------------------------------------------------- |
+| Frontend        | Next.js 16 · React 19 · TypeScript 5 · Tailwind CSS 4 · shadcn/ui        | Public experience, dashboard, evaluation UI                                |
+| Backend         | FastAPI · Python 3.12 · Pydantic v2                                      | Intake APIs, orchestration, rules, packet generation                       |
+| Agent Framework | Google ADK for Python v1.31 · `SequentialAgent`                          | `RootAgent` orchestration                                                  |
+| Models          | Gemini 3.1 Flash-Lite (free Gemini Developer API)                        | All pipeline steps on Flash-Lite; in-family fallback gemini-2.5-flash-lite |
+| Grounding       | Local embedding RAG (gemini-embedding-001 + numpy)                       | Source passage retrieval for provenance                                    |
+| Computation     | Gemini Code Execution                                                    | Annual upside calculations                                                 |
+| Document Output | WeasyPrint                                                               | Draft PDF packet generation                                                |
+| Identity & Data | Firebase Auth · Firestore                                                | Authenticated flows, saved evaluations, quotas, discovery queue            |
+| Cloud           | Vercel (frontend) · Render (backend) · Firebase Spark (Auth + Firestore) | Hosting, runtime secrets, authenticated state                              |
+| Tooling         | pnpm · ESLint · Prettier · Husky · lint-staged · ruff                    | Workspace and code quality                                                 |
 
 ---
 
@@ -372,15 +372,14 @@ Layak exercises **eight** first-party Google components in one flow:
 
 ```bash
 pnpm install          # installs every workspace package
-cp .env.example .env  # then fill in the GCP + Firebase values below
+cp .env.example .env  # then fill in the Gemini + Firebase values below
 ```
 
 Required environment variables:
 
-- `GOOGLE_CLOUD_PROJECT`
-- `GOOGLE_CLOUD_LOCATION`
-- `VERTEX_AI_SEARCH_DATA_STORE`
-- `VERTEX_AI_SEARCH_LOCATION`
+- `GEMINI_API_KEY` (free key from <https://aistudio.google.com/apikey>)
+- `GOOGLE_GENAI_USE_VERTEXAI=FALSE`
+- `LAYAK_CORS_ORIGINS`
 - `NEXT_PUBLIC_BACKEND_URL`
 - `NEXT_PUBLIC_FIREBASE_*`
 - `FIREBASE_ADMIN_KEY`
@@ -388,10 +387,13 @@ Required environment variables:
 ### Run Locally
 
 ```bash
+# one-time - build the committed local RAG index from the scheme PDFs
+cd backend && GEMINI_API_KEY=... python -m scripts.build_rag_index --verbose
+
 # in terminal 1 - frontend
 pnpm dev                                                # → http://localhost:3000
 
-# in terminal 2 - backend
+# in terminal 2 - backend (GEMINI_API_KEY in backend/.env)
 cd backend && uvicorn app.main:app --reload --port 8080 # → http://localhost:8080
 ```
 
@@ -409,37 +411,31 @@ pnpm format      # prettier --write across the repo
 
 ## ☁ Deployment
 
-Both services deploy to Google Cloud Run, fronted by custom domains. Current production URLs:
-
-- **Frontend:** <https://layak.tech> (`www.layak.tech` → 308 redirect to apex)
-- **Backend:** <https://api.layak.tech>
+The frontend deploys to **Vercel** (Next.js native, free Hobby tier) and the backend deploys to **Render** (Docker web service, free tier; cold-starts ~30-60s after idle). Live demo: <https://layak.tech>.
 
 <details>
-<summary><strong>Reference <code>gcloud run deploy</code> Commands</strong></summary>
+<summary><strong>Deploy Steps</strong></summary>
+
+**One-time - build the committed RAG index** (commit `backend/data/rag_index/`):
 
 ```bash
-# Frontend
-gcloud run deploy layak-frontend \
-  --source frontend \
-  --region asia-southeast1 \
-  --min-instances 1 --cpu-boost --allow-unauthenticated \
-  --set-build-env-vars NEXT_PUBLIC_BACKEND_URL=https://api.layak.tech \
-  --memory 512Mi --timeout 60
-
-# Backend
-gcloud run deploy layak-backend \
-  --source backend \
-  --region asia-southeast1 \
-  --min-instances 1 --cpu-boost --allow-unauthenticated \
-  --set-env-vars GOOGLE_CLOUD_PROJECT=...,GOOGLE_CLOUD_LOCATION=global,VERTEX_AI_SEARCH_DATA_STORE=layak-schemes-v1,VERTEX_AI_SEARCH_LOCATION=global \
-  --set-secrets FIREBASE_ADMIN_KEY=firebase-admin-key:latest \
-  --memory 2Gi --timeout 300
+cd backend && GEMINI_API_KEY=... python -m scripts.build_rag_index --verbose
 ```
+
+**Frontend → Vercel:**
+
+1. Connect the repo on Vercel and set the project root to `frontend/`.
+2. Set env vars `NEXT_PUBLIC_FIREBASE_*` and `NEXT_PUBLIC_BACKEND_URL`.
+
+**Backend → Render:**
+
+1. Use the `render.yaml` blueprint at the repo root to provision the Docker web service.
+2. Set secrets `GEMINI_API_KEY`, `FIREBASE_ADMIN_KEY`, and `LAYAK_CORS_ORIGINS` (plus `GOOGLE_GENAI_USE_VERTEXAI=FALSE`).
 
 </details>
 
 > [!IMPORTANT]
-> If these URLs or commands drift, the live runtime configuration and `.github/workflows/cloud-run-deploy.yml` are the source of truth - not this README.
+> If these URLs or steps drift, the live Vercel / Render configuration and `render.yaml` are the source of truth - not this README.
 
 ---
 
@@ -449,7 +445,7 @@ gcloud run deploy layak-backend \
 > Layak is a **preparation** tool, not a submission tool. It never writes to `bantuantunai.hasil.gov.my`, the LHDN portal, or any other live agency endpoint.
 
 - 🚫 **No Live Submission - Ever.** Outputs are drafts. The citizen submits through the official channel.
-- 🧾 **No Unverified Claim** reaches the UI. If Vertex AI Search returns no passage for a rule, the rule drops out of the ranking.
+- 🧾 **No Unverified Claim** reaches the UI. If local RAG returns no passage for a rule, the rule drops out of the ranking.
 - 🎭 **Synthetic Demo Documents Only.** Every MyKad, payslip, and utility bill used in our demo fixtures is fictional and watermarked `SYNTHETIC - FOR DEMO ONLY`.
 - ⚖ **No Final Legal Determination** is claimed. Every explanation uses _"you appear to qualify ... the agency confirms on application."_
 - 🗑 **30-Day Retention** on free-tier history, cascade-delete on account deletion, JSON export on demand - PDPA 2010-aligned.
@@ -508,10 +504,12 @@ Layak/
 │   ├── app/agents/          #   ADK-Python RootAgent + 6 FunctionTools + chat / optimizer prompts
 │   ├── app/rules/           #   19 typed Pydantic rule modules (STR, JKM, LHDN, i-Saraan, PERKESO, …)
 │   ├── app/routes/          #   FastAPI routes (auth, evaluations, chat, what_if, schemes, admin, user, quota)
-│   ├── app/services/        #   Vertex AI Search client, rate limit, Firestore wrappers, warmup
+│   ├── app/services/        #   local RAG client, rate limit, Firestore wrappers, warmup
 │   ├── data/schemes/        #   20 committed gazetted source PDFs (source of truth)
-│   └── data/discovered/     #   YAML manifests from approved discovery candidates
-├── .github/workflows/       # cloud-run-deploy.yml
+│   ├── data/rag_index/      #   committed local RAG index (vectors.npz + chunks.json)
+│   ├── data/discovered/     #   YAML manifests from approved discovery candidates
+│   └── scripts/             #   build_rag_index.py builds the committed RAG index
+├── render.yaml              # Render backend blueprint
 ├── LICENSE                  # MIT (+ attribution courtesy clause)
 ├── package.json             # root workspace orchestrator
 ├── pnpm-workspace.yaml

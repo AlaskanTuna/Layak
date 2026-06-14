@@ -281,7 +281,7 @@
         {
           "label": "Match",
           "title": "Run deterministic rules\nacross the scheme corpus.",
-          "body": "The rule engine checks the structured profile against 20 tracked scheme entries across 19 rule modules. Vertex AI Search grounds citations when available; deterministic rules decide eligibility."
+          "body": "The rule engine checks the structured profile against 20 tracked scheme entries across 19 rule modules. Semantic Search grounds citations when available; deterministic rules decide eligibility."
         },
         {
           "label": "Strategy",
@@ -322,7 +322,7 @@
         {
           "docCode": "FAQ-02",
           "question": "Which schemes does Layak cover today?",
-          "body": "Layak currently tracks 20 scheme entries across cash aid, welfare, education, healthcare, tax relief, retirement, subsidy credits, and required contributions. Eligibility and amounts come from deterministic rules; Vertex AI Search grounds the citations where available."
+          "body": "Layak currently tracks 20 scheme entries across cash aid, welfare, education, healthcare, tax relief, retirement, subsidy credits, and required contributions. Eligibility and amounts come from deterministic rules; Semantic Search grounds the citations where available."
         },
         {
           "docCode": "FAQ-03",
@@ -337,7 +337,7 @@
         {
           "docCode": "FAQ-05",
           "question": "How accurate are the figures Layak shows?",
-          "body": "Eligibility and amount logic is deterministic. Each match carries source citations, with Vertex AI Search used for primary grounding when available and cached agency citations as fallback. The agency still makes the final call on every application."
+          "body": "Eligibility and amount logic is deterministic. Each match carries source citations, with Semantic Search used for primary grounding when available and cached agency citations as fallback. The agency still makes the final call on every application."
         },
         {
           "docCode": "FAQ-06",
@@ -379,7 +379,7 @@
       "pipelineSubtitle": "Streaming · step-by-step",
       "step1Body": "Gemini Vision reads your MyKad, payslip, and utility bill and pulls structured profile fields — name, IC, monthly income, household composition, address.",
       "step2Body": "Household size, per-capita monthly income, filer category (Form B vs BE), and counts of children under 18 and elderly dependants 60+ are derived from the extracted profile.",
-      "step3Body": "The rule engine checks your derived profile against 20 tracked scheme entries across 19 rule modules. Vertex AI Search grounds the primary citation when available, and cached agency citations stay as fallback.",
+      "step3Body": "The rule engine checks your derived profile against 20 tracked scheme entries across 19 rule modules. Semantic Search grounds the primary citation when available, and cached agency citations stay as fallback.",
       "step4Body": "Gemini reasons across the matched schemes after deterministic trigger filtering to surface 0-3 grounded advisories.",
       "step5Body": "Gemini writes a Python snippet and runs it in Google's code sandbox to sum your annual upside across every qualifying scheme. The generated code and its output stream live to the UI, so you see the full working — not just a final number.",
       "step6Body": "WeasyPrint renders draft PDFs only for qualifying schemes with packet templates. Every page carries the watermark: DRAFT ? NOT SUBMITTED. Subsidy-only and required-contribution cards stay out of the inline packet preview.",
@@ -1037,7 +1037,7 @@
       "emptyList": "Scheme matches will appear here after your first evaluation completes.",
       "eligibleSchemesCount": "Eligible Schemes ({{count}})",
       "sourcesLabel": "Sources ({{count}})",
-      "sourceRagBadge": "Vertex AI Search",
+      "sourceRagBadge": "Semantic Search",
       "sourceGovBadge": "Gov source",
       "sourceOpen": "Open source"
     },

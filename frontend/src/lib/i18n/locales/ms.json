@@ -246,7 +246,7 @@
         {
           "label": "Padan",
           "title": "Jalankan peraturan deterministik\nmerentas korpus skim.",
-          "body": "Enjin peraturan menyemak profil berstruktur terhadap 20 entri skim yang dijejaki merentas 19 modul peraturan. Vertex AI Search mengasaskan petikan apabila tersedia; peraturan deterministik menentukan kelayakan."
+          "body": "Enjin peraturan menyemak profil berstruktur terhadap 20 entri skim yang dijejaki merentas 19 modul peraturan. Carian Semantik mengasaskan petikan apabila tersedia; peraturan deterministik menentukan kelayakan."
         },
         {
           "label": "Strategi",
@@ -287,7 +287,7 @@
         {
           "docCode": "FAQ-02",
           "question": "Skim manakah yang Layak liputi hari ini?",
-          "body": "Layak kini menjejaki 20 entri skim merentas bantuan tunai, kebajikan, pendidikan, kesihatan, pelepasan cukai, persaraan, kredit subsidi, dan caruman wajib. Kelayakan dan jumlah datang daripada peraturan deterministik; Vertex AI Search mengasaskan petikan apabila tersedia."
+          "body": "Layak kini menjejaki 20 entri skim merentas bantuan tunai, kebajikan, pendidikan, kesihatan, pelepasan cukai, persaraan, kredit subsidi, dan caruman wajib. Kelayakan dan jumlah datang daripada peraturan deterministik; Carian Semantik mengasaskan petikan apabila tersedia."
         },
         {
           "docCode": "FAQ-03",
@@ -302,7 +302,7 @@
         {
           "docCode": "FAQ-05",
           "question": "Sejauh manakah ketepatan angka yang Layak tunjukkan?",
-          "body": "Logik kelayakan dan jumlah adalah deterministik. Setiap padanan membawa petikan sumber, dengan Vertex AI Search digunakan untuk asas utama apabila tersedia dan petikan agensi tersimpan sebagai sandaran. Agensi masih membuat keputusan akhir bagi setiap permohonan."
+          "body": "Logik kelayakan dan jumlah adalah deterministik. Setiap padanan membawa petikan sumber, dengan Carian Semantik digunakan untuk asas utama apabila tersedia dan petikan agensi tersimpan sebagai sandaran. Agensi masih membuat keputusan akhir bagi setiap permohonan."
         },
         {
           "docCode": "FAQ-06",
@@ -379,7 +379,7 @@
       "pipelineSubtitle": "Penstriman · langkah demi langkah",
       "step1Body": "Gemini Vision membaca MyKad, slip gaji, dan bil utiliti anda, kemudian mengeluarkan medan profil berstruktur — nama, IC, pendapatan bulanan, komposisi isi rumah, alamat.",
       "step2Body": "Saiz isi rumah, pendapatan bulanan per kapita, kategori pemfail (Borang B berbanding BE), serta bilangan anak di bawah 18 tahun dan tanggungan warga emas 60+ diperoleh daripada profil yang diekstrak.",
-      "step3Body": "Enjin peraturan menyemak profil anda terhadap 20 entri skim yang dijejaki merentas 19 modul peraturan. Vertex AI Search mengasaskan petikan utama apabila tersedia, dan petikan agensi tersimpan kekal sebagai sandaran.",
+      "step3Body": "Enjin peraturan menyemak profil anda terhadap 20 entri skim yang dijejaki merentas 19 modul peraturan. Carian Semantik mengasaskan petikan utama apabila tersedia, dan petikan agensi tersimpan kekal sebagai sandaran.",
       "step4Body": "Gemini menaakul merentas skim yang dipadankan selepas penapisan pencetus deterministik untuk mengeluarkan 0-3 nasihat strategi.",
       "step5Body": "Gemini menulis skrip Python dan menjalankannya dalam kotak pasir kod Google untuk menjumlahkan faedah tahunan anda merentasi setiap skim yang layak. Kod yang dihasilkan dan keluarannya dihantar langsung ke antara muka, jadi anda dapat melihat keseluruhan pengiraan — bukan hanya angka akhir.",
       "step6Body": "WeasyPrint menjana PDF draf hanya untuk skim layak yang mempunyai templat paket. Setiap halaman membawa tanda air: DRAFT ? NOT SUBMITTED. Kad subsidi sahaja dan caruman wajib tidak muncul dalam pratonton paket sebaris.",
@@ -1037,7 +1037,7 @@
       "emptyList": "Padanan skim akan muncul di sini selepas penilaian pertama anda selesai.",
       "eligibleSchemesCount": "Skim yang layak ({{count}})",
       "sourcesLabel": "Sumber ({{count}})",
-      "sourceRagBadge": "Vertex AI Search",
+      "sourceRagBadge": "Carian Semantik",
       "sourceGovBadge": "Sumber kerajaan",
       "sourceOpen": "Buka sumber"
     },

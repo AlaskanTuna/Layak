@@ -54,7 +54,7 @@ _AGENCY = "PERKESO (Social Security Organisation)"
 _PORTAL_URL = "https://eis.perkeso.gov.my"
 _SOURCE_PDF = "perkeso-sip-coverage.pdf"
 
-# Vertex AI Search grounds the primary citation against the live source PDF.
+# Local RAG grounds the primary citation against the live source PDF.
 # URI filter constrains the snippet ranker to the expected document so the
 # rule cannot accidentally cite a different scheme's PDF.
 _RAG_QUERY = getenv(

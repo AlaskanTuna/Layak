@@ -68,7 +68,7 @@ _PORTAL_URL = "https://mytax.hasil.gov.my"
 _SCHEME_NAME_FORM_B = "LHDN Form B — five YA2025 reliefs"
 _SCHEME_NAME_FORM_BE = "LHDN Form BE — five YA2025 reliefs"
 
-# Vertex AI Search grounds the primary citation against the live source PDF.
+# Local RAG grounds the primary citation against the live source PDF.
 # URI filter constrains the snippet ranker to the expected document so the
 # rule cannot accidentally cite a different scheme's PDF.
 _RAG_QUERY = getenv("LAYAK_RAG_QUERY_LHDN_FORM_B", "individual personal relief paragraph 46 RM9000")

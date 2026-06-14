@@ -38,7 +38,7 @@ _AGENCY = "KPM (Ministry of Education Malaysia)"
 _PORTAL_URL = "https://www.moe.gov.my/en/bantuan-pembelajaran-menu/skim-pinjaman-buku-teks-spbt"
 _SOURCE_PDF = "spbt-circular.pdf"
 
-# Vertex AI Search grounds the primary citation against the live source PDF.
+# Local RAG grounds the primary citation against the live source PDF.
 # URI filter constrains the snippet ranker to the expected document so the
 # rule cannot accidentally cite a different scheme's PDF.
 _RAG_QUERY = getenv(

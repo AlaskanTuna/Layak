@@ -8,7 +8,7 @@ Two pure functions per pipeline step:
 The lay tier is editorial — one ≤ 80-char headline (action-oriented, no
 jargon, no scheme IDs) plus an optional ≤ 40-char data point (the single
 most useful number for the step). The technical tier is developer-grade —
-1-N preformatted log lines including timestamps, model latencies, Vertex
+1-N preformatted log lines including timestamps, model latencies, RAG
 hit scores, and Code Execution stdout.
 
 PII contract (Phase 12):
@@ -198,7 +198,7 @@ def narrate_match_technical(
         for cite in m.rule_citations[:1]:
             # Surface the source PDF + page so reviewers can trace the
             # match; relevance score isn't on RuleCitation directly, but
-            # the per-rule modules push the Vertex passage hash into
+            # the per-rule modules push the RAG passage hash into
             # `passage` — we trim to 40 chars to keep the line readable.
             citation_part = f" cite={cite.source_pdf}:{cite.page_ref}"
         lines.append(f"  {marker} {m.scheme_id}{rm_part}{citation_part}")

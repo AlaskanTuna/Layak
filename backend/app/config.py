@@ -22,7 +22,7 @@ What lives here:
       `LAYAK_HEAVY_MODEL_FALLBACK`, `LAYAK_ORCHESTRATOR_MODEL`)
     - Free-tier rate-limit knobs (`LAYAK_FREE_TIER_LIMIT`,
       `LAYAK_FREE_TIER_WINDOW_HOURS`)
-    - Per-rule Vertex AI Search query strings
+    - Per-rule local RAG query strings
       (`LAYAK_RAG_QUERY_<SCHEME_ID>`)
 
 What does NOT live here:

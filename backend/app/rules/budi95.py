@@ -53,7 +53,7 @@ _AGENCY = "MOF (Ministry of Finance Malaysia)"
 _PORTAL_URL = "https://www.budi95.gov.my/"
 _SOURCE_PDF = "budi95-press-release.pdf"
 
-# Vertex AI Search grounds the primary citation against the live source PDF.
+# Local RAG grounds the primary citation against the live source PDF.
 # URI filter constrains the snippet ranker to the expected document so the
 # rule cannot accidentally cite a different scheme's PDF.
 _RAG_QUERY = getenv("LAYAK_RAG_QUERY_BUDI95", "BUDI95 petrol diesel subsidy eligibility")

@@ -167,15 +167,15 @@ def _patch_gemini_stream(
     grounding_uris: list[str] | None = None,
 ) -> MagicMock:
     """Patch `app.services.chat.get_client` so generate_content_stream returns
-    the canned chunks. Also stubs build_grounding_tool to None so the
-    test doesn't try to resolve a real Vertex AI Search datastore."""
+    the canned chunks. Also stubs `retrieve_grounding_passages` to [] so the
+    test doesn't hit the local RAG index (grounding_unavailable=True)."""
     from app.services import chat as chat_module
 
     fake_client = MagicMock()
     fake_client.models.generate_content_stream.return_value = _fake_stream(chunks, grounding_uris)
     monkeypatch.setattr(chat_module, "get_client", lambda: fake_client)
-    # Skip real Vertex AI Search datastore resolution — return a stub Tool.
-    monkeypatch.setattr(chat_module, "build_grounding_tool", lambda: None)
+    # Skip real local RAG retrieval — no grounding passages.
+    monkeypatch.setattr(chat_module, "retrieve_grounding_passages", lambda *a, **k: [])
     return fake_client
 
 

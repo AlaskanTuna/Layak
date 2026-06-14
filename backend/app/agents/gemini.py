@@ -1,5 +1,5 @@
-# Vertex AI mode (not AI Studio) — AI Studio API key silently demotes billing tier.
-# Location pinned to "global" because asia-southeast1 only publishes a subset of the model catalogue.
+# Gemini Developer API (AI Studio) mode — free tier, API-key auth.
+# Project/billing-free: set GEMINI_API_KEY (see .env.example).
 
 from __future__ import annotations
 
@@ -45,11 +45,9 @@ LANGUAGE_INSTRUCTION_BLOCK: dict[SupportedLanguage, str] = {
 
 FAST_MODEL = getenv("LAYAK_FAST_MODEL", "gemini-3.1-flash-lite")
 WORKER_MODEL = getenv("LAYAK_WORKER_MODEL", "gemini-3.1-flash-lite")
-HEAVY_MODEL = getenv("LAYAK_HEAVY_MODEL", "gemini-2.5-pro")
-HEAVY_MODEL_FALLBACK = getenv("LAYAK_HEAVY_MODEL_FALLBACK", "gemini-2.5-pro")
-ORCHESTRATOR_MODEL = getenv("LAYAK_ORCHESTRATOR_MODEL", "gemini-2.5-pro")
-
-_DEFAULT_LOCATION = "global"
+HEAVY_MODEL = getenv("LAYAK_HEAVY_MODEL", "gemini-3.1-flash-lite")
+HEAVY_MODEL_FALLBACK = getenv("LAYAK_HEAVY_MODEL_FALLBACK", "gemini-2.5-flash-lite")
+ORCHESTRATOR_MODEL = getenv("LAYAK_ORCHESTRATOR_MODEL", "gemini-3.1-flash-lite")
 
 _DOTENV_CANDIDATES = (
     Path(__file__).resolve().parent.parent.parent.parent / ".env",
@@ -73,32 +71,25 @@ def _load_var_from_dotenv(key: str) -> str | None:
     return None
 
 
-def _resolve_project() -> str:
-    project = os.environ.get("GOOGLE_CLOUD_PROJECT") or _load_var_from_dotenv("GOOGLE_CLOUD_PROJECT")
-    if not project:
-        raise RuntimeError(
-            "GOOGLE_CLOUD_PROJECT not set. Populate the repo-root .env "
-            "(see .env.example) or `gcloud config set project <id>` and "
-            "export GOOGLE_CLOUD_PROJECT before starting uvicorn."
-        )
-    return project
-
-
-def _resolve_location() -> str:
-    return (
-        os.environ.get("GOOGLE_CLOUD_LOCATION")
-        or _load_var_from_dotenv("GOOGLE_CLOUD_LOCATION")
-        or _DEFAULT_LOCATION
+def _resolve_api_key() -> str:
+    key = (
+        os.environ.get("GEMINI_API_KEY")
+        or os.environ.get("GOOGLE_API_KEY")
+        or _load_var_from_dotenv("GEMINI_API_KEY")
+        or _load_var_from_dotenv("GOOGLE_API_KEY")
     )
+    if not key:
+        raise RuntimeError(
+            "GEMINI_API_KEY not set. Create a free key at "
+            "https://aistudio.google.com/apikey and populate the repo-root "
+            ".env (see .env.example), or export GEMINI_API_KEY before starting uvicorn."
+        )
+    return key
 
 
 @lru_cache(maxsize=1)
 def get_client() -> genai.Client:
-    return genai.Client(
-        vertexai=True,
-        project=_resolve_project(),
-        location=_resolve_location(),
-    )
+    return genai.Client(api_key=_resolve_api_key())
 
 
 # 3 total attempts (2 retries) caps worst-case latency around the SSE 60s budget.

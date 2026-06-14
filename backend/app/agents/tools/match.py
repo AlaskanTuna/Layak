@@ -80,10 +80,10 @@ async def match_schemes(
     `summary` + `why_qualify` strings render in the user's language.
 
     Rule modules run concurrently via `asyncio.to_thread` — each rule's
-    `_citations()` may hit Vertex AI Search synchronously over gRPC, so
+    `_citations()` may call the local RAG embedding API synchronously, so
     serialising all 19 modules previously bottlenecked the Match step at
     sum(per-rule latency). Concurrent dispatch caps it at max(per-rule),
-    which matters now that more rules cite from the live data store.
+    which matters now that more rules cite from the local RAG index.
     """
     results = await asyncio.gather(
         *(asyncio.to_thread(module.match, profile, language=language) for module in _RULES)

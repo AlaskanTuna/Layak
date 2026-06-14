@@ -6,12 +6,11 @@ executable source + stdout. We parse both out of the response parts and
 populate `ComputeUpsideResult` — the frontend pipeline step renders the
 `<pre>`-block exactly as Gemini produced it.
 
-This step uses `HEAVY_MODEL` (gemini-2.5-pro by default — see
-`app/agents/gemini.py`). The Vertex AI cutover (away from the AI Studio key)
-means billing flows to the project's GCC, so we can safely run the more
-capable model here. `gemini-2.5-pro` supports both `code_execution` and
-`response_mime_type=application/json` in the `global` location. Override
-via `LAYAK_HEAVY_MODEL` if a future model becomes preferred.
+This step uses `HEAVY_MODEL` (gemini-3.1-flash-lite by default — see
+`app/agents/gemini.py`). The total returned in `ComputeUpsideResult` is
+computed locally in Python; Gemini's `code_execution` tool only renders the
+display snippet + stdout table. Override via `LAYAK_HEAVY_MODEL` (e.g.
+`gemini-2.5-flash`) if a step needs broader tool support on the free tier.
 """
 
 from __future__ import annotations

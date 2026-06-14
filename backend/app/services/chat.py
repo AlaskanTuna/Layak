@@ -1,4 +1,4 @@
-"""Chat orchestration: guardrails + Vertex AI Search grounding + streaming
+"""Chat orchestration: guardrails + local RAG grounding + streaming
 Gemini call. Sits between `app/routes/chat.py` (request lifecycle) and
 `app/agents/gemini.py` + `app/agents/chat_prompt.py` (LLM contract).
 
@@ -7,7 +7,7 @@ Five guardrail layers:
     1. System prompt hard constraints  → app/agents/chat_prompt.py
     2. `safety_settings` BLOCK_LOW_AND_ABOVE on the four harm categories
     3. Input validator — regex + length cap (this module)
-    4. Vertex AI Search grounding — first-class retrieval Tool
+    4. Local RAG grounding — scheme-PDF passages injected into the prompt
     5. Output validator — citation drift detection (this module)
 """
 
@@ -30,6 +30,7 @@ from app.agents.gemini import (
 )
 from app.config import getenv
 from app.schema.chat import (
+    MAX_CITATION_SNIPPET_CHARS,
     MAX_MESSAGE_CHARS,
     ChatCitation,
     ChatDoneEvent,
@@ -40,7 +41,7 @@ from app.schema.chat import (
 )
 from app.schema.events import ErrorCategory
 from app.schema.locale import SupportedLanguage
-from app.services.vertex_ai_search import _resolve_data_store, _resolve_location
+from app.services.vertex_ai_search import RetrievedPassage, search_passage
 
 _logger = logging.getLogger(__name__)
 
@@ -103,56 +104,51 @@ def validate_chat_input(message: str) -> ErrorCategory | None:
 
 
 # -----------------------------------------------------------------------------
-# Vertex AI Search grounding tool
+# Guardrail #4 — local RAG grounding
 # -----------------------------------------------------------------------------
 
-# Discovery Engine "default_collection" is a magic string — the seed script
-# (backend/scripts/seed_vertex_ai_search.py) provisions every data store under
-# this collection by Discovery-Engine convention. Keep in sync with
-# `vertex_ai_search.py::_serving_config_path`.
-_COLLECTION = "default_collection"
+# How many scheme-PDF passages to retrieve and inject as grounding context.
+_GROUNDING_TOP_K = 4
 
 
-def _datastore_resource_path() -> str | None:
-    """Build the fully-qualified Vertex AI Search datastore resource path.
+def retrieve_grounding_passages(query: str, *, top_k: int = _GROUNDING_TOP_K) -> list[RetrievedPassage]:
+    """Retrieve scheme-PDF passages from the local embedding index.
 
-    Uses `_resolve_data_store` + `_resolve_location` from the existing
-    rule-citation helper to pick up the same `LAYAK_VERTEX_AI_SEARCH_*`
-    env-var overrides. Returns None if the project ID isn't set, which
-    flips the call to the no-grounding fallback path.
+    Fail-open: returns [] when retrieval is unavailable (no key / no index),
+    which flips the chat call to no-grounding mode — the `ChatDoneEvent` is
+    stamped `grounding_unavailable=True` so the UI can surface a caveat. This
+    mirrors the rule-engine's RAG posture.
     """
-    try:
-        from app.agents.gemini import _resolve_project
-
-        project = _resolve_project()
-    except Exception:  # noqa: BLE001 — fail-open per grounding contract.
-        _logger.exception("Could not resolve GCP project for chat grounding; flipping to no-grounding mode")
-        return None
-    location = _resolve_location()
-    data_store = _resolve_data_store()
-    return f"projects/{project}/locations/{location}/collections/{_COLLECTION}/dataStores/{data_store}"
+    return search_passage(query, top_k=top_k)
 
 
-def build_grounding_tool() -> types.Tool | None:
-    """Return the Vertex AI Search retrieval tool, or None if unavailable.
+def _grounding_context_block(passages: list[RetrievedPassage]) -> str:
+    """Render retrieved passages into a system-prompt grounding block."""
+    lines = [
+        "Grounding context — passages retrieved from the official scheme PDFs. "
+        "Ground your answer in these; cite the source PDF when you use one:",
+    ]
+    for passage in passages:
+        lines.append(f"- [{passage.source_uri}] {passage.passage_text}")
+    return "\n".join(lines)
 
-    Returning None signals to `stream_chat_response` that grounding is
-    unreachable — the call is retried without the tool and the
-    `ChatDoneEvent` is stamped `grounding_unavailable=True` so the UI can
-    surface a caveat. Fail-open mirrors the rule-engine's RAG posture.
-    """
-    datastore = _datastore_resource_path()
-    if datastore is None:
-        return None
-    try:
-        return types.Tool(
-            retrieval=types.Retrieval(
-                vertex_ai_search=types.VertexAISearch(datastore=datastore)
+
+def passages_to_chat_citations(passages: list[RetrievedPassage]) -> list[ChatCitation]:
+    """Convert retrieved passages into ChatCitation entries (dedup by source PDF)."""
+    citations: list[ChatCitation] = []
+    seen: set[str] = set()
+    for passage in passages:
+        if passage.source_uri in seen:
+            continue
+        seen.add(passage.source_uri)
+        citations.append(
+            ChatCitation(
+                source_pdf=passage.source_uri or None,
+                snippet=passage.passage_text[:MAX_CITATION_SNIPPET_CHARS],
+                source_uri=passage.source_uri or None,
             )
         )
-    except Exception:  # noqa: BLE001 — never fail the chat call on tool config.
-        _logger.exception("Could not construct Vertex AI Search grounding tool")
-        return None
+    return citations
 
 
 # -----------------------------------------------------------------------------
@@ -257,8 +253,8 @@ def extract_inline_scheme_citations(
 def extract_grounding_citations(response_chunk: object) -> list[ChatCitation]:
     """Best-effort parse of `grounding_metadata` into `ChatCitation` entries.
 
-    The Vertex AI Search retrieval tool emits grounding chunks with URIs
-    pointing at the indexed scheme PDFs. Shape varies across SDK versions
+    Retained as a defensive parser — the local-RAG path injects grounding into
+    the prompt, so Gemini rarely emits grounding_metadata now. Shape varies by SDK
     (`grounding_chunks`, `grounding_supports`, `web` vs `retrieved_context`)
     so we descend defensively and skip anything we can't parse.
     """
@@ -326,14 +322,14 @@ async def stream_chat_response(
     contents = _history_to_contents(request.history, request.message)
     valid_ids = qualifying_scheme_ids(eval_doc)
 
-    grounding_tool = build_grounding_tool()
-    grounding_unavailable = grounding_tool is None
-    tools = [grounding_tool] if grounding_tool is not None else []
+    grounding_passages = retrieve_grounding_passages(request.message)
+    grounding_unavailable = not grounding_passages
+    if grounding_passages:
+        system_instruction = f"{system_instruction}\n\n{_grounding_context_block(grounding_passages)}"
 
     config = types.GenerateContentConfig(
         system_instruction=system_instruction,
         safety_settings=_safety_settings(),
-        tools=tools or None,
         temperature=0.2,
     )
 
@@ -357,8 +353,8 @@ async def stream_chat_response(
 
     client = get_client()
     accumulated_text = ""
-    accumulated_grounding: list[ChatCitation] = []
-    seen_grounding_uris: set[str] = set()
+    accumulated_grounding: list[ChatCitation] = passages_to_chat_citations(grounding_passages)
+    seen_grounding_uris: set[str] = {c.source_uri for c in accumulated_grounding if c.source_uri}
 
     try:
         stream = client.models.generate_content_stream(

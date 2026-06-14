@@ -3,11 +3,10 @@
 Fires two best-effort sync calls during the FastAPI lifespan startup so the
 first user-facing chat request doesn't pay cold-start cost on either:
 
-    1. Gemini (`gemini-3.1-flash-lite` via FAST_MODEL) — Vertex AI model warm-up.
-       Cold first-token can be 3-5 s after a few minutes of idle traffic in the
-       project.
-    2. Discovery Engine (`layak-schemes-v1`) — the retrieval Tool's cold-path
-       can add ~500 ms - 2 s on the first query of a session.
+    1. Gemini (`gemini-3.1-flash-lite` via FAST_MODEL) — Developer API model
+       warm-up. Cold first-token can be 3-5 s after a few minutes of idle.
+    2. Local RAG index — loads the committed embedding matrix + fires one query
+       embedding so the first retrieval of a session is hot.
 
 Both calls run via `asyncio.to_thread` because the underlying SDKs are sync.
 Failures are logged and swallowed — warm-up never breaks startup. Toggleable
@@ -39,7 +38,7 @@ def _warmup_gemini() -> float:
     """Fire one minimal `generate_content` against the chat model.
 
     `max_output_tokens=1` + `temperature=0` keeps the call sub-second under
-    normal conditions while still triggering the model + Vertex AI auth
+    normal conditions while still triggering the model + Developer API auth
     handshake that dominates first-call latency.
     """
     from google.genai import types
@@ -60,11 +59,11 @@ def _warmup_gemini() -> float:
     return time.perf_counter() - start
 
 
-def _warmup_discovery_engine() -> float:
-    """Fire one tiny Discovery Engine query so the data store is hot.
+def _warmup_rag() -> float:
+    """Fire one tiny local RAG query so the index is loaded + hot.
 
     Reuses `search_passage` (the helper rule modules already use) so the
-    cached `SearchServiceClient` is the one chat will hit at request time.
+    cached index matrix is the one chat will hit at request time.
     """
     from app.services.vertex_ai_search import search_passage
 
@@ -84,13 +83,13 @@ async def warmup_chat_dependencies() -> None:
         _logger.info("Chat warmup skipped (LAYAK_WARMUP_ENABLED is false)")
         return
 
-    _logger.info("Chat warmup starting (Gemini + Discovery Engine)")
+    _logger.info("Chat warmup starting (Gemini + local RAG)")
     results = await asyncio.gather(
         asyncio.to_thread(_warmup_gemini),
-        asyncio.to_thread(_warmup_discovery_engine),
+        asyncio.to_thread(_warmup_rag),
         return_exceptions=True,
     )
-    for name, res in zip(("gemini", "discovery_engine"), results, strict=True):
+    for name, res in zip(("gemini", "rag"), results, strict=True):
         if isinstance(res, BaseException):
             _logger.warning("Chat warmup %s failed (non-fatal): %s", name, res)
         else:

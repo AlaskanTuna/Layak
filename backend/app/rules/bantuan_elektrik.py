@@ -35,7 +35,7 @@ _AGENCY = "TNB (Tenaga Nasional Berhad) + PETRA (Ministry of Energy Transition)"
 _PORTAL_URL = "https://www.tnb.com.my/residential/discounts-rebates-offers"
 _SOURCE_PDF = "tnb-rebate-eligibility.pdf"
 
-# Vertex AI Search grounds the primary citation against the live source PDF.
+# Local RAG grounds the primary citation against the live source PDF.
 # URI filter constrains the snippet ranker to the expected document so the
 # rule cannot accidentally cite a different scheme's PDF.
 _RAG_QUERY = getenv(

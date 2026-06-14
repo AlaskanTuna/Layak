@@ -10,7 +10,7 @@ v1 grounding stack (4 of 5 layers from spec §3.5):
      unknown ids are dropped before reaching the frontend.
   2. Pydantic schema: this module — mandatory `interaction_id`, `citation`,
      `confidence`, severity literal, length caps on headline/rationale.
-  3. (DEFERRED to v1.1) Vertex AI Search re-grounding of citation page refs.
+  3. (DEFERRED to v1.1) local RAG re-grounding of citation page refs.
   4. Few-shot prompt: hand-written Aisyah-style worked examples in
      `backend/app/agents/optimizer_prompt.py`.
   5. Frontend confidence gating: ≥ 0.8 full card; 0.5–0.8 soft suggestion +
@@ -41,8 +41,8 @@ class StrategyCitation(BaseModel):
     Mirrors the shape of `RuleCitation` (in `app.schema.scheme`) but
     intentionally narrower: the optimizer cites the PDF page that defines
     the interaction (e.g. PR-4/2024 §5.2 p.12 for dependent-parent relief),
-    not a Vertex retrieval result. v1.1 will add re-grounding via Vertex AI
-    Search to verify the (pdf, page) pair exists in the source PDFs.
+    not a RAG retrieval result. v1.1 will add re-grounding via local RAG
+    retrieval to verify the (pdf, page) pair exists in the source PDFs.
     """
 
     model_config = ConfigDict(extra="forbid")

@@ -82,7 +82,7 @@ _PORTAL_URL = "https://www.perkeso.gov.my"
 _SCHEME_NAME = "PERKESO SKSPS — Self-Employed Social Security"
 _SOURCE_PDF = "perkeso-sksps-rates.pdf"
 
-# Vertex AI Search grounds the primary citation against the live source PDF.
+# Local RAG grounds the primary citation against the live source PDF.
 # URI filter constrains the snippet ranker to the expected document so the
 # rule cannot accidentally cite a different scheme's PDF.
 _RAG_QUERY = getenv("LAYAK_RAG_QUERY_PERKESO_SKSPS", "PERKESO SKSPS self-employed contribution plans")

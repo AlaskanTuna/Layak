@@ -99,7 +99,7 @@ root_agent = SequentialAgent(
                 "Matcher. Pure-Python rule engine in app/rules/ validates thresholds "
                 "across 19 modules dispatched concurrently via asyncio.to_thread; "
                 "app/services/vertex_ai_search.py augments each rule's "
-                "_citations() with a Discovery Engine retrieved passage as the primary "
+                "_citations() with a local RAG retrieved passage as the primary "
                 "citation, hardcoded URL as fail-open fallback."
             ),
         ),

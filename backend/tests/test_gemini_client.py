@@ -1,10 +1,9 @@
-"""Pin the `gemini.get_client()` Vertex AI contract.
+"""Pin the `gemini.get_client()` Gemini Developer API (API-key) contract.
 
-`get_client()` must construct a `google.genai.Client` in Vertex AI mode using
-the project + location resolved from the environment (with a dotenv fallback
-for local dev). The previous AI-Studio API-key path is gone; if anyone tries
-to reintroduce `api_key=…` the diff will read suspicious and these tests will
-have to be updated.
+`get_client()` must construct a `google.genai.Client` with the API key
+resolved from the environment (with a dotenv fallback for local dev). The
+previous Vertex AI project/location path is gone; if anyone reintroduces
+`vertexai=True` the diff will read suspicious and these tests will fail.
 """
 
 from __future__ import annotations
@@ -17,74 +16,43 @@ import pytest
 
 @pytest.fixture
 def gemini_module(monkeypatch: pytest.MonkeyPatch) -> object:
-    """Reload the module fresh per test so `lru_cache` doesn't leak state.
-
-    Stubs `_load_var_from_dotenv` to always return None so the local
-    `.env` (which contains real GOOGLE_CLOUD_PROJECT etc.) doesn't bleed
-    into env-var-absent test cases.
-    """
     import app.agents.gemini as mod
 
     importlib.reload(mod)
     monkeypatch.setattr(mod, "_load_var_from_dotenv", lambda _key: None)
     yield mod
-    importlib.reload(mod)  # reset for the next test
+    importlib.reload(mod)
 
 
-def test_get_client_uses_vertexai_with_env_project_and_location(
-    monkeypatch: pytest.MonkeyPatch, gemini_module: object
-) -> None:
-    monkeypatch.setenv("GOOGLE_CLOUD_PROJECT", "layak-myaifuturehackathon")
-    monkeypatch.setenv("GOOGLE_CLOUD_LOCATION", "asia-southeast1")
-
-    with patch("app.agents.gemini.genai.Client") as ctor:
-        gemini_module.get_client()
-
-    ctor.assert_called_once_with(
-        vertexai=True,
-        project="layak-myaifuturehackathon",
-        location="asia-southeast1",
-    )
-
-
-def test_get_client_defaults_location_when_unset(
-    monkeypatch: pytest.MonkeyPatch, gemini_module: object
-) -> None:
-    monkeypatch.setenv("GOOGLE_CLOUD_PROJECT", "some-project")
-    monkeypatch.delenv("GOOGLE_CLOUD_LOCATION", raising=False)
+def test_get_client_uses_api_key(monkeypatch: pytest.MonkeyPatch, gemini_module: object) -> None:
+    monkeypatch.setenv("GEMINI_API_KEY", "test-key-123")
+    monkeypatch.delenv("GOOGLE_API_KEY", raising=False)
 
     with patch("app.agents.gemini.genai.Client") as ctor:
         gemini_module.get_client()
 
     _args, kwargs = ctor.call_args
-    assert kwargs["vertexai"] is True
-    assert kwargs["project"] == "some-project"
-    # Default location is `global` so a single Vertex AI endpoint serves all
-    # four pipeline models (asia-southeast1 only publishes gemini-2.5-flash).
-    assert kwargs["location"] == "global"
+    assert kwargs["api_key"] == "test-key-123"
+    assert "vertexai" not in kwargs
+    assert "project" not in kwargs
 
 
-def test_get_client_raises_runtime_error_when_project_unset(
-    monkeypatch: pytest.MonkeyPatch, gemini_module: object
-) -> None:
-    monkeypatch.delenv("GOOGLE_CLOUD_PROJECT", raising=False)
-
-    with pytest.raises(RuntimeError, match="GOOGLE_CLOUD_PROJECT"):
-        gemini_module.get_client()
-
-
-def test_get_client_never_passes_api_key(
-    monkeypatch: pytest.MonkeyPatch, gemini_module: object
-) -> None:
-    """Regression guard — the AI Studio key path is gone for good."""
-    monkeypatch.setenv("GOOGLE_CLOUD_PROJECT", "p")
-    monkeypatch.setenv("GOOGLE_CLOUD_LOCATION", "us-central1")
-    # Even if someone re-exports a stale GEMINI_API_KEY locally, we must not
-    # forward it to the SDK constructor.
-    monkeypatch.setenv("GEMINI_API_KEY", "should-be-ignored")
+def test_get_client_accepts_google_api_key_alias(monkeypatch: pytest.MonkeyPatch, gemini_module: object) -> None:
+    monkeypatch.delenv("GEMINI_API_KEY", raising=False)
+    monkeypatch.setenv("GOOGLE_API_KEY", "alias-key-456")
 
     with patch("app.agents.gemini.genai.Client") as ctor:
         gemini_module.get_client()
 
     _args, kwargs = ctor.call_args
-    assert "api_key" not in kwargs
+    assert kwargs["api_key"] == "alias-key-456"
+
+
+def test_get_client_raises_runtime_error_when_key_unset(
+    monkeypatch: pytest.MonkeyPatch, gemini_module: object
+) -> None:
+    monkeypatch.delenv("GEMINI_API_KEY", raising=False)
+    monkeypatch.delenv("GOOGLE_API_KEY", raising=False)
+
+    with pytest.raises(RuntimeError, match="GEMINI_API_KEY"):
+        gemini_module.get_client()

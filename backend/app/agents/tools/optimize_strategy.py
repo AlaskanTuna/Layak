@@ -17,7 +17,7 @@ matched schemes by:
 5. **Confidence floor**: drop records with `confidence < 0.5`. The
    frontend gates 0.5–0.8 separately (soft-suggestion copy).
 
-Layer 3 (Vertex AI Search re-grounding of citation page refs) is deferred
+Layer 3 (local RAG re-grounding of citation page refs) is deferred
 to v1.1 per the plan.md amendment. v1 trusts the citation triple as
 carried verbatim from the YAML rule.
 """

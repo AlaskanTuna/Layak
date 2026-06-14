@@ -38,7 +38,7 @@ _AGENCY = "KWSP (Kumpulan Wang Simpanan Pekerja)"
 _PORTAL_URL = "https://www.kwsp.gov.my/en/member/savings/i-suri"
 _SOURCE_PDF = "kwsp-i-suri-incentive.pdf"
 
-# Vertex AI Search grounds the primary citation against the live source PDF.
+# Local RAG grounds the primary citation against the live source PDF.
 # URI filter constrains the snippet ranker to the expected document so the
 # rule cannot accidentally cite a different scheme's PDF.
 _RAG_QUERY = getenv("LAYAK_RAG_QUERY_I_SURI", "i-Suri housewife KWSP RM480 incentive")

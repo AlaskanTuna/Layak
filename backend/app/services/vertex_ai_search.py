@@ -1,55 +1,52 @@
-"""Vertex AI Search (Discovery Engine) retrieval helper.
+"""Local embedding RAG retrieval helper.
 
-The data store is provisioned by `backend/scripts/seed_vertex_ai_search.py` —
-it indexes every PDF under `backend/data/schemes/` so the rule engine can
-ground each citation in a retrieved passage instead of (or alongside) the
-hardcoded URL each rule module ships today.
+Replaces the former Vertex AI Search (Discovery Engine) path with a fully
+local, billing-free retrieval layer. The index is built offline by
+`backend/scripts/build_rag_index.py` — it embeds every PDF under
+`backend/data/schemes/` with the free `gemini-embedding-001` model and
+commits two artifacts under `backend/data/rag_index/`:
+
+    vectors.npz   float32 matrix (n_chunks x 768), L2-normalized
+    chunks.json   aligned [{source_pdf, page_start, page_end, text}]
+
+At runtime `search_passage()` embeds the query (one free embeddings call),
+runs a numpy cosine search over the committed matrix, and returns the top
+hits. The module name is retained so the ~20 rule modules and `chat.py`
+keep importing the same public surface unchanged.
 
 Design contract:
 
-- **Fail-open.** Any Discovery Engine error or empty response returns `[]`,
-  never raises. Rule modules treat the empty list as "no retrieved citation,
-  fall back to the hardcoded one." This mirrors the existing
-  `services/rate_limit.py` posture (NEVER hard-block the user on a Firestore
-  hiccup).
-- **Cached client.** `SearchServiceClient` instantiation hits the gRPC channel
-  setup; cache one per process via `@lru_cache(maxsize=1)`.
-- **Region-pinned to `global`.** The seed script provisions the data store in
-  `global` (per Discovery Engine v1's data-store region constraints), and our
-  Vertex AI Gemini calls also live in `global` (asia-southeast1 only publishes
-  2.5-flash). Keeping both in `global` removes one cross-region hop.
+- **Fail-open.** Any error (missing key, missing index, embedding failure)
+  returns `[]` / `None`, never raises. Rule modules treat the empty result
+  as "no retrieved citation, fall back to the hardcoded one." This mirrors
+  the `services/rate_limit.py` posture (NEVER hard-block the user).
+- **Cached index.** The vectors + chunks load once per process via
+  `@lru_cache`.
 
-Configuration:
-
-    `GOOGLE_CLOUD_PROJECT`            — required (resolved via gemini.py loader).
-    `VERTEX_AI_SEARCH_DATA_STORE`     — optional. Defaults to "layak-schemes-v1"
-                                        (the seed script's default ID).
-    `VERTEX_AI_SEARCH_LOCATION`       — optional. Defaults to "global".
-
-The seed script prints the canonical `VERTEX_AI_SEARCH_DATA_STORE` line on a
-successful run so operators can paste it into `.env` verbatim.
+Configuration: none required beyond `GEMINI_API_KEY` (resolved via
+`app.agents.gemini.get_client`). Per-scheme query strings still come from
+the rule modules (overridable via `LAYAK_RAG_QUERY_*`).
 """
 
 from __future__ import annotations
 
+import json
 import logging
-import os
-import re
 from collections.abc import Iterator
 from contextlib import contextmanager
 from contextvars import ContextVar
 from functools import lru_cache
+from pathlib import Path
 
+import numpy as np
 from pydantic import BaseModel, ConfigDict, Field
-
-from app.agents.gemini import _resolve_project
 
 _logger = logging.getLogger(__name__)
 
-_DEFAULT_DATA_STORE = "layak-schemes-v1"
-_DEFAULT_LOCATION = "global"
-_DEFAULT_SERVING_CONFIG = "default_serving_config"
-_RAG_DISABLED: ContextVar[bool] = ContextVar("vertex_ai_search_disabled", default=False)
+_INDEX_DIR = Path(__file__).resolve().parent.parent.parent / "data" / "rag_index"
+_EMBED_MODEL = "gemini-embedding-001"
+_DIM = 768
+_RAG_DISABLED: ContextVar[bool] = ContextVar("local_rag_disabled", default=False)
 
 
 @contextmanager
@@ -63,7 +60,7 @@ def disable_vertex_ai_search() -> Iterator[None]:
 
 
 class RetrievedPassage(BaseModel):
-    """One Discovery Engine search hit, normalised for rule-module consumption."""
+    """One retrieved chunk, normalised for rule-module consumption."""
 
     model_config = ConfigDict(extra="forbid")
 
@@ -73,117 +70,28 @@ class RetrievedPassage(BaseModel):
     relevance_score: float | None = None
 
 
-def _resolve_data_store() -> str:
-    return os.environ.get("VERTEX_AI_SEARCH_DATA_STORE") or _DEFAULT_DATA_STORE
-
-
-def _resolve_location() -> str:
-    return os.environ.get("VERTEX_AI_SEARCH_LOCATION") or _DEFAULT_LOCATION
-
-
 @lru_cache(maxsize=1)
-def _client():  # type: ignore[no-untyped-def]
-    """Cached SearchServiceClient. Lazy import keeps the package optional at
-    cold-start so backend/main.py imports never fail when Discovery Engine is
-    unreachable in CI/test contexts."""
-    from google.cloud import discoveryengine_v1 as de
-
-    return de.SearchServiceClient()
+def _load_index():  # type: ignore[no-untyped-def]
+    """Load the committed embedding matrix + aligned chunk metadata once."""
+    vectors = np.load(_INDEX_DIR / "vectors.npz")["vectors"]
+    chunks = json.loads((_INDEX_DIR / "chunks.json").read_text(encoding="utf-8"))
+    return vectors, chunks
 
 
-def _serving_config_path() -> str:
-    project = _resolve_project()
-    location = _resolve_location()
-    data_store = _resolve_data_store()
-    return (
-        f"projects/{project}/locations/{location}/collections/default_collection/"
-        f"dataStores/{data_store}/servingConfigs/{_DEFAULT_SERVING_CONFIG}"
+def _embed_query(query: str) -> np.ndarray:
+    """Embed a query with gemini-embedding-001, L2-normalized (768-dim)."""
+    from google.genai import types
+
+    from app.agents.gemini import get_client
+
+    resp = get_client().models.embed_content(
+        model=_EMBED_MODEL,
+        contents=query,
+        config=types.EmbedContentConfig(task_type="RETRIEVAL_QUERY", output_dimensionality=_DIM),
     )
-
-
-_SNIPPET_TAG_RE = re.compile(r"<[^>]+>")
-
-
-def _clean_snippet(text: str) -> str:
-    """Strip HTML highlight tags (`<b>`) and leading/trailing ellipses-noise
-    that Discovery Engine emits inside snippet payloads."""
-    cleaned = _SNIPPET_TAG_RE.sub("", text)
-    cleaned = cleaned.replace("&nbsp;", " ").strip()
-    # Snippets often start with "... " and end with " ..."; trim those.
-    if cleaned.startswith("... "):
-        cleaned = cleaned[4:]
-    if cleaned.endswith(" ..."):
-        cleaned = cleaned[:-4]
-    return cleaned.strip()
-
-
-def _extract_passage_text(result_obj: object) -> str:
-    """Flatten a SearchResult's document content into a single plain-text snippet.
-
-    Discovery Engine v1 standard-edition returns snippets under
-    `derived_struct_data.snippets[*].snippet` (with `snippet_status="SUCCESS"`
-    when the snippet generator fired). Enterprise edition adds
-    `extractive_answers` and `extractive_segments` under `content`; we still
-    try those keys first so an enterprise upgrade is a no-code change.
-    """
-    document = getattr(result_obj, "document", None)
-    if document is None:
-        return ""
-
-    derived = getattr(document, "derived_struct_data", None)
-    if derived is not None:
-        try:
-            data = dict(derived)
-        except (TypeError, ValueError):
-            data = {}
-        # Enterprise paths first.
-        for key in ("extractive_answers", "extractive_segments"):
-            entries = data.get(key) or []
-            for entry in entries:
-                content = None
-                if isinstance(entry, dict):
-                    content = entry.get("content")
-                if content:
-                    return _clean_snippet(str(content))
-        # Standard-edition snippet path.
-        snippets = data.get("snippets") or []
-        for entry in snippets:
-            if not isinstance(entry, dict):
-                # The proto-plus marshal may surface MapComposite types here
-                # that don't .items() cleanly — coerce via the raw proto.
-                try:
-                    entry = dict(entry)
-                except (TypeError, ValueError):
-                    continue
-            status = entry.get("snippet_status")
-            if status and status != "SUCCESS":
-                continue
-            text = entry.get("snippet")
-            if text:
-                return _clean_snippet(str(text))
-
-    content = getattr(document, "content", None)
-    snippet = getattr(content, "snippet", None) if content is not None else None
-    if snippet:
-        return _clean_snippet(str(snippet))
-
-    return ""
-
-
-def _extract_uri(result_obj: object) -> str:
-    document = getattr(result_obj, "document", None)
-    if document is None:
-        return ""
-    derived = getattr(document, "derived_struct_data", None)
-    if derived is not None:
-        try:
-            data = dict(derived)
-        except (TypeError, ValueError):
-            data = {}
-        link = data.get("link")
-        if isinstance(link, str):
-            return link
-    return getattr(document, "uri", "") or ""
+    vec = np.asarray(resp.embeddings[0].values, dtype=np.float32)
+    norm = float(np.linalg.norm(vec)) or 1.0
+    return vec / norm
 
 
 def search_passage(
@@ -192,16 +100,14 @@ def search_passage(
     top_k: int = 1,
     filter_uri_contains: list[str] | None = None,
 ) -> list[RetrievedPassage]:
-    """Run a Discovery Engine search and return up to `top_k` normalised hits.
+    """Cosine-search the local embedding index for up to `top_k` hits.
 
     Args:
         query: Natural-language query string. Crafted per scheme by callers.
         top_k: Maximum hits to return.
-        filter_uri_contains: When supplied, drops any hit whose source_uri does
-            not contain ANY of the listed substrings. Discovery Engine assigns
-            random hash document IDs when ingesting from a GCS source, so URI
-            substring matching is the practical way to constrain a query to its
-            expected scheme PDF (e.g. `["risalah-str-2026.pdf"]` for STR).
+        filter_uri_contains: When supplied, drops any hit whose source PDF
+            filename does not contain ANY of the listed substrings (e.g.
+            `["risalah-str-2026.pdf"]` constrains a query to the STR PDF).
 
     Returns:
         List of RetrievedPassage. Empty list on any error (logged) or no hits.
@@ -209,47 +115,27 @@ def search_passage(
     if not query.strip():
         return []
     try:
-        from google.cloud.discoveryengine_v1.types import SearchRequest
-
-        client = _client()
-        # Default Discovery Engine search returns only doc id + link + title —
-        # no snippets unless `content_search_spec` is set. We use snippet_spec
-        # only (extractive_content_spec is Enterprise-edition gated and the
-        # layak-schemes-v1 data store is on the free Standard edition).
-        content_spec = SearchRequest.ContentSearchSpec(
-            snippet_spec=SearchRequest.ContentSearchSpec.SnippetSpec(
-                return_snippet=True,
-            ),
-        )
-        # Over-fetch when filtering so we still have headroom after dropping
-        # mismatched results client-side.
-        page_size = top_k * 5 if filter_uri_contains else top_k
-        request = SearchRequest(
-            serving_config=_serving_config_path(),
-            query=query,
-            page_size=max(page_size, 1),
-            content_search_spec=content_spec,
-        )
-        response = client.search(request=request)
+        vectors, chunks = _load_index()
+        qv = _embed_query(query)
+        scores = vectors @ qv
     except Exception:  # noqa: BLE001 — fail-open per module contract.
-        _logger.exception("Discovery Engine search failed for query=%r", query)
+        _logger.exception("Local RAG search failed for query=%r", query)
         return []
 
+    order = np.argsort(scores)[::-1]
     results: list[RetrievedPassage] = []
-    for raw in response.results:
-        document_id = getattr(getattr(raw, "document", None), "id", "") or ""
-        uri = _extract_uri(raw)
+    for raw_idx in order:
+        idx = int(raw_idx)
+        chunk = chunks[idx]
+        uri = chunk["source_pdf"]
         if filter_uri_contains and not any(needle in uri for needle in filter_uri_contains):
-            continue
-        text = _extract_passage_text(raw)
-        if not text:
             continue
         results.append(
             RetrievedPassage(
-                passage_text=text,
+                passage_text=chunk["text"],
                 source_uri=uri,
-                document_id=document_id,
-                relevance_score=None,
+                document_id=f"{uri}#{idx}",
+                relevance_score=float(scores[idx]),
             )
         )
         if len(results) >= top_k:
@@ -270,12 +156,12 @@ def passage_to_citation(
     """
     from app.schema.scheme import RuleCitation
 
-    # Prefer the scheme's canonical source_pdf filename over the hash
-    # document_id Discovery Engine assigns when ingesting from GCS.
+    # Prefer the scheme's canonical source_pdf filename over the synthetic
+    # chunk document_id.
     return RuleCitation(
         rule_id=rule_id,
         source_pdf=fallback_source_pdf,
-        page_ref="Vertex AI Search retrieval",
+        page_ref="Local RAG retrieval",
         passage=passage.passage_text,
         source_url=passage.source_uri or None,
     )
@@ -290,28 +176,11 @@ def get_primary_rag_citation(
 ):  # type: ignore[no-untyped-def]
     """High-level convenience for rule modules.
 
-    Runs a Discovery Engine search filtered to the scheme's expected source
-    PDF, and converts the top hit into a `RuleCitation` ready to prepend to
-    `_citations()`. Returns `None` when the data store is unreachable or
-    when no hit matches the URI filter — rule modules can then fall through
-    to their hardcoded citation list unchanged.
-
-    Usage in a rule module:
-
-        from app.services.vertex_ai_search import get_primary_rag_citation
-
-        def _citations() -> list[RuleCitation]:
-            cites: list[RuleCitation] = []
-            rag = get_primary_rag_citation(
-                query="Sumbangan Tunai Rahmah household tier with children",
-                uri_substring="risalah-str-2026.pdf",
-                rule_id="rag.str_2026.primary",
-                fallback_pdf="risalah-str-2026.pdf",
-            )
-            if rag is not None:
-                cites.append(rag)
-            cites.extend([<existing hardcoded citations>])
-        return cites
+    Runs a local RAG search filtered to the scheme's expected source PDF and
+    converts the top hit into a `RuleCitation` ready to prepend to
+    `_citations()`. Returns `None` when retrieval is disabled or no hit
+    matches the URI filter — rule modules then fall through to their
+    hardcoded citation list unchanged.
     """
     if _RAG_DISABLED.get():
         return None

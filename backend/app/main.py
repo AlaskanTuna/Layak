@@ -30,7 +30,7 @@ from pydantic import ValidationError
 from starlette.responses import StreamingResponse
 
 # Load repo-root .env into os.environ before any agent module reads
-# GOOGLE_CLOUD_PROJECT / GOOGLE_CLOUD_LOCATION for the Vertex AI cutover.
+# GEMINI_API_KEY for the Gemini Developer API client.
 # Path: backend/app/main.py -> project root is three levels up.
 _DOTENV = Path(__file__).resolve().parent.parent.parent / ".env"
 if _DOTENV.is_file():
@@ -41,6 +41,10 @@ if _DOTENV.is_file():
         _k, _v = _k.strip(), _v.strip()
         if _k and _v and _k not in os.environ:
             os.environ[_k] = _v
+
+# ADK LlmAgents honour this flag — force the Gemini Developer API (API key),
+# never Vertex. Set here before app.agents.* import below.
+os.environ.setdefault("GOOGLE_GENAI_USE_VERTEXAI", "FALSE")
 
 from app.agents.root_agent import stream_agent_events  # noqa: E402 — after dotenv load
 from app.agents.tools.build_profile import build_profile_from_manual_entry  # noqa: E402
@@ -82,7 +86,7 @@ def _coerce_language(raw: str | None) -> SupportedLanguage:
 async def _lifespan(_app: FastAPI) -> AsyncIterator[None]:
     """Schedule chat warm-up as a background task on startup so uvicorn becomes
     ready immediately, and the first user-facing chat request hits a hot
-    Gemini + Discovery Engine path. Toggleable via the `LAYAK_WARMUP_ENABLED`
+    Gemini + local RAG path. Toggleable via the `LAYAK_WARMUP_ENABLED`
     env var (default on)."""
     try:
         asyncio.create_task(warmup_chat_dependencies())
@@ -93,18 +97,19 @@ async def _lifespan(_app: FastAPI) -> AsyncIterator[None]:
 
 app = FastAPI(title="Layak Backend", version="0.1.0", lifespan=_lifespan)
 
+# Dev: any localhost port. Prod: an explicit allowlist supplied via
+# LAYAK_CORS_ORIGINS (comma-separated) — set it to the Vercel frontend URL(s)
+# in Render. A broad allowlist would let any attacker-hosted site drive the SSE
+# pipeline from a victim's browser and exfiltrate the extracted profile JSON,
+# so we never wildcard. Defaults keep the custom domain.
+_DEFAULT_CORS_ORIGINS = "https://layak.tech,https://www.layak.tech"
+_CORS_ORIGINS = [
+    o.strip() for o in os.environ.get("LAYAK_CORS_ORIGINS", _DEFAULT_CORS_ORIGINS).split(",") if o.strip()
+]
+
 app.add_middleware(
     CORSMiddleware,
-    # Dev: any localhost port. Prod: ONLY the two Cloud Run URLs that back the
-    # Layak frontend. A broad `*.run.app` allowlist would let any attacker-hosted
-    # Cloud Run service drive the SSE pipeline from a victim's browser and
-    # exfiltrate the extracted profile JSON — locked down after a security audit.
-    allow_origins=[
-        "https://layak.tech",
-        "https://www.layak.tech",
-        "https://layak-frontend-297019726346.asia-southeast1.run.app",
-        "https://layak-frontend-i2t7hf6seq-as.a.run.app",
-    ],
+    allow_origins=_CORS_ORIGINS,
     allow_origin_regex=r"http://localhost:\d+",
     # PATCH — `/api/user/preferences` uses it to persist the language choice.
     # Without it the CORS preflight blocks the call and the language toggle

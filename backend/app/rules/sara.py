@@ -52,7 +52,7 @@ _AGENCY = "MOF (Ministry of Finance Malaysia)"
 _PORTAL_URL = "https://sara.gov.my/en/home.html"
 _SOURCE_PDF = "sara-rate-schedule.pdf"
 
-# Vertex AI Search grounds the primary citation against the live source PDF.
+# Local RAG grounds the primary citation against the live source PDF.
 # URI filter constrains the snippet ranker to the expected document so the
 # rule cannot accidentally cite a different scheme's PDF.
 _RAG_QUERY = getenv(

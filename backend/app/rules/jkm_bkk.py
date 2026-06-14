@@ -67,7 +67,7 @@ _SCHEME_NAME = "JKM Bantuan Kanak-Kanak — per-child monthly payment"
 # Manfaat live page instead.
 _SOURCE_PDF = "jkm-bkk-brochure.pdf"
 
-# Vertex AI Search grounds the primary citation against the live source PDF.
+# Local RAG grounds the primary citation against the live source PDF.
 # URI filter constrains the snippet ranker to the expected document so the
 # rule cannot accidentally cite a different scheme's PDF.
 _RAG_QUERY = getenv("LAYAK_RAG_QUERY_JKM_BKK", "Bantuan Kanak-Kanak children household monthly")

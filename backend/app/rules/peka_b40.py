@@ -40,7 +40,7 @@ _AGENCY = "MOH (Ministry of Health) — ProtectHealth Malaysia"
 _PORTAL_URL = "https://protecthealth.com.my/peka-b40/"
 _SOURCE_PDF = "peka-b40-eligibility.pdf"
 
-# Vertex AI Search grounds the primary citation against the live source PDF.
+# Local RAG grounds the primary citation against the live source PDF.
 # URI filter constrains the snippet ranker to the expected document so the
 # rule cannot accidentally cite a different scheme's PDF.
 _RAG_QUERY = getenv(

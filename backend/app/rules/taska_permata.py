@@ -48,7 +48,7 @@ _AGENCY = "KPWKM (Ministry of Women, Family & Community Development) — Jabatan
 _PORTAL_URL = "https://www.kpwkm.gov.my/portal-main/list-services?type=taman-asuhan-kanak-kanak"
 _SOURCE_PDF = "taska-permata-circular.pdf"
 
-# Vertex AI Search grounds the primary citation against the live source PDF.
+# Local RAG grounds the primary citation against the live source PDF.
 # URI filter constrains the snippet ranker to the expected document so the
 # rule cannot accidentally cite a different scheme's PDF.
 _RAG_QUERY = getenv(

@@ -55,7 +55,7 @@ _AGENCY = "MOF / MyKasih Foundation"
 _PORTAL_URL = "https://checkstatus.mykasih.net/"
 _SOURCE_PDF = "mykasih-sara-2026.pdf"
 
-# Vertex AI Search grounds the primary citation against the live source PDF.
+# Local RAG grounds the primary citation against the live source PDF.
 # URI filter constrains the snippet ranker to the expected document so the
 # rule cannot accidentally cite a different scheme's PDF.
 _RAG_QUERY = getenv("LAYAK_RAG_QUERY_MYKASIH", "MyKasih SARA RM100 February disbursement")

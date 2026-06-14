@@ -58,7 +58,7 @@ _PORTAL_URL = "https://www.kwsp.gov.my/en/member/contribution/i-saraan"
 _SCHEME_NAME = "EPF i-Saraan — voluntary contribution government match"
 _SOURCE_PDF = "i-saraan-program.pdf"
 
-# Vertex AI Search grounds the primary citation against the live source PDF.
+# Local RAG grounds the primary citation against the live source PDF.
 # URI filter constrains the snippet ranker to the expected document so the
 # rule cannot accidentally cite a different scheme's PDF.
 _RAG_QUERY = getenv("LAYAK_RAG_QUERY_I_SARAAN", "i-Saraan RM500 government match")

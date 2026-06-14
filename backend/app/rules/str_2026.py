@@ -57,7 +57,7 @@ _AGENCY = "LHDN (HASiL) / Kementerian Kewangan"
 _PORTAL_URL = "https://bantuantunai.hasil.gov.my"
 _SCHEME_NAME = "STR 2026 — Household with children tier"
 
-# Vertex AI Search grounds the tier-table citation against the live risalah
+# Local RAG grounds the tier-table citation against the live risalah
 # PDF. Query tuned against the standard-edition snippet ranker; the URI
 # filter guards against cross-scheme drift (e.g. the query text could
 # otherwise rank i-saraan-program.pdf above the STR risalah when both mention

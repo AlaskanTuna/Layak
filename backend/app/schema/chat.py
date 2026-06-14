@@ -97,7 +97,7 @@ class ChatCitation(BaseModel):
         in the eval's matches list. Frontend renders it as a chip that
         scrolls + highlights the corresponding scheme card on the page.
       - `scheme_id` None + `source_pdf` set → this citation came from
-        Vertex AI Search retrieval over a scheme PDF that wasn't in the
+        local RAG retrieval over a scheme PDF that wasn't in the
         eval's matches (e.g. user asked about a scheme they don't qualify
         for). Frontend renders as a passive PDF-source chip.
     """
@@ -124,8 +124,8 @@ class ChatDoneEvent(BaseModel):
     """Terminal success event. `message_id` is a server-minted UUID the
     client can use as a React key + future Firestore lookup. `citations`
     aggregates everything Gemini grounded against during this turn.
-    `grounding_unavailable` flips True when the Vertex AI Search retrieval
-    Tool failed to attach (datastore unreachable, IAM denial, etc.) so the
+    `grounding_unavailable` flips True when local RAG retrieval returned
+    no passages (no API key, missing index, etc.) so the
     UI can surface a "responses are not currently grounded on PDFs" caveat
     without breaking the flow."""
 

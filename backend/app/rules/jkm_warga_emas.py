@@ -35,7 +35,7 @@ _AGENCY = "JKM (Jabatan Kebajikan Masyarakat)"
 _PORTAL_URL = "https://www.jkm.gov.my"
 _SCHEME_NAME = "JKM Warga Emas — dependent elderly payment"
 
-# Vertex AI Search grounds the primary citation against the live source PDF.
+# Local RAG grounds the primary citation against the live source PDF.
 # URI filter constrains the snippet ranker to the expected document so the
 # rule cannot accidentally cite a different scheme's PDF.
 _RAG_QUERY = getenv("LAYAK_RAG_QUERY_JKM_WARGA_EMAS", "JKM Warga Emas application elderly parent")
